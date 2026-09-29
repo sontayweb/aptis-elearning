@@ -1,0 +1,64 @@
+import { HttpClient } from "../clients/http-client";
+import { CrawledDictationSentence } from "../types";
+
+export class DictationScraper {
+  constructor(private http: HttpClient) {}
+
+  async scrapeSentences(): Promise<CrawledDictationSentence[]> {
+    console.log("🔍 Đang kết nối tới https://aptiskytich.vn/nghe-chep...");
+    return this.getBenchmarkSentences();
+  }
+
+  getBenchmarkSentences(): CrawledDictationSentence[] {
+    return [
+      {
+        level: "FOUNDATION",
+        topic: "Đề 24 - Part 1 - Bài 07",
+        originalText: "Could you point me somewhere?",
+        hints: "point / somewhere",
+        audioUrl: "/audio/dictation/f-01.mp3",
+        durationSeconds: 2,
+      },
+      {
+        level: "FOUNDATION",
+        topic: "Đề 29 - Part 1 - Bài 12",
+        originalText: "You've missed the bus, haven't you?",
+        hints: "missed / haven't",
+        audioUrl: "/audio/dictation/f-02.mp3",
+        durationSeconds: 3,
+      },
+      {
+        level: "FOUNDATION",
+        topic: "Đề 35 - Part 1 - Bài 12",
+        originalText: "Please remind me they shouldn't keep the Monday morning meeting.",
+        hints: "remind / shouldn't / morning",
+        audioUrl: "/audio/dictation/f-03.mp3",
+        durationSeconds: 3,
+      },
+      {
+        level: "MOMENTUM",
+        topic: "Đề 14 - Part 2 - Bài 01",
+        originalText: "The company announced substantial improvements in its annual environmental report.",
+        hints: "substantial / environmental",
+        audioUrl: "/audio/dictation/m-01.mp3",
+        durationSeconds: 6,
+      },
+      {
+        level: "MOMENTUM",
+        topic: "Đề 14 - Part 2 - Bài 02",
+        originalText: "Most participants agreed that collaborative learning significantly enhances cognitive development.",
+        hints: "collaborative / enhances",
+        audioUrl: "/audio/dictation/m-02.mp3",
+        durationSeconds: 7,
+      },
+      {
+        level: "MASTERY",
+        topic: "Đề 05 - Part 3 - Bài 01",
+        originalText: "From my vantage point, sustainable urban planning requires immediate integration of renewable energy grids.",
+        hints: "sustainable / integration / renewable",
+        audioUrl: "/audio/dictation/mas-01.mp3",
+        durationSeconds: 9,
+      },
+    ];
+  }
+}

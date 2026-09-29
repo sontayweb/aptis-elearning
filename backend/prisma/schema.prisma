@@ -1,0 +1,573 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ==========================================
+// 1. ENUMS
+// ==========================================
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum TargetBand {
+  B1_TARGET
+  B2_TARGET
+  C_TARGET
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ExamSkill {
+  FULL_TEST
+  LISTENING
+  READING
+  WRITING
+  SPEAKING
+  GRAMMAR_VOCABULARY
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  GAP_FILL
+  SENTENCE_ORDER
+  MATCHING
+  ESSAY
+  SHORT_TEXT
+  SPEAKING_AUDIO
+}
+
+enum SubmissionStatus {
+  IN_PROGRESS
+  SUBMITTED
+  PENDING_EVALUATION
+  GRADED
+  CANCELLED
+}
+
+enum PlanType {
+  FREE
+  VIP_1M
+  VIP_3M
+  PREMIER_6M
+}
+
+enum NotificationType {
+  SYSTEM
+  EXAM_GRADED
+  VIP_ACTIVATED
+  CLASS_ANNOUNCEMENT
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum DictationLevel {
+  FOUNDATION
+  MOMENTUM
+  MASTERY
+}
+
+enum DictationMode {
+  DICTATION
+  SHADOWING
+  HYBRID
+}
+
+// ==========================================
+// 2. USER & AUTH MODELS
+// ==========================================
+
+model User {
+  id              String         @id @default(uuid())
+  email           String         @unique
+  password_hash   String?        // Nullable nếu đăng nhập hoàn toàn qua Google
+  full_name       String
+  phone_number    String?
+  avatar_url      String?
+  role            UserRole       @default(STUDENT)
+  target_band     TargetBand?    @default(B2_TARGET)
+  internal_notes  String?
+  is_active       Boolean        @default(true)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  subscriptions   UserSubscription[]
+  submissions     ExamSubmission[]
+  transactions    Transaction[]
+  vocab_notebooks VocabNotebook[]
+  dictation_progress UserDictationProgress[]
+  dictation_attempts UserDictationAttempt[]
+  classroom_members ClassroomMember[]
+  created_custom_exams Exam[]    @relation("CustomExamCreator")
+  graded_submissions ExamSubmission[] @relation("TeacherGraded")
+  audit_logs      AuditLog[]
+  reviews         ExamReview[]
+  notifications   Notification[]
+
+  @@index([email])
+  @@index([role])
+}
+
+// ==========================================
+// 3. EXAMS & QUESTIONS
+// ==========================================
+
+model Exam {
+  id               String         @id @default(uuid())
+  title            String         // Ví dụ: "Đề thi thử Aptis ESOL Full Test 01"
+  description      String?
+  skill            ExamSkill      // FULL_TEST, LISTENING, etc.
+  duration_minutes Int            // Full test: 162p; Listening: 40p; etc.
+  is_pro           Boolean        @default(false)
+  is_published     Boolean        @default(true)
+  source           String         @default("WEB") // "WEB" hoặc "CUSTOM"
+  creator_id       String?
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  creator          User?          @relation("CustomExamCreator", fields: [creator_id], references: [id], onDelete: SetNull)
+  parts            ExamPart[]
+  submissions      ExamSubmission[]
+  reviews          ExamReview[]
+
+  @@index([skill, is_published])
+  @@index([source, creator_id])
+}
+
+model ExamPart {
+  id               String         @id @default(uuid())
+  exam_id          String
+  part_number      Int            // 1, 2, 3, 4, 5
+  title            String         // "Part 1: Social network interaction"
+  instructions     String?
+  passage_text     String?        // Bài đọc (Reading) hoặc Ngữ cảnh
+  audio_url        String?        // Audio dùng chung cho Part (Listening)
+  image_url        String?        // Tranh mô tả (Speaking Part 2, 3)
+  created_at       DateTime       @default(now())
+
+  exam             Exam           @relation(fields: [exam_id], references: [id], onDelete: Cascade)
+  questions        Question[]
+
+  @@index([exam_id, part_number])
+}
+
+model Question {
+  id               String         @id @default(uuid())
+  part_id          String
+  question_number  Int            // Số thứ tự câu hỏi (1 - 50)
+  question_type    QuestionType
+  prompt           String         // Nội dung câu hỏi
+  options          Json?          // Danh sách lựa chọn A, B, C, D (dành cho trắc nghiệm)
+  correct_answer   String?        // Đáp án chuẩn (trắc nghiệm/điền từ ngắn)
+  explanation      String?        // Lời giải thích chi tiết
+  max_score        Float          @default(1.0)
+  created_at       DateTime       @default(now())
+
+  part             ExamPart       @relation(fields: [part_id], references: [id], onDelete: Cascade)
+  answers          SubmissionAnswer[]
+  ai_results       AiGradingResult[]
+
+  @@index([part_id, question_number])
+}
+
+// ==========================================
+// 4. SUBMISSIONS & AUTO-SAVE (PHÒNG THI 162P)
+// ==========================================
+
+model ExamSubmission {
+  id               String           @id @default(uuid())
+  user_id          String
+  exam_id          String
+  status           SubmissionStatus @default(IN_PROGRESS)
+  started_at       DateTime         @default(now())
+  submitted_at     DateTime?
+  deadline_at      DateTime         // started_at + exam.duration_minutes
+  last_active_at   DateTime         @default(now())
+  tab_switch_count Int              @default(0)
+  
+  // Điểm số tổng & theo kỹ năng (Thang điểm 0 - 50 chuẩn CEFR)
+  total_score      Float?
+  cefr_level       String?          // "A1", "A2", "B1", "B2", "C1", "C2"
+  grammar_score    Float?
+  listening_score  Float?
+  reading_score    Float?
+  writing_score    Float?
+  speaking_score   Float?
+
+  // Chấm điểm bởi giảng viên
+  graded_by_id     String?
+  teacher_feedback String?
+  graded_at        DateTime?
+
+  user             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  exam             Exam             @relation(fields: [exam_id], references: [id], onDelete: Cascade)
+  graded_by        User?            @relation("TeacherGraded", fields: [graded_by_id], references: [id], onDelete: SetNull)
+  answers          SubmissionAnswer[]
+  ai_results       AiGradingResult[]
+
+  @@index([user_id, status])
+  @@index([exam_id, status])
+  @@index([status])
+}
+
+model SubmissionAnswer {
+  id               String         @id @default(uuid())
+  submission_id    String
+  question_id      String
+  selected_option  String?        // A, B, C, D
+  text_answer      String?        // Dành cho Writing
+  audio_url        String?        // File ghi âm cho Speaking
+  audio_duration   Int?           // Số giây ghi âm
+  audio_mime_type  String?        // audio/webm, audio/mp4
+  audio_size_bytes Int?
+  transcript_text  String?        // Text bóc băng từ Whisper
+  score            Float?
+  feedback         String?
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  submission       ExamSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  question         Question       @relation(fields: [question_id], references: [id])
+
+  @@unique([submission_id, question_id])
+  @@index([submission_id])
+}
+
+// ==========================================
+// 5. AI GRADING RESULTS
+// ==========================================
+
+model AiGradingResult {
+  id               String         @id @default(uuid())
+  submission_id    String
+  question_id      String
+  skill            ExamSkill
+  model_name       String         // "gpt-4o", "whisper-1"
+  transcript       String?
+  score            Float          // 0 - 50
+  cefr_level       String         // A1 - C2
+  task_completion  Float?
+  grammar_score    Float?
+  vocabulary_score Float?
+  fluency_score    Float?
+  pronunciation    Float?
+  feedback_summary String
+  detailed_feedback Json
+  raw_ai_response  Json?
+  created_at       DateTime       @default(now())
+
+  submission       ExamSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  question         Question       @relation(fields: [question_id], references: [id])
+
+  @@index([submission_id])
+}
+
+// ==========================================
+// 6. SUBSCRIPTION & PAYMENT (SEPAY)
+// ==========================================
+
+model SubscriptionPlan {
+  id               String         @id @default(uuid())
+  code             PlanType       @unique
+  name             String         // "Aptis ESOL Premier"
+  price_vnd        Int            // 699000
+  duration_days    Int            // 180
+  ai_quota         Int            // 100
+  teacher_quota    Int            // 10
+  is_active        Boolean        @default(true)
+  features         Json
+  created_at       DateTime       @default(now())
+
+  subscriptions    UserSubscription[]
+}
+
+model UserSubscription {
+  id               String           @id @default(uuid())
+  user_id          String
+  plan_id          String
+  start_date       DateTime         @default(now())
+  end_date         DateTime
+  is_active        Boolean          @default(true)
+  ai_quota_left    Int              @default(0)
+  teacher_quota_left Int            @default(0)
+  transaction_id   String?
+
+  user             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  plan             SubscriptionPlan @relation(fields: [plan_id], references: [id])
+
+  @@index([user_id, is_active])
+}
+
+model Transaction {
+  id               String            @id @default(uuid())
+  user_id          String
+  order_code       String            @unique // "APTIS_1727221800_USERID"
+  amount           Int
+  status           TransactionStatus @default(PENDING)
+  payment_method   String            @default("SEPAY_QR")
+  bank_account     String?           // "0866950837"
+  bank_name        String?           // "MBBank"
+  sepay_ref_id     String?
+  paid_at          DateTime?
+  created_at       DateTime          @default(now())
+
+  user             User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, status])
+  @@index([order_code])
+}
+
+// ==========================================
+// 7. DICTATION & SHADOWING
+// ==========================================
+
+model DictationLesson {
+  id               String           @id @default(uuid())
+  level            DictationLevel
+  title            String           // "Lesson 1: Airport announcements"
+  order_index      Int              @default(0)
+  total_sentences  Int              @default(0)
+  is_free          Boolean          @default(true)
+  created_at       DateTime         @default(now())
+
+  sentences        DictationSentence[]
+  user_progress    UserDictationProgress[]
+
+  @@index([level, order_index])
+}
+
+model DictationSentence {
+  id               String           @id @default(uuid())
+  lesson_id        String
+  order_index      Int              @default(0)
+  audio_url        String
+  transcript       String
+  translation_vi   String?
+  hints            String?
+  duration_seconds Float            @default(0)
+
+  lesson           DictationLesson  @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+  attempts         UserDictationAttempt[]
+
+  @@index([lesson_id, order_index])
+}
+
+model UserDictationProgress {
+  id                  String          @id @default(uuid())
+  user_id             String
+  lesson_id           String
+  completed_sentences Int             @default(0)
+  is_completed        Boolean         @default(false)
+  updated_at          DateTime        @updatedAt
+
+  user                User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  lesson              DictationLesson @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, lesson_id])
+}
+
+model UserDictationAttempt {
+  id               String            @id @default(uuid())
+  user_id          String
+  sentence_id      String
+  mode             DictationMode
+  submitted_text   String?
+  audio_url        String?
+  accuracy_rate    Float
+  word_diff_result Json
+  is_passed        Boolean           @default(false)
+  created_at       DateTime          @default(now())
+
+  user             User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  sentence         DictationSentence @relation(fields: [sentence_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, sentence_id])
+}
+
+// ==========================================
+// 8. VOCABULARY & NOTEBOOK
+// ==========================================
+
+model VocabSet {
+  id               String         @id @default(uuid())
+  title            String         // "500 Từ vựng Aptis B1 - B2 cốt lõi"
+  category         String         // "B1", "B2", "Grammar", "Collocations"
+  total_words      Int            @default(0)
+  is_free          Boolean        @default(true)
+  created_at       DateTime       @default(now())
+
+  words            VocabWord[]
+}
+
+model VocabWord {
+  id               String         @id @default(uuid())
+  set_id           String
+  word             String         // "Accommodate"
+  phonetic         String?        // "/əˈkɒm.ə.deɪt/"
+  meaning_vi       String         // "Cung cấp nơi ở, đáp ứng nhu cầu"
+  example_sentence String?        // "The hotel can accommodate up to 500 guests."
+  audio_url        String?
+  cefr_level       String         @default("B1")
+
+  set              VocabSet       @relation(fields: [set_id], references: [id], onDelete: Cascade)
+  notebook_items   VocabNotebook[]
+
+  @@index([set_id])
+}
+
+model VocabNotebook {
+  id               String         @id @default(uuid())
+  user_id          String
+  word_id          String
+  is_memorized     Boolean        @default(false)
+  created_at       DateTime       @default(now())
+
+  user             User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  word             VocabWord      @relation(fields: [word_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, word_id])
+}
+
+// ==========================================
+// 9. CLASSROOM & TEACHER MANAGEMENT
+// ==========================================
+
+model Classroom {
+  id               String         @id @default(uuid())
+  name             String         // "Lớp Luyện Thi Cấp Tốc B2 - K24"
+  teacher_id       String
+  class_code       String         @unique // "APTIS-B2-K24"
+  description      String?
+  created_at       DateTime       @default(now())
+
+  members          ClassroomMember[]
+
+  @@index([teacher_id])
+}
+
+model ClassroomMember {
+  id               String         @id @default(uuid())
+  classroom_id     String
+  user_id          String
+  joined_at        DateTime       @default(now())
+
+  classroom        Classroom      @relation(fields: [classroom_id], references: [id], onDelete: Cascade)
+  user             User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([classroom_id, user_id])
+}
+
+// ==========================================
+// 10. ENTERPRISE AUDIT LOG (NHẬT KÝ KIỂM TOÁN)
+// ==========================================
+
+enum AuditAction {
+  AUTH_LOGIN
+  AUTH_LOGOUT
+  AUTH_PASSWORD_RESET
+  USER_CREATE
+  USER_STATUS_CHANGE
+  USER_ROLE_CHANGE
+  PAYMENT_WEBHOOK_RECEIVED
+  PAYMENT_MANUAL_RESOLVE
+  EXAM_CREATE
+  EXAM_UPDATE
+  EXAM_DELETE
+  SUBMISSION_GRADE_TEACHER
+  PLAN_UPDATE
+}
+
+model AuditLog {
+  id           String      @id @default(uuid())
+  user_id      String?
+  actor_name   String
+  actor_email  String
+  actor_role   String
+
+  action       AuditAction
+  entity_type  String
+  entity_id    String
+
+  description  String
+  old_value    Json?
+  new_value    Json?
+
+  ip_address   String?
+  user_agent   String?
+
+  created_at   DateTime    @default(now())
+
+  user         User?       @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([action])
+  @@index([entity_type, entity_id])
+  @@index([created_at(sort: Desc)])
+}
+
+// ==========================================
+// 11. EXAM REVIEWS & TESTIMONIALS
+// ==========================================
+
+model ExamReview {
+  id              String        @id @default(uuid())
+  user_id         String
+  exam_id         String?
+  rating          Int           @default(5)
+  score_achieved  String?
+  comment         String
+  exam_location   String?
+  exam_date       DateTime?
+  status          ReviewStatus  @default(PENDING)
+  teacher_note    String?
+  reward_claimed  Boolean       @default(false)
+  reward_quota    Int           @default(0)
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+
+  user            User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  exam            Exam?         @relation(fields: [exam_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([status])
+  @@index([created_at(sort: Desc)])
+}
+
+// ==========================================
+// 12. NOTIFICATIONS SYSTEM
+// ==========================================
+
+model Notification {
+  id         String           @id @default(uuid())
+  user_id    String
+  title      String
+  message    String
+  type       NotificationType @default(SYSTEM)
+  link       String?
+  is_read    Boolean          @default(false)
+  created_at DateTime         @default(now())
+
+  user       User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, is_read])
+  @@index([created_at(sort: Desc)])
+  @@map("notifications")
+}
+
