@@ -1,0 +1,97 @@
+# ──────────────────────────────────────────────
+# NODE MODULES
+# ──────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ──────────────────────────────────────────────
+# ENVIRONMENT & SECRETS (QUAN TRỌNG - KHÔNG BAO GIỜ COMMIT)
+# ──────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ──────────────────────────────────────────────
+# BACKEND (Express / TypeScript)
+# ──────────────────────────────────────────────
+backend/dist/
+backend/node_modules/
+backend/uploads/
+backend/logs/
+backend/*.log
+
+# ──────────────────────────────────────────────
+# FRONTEND (Next.js)
+# ──────────────────────────────────────────────
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.turbo/
+
+# ──────────────────────────────────────────────
+# CRAWLER
+# ──────────────────────────────────────────────
+crawler/node_modules/
+crawler/dist/
+crawler/data/
+crawler/*.log
+
+# ──────────────────────────────────────────────
+# PRISMA
+# ──────────────────────────────────────────────
+# Giữ lại schema.prisma, migrations — chỉ bỏ generated client nếu cần
+# backend/prisma/generated/
+
+# ──────────────────────────────────────────────
+# LOGS
+# ──────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ──────────────────────────────────────────────
+# BUILD OUTPUT
+# ──────────────────────────────────────────────
+dist/
+build/
+*.tsbuildinfo
+
+# ──────────────────────────────────────────────
+# OS FILES
+# ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ──────────────────────────────────────────────
+# EDITOR / IDE
+# ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ──────────────────────────────────────────────
+# TESTING
+# ──────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ──────────────────────────────────────────────
+# MISC
+# ──────────────────────────────────────────────
+_dev/
+__pycache__/
+*.pyc
+.turbo/
+.vercel/

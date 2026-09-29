@@ -1,0 +1,270 @@
+{
+  "title": "Đề 01 — Full Reading · 4 Parts",
+  "description": "Hoàn thành 4 Part kỹ năng Reading trong 35 phút chuẩn cấu trúc Aptis ESOL.",
+  "skill": "READING",
+  "duration_minutes": 35,
+  "is_pro": false,
+  "parts": [
+    {
+      "part_number": 1,
+      "title": "Part 1 – Sentence comprehension",
+      "instructions": "Choose the word that fits in the gap. The first one is done for you.",
+      "passage_text": "I live in a flat. I [share] it with my friend. We are in the same [class]. We [walk] to work. We like to [cook] dinner.",
+      "questions": [
+        {
+          "question_number": 1,
+          "question_type": "GAP_FILL",
+          "prompt": "I [gap] it with my friend.",
+          "options": [
+            "share",
+            "keep",
+            "send"
+          ],
+          "correct_answer": "share",
+          "max_score": 1.75
+        },
+        {
+          "question_number": 2,
+          "question_type": "GAP_FILL",
+          "prompt": "We are in the same [gap].",
+          "options": [
+            "class",
+            "room",
+            "team"
+          ],
+          "correct_answer": "class",
+          "max_score": 1.75
+        },
+        {
+          "question_number": 3,
+          "question_type": "GAP_FILL",
+          "prompt": "We [gap] to work.",
+          "options": [
+            "walk",
+            "smile",
+            "ride"
+          ],
+          "correct_answer": "walk",
+          "max_score": 1.75
+        },
+        {
+          "question_number": 4,
+          "question_type": "GAP_FILL",
+          "prompt": "We like to [gap] dinner.",
+          "options": [
+            "cook",
+            "make",
+            "eat"
+          ],
+          "correct_answer": "cook",
+          "max_score": 1.75
+        }
+      ]
+    },
+    {
+      "part_number": 2,
+      "title": "Part 2 + 3 – Text cohesion",
+      "instructions": "The sentences below make a complete text. Put them in the correct order.",
+      "passage_text": "Delivery instructions",
+      "questions": [
+        {
+          "question_number": 1,
+          "question_type": "SENTENCE_ORDER",
+          "prompt": "Delivery instructions: Sắp xếp các câu sau theo thứ tự đúng.",
+          "options": {
+            "title": "Delivery instructions",
+            "fixedSentence": "You should arrive at the main office by 6.30am and collect your keys",
+            "sentences": [
+              {
+                "id": "s3",
+                "text": "You must follow the route on the map to deliver packages"
+              },
+              {
+                "id": "s2",
+                "text": "In the office, you can also collect a map of your route"
+              },
+              {
+                "id": "s5",
+                "text": "You must return your keys to the office manager after you get back"
+              },
+              {
+                "id": "s4",
+                "text": "When you have completed all deliveries, return to your office"
+              }
+            ]
+          },
+          "correct_answer": "[\"s2\",\"s3\",\"s4\",\"s5\"]",
+          "max_score": 8.5
+        },
+        {
+          "question_number": 2,
+          "question_type": "SENTENCE_ORDER",
+          "prompt": "Tom Harper: Sắp xếp các câu sau theo thứ tự đúng.",
+          "options": {
+            "title": "Tom Harper",
+            "fixedSentence": "When he was young, he began writing short stories for a magazine",
+            "sentences": [
+              {
+                "id": "th-4",
+                "text": "the characters he imagined were one of the most famous in the world"
+              },
+              {
+                "id": "th-2",
+                "text": "he soon wrote regularly for the magazine, but he was not satisfied"
+              },
+              {
+                "id": "th-5",
+                "text": "this popularity made Tom Harper rich and successful."
+              },
+              {
+                "id": "th-3",
+                "text": "he almost left the magazine, but then he decided to create some unusual new characters"
+              }
+            ]
+          },
+          "correct_answer": "[\"th-2\",\"th-3\",\"th-4\",\"th-5\"]",
+          "max_score": 8.5
+        }
+      ]
+    },
+    {
+      "part_number": 4,
+      "title": "Part 4 – Opinion matching",
+      "instructions": "Four people write reviews of a new restaurant in their town on a website. Read the texts and then answer the questions below.",
+      "passage_text": "A\nI'm not sure if I will return to this restaurant. I think the staff was arguing when I got there, because the atmosphere here was not very comfortable. As for the food, I think there's nothing to write about. I ordered fish and chips, it wasn't bad, but it wasn't good either. But many people say that the food here is fabulous. So, I think I'm an exception.\n\nB\nThis is a very famous restaurant that I saw in the newspaper. Sadly, I arrived later than the rest of the party, so I didn't get to order dinner. However, I ordered orange juice and mango juice and they were both delicious. What about the surroundings? Lively music along with fashionable and appropriate decor makes me feel very comfortable.\n\nC\nI don't understand why this restaurant is so famous. When I arrived and saw a menu with lots of different dishes, I saw this as a bad sign. Furthermore, the menu with traditional dishes contrasting with the modern decoration style made me feel very confused and strange. The waiters here were also not friendly. This was one of my worst experiences eating at a restaurant.\n\nD\nThis is my first time coming to this restaurant. The food is very cheap but the quality is excellent. I was very surprised with the starter because its menu is very diverse. But there is one thing that I want the restaurant to improve. The restaurant band played live music but it was very far away, so the sound was very low and it didn't make the meal atmosphere lively. Next time turn the music louder, please!",
+      "questions": [
+        {
+          "question_number": 1,
+          "question_type": "MATCHING",
+          "prompt": "Who enjoyed the atmosphere?",
+          "options": [
+            "Person A",
+            "Person B",
+            "Person C",
+            "Person D"
+          ],
+          "correct_answer": "Person B",
+          "max_score": 1.85
+        },
+        {
+          "question_number": 2,
+          "question_type": "MATCHING",
+          "prompt": "Who thought the music was too quiet?",
+          "options": [
+            "Person A",
+            "Person B",
+            "Person C",
+            "Person D"
+          ],
+          "correct_answer": "Person D",
+          "max_score": 1.85
+        },
+        {
+          "question_number": 3,
+          "question_type": "MATCHING",
+          "prompt": "Who didn't eat anything at the restaurant?",
+          "options": [
+            "Person A",
+            "Person B",
+            "Person C",
+            "Person D"
+          ],
+          "correct_answer": "Person B",
+          "max_score": 1.85
+        },
+        {
+          "question_number": 4,
+          "question_type": "MATCHING",
+          "prompt": "Who will definitely not return to the restaurant?",
+          "options": [
+            "Person A",
+            "Person B",
+            "Person C",
+            "Person D"
+          ],
+          "correct_answer": "Person C",
+          "max_score": 1.85
+        },
+        {
+          "question_number": 5,
+          "question_type": "MATCHING",
+          "prompt": "Who thought their bad experience was probably unusual?",
+          "options": [
+            "Person A",
+            "Person B",
+            "Person C",
+            "Person D"
+          ],
+          "correct_answer": "Person A",
+          "max_score": 1.85
+        },
+        {
+          "question_number": 6,
+          "question_type": "MATCHING",
+          "prompt": "Who was impressed by the range of appetizers?",
+          "options": [
+            "Person A",
+            "Person B",
+            "Person C",
+            "Person D"
+          ],
+          "correct_answer": "Person D",
+          "max_score": 1.85
+        },
+        {
+          "question_number": 7,
+          "question_type": "MATCHING",
+          "prompt": "Who thought the food was of average quality?",
+          "options": [
+            "Person A",
+            "Person B",
+            "Person C",
+            "Person D"
+          ],
+          "correct_answer": "Person A",
+          "max_score": 1.85
+        }
+      ]
+    },
+    {
+      "part_number": 5,
+      "title": "Part 5 – Long reading",
+      "instructions": "Read the passage quickly. Choose a heading for each numbered paragraph from the drop-down box.",
+      "passage_text": "Children and Exercises",
+      "questions": [
+        {
+          "question_number": 1,
+          "question_type": "MATCHING",
+          "prompt": "Paragraph 1: Recent research into childhood health reveals that children around the world are spending significantly less time being physically active than previous generations.",
+          "options": [
+            "Technology is not the only cause of inactivity",
+            "The physical and mental perils of sedentary life",
+            "Schools leading the fitness transformation",
+            "Parental encouragement makes a vital difference",
+            "Redesigning community and recreational spaces",
+            "The long-term economic burden of health issues",
+            "Small daily habits for lifelong wellbeing"
+          ],
+          "correct_answer": "Technology is not the only cause of inactivity",
+          "max_score": 1.85
+        },
+        {
+          "question_number": 2,
+          "question_type": "MATCHING",
+          "prompt": "Paragraph 2: The lack of regular exercise has immediate and far-reaching consequences on young bodies and minds.",
+          "options": [
+            "Technology is not the only cause of inactivity",
+            "The physical and mental perils of sedentary life",
+            "Schools leading the fitness transformation",
+            "Parental encouragement makes a vital difference",
+            "Redesigning community and recreational spaces",
+            "The long-term economic burden of health issues",
+            "Small daily habits for lifelong wellbeing"
+          ],
+          "correct_answer": "The physical and mental perils of sedentary life",
+          "max_score": 1.85
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+services:
+  # ─── BACKEND (Express + Prisma) ───────────────────────────────────────────
+  - type: web
+    name: aptis-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma migrate deploy && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aptis-postgres
+          property: connectionString
+      - key: REDIS_HOST
+        value: ""        # Để trống nếu chưa có Redis, thêm sau
+      - key: REDIS_PORT
+        value: "6379"
+      - key: JWT_ACCESS_SECRET
+        generateValue: true   # Render tự sinh chuỗi random
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRES_IN
+        value: "15m"
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: "7d"
+      - key: FRONTEND_URL
+        value: https://aptis-frontend.onrender.com   # Đổi lại sau khi deploy
+      - key: GOOGLE_CLIENT_ID
+        sync: false     # Bạn tự nhập trong dashboard
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: USE_REAL_AI
+        value: "false"
+      - key: UPLOAD_DIR
+        value: "./uploads"
+
+  # ─── FRONTEND (Next.js) ───────────────────────────────────────────────────
+  - type: web
+    name: aptis-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://aptis-backend.onrender.com   # Đổi lại sau khi biết URL backend
+
+# ─── POSTGRESQL DATABASE ──────────────────────────────────────────────────────
+databases:
+  - name: aptis-postgres
+    databaseName: aptis_kytich_db
+    user: aptis_user
+    plan: free            # Free: 1GB storage, xóa sau 90 ngày nếu không hoạt động
