@@ -3,12 +3,9 @@
  * Connects Next.js Frontend with Node.js/Express Backend (Port 5000)
  */
 
-const normalizeApiUrl = (url?: string): string => {
-  const base = (url || 'http://localhost:5000/api').replace(/\/+$/, '');
-  return base.endsWith('/api') ? base : `${base}/api`;
-};
-
-const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_URL);
+// Standard Base API URL: expects full endpoint root (e.g. http://localhost:5000/api)
+// Removes any accidental trailing slashes to ensure consistent path joining
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
 
 export interface ApiResponse<T = any> {
   success: boolean;
