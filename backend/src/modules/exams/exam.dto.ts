@@ -7,7 +7,7 @@ export const examFilterSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val === 'true' ? true : val === 'false' ? false : undefined)),
-  source: z.enum(['WEB', 'CUSTOM', 'KEY']).optional().default('WEB'),
+  source: z.string().optional(),
   page: z.string().optional().default('1').transform(Number),
   limit: z.string().optional().default('20').transform(Number),
 });

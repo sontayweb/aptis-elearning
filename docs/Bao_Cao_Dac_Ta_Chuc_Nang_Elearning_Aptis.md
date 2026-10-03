@@ -6,7 +6,7 @@
 Tài liệu phân tích chức năng & Tích hợp Giải pháp
 
 
-| 📌 Tóm tắt tài liệu:  Tài liệu này đặc tả toàn bộ các phân hệ chức năng của hệ thống luyện thi Aptis ESOL, tập trung sâu vào luồng nghiệp vụ người dùng, ma trận phân quyền quản trị, quy trình cấp phát tài khoản học viên và đặc biệt là phân tích chi tiết Giải pháp Thanh toán tự động SePay qua mã VietQR ngân hàng. |
+|  Tóm tắt tài liệu:  Tài liệu này đặc tả toàn bộ các phân hệ chức năng của hệ thống luyện thi Aptis ESOL, tập trung sâu vào luồng nghiệp vụ người dùng, ma trận phân quyền quản trị, quy trình cấp phát tài khoản học viên và đặc biệt là phân tích chi tiết Giải pháp Thanh toán tự động SePay qua mã VietQR ngân hàng. |
 | --- |
 
 

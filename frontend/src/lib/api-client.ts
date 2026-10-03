@@ -584,6 +584,47 @@ class ApiClient {
         method: 'POST',
       }),
 
+    // ── Content Editor ──────────────────────────────────────────
+    getExamFull: (id: string) => this.request(`/admin/exams/${id}/full`),
+
+    updatePart: (partId: string, body: {
+      title?: string; instructions?: string;
+      passageText?: string; audioUrl?: string; imageUrl?: string;
+    }) =>
+      this.request(`/admin/parts/${partId}`, {
+        method: 'PATCH', body: JSON.stringify(body),
+      }),
+
+    addPart: (examId: string, body: {
+      title?: string; instructions?: string; partNumber?: number;
+      passageText?: string; audioUrl?: string; imageUrl?: string;
+    }) =>
+      this.request(`/admin/exams/${examId}/parts`, {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+
+    deletePart: (partId: string) =>
+      this.request(`/admin/parts/${partId}`, { method: 'DELETE' }),
+
+    updateQuestion: (questionId: string, body: {
+      prompt?: string; questionType?: string; options?: string[];
+      correctAnswer?: string; explanation?: string; maxScore?: number; questionNumber?: number;
+    }) =>
+      this.request(`/admin/questions/${questionId}`, {
+        method: 'PATCH', body: JSON.stringify(body),
+      }),
+
+    addQuestion: (partId: string, body: {
+      prompt?: string; questionType?: string; options?: string[];
+      correctAnswer?: string; explanation?: string; maxScore?: number; questionNumber?: number;
+    }) =>
+      this.request(`/admin/parts/${partId}/questions`, {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+
+    deleteQuestion: (questionId: string) =>
+      this.request(`/admin/questions/${questionId}`, { method: 'DELETE' }),
+
     getPlans: () => this.request('/admin/plans'),
 
     updatePlan: (

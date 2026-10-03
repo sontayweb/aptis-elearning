@@ -17,6 +17,11 @@ import {
   Flame,
   Bell,
   Sun,
+  Moon,
+  Gift,
+  Check,
+  CheckCircle2,
+  Copy,
   Menu,
   X,
   LogIn,
@@ -40,10 +45,53 @@ export function Navbar() {
   const [userDropdown, setUserDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [referralModalOpen, setReferralModalOpen] = useState(false);
+  const [referralCopied, setReferralCopied] = useState(false);
+  const [referralLink, setReferralLink] = useState("");
 
   const skillsRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Check initial theme from localStorage or document class
+    const savedTheme = localStorage.getItem("theme");
+    const isDark =
+      savedTheme === "dark" ||
+      (!savedTheme && document.documentElement.classList.contains("dark"));
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+      setTheme("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      setTheme("light");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && user) {
+      setReferralLink(`${window.location.origin}/?ref=${user.id || "invite"}`);
+    }
+  }, [user]);
+
+  const toggleTheme = (newTheme: "light" | "dark") => {
+    setTheme(newTheme);
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
+
+  const copyReferralLink = () => {
+    if (!referralLink) return;
+    navigator.clipboard.writeText(referralLink);
+    setReferralCopied(true);
+    setTimeout(() => setReferralCopied(false), 2000);
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -342,108 +390,111 @@ export function Navbar() {
                 <button
                   onClick={() => setUserDropdown(!userDropdown)}
                   aria-label="Mở menu tài khoản"
-                  className="relative w-8 h-8 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center hover:opacity-90 transition-opacity"
+                  className="relative w-8 h-8 rounded-full bg-[#0d4a44] text-white text-xs font-bold flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
                 >
-                  <span className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-primary/20 text-primary font-bold">
-                    {user.full_name ? user.full_name.charAt(0).toUpperCase() : "U"}
+                  <span className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-[#0d4a44] text-white font-bold text-sm">
+                    {user.full_name ? user.full_name.charAt(0).toUpperCase() : "H"}
                   </span>
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-background" />
                 </button>
 
                 {userDropdown && (
                   <div
-                    onMouseLeave={() => setUserDropdown(false)}
-                    className="absolute top-full right-0 mt-2 w-64 rounded-2xl border border-border bg-popover p-3 shadow-xl z-50 animate-in fade-in zoom-in-95"
+                    className="absolute top-full right-0 mt-2.5 w-60 rounded-2xl border border-border bg-card p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 select-none"
                   >
-                    <div className="flex items-center gap-3 pb-3 border-b border-border">
-                      <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-base">
-                        {user.full_name?.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-foreground truncate">{user.full_name}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
-                        <div className="flex items-center gap-1 mt-1">
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-primary/15 text-primary">
-                            {user.role}
-                          </span>
-                          {user.user_subscriptions?.length ? (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-amber-500/15 text-amber-600">
-                              {user.user_subscriptions[0].plan.name}
-                            </span>
-                          ) : (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-muted text-muted-foreground">
-                              FREE
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                    {/* Giao diện */}
+                    <div className="px-3 pt-1.5 pb-1 text-xs font-semibold text-muted-foreground">
+                      Giao diện
                     </div>
 
-                    <div className="py-2 text-xs space-y-1">
-                      <div className="flex justify-between px-2 py-1 text-muted-foreground text-[11px]">
-                        <span>Lượt chấm AI còn lại:</span>
-                        <span className="font-bold text-primary">
-                          {user.ai_quotas ? user.ai_quotas.total_quota - user.ai_quotas.used_quota : 3}
-                        </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleTheme("light")}
+                      className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Sun className="w-4 h-4 text-foreground/80" />
+                        <span>Sáng</span>
                       </div>
-                      <div className="flex justify-between px-2 py-1 text-muted-foreground text-[11px]">
-                        <span>Lượt chấm Giảng viên:</span>
-                        <span className="font-bold text-emerald-500">
-                          {user.teacher_quotas ? user.teacher_quotas.total_quota - user.teacher_quotas.used_quota : 0}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-border space-y-1">
-                      <Link
-                        href="/profile"
-                        onClick={() => setUserDropdown(false)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl text-foreground hover:bg-muted transition-colors"
-                      >
-                        <User className="w-4 h-4 text-primary" />
-                        <span>Hồ sơ & Đổi mật khẩu</span>
-                      </Link>
-
-                      <Link
-                        href="/my-classes"
-                        onClick={() => setUserDropdown(false)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl text-foreground hover:bg-muted transition-colors"
-                      >
-                        <Users className="w-4 h-4 text-primary" />
-                        <span>Lớp học của tôi</span>
-                      </Link>
-
-                      {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
-                        <Link
-                          href="/admin"
-                          onClick={() => setUserDropdown(false)}
-                          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 transition-colors"
-                        >
-                          <ShieldCheck className="w-4 h-4" />
-                          <span>{user.role === "SUPER_ADMIN" ? "Vào Cổng Super Admin" : "Vào Trang Quản Trị (Admin)"}</span>
-                        </Link>
+                      {theme === "light" && (
+                        <span className="text-red-500 font-bold text-base leading-none">✓</span>
                       )}
-                      {user.role === "TEACHER" && (
-                        <Link
-                          href="/teacher"
-                          onClick={() => setUserDropdown(false)}
-                          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
-                        >
-                          <GraduationCap className="w-4 h-4" />
-                          <span>Vào Cổng Giảng Viên</span>
-                        </Link>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleTheme("dark")}
+                      className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Moon className="w-4 h-4 text-foreground/80" />
+                        <span>Tối</span>
+                      </div>
+                      {theme === "dark" && (
+                        <span className="text-red-500 font-bold text-base leading-none">✓</span>
                       )}
-                      <button
-                        onClick={() => {
-                          logout();
-                          setUserDropdown(false);
-                        }}
-                        className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl text-red-500 hover:bg-red-500/10 transition-colors"
+                    </button>
+
+                    <div className="my-1 border-t border-border/80" />
+
+                    {/* Thông tin tài khoản */}
+                    <Link
+                      href="/profile"
+                      onClick={() => setUserDropdown(false)}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors"
+                    >
+                      <User className="w-4 h-4 text-foreground/80" />
+                      <span>Thông tin tài khoản</span>
+                    </Link>
+
+                    {/* Giới thiệu bạn */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserDropdown(false);
+                        setReferralModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors text-left"
+                    >
+                      <Gift className="w-4 h-4 text-foreground/80" />
+                      <span>Giới thiệu bạn</span>
+                    </button>
+
+                    {/* Cổng điều hành Admin / Giảng viên nếu có */}
+                    {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setUserDropdown(false)}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-amber-600 hover:bg-amber-500/10 transition-colors"
                       >
-                        <LogOut className="w-3.5 h-3.5" />
-                        Đăng xuất
-                      </button>
-                    </div>
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>Quản trị hệ thống</span>
+                      </Link>
+                    )}
+                    {user.role === "TEACHER" && (
+                      <Link
+                        href="/teacher"
+                        onClick={() => setUserDropdown(false)}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-blue-600 hover:bg-blue-500/10 transition-colors"
+                      >
+                        <GraduationCap className="w-4 h-4" />
+                        <span>Cổng giảng viên</span>
+                      </Link>
+                    )}
+
+                    <div className="my-1 border-t border-border/80" />
+
+                    {/* Đăng xuất */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logout();
+                        setUserDropdown(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-red-500 hover:bg-red-500/10 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 text-red-500" />
+                      <span>Đăng xuất</span>
+                    </button>
                   </div>
                 )}
               </div>
@@ -462,11 +513,12 @@ export function Navbar() {
         {/* Mobile menu and theme buttons */}
         <div className="xl:hidden flex items-center gap-1 ml-auto">
           <button
+            onClick={() => toggleTheme(theme === "dark" ? "light" : "dark")}
             className="flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent/20 text-foreground transition-colors"
             type="button"
-            aria-label="Toggle theme"
+            aria-label="Chuyển đổi giao diện Sáng / Tối"
           >
-            <Sun className="w-4 h-4" />
+            {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -548,6 +600,81 @@ export function Navbar() {
         </div>
       )}
       </nav>
+
+      {/* Referral Modal */}
+      {referralModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl space-y-4 animate-in zoom-in-95">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Gift className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-bold text-base text-foreground">Giới thiệu bạn bè</h3>
+                  <p className="text-xs text-muted-foreground">Cùng học cùng tiến — nhận ưu đãi đặc biệt</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReferralModalOpen(false)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                aria-label="Đóng"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-muted/40 border border-border/50 space-y-2 text-xs text-foreground">
+              <div className="flex items-center gap-2">
+                <span className="text-primary font-bold">✓</span>
+                <span>Bạn bè được giảm <strong>10%</strong> học phí khi nhập link giới thiệu</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-primary font-bold">✓</span>
+                <span>Bạn nhận thêm <strong>10 lượt chấm AI</strong> và tích lũy phần thưởng</span>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">Liên kết giới thiệu của bạn</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={referralLink}
+                  className="flex-1 px-3 py-2 text-xs rounded-xl bg-muted/60 border border-border focus:outline-none select-all text-foreground"
+                />
+                <button
+                  type="button"
+                  onClick={copyReferralLink}
+                  className="px-3.5 py-2 text-xs font-bold text-white bg-primary hover:bg-brand-brown rounded-xl transition-colors shrink-0 flex items-center gap-1.5 shadow-sm"
+                >
+                  {referralCopied ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                      <span>Đã chép!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Sao chép</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setReferralModalOpen(false)}
+              className="w-full py-2.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Auth Modal rendered outside nav container */}
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />

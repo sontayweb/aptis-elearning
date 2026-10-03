@@ -1,0 +1,10 @@
+[
+  {
+    "user_id": "2830c25c-ca05-4ec9-bc9a-79bcfc8e2d4b",
+    "tier": "pro",
+    "pro_until": "2026-10-04T14:20:19.58+00:00",
+    "updated_at": "2026-10-03T14:20:19.58+00:00",
+    "plan_key": "day",
+    "ai_daily_cap": 10
+  }
+]

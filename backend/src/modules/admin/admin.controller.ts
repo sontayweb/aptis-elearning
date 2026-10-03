@@ -225,6 +225,78 @@ export class AdminController {
       next(error);
     }
   }
+
+  // ── CONTENT EDITOR CONTROLLERS ─────────────────────────────────
+
+  async getExamFull(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const examId = req.params.id;
+      const exam = await adminService.getExamFull(examId);
+      sendSuccess(res, exam, 'Lấy nội dung đầy đủ đề thi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updatePart(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const updated = await adminService.updatePart(partId, req.body, req);
+      sendSuccess(res, updated, 'Cập nhật phần thi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addPart(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const examId = req.params.id;
+      const part = await adminService.addPart(examId, req.body, req);
+      sendSuccess(res, part, 'Thêm phần thi mới thành công', 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deletePart(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const result = await adminService.deletePart(partId, req);
+      sendSuccess(res, result, 'Xóa phần thi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateQuestion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const questionId = req.params.questionId;
+      const updated = await adminService.updateQuestion(questionId, req.body, req);
+      sendSuccess(res, updated, 'Cập nhật câu hỏi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addQuestion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const question = await adminService.addQuestion(partId, req.body, req);
+      sendSuccess(res, question, 'Thêm câu hỏi thành công', 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteQuestion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const questionId = req.params.questionId;
+      const result = await adminService.deleteQuestion(questionId, req);
+      sendSuccess(res, result, 'Xóa câu hỏi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const adminController = new AdminController();

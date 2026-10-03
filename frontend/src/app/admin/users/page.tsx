@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { api } from "@/lib/api-client";
+import { AdminPagination } from "@/components/admin/admin-pagination";
+import { SortableHeader, SortState } from "@/components/admin/sortable-header";
 import {
   Users,
   Search,
@@ -105,8 +107,15 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [vipFilterOnly, setVipFilterOnly] = useState(false);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+
+  type UserSortKey = "full_name" | "phone_number" | "is_active" | "created_at" | "submissions";
+  const [sortState, setSortState] = useState<SortState<UserSortKey>>({
+    key: "created_at",
+    order: "desc",
+  });
 
   // Smart Toggle for KPI metrics strip (defaults to false for clean workhorse layout, persists in localStorage)
   const [showMetrics, setShowMetrics] = useState(false);
@@ -196,7 +205,7 @@ export default function AdminUsersPage() {
         search: searchTerm || undefined,
         role: roleFilter,
         page,
-        limit: 15,
+        limit: pageSize,
       });
 
       if (res.success && res.data) {
@@ -216,7 +225,7 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
     setSelectedUserIds([]);
-  }, [page, roleFilter]);
+  }, [page, roleFilter, pageSize]);
 
   // Lock body scroll and listen for Escape key when modals are open
   useEffect(() => {
@@ -559,6 +568,41 @@ export default function AdminUsersPage() {
     ? users.filter((u) => u.subscriptions && u.subscriptions.length > 0)
     : users;
 
+  const handleSort = (field: UserSortKey) => {
+    setSortState((prev) => {
+      if (prev.key !== field) return { key: field, order: "asc" };
+      if (prev.order === "asc") return { key: field, order: "desc" };
+      if (prev.order === "desc") return { key: field, order: null };
+      return { key: field, order: "asc" };
+    });
+  };
+
+  const sortedUsers = useMemo(() => {
+    const list = [...displayedUsers];
+    if (!sortState.order || !sortState.key) return list;
+
+    const { key, order } = sortState;
+    return list.sort((a, b) => {
+      let valA: any = a[key as keyof UserItem];
+      let valB: any = b[key as keyof UserItem];
+
+      if (key === "submissions") {
+        valA = a._count?.submissions || 0;
+        valB = b._count?.submissions || 0;
+      } else if (key === "is_active") {
+        valA = a.is_active ? 1 : 0;
+        valB = b.is_active ? 1 : 0;
+      } else if (typeof valA === "string") {
+        valA = valA.toLowerCase();
+        valB = (valB || "").toLowerCase();
+      }
+
+      if (valA < valB) return order === "asc" ? -1 : 1;
+      if (valA > valB) return order === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [displayedUsers, sortState]);
+
   // Calculated Stats
   const vipCount = users.filter((u) => u.subscriptions && u.subscriptions.length > 0).length;
   const teacherCount = users.filter((u) => u.role === "TEACHER").length;
@@ -834,12 +878,38 @@ export default function AdminUsersPage() {
                     )}
                   </button>
                 </th>
-                <th className="py-3.5 px-4">Học viên / Tài khoản</th>
-                <th className="py-3.5 px-4">Số điện thoại</th>
+                <SortableHeader
+                  field="full_name"
+                  title="Học viên / Tài khoản"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="phone_number"
+                  title="Số điện thoại"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
                 <th className="py-3.5 px-4">Gói dịch vụ</th>
-                <th className="py-3.5 px-4">Trạng thái</th>
-                <th className="py-3.5 px-4 text-center">Lượt thi</th>
-                <th className="py-3.5 px-4">Ngày đăng ký</th>
+                <SortableHeader
+                  field="is_active"
+                  title="Trạng thái"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="submissions"
+                  title="Lượt thi"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                  align="center"
+                />
+                <SortableHeader
+                  field="created_at"
+                  title="Ngày đăng ký"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
                 <th className="py-3.5 px-4 text-right pr-6">Hỗ trợ học vụ</th>
               </tr>
             </thead>
@@ -851,14 +921,14 @@ export default function AdminUsersPage() {
                     Đang tải danh sách tài khoản...
                   </td>
                 </tr>
-              ) : displayedUsers.length === 0 ? (
+              ) : sortedUsers.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-16 text-center text-slate-400 font-normal">
                     Không tìm thấy tài khoản nào phù hợp bộ lọc
                   </td>
                 </tr>
               ) : (
-                displayedUsers.map((user) => {
+                sortedUsers.map((user) => {
                   const activeSub =
                     user.subscriptions && user.subscriptions.length > 0
                       ? user.subscriptions[0]
@@ -1022,33 +1092,20 @@ export default function AdminUsersPage() {
           </table>
         </div>
 
-        {/* Pagination Footer */}
-        <div className="py-3.5 px-4 sm:px-6 bg-slate-50/60 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <div>
-            Hiển thị <span className="font-bold text-slate-900">{displayedUsers.length}</span> /{" "}
-            <span className="font-bold text-slate-900">{totalCount}</span> tài khoản
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              disabled={page <= 1}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="font-medium text-slate-700 px-2 font-mono">
-              Trang {page} / {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-              disabled={page >= totalPages}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        {/* Standard Admin Pagination Footer */}
+        <AdminPagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalCount || sortedUsers.length}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 15, 25, 50]}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setPage(1);
+          }}
+          itemName="tài khoản"
+        />
       </div>
 
       {/* FLOATING BATCH ACTIONS BAR (Linear / Notion Style) */}

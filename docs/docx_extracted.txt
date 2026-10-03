@@ -1,6 +1,6 @@
 BÁO CÁO ĐẶC TẢ YÊU CẦU NGHIỆP VỤ HỆ THỐNG E-LEARNING & APTIS
 Tài liệu phân tích chức năng & Tích hợp Giải
-pháp 📌 Tóm tắt tài liệu:
+pháp  Tóm tắt tài liệu:
 Tài liệu này đặc tả toàn bộ các phân hệ chức năng của hệ thống luyện thi Aptis ESOL, tập trung sâu vào luồng nghiệp vụ người dùng, ma trận phân quyền quản trị, quy trình cấp phát tài khoản học viên và đặc biệt là phân tích chi tiết Giải pháp Thanh toán tự động SePay qua mã VietQR ngân hàng. PHẦN 1: TỔNG QUAN NGHIỆP VỤ & ĐỐI TƯỢNG NGƯỜI DÙNG Hệ thống E-Learning Aptis ESOL được xây dựng nhằm mục tiêu số hóa toàn diện quy trình ôn luyện và khảo thí tiếng Anh 4 kỹ năng (Listening, Speaking, Reading, Writing). Giải pháp tập trung tối ưu hóa trải nghiệm tự học của học viên và đơn giản hóa công tác vận hành, quản trị học vụ của trung tâm. 1.1 Mục Tiêu Nghiệp Vụ Của Sản Phẩm Mô phỏng phòng thi chuẩn hóa:
 Cung cấp môi trường thi thử trực tuyến với giao diện và áp lực thời gian tương đương 100% kỳ thi chính thức trên máy tính tại Hội đồng thi British Council. Luyện thi theo bộ đề Key:
 Phân loại đề thi theo từng kỹ năng và từng phần (Part 1 - Part 4), cập nhật ngân hàng câu hỏi trọng tâm sát với các đợt thi thật gần nhất. Đo lường năng lực học tập:

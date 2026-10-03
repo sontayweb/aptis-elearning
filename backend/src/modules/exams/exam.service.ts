@@ -8,8 +8,11 @@ export class ExamService {
 
     const where: any = {
       is_published: true,
-      source: source || 'WEB',
     };
+
+    if (source) {
+      where.source = source;
+    }
 
     if (skill) {
       where.skill = skill;

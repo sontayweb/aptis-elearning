@@ -34,9 +34,9 @@
   --exam-text: 0 0% 5%;
   --exam-text-muted: 0 0% 40%;
   --exam-border: 0 0% 88%;
-  --exam-header: 260 83% 19%;
+  --exam-header: 0 75% 18%;
   --exam-header-foreground: 0 0% 100%;
-  --exam-accent: 260 83% 19%;
+  --exam-accent: 8 99% 40%;
   --exam-accent-foreground: 0 0% 100%;
 
   --brand-red: 8 99% 40%;
@@ -91,10 +91,10 @@
   --exam-text: 0 0% 95%;
   --exam-text-muted: 0 0% 72%;
   --exam-border: 240 10% 34%;
-  --exam-header: 262 52% 26%;
+  --exam-header: 0 75% 18%;
   --exam-header-foreground: 0 0% 100%;
-  --exam-accent: 265 78% 72%;
-  --exam-accent-foreground: 240 10% 10%;
+  --exam-accent: 8 99% 50%;
+  --exam-accent-foreground: 0 0% 100%;
   --background-elevated: 240 18% 10%;
   --surface-glass: 240 18% 10%;
   --border-glow: 8 99% 50%;

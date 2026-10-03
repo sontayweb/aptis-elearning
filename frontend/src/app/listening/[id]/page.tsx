@@ -318,6 +318,15 @@ function ListeningExamRunnerContent() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showSampleAnswers, setShowSampleAnswers] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+
+  const totalAnsweredCount =
+    Object.keys(p1Answers).length +
+    Object.keys(p2Answers).length +
+    Object.keys(p3Answers).length +
+    Object.keys(p4Answers).length;
+  const totalQuestionsCount = 25;
 
   // Tự động nhảy tới Part nếu URL có ?part=p1 / p2 / p3 / p4
   useEffect(() => {
@@ -336,11 +345,13 @@ function ListeningExamRunnerContent() {
         const res = await api.exams.getQuestions(examId);
         if (res.success && res.data) {
           // Nếu backend trả về đề thi có dữ liệu, có thể map tương ứng hoặc dùng mặc định đã seed
+          const dMinutes = res.data.duration_minutes || 40;
           setExamData((prev) => ({
             ...prev,
             title: res.data.title || prev.title,
-            durationMinutes: res.data.duration_minutes || 40,
+            durationMinutes: dMinutes,
           }));
+          setTimeLeft(dMinutes * 60);
         }
       } catch (err) {
         console.warn("Using default listening exam:", err);
@@ -679,39 +690,49 @@ function ListeningExamRunnerContent() {
   // MÀN HÌNH LÀM BÀI PHÒNG THI LISTENING (THEO DESIGN SYSTEM CỦA MÌNH)
   // =========================================================================
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none">
-      {/* 1. TOP HEADER */}
-      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/listening"
-            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-              Listening Practice
+    <div className="notranslate exam-active exam-mode min-h-screen bg-exam-bg text-exam-text flex flex-col font-sans select-none">
+      {/* 0. Top thin progress bar */}
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-[3px]">
+        <div
+          className="h-full bg-gradient-to-r from-primary via-accent to-primary transition-all duration-500"
+          style={{ width: `${((activeStage + 1) / 17) * 100}%` }}
+        />
+      </div>
+
+      {/* 1. TOP HEADER (EXAM MODE) */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-exam-surface/95 backdrop-blur border-b border-exam-border">
+        <div className="max-w-6xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-xs font-bold text-exam-text truncate hidden sm:block">
+              {examData.title}
             </span>
-            <span className="text-sm md:text-base font-bold text-foreground">
-              {currentMeta.partName}
+            <span className="text-[10px] text-exam-text-muted hidden md:inline">
+              Listening Aptis ESOL
             </span>
           </div>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/listening"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          {/* Countdown Timer */}
+          <div
+            className={`font-mono text-base font-black px-3 py-1 rounded-lg border flex items-center gap-1.5 ${
+              timeLeft < 300
+                ? "bg-red-500/20 border-red-500 text-red-500 animate-pulse"
+                : "bg-exam-bg border-exam-border text-exam-text"
+            }`}
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Thoát</span>
-          </Link>
+            <Clock className="w-4 h-4 text-primary" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-xs font-bold text-exam-text-muted">
+              {totalAnsweredCount}/{totalQuestionsCount} câu
+            </span>
+          </div>
         </div>
       </header>
 
       {/* 2. MAIN WORKSPACE */}
-      <main className="flex-1 py-6 px-3 md:px-6 pb-24">
+      <main className="flex-1 pt-16 pb-24 px-3 md:px-6 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Card Context & Header Banner */}
           <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
@@ -738,29 +759,17 @@ function ListeningExamRunnerContent() {
                 </p>
               </div>
 
-              {/* Bookmark, Pause, Timer */}
-              <div className="flex items-center gap-3 self-end md:self-auto shrink-0">
-                <button
-                  type="button"
-                  className="flex items-center gap-1 px-3 py-1 rounded-xl border border-border text-xs text-muted-foreground hover:bg-muted font-medium transition-colors"
-                >
-                  <Bookmark className="w-3.5 h-3.5" />
-                  <span>Bookmark</span>
-                </button>
-
+              {/* Pause & Playback control */}
+              <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsPaused(!isPaused)}
-                  className="p-1.5 rounded-xl border border-border text-muted-foreground hover:bg-muted transition-colors"
+                  className="px-3 py-1.5 rounded-xl border border-border text-xs text-muted-foreground hover:bg-muted font-medium transition-colors flex items-center gap-1.5"
                   title={isPaused ? "Tiếp tục" : "Tạm dừng"}
                 >
                   {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                  <span>{isPaused ? "Tiếp tục" : "Tạm dừng"}</span>
                 </button>
-
-                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span>{formatTime(timeLeft)}</span>
-                </div>
               </div>
             </div>
 
@@ -973,90 +982,148 @@ function ListeningExamRunnerContent() {
         </div>
       </main>
 
-      {/* 4. BOTTOM BAR CHUẨN */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
-        {/* Left: Hiện đáp án & Báo lỗi */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowSampleAnswers(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Hiện đáp án</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => alert("Đã gửi phản hồi báo lỗi đề thi.")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors"
-          >
-            <Flag className="w-3.5 h-3.5" />
-            <span>Báo lỗi</span>
-          </button>
-        </div>
-
-        {/* Center: Navigation Controls */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowDrawer(true)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
-            title="Danh sách câu hỏi"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => alert(`Đang làm bài: ${currentMeta.partName} - ${currentMeta.subTitle}`)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
-            title="Thông tin bài thi"
-          >
-            <Info className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
-            title="Cuộn lên đầu trang"
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Right: Previous & Next / Submit */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            disabled={activeStage === 0}
-            onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
-            className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors"
-          >
-            ← Previous
-          </button>
-
-          {activeStage < 16 ? (
+      {/* 4. FIXED BOTTOM BAR CHUẨN EXAM MODE */}
+      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-exam-surface/95 backdrop-blur border-t border-exam-border h-14">
+        <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
+          {/* Left: Question Drawer & Info */}
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setActiveStage((p) => Math.min(16, p + 1))}
-              className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1"
+              onClick={() => setShowDrawer(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
+              title="Danh sách câu hỏi"
             >
-              <span>Next</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <Menu className="w-4 h-4 text-primary" />
+              <span className="hidden sm:inline">Danh sách ({totalAnsweredCount}/{totalQuestionsCount})</span>
             </button>
-          ) : (
+
             <button
               type="button"
-              onClick={() => setIsSubmitted(true)}
-              className="tech-btn px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all"
+              onClick={() => setIsInfoOpen(true)}
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 transition-colors cursor-pointer"
+              title="Thông tin bài thi"
             >
-              Nộp bài
+              <Info className="w-4 h-4 text-exam-text-muted" />
             </button>
-          )}
+
+            <button
+              type="button"
+              onClick={() => setShowSampleAnswers(true)}
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
+            >
+              <span>💡 Đáp án mẫu</span>
+            </button>
+          </div>
+
+          {/* Right: Exit, Previous, Next / Submit */}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/listening"
+              title="Thoát"
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </Link>
+            <button
+              type="button"
+              onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
+              disabled={activeStage === 0}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-sm font-medium hover:bg-exam-border/40 transition-colors disabled:opacity-40 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Previous</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (activeStage === 16) {
+                  setIsSubmitModalOpen(true);
+                } else {
+                  setActiveStage((p) => Math.min(16, p + 1));
+                }
+              }}
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-brand-brown text-sm font-bold shadow-sm transition-all cursor-pointer"
+            >
+              <span>{activeStage === 16 ? "Nộp bài" : "Next"}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </footer>
+
+      {/* MODAL THÔNG TIN BÀI THI */}
+      {isInfoOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in"
+          onClick={() => setIsInfoOpen(false)}
+        >
+          <div
+            className="bg-exam-surface border border-exam-border rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-exam-border">
+              <h4 className="font-bold text-sm text-exam-text">Thông tin bài thi Listening</h4>
+              <button
+                type="button"
+                onClick={() => setIsInfoOpen(false)}
+                className="w-6 h-6 flex items-center justify-center rounded text-exam-text-muted hover:text-exam-text"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-2 text-xs text-exam-text">
+              {[
+                { l: "Tên bài thi", v: examData.title },
+                { l: "Kỹ năng", v: "Listening Aptis ESOL (4 Parts · 25 câu)" },
+                { l: "Thời lượng", v: `${examData.durationMinutes} phút` },
+                { l: "Đã hoàn thành", v: `${totalAnsweredCount}/${totalQuestionsCount} câu` },
+                { l: "Thời gian còn lại", v: formatTime(timeLeft) },
+              ].map((x) => (
+                <div key={x.l} className="flex justify-between">
+                  <span className="text-exam-text-muted">{x.l}:</span>
+                  <span className="font-bold">{x.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL XÁC NHẬN NỘP BÀI */}
+      {isSubmitModalOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-exam-surface rounded-2xl border border-exam-border p-6 max-w-md w-full shadow-2xl space-y-4">
+            <h3 className="text-lg font-black text-exam-text">Xác nhận nộp bài thi Listening?</h3>
+            <p className="text-sm text-exam-text-muted leading-relaxed">
+              Bạn đã hoàn thành <strong className="text-primary font-black">{totalAnsweredCount}/{totalQuestionsCount}</strong> câu hỏi. Hệ thống sẽ tiến hành chấm điểm và lập báo cáo kết quả.
+            </p>
+            {totalAnsweredCount < totalQuestionsCount && (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold">
+                ⚠️ Lưu ý: Bạn vẫn còn {totalQuestionsCount - totalAnsweredCount} câu chưa làm xong!
+              </div>
+            )}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsSubmitModalOpen(false)}
+                className="px-4 py-2 rounded-xl border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
+              >
+                Tiếp tục làm bài
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSubmitModalOpen(false);
+                  setIsSubmitted(true);
+                }}
+                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown transition-colors shadow-sm cursor-pointer"
+              >
+                Xác nhận nộp bài
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL HIỆN ĐÁP ÁN */}
       {showSampleAnswers && (

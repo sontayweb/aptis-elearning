@@ -1,0 +1,2844 @@
+[
+  {
+    "_id": "68e6657553b4655eba3f11bb",
+    "title": "Mua đồ xa xỉ, mua đồ bình dân",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Mua đồ xa xỉ, mua đồ bình dân",
+    "questions": [
+      {
+        "questionTitle": "Mua đồ xa xỉ, mua đồ bình dân",
+        "content": "Mua đồ xa xỉ, mua đồ bình dân",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Compare 2 pictures",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<strong>\nAs I can see in the first picture,</strong> there is a family traveling by car.The man is driving while the woman is sitting beside him. They all look very happy. The environment looks peaceful and comfortable, with natural light coming through the car windows.<strong>\n\nOn the other hand, in the second picture, </strong>there are four people sitting together on a train. They seem to be relaxed, talking, and enjoying their time. The atmosphere is friendly, and they appear to be having a pleasant journey.<strong>\n\nBoth pictures show</strong> people traveling, but in different ways. I prefer the first image because I enjoy the freedom of a road trip, where I can stop whenever I want to explore, try local food, take pictures, and enjoy the journey at my own pace.",
+            "_id": "69709ce779e903cc0a1f3d69"
+          },
+          {
+            "content": "What is different about these two shopping experiences?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Traveling by car and by train both have benefits.\n\nWhen you travel by car, you have the freedom to go wherever you want and stop at any place you like.\nIt is also convenient if you have a lot of luggage or are traveling with family.\nYou can enjoy the scenery and make your trip more personal.\n\nOn the other hand, traveling by train is relaxing because you do not have to drive.\nTrains can be more comfortable for long trips and you can walk around or use the bathroom easily.\nTrain travel is also better for the environment because it reduces pollution.\n\nBoth options offer different advantages depending on your needs and preferences.",
+            "_id": "69709ce779e903cc0a1f3d6a"
+          },
+          {
+            "content": "Why are people people are attracted to expensive by expensive things?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Some people like to travel by train for several reasons.\n\nFirst, trains are often very comfortable, with spacious seats and the ability to walk around during the journey.\nThis makes long trips more enjoyable.\n\nSecond, train travel can be more relaxing because you don't need to worry about driving or traffic.\nYou can sit back, read a book, or enjoy the view outside.\n\nThird, trains are often more eco-friendly than cars or planes, which helps reduce pollution.\nAdditionally, trains can offer beautiful scenic routes, allowing passengers to see interesting landscapes.\n\nFinally, train stations are usually located in city centers, making it easier to get to your destination.",
+            "_id": "69709ce779e903cc0a1f3d6b"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de01_1.png",
+          "https://aptiskey.com/images/speaking/part3/de01_2.png"
+        ],
+        "_id": "69709ce779e903cc0a1f3d68"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e6657553b4655eba3f11c0",
+    "createdAt": "2025-10-08T13:21:57.756Z",
+    "updatedAt": "2026-06-17T09:38:06.229Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e6683153b4655eba3f11f3",
+    "title": "Sống 1 mình, sống với gia đình",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Sống 1 mình, sống với gia đình",
+    "questions": [
+      {
+        "questionTitle": "Sống 1 mình, sống với gia đình",
+        "content": "Sống 1 mình, sống với gia đình",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two photographs.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<strong>As I can see in the first picture</strong>, there are two children sitting at a table playing chess. They look focused and are enjoying the game. The environment seems calm, and they appear to be in deep concentration.<strong>\n\nOn the other hand, in the second picture,</strong> two kids are sitting on a couch playing video games.They are holding controllers and smiling.The room looks cozy and bright, and the children seem to be having a great time.<strong>\n\nBoth pictures show</strong> children having fun, but in different ways. I prefer the first image because I enjoy the intellectual challenge of a board game, where strategic thinking is key. However, the second image also looks fun, as video games provide a fast-paced, interactive experience.",
+            "_id": "68f1b9dc53b4655eba3f2fa7"
+          },
+          {
+            "content": "Do you prefer living alone or living with your family?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I prefer playing video games because they are more exciting and fun. Video games have colorful graphics, interesting stories, and many challenges that make me want to play more. I can play alone or with friends, which makes it social and enjoyable. However, I think chess is also a great game because it helps improve thinking and planning skills. Sometimes, I enjoy playing chess when I want a quiet and relaxing activity. But overall, I like video games more because they are faster, more modern, and have many options to choose from.",
+            "_id": "68f1b9dc53b4655eba3f2fa8"
+          },
+          {
+            "content": "Is it necessary for young people to live independently from their families?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Yes, outdoor activities are very important. They help people stay healthy and active by moving their bodies and getting fresh air. Activities like running, playing sports, or walking in the park are good for the heart and muscles. Outdoor activities are also fun and help reduce stress because they let people connect with nature. They are a great way to spend time with friends and family, making relationships stronger. Children, especially, learn teamwork and new skills through outdoor games. Overall, outdoor activities keep the mind and body strong and improve happiness and well-being.",
+            "_id": "68f1b9dc53b4655eba3f2fa9"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de02_1.png",
+          "https://aptiskey.com/images/speaking/part3/de02_2.png"
+        ],
+        "_id": "68f1b9dc53b4655eba3f2fa6"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e6683153b4655eba3f11f8",
+    "createdAt": "2025-10-08T13:33:37.441Z",
+    "updatedAt": "2026-06-17T09:38:06.415Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e66a4653b4655eba3f12e8",
+    "title": "1 người đàn ông đang đứng ở sân bay, 1 người đàn ông đang chờ tàu hỏa",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 người đàn ông đang đứng ở sân bay, 1 người đàn ông đang chờ tàu hỏa",
+    "questions": [
+      {
+        "questionTitle": "1 người đàn ông đang đứng ở sân bay, 1 người đàn ông đang chờ tàu hỏa",
+        "content": "1 người đàn ông đang đứng ở sân bay, 1 người đàn ông đang chờ tàu hỏa",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<strong>As I can see in the first picture, </strong>there is a forest with tall green trees. The trees are very big, and the background shows mountains and the sky during sunset. The forest looks quiet and peaceful, perfect for hiking or enjoying nature. <strong>\n\nOn the other hand, in the second picture,</strong> there is a beach with clear blue water and white sand. There are palm trees and chairs on the beach, making it a relaxing place to rest or enjoy the sun. <strong>\n\nBoth pictures show</strong> the beauty of nature, but in different ways. I prefer the first image because I enjoy the calmness and peace of the forest, where I can go hiking, breathe fresh air, and experience the beauty of nature up close. However, the second image also looks wonderful, as the beach offers a great place to relax and enjoy the warmth of the sun.",
+            "_id": "69709d1479e903cc0a1f3faa"
+          },
+          {
+            "content": "Which means of transport do you prefer? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I like the beach better because it feels relaxing and peaceful. The sound of the waves and the soft sand make it a perfect place to rest. I enjoy swimming in the clear blue water and lying under the shade of palm trees. The beach is also great for watching sunsets and spending time with friends or family. Although the pine forest is beautiful and calm, I prefer the beach because of the warm weather and the chance to enjoy outdoor activities like swimming and walking on the sand. It is my favorite place to feel happy and free.",
+            "_id": "69709d1479e903cc0a1f3fab"
+          },
+          {
+            "content": "Why do people usually not choose to travel by plane?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Yes, weather affects human emotions because it changes how we feel and act. Sunny weather makes people feel happy and energetic because they can go outside and enjoy activities. Rainy weather can make people feel sad or lazy because they stay indoors. Cold weather can feel cozy for some people, but it can also make others feel tired or unhappy. Hot weather can be fun at the beach, but it can also make others feel uncomfortable. Different types of weather can affect our mood because they change the environment around us and how we experience our day.",
+            "_id": "69709d1479e903cc0a1f3fac"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de03_1.png",
+          "https://aptiskey.com/images/speaking/part3/de03_2.png"
+        ],
+        "_id": "69709d1479e903cc0a1f3fa9"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e66a4653b4655eba3f12ed",
+    "createdAt": "2025-10-08T13:42:30.257Z",
+    "updatedAt": "2026-06-17T09:38:06.557Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e739c953b4655eba3f147e",
+    "title": "Nhóm người đi leo núi, bãi biển xanh",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Nhóm người đi leo núi, bãi biển xanh",
+    "questions": [
+      {
+        "questionTitle": "Nhóm người đi leo núi, bãi biển xanh",
+        "content": "Nhóm người đi leo núi, bãi biển xanh",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<strong>As I can see in the first picture,</strong> there are four men who are football players. They are standing in a stadium, and there is a sports match happening. It seems like this is a very important match because I see a lot of spectators in the stands. The weather looks very nice, with clear skies and bright sunlight.<strong>\n\nOn the other hand, in the second picture</strong>, there is a woman who looks quite young, around 25 years old. She is jumping over a stick, and this seems to be a competition for athletes. The atmosphere looks energetic and focused.<strong>\n\nBoth pictures</strong> are very nice, and I think they were taken by professional photographers, capturing the energy and excitement of these events.",
+            "_id": "69709d3a79e903cc0a1f4179"
+          },
+          {
+            "content": "What's so attractive about these two places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "The difference between two sports depends on which ones we are talking about. For example, football and basketball are different in many ways. In football, players use their feet to kick the ball and score goals, while in basketball, players use their hands to dribble and shoot the ball into a hoop. Football is played on a large field, and basketball is played on a smaller court. Another difference is the number of players. Football usually has 11 players on each team, while basketball has 5. The rules of the games are also different, like how points are scored and how long the game lasts. Even though they are different, both sports are fun, and they help players stay active and healthy.",
+            "_id": "69709d3a79e903cc0a1f417a"
+          },
+          {
+            "content": "How to protect natural beauty?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Some sports are more important than others because they are more popular, have a bigger impact, or are played by more people. For example, sports like football and basketball are important because they are played all over the world, with millions of fans watching big tournaments like the World Cup or the NBA. These sports bring people together and create excitement. Some sports are important because they teach valuable skills, like teamwork, discipline, and leadership. In some countries, certain sports are part of the culture and history, making them more meaningful. However, all sports are important in their own way because they help people stay healthy, have fun, and learn new skills even if they are not as famous as others.",
+            "_id": "69709d3a79e903cc0a1f417b"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de04_1.png",
+          "https://aptiskey.com/images/speaking/part3/de04_2.png"
+        ],
+        "_id": "69709d3a79e903cc0a1f4178"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e739c953b4655eba3f1483",
+    "createdAt": "2025-10-09T04:27:53.017Z",
+    "updatedAt": "2026-06-17T09:38:06.782Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e73b1853b4655eba3f14a8",
+    "title": "bãi biển đông đúc, 1 cô gái đang ngồi ở một nơi yên tĩnh",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "bãi biển đông đúc, 1 cô gái đang ngồi ở một nơi yên tĩnh",
+    "questions": [
+      {
+        "questionTitle": "bãi biển đông đúc, 1 cô gái đang ngồi ở một nơi yên tĩnh",
+        "content": "bãi biển đông đúc, 1 cô gái đang ngồi ở một nơi yên tĩnh",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe those pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<strong>As I can see in the first picture,</strong> there are three friends who are studying together. They are wearing different casual clothes and seem to be studying very hard. Looking at the background, I believe this is a library filled with many books.<strong>\n\nOn the other hand, in the second picture</strong>, there is a man reading a book in a coffee shop. He is wearing a striped shirt and is sitting next to the window of the cafe. The weather outside looks very nice, with clear skies and bright sunlight. .<strong>\n\nBoth pictures show</strong> people studying, but in different places. I prefer the first image because I enjoy the peaceful and quiet environment of a library, where I can focus better on my studies. However, the second image also looks nice, as it offers a more relaxed and cozy setting in a cafe.",
+            "_id": "69709d4579e903cc0a1f4201"
+          },
+          {
+            "content": "Do you like going to crowded beaches?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I prefer studying in the library. Libraries are quiet and free, which helps me to focus on my work. They also have a variety of resources, such as books, articles, and computers, which can be helpful for research. However, I sometimes study in coffee shops. Coffee shops can be a social and welcoming environment. They also have free Wi-Fi, which can be helpful if I need to access online resources. In the end, the best place to study depends on my individual needs and preferences. If I need to focus on my work, I will study in the library. If I want to be more social, I will study in a coffee shop.",
+            "_id": "69709d4579e903cc0a1f4202"
+          },
+          {
+            "content": "Why do many people like quiet places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Studying at a library can sometimes be challenging due to the rigid, quiet atmosphere, which may feel restrictive for some. On the other hand, coffee shops might pose difficulties with noise distractions and limited space. Libraries may lack the comfortable amenities that coffee shops provide, like refreshments. However, coffee shops may have inconsistent Wi-Fi or too much ambient noise. The choice depends on personal preferences, balancing the need for a quiet, focused environment with the desire for a more relaxed and comfortable setting.",
+            "_id": "69709d4579e903cc0a1f4203"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de05_1.png",
+          "https://aptiskey.com/images/speaking/part3/de05_2.png"
+        ],
+        "_id": "69709d4579e903cc0a1f4200"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e73b1853b4655eba3f14ad",
+    "createdAt": "2025-10-09T04:33:28.419Z",
+    "updatedAt": "2026-06-17T09:38:06.870Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e73def53b4655eba3f14c4",
+    "title": "1 gia đình đi ô tô, 2 người đi tàu hỏa",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 gia đình đi ô tô, 2 người đi tàu hỏa",
+    "questions": [
+      {
+        "questionTitle": "1 gia đình đi ô tô, 2 người đi tàu hỏa",
+        "content": "1 gia đình đi ô tô, 2 người đi tàu hỏa",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a family of four: a father, a mother, and two daughters. They are sitting on the grass in their garden. The family looks happy and full of energy. It seems like they are enjoying a holiday or camping together.\n\nOn the other hand, in the second picture, there is a girl standing by a balcony. She is enjoying the fresh air on a sunny day. She is wearing light white clothes, which move in the breeze, making her feel free and comfortable. It seems like she enjoys being alone and having some quiet time.\n\nBoth pictures show people relaxing, but in different ways. I prefer the first picture because I like spending time with my family, having fun together. However, the second picture also looks nice because it shows a calm and peaceful moment alone.",
+            "_id": "69c16338c68879da1b92c372"
+          },
+          {
+            "content": "What means of transport do you like to travel by?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I feel over the moon when I can live with my family because it provides a strong sense of support and emotional connection. Having loved ones around creates a warm, comforting environment, and it's reassuring to know help is always available. While living alone offers more independence, it can sometimes feel isolating. I enjoy the security and togetherness that comes with being close to family.",
+            "_id": "69c16338c68879da1b92c373"
+          },
+          {
+            "content": "Why do some people like to travel by train?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Many people today choose to live alone because it offers greater independence and personal freedom. It allows them to make decisions without compromising and gives them complete control over their space and schedule. Additionally, living alone promotes self-sufficiency, which is highly valued in our modern, fast-paced society.",
+            "_id": "69c16338c68879da1b92c374"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de06_1.png",
+          "https://aptiskey.com/images/speaking/part3/de06_2.png"
+        ],
+        "_id": "69c16338c68879da1b92c371"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e73def53b4655eba3f14c9",
+    "createdAt": "2025-10-09T04:45:35.972Z",
+    "updatedAt": "2026-06-17T09:38:06.960Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f20a6b53b4655eba3f372c",
+    "title": "3 người đang thu hoạch táo, ông và cháu đang tưới cây",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "3 người đang thu hoạch táo, ông và cháu đang tưới cây",
+    "questions": [
+      {
+        "questionTitle": "3 người đang thu hoạch táo, ông và cháu đang tưới cây",
+        "content": "3 người đang thu hoạch táo, ông và cháu đang tưới cây",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a man riding a camel. It seems like he is in the desert because there is a pyramid behind him and golden sand all around him.\n\nOn the other hand, in the second picture, there is a man riding a horse-drawn carriage. He is wearing a very elegant suit. It seems like he is in a town.\n\nBoth pictures show people moving with animals, but in different ways. I prefer the first image because I like the idea of traveling in the desert and seeing the pyramids. However, the second picture also looks nice because it shows a calm and elegant way to travel in the town.",
+            "_id": "69709d8279e903cc0a1f4493"
+          },
+          {
+            "content": "What are the attractions of the two pictures?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Riding a horse or camel is interesting because these animals make the journey special. Horses are fast and make the trip exciting, creating a strong bond with the rider. Camels are great for slower, relaxed journeys, letting travelers enjoy the surroundings. Both experiences connect people with animals, adding a unique touch to the trip. Riding horses or camels also lets us feel a connection to history, culture, and nature, making the journey more memorable and meaningful.",
+            "_id": "69709d8279e903cc0a1f4494"
+          },
+          {
+            "content": "What is the appeal of growing plants and doing gardening?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I think animals shouldn't just be used as a way to get around. Even though they can help us travel, we need to be kind to them. Animals have feelings and needs, so it's not fair to treat them only as a transportation tool. Taking care of them means giving them enough rest and not making them work too much. We should be nice to animals and make sure they are treated well while still using them for transportation.",
+            "_id": "69709d8279e903cc0a1f4495"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de07_1.png",
+          "https://aptiskey.com/images/speaking/part3/de07_2.png"
+        ],
+        "_id": "69709d8279e903cc0a1f4492"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f20a6b53b4655eba3f3731",
+    "createdAt": "2025-10-17T09:20:43.896Z",
+    "updatedAt": "2026-06-17T09:38:07.286Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f20bcb53b4655eba3f3748",
+    "title": "Du lịch vùng núi, du lịch thành phố",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Du lịch vùng núi, du lịch thành phố",
+    "questions": [
+      {
+        "questionTitle": "Du lịch vùng núi, du lịch thành phố",
+        "content": "Du lịch vùng núi, du lịch thành phố",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in these two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, a father and son are feeding a white horse in a park. The boy looks happy, showing the strong bond between people and animals.\n\nOn the other hand, in the second picture, three children are learning about animals in a classroom. They are studying a snake and other animals, which helps them learn more about them.\n\nBoth pictures show the positive relationship between humans and animals, but in different ways. I prefer the first picture because I enjoy seeing the emotional connection between people and animals. However, the second picture also looks nice because it shows children learning and gaining knowledge about animals.",
+            "_id": "69709d9679e903cc0a1f4549"
+          },
+          {
+            "content": "What are the benefits of two ways of traveling?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Yes, I really enjoy spending time with animals, particularly with dogs and cats. I believe they share emotions similar to humans, and they play a significant role in helping me unwind after a stressful day. When I return home after a hectic workday, I like to engage in playful moments with my pets. They react with excitement, wagging their tails and expressing joy whenever they hear my voice from a distance. Animals, especially pets, have this incredible ability to create a positive and stable atmosphere in my life. They bring joy and contribute to a sense of family closeness. Overall, I find animals to be not just wonderful companions but also a source of comfort and happiness in my everyday life.",
+            "_id": "69709d9679e903cc0a1f454a"
+          },
+          {
+            "content": "What are the disadvantages of two ways of traveling?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Yes, children should learn about animals. It helps them understand nature and the world around them. Learning about animals also teaches children to care for living things and respect all creatures. It can make them more curious and aware of the environment.",
+            "_id": "69709d9679e903cc0a1f454b"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de08_1.png",
+          "https://aptiskey.com/images/speaking/part3/de08_2.png"
+        ],
+        "_id": "69709d9679e903cc0a1f4548"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f20bcb53b4655eba3f374d",
+    "createdAt": "2025-10-17T09:26:35.254Z",
+    "updatedAt": "2026-06-17T09:38:07.378Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f345ee53b4655eba3f38b2",
+    "title": "Âm nhạc sôi động, âm nhạc du dương",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Âm nhạc sôi động, âm nhạc du dương",
+    "questions": [
+      {
+        "questionTitle": "Âm nhạc sôi động, âm nhạc du dương",
+        "content": "Âm nhạc sôi động, âm nhạc du dương",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you can see in these two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a man riding a bicycle on the road. He looks very young, and I guess he is about 36 years old. The weather looks very nice, and the trees next to the road are very green and lush.\n\nOn the other hand, in the second picture, I see eight women sitting on a boat. They are participating in a competition and look quite happy, so I think they are friends.\n\nBoth pictures are very beautiful, showing different activities. I think they were taken by professional photographers because the images look so clear and well-captured.",
+            "_id": "69709dcd79e903cc0a1f47ad"
+          },
+          {
+            "content": "What sort of people go to these two events?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Riding a bike and rowing both have their own difficulties. For riding a bike, one challenge is keeping balance, especially on uneven or rough roads. It can be hard to control the bike when going uphill or downhill. Long rides also require a lot of energy and strong legs. Staying focused to avoid accidents is also important. Rowing, on the other hand, is difficult because it requires a lot of upper body strength. Rowers must work hard to move the boat, and it can be tiring over long distances. Another challenge is teamwork in rowing. If you are in a team, everyone must row together at the same time for the boat to move smoothly. Both sports need strength and practice.",
+            "_id": "69709dcd79e903cc0a1f47ae"
+          },
+          {
+            "content": "Which of these two events would you prefer to go to? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Many people prefer team sports because they are more social and fun. In team sports, like football or basketball, players work together with friends or teammates. This creates a sense of community and makes the game more exciting. People enjoy cheering for each other and celebrating victories together. Team sports also help build strong friendships and teach important skills like teamwork and communication. Additionally, in team sports, players can share the challenges and support each other, which can be motivating. On the other hand, individual sports, like tennis or running, can be more lonely and require players to rely only on themselves. For many, the social and cooperative aspects of team sports make them more enjoyable.",
+            "_id": "69709dcd79e903cc0a1f47af"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de09_1.png",
+          "https://aptiskey.com/images/speaking/part3/de09_2.png"
+        ],
+        "_id": "69709dcd79e903cc0a1f47ac"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f345ee53b4655eba3f38b7",
+    "createdAt": "2025-10-18T07:46:54.412Z",
+    "updatedAt": "2026-06-17T09:38:07.796Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5e8c353b4655eba3f10cd",
+    "title": "1 cô gái đọc sách giấy, 1 cô gái nhìn màn hình máy tính",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 cô gái đọc sách giấy, 1 cô gái nhìn màn hình máy tính",
+    "questions": [
+      {
+        "questionTitle": "1 cô gái đọc sách giấy, 1 cô gái nhìn màn hình máy tính",
+        "content": "1 cô gái đọc sách giấy, 1 cô gái nhìn màn hình máy tính",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see from the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a man standing in a very large pine forest. The weather looks very nice, and it seems like it is winter because the man is dressed warmly.\n\nOn the other hand, in the second picture, I see many people in the desert. They are walking together, so I think they are friends. The weather looks very hot, and they don't have any water. It reminds me of a memory I had while traveling.\n\nBoth pictures are beautiful, and I think they were taken by professional photographers because they look so clear and well-captured.",
+            "_id": "69709c5e79e903cc0a1f3b70"
+          },
+          {
+            "content": "Do you prefer reading printed books or e-books?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "In a pine forest, you can find people who enjoy nature and outdoor activities. These might include hikers, campers, and people who love to explore wildlife. Forest areas often attract those who appreciate quiet, natural surroundings and prefer a peaceful lifestyle. Some people living in pine forests might work in forestry or conservation.In a desert, people often live in areas adapted to hot, dry conditions. This includes people involved in agriculture, such as growing drought-resistant crops, and those who work in mining or tourism. Desert residents are usually well-adapted to the extreme heat and dry environment. Both places have unique lifestyles shaped by their natural surroundings.",
+            "_id": "69709c5e79e903cc0a1f3b71"
+          },
+          {
+            "content": "Does technology affect the way we read books?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I would rather visit a pine forest. I find the cool, shaded environment and the fresh, clean air very refreshing. Walking among tall trees and enjoying the peaceful sounds of nature would be relaxing and calming. Pine forests often have beautiful trails for hiking and exploring, which I enjoy. Additionally, being in a forest allows for wildlife observation and the chance to experience a diverse range of plants and animals. The natural beauty and tranquility of a pine forest appeal to me more than the extreme heat and arid conditions of a desert. Overall, a pine forest seems like a great place to unwind and connect with nature.",
+            "_id": "69709c5e79e903cc0a1f3b72"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de10_1.png",
+          "https://aptiskey.com/images/speaking/part3/de10_2.png"
+        ],
+        "_id": "69709c5e79e903cc0a1f3b6f"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e5e8c353b4655eba3f10d2",
+    "createdAt": "2025-10-08T04:29:55.831Z",
+    "updatedAt": "2026-06-17T09:38:06.010Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e6646d53b4655eba3f119f",
+    "title": "Mua sắm trong siêu thị, mua sắm trong chợ",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Mua sắm trong siêu thị, mua sắm trong chợ",
+    "questions": [
+      {
+        "questionTitle": "Mua sắm trong siêu thị, mua sắm trong chợ",
+        "content": "Mua sắm trong siêu thị, mua sắm trong chợ",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a group of people playing basketball together. The special thing is that they are all sitting in their own wheelchairs. So, I think they are playing in a basketball match for disabled people.\n\nOn the other hand, in the second picture, there are two old men. They look about 60 years old and are shaking hands. They are both holding their tennis rackets, so I think they have just finished a match. Looking at their faces, they look tired, but they are ready to take a break.\n\nBoth pictures show people enjoying sports in different ways. I think both of them are great because they show people being active and having fun.",
+            "_id": "69709cdb79e903cc0a1f3ce1"
+          },
+          {
+            "content": "Benefits of markets and supermarkets?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "In my opinion, indoor and outdoor activities have their own benefits. First, indoor activities are great for their controlled environment, allowing for focused practice and skill development. Activities like reading, arts, or indoor sports can boost creativity and concentration. On the other hand, outdoor activities offer significant physical benefits, such as improved cardiovascular health and Vitamin D from sunlight. Activities like hiking or playing sports outdoors can boost mood and overall health.",
+            "_id": "69709cdb79e903cc0a1f3ce2"
+          },
+          {
+            "content": "Why do many people not like shopping?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "From my perspective, I don't think that the main purpose of playing games is solely to win. While winning can be a motivating factor, the essence of playing games often lies in the enjoyment of the experience, the development of skills, and the social interactions it fosters. Many players value the process of learning, improving, and having fun over just the outcome. Games can offer personal satisfaction and a sense of accomplishment regardless of whether you win or lose.",
+            "_id": "69709cdb79e903cc0a1f3ce3"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de11_1.png",
+          "https://aptiskey.com/images/speaking/part3/de11_2.png"
+        ],
+        "_id": "69709cdb79e903cc0a1f3ce0"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e6646d53b4655eba3f11a4",
+    "createdAt": "2025-10-08T13:17:33.573Z",
+    "updatedAt": "2026-06-17T09:38:06.137Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e6679e53b4655eba3f11e5",
+    "title": "1 gia đình chụp ảnh, 1 người đàn ông viết nhật ký",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 gia đình chụp ảnh, 1 người đàn ông viết nhật ký",
+    "questions": [
+      {
+        "questionTitle": "1 gia đình chụp ảnh, 1 người đàn ông viết nhật ký",
+        "content": "1 gia đình chụp ảnh, 1 người đàn ông viết nhật ký",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there are three people in a supermarket. They look quite happy, so I think they are a family. The supermarket they are in looks like it has a lot of things to buy.\n\nOn the other hand, in the second picture, I see many women. They also look happy, so I think they are friends. They seem to be selling items at a local market.\n\nBoth pictures are very beautiful, and I think they were taken by professional photographers because they look very clear and well-captured.",
+            "_id": "69709cfa79e903cc0a1f3e35"
+          },
+          {
+            "content": "Do you like to preserve memories by photo or writing?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Markets and supermarkets both offer many benefits. Markets are great because they often have fresh fruits, vegetables, and other local foods. People like markets for their friendly atmosphere, where they can talk to sellers and sometimes get better prices. Markets also support local farmers and small businesses. On the other hand, supermarkets are very convenient because they have everything you need in one place, from food to household items. They are open for longer hours, and you can find many different products and brands. Supermarkets are also clean and well-organized, making shopping easy and fast. You can use a shopping cart and pay with cash or card. Both markets and supermarkets provide good choices for buying what people need every day.",
+            "_id": "69709cfa79e903cc0a1f3e36"
+          },
+          {
+            "content": "Why do people today like to use photos to save memories?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Many people don't like to go shopping for different reasons. First, shopping can take a lot of time, especially in big stores or when there are long lines. Some people feel it is boring and tiring to walk around and look for things they need. Also, crowded places can make shopping stressful because it is noisy and hard to move around. Some people don't like to spend money or feel pressure to buy things they don't really need. Others might not like shopping because they find it hard to choose from too many options. For some, carrying heavy bags is a problem, and they prefer to shop online where it is easier and quicker. These reasons make shopping less enjoyable for many people.",
+            "_id": "69709cfa79e903cc0a1f3e37"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de12_1.png",
+          "https://aptiskey.com/images/speaking/part3/de12_2.png"
+        ],
+        "_id": "69709cfa79e903cc0a1f3e34"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e6679e53b4655eba3f11ea",
+    "createdAt": "2025-10-08T13:31:10.774Z",
+    "updatedAt": "2026-06-17T09:38:06.368Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e6698753b4655eba3f12cc",
+    "title": "Cô gái nghe nhạc trên sofa, ban nhạc đang chơi nhạc",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Cô gái nghe nhạc trên sofa, ban nhạc đang chơi nhạc",
+    "questions": [
+      {
+        "questionTitle": "Cô gái nghe nhạc trên sofa, ban nhạc đang chơi nhạc",
+        "content": "Cô gái nghe nhạc trên sofa, ban nhạc đang chơi nhạc",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Compare 2 pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a group of people climbing a mountain. The sky looks very beautiful, with many clouds in the background. They seem to be professional climbers.\n\nOn the other hand, in the second picture, I see a family at the beach. They look very happy and full of energy. The weather looks beautiful and bright.\n\nBoth pictures show people enjoying different activities, but in different ways. I prefer the first image because I like outdoor adventures like mountain climbing. However, the second image also looks nice because it shows a fun and relaxing family moment at the beach.",
+            "_id": "69709d0979e903cc0a1f3f22"
+          },
+          {
+            "content": "Which would you prefer to be in?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I find the mountains more appealing. The serene landscapes and fresh mountain air create a peaceful ambiance that resonates with me. I appreciate the opportunity to hike and explore nature trails, immersing myself in the tranquility of the surroundings. While beaches are lovely, I'm drawn to the rugged beauty and sense of solitude that mountains offer. The idea of cozy mountain retreats and breathtaking views adds to the allure. Overall, the mountains provide a retreat where I can disconnect and recharge amidst the beauty of nature.",
+            "_id": "69709d0979e903cc0a1f3f23"
+          },
+          {
+            "content": "What are the benefits of listening to music?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "It really depends on personal preferences and interests. Beaches are great for those who enjoy sunbathing, water activities, and a more laid-back atmosphere. People who love the sound of waves, sandy shores, and a tropical vibe would likely prefer beaches. On the other hand, mountains cater to individuals who appreciate hiking, nature walks, and a cooler climate. Those seeking adventure, stunning landscapes, and a quieter retreat might find mountains more suitable.",
+            "_id": "69709d0979e903cc0a1f3f24"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de13_1.png",
+          "https://aptiskey.com/images/speaking/part3/de13_2.png"
+        ],
+        "_id": "69709d0979e903cc0a1f3f21"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e6698753b4655eba3f12d1",
+    "createdAt": "2025-10-08T13:39:19.268Z",
+    "updatedAt": "2026-06-17T09:38:06.463Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e7387553b4655eba3f1470",
+    "title": "Ăn đồ ăn nhanh, nấu ăn healthy",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Ăn đồ ăn nhanh, nấu ăn healthy",
+    "questions": [
+      {
+        "questionTitle": "Ăn đồ ăn nhanh, nấu ăn healthy",
+        "content": "Ăn đồ ăn nhanh, nấu ăn healthy",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there are two adults and one child. They look quite happy, so I think they are a family. The child is playing the piano, and the man is playing the guitar.\n\nOn the other hand, in the second picture, I see many people. In the middle of the picture, I can see three men playing musical instruments. I think they are friends. This picture was taken at a music festival, and it reminds me of memories from last year's trip.\n\nBoth pictures are very beautiful, and I think they were taken by professional photographers because they look very clear and well-captured.",
+            "_id": "69709d3579e903cc0a1f4135"
+          },
+          {
+            "content": "Which kind of food in those pictures is healthier?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I like to play music at home because it is comfortable and quiet. At home, I can play music anytime I want, without worrying about disturbing others. I have my instruments, like a guitar or piano, and I can practice in a relaxed space. Playing music at home also allows me to focus and improve my skills without distractions. Sometimes, I enjoy playing music with my family or friends when they visit. It's a fun way to spend time together. I also like to play music in parks or outdoor spaces because it feels nice to be in nature while playing. However, home is my favorite place because it's peaceful, and I can play for as long as I want.",
+            "_id": "69709d3579e903cc0a1f4136"
+          },
+          {
+            "content": "What are the benefits of them?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Playing music in different places can bring different emotions because the environment affects how we feel. When we play music at home, it can feel relaxing and comfortable because it is a familiar space. We can play peacefully and enjoy the music without stress. In a park or outdoor space, playing music can feel fresh and lively because we are surrounded by nature, like trees and birds. The open air makes us feel happy and free. If we play music on a stage in front of people, it can feel exciting and even a little scary, but the energy from the audience makes it fun. Each place gives a different mood, and that changes how we feel when we play.",
+            "_id": "69709d3579e903cc0a1f4137"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de14_1.png",
+          "https://aptiskey.com/images/speaking/part3/de14_2.png"
+        ],
+        "_id": "69709d3579e903cc0a1f4134"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e7387553b4655eba3f1475",
+    "createdAt": "2025-10-09T04:22:13.978Z",
+    "updatedAt": "2026-06-17T09:38:06.737Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e73d7b53b4655eba3f14b6",
+    "title": "Thành thị đông đúc, vùng quê thanh tĩnh",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Thành thị đông đúc, vùng quê thanh tĩnh",
+    "questions": [
+      {
+        "questionTitle": "Thành thị đông đúc, vùng quê thanh tĩnh",
+        "content": "Thành thị đông đúc, vùng quê thanh tĩnh",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there are many people at the beach. There are a lot of umbrellas with many colors. It seems like a very beautiful beach with blue water and white sand. I believe the weather is lovely and perfect for a day at the beach.\n\nOn the other hand, in the second picture, I see two girls sitting next to a river. I think they are sitting and watching the mountains and forests to relax. This picture looks very peaceful.\n\nBoth pictures show different places to travel, but they are both beautiful in their own way. I prefer the first picture because I enjoy the beach and the fun activities you can do there. However, the second picture also looks nice because it shows a calm and relaxing place in nature.",
+            "_id": "69709d4f79e903cc0a1f4273"
+          },
+          {
+            "content": "What are the differences between life in the countryside and in the city?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "No, I don't like going to crowded beaches. First, they are often noisy. There is a lot of noise from people talking, laughing, and playing music. This can be very distracting and make it difficult to relax. Second, crowded beaches are often dirty. There is a lot of trash and litter on the sand and in the water. This can be unsightly and even dangerous. Third, crowded beaches can be uncomfortable. It can be difficult to find a place to sit or lay down, and the sand can be hot and uncomfortable.",
+            "_id": "69709d4f79e903cc0a1f4274"
+          },
+          {
+            "content": "Do you prefer living in the countryside or living in the city?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "People like quiet places because they offer a calm and focused environment. Silence helps with concentration and minimizes distractions, making it easier to study, read, or think deeply. A quiet setting also promotes relaxation and reduces stress. When it's quiet, people can concentrate better on their tasks, which improves productivity. The preference for quiet places is often based on the desire for a peaceful and comfortable atmosphere that supports various activities without interruptions.",
+            "_id": "69709d4f79e903cc0a1f4275"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de15_1.png",
+          "https://aptiskey.com/images/speaking/part3/de15_2.png"
+        ],
+        "_id": "69709d4f79e903cc0a1f4272"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e73d7b53b4655eba3f14bb",
+    "createdAt": "2025-10-09T04:43:39.606Z",
+    "updatedAt": "2026-06-17T09:38:06.915Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e73e9553b4655eba3f14e0",
+    "title": "1 cặp đôi trò chuyện dưới tuyết, 2 cô gái đang tắm nắng",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Cười về một điều gì đó",
+    "questions": [
+      {
+        "questionTitle": "Cười về một điều gì đó",
+        "content": "1 cặp đôi trò chuyện dưới tuyết, 2 cô gái đang tắm nắng",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures. ",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a man wearing headphones. He looks quite young, and I guess he is about 24 years old. It seems like he is waiting for the train.\n\nOn the other hand, in the second picture, I see another man. He is standing in an airport, looking out the window. It seems like he is waiting for his next flight. This picture reminds me of a memory I had when I was traveling.\n\nBoth pictures are very beautiful, and I think they were taken by professional photographers because they look so clear and well-captured.",
+            "_id": "69709d5f79e903cc0a1f433f"
+          },
+          {
+            "content": "Between the two locations, where do you prefer to go? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "People prefer to go by plane instead of by train mainly because it is faster. A plane can take you to your destination in a few hours, while trains can be slow and take much longer. Planes also feel more comfortable for long trips, with nice seats and sometimes food or drinks. Traveling by plane is also exciting for many people, especially when they look forward to flying high in the sky. Planes are better for international trips because trains cannot cross oceans. Even though flying can be more expensive, people like the time they save. In short, planes are popular because they are quick, comfortable, and make long-distance travel easier.",
+            "_id": "69709d5f79e903cc0a1f4340"
+          },
+          {
+            "content": "Do you think the weather affects people’s emotions on trips?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Flying makes many people uncomfortable for several reasons. First, some people are scared of heights or worry about the plane having problems in the air. The feeling of not being in control can make them nervous. Second, planes are often crowded, and the seats can be small and not very comfortable, especially on long flights. The noise from the engines and being in a tight space can also be annoying. Some people also feel uncomfortable because of changes in air pressure, which can cause ear pain or make them feel sick. Lastly, long flights can be tiring, and not being able to move around much can make people feel stiff or restless. These reasons can make flying an uncomfortable experience for many.",
+            "_id": "69709d5f79e903cc0a1f4341"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de16_1.png",
+          "https://aptiskey.com/images/speaking/part3/de16_2.png"
+        ],
+        "_id": "69709d5f79e903cc0a1f433e"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e73e9553b4655eba3f14e5",
+    "createdAt": "2025-10-09T04:48:21.997Z",
+    "updatedAt": "2026-06-17T09:38:07.051Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e73ef253b4655eba3f14ee",
+    "title": "1 người đàn ông tập gym, 2 người đi leo núi",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 người đàn ông tập gym, 2 người đi leo núi",
+    "questions": [
+      {
+        "questionTitle": "1 người đàn ông tập gym, 2 người đi leo núi",
+        "content": "1 người đàn ông tập gym, 2 người đi leo núi",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Please describe the 2 pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a young woman sitting in a greenhouse. She is picking red tomatoes and placing them into a basket. The greenhouse is full of fresh vegetables, creating a peaceful atmosphere.\n\nOn the other hand, in the second picture, I see a father and his young child working together in a garden. The father is helping the child plant yellow flowers, using small tools and a watering can. It looks like they are in their backyard, enjoying time together.\n\nBoth pictures show people working with plants, but in different ways. I prefer the first image because I enjoy seeing fresh vegetables being picked. However, the second image also looks nice because it shows a father and child spending time together.",
+            "_id": "69709d6479e903cc0a1f4383"
+          },
+          {
+            "content": "What the difference of these two exercises?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "It allows people to have fresh vegetables and beautiful flowers, making their surroundings healthier and more attractive. Gardening also helps reduce stress, improves mental well-being, and encourages physical activity, which is good for overall health. Moreover, it teaches patience and responsibility, as plants require daily care, watering, and attention to grow properly. In addition, gardening can be a rewarding and relaxing hobby, giving people a sense of accomplishment when they see their plants grow and thrive. It also promotes environmental awareness, as people learn how to take care of nature and appreciate the beauty of green spaces.",
+            "_id": "69709d6479e903cc0a1f4384"
+          },
+          {
+            "content": "How important is it to do daily exercises?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Vegetables provide fresh, nutritious food, reducing grocery expenses and promoting a healthy diet. Homegrown produce is often tastier and free from harmful chemicals, making it a better option for families. Flowers, on the other hand, make any space more colorful, attractive, and peaceful, creating a pleasant and welcoming atmosphere. Both activities offer a deep connection with nature, a sense of accomplishment, and the joy of watching plants flourish over time. Additionally, gardening can be a great way to spend time outdoors, socialize with others who share the same interest, and develop new skills related to plant care and sustainability.",
+            "_id": "69709d6479e903cc0a1f4385"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de17_1.png",
+          "https://aptiskey.com/images/speaking/part3/de17_2.png"
+        ],
+        "_id": "69709d6479e903cc0a1f4382"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e73ef253b4655eba3f14f3",
+    "createdAt": "2025-10-09T04:49:54.144Z",
+    "updatedAt": "2026-06-17T09:38:07.100Z",
+    "__v": 0
+  },
+  {
+    "_id": "68ea019e53b4655eba3f171e",
+    "title": "1 người đàn ông chạy bộ, 1 đội thể thao chuyên nghiệp",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 người đàn ông chạy bộ, 1 đội thể thao chuyên nghiệp",
+    "questions": [
+      {
+        "questionTitle": "1 người đàn ông chạy bộ, 1 đội thể thao chuyên nghiệp",
+        "content": "1 người đàn ông chạy bộ, 1 đội thể thao chuyên nghiệp",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Please describe the 2 pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a young woman sitting on a couch, wearing headphones and enjoying music. She looks relaxed and is raising her arms, almost as if she is dancing. There is a laptop beside her, so she might be listening to music online.\n\nOn the other hand, in the second picture, there is a female singer performing on stage with a band. She is wearing a black dress, and the atmosphere seems lively, even though the audience is not visible.\n\nBoth pictures show people enjoying music, but in different ways. I prefer the first picture because I like listening to music in a calm and relaxed way. However, the second picture also looks great because it shows the energy and excitement of a live performance.",
+            "_id": "69709d6e79e903cc0a1f43c7"
+          },
+          {
+            "content": "How are these experiences of sport different?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "The two pictures represent different ways to enjoy music. The first one shows a personal experience, where someone listens to music alone using headphones. This method is more private and allows people to relax in their own space. In contrast, the second picture captures a social event where people enjoy live performances. Attending concerts or live music events creates a sense of excitement and connection with others. Both ways provide unique experiences, depending on personal preferences and mood.",
+            "_id": "69709d6e79e903cc0a1f43c8"
+          },
+          {
+            "content": "What kinds of sports are popular in your country? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Listening to music has many benefits. It helps people relax, reduce stress, and improve their mood. Music can also boost concentration and creativity, making it useful for studying or working. Additionally, it brings people together, whether at concerts or through shared playlists. Music therapy is even used to help with mental health issues. Overall, whether listening alone or at an event, music has a positive impact on emotions and well-being, making life more enjoyable.",
+            "_id": "69709d6e79e903cc0a1f43c9"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de18_1.png",
+          "https://aptiskey.com/images/speaking/part3/de18_2.png"
+        ],
+        "_id": "69709d6e79e903cc0a1f43c6"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68ea019e53b4655eba3f1723",
+    "createdAt": "2025-10-11T07:05:02.555Z",
+    "updatedAt": "2026-06-17T09:38:07.146Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f20ca353b4655eba3f3766",
+    "title": "Nhiều người trên xe bus, 1 người mở cửa vào ô tô",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Nhiều người trên xe bus, 1 người mở cửa vào ô tô",
+    "questions": [
+      {
+        "questionTitle": "Nhiều người trên xe bus, 1 người mở cửa vào ô tô",
+        "content": "Nhiều người trên xe bus, 1 người mở cửa vào ô tô",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in these two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a family playing chess together. The parents are smiling, and their child seems very focused on the game. It shows quality family time and intellectual activity.\n\nOn the other hand, in the second picture, I see a young boy playing video games alone. He looks focused, holding a controller while sitting on a couch.\n\nBoth pictures show indoor activities, but in different ways. I prefer the first picture because I enjoy spending time with family and playing games that require thinking. However, the second picture also looks fun, as it shows a more personal and relaxing activity.",
+            "_id": "69709da079e903cc0a1f458d"
+          },
+          {
+            "content": "What are the benefits of two ways of traveling?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I prefer playing video games because they are more exciting and interactive. Video games offer different challenges, from action-packed missions to puzzle-solving adventures. They also improve reflexes and problem-solving skills. However, chess is great for strategic thinking and patience. While both are enjoyable, video games provide a wider variety of experiences and can be played alone or with friends online.",
+            "_id": "69709da079e903cc0a1f458e"
+          },
+          {
+            "content": "Why do some people like traveling by car?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Indoor activities are important because they provide entertainment and relaxation, especially when outdoor activities are not possible. They help people develop mental skills, such as concentration and problem-solving, through games like chess or video games. Indoor activities also strengthen family bonds, as seen in board games or movie nights. Additionally, they are a safe option during bad weather or when people need to stay indoors for health reasons.",
+            "_id": "69709da079e903cc0a1f458f"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de19_1.png",
+          "https://aptiskey.com/images/speaking/part3/de19_2.png"
+        ],
+        "_id": "69709da079e903cc0a1f458c"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f20ca353b4655eba3f376b",
+    "createdAt": "2025-10-17T09:30:11.809Z",
+    "updatedAt": "2026-06-17T09:38:07.425Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e663aa53b4655eba3f1191",
+    "title": "Thể thao chuyên nghiệp, thể thao nghiệp dư",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Thể thao chuyên nghiệp, thể thao nghiệp dư",
+    "questions": [
+      {
+        "questionTitle": "Thể thao chuyên nghiệp, thể thao nghiệp dư",
+        "content": "Thể thao chuyên nghiệp, thể thao nghiệp dư",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, a man and a boy are cooking together in a modern kitchen. They look happy, and the fresh ingredients on the counter suggest they are preparing a homemade meal. This creates a warm and cozy family atmosphere.\n\nOn the other hand, in the second picture, a man is sitting at an outdoor restaurant, enjoying a slice of pizza. He looks relaxed, and the background shows many people dining, creating a lively and social setting.\n\nBoth pictures show different ways of eating, but in different settings. I prefer the first picture because I enjoy the feeling of cooking and sharing a meal at home with my family. However, the second picture also looks nice because it shows a fun and social experience of eating out.",
+            "_id": "69709cd579e903cc0a1f3c9d"
+          },
+          {
+            "content": "What are the benefits of indoor and outdoor sports?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Eating at different places is appealing because it allows people to explore new foods and flavors. Each restaurant or food stall offers unique dishes, making meals more exciting. It's also a great way to experience different cultures and cooking styles, which can be both fun and educational. Additionally, dining out provides a change of scenery and atmosphere, making it more interesting than always eating at home. It also offers social opportunities, whether by meeting new people or celebrating special occasions like birthdays or holidays. Overall, trying new places adds variety to life and makes dining a more enjoyable experience.",
+            "_id": "69709cd579e903cc0a1f3c9e"
+          },
+          {
+            "content": "Playing a game is to win. What do you think ?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "On special occasions, people prefer to dine at places that feel unique and memorable. Many choose fine dining restaurants or venues with beautiful views to create a luxurious experience. Others may opt for a cozy family restaurant where they feel comfortable and relaxed. Some enjoy celebrating at their favorite local spot, where they know the food is always delicious. For many, hosting a meal at home with family and friends is the best way to celebrate, as it allows for a more personal and intimate gathering. Buffets, barbecue spots, and outdoor picnics are also popular choices for special days. Ultimately, the goal is to enjoy great food, spend time with loved ones, and make the occasion feel truly special.",
+            "_id": "69709cd579e903cc0a1f3c9f"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de20_1.png",
+          "https://aptiskey.com/images/speaking/part3/de20_2.png"
+        ],
+        "_id": "69709cd579e903cc0a1f3c9c"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e663aa53b4655eba3f1196",
+    "createdAt": "2025-10-08T13:14:18.407Z",
+    "updatedAt": "2026-06-17T09:38:06.093Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e665d653b4655eba3f11c9",
+    "title": "Trèo thuyền theo team, đạp xe một mình",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Trèo thuyền theo team, đạp xe một mình",
+    "questions": [
+      {
+        "questionTitle": "Trèo thuyền theo team, đạp xe một mình",
+        "content": "Trèo thuyền theo team, đạp xe một mình",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe these two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, a happy family is sitting together on the grass in front of their house. They look relaxed and close to each other, suggesting a warm family life. The house behind them is big and comfortable, showing a peaceful environment.\n\nOn the other hand, in the second picture, a young woman is standing alone on a balcony in the city. She looks confident and independent. The tall buildings in the background suggest she lives in an apartment in an urban area.\n\nBoth pictures show different ways of living, with the first showing family life, which offers support and togetherness. The second shows living alone, which provides independence and privacy. Each lifestyle has its own benefits, depending on personal preferences.",
+            "_id": "69709ced79e903cc0a1f3dad"
+          },
+          {
+            "content": "What are the difficulties of each sport?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I prefer living with my family because it gives me a sense of comfort, support, and belonging. When I live with my family, I don't feel lonely, and I always have someone to talk to or share my day with. It also helps with responsibilities like cooking and cleaning, as we can share the tasks. Living with family creates strong bonds and allows me to learn important values such as respect, cooperation, and caring for others. While living alone may offer more freedom and privacy, I think living with family is more meaningful and emotionally fulfilling, especially when you have a close relationship with them.",
+            "_id": "69709ced79e903cc0a1f3dae"
+          },
+          {
+            "content": "Why do some people prefer team sports to individual sports?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "Nowadays, many people like to live alone because it gives them more freedom and independence. When people live alone, they can make their own decisions, manage their time the way they want, and enjoy privacy without being disturbed. This is especially appealing to young adults who want to focus on their careers, studies, or personal growth. Living alone also helps people become more responsible and self-reliant, as they have to handle all daily tasks by themselves. Additionally, in modern cities, people often move away from their families for work or education, so living alone becomes a practical choice. While it can sometimes feel lonely, many enjoy the peace and quiet it offers. With technology, they can still stay connected with friends and family even if they live apart.",
+            "_id": "69709ced79e903cc0a1f3daf"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de21_1.png",
+          "https://aptiskey.com/images/speaking/part3/de21_2.png"
+        ],
+        "_id": "69709ced79e903cc0a1f3dac"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e665d653b4655eba3f11ce",
+    "createdAt": "2025-10-08T13:23:34.899Z",
+    "updatedAt": "2026-06-17T09:38:06.274Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e6673c53b4655eba3f11d7",
+    "title": "Cưỡi lạc đà, cưỡi ngựa",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Cưỡi lạc đà, cưỡi ngựa",
+    "questions": [
+      {
+        "questionTitle": "Cưỡi lạc đà, cưỡi ngựa",
+        "content": "Cưỡi lạc đà, cưỡi ngựa",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see from the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "As I can see in the first picture, there is a father and his son playing with a horse. The father is wearing a shirt, and the son is wearing a shirt. The boy looks very happy, maybe because it's the first time he has seen a horse. Looking at the background, I think they are in a park and enjoying their day off.\n\nOn the other hand, in the second picture, I see a teacher with her students. The teacher is wearing a shirt, and she is guiding the kids to play with a snake on the table. The kids look excited and happy.\n\nBoth pictures show children interacting with animals, but in different ways. I prefer the first picture because I enjoy seeing a happy family having fun with animals. However, the second picture also looks nice because it shows kids learning about animals in a fun way.",
+            "_id": "6970e8ba58cb12223e943b79"
+          },
+          {
+            "content": "Have you ever ridden a camel or a horse before?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "I don't interact with animals myself, but I know that many people enjoy spending time with them! Animals offer companionship, comfort, and can even be therapeutic. Whether it's playing with a dog, watching birds, or observing wildlife, interacting with animals can help reduce stress and create positive emotions. Animals often show affection and loyalty, which can make people feel valued and loved. I think the bond between humans and animals is special, and it's wonderful to see how much joy animals bring to people's lives.",
+            "_id": "6970e8ba58cb12223e943b7a"
+          },
+          {
+            "content": "Is riding animals popular in your country?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "From my perspective, I see eye to eye with the exposure of children to animals from a young age. Having a pet has various benefits for children. According to a survey, children who developed the closest attachments or strong bonds to their pets didn't have the rates of anxiety and depression. Furthermore, caring for their furry friends, such as taking them for a walk, feeding them and grooming them teaches the children to be responsible not only towards other animals but also with people.",
+            "_id": "6970e8ba58cb12223e943b7b"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part3/de22_1.png",
+          "https://aptiskey.com/images/speaking/part3/de22_2.png"
+        ],
+        "_id": "6970e8ba58cb12223e943b78"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e6673c53b4655eba3f11dc",
+    "createdAt": "2025-10-08T13:29:32.935Z",
+    "updatedAt": "2026-06-17T09:38:06.320Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e669ed53b4655eba3f12da",
+    "title": "Bé gái đang đi thang dây, 1 lớp học đang xem tranh thiên nhiên",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Bé gái đang đi thang dây, 1 lớp học đang xem tranh thiên nhiên",
+    "questions": [
+      {
+        "questionTitle": "Bé gái đang đi thang dây, 1 lớp học đang xem tranh thiên nhiên",
+        "content": "Bé gái đang đi thang dây, 1 lớp học đang xem tranh thiên nhiên",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d0f79e903cc0a1f3f66"
+          },
+          {
+            "content": "What are the benefits for children doing these two activities?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d0f79e903cc0a1f3f67"
+          },
+          {
+            "content": "It is easier to learn something if you enjoy doing it. What do you think?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d0f79e903cc0a1f3f68"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759930860609_fd7bed6632e3cabd_1725787805324_file.png",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759930860610_2e2f6d92897f6617_1725787811952_file.png"
+        ],
+        "_id": "69709d0f79e903cc0a1f3f65"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e669ed53b4655eba3f12df",
+    "createdAt": "2025-10-08T13:41:01.439Z",
+    "updatedAt": "2026-06-17T09:38:06.510Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e7382553b4655eba3f1462",
+    "title": "đội tuyển đá bóng, vận động viên nhảy sào",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "đội tuyển đá bóng, vận động viên nhảy sào",
+    "questions": [
+      {
+        "questionTitle": "đội tuyển đá bóng, vận động viên nhảy sào",
+        "content": "đội tuyển đá bóng, vận động viên nhảy sào",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Compare 2 pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "6970e85b58cb12223e9438b9"
+          },
+          {
+            "content": "The attractions of these different kinds of sport?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "6970e85b58cb12223e9438ba"
+          },
+          {
+            "content": "Why are sports more popular than others?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "6970e85b58cb12223e9438bb"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2026/01/1769007193029_8e2ff3790805d56b_cap1.png",
+          "https://files.aptisacademy.com.vn/speaking/2026/01/1769007193030_e175800e9d88e6ae_cap2.png"
+        ],
+        "_id": "6970e85b58cb12223e9438b8"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e7382553b4655eba3f1467",
+    "createdAt": "2025-10-09T04:20:53.433Z",
+    "updatedAt": "2026-06-17T09:38:06.695Z",
+    "__v": 0
+  },
+  {
+    "_id": "68ea05f453b4655eba3f1737",
+    "title": "Trang trí nhà cửa",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Trang trí nhà cửa",
+    "questions": [
+      {
+        "questionTitle": "Trang trí nhà cửa",
+        "content": "Trang trí nhà cửa",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d7579e903cc0a1f440b"
+          },
+          {
+            "content": "Where would you rather live? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d7579e903cc0a1f440c"
+          },
+          {
+            "content": "Why do people like to decorate their home?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d7579e903cc0a1f440d"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760167411045_fe323b6743a6f344_110719_Religion_009_2500.webp",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760167411046_a5a33e7305a0e82d_przestrzen_dla_studenta_400_63412477.jpg"
+        ],
+        "_id": "69709d7579e903cc0a1f440a"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68ea05f453b4655eba3f173c",
+    "createdAt": "2025-10-11T07:23:32.702Z",
+    "updatedAt": "2026-06-17T09:38:07.192Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f20da653b4655eba3f37a3",
+    "title": "1 người đầu bếp, 2 công nhân mỏ",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 người đầu bếp, 2 công nhân mỏ",
+    "questions": [
+      {
+        "questionTitle": "1 người đầu bếp, 2 công nhân mỏ",
+        "content": "1 người đầu bếp, 2 công nhân mỏ",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709da579e903cc0a1f45d1"
+          },
+          {
+            "content": "What is your opinion about these 2 jobs?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709da579e903cc0a1f45d2"
+          },
+          {
+            "content": "Which job do you think is more interesting?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709da579e903cc0a1f45d3"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760693670036_1df75f48b33bfce1_chat_luong_mon_an_trong_nha_hang_3.jpg",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760693670037_e5cad00257b5f1c7_anh_tho_mo_thai_hoang_linh_750x375.jpg"
+        ],
+        "_id": "69709da579e903cc0a1f45d0"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f20da653b4655eba3f37a8",
+    "createdAt": "2025-10-17T09:34:30.961Z",
+    "updatedAt": "2026-06-17T09:38:07.470Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f2184153b4655eba3f383f",
+    "title": "Cô gái ngồi trước máy tính, lớp học trực tuyến",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Cô gái ngồi trước máy tính, lớp học trực tuyến",
+    "questions": [
+      {
+        "questionTitle": "Cô gái ngồi trước máy tính, lớp học trực tuyến",
+        "content": "Cô gái ngồi trước máy tính, lớp học trực tuyến",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dc879e903cc0a1f4769"
+          },
+          {
+            "content": "Which place looks better to learn in?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dc879e903cc0a1f476a"
+          },
+          {
+            "content": "Is it better to study in groups or face to face or on the internet? Why? ",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dc879e903cc0a1f476b"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760696376930_b0aa89685d0afce6_pngtree_stressed_student_with_laptop_in_cafe_struggling_to_work_and_study_photo_image_51040858.jpg",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760696376931_be4923cea49bc001_londra_excursie_si_cursuri_420x290.jpg"
+        ],
+        "_id": "69709dc879e903cc0a1f4768"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f2184153b4655eba3f3844",
+    "createdAt": "2025-10-17T10:19:45.968Z",
+    "updatedAt": "2026-06-17T09:38:07.748Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f3470e53b4655eba3f38c0",
+    "title": "1 ngọn núi tuyết, 1 bãi biển đẹp",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 ngọn núi tuyết, 1 bãi biển đẹp",
+    "questions": [
+      {
+        "questionTitle": "1 ngọn núi tuyết, 1 bãi biển đẹp",
+        "content": "1 ngọn núi tuyết, 1 bãi biển đẹp",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe these two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dd279e903cc0a1f4803"
+          },
+          {
+            "content": "Which of these two places would you prefer to go on holiday to? Why? ",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dd279e903cc0a1f4804"
+          },
+          {
+            "content": "Which of these two places do you think children would prefer? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dd279e903cc0a1f4805"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760773901839_2d85fee57c9d6d5c_images__6_.jfif",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760773901840_8c79e06b858ae502_chairs_under_palm_trees_at_a_beach_in_cdwheatley.jpg"
+        ],
+        "_id": "69709dd279e903cc0a1f4802"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f3470e53b4655eba3f38c5",
+    "createdAt": "2025-10-18T07:51:42.516Z",
+    "updatedAt": "2026-06-17T09:38:07.843Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f34d1753b4655eba3f38ce",
+    "title": "1 cuộc đua xe đạp, 1 cuộc đua xe máy",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 cuộc đua xe đạp, 1 cuộc đua xe máy",
+    "questions": [
+      {
+        "questionTitle": "1 cuộc đua xe đạp, 1 cuộc đua xe máy",
+        "content": "1 cuộc đua xe đạp, 1 cuộc đua xe máy",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "What do you see in the two pictures?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dd779e903cc0a1f482b"
+          },
+          {
+            "content": "What kinds of people play these two sports?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dd779e903cc0a1f482c"
+          },
+          {
+            "content": "Which of these two sports is more difficult to do?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dd779e903cc0a1f482d"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760775446166_f5058f97fab79155_images__7_.jfif",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760775446168_5e404d98b0e63ef6_images__8_.jfif"
+        ],
+        "_id": "69709dd779e903cc0a1f482a"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f34d1753b4655eba3f38d3",
+    "createdAt": "2025-10-18T08:17:27.675Z",
+    "updatedAt": "2026-06-17T09:38:07.889Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f34e0d53b4655eba3f38dc",
+    "title": "Bãi biển, thảo nguyên xanh",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Bãi biển, thảo nguyên xanh",
+    "questions": [
+      {
+        "questionTitle": "Bãi biển, thảo nguyên xanh",
+        "content": "Bãi biển, thảo nguyên xanh",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "What do you see in the two pictures?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709ddb79e903cc0a1f4853"
+          },
+          {
+            "content": "Which of these two places do you think children would prefer? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709ddb79e903cc0a1f4854"
+          },
+          {
+            "content": "Which of these two places would you prefer to go on holiday? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709ddb79e903cc0a1f4855"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760775692721_9bca4c01f92b2160_Tropical_Paradise_Seychelles_Tropics_Islands_Indian_Ocean_Beach_Wallpaper_Hd_1920x1200_840x525.webp",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760775692722_0f721338d30eebb7_wall_murals_far_west_spirit.jpg"
+        ],
+        "_id": "69709ddb79e903cc0a1f4852"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f34e0d53b4655eba3f38e1",
+    "createdAt": "2025-10-18T08:21:33.437Z",
+    "updatedAt": "2026-06-17T09:38:07.934Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5e92353b4655eba3f10db",
+    "title": "1 người đàn ông đọc sách, 1 cậu bé đang chơi game",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 người đàn ông đọc sách, 1 cậu bé đang chơi game",
+    "questions": [
+      {
+        "questionTitle": "1 người đàn ông đọc sách, 1 cậu bé đang chơi game",
+        "content": "1 người đàn ông đọc sách, 1 cậu bé đang chơi game",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two photographs?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709ccb79e903cc0a1f3c59"
+          },
+          {
+            "content": "How do you schedule your day to include focused studying and entertainment breaks?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709ccb79e903cc0a1f3c5a"
+          },
+          {
+            "content": "Playing video games is not for adults. What do you think?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709ccb79e903cc0a1f3c5b"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759897887485_1a9e4cfa8607f3fd_1725772817410_file.png",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759897887486_ebce815486ef7005_1725772820072_file.png"
+        ],
+        "_id": "69709ccb79e903cc0a1f3c58"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e5e92353b4655eba3f10e0",
+    "createdAt": "2025-10-08T04:31:31.388Z",
+    "updatedAt": "2026-06-17T09:38:06.052Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e664f553b4655eba3f11ad",
+    "title": "1 gia đình đang đi picnic, 1 bãi biển đông đúc",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 gia đình đang đi picnic, 1 bãi biển đông đúc",
+    "questions": [
+      {
+        "questionTitle": "1 gia đình đang đi picnic, 1 bãi biển đông đúc",
+        "content": "1 gia đình đang đi picnic, 1 bãi biển đông đúc",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two photographs.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709ce179e903cc0a1f3d25"
+          },
+          {
+            "content": "Which one do you prefer: eating out or eating at home?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709ce179e903cc0a1f3d26"
+          },
+          {
+            "content": "Why do people prefer eating out to eating at home?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709ce179e903cc0a1f3d27"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759929589108_0a7dce445a9d22d7_1725781316047_file.png",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759929589109_175ec4a3ea23b306_1725781319435_file.png"
+        ],
+        "_id": "69709ce179e903cc0a1f3d24"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e664f553b4655eba3f11b2",
+    "createdAt": "2025-10-08T13:19:49.850Z",
+    "updatedAt": "2026-06-17T09:38:06.183Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e66ad753b4655eba3f12f6",
+    "title": "Ăn một mình, ăn cùng gia đình",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Ăn một mình, ăn cùng gia đình",
+    "questions": [
+      {
+        "questionTitle": "Ăn một mình, ăn cùng gia đình",
+        "content": "Ăn một mình, ăn cùng gia đình",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Compare 2 pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d1a79e903cc0a1f3fee"
+          },
+          {
+            "content": "Which two kinds of food would you prefer, and why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d1a79e903cc0a1f3fef"
+          },
+          {
+            "content": "Why is it  important to eat different food?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d1a79e903cc0a1f3ff0"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759931094457_bff42820a34939fb_1725788515198_file.png",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759931094459_0cd9f9e30aea0344_1725788518658_file.png"
+        ],
+        "_id": "69709d1a79e903cc0a1f3fed"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e66ad753b4655eba3f12fb",
+    "createdAt": "2025-10-08T13:44:55.216Z",
+    "updatedAt": "2026-06-17T09:38:06.603Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e737a453b4655eba3f1454",
+    "title": "Đám trẻ đọc sách, người đàn ông làm việc trên iPad",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Đám trẻ đọc sách, người đàn ông làm việc trên iPad",
+    "questions": [
+      {
+        "questionTitle": "Đám trẻ đọc sách, người đàn ông làm việc trên iPad",
+        "content": "Đám trẻ đọc sách, người đàn ông làm việc trên iPad",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe 2 the pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d2579e903cc0a1f4069"
+          },
+          {
+            "content": "What difficulties do you encounter when studying at the library or coffee shop?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d2579e903cc0a1f406a"
+          },
+          {
+            "content": "Which place do you prefer? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d2579e903cc0a1f406b"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759983523185_2c75f70316dfd288_1725788835105_file.png",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759983523186_6987f812465a79c1_1725788838904_file.png"
+        ],
+        "_id": "69709d2579e903cc0a1f4068"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e737a453b4655eba3f1459",
+    "createdAt": "2025-10-09T04:18:44.834Z",
+    "updatedAt": "2026-06-17T09:38:06.650Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e73ab753b4655eba3f149a",
+    "title": "Cô gái đang bê khay đồ ăn, 2 người đang ăn và 1 người phục vụ",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Cô gái đang bê khay đồ ăn, 2 người đang ăn và 1 người phục vụ",
+    "questions": [
+      {
+        "questionTitle": "Cô gái đang bê khay đồ ăn, 2 người đang ăn và 1 người phục vụ",
+        "content": "Cô gái đang bê khay đồ ăn, 2 người đang ăn và 1 người phục vụ",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d4079e903cc0a1f41bd"
+          },
+          {
+            "content": "What are the attractions of eating in these different places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d4079e903cc0a1f41be"
+          },
+          {
+            "content": "Why do some people like to eat out on special occasions?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d4079e903cc0a1f41bf"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759984309883_2d305000373950c9_1725773228290_file.png",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759984309884_e6f6e99c661ffdb6_1725773230931_file.png"
+        ],
+        "_id": "69709d4079e903cc0a1f41bc"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e73ab753b4655eba3f149f",
+    "createdAt": "2025-10-09T04:31:51.004Z",
+    "updatedAt": "2026-06-17T09:38:06.827Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e73e3c53b4655eba3f14d2",
+    "title": "1 cô gái ôm mèo, 1 cậu bé đang chơi với một con sâu",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 cô gái ôm mèo, 1 cậu bé đang chơi với một con sâu",
+    "questions": [
+      {
+        "questionTitle": "1 cô gái ôm mèo, 1 cậu bé đang chơi với một con sâu",
+        "content": "1 cô gái ôm mèo, 1 cậu bé đang chơi với một con sâu",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d5979e903cc0a1f42fb"
+          },
+          {
+            "content": "What are the attractions of keeping these animals as pets?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d5979e903cc0a1f42fc"
+          },
+          {
+            "content": "Some say animals should not be kept in the home. What do you think?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d5979e903cc0a1f42fd"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759985211491_0c8eca8202ed3c04_1725787131830_file.png",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1759985211492_16e27e6c436f4d3d_1725787134760_file.png"
+        ],
+        "_id": "69709d5979e903cc0a1f42fa"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68e73e3c53b4655eba3f14d7",
+    "createdAt": "2025-10-09T04:46:52.107Z",
+    "updatedAt": "2026-06-17T09:38:07.004Z",
+    "__v": 0
+  },
+  {
+    "_id": "68eb7e3653b4655eba3f1901",
+    "title": "Ăn ở nhà bình dân, ăn ở nhà hàng cao cấp",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Ăn ở nhà bình dân, ăn ở nhà hàng cao cấp",
+    "questions": [
+      {
+        "questionTitle": "Ăn ở nhà bình dân, ăn ở nhà hàng cao cấp",
+        "content": "Ăn ở nhà bình dân, ăn ở nhà hàng cao cấp",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in two the pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d7c79e903cc0a1f444f"
+          },
+          {
+            "content": "What would it be like to eat in two places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d7c79e903cc0a1f4450"
+          },
+          {
+            "content": "Which of the two places would be healthier to eat in? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d7c79e903cc0a1f4451"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760263733329_77c06fd36a860bd1_1725790916466_file.png",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760263733330_a7d7376f0858e7da_Screenshot_15.png"
+        ],
+        "_id": "69709d7c79e903cc0a1f444e"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68eb7e3653b4655eba3f1906",
+    "createdAt": "2025-10-12T10:08:54.779Z",
+    "updatedAt": "2026-06-17T09:38:07.239Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f20b6353b4655eba3f373a",
+    "title": "2 bố con cho ngựa ăn, trẻ con chơi với rắn",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "2 bố con cho ngựa ăn, trẻ con chơi với rắn",
+    "questions": [
+      {
+        "questionTitle": "2 bố con cho ngựa ăn, trẻ con chơi với rắn",
+        "content": "2 bố con cho ngựa ăn, trẻ con chơi với rắn",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d8b79e903cc0a1f44d7"
+          },
+          {
+            "content": "Do you like to play with horses or with snakes?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d8b79e903cc0a1f44d8"
+          },
+          {
+            "content": "Should children be exposed to animals?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709d8b79e903cc0a1f44d9"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760693072284_b08684c2af32687f_istockphoto_873973612_1024x1024.jpg",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760693072286_b0e001f04845722f_IMG_1261.webp"
+        ],
+        "_id": "69709d8b79e903cc0a1f44d6"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f20b6353b4655eba3f373f",
+    "createdAt": "2025-10-17T09:24:51.483Z",
+    "updatedAt": "2026-06-17T09:38:07.331Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f211b553b4655eba3f37b1",
+    "title": "thuyết trình không có công nghệ, thuyết trình với công nghệ",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "thuyết trình không có công nghệ, thuyết trình với công nghệ",
+    "questions": [
+      {
+        "questionTitle": "thuyết trình không có công nghệ, thuyết trình với công nghệ",
+        "content": "thuyết trình không có công nghệ, thuyết trình với công nghệ",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see from the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dad79e903cc0a1f4615"
+          },
+          {
+            "content": "What are the problems of giving a presentation in these situations?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dad79e903cc0a1f4616"
+          },
+          {
+            "content": "Technology has improved the ability to communicate with other people. What do you think?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dad79e903cc0a1f4617"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760694708008_215633b703917ad3_photo_1627653126.jpg",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760694708009_70ce06edad2e70d0_laser_projector_landing_fg_office.png"
+        ],
+        "_id": "69709dad79e903cc0a1f4614"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f211b553b4655eba3f37b6",
+    "createdAt": "2025-10-17T09:51:49.019Z",
+    "updatedAt": "2026-06-17T09:38:07.517Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f212b953b4655eba3f3807",
+    "title": "1 gia đình đi biển, 1 nhóm bạn đi leo núi",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "1 gia đình đi biển, 1 nhóm bạn đi leo núi",
+    "questions": [
+      {
+        "questionTitle": "1 gia đình đi biển, 1 nhóm bạn đi leo núi",
+        "content": "1 gia đình đi biển, 1 nhóm bạn đi leo núi",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe these two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709db279e903cc0a1f4659"
+          },
+          {
+            "content": "Which place in these two pictures do you prefer to go?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709db279e903cc0a1f465a"
+          },
+          {
+            "content": "Do you prefer spending time with your family or your friends?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709db279e903cc0a1f465b"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760694968699_85d9ad55f8868dd4_family_tours.jpg",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760694968700_04c751d8e348bdc9_istockphoto_941249992_2048x2048.jpg"
+        ],
+        "_id": "69709db279e903cc0a1f4658"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f212b953b4655eba3f380c",
+    "createdAt": "2025-10-17T09:56:09.533Z",
+    "updatedAt": "2026-06-17T09:38:07.562Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f2132c53b4655eba3f3815",
+    "title": "chung cư, nhà mặt đất",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "chung cư, nhà mặt đất",
+    "questions": [
+      {
+        "questionTitle": "chung cư, nhà mặt đất",
+        "content": "chung cư, nhà mặt đất",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures. ",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709db879e903cc0a1f469d"
+          },
+          {
+            "content": "What would it be like living in these two places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709db879e903cc0a1f469e"
+          },
+          {
+            "content": "Which of these two places would it be better for old people to live in? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709db879e903cc0a1f469f"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760695084186_f23610f79e726bdf_interagency_mous.jpg",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760695084187_9d8d14d19d4c134f_4183ed124dc5403d9b06b388e59bd413_crop_576x384.webp"
+        ],
+        "_id": "69709db879e903cc0a1f469c"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f2132c53b4655eba3f381a",
+    "createdAt": "2025-10-17T09:58:04.955Z",
+    "updatedAt": "2026-06-17T09:38:07.607Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f2145a53b4655eba3f3823",
+    "title": "Mua sắm trong siêu thị, mua sắm trong chợ ( Version 2)",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Mua sắm trong siêu thị, mua sắm trong chợ ( Version 2)",
+    "questions": [
+      {
+        "questionTitle": "Mua sắm trong siêu thị, mua sắm trong chợ ( Version 2)",
+        "content": "Mua sắm trong siêu thị, mua sắm trong chợ ( Version 2)",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dbe79e903cc0a1f46e1"
+          },
+          {
+            "content": "What sort of people shop in these two places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dbe79e903cc0a1f46e2"
+          },
+          {
+            "content": "Which of these two places would you prefer to shop in? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dbe79e903cc0a1f46e3"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760695383809_5b08440017730814_istockphoto_157511642_1024x1024__1_.jpg",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760695383810_8da25a06287f21fa_90672d456c949228f8e37e1b915b924d__1_.jpg"
+        ],
+        "_id": "69709dbe79e903cc0a1f46e0"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f2145a53b4655eba3f3828",
+    "createdAt": "2025-10-17T10:03:06.793Z",
+    "updatedAt": "2026-06-17T09:38:07.657Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f2177c53b4655eba3f3831",
+    "title": "Làm việc trong văn phòng, làm việc trong nhà máy",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Làm việc trong văn phòng, làm việc trong nhà máy",
+    "questions": [
+      {
+        "questionTitle": "Làm việc trong văn phòng, làm việc trong nhà máy",
+        "content": "Làm việc trong văn phòng, làm việc trong nhà máy",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Tell me what you see in the two pictures.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dc479e903cc0a1f4725"
+          },
+          {
+            "content": "What would it be like to work in these two places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dc479e903cc0a1f4726"
+          },
+          {
+            "content": "Which of these two places would you prefer to work in? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69709dc479e903cc0a1f4727"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760696185456_11c74473d1733a4d_images.jpg",
+          "https://files.aptisacademy.com.vn/speaking/2025/10/1760696185458_462fc15a5a303628_istockphoto_135456139_1024x1024.jpg"
+        ],
+        "_id": "69709dc479e903cc0a1f4724"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "68f2177c53b4655eba3f3836",
+    "createdAt": "2025-10-17T10:16:28.279Z",
+    "updatedAt": "2026-06-17T09:38:07.702Z",
+    "__v": 0
+  },
+  {
+    "_id": "69c1640ac68879da1b92c704",
+    "title": "2 đứa trẻ chơi cờ vua, 2 đứa trẻ đang chơi điện tử",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "2 đứa trẻ chơi cờ vua, 2 đứa trẻ đang chơi điện tử",
+    "questions": [
+      {
+        "questionTitle": "2 đứa trẻ chơi cờ vua, 2 đứa trẻ đang chơi điện tử",
+        "content": "2 đứa trẻ chơi cờ vua, 2 đứa trẻ đang chơi điện tử",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c1640ac68879da1b92c706"
+          },
+          {
+            "content": "Do you prefer playing chess or video games, why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c1640ac68879da1b92c707"
+          },
+          {
+            "content": "Are outdoor activities important and why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c1640ac68879da1b92c708"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774281736264_9da91809b4bae7a6_de02_1.png",
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774281736273_9028725b9bfca7b0_de02_2.png"
+        ],
+        "_id": "69c1640ac68879da1b92c705"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "69c1640ac68879da1b92c709",
+    "createdAt": "2026-03-23T16:02:18.077Z",
+    "updatedAt": "2026-06-17T09:38:07.977Z",
+    "__v": 0
+  },
+  {
+    "_id": "69c164c0c68879da1b92cdc9",
+    "title": "rừng thông, bãi biển",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "rừng thông, bãi biển",
+    "questions": [
+      {
+        "questionTitle": "rừng thông, bãi biển",
+        "content": "rừng thông, bãi biển",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c164c0c68879da1b92cdcb"
+          },
+          {
+            "content": "Which place do you like better? Pine forest or beach?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c164c0c68879da1b92cdcc"
+          },
+          {
+            "content": "Does weather affect human emotions? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c164c0c68879da1b92cdcd"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774281919835_5c53b059ccdaf753_de03_1.png",
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774281919836_76e07c332cad60e5_de03_2.png"
+        ],
+        "_id": "69c164c0c68879da1b92cdca"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "69c164c0c68879da1b92cdce",
+    "createdAt": "2026-03-23T16:05:20.658Z",
+    "updatedAt": "2026-06-17T09:38:08.017Z",
+    "__v": 0
+  },
+  {
+    "_id": "69c1659cc68879da1b92d179",
+    "title": "Người đàn ông trong rừng thông, nhóm người cưỡi lạc đà trên sa mạc",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Người đàn ông trong rừng thông, nhóm người cưỡi lạc đà trên sa mạc",
+    "questions": [
+      {
+        "questionTitle": "Người đàn ông trong rừng thông, nhóm người cưỡi lạc đà trên sa mạc",
+        "content": "Người đàn ông trong rừng thông, nhóm người cưỡi lạc đà trên sa mạc",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c1659cc68879da1b92d17b"
+          },
+          {
+            "content": "What types of people live in these places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c1659cc68879da1b92d17c"
+          },
+          {
+            "content": "Which place would you rather visit, and why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c1659cc68879da1b92d17d"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774282139794_d134cdc463103dbd_de10_1.png",
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774282139795_ed1d84fb042d8058_de10_2.png"
+        ],
+        "_id": "69c1659cc68879da1b92d17a"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "69c1659cc68879da1b92d17e",
+    "createdAt": "2026-03-23T16:09:00.478Z",
+    "updatedAt": "2026-06-17T09:38:08.058Z",
+    "__v": 0
+  },
+  {
+    "_id": "69c167b5c68879da1b92d850",
+    "title": "Chơi đàn trong nhà, chơi đàn ngoài trời",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Chơi đàn trong nhà, chơi đàn ngoài trời",
+    "questions": [
+      {
+        "questionTitle": "Chơi đàn trong nhà, chơi đàn ngoài trời",
+        "content": "Chơi đàn trong nhà, chơi đàn ngoài trời",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c167b5c68879da1b92d852"
+          },
+          {
+            "content": "Where do you like to play music and why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c167b5c68879da1b92d853"
+          },
+          {
+            "content": "How will playing music in different places bring different emotions?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c167b5c68879da1b92d854"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774282676285_a942f29369ef5d5e_de14_1.png",
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774282676286_6b9c9a8a5be6c550_de14_2.png"
+        ],
+        "_id": "69c167b5c68879da1b92d851"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "69c167b5c68879da1b92d855",
+    "createdAt": "2026-03-23T16:17:57.950Z",
+    "updatedAt": "2026-06-17T09:38:08.100Z",
+    "__v": 0
+  },
+  {
+    "_id": "69c16a4ac68879da1b92d9f3",
+    "title": "Cô gái trồng rau, 2 cha con trồng hoa",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Cô gái trồng rau, 2 cha con trồng hoa",
+    "questions": [
+      {
+        "questionTitle": "Cô gái trồng rau, 2 cha con trồng hoa",
+        "content": "Cô gái trồng rau, 2 cha con trồng hoa",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><span style=\"background-color: rgb(255, 255, 255); color: rgb(33, 37, 41);\"> As I can see in the first picture, there is a young woman sitting in a greenhouse. She is picking red tomatoes and placing them into a basket. The greenhouse is full of fresh vegetables, creating a peaceful atmosphere.</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(33, 37, 41);\">On the other hand, in the second picture, I see a father and his young child working together in a garden. The father is helping the child plant yellow flowers, using small tools and a watering can. It looks like they are in their backyard, enjoying time together.</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(33, 37, 41);\">Both pictures show people working with plants, but in different ways. I prefer the first image because I enjoy seeing fresh vegetables being picked. However, the second image also looks nice because it shows a father and child spending time together.</span></p>",
+            "_id": "69c16b40c68879da1b92e136"
+          },
+          {
+            "content": "Growing a garden has many wonderful benefits?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p>It allows people to have fresh vegetables and beautiful flowers, making their surroundings healthier and more attractive. Gardening also helps reduce stress, improves mental well-being, and encourages physical activity, which is good for overall health. Moreover, it teaches patience and responsibility, as plants require daily care, watering, and attention to grow properly. In addition, gardening can be a rewarding and relaxing hobby, giving people a sense of accomplishment when they see their plants grow and thrive. It also promotes environmental awareness, as people learn how to take care of nature and appreciate the beauty of green spaces.</p><p>Đóng</p>",
+            "_id": "69c16b40c68879da1b92e137"
+          },
+          {
+            "content": "Growing vegetables and flowers is appealing for many reasons?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p>Vegetables provide fresh, nutritious food, reducing grocery expenses and promoting a healthy diet. Homegrown produce is often tastier and free from harmful chemicals, making it a better option for families. Flowers, on the other hand, make any space more colorful, attractive, and peaceful, creating a pleasant and welcoming atmosphere. Both activities offer a deep connection with nature, a sense of accomplishment, and the joy of watching plants flourish over time. Additionally, gardening can be a great way to spend time outdoors, socialize with others who share the same interest, and develop new skills related to plant care and sustainability.</p><p>Đóng</p>",
+            "_id": "69c16b40c68879da1b92e138"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774283583746_8eddceaa4d670623_de17_1.png",
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774283583747_0f46c1d09de99d27_de17_2.png"
+        ],
+        "_id": "69c16b40c68879da1b92e135"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "69c16a4ac68879da1b92d9f8",
+    "createdAt": "2026-03-23T16:28:58.520Z",
+    "updatedAt": "2026-06-17T09:38:08.143Z",
+    "__v": 0
+  },
+  {
+    "_id": "69c16b1ec68879da1b92e054",
+    "title": "2 cha con nấu ăn, người đàn ông ăn đồ ăn nhanh",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "2 cha con nấu ăn, người đàn ông ăn đồ ăn nhanh",
+    "questions": [
+      {
+        "questionTitle": "2 cha con nấu ăn, người đàn ông ăn đồ ăn nhanh",
+        "content": "2 cha con nấu ăn, người đàn ông ăn đồ ăn nhanh",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c16b1ec68879da1b92e056"
+          },
+          {
+            "content": "Why is it appealing to eat at different places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c16b1ec68879da1b92e057"
+          },
+          {
+            "content": "Where do people like to eat on special occasions?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "",
+            "_id": "69c16b1ec68879da1b92e058"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774283549661_05e29a0900634270_de20_1.png",
+          "https://files.aptisacademy.com.vn/speaking/2026/03/1774283549661_007bd1c2afba705b_de20_2.png"
+        ],
+        "_id": "69c16b1ec68879da1b92e055"
+      }
+    ],
+    "questionPart": "THREE",
+    "questionType": "SPEAKING",
+    "id": "69c16b1ec68879da1b92e059",
+    "createdAt": "2026-03-23T16:32:30.628Z",
+    "updatedAt": "2026-06-17T09:38:08.186Z",
+    "__v": 0
+  }
+]

@@ -1,0 +1,1186 @@
+[
+  {
+    "_id": "b062893b79a46b5f571ff2cf",
+    "title": "Tell about a time you saved money to do something?...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Saving money to buy a new laptop for my studies]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[challenged and a little frustrated because I had to cut back on my spending]</strong></span>, I decided to stick to my plan and save consistently over several months. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I successfully bought the laptop, which greatly helped improve my productivity and studies]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: Thay phần này bằng tình huống cụ thể liên quan đến câu hỏi, ví dụ: nếu câu hỏi là 'Kể về một lần bạn tiết kiệm tiền làm gì đó', bạn sẽ điền vào: 'Tiết kiệm tiền để mua một chiếc laptop mới phục vụ cho việc học của mình.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: Phần này bạn sẽ điền vào cảm xúc hoặc khó khăn khi đối mặt với tình huống đó, ví dụ: 'Cảm thấy thử thách và hơi nản lòng vì tôi phải giảm chi tiêu nhiều.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: Mô tả cảm giác tự hào về kết quả đạt được hoặc bài học bạn học được từ trải nghiệm đó, ví dụ: 'Cuối cùng tôi đã mua được chiếc laptop, và nó giúp tôi rất nhiều trong việc học và làm việc hiệu quả hơn.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Tell about a time you saved money to do something? (Kể về một lần bạn tiết kiệm tiền làm gì đó)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "9f94cd7ab797d000e9b2a32c"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "102517ac2652e621042baf2b",
+    "title": "A Time you Asked a Good Question. (Kể về lần bạn đ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Asking a professor a question about a difficult concept during a class]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[a bit nervous because I didn't want to seem unprepared]</strong></span>, I decided to ask the question because I genuinely wanted to understand the material better. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[the professor explained the concept clearly, and it helped me improve my understanding of the subject]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: Thay phần này bằng tình huống cụ thể liên quan đến câu hỏi, ví dụ: 'Đặt câu hỏi với giảng viên về một khái niệm khó trong lớp học.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hơi lo lắng vì tôi không muốn bị cho là chưa chuẩn bị.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Giảng viên đã giải thích rất rõ ràng và điều này giúp tôi hiểu bài tốt hơn.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "A Time you Asked a Good Question. (Kể về lần bạn đặt một câu hỏi hay)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "11e311abe000348ccb54d729"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "89c3a73b881ca8def490e768",
+    "title": "Tell me a time you read a good book. (Kể về một lầ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Reading an inspiring book during a difficult time in my life]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[a bit unsure if a book could help me feel better]</strong></span>, I decided to give it a try because I was looking for guidance and motivation. After a while, the result proved that my decision was the right one. I felt very uplifted because <span style='color:red;'><strong>[the book provided me with valuable lessons on resilience, and it helped me overcome my challenges]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Đọc một cuốn sách truyền cảm hứng trong một thời gian khó khăn trong cuộc sống của tôi.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy không chắc chắn liệu một cuốn sách có thể giúp tôi cảm thấy tốt hơn.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Cuốn sách đã mang lại cho tôi những bài học quý giá về sự kiên cường, và nó đã giúp tôi vượt qua những thử thách của mình.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Tell me a time you read a good book. (Kể về một lần bạn đọc 1 cuốn sách hay)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "153fb5f640e96a2f6b36d690"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "53208555df58bebcc7669cd6",
+    "title": "Tell me a time you went to see a work of art. (Kể ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Visiting an art gallery to see a famous painting]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[excited but also a little unsure about the experience, as it was my first time visiting an art exhibition]</strong></span>, I decided to explore the gallery and appreciate the artwork. After a while, the result proved that my decision was the right one. I felt very inspired because <span style='color:red;'><strong>[the paintings were breathtaking, and they gave me a deeper appreciation for art and creativity]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Đi thăm một triển lãm nghệ thuật để xem một bức tranh nổi tiếng.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hào hứng nhưng cũng hơi bối rối vì đây là lần đầu tôi tham gia một triển lãm nghệ thuật.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Các bức tranh thật sự ấn tượng và giúp tôi có cái nhìn sâu sắc hơn về nghệ thuật và sự sáng tạo.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Tell me a time you went to see a work of art. (Kể về một lần bạn đi xem một tác phẩm nghệ thuật)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "df25e1fd6ca34995215d3cc1"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "24774343a621169243a42406",
+    "title": "Describe a time when you had many options to choos...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Choosing a university to apply to, as I had several options in different cities]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[overwhelmed because there were so many good choices]</strong></span>, I decided to take my time, research each university, and weigh the pros and cons of each option. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I made an informed choice, and the university I chose turned out to be a great fit for my goals and aspirations]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Chọn trường đại học để nộp hồ sơ vì tôi có nhiều sự lựa chọn ở các thành phố khác nhau.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy choáng ngợp vì có quá nhiều lựa chọn tốt.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã đưa ra quyết định đúng đắn, và trường đại học tôi chọn thực thực sự phù hợp với mục tiêu và ước mơ của tôi.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you had many options to choose from. (Kể về lần bạn có nhiều sự lựa chọn)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "76d5cb4fba25a6a76e54e795"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "4587db81747c950f3faebbbd",
+    "title": "Describe a time when you worked in a team. (Kể về ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Working in a team to complete a group project at work]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[a bit nervous because it was my first time working in a large team with diverse skills]</strong></span>, I decided to continue and do my best. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[we completed the project successfully, and I learned how to collaborate effectively with others]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Làm việc nhóm để hoàn thành một dự án nhóm tại công ty.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hơi lo lắng vì đó là lần đầu tiên tôi làm việc trong một nhóm lớn với những kỹ năng đa dạng.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Chúng tôi đã hoàn thành dự án thành công, và tôi đã học được cách hợp tác hiệu quả với người khác.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you worked in a team. (Kể về một lần bạn làm việc nhóm)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "c3123e556ac5f6197c00fcb0"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "f18415927f91171b5916b7b7",
+    "title": "Describe a time when you did an extreme sport. (Kể...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Doing bungee jumping during a trip abroad]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[terrified and nervous about jumping from such a height]</strong></span>, I decided to continue and do my best. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I conquered my fear and had an unforgettable experience that boosted my confidence]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Chơi bungee jumping trong một chuyến đi du lịch nước ngoài.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy sợ hãi và lo lắng khi phải nhảy từ độ cao như vậy.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã vượt qua nỗi sợ hãi và có một trải nghiệm không thể quên, điều này giúp tôi tăng cường sự tự tin.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you did an extreme sport. (Kể về một lần bạn chơi thể thao mạo hiểm)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "170085d1f7c7f5d835e623cd"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "fed4e6dd23b60e85865b7032",
+    "title": "Describe a time you explored a forest. (Kể về một ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Exploring a forest during a hiking trip with friends]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[excited but also a little worried because I wasn't sure what to expect in the forest]</strong></span>, I decided to continue and do my best. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[the adventure was amazing, and it allowed me to connect with nature and enjoy the peaceful environment]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Khám phá một khu rừng trong chuyến đi bộ đường dài cùng bạn bè.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Hồi hộp nhưng cũng có chút lo lắng vì không chắc mình sẽ gặp phải gì trong rừng.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Chuyến đi thật tuyệt vời và nó giúp tôi kết nối với thiên nhiên, cảm nhận sự yên bình.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time you explored a forest. (Kể về một lần bạn vào rừng chơi)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "f6adcd45b02dd7abd8dcd620"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "8f9187a83bbd75a5c9234ed7",
+    "title": "Describe a time when you achieved something. (Kể v...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Passing the Aptis test and obtaining my English proficiency certificate]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[nervous and unsure about whether I would perform well on the test]</strong></span>, I decided to continue and do my best. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I passed the test and earned the certificate, which boosted my confidence in using English in professional settings]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Thi đạt chứng chỉ Aptis và nhận chứng chỉ tiếng Anh của mình.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy lo lắng và không chắc liệu mình có thể hoàn thành bài thi tốt không.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã vượt qua bài thi và đạt chứng chỉ, điều này giúp tôi tự tin hơn khi sử dụng tiếng Anh trong công việc.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you achieved something. (Kể về một lần bạn đạt được thành tựu)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "8ef3d019c51523bc692e520f"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "514409592a0e1687934001b5",
+    "title": "Describe a time when you learned a new skill. (Kể ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Learning how to use a new software program for work]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[a bit overwhelmed because I had no prior experience with the software]</strong></span>, I decided to continue and do my best. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I became proficient in the software and it improved my efficiency at work]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Học cách sử dụng một phần mềm mới cho công việc.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hơi choáng ngợp vì không có kinh nghiệm trước đó với phần mềm này.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã thành thạo phần mềm này và cải thiện hiệu quả công việc của mình.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you learned a new skill. (Kể về một lần bạn học một kỹ năng mới)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "9dfd990b075b1c4ba63ba959"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "486848e41df5499c21e6d179",
+    "title": "Describe a time when you received good news. (Kể v...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Receiving the news that I passed an important exam and achieved my goal]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[nervous and anxious while waiting for the result]</strong></span>, I decided to stay positive and keep my hopes up. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I had worked hard for the exam, and passing it boosted my confidence and opened new opportunities]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Nhận được tin mình đã đậu kỳ thi quan trọng và đạt được mục tiêu.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy lo lắng và hồi hộp khi chờ đợi kết quả.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã làm việc chăm chỉ cho kỳ thi và việc đậu kỳ thi giúp tôi tự tin hơn và mở ra nhiều cơ hội mới.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you received good news. (Kể về một lần bạn nhận được một tin tốt)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "1ce0ec654f9a32e51f251773"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "99b2e3687215c01f5bb391be",
+    "title": "Describe a time when you helped someone. (Kể về mộ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Helping a friend move into a new apartment]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[a bit tired because I had a busy week]</strong></span>, I decided to continue and do my best. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I was able to help my friend settle in and they were really grateful for the support]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Giúp một người bạn chuyển đến căn hộ mới.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hơi mệt mỏi vì tuần đó tôi đã có lịch trình bận rộn.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã giúp bạn ổn định cuộc sống mới và họ rất biết ơn sự hỗ trợ của tôi.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you helped someone. (Kể về một lần bạn giúp đỡ một ai đó)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "19c01a54af0cba59f4deb22e"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "850af39947093e5b52968a1a",
+    "title": "Describe a time when you went to an amusement park...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Going to an amusement park with friends during a holiday]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[excited but also a bit nervous because I wasn't sure if the rides would be too scary]</strong></span>, I decided to continue and enjoy the experience. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I had a great time, tried new rides, and shared lots of fun moments with my friends]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Đi công viên giải trí cùng bạn bè vào kỳ nghỉ.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy phấn khích nhưng cũng có chút lo lắng vì không chắc các trò chơi có quá đáng sợ hay không.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã có thời gian tuyệt vời, thử những trò chơi mới và chia sẻ nhiều khoảnh khắc vui vẻ với bạn bè.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you went to an amusement park. (Kể về một lần bạn đi công viên giải trí)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "b31fed1d671dec595cc68a2b"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "a5871cb1aa5aa561932ca7e1",
+    "title": "Describe a time when you wanted to buy something b...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Wanting to buy a new laptop but couldn't afford it at the time]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[disappointed and frustrated because I really needed the laptop for work]</strong></span>, I decided to continue and look for alternatives. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I saved money for a few months and was eventually able to buy the laptop when I could afford it]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Muốn mua một chiếc laptop mới nhưng không đủ khả năng tài chính vào thời điểm đó.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy thất vọng và bực bội vì thực sự tôi cần chiếc laptop đó cho công việc.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã tiết kiệm tiền trong vài tháng và cuối cùng cũng có thể mua được chiếc laptop khi tôi đủ khả năng tài chính.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you wanted to buy something but couldn't. (Kể về một lần bạn muốn mua gì đó nhưng không được)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "8fb9567275ec297f6bf0218f"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "b96625c1345af432a5da1514",
+    "title": "Describe a time when you hurried to do something. ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Hurrying to finish a work assignment before the deadline]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[stressed and rushed because I had left the task to the last minute]</strong></span>, I decided to focus and do my best. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I completed the assignment on time, and it was well received by my manager]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Vội vã hoàn thành công việc trước hạn chót.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy căng thẳng và vội vàng vì tôi đã để công việc đến phút cuối.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã hoàn thành công việc đúng hạn và nó được sếp đánh giá cao.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you hurried to do something. (Kể về một lần bạn vội vã làm gì đó)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "24857d46be5bbdb4402475a3"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "fa10066a05e5e0e174324690",
+    "title": "Describe a time when you laughed out loud with a f...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Laughing out loud with a friend while watching a funny movie]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[a bit embarrassed because we were laughing so loudly in a public place]</strong></span>, I decided to continue and enjoy the moment. After a while, the result proved that my decision was the right one. I felt very happy because <span style='color:red;'><strong>[we had so much fun, and it brought us closer as friends]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Cười lớn với bạn khi xem một bộ phim hài.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hơi xấu hổ vì chúng tôi cười quá lớn ở nơi công cộng.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Chúng tôi đã có khoảng thời gian tuyệt vời, và điều này giúp gắn kết tình bạn của chúng tôi hơn.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you laughed out loud with a friend. (Kể về một lần bạn cười lớn với người bạn)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "9a330a0aa928c1a301b37cbf"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "d742afce60d8f1b852f65b0f",
+    "title": "Describe a time when you faced a difficult questio...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Facing a difficult question during an important job interview]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[nervous and unsure about how to answer the question]</strong></span>, I decided to stay calm and think carefully. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I was able to answer the question thoughtfully, and it helped me land the job]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Đối mặt với câu hỏi khó trong một buổi phỏng vấn xin việc quan trọng.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy lo lắng và không chắc chắn về cách trả lời câu hỏi.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã trả lời câu hỏi một cách suy nghĩ kỹ lưỡng, và điều này giúp tôi có được công việc.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you faced a difficult question. (Kể về một lần bạn gặp câu hỏi khó)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "a1ab006d6056dd2bdb19b0a0"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "8a8917d11fe226601b2fabdd",
+    "title": "Describe a time when you had a holiday/vacation. (...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Going on a holiday to a beach resort with family]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[excited but also a little stressed because I had a lot of work to catch up on]</strong></span>, I decided to enjoy the time away and relax. After a while, the result proved that my decision was the right one. I felt very refreshed because <span style='color:red;'><strong>[the holiday gave me time to recharge, enjoy beautiful scenery, and bond with my family]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Đi nghỉ tại khu nghỉ dưỡng bãi biển cùng gia đình.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy phấn khích nhưng cũng hơi căng thẳng vì tôi có rất nhiều công việc cần làm.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Kỳ nghỉ giúp tôi thư giãn, tận hưởng cảnh đẹp và gắn kết với gia đình.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you had a holiday/vacation. (Kể về một lần bạn có 1 kỳ nghỉ lễ)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "8ed22787d1ab8dcf36632f99"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "83d53bebe2b5604e89cd70f7",
+    "title": "Describe a time when you made a great effort. (Kể ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Making a great effort to prepare for an important exam]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[exhausted and overwhelmed by the amount of material I had to cover]</strong></span>, I decided to continue and give it my best. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I passed the exam with a good grade, and my hard work paid off]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Nỗ lực học tập chuẩn bị cho một kỳ thi quan trọng.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy mệt mỏi và choáng ngợp vì khối lượng tài liệu phải ôn tập.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã vượt qua kỳ thi với điểm số tốt và cảm thấy tự hào vì sự nỗ lực của mình đã được đền đáp.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you made a great effort. (Kể về một lần bạn nỗ lực)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "c27d6bce9d5422bc6c32a0f9"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "d74c2417f8215b578b1e38e0",
+    "title": "Describe a time when you worked with both elderly ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Volunteering at a community event that involved both elderly people and children]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[challenged because I wasn't sure how to engage both groups effectively]</strong></span>, I decided to stay patient and approach the situation with an open mind. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I was able to help both the elderly and children, creating a fun and supportive environment for everyone]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Tình nguyện tham gia sự kiện cộng đồng có sự tham gia của cả người già và trẻ em.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy thách thức vì tôi không biết làm sao để thu hút sự chú ý của cả hai nhóm.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã giúp đỡ cả người già và trẻ em, tạo ra một môi trường vui vẻ và hỗ trợ cho tất cả mọi người.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Describe a time when you worked with both elderly people and children. (Kể về một lần bạn làm việc với người già và trẻ)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "ab044c4639de4b0f237ae804"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad4f6e35934526c9f70454f5",
+    "title": "Talk about a challenge you have faced. (Kể về một ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Facing a challenge in balancing work and study during university]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[overwhelmed by the pressure of deadlines and assignments]</strong></span>, I decided to stay focused and manage my time more effectively. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I successfully managed both work and study, and I was able to achieve my goals without sacrificing quality]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Đối mặt với thử thách trong việc cân bằng công việc và học tập trong thời gian đại học.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy choáng ngợp vì áp lực từ các hạn chót và bài tập.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã thành công trong việc cân bằng cả công việc và học tập, và đạt được mục tiêu mà không làm giảm chất lượng công việc.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a challenge you have faced. (Kể về một thử thách của bạn)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "0bc195562117b42c69b36f21"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "1b482fb52f57b17145412166",
+    "title": "Talk about a busy time you had. (Kể về một lần bạn...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Having a very busy period at work with multiple deadlines to meet]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[overwhelmed by the number of tasks I had to complete in a short time]</strong></span>, I decided to stay organized and manage my time effectively. After a while, the result proved that my decision was the right one. I felt very proud because <span style='color:red;'><strong>[I successfully completed all the tasks on time and received positive feedback from my boss]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Có một khoảng thời gian rất bận rộn tại công ty với nhiều công việc cần hoàn thành trước hạn chót.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy choáng ngợp vì số lượng công việc cần hoàn thành trong thời gian ngắn.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã hoàn thành tất cả công việc đúng hạn và nhận được phản hồi tích cực từ sếp.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a busy time you had. (Kể về một lần bạn bận rộn)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "081a810c5fb40c469aa9d45e"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "8c4fea35041d231e0c4fd8e6",
+    "title": "Talk about a time you visited a new city. (Kể về m...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Visiting a new city for the first time during a holiday]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[excited but a bit nervous because I didn't know the city well]</strong></span>, I decided to explore the city and enjoy the experience. After a while, the result proved that my decision was the right one. I felt very happy because <span style='color:red;'><strong>[I got to experience the culture, try new food, and visit beautiful landmarks]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Thăm một thành phố mới lần đầu trong kỳ nghỉ.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hào hứng nhưng cũng hơi lo lắng vì tôi chưa quen với thành phố đó.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã trải nghiệm văn hóa mới, thử món ăn đặc trưng, và tham quan những địa điểm nổi bật.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time you visited a new city. (Kể về một lần thăm một thành phố mới)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "aef99323aa7af189920477be"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "e84245f2d6bc896942c4144b",
+    "title": "Talk about a time you met a new friend. (Kể về một...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Meeting a new friend during a group activity at school]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[a bit shy because I didn't know anyone in the group]</strong></span>, I decided to approach the person and start a conversation. After a while, the result proved that my decision was the right one. I felt very happy because <span style='color:red;'><strong>[we quickly became good friends and had many common interests]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Gặp một người bạn mới trong một hoạt động nhóm ở trường.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hơi nhút nhát vì tôi không quen biết ai trong nhóm.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Chúng tôi nhanh chóng trở thành bạn tốt và có nhiều sở thích chung.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time you met a new friend. (Kể về một lần gặp một người bạn mới)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "5018455e733361812e7b4a0f"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "ad1c2d014032f1c1f94e2a1c",
+    "title": "Talk about a time you received a gift. (Kể về một ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Receiving a thoughtful gift from a close friend on my birthday]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[surprised and a little embarrassed because I wasn't expecting anything]</strong></span>, I decided to appreciate the gesture and show my gratitude. After a while, the result proved that my decision was the right one. I felt very happy because <span style='color:red;'><strong>[the gift was something I truly needed and it made me feel loved and appreciated]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Nhận món quà ý nghĩa từ người bạn thân vào sinh nhật.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy bất ngờ và hơi ngượng ngùng vì tôi không ngờ lại nhận được món quà.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Món quà thực sự là thứ tôi cần, và nó khiến tôi cảm thấy yêu thương và trân trọng.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time you received a gift. (Kể về một lần bạn được tặng quà)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "59c0a50edbf557441ea7009d"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "b822b8af31a206d1aa1be365",
+    "title": "Talk about a time you were helped. (Kể về một lần ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Being helped by a colleague when I was overwhelmed with work]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[a bit embarrassed to ask for help]</strong></span>, I decided to accept the offer and work together. After a while, the result proved that my decision was the right one. I felt very grateful because <span style='color:red;'><strong>[with their help, we were able to complete the task on time, and I learned valuable teamwork skills]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Được một đồng nghiệp giúp đỡ khi tôi quá tải công việc.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hơi xấu hổ khi phải nhờ vả sự giúp đỡ.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Nhờ sự giúp đỡ của họ, chúng tôi đã hoàn thành công việc đúng hạn và tôi học được kỹ năng làm việc nhóm quý giá.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time you were helped. (Kể về một lần bạn được giúp đỡ)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "59eba9022f642be9f43b191b"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "2b5cee21f0120f2f8b81745b",
+    "title": "Talk about a time someone asked you to stop doing ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Being asked by a colleague to stop talking during a meeting because it was disruptive]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[embarrassed and surprised because I didn't realize I was disturbing others]</strong></span>, I decided to stop talking and pay attention to the discussion. After a while, the result proved that my decision was the right one. I felt very grateful because <span style='color:red;'><strong>[I was able to listen and learn more from the meeting, and it helped me improve my communication skills]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Được yêu cầu ngừng nói chuyện trong cuộc họp vì đã làm phiền mọi người.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy xấu hổ và ngạc nhiên vì tôi không nhận ra mình đang làm phiền người khác.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã biết lắng nghe và học hỏi thêm trong cuộc họp, điều này giúp tôi cải thiện kỹ năng giao tiếp.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time someone asked you to stop doing something. (Kể về một lần ai đó yêu cầu dừng làm việc gì)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "19a4794b10c72d319bd5d299"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "b29e63411bef48dcadb4aab3",
+    "title": "Talk about a time you got lost. (Kể về một lần bị ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Getting lost while exploring a new city during a trip]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[frustrated and a little scared because I didn't know the area well]</strong></span>, I decided to stay calm and ask for directions. After a while, the result proved that my decision was the right one. I felt very relieved because <span style='color:red;'><strong>[I eventually found my way and enjoyed the rest of my exploration with more confidence]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Bị lạc khi khám phá một thành phố mới trong chuyến đi.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy bối rối và hơi lo lắng vì tôi không quen thuộc với khu vực này.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Cuối cùng tôi đã tìm được đường và tận hưởng phần còn lại của chuyến đi với sự tự tin hơn.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time you got lost. (Kể về một lần bị lạc đường)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "be20291ead54b1f55e242501"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "6958cd9127e2de6a93873037",
+    "title": "Talk about a time you visited an old building. (Kể...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Visiting an old historical building during a trip to a new city]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[curious but also a little unsure about how much I would enjoy the visit]</strong></span>, I decided to explore the building and learn more about its history. After a while, the result proved that my decision was the right one. I felt very inspired because <span style='color:red;'><strong>[the building was full of rich history, and I learned so much about the past while appreciating the architecture]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Thăm một tòa nhà lịch sử cổ khi đi du lịch ở một thành phố mới.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy tò mò nhưng cũng hơi không chắc liệu mình có thích chuyến tham quan này không.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tòa nhà đó chứa đựng nhiều lịch sử phong phú, và tôi đã học được rất nhiều về quá khứ trong khi trân trọng kiến trúc.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time you visited an old building. (Kể về một lần thăm một tòa nhà cổ)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "0a1002d9d88d7dd8a75467e2"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "0b35de2745c5ee0a90f40b07",
+    "title": "Talk about a time you broke a rule. (Kể về một lần...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Breaking a rule by arriving late to an important meeting]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[guilty and worried about the consequences]</strong></span>, I decided to take responsibility for my actions and apologize. After a while, the result proved that my decision was the right one. I felt very relieved because <span style='color:red;'><strong>[I was forgiven, and I learned the importance of punctuality and being more mindful of my commitments]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Phạm luật khi đến muộn một cuộc họp quan trọng.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy tội lỗi và lo lắng về hậu quả của việc đến muộn.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã được tha thứ, và tôi học được tầm quan trọng của việc đúng giờ và chú ý đến cam kết của mình.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time you broke a rule. (Kể về một lần phạm luật)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "54b9c66de9e9abcaf657fe9e"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "9d67a53f48c0243e65dc5121",
+    "title": "Talk about a time you attended a music festival. (...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Attending a music festival with friends during the summer]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[excited but also a bit overwhelmed because I wasn't sure what to expect from such a big event]</strong></span>, I decided to go with an open mind and enjoy the experience. After a while, the result proved that my decision was the right one. I felt very happy because <span style='color:red;'><strong>[I had an unforgettable time listening to live music, dancing, and bonding with my friends]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Tham gia lễ hội âm nhạc cùng bạn bè trong dịp hè.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hào hứng nhưng cũng hơi choáng ngợp vì tôi không biết lễ hội sẽ như thế nào.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Tôi đã có một khoảng thời gian không thể quên khi nghe nhạc sống, nhảy múa và gắn kết với bạn bè.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time you attended a music festival. (Kể về một lần tham gia lễ hội âm nhạc)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "bdef98d06eae74a62b798781"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  },
+  {
+    "_id": "6bcd76b0d78972728214cfd3",
+    "title": "Talk about a time you watched a sports match. (Kể ...",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "Học một thứ mới",
+    "questions": [
+      {
+        "questionTitle": "Học một thứ mới",
+        "content": "2 phút/ 3 câu - trả lời liên tục",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "There was a time when I faced a special situation, where I had to make an important decision or take significant action. <span style='color:red;'><strong>[Watching a live football match with friends at the stadium]</strong></span>. Although at first, I felt <span style='color:red;'><strong>[excited but also nervous because it was my first time attending a live sports event]</strong></span>, I decided to enjoy the experience and support my team. After a while, the result proved that my decision was the right one. I felt very happy because <span style='color:red;'><strong>[the match was thrilling, and I had a great time cheering for my team and bonding with my friends]</strong></span>.<br><br><strong>Giải thích chi tiết:</strong><br><ul><li><strong>[Tình huống cụ thể từ câu hỏi]</strong>: 'Xem một trận đấu bóng đá trực tiếp với bạn bè tại sân vận động.'</li><li><strong>[Miêu tả cảm xúc hoặc khó khăn]</strong>: 'Cảm thấy hào hứng nhưng cũng hơi lo lắng vì đây là lần đầu tiên tôi tham gia một sự kiện thể thao trực tiếp.'</li><li><strong>[Miêu tả cảm giác thành công hoặc bài học rút ra]</strong>: 'Trận đấu thật thú vị, tôi có thời gian tuyệt vời khi cổ vũ cho đội của mình và gắn kết với bạn bè.'</li></ul>",
+        "subQuestion": [
+          {
+            "content": "Talk about a time you watched a sports match. (Kể về một lần xem một trận đấu thể thao)",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": null,
+            "_id": "d3181b7894d480322d1855bb"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e478fb53b4655eba3f06da"
+      }
+    ],
+    "questionPart": "FOUR",
+    "questionType": "SPEAKING",
+    "id": "68e478fb53b4655eba3f06de",
+    "createdAt": "2025-10-07T02:20:43.498Z",
+    "updatedAt": "2026-06-17T09:38:08.277Z",
+    "__v": 0
+  }
+]

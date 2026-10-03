@@ -188,6 +188,11 @@ function WritingExamRunnerContent() {
   const [showAiWaitingScreen, setShowAiWaitingScreen] = useState(false);
   const [showSampleAnswersModal, setShowSampleAnswersModal] = useState(false);
   const [showPartsDrawer, setShowPartsDrawer] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+
+  const totalQuestionsCount = parts.reduce((acc, p) => acc + p.questions.length, 0);
+  const totalAnsweredCount = Object.values(answers).filter((a) => a.trim().length > 0).length;
 
   // Khởi tạo Quota từ localStorage (hoặc 2 lượt như hệ thống gốc)
   useEffect(() => {
@@ -612,39 +617,49 @@ function WritingExamRunnerContent() {
   // MÀN HÌNH LÀM BÀI PHÒNG THI (THEO THEME CHUẨN CỦA HỆ THỐNG MÌNH)
   // =========================================================================
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none">
-      {/* 1. TOP HEADER (THEO DESIGN SYSTEM CỦA DỰ ÁN) */}
-      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/writing"
-            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-              Writing Practice
+    <div className="notranslate exam-active exam-mode min-h-screen bg-exam-bg text-exam-text flex flex-col font-sans select-none">
+      {/* 0. Top thin progress bar */}
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-[3px]">
+        <div
+          className="h-full bg-gradient-to-r from-primary via-accent to-primary transition-all duration-500"
+          style={{ width: `${((currentPartIdx + 1) / parts.length) * 100}%` }}
+        />
+      </div>
+
+      {/* 1. TOP HEADER (EXAM MODE) */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-exam-surface/95 backdrop-blur border-b border-exam-border">
+        <div className="max-w-6xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-xs font-bold text-exam-text truncate hidden sm:block">
+              {examTitle}
             </span>
-            <span className="text-sm md:text-base font-bold text-foreground">
-              {currentPart.partSubtitle}
+            <span className="text-[10px] text-exam-text-muted hidden md:inline">
+              Writing Aptis ESOL
             </span>
           </div>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/writing"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          {/* Countdown Timer */}
+          <div
+            className={`font-mono text-base font-black px-3 py-1 rounded-lg border flex items-center gap-1.5 ${
+              timeLeft < 300
+                ? "bg-red-500/20 border-red-500 text-red-500 animate-pulse"
+                : "bg-exam-bg border-exam-border text-exam-text"
+            }`}
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Thoát</span>
-          </Link>
+            <Clock className="w-4 h-4 text-primary" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-xs font-bold text-exam-text-muted">
+              Phần {currentPart.partNumber} / {parts.length}
+            </span>
+          </div>
         </div>
       </header>
 
       {/* 2. MAIN WORKSPACE */}
-      <main className="flex-1 py-6 px-3 md:px-6 pb-24">
+      <main className="flex-1 pt-16 pb-24 px-3 md:px-6 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Card Context & Header Banner */}
           <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
@@ -663,29 +678,17 @@ function WritingExamRunnerContent() {
                 </p>
               </div>
 
-              {/* Bookmark, Pause, Timer */}
-              <div className="flex items-center gap-3 self-end md:self-auto shrink-0">
-                <button
-                  type="button"
-                  className="flex items-center gap-1 px-3 py-1 rounded-xl border border-border text-xs text-muted-foreground hover:bg-muted font-medium transition-colors"
-                >
-                  <Bookmark className="w-3.5 h-3.5" />
-                  <span>Bookmark</span>
-                </button>
-
+              {/* Pause control */}
+              <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsPaused(!isPaused)}
-                  className="p-1.5 rounded-xl border border-border text-muted-foreground hover:bg-muted transition-colors"
+                  className="px-3 py-1.5 rounded-xl border border-border text-xs text-muted-foreground hover:bg-muted font-medium transition-colors flex items-center gap-1.5"
                   title={isPaused ? "Tiếp tục" : "Tạm dừng"}
                 >
                   {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                  <span>{isPaused ? "Tiếp tục" : "Tạm dừng"}</span>
                 </button>
-
-                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span>{formatTime(timeLeft)}</span>
-                </div>
               </div>
             </div>
 
@@ -851,76 +854,155 @@ function WritingExamRunnerContent() {
         </div>
       </main>
 
-      {/* 4. BOTTOM BAR (THEO DESIGN SYSTEM CỦA DỰ ÁN) */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
-        {/* Left: Hiện đáp án & Báo lỗi */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowSampleAnswersModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Hiện đáp án</span>
-          </button>
+      {/* 4. FIXED BOTTOM BAR CHUẨN EXAM MODE */}
+      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-exam-surface/95 backdrop-blur border-t border-exam-border h-14">
+        <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
+          {/* Left: Drawer & Info & Sample Modal */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowPartsDrawer(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
+              title="Danh sách Parts"
+            >
+              <Menu className="w-4 h-4 text-primary" />
+              <span className="hidden sm:inline">Phần ({currentPartIdx + 1}/{parts.length})</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => alert("Chức năng ghi nhận báo lỗi đề thi đã được gửi đến ban quản trị.")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors"
-          >
-            <Flag className="w-3.5 h-3.5" />
-            <span>Báo lỗi</span>
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => setIsInfoOpen(true)}
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 transition-colors cursor-pointer"
+              title="Thông tin bài thi"
+            >
+              <Info className="w-4 h-4 text-exam-text-muted" />
+            </button>
 
-        {/* Center: Navigation Controls */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowPartsDrawer(true)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
-            title="Danh sách Parts"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => alert(`Đang làm bài: ${currentPart.partSubtitle}`)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
-            title="Thông tin bài thi"
-          >
-            <Info className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
-            title="Cuộn lên đầu trang"
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Right: Lượt chấm AI & Nút Submit */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-            <span>⚡</span>
-            <span>Còn {aiQuota} lượt chấm AI</span>
+            <button
+              type="button"
+              onClick={() => setShowSampleAnswersModal(true)}
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
+            >
+              <span>💡 Bài mẫu</span>
+            </button>
           </div>
 
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="tech-btn inline-flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all cursor-pointer"
-          >
-            <span>Submit</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          {/* Right: AI Quota & Exit, Previous, Next / Submit */}
+          <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-1 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 mr-1">
+              <span>⚡</span>
+              <span>{aiQuota} lượt AI</span>
+            </div>
+
+            <Link
+              href="/writing"
+              title="Thoát"
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setCurrentPartIdx((p) => Math.max(0, p - 1))}
+              disabled={currentPartIdx === 0}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-sm font-medium hover:bg-exam-border/40 transition-colors disabled:opacity-40 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Previous</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (currentPartIdx === parts.length - 1) {
+                  setIsSubmitModalOpen(true);
+                } else {
+                  setCurrentPartIdx((p) => Math.min(parts.length - 1, p + 1));
+                }
+              }}
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-brand-brown text-sm font-bold shadow-sm transition-all cursor-pointer"
+            >
+              <span>{currentPartIdx === parts.length - 1 ? "Nộp bài" : "Next"}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </footer>
+
+      {/* MODAL THÔNG TIN BÀI THI */}
+      {isInfoOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in"
+          onClick={() => setIsInfoOpen(false)}
+        >
+          <div
+            className="bg-exam-surface border border-exam-border rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-exam-border">
+              <h4 className="font-bold text-sm text-exam-text">Thông tin bài thi Writing</h4>
+              <button
+                type="button"
+                onClick={() => setIsInfoOpen(false)}
+                className="w-6 h-6 flex items-center justify-center rounded text-exam-text-muted hover:text-exam-text"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-2 text-xs text-exam-text">
+              {[
+                { l: "Tên bài thi", v: examTitle },
+                { l: "Kỹ năng", v: "Writing Aptis ESOL (4 Parts)" },
+                { l: "Phần hiện tại", v: `${currentPart.partSubtitle}` },
+                { l: "Đã điền", v: `${totalAnsweredCount}/${totalQuestionsCount} câu` },
+                { l: "Thời gian còn lại", v: formatTime(timeLeft) },
+              ].map((x) => (
+                <div key={x.l} className="flex justify-between">
+                  <span className="text-exam-text-muted">{x.l}:</span>
+                  <span className="font-bold">{x.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL XÁC NHẬN NỘP BÀI */}
+      {isSubmitModalOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-exam-surface rounded-2xl border border-exam-border p-6 max-w-md w-full shadow-2xl space-y-4">
+            <h3 className="text-lg font-black text-exam-text">Xác nhận nộp bài thi Writing?</h3>
+            <p className="text-sm text-exam-text-muted leading-relaxed">
+              Bạn đã hoàn thành <strong className="text-primary font-black">{totalAnsweredCount}/{totalQuestionsCount}</strong> câu hỏi. Hệ thống AI sẽ chấm điểm chi tiết 4 tiêu chí CEFR cho bài viết của bạn.
+            </p>
+            {totalAnsweredCount < totalQuestionsCount && (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold">
+                ⚠️ Lưu ý: Bạn vẫn còn {totalQuestionsCount - totalAnsweredCount} câu chưa điền nội dung!
+              </div>
+            )}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsSubmitModalOpen(false)}
+                className="px-4 py-2 rounded-xl border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
+              >
+                Tiếp tục viết bài
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSubmitModalOpen(false);
+                  handleSubmit();
+                }}
+                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown transition-colors shadow-sm cursor-pointer"
+              >
+                Xác nhận nộp bài
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL HIỆN ĐÁP ÁN THAM KHẢO */}
       {showSampleAnswersModal && (

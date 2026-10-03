@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
+import { AdminPagination } from "@/components/admin/admin-pagination";
+import { SortableHeader, SortState } from "@/components/admin/sortable-header";
 import {
   BookOpen,
   Search,
@@ -62,8 +64,24 @@ export default function AdminExamsPage() {
   const [skillFilter, setSkillFilter] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+
+  type ExamSortKey =
+    | "title"
+    | "skill"
+    | "durationMinutes"
+    | "questionsCount"
+    | "isPublished"
+    | "isPro"
+    | "attemptsCount"
+    | "createdAt";
+
+  const [sortState, setSortState] = useState<SortState<ExamSortKey>>({
+    key: "createdAt",
+    order: "desc",
+  });
 
   // Stepper Modal for Exam Builder
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -73,6 +91,23 @@ export default function AdminExamsPage() {
 
   // Preview Modal
   const [previewExam, setPreviewExam] = useState<ExamItem | null>(null);
+
+  // Helper determine student test room url by skill
+  const getExamTakeUrl = (exam: { id: string; skill?: string }) => {
+    switch (exam.skill) {
+      case "READING":
+        return `/reading/${exam.id}`;
+      case "LISTENING":
+        return `/listening/${exam.id}`;
+      case "WRITING":
+        return `/writing/${exam.id}`;
+      case "SPEAKING":
+        return `/speaking/${exam.id}`;
+      case "FULL_TEST":
+      default:
+        return `/thi-thu/${exam.id}`;
+    }
+  };
 
   // Quick Edit Modal
   const [editingExam, setEditingExam] = useState<ExamItem | null>(null);
@@ -153,7 +188,7 @@ export default function AdminExamsPage() {
       const res = await api.admin.getExams({
         skill: skillFilter,
         page,
-        limit: 15,
+        limit: pageSize,
       });
 
       if (res.success && res.data) {
@@ -172,7 +207,7 @@ export default function AdminExamsPage() {
 
   useEffect(() => {
     fetchExams();
-  }, [page, skillFilter]);
+  }, [page, skillFilter, pageSize]);
 
   // Lock body scroll for modals
   useEffect(() => {
@@ -358,6 +393,40 @@ export default function AdminExamsPage() {
   const filteredExams = exams.filter((e) =>
     e.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSort = (field: ExamSortKey) => {
+    setSortState((prev) => {
+      if (prev.key !== field) {
+        return { key: field, order: "asc" };
+      }
+      if (prev.order === "asc") return { key: field, order: "desc" };
+      if (prev.order === "desc") return { key: field, order: null };
+      return { key: field, order: "asc" };
+    });
+  };
+
+  const sortedExams = useMemo(() => {
+    const list = [...filteredExams];
+    if (!sortState.order || !sortState.key) return list;
+
+    const { key, order } = sortState;
+    return list.sort((a, b) => {
+      let valA: any = a[key as keyof ExamItem];
+      let valB: any = b[key as keyof ExamItem];
+
+      if (key === "isPublished" || key === "isPro") {
+        valA = valA ? 1 : 0;
+        valB = valB ? 1 : 0;
+      } else if (typeof valA === "string") {
+        valA = valA.toLowerCase();
+        valB = (valB || "").toLowerCase();
+      }
+
+      if (valA < valB) return order === "asc" ? -1 : 1;
+      if (valA > valB) return order === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [filteredExams, sortState]);
 
   // KPI Calculations
   const fullTestCount = exams.filter((e) => e.skill === "FULL_TEST").length;
@@ -607,13 +676,49 @@ export default function AdminExamsPage() {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-heading font-bold uppercase tracking-wider text-[10px]">
               <tr>
-                <th className="py-3.5 px-4 sm:px-6">Tên đề thi</th>
-                <th className="py-3.5 px-4">Kỹ năng</th>
-                <th className="py-3.5 px-4">Thời lượng</th>
-                <th className="py-3.5 px-4">Cấu trúc đề</th>
-                <th className="py-3.5 px-4">Trạng thái</th>
-                <th className="py-3.5 px-4">Gói truy cập</th>
-                <th className="py-3.5 px-4">Lượt thi</th>
+                <SortableHeader
+                  field="title"
+                  title="Tên đề thi"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                  className="px-4 sm:px-6"
+                />
+                <SortableHeader
+                  field="skill"
+                  title="Kỹ năng"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="durationMinutes"
+                  title="Thời lượng"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="questionsCount"
+                  title="Cấu trúc đề"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="isPublished"
+                  title="Trạng thái"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="isPro"
+                  title="Gói truy cập"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="attemptsCount"
+                  title="Lượt thi"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
                 <th className="py-3.5 px-4 sm:px-6 text-right">Thao tác</th>
               </tr>
             </thead>
@@ -625,23 +730,27 @@ export default function AdminExamsPage() {
                     Đang tải danh sách đề thi...
                   </td>
                 </tr>
-              ) : filteredExams.length === 0 ? (
+              ) : sortedExams.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-16 text-center text-slate-400 font-normal">
                     Không tìm thấy đề thi nào phù hợp.
                   </td>
                 </tr>
               ) : (
-                filteredExams.map((exam) => {
+                sortedExams.map((exam) => {
                   const badge = getSkillBadge(exam.skill);
                   const SkillIcon = badge.icon;
                   return (
                     <tr key={exam.id} className="hover:bg-slate-50/60 transition-colors">
                       {/* Title */}
                       <td className="py-3.5 px-4 sm:px-6 max-w-xs">
-                        <div className="font-heading font-semibold text-slate-900 text-xs">
+                        <Link
+                          href={`/admin/exams/${exam.id}/edit`}
+                          className="font-heading font-semibold text-slate-900 text-xs hover:text-indigo-600 hover:underline transition-colors block"
+                          title="Nhấp để mở trang biên soạn nội dung câu hỏi"
+                        >
                           {exam.title}
-                        </div>
+                        </Link>
                         {exam.description && (
                           <div className="text-[11px] text-slate-400 truncate mt-0.5 font-normal">
                             {exam.description}
@@ -731,6 +840,16 @@ export default function AdminExamsPage() {
                       {/* Actions Cluster */}
                       <td className="py-3.5 px-4 sm:px-6 text-right">
                         <div className="inline-flex items-center gap-1">
+                          {/* Live Student Practice Room */}
+                          <Link
+                            href={getExamTakeUrl(exam)}
+                            target="_blank"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors border border-slate-200/80"
+                            title="Mở làm bài thử (Giao diện học viên)"
+                          >
+                            <Play className="w-3.5 h-3.5" />
+                          </Link>
+
                           {/* Preview Button */}
                           <button
                             onClick={() => setPreviewExam(exam)}
@@ -744,10 +863,19 @@ export default function AdminExamsPage() {
                           <button
                             onClick={() => handleOpenEdit(exam)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors border border-slate-200/80"
-                            title="Chỉnh sửa thông tin đề thi"
+                            title="Sửa nhanh thông tin đề thi"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
+
+                          {/* Full Question Editor */}
+                          <Link
+                            href={`/admin/exams/${exam.id}/edit`}
+                            className="p-1.5 rounded-lg text-indigo-600 hover:text-indigo-800 bg-indigo-50/70 hover:bg-indigo-100 transition-colors border border-indigo-200/80"
+                            title="Biên soạn nội dung câu hỏi & Parts (Editor đầy đủ)"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                          </Link>
 
                           {/* Duplicate */}
                           <button
@@ -776,31 +904,20 @@ export default function AdminExamsPage() {
           </table>
         </div>
 
-        {/* Pagination Footer */}
-        <div className="py-3.5 px-4 sm:px-6 bg-slate-50/60 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
-          <div>
-            Trang <span className="font-bold text-slate-900 font-mono">{page}</span> /{" "}
-            <span className="font-bold text-slate-900 font-mono">{totalPages}</span> (Tổng{" "}
-            {totalCount} đề thi)
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="p-1.5 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-40 disabled:pointer-events-none text-slate-700 transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-              className="p-1.5 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-40 disabled:pointer-events-none text-slate-700 transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        {/* Standard Admin Pagination Footer */}
+        <AdminPagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalCount || sortedExams.length}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 15, 25, 50]}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setPage(1);
+          }}
+          itemName="đề thi"
+        />
       </div>
 
       {/* MODAL 1: PREVIEW EXAM */}
@@ -898,15 +1015,25 @@ export default function AdminExamsPage() {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-              <Link
-                href={`/exams/${previewExam.id}`}
-                target="_blank"
-                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-colors"
-              >
-                <Play className="w-3.5 h-3.5" />
-                <span>Mở làm bài thử (Giao diện học viên)</span>
-              </Link>
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Link
+                  href={getExamTakeUrl(previewExam)}
+                  target="_blank"
+                  className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-colors"
+                >
+                  <Play className="w-3.5 h-3.5" />
+                  <span>Làm bài thử</span>
+                </Link>
+
+                <Link
+                  href={`/admin/exams/${previewExam.id}/edit`}
+                  className="px-3.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-heading font-semibold text-xs flex items-center gap-1.5 transition-colors"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Sửa nội dung câu hỏi</span>
+                </Link>
+              </div>
 
               <button
                 onClick={() => setPreviewExam(null)}
@@ -1032,24 +1159,35 @@ export default function AdminExamsPage() {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setEditingExam(null)}
-                className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-heading font-semibold text-xs transition-colors"
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+              <Link
+                href={`/admin/exams/${editingExam.id}/edit`}
+                className="text-indigo-600 hover:text-indigo-800 font-heading font-semibold text-xs flex items-center gap-1 transition-colors"
+                title="Mở giao diện biên soạn câu hỏi chi tiết"
               >
-                Hủy
-              </button>
+                <FileText className="w-3.5 h-3.5" />
+                <span>Sửa câu hỏi & Parts →</span>
+              </Link>
 
-              <button
-                type="button"
-                disabled={editLoading || !editForm.title}
-                onClick={handleSaveEdit}
-                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-colors disabled:opacity-40"
-              >
-                {editLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                <span>Lưu thay đổi</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingExam(null)}
+                  className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-heading font-semibold text-xs transition-colors"
+                >
+                  Hủy
+                </button>
+
+                <button
+                  type="button"
+                  disabled={editLoading || !editForm.title}
+                  onClick={handleSaveEdit}
+                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-colors disabled:opacity-40"
+                >
+                  {editLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                  <span>Lưu thay đổi</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

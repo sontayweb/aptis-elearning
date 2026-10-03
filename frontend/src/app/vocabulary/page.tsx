@@ -391,18 +391,13 @@ export default function VocabularyPage() {
                           <span>Xem nhanh</span>
                         </button>
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPracticeMode(topic);
-                            setQuizIndex(0);
-                            setQuizScore(0);
-                          }}
+                        <Link
+                          href={`/vocabulary/${topic.id}`}
                           className="tech-btn inline-flex items-center justify-center whitespace-nowrap text-sm font-medium bg-primary text-primary-foreground hover:bg-brand-brown h-9 rounded-md px-3 flex-1 gap-1.5 transition-colors"
                         >
                           <Play className="w-3.5 h-3.5" />
                           <span>Luyện tập</span>
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   ))}
@@ -762,18 +757,13 @@ export default function VocabularyPage() {
               >
                 Đóng
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setPracticeMode(selectedTopic);
-                  setSelectedTopic(null);
-                  setQuizIndex(0);
-                  setQuizScore(0);
-                }}
-                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown"
+              <Link
+                href={`/vocabulary/${selectedTopic.id}`}
+                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown inline-flex items-center gap-1.5"
               >
-                Bắt đầu luyện tập
-              </button>
+                <Play className="w-3.5 h-3.5" />
+                <span>Bắt đầu luyện tập</span>
+              </Link>
             </div>
           </div>
         </div>

@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { api } from "@/lib/api-client";
+import { AdminPagination } from "@/components/admin/admin-pagination";
+import { SortableHeader, SortState } from "@/components/admin/sortable-header";
 import {
   CreditCard,
   Search,
@@ -75,8 +77,15 @@ export default function AdminTransactionsPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+
+  type TxSortKey = "order_code" | "full_name" | "amount" | "payment_gateway" | "status" | "created_at";
+  const [sortState, setSortState] = useState<SortState<TxSortKey>>({
+    key: "created_at",
+    order: "desc",
+  });
 
   // Manual Match & Resolve Modal
   const [selectedTx, setSelectedTx] = useState<TransactionItem | null>(null);
@@ -168,7 +177,7 @@ export default function AdminTransactionsPage() {
       const res = await api.admin.getTransactions({
         status: statusFilter,
         page,
-        limit: 15,
+        limit: pageSize,
       });
 
       if (res.success && res.data) {
@@ -187,7 +196,7 @@ export default function AdminTransactionsPage() {
 
   useEffect(() => {
     fetchTransactions();
-  }, [page, statusFilter]);
+  }, [page, statusFilter, pageSize]);
 
   // Lock body scroll and handle Escape key for modals
   useEffect(() => {
@@ -404,6 +413,38 @@ export default function AdminTransactionsPage() {
         );
       })
     : transactions;
+
+  const handleSort = (field: TxSortKey) => {
+    setSortState((prev) => {
+      if (prev.key !== field) return { key: field, order: "asc" };
+      if (prev.order === "asc") return { key: field, order: "desc" };
+      if (prev.order === "desc") return { key: field, order: null };
+      return { key: field, order: "asc" };
+    });
+  };
+
+  const sortedTransactions = useMemo(() => {
+    const list = [...displayedTransactions];
+    if (!sortState.order || !sortState.key) return list;
+
+    const { key, order } = sortState;
+    return list.sort((a, b) => {
+      let valA: any = a[key as keyof TransactionItem];
+      let valB: any = b[key as keyof TransactionItem];
+
+      if (key === "full_name") {
+        valA = a.user?.full_name || "";
+        valB = b.user?.full_name || "";
+      } else if (typeof valA === "string") {
+        valA = valA.toLowerCase();
+        valB = (valB || "").toLowerCase();
+      }
+
+      if (valA < valB) return order === "asc" ? -1 : 1;
+      if (valA > valB) return order === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [displayedTransactions, sortState]);
 
   return (
     <div className="space-y-6">
@@ -656,12 +697,44 @@ export default function AdminTransactionsPage() {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50/80 border-b border-slate-200/70 text-slate-500 font-heading font-bold text-[10px] uppercase tracking-wider">
-                <th className="py-3 px-4 sm:px-6">Mã đơn / Nội dung CK</th>
-                <th className="py-3 px-4">Học viên thanh toán</th>
-                <th className="py-3 px-4 text-right">Số tiền (VND)</th>
-                <th className="py-3 px-4">Kênh thanh toán</th>
-                <th className="py-3 px-4">Trạng thái</th>
-                <th className="py-3 px-4">Thời gian</th>
+                <SortableHeader
+                  field="order_code"
+                  title="Mã đơn / Nội dung CK"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                  className="px-4 sm:px-6"
+                />
+                <SortableHeader
+                  field="full_name"
+                  title="Học viên thanh toán"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="amount"
+                  title="Số tiền (VND)"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                  align="right"
+                />
+                <SortableHeader
+                  field="payment_gateway"
+                  title="Kênh thanh toán"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="status"
+                  title="Trạng thái"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="created_at"
+                  title="Thời gian"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
                 <th className="py-3 px-4 text-right pr-6">Thao tác</th>
               </tr>
             </thead>
@@ -673,7 +746,7 @@ export default function AdminTransactionsPage() {
                     Đang tải danh sách giao dịch...
                   </td>
                 </tr>
-              ) : displayedTransactions.length === 0 ? (
+              ) : sortedTransactions.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-16 text-center text-slate-400">
                     <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
@@ -686,7 +759,7 @@ export default function AdminTransactionsPage() {
                   </td>
                 </tr>
               ) : (
-                displayedTransactions.map((tx) => {
+                sortedTransactions.map((tx) => {
                   return (
                     <tr key={tx.id} className="hover:bg-slate-50/60 transition-colors">
                       {/* Order Code */}
@@ -806,33 +879,20 @@ export default function AdminTransactionsPage() {
           </table>
         </div>
 
-        {/* Pagination Footer */}
-        <div className="p-4 bg-slate-50/70 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <div>
-            Hiển thị <span className="font-bold text-slate-900">{displayedTransactions.length}</span> /{" "}
-            <span className="font-bold text-slate-900">{totalCount}</span> giao dịch
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              disabled={page <= 1}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="font-medium text-slate-900 px-2 font-mono">
-              Trang {page} / {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-              disabled={page >= totalPages}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        {/* Standard Admin Pagination Footer */}
+        <AdminPagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalCount || sortedTransactions.length}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 15, 25, 50]}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setPage(1);
+          }}
+          itemName="giao dịch"
+        />
       </div>
 
       {/* MODAL 1: TẠO GIAO DỊCH NẠP TIỀN THỦ CÔNG */}

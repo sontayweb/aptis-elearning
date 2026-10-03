@@ -1265,8 +1265,7 @@ export default function OfficialMockExamRoom() {
             <button
               type="button"
               onClick={handleNext}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-bold transition-colors"
-              style={{ backgroundColor: "hsl(var(--exam-accent))", color: "hsl(var(--exam-accent-foreground))" }}
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-brand-brown text-sm font-bold shadow-sm transition-all cursor-pointer"
             >
               <span>{isLastStage ? "Nộp bài" : "Next"}</span>
               <ArrowRight className="w-4 h-4" />

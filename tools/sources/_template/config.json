@@ -1,0 +1,10 @@
+{
+  "name": "ten_nguon_web",
+  "displayName": "Tên Website",
+  "baseUrl": "https://example.com/",
+  "account": {
+    "email": "user@example.com",
+    "password": "your_password"
+  },
+  "remotePort": 9225
+}
