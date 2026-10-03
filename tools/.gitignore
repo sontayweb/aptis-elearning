@@ -1,0 +1,31 @@
+# Node dependencies
+node_modules/
+
+# Authentication & Sensitive Credentials
+auth_token.json
+**/auth_token.json
+session.json
+**/session.json
+
+# Chrome automation profiles
+.chrome_profile*/
+
+# Execution Logs
+logs/
+*.log
+
+# Scratch scripts & temporary tests
+archive/
+aptis-academy/
+test-*.js
+test-*.json
+find-*.js
+scrape-*.js
+sample-*.js
+sample-*.json
+probe-*.json
+
+# Downloaded media files
+data/**/media/
+data/**/*.mp3
+data/**/*.wav
