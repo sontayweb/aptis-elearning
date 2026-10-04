@@ -446,26 +446,23 @@ class ApiClient {
   // 8. ADMIN PORTAL (SPRINT 7)
   // ==========================================
   admin = {
-    getDashboardKPIs: () =>
-      this.request<{
-        totalExams: number;
-        totalUsers: number;
-        activeUsers: number;
-        totalAttempts: number;
-        todayAttempts: number;
-        totalRevenueVND: number;
-        pendingTransactionsCount: number;
-        pendingGradingCount: number;
-        pendingTransactions: Array<{
-          id: string;
-          order_code: string;
-          amount: number;
-          status: string;
-          created_at: string;
-          user: { id: string; full_name: string; email: string; phone_number?: string };
-        }>;
-        dailyAttempts: Array<{ date: string; label: string; attempts: number }>;
-      }>('/admin/dashboard/stats'),
+    getDashboardKPIs: (params?: { period?: string; fromDate?: string; toDate?: string }) => {
+      const query = new URLSearchParams();
+      if (params?.period) query.append('period', params.period);
+      if (params?.fromDate) query.append('fromDate', params.fromDate);
+      if (params?.toDate) query.append('toDate', params.toDate);
+      const qs = query.toString();
+      return this.request<any>(`/admin/dashboard/stats${qs ? `?${qs}` : ''}`);
+    },
+
+    exportDashboardReportUrl: (params?: { period?: string; fromDate?: string; toDate?: string }) => {
+      const query = new URLSearchParams();
+      if (params?.period) query.append('period', params.period);
+      if (params?.fromDate) query.append('fromDate', params.fromDate);
+      if (params?.toDate) query.append('toDate', params.toDate);
+      const qs = query.toString();
+      return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/admin/dashboard/export${qs ? `?${qs}` : ''}`;
+    },
 
     getUsers: (params?: { search?: string; role?: string; page?: number; limit?: number }) => {
       const query = new URLSearchParams();
@@ -583,6 +580,47 @@ class ApiClient {
       this.request(`/admin/exams/${id}/duplicate`, {
         method: 'POST',
       }),
+
+    // ── Content Editor ──────────────────────────────────────────
+    getExamFull: (id: string) => this.request(`/admin/exams/${id}/full`),
+
+    updatePart: (partId: string, body: {
+      title?: string; instructions?: string;
+      passageText?: string; audioUrl?: string; imageUrl?: string;
+    }) =>
+      this.request(`/admin/parts/${partId}`, {
+        method: 'PATCH', body: JSON.stringify(body),
+      }),
+
+    addPart: (examId: string, body: {
+      title?: string; instructions?: string; partNumber?: number;
+      passageText?: string; audioUrl?: string; imageUrl?: string;
+    }) =>
+      this.request(`/admin/exams/${examId}/parts`, {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+
+    deletePart: (partId: string) =>
+      this.request(`/admin/parts/${partId}`, { method: 'DELETE' }),
+
+    updateQuestion: (questionId: string, body: {
+      prompt?: string; questionType?: string; options?: string[];
+      correctAnswer?: string; explanation?: string; maxScore?: number; questionNumber?: number;
+    }) =>
+      this.request(`/admin/questions/${questionId}`, {
+        method: 'PATCH', body: JSON.stringify(body),
+      }),
+
+    addQuestion: (partId: string, body: {
+      prompt?: string; questionType?: string; options?: string[];
+      correctAnswer?: string; explanation?: string; maxScore?: number; questionNumber?: number;
+    }) =>
+      this.request(`/admin/parts/${partId}/questions`, {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+
+    deleteQuestion: (questionId: string) =>
+      this.request(`/admin/questions/${questionId}`, { method: 'DELETE' }),
 
     getPlans: () => this.request('/admin/plans'),
 

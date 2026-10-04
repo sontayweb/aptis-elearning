@@ -1,0 +1,26 @@
+[
+  {
+    "id": "60e4c685-33c0-450b-82fa-7245f3f94908",
+    "title": "Đề 01",
+    "category": "aptis",
+    "is_published": true,
+    "created_at": "2026-07-05T08:22:57.661942+00:00",
+    "updated_at": "2026-07-05T08:22:57.661942+00:00"
+  },
+  {
+    "id": "ce4f91da-f44b-4587-87e9-f0ebf321f45a",
+    "title": "Đề 02",
+    "category": "aptis",
+    "is_published": true,
+    "created_at": "2026-07-05T08:23:16.633287+00:00",
+    "updated_at": "2026-07-05T08:23:16.633287+00:00"
+  },
+  {
+    "id": "20fd722f-734c-476d-8f29-0e8d817354ed",
+    "title": "Đề 03",
+    "category": "aptis",
+    "is_published": true,
+    "created_at": "2026-07-05T08:23:30.116649+00:00",
+    "updated_at": "2026-07-05T08:23:30.116649+00:00"
+  }
+]

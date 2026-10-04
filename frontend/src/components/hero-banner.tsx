@@ -12,6 +12,8 @@ import {
   Crown,
 } from "lucide-react";
 
+import { useEventTheme } from "@/contexts/event-theme-context";
+
 interface HeroBannerProps {
   displayName?: string;
   skillsCovered?: number;
@@ -22,6 +24,18 @@ interface HeroBannerProps {
   aiCreditsRemaining?: number;
   aiCreditsTotal?: number;
   planName?: string;
+}
+
+function hexToRgb(hex?: string): { r: number; g: number; b: number } {
+  if (!hex || !hex.startsWith("#")) return { r: 37, g: 99, b: 235 };
+  const cleanHex = hex.replace("#", "");
+  const num = parseInt(cleanHex.length === 3 ? cleanHex.split("").map((c) => c + c).join("") : cleanHex, 16);
+  if (isNaN(num)) return { r: 37, g: 99, b: 235 };
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
 }
 
 export function HeroBanner({
@@ -35,6 +49,7 @@ export function HeroBanner({
   aiCreditsTotal = 3,
   planName = "Miễn phí",
 }: HeroBannerProps) {
+  const { config: eventConfig } = useEventTheme();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -42,6 +57,10 @@ export function HeroBanner({
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    const rgb = eventConfig.enabled && eventConfig.primaryColor
+      ? hexToRgb(eventConfig.primaryColor)
+      : { r: 37, g: 99, b: 235 };
 
     let animationFrameId: number;
     let width = (canvas.width = canvas.offsetWidth);
@@ -84,7 +103,7 @@ export function HeroBanner({
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 110) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(204, 28, 1, ${0.12 * (1 - dist / 110)})`;
+            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${0.18 * (1 - dist / 110)})`;
             ctx.lineWidth = 0.6;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -104,7 +123,7 @@ export function HeroBanner({
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(224, 38, 2, 0.35)";
+        ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)`;
         ctx.fill();
       });
 
@@ -117,7 +136,7 @@ export function HeroBanner({
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [eventConfig.enabled, eventConfig.primaryColor]);
 
   return (
     <div
@@ -130,9 +149,9 @@ export function HeroBanner({
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <div className="absolute inset-0 tech-grid-bg animate-grid-drift" />
-        <div className="glow-orb glow-orb-red -top-24 -left-24 w-[420px] h-[420px]" />
-        <div className="glow-orb glow-orb-orange top-1/3 -right-32 w-[360px] h-[360px]" />
-        <div className="glow-orb glow-orb-violet bottom-0 left-1/3 w-[320px] h-[320px]" />
+        <div className="glow-orb glow-orb-blue -top-24 -left-24 w-[420px] h-[420px]" />
+        <div className="glow-orb glow-orb-blue top-1/3 -right-32 w-[360px] h-[360px]" />
+        <div className="glow-orb glow-orb-navy bottom-0 left-1/3 w-[320px] h-[320px]" />
       </div>
 
       {/* Particle Canvas */}
@@ -167,10 +186,19 @@ export function HeroBanner({
         {/* Top Header Row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-5 sm:mb-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-[11px] sm:text-xs font-bold mb-2 sm:mb-3">
-              <Sparkles className="w-3 h-3" />
-              <span>Dashboard</span>
-            </div>
+            {eventConfig.enabled ? (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-[11px] sm:text-xs font-bold mb-2 sm:mb-3 shadow-xs">
+                <span>{eventConfig.icon}</span>
+                <span>{eventConfig.badge}</span>
+                <span className="text-muted-foreground/40">·</span>
+                <span className="font-semibold">{eventConfig.name}</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-[11px] sm:text-xs font-bold mb-2 sm:mb-3">
+                <Sparkles className="w-3 h-3" />
+                <span>Dashboard</span>
+              </div>
+            )}
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-extrabold leading-tight">
               Xin chào,{" "}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary-glow to-accent">
@@ -190,7 +218,7 @@ export function HeroBanner({
           </div>
 
           <Link
-            className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-xs sm:text-sm font-bold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow-glow-red hover:bg-primary-glow hover:shadow-glow-red transition-all duration-300 hover:-translate-y-0.5 h-10 sm:h-11 rounded-xl px-6 sm:px-8 shrink-0 w-full sm:w-auto"
+            className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-xs sm:text-sm font-bold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 btn-brand-gradient text-white shadow-glow-soft hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 h-10 sm:h-11 rounded-xl px-6 sm:px-8 shrink-0 w-full sm:w-auto"
             href="/thi-thu"
             data-discover="true"
           >
@@ -248,14 +276,14 @@ export function HeroBanner({
 
           {/* Card 4: Trình độ */}
           <div className="group relative flex items-center gap-2.5 sm:gap-4 rounded-xl sm:rounded-2xl border border-border bg-card/70 backdrop-blur-sm p-3 sm:px-5 sm:py-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-glow-soft">
-            <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br ring-1 ring-inset ring-border from-[#a78bfa]/30 to-[#a78bfa]/5 text-[#a78bfa]">
+            <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br ring-1 ring-inset ring-border from-primary/30 to-primary/5 text-primary">
               <TrendingUp className="h-5 w-5 sm:h-7 sm:w-7" />
             </div>
             <div className="min-w-0">
               <div className="text-[11px] sm:text-sm text-muted-foreground truncate">
                 Trình độ
               </div>
-              <div className="text-base sm:text-2xl font-heading font-extrabold text-foreground leading-tight truncate">
+              <div className="text-sm sm:text-xl font-heading font-extrabold text-foreground leading-tight truncate">
                 {currentLevel}
               </div>
             </div>
@@ -296,7 +324,7 @@ export function HeroBanner({
               <div className="text-sm sm:text-xl font-heading font-extrabold leading-tight truncate text-foreground">
                 {planName}
               </div>
-              <span className="mt-1 inline-flex items-center gap-0.5 sm:gap-1 rounded-full bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] px-2 py-0.2 sm:px-2.5 sm:py-0.5 text-[9.5px] sm:text-[11px] font-bold text-white shadow-xs hover:brightness-110">
+              <span className="mt-1 inline-flex items-center gap-0.5 sm:gap-1 rounded-full btn-brand-gradient px-2 py-0.2 sm:px-2.5 sm:py-0.5 text-[9.5px] sm:text-[11px] font-bold text-white shadow-xs">
                 <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 Nâng cấp
               </span>

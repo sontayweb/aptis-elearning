@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { AuthModal } from "@/components/auth-modal";
 import {
   Crown,
   Check,
@@ -106,6 +107,7 @@ export default function PricingPage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "success">("pending");
   const [loading, setLoading] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   // States for Enterprise Payment Resilience
   const [verifyingPayment, setVerifyingPayment] = useState(false);
@@ -175,9 +177,10 @@ export default function PricingPage() {
       return;
     }
 
-    // If not logged in, auto quick-login student
+    // If not logged in, prompt user to login/register real account
     if (!isAuthenticated) {
-      await quickLogin("student");
+      setAuthModalOpen(true);
+      return;
     }
 
     setSelectedPlan(plan);
@@ -314,9 +317,9 @@ export default function PricingPage() {
           />
 
           <div className="section-container py-12 md:py-20 text-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white text-xs font-bold mb-4 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white text-xs font-bold mb-4 shadow-sm shadow-blue-500/20">
               <Crown className="w-4 h-4" />
-              <span>Nâng Cấp Gói Ôn Thi Aptis Kỳ Tích</span>
+              <span>Nâng Cấp Gói Ôn Thi APTIS ESOL PREMIER</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-foreground mb-4">
               Mở Khóa Toàn Bộ Đề Thi &amp; Chấm AI
@@ -340,7 +343,7 @@ export default function PricingPage() {
                 }`}
               >
                 {plan.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white text-[11px] font-extrabold tracking-wider shadow-md">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white text-[11px] font-extrabold tracking-wider shadow-md shadow-blue-500/30">
                     {plan.badge}
                   </div>
                 )}
@@ -454,7 +457,7 @@ export default function PricingPage() {
                   <span className="text-[10px] font-mono tracking-wider font-bold">
                     MB BANK · 0866950837
                   </span>
-                  <span className="text-[9px] bg-red-600 px-2 py-0.5 rounded text-white font-bold">
+                  <span className="text-[9px] bg-blue-600 px-2 py-0.5 rounded text-white font-bold">
                     QUÉT MÃ VIETQR
                   </span>
                 </div>
@@ -527,14 +530,16 @@ export default function PricingPage() {
                 <span>Đang chờ tín hiệu chuyển khoản từ SePay (3 - 5s)...</span>
               </div>
 
-              {/* Demo button to simulate instant bank payment webhook */}
-              <button
-                type="button"
-                onClick={handleSimulatePaymentSuccess}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-colors"
-              >
-                ✓ Mô phỏng đã chuyển khoản thành công (SePay Webhook)
-              </button>
+              {/* Demo button to simulate instant bank payment webhook (Chỉ hiển thị khi development) */}
+              {process.env.NODE_ENV !== "production" && (
+                <button
+                  type="button"
+                  onClick={handleSimulatePaymentSuccess}
+                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-colors"
+                >
+                  ✓ [DEV] Mô phỏng đã chuyển khoản thành công (SePay Webhook)
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -542,6 +547,7 @@ export default function PricingPage() {
 
       <Footer />
       <FloatingActions />
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </div>
   );
 }

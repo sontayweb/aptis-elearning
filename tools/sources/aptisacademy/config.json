@@ -1,0 +1,10 @@
+{
+  "name": "aptisacademy",
+  "displayName": "Aptis Academy (Tiên Phong)",
+  "baseUrl": "https://aptisacademy.com.vn/",
+  "account": {
+    "email": "Aptisonthi7@gmail.com",
+    "password": "Aptis12"
+  },
+  "remotePort": 9223
+}

@@ -44,13 +44,15 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
             </p>
           </div>
           <div className="space-y-2 pt-2">
-            <button
-              onClick={() => quickLogin("teacher")}
-              className="w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-heading font-semibold hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
-            >
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Đăng nhập thử nghiệm: Giảng viên (Teacher)</span>
-            </button>
+            {process.env.NODE_ENV !== "production" && (
+              <button
+                onClick={() => quickLogin("teacher")}
+                className="w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-heading font-semibold hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+              >
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>[DEV] Đăng nhập nhanh Giảng viên (Teacher)</span>
+              </button>
+            )}
             <Link
               href="/"
               className="w-full py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors inline-flex items-center justify-center gap-1.5"
@@ -79,7 +81,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
                 Cổng Giảng Viên
               </div>
               <div className="text-[10px] text-blue-600 font-semibold uppercase tracking-wider">
-                Aptis Kỳ Tích
+                APTIS ESOL PREMIER
               </div>
             </div>
           </Link>

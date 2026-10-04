@@ -24,160 +24,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-interface DocumentItem {
-  id: string;
-  title: string;
-  category: "PDF" | "EBOOK" | "HANDBOOK";
-  skill: "ALL" | "SPEAKING" | "WRITING" | "READING" | "LISTENING" | "GRAMMAR";
-  targetBand: "B1" | "B2" | "C" | "ALL";
-  pages: number;
-  fileSize: string;
-  downloadsCount: number;
-  isVip: boolean;
-  description: string;
-  downloadUrl: string;
-}
-
-interface VideoLesson {
-  id: string;
-  title: string;
-  speaker: string;
-  duration: string;
-  skill: "SPEAKING" | "WRITING" | "READING" | "LISTENING" | "GRAMMAR";
-  targetBand: "B1" | "B2" | "C" | "ALL";
-  thumbnailUrl?: string;
-  views: number;
-  description: string;
-  videoEmbedId: string;
-}
-
-const DOCUMENTS_DATA: DocumentItem[] = [
-  {
-    id: "doc-1",
-    title: "Cẩm nang Chiến thuật 4 Kỹ năng Aptis ESOL đạt Band C",
-    category: "HANDBOOK",
-    skill: "ALL",
-    targetBand: "C",
-    pages: 128,
-    fileSize: "14.2 MB",
-    downloadsCount: 3842,
-    isVip: false,
-    description: "Bộ cẩm nang thực chiến tổng hợp cấu trúc đề, thang điểm CEFR và bí quyết tối ưu thời gian 162 phút của British Council.",
-    downloadUrl: "#",
-  },
-  {
-    id: "doc-2",
-    title: "Tuyển tập Bộ đề thi thật Aptis ESOL Update Mới Nhất",
-    category: "PDF",
-    skill: "ALL",
-    targetBand: "B2",
-    pages: 250,
-    fileSize: "28.5 MB",
-    downloadsCount: 5120,
-    isVip: true,
-    description: "Tổng hợp các đề thi thực tế tại các hội đồng BC Hà Nội, TP.HCM & Đà Nẵng kèm lời giải chi tiết và audio transcript.",
-    downloadUrl: "#",
-  },
-  {
-    id: "doc-3",
-    title: "500 Từ vựng Trọng tâm Aptis B1 - B2 Cốt lõi & Phiên âm IPA",
-    category: "EBOOK",
-    skill: "GRAMMAR",
-    targetBand: "B2",
-    pages: 64,
-    fileSize: "6.8 MB",
-    downloadsCount: 4620,
-    isVip: false,
-    description: "Kho từ vựng chọn lọc xuất hiện với tần suất cao nhất trong các bài thi Reading, Speaking và Grammar & Vocabulary.",
-    downloadUrl: "#",
-  },
-  {
-    id: "doc-4",
-    title: "Template Bài viết Writing Part 1 - Part 4 Đạt Chuẩn 50/50",
-    category: "PDF",
-    skill: "WRITING",
-    targetBand: "C",
-    pages: 85,
-    fileSize: "9.1 MB",
-    downloadsCount: 2980,
-    isVip: true,
-    description: "Mẫu câu ăn điểm cho thư thân mật, thư trang trọng và dàn ý phản hồi group chat mạng xã hội kèm 20 bài mẫu Band C.",
-    downloadUrl: "#",
-  },
-  {
-    id: "doc-5",
-    title: "Trọn bộ 9 Câu hỏi & Câu trả lời Mẫu Speaking Band C",
-    category: "PDF",
-    skill: "SPEAKING",
-    targetBand: "C",
-    pages: 92,
-    fileSize: "11.4 MB",
-    downloadsCount: 3410,
-    isVip: true,
-    description: "Hướng dẫn miêu tả tranh, so sánh đối chiếu và thuyết trình 2 phút Part 4 với các cấu trúc câu nâng cao và idiom tự nhiên.",
-    downloadUrl: "#",
-  },
-  {
-    id: "doc-6",
-    title: "Tổng hợp 25 Chủ điểm Ngữ pháp Bắt buộc trong Kỳ thi Aptis",
-    category: "HANDBOOK",
-    skill: "GRAMMAR",
-    targetBand: "B1",
-    pages: 78,
-    fileSize: "7.5 MB",
-    downloadsCount: 4100,
-    isVip: false,
-    description: "Hệ thống hóa toàn bộ thì động từ, câu điều kiện, mệnh đề quan hệ và đảo ngữ thường gặp trong 25 câu ngữ pháp đầu tiên.",
-    downloadUrl: "#",
-  },
-];
-
-const VIDEOS_DATA: VideoLesson[] = [
-  {
-    id: "vid-1",
-    title: "Chiến thuật chinh phục Speaking Part 1 - 4 đạt Band C cấp tốc",
-    speaker: "Thầy Hưng (Band C Aptis - 195/200)",
-    duration: "28:45",
-    skill: "SPEAKING",
-    targetBand: "C",
-    views: 8940,
-    description: "Phân tích tư duy trả lời tức thì, cách tận dụng 1 phút chuẩn bị Part 4 và phương pháp phát âm chuẩn để AI chấm điểm tối đa.",
-    videoEmbedId: "dQw4w9WgXcQ",
-  },
-  {
-    id: "vid-2",
-    title: "Bí kíp viết Thư Trang trọng Part 4 Writing chuẩn chỉnh 50/50",
-    speaker: "Cô Mai Lan (Chuyên gia Khảo thí Aptis)",
-    duration: "34:10",
-    skill: "WRITING",
-    targetBand: "B2",
-    views: 6520,
-    description: "So sánh sự khác biệt giữa thư thân mật và thư gửi ban quản lý, các cặp liên từ chỉ nguyên nhân/kết quả nâng cao band điểm.",
-    videoEmbedId: "dQw4w9WgXcQ",
-  },
-  {
-    id: "vid-3",
-    title: "Phương pháp né bẫy và bắt từ khóa Listening Part 3 & 4",
-    speaker: "Thầy David Miller (Giảng viên Bản ngữ)",
-    duration: "25:15",
-    skill: "LISTENING",
-    targetBand: "B2",
-    views: 5230,
-    description: "Kỹ thuật dự đoán nội dung qua câu hỏi, nhận diện giọng điệu nhân vật và cách xử lý đoạn đối thoại nhiều quan điểm trái chiều.",
-    videoEmbedId: "dQw4w9WgXcQ",
-  },
-  {
-    id: "vid-4",
-    title: "Kỹ thuật Scanning & Skimming bài đọc dài Reading Part 4",
-    speaker: "Cô Hoàng Yến (8.0 IELTS / C Aptis)",
-    duration: "22:30",
-    skill: "READING",
-    targetBand: "C",
-    views: 4780,
-    description: "Cách tìm thông tin nhanh trong 7 đoạn văn phức tạp mà không cần đọc hết toàn bộ bài đọc, đảm bảo hoàn thành trong 35 phút.",
-    videoEmbedId: "dQw4w9WgXcQ",
-  },
-];
+import {
+  DocumentItem,
+  VideoLesson,
+  DOCUMENTS_DATA,
+  VIDEOS_DATA,
+} from "@/data/documents-data";
 
 export default function TaiLieuPage() {
   const [activeTab, setActiveTab] = useState<"docs" | "videos">("docs");
@@ -209,7 +61,7 @@ export default function TaiLieuPage() {
   const handleDownload = (doc: DocumentItem) => {
     setDownloadSuccessModal(doc);
     // Tạo tệp tải về giả lập
-    const dummyContent = `# ${doc.title}\n\nHệ thống Luyện thi & Khảo thí Aptis Kỳ Tích\nTài liệu học tập chính thức dành cho học viên ôn luyện Aptis ESOL.\nTrang: ${doc.pages}\nKích thước: ${doc.fileSize}\n\nChúc bạn ôn tập tốt và đạt mục tiêu Band ${doc.targetBand}!`;
+    const dummyContent = `# ${doc.title}\n\nHệ thống Luyện thi & Khảo thí APTIS ESOL PREMIER\nTài liệu học tập chính thức dành cho học viên ôn luyện Aptis ESOL.\nTrang: ${doc.pages}\nKích thước: ${doc.fileSize}\n\nChúc bạn ôn tập tốt và đạt mục tiêu Band ${doc.targetBand}!`;
     const blob = new Blob([dummyContent], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

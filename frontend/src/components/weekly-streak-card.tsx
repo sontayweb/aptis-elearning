@@ -1,12 +1,14 @@
 "use client";
 
-import { Flame } from "lucide-react";
+import Link from "next/link";
+import { Flame, ArrowRight } from "lucide-react";
 
 interface WeeklyStreakCardProps {
   currentStreak?: number;
   completedThisWeek?: number;
   totalDays?: number;
   activeDays?: boolean[];
+  practiceRoute?: string;
 }
 
 export function WeeklyStreakCard({
@@ -14,6 +16,7 @@ export function WeeklyStreakCard({
   completedThisWeek = 0,
   totalDays = 7,
   activeDays,
+  practiceRoute = "/grammar",
 }: WeeklyStreakCardProps) {
   // Radius 55 -> Circumference = 2 * Math.PI * 55 ≈ 345.575
   const circumference = 2 * Math.PI * 55;
@@ -31,8 +34,16 @@ export function WeeklyStreakCard({
     { label: "CN", isToday: todayIdx === 6, completed: activeDays ? !!activeDays[6] : false },
   ];
 
+  const isTodayDone = activeDays ? !!activeDays[todayIdx] : false;
+  const streakHeading = !isTodayDone && currentStreak > 0
+    ? `Sắp mất chuỗi ${currentStreak} ngày!`
+    : `Chuỗi ${currentStreak} ngày`;
+  const streakSubtitle = !isTodayDone
+    ? "Luyện 1 bài hôm nay là đủ để giữ streak."
+    : "Tuyệt vời! Bạn đã duy trì streak hôm nay.";
+
   return (
-    <div className="relative rounded-2xl border border-border bg-card/80 backdrop-blur-sm shadow-md tech-card hover:border-primary/50 hover:shadow-glow-red p-4 sm:p-6">
+    <div className="relative rounded-2xl border border-border bg-card/80 backdrop-blur-sm shadow-md tech-card hover:border-primary/50 hover:shadow-glow-soft p-4 sm:p-6">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 rounded-2xl opacity-60"
@@ -91,13 +102,13 @@ export function WeeklyStreakCard({
           {/* Streak Details & Days */}
           <div className="flex-1 min-w-0 w-full">
             <div className="flex items-center gap-2 mb-1">
-              <Flame className="w-6 h-6 text-primary fill-primary/20" />
+              <Flame className="w-6 h-6 text-primary fill-primary/20 animate-pulse" />
               <h2 className="font-heading font-extrabold text-lg text-foreground">
-                Chuỗi {currentStreak} ngày
+                {streakHeading}
               </h2>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Tiếp tục học hôm nay để duy trì streak.
+              {streakSubtitle}
             </p>
             <div className="flex gap-1.5">
               {days.map((day) => (
@@ -105,16 +116,26 @@ export function WeeklyStreakCard({
                   <div className="text-[10px] text-muted-foreground">{day.label}</div>
                   <div
                     className={`w-full h-9 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
-                      day.isToday
+                      day.completed
+                        ? "btn-brand-gradient text-white shadow-glow-soft"
+                        : day.isToday
                         ? "bg-primary/15 border border-primary/50 text-primary animate-glow-pulse"
                         : "bg-muted/40 text-muted-foreground/60"
                     }`}
                   >
-                    {day.isToday ? "•" : "·"}
+                    {day.completed ? "✓" : day.isToday ? "•" : "·"}
                   </div>
                 </div>
               ))}
             </div>
+
+            <Link
+              className="tech-btn inline-flex items-center justify-center gap-1.5 whitespace-nowrap text-sm font-semibold ring-offset-background btn-brand-gradient text-white shadow-glow-soft hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 h-9 rounded-xl px-4 mt-4 w-full sm:w-auto"
+              href={practiceRoute}
+            >
+              <span>Luyện ngay</span>
+              <ArrowRight className="w-3.5 h-3.5 ml-1" />
+            </Link>
           </div>
         </div>
       </div>

@@ -184,8 +184,30 @@ export class AdminController {
 
   async getDashboardKPIs(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const kpis = await adminService.getDashboardKPIs();
+      const period = req.query.period as string | undefined;
+      const fromDate = req.query.fromDate as string | undefined;
+      const toDate = req.query.toDate as string | undefined;
+      const kpis = await adminService.getDashboardKPIs({ period, fromDate, toDate });
       sendSuccess(res, kpis, 'Lấy chỉ số KPI Dashboard thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async exportDashboardReport(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const period = req.query.period as string | undefined;
+      const fromDate = req.query.fromDate as string | undefined;
+      const toDate = req.query.toDate as string | undefined;
+      const format = (req.query.format as string) || 'csv';
+
+      const csvContent = await adminService.exportDashboardReport({ period, fromDate, toDate, format });
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="bao-cao-aptis-${period || 'custom'}-${Date.now()}.csv"`
+      );
+      res.send(csvContent);
     } catch (error) {
       next(error);
     }
@@ -221,6 +243,78 @@ export class AdminController {
       const planId = req.params.id;
       const updated = await adminService.updatePlan(planId, req.body, req);
       sendSuccess(res, updated, 'Cập nhật gói cước thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // ── CONTENT EDITOR CONTROLLERS ─────────────────────────────────
+
+  async getExamFull(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const examId = req.params.id;
+      const exam = await adminService.getExamFull(examId);
+      sendSuccess(res, exam, 'Lấy nội dung đầy đủ đề thi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updatePart(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const updated = await adminService.updatePart(partId, req.body, req);
+      sendSuccess(res, updated, 'Cập nhật phần thi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addPart(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const examId = req.params.id;
+      const part = await adminService.addPart(examId, req.body, req);
+      sendSuccess(res, part, 'Thêm phần thi mới thành công', 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deletePart(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const result = await adminService.deletePart(partId, req);
+      sendSuccess(res, result, 'Xóa phần thi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateQuestion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const questionId = req.params.questionId;
+      const updated = await adminService.updateQuestion(questionId, req.body, req);
+      sendSuccess(res, updated, 'Cập nhật câu hỏi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addQuestion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const question = await adminService.addQuestion(partId, req.body, req);
+      sendSuccess(res, question, 'Thêm câu hỏi thành công', 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteQuestion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const questionId = req.params.questionId;
+      const result = await adminService.deleteQuestion(questionId, req);
+      sendSuccess(res, result, 'Xóa câu hỏi thành công', 200);
     } catch (error) {
       next(error);
     }

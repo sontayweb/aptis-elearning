@@ -52,7 +52,7 @@ export default function ContactPage() {
               Liên Hệ &amp; <span className="gradient-text">Hỗ Trợ Học Viên</span>
             </h1>
             <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto">
-              Đội ngũ tư vấn học vụ và giảng viên Aptis Kỳ Tích luôn sẵn sàng đồng hành, tư vấn mục tiêu và giải đáp mọi câu hỏi của bạn.
+              Đội ngũ tư vấn học vụ và giảng viên APTIS ESOL PREMIER luôn sẵn sàng đồng hành, tư vấn mục tiêu và giải đáp mọi câu hỏi của bạn.
             </p>
           </div>
         </section>
@@ -119,7 +119,7 @@ export default function ContactPage() {
                   </div>
                   <h3 className="text-lg font-bold text-foreground">Gửi thông tin thành công!</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Cảm ơn bạn đã quan tâm. Cố vấn học tập Aptis Kỳ Tích sẽ gọi điện hoặc nhắn tin Zalo qua số điện thoại <strong>{formData.phone}</strong> trong vòng 15 phút.
+                    Cảm ơn bạn đã quan tâm. Cố vấn học tập APTIS ESOL PREMIER sẽ gọi điện hoặc nhắn tin Zalo qua số điện thoại <strong>{formData.phone}</strong> trong vòng 15 phút.
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}

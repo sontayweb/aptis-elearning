@@ -48,7 +48,7 @@ export default function TermsPage() {
               </h1>
             </div>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              Cập nhật lần cuối: 27/09/2026 · Áp dụng cho toàn bộ học viên và người dùng trên nền tảng Aptis Kỳ Tích.
+              Cập nhật lần cuối: 27/09/2026 · Áp dụng cho toàn bộ học viên và người dùng trên nền tảng APTIS ESOL PREMIER.
             </p>
           </div>
         </section>
@@ -92,7 +92,7 @@ export default function TermsPage() {
               </h2>
               <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
                 <p>
-                  Aptis Kỳ Tích cam kết không bán, chia sẻ hoặc tiết lộ số điện thoại, email, thông tin bài làm thi thử của học viên cho bất kỳ đơn vị thứ ba nào vì mục đích quảng cáo.
+                  APTIS ESOL PREMIER cam kết không bán, chia sẻ hoặc tiết lộ số điện thoại, email, thông tin bài làm thi thử của học viên cho bất kỳ đơn vị thứ ba nào vì mục đích quảng cáo.
                 </p>
                 <p>
                   Toàn bộ file âm thanh ghi âm trong phòng thi Speaking chỉ được sử dụng cho mục đích bóc băng chấm điểm AI và phản hồi chất lượng đào tạo từ giảng viên.

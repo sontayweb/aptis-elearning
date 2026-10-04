@@ -1,0 +1,23 @@
+[
+  {
+    "level": 1,
+    "bo": 355,
+    "cau": 1681,
+    "bo_xong": 0,
+    "cau_xong": 0
+  },
+  {
+    "level": 2,
+    "bo": 34,
+    "cau": 364,
+    "bo_xong": 0,
+    "cau_xong": 0
+  },
+  {
+    "level": 3,
+    "bo": 133,
+    "cau": 1441,
+    "bo_xong": 0,
+    "cau_xong": 0
+  }
+]

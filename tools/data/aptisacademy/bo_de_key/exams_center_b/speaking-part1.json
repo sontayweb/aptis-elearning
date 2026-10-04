@@ -1,0 +1,1038 @@
+[
+  {
+    "_id": "56a7103da0f455f14dfcb79d",
+    "title": "Please tell me about your family?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Please tell me about your family?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Please tell me about your family?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I'm so happy when I talk about my family. There are four people in my family: my father, my mother, my sister, and me. My parents are farmers, and they are very kind and friendly. My sister is a teacher, and she is very beautiful. I'm a doctor. I hope my family will be with me forever.</p><p><strong>Sample Answer 2:</strong> I'm so happy when I can talk about my family. There are five people in my family: my parents, two younger sisters, and me. My parents are farmers. They are so nice and humorous. My sisters are students who study at secondary school. And I'm a senior at National Economics University. I love my family very much and like to spend time with them.</p>",
+            "_id": "d7fe0859d5a1af98ea89585e"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "5533265ba4ed1dcc52849bb3"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "a16eedb733b68dbaf0cfaee0",
+    "createdAt": "2026-07-06T15:41:52.263Z",
+    "updatedAt": "2026-07-06T15:41:52.264Z",
+    "__v": 0
+  },
+  {
+    "_id": "d8c210dc06a7173ddcb4e816",
+    "title": "Please tell me about yourself?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Please tell me about yourself?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> Hi, thank you for your question. I'm really happy to tell you a bit about myself. My name is Nguyen Van A. I'm a teacher. My hobby is listening to music, I really like listening to music because it helps me relax and feel better after a long working day.</p><p><strong>Sample Answer 2:</strong> I would like to introduce myself. My full name is Nguyen Hong Ngoc. I'm a senior at National Economics University. My major is Accounting. I'm very friendly and nice. In my free time, I like hanging out with my friend. We go out to eat, go to the cinema, go shopping or go to the concert music and so on. In the future, I want to be an auditor because it helps to build a solid ground about accounting, finance and improve my soft skill.</p>",
+        "subQuestion": [
+          {
+            "content": "Please tell me about yourself?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> Hi, thank you for your question. I'm really happy to tell you a bit about myself. My name is Nguyen Van A. I'm a teacher. My hobby is listening to music, I really like listening to music because it helps me relax and feel better after a long working day.</p><p><strong>Sample Answer 2:</strong> I would like to introduce myself. My full name is Nguyen Hong Ngoc. I'm a senior at National Economics University. My major is Accounting. I'm very friendly and nice. In my free time, I like hanging out with my friend. We go out to eat, go to the cinema, go shopping or go to the concert music and so on. In the future, I want to be an auditor because it helps to build a solid ground about accounting, finance and improve my soft skill.</p>",
+            "_id": "fa2de2511f96c41eeb240047"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "699da77eb59d0c07fe30ea90"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "e4c25db4bef31848d330a6fe",
+    "createdAt": "2026-07-06T15:41:52.264Z",
+    "updatedAt": "2026-07-06T15:41:52.264Z",
+    "__v": 0
+  },
+  {
+    "_id": "1891ce49e114eb9ca105306d",
+    "title": "Tell me about your hometown / the place that you live? / A famous place in your country?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Tell me about your hometown / the place that you live? / A famous place in your country?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> My hometown is Hanoi, the capital city of Vietnam. It is a very old city with many beautiful places. The weather in Hanoi is often cool in the winter and hot in the summer. People here are friendly and kind. There are many delicious foods like Pho and Bánh mì. I love my hometown very much.</p><p><strong>Sample Answer 2:</strong> I live in Hung Yen province, which is located in the north part of Vietnam. It is about sixty kilometers from Ha Noi. I often come back to my hometown by motorbike. There are a lot of beautiful places such as Tam Dao, Dai Lai... It is a place with friendly and kind people. I think everyone should visit my hometown at least once.</p>",
+        "subQuestion": [
+          {
+            "content": "Tell me about your hometown / the place that you live? / A famous place in your country?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> My hometown is Hanoi, the capital city of Vietnam. It is a very old city with many beautiful places. The weather in Hanoi is often cool in the winter and hot in the summer. People here are friendly and kind. There are many delicious foods like Pho and Bánh mì. I love my hometown very much.</p><p><strong>Sample Answer 2:</strong> I live in Hung Yen province, which is located in the north part of Vietnam. It is about sixty kilometers from Ha Noi. I often come back to my hometown by motorbike. There are a lot of beautiful places such as Tam Dao, Dai Lai... It is a place with friendly and kind people. I think everyone should visit my hometown at least once.</p>",
+            "_id": "4108bb6a2e87a8ef2d6d4499"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "ec6fa4fa93823c03617da096"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "b3e6bd67e33a22aa68aac7c2",
+    "createdAt": "2026-07-06T15:41:52.264Z",
+    "updatedAt": "2026-07-06T15:41:52.264Z",
+    "__v": 0
+  },
+  {
+    "_id": "81c04e909fb74a3faa0c2b99",
+    "title": "Tell me the best way to travel about around your country?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Tell me the best way to travel about around your country?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> Well, this is a very good question. I think the best way to travel around my country is by motorbike, because it is a very cheap and flexible way to move from place to place. With a motorbike, you can stop anywhere to enjoy the view, take pictures, or try local food. Right now, I usually use a motorbike to go to work. It makes me feel comfortable every day.</p><p><strong>Sample Answer 2:</strong> This is a good question. I think the best way to travel in my country is by motorbike. It is cheap and easy to go from one place to another. With a motorbike, you can stop anytime to see the view, take photos, or try local food. I also use a motorbike to go to work every day. It makes me feel comfortable.</p>",
+        "subQuestion": [
+          {
+            "content": "Tell me the best way to travel about around your country?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> Well, this is a very good question. I think the best way to travel around my country is by motorbike, because it is a very cheap and flexible way to move from place to place. With a motorbike, you can stop anywhere to enjoy the view, take pictures, or try local food. Right now, I usually use a motorbike to go to work. It makes me feel comfortable every day.</p><p><strong>Sample Answer 2:</strong> This is a good question. I think the best way to travel in my country is by motorbike. It is cheap and easy to go from one place to another. With a motorbike, you can stop anytime to see the view, take photos, or try local food. I also use a motorbike to go to work every day. It makes me feel comfortable.</p>",
+            "_id": "ff03875df013c6c5aa6172dc"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "3b427ef3b61c174fcef51042"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "7b45efb7ada57fbc70c80e95",
+    "createdAt": "2026-07-06T15:41:52.264Z",
+    "updatedAt": "2026-07-06T15:41:52.264Z",
+    "__v": 0
+  },
+  {
+    "_id": "f61458294f9351735e38d863",
+    "title": "Tell me about your friend / a member in your family",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Tell me about your friend / a member in your family",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I have many friends, but Marry is my best friend. We have known each other since childhood. Now we live in different cities, but we talk to each other every day via mobile phone. I like her because she is very kind and always helps me when I need support. I hope she will be with me forever and become my wife in the future.</p><p><strong>Sample Answer 2:</strong> Well, I would like to talk about my mother who has played an essential role in my life. She's forty-two years old. She is very nice and humorous. She really is a mother and a friend to me as she always gives me valuable advice when I face a difficult problem. I love my mom very much.</p>",
+        "subQuestion": [
+          {
+            "content": "Tell me about your friend / a member in your family",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I have many friends, but Marry is my best friend. We have known each other since childhood. Now we live in different cities, but we talk to each other every day via mobile phone. I like her because she is very kind and always helps me when I need support. I hope she will be with me forever and become my wife in the future.</p><p><strong>Sample Answer 2:</strong> Well, I would like to talk about my mother who has played an essential role in my life. She's forty-two years old. She is very nice and humorous. She really is a mother and a friend to me as she always gives me valuable advice when I face a difficult problem. I love my mom very much.</p>",
+            "_id": "d8e5d5e6e697a65a4670dee3"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "0f70e190006b1a055609933a"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "1419a0da8d1d13858e5ae37f",
+    "createdAt": "2026-07-06T15:41:52.264Z",
+    "updatedAt": "2026-07-06T15:41:52.264Z",
+    "__v": 0
+  },
+  {
+    "_id": "1d27d32b7b5e927e8ad48ad2",
+    "title": "What is the weather like today? / What is your favorite season?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "What is the weather like today? / What is your favorite season?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> Today, it's very hot, but I like the heat and I really enjoy summer. In this season, I can go to the beach with my friends and family. At the beach, I can watch the sunset and enjoy the fresh air. I usually exercise in the morning, and summer is a great season for walking or running. I wish there were only one season in a year — summer!</p><p><strong>Sample Answer 2:</strong> Today the weather is very good. It is amazing because it's cloudy. I can go hang out with my friend. We can take a beautiful photograph. I really love this weather, it makes me feel happy and relaxed.</p>",
+        "subQuestion": [
+          {
+            "content": "What is the weather like today? / What is your favorite season?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> Today, it's very hot, but I like the heat and I really enjoy summer. In this season, I can go to the beach with my friends and family. At the beach, I can watch the sunset and enjoy the fresh air. I usually exercise in the morning, and summer is a great season for walking or running. I wish there were only one season in a year — summer!</p><p><strong>Sample Answer 2:</strong> Today the weather is very good. It is amazing because it's cloudy. I can go hang out with my friend. We can take a beautiful photograph. I really love this weather, it makes me feel happy and relaxed.</p>",
+            "_id": "e3affcf6e29d21dafe787c08"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "f19ca2b2f3ac1a79336c4708"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "4f611e5a7567ae85f677e6a8",
+    "createdAt": "2026-07-06T15:41:52.264Z",
+    "updatedAt": "2026-07-06T15:41:52.264Z",
+    "__v": 0
+  },
+  {
+    "_id": "0976ab4f46d8346ebad4109f",
+    "title": "Please tell me about one of your good memories",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Please tell me about one of your good memories",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I come from Hanoi, which is the capital of Vietnam. But now I'm working in another city, very far from there. Back in Hanoi, I had an old friend. Now she still lives there. We shared many memories when we were young. One day, we walked together and she talked to me about her feelings. But at that time, I was just a student, so I rejected her. Now she is married. I miss her every day but it's too late, I hope she will be happy every day.</p><p><strong>Sample Answer 2:</strong> I am from Hanoi, the capital of Vietnam. Now I am working in a city far from Hanoi. In Hanoi, I had an old friend. She still lives there. We shared many memories when we were young. One day, we walked together and she told me how she felt. But at that time, I was just a student, so I didn't agree with her. Now she is married. I miss her a lot, but it is too late. I hope she is happy every day.</p>",
+        "subQuestion": [
+          {
+            "content": "Please tell me about one of your good memories",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I come from Hanoi, which is the capital of Vietnam. But now I'm working in another city, very far from there. Back in Hanoi, I had an old friend. Now she still lives there. We shared many memories when we were young. One day, we walked together and she talked to me about her feelings. But at that time, I was just a student, so I rejected her. Now she is married. I miss her every day but it's too late, I hope she will be happy every day.</p><p><strong>Sample Answer 2:</strong> I am from Hanoi, the capital of Vietnam. Now I am working in a city far from Hanoi. In Hanoi, I had an old friend. She still lives there. We shared many memories when we were young. One day, we walked together and she told me how she felt. But at that time, I was just a student, so I didn't agree with her. Now she is married. I miss her a lot, but it is too late. I hope she is happy every day.</p>",
+            "_id": "28c5d5becbe70d86dcae9e06"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "e084ca413e065067b71c6d7c"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "2b61b208b249265684227d63",
+    "createdAt": "2026-07-06T15:41:52.264Z",
+    "updatedAt": "2026-07-06T15:41:52.264Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e4e9e753b4655eba3f0dac",
+    "title": "What do you like doing with your friends?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "What do you like doing with your friends?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I like to go to beach with my friend, I really like the beach and my friends are same, at there I can enjoy the fresh air, listen the sound of the waves, we usually go there at the weekend and watch sunset together then go to cinema to watch action film, it helps us relax and feel better after along working week.</p><p><strong>Sample Answer 2:</strong> I like to listen to music with my friends. When we have free time, we enjoy our favorite songs together. Music helps us relax and forget about stress. Sometimes, we also talk about the songs we like.</p>",
+        "subQuestion": [
+          {
+            "content": "What do you like doing with your friends?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I like to go to beach with my friend, I really like the beach and my friends are same, at there I can enjoy the fresh air, listen the sound of the waves, we usually go there at the weekend and watch sunset together then go to cinema to watch action film, it helps us relax and feel better after along working week.</p><p><strong>Sample Answer 2:</strong> I like to listen to music with my friends. When we have free time, we enjoy our favorite songs together. Music helps us relax and forget about stress. Sometimes, we also talk about the songs we like.</p>",
+            "_id": "68e4e9e753b4655eba3f0db0"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e4e9e753b4655eba3f0dad"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "68e4e9e753b4655eba3f0db1",
+    "createdAt": "2026-07-06T15:41:52.264Z",
+    "updatedAt": "2026-07-06T15:41:52.264Z",
+    "__v": 0
+  },
+  {
+    "_id": "c239ac73a5a174f0325bdbb3",
+    "title": "What do you like doing in your free time?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "What do you like doing in your free time?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I like to go to beach in my free time, I really like the beach and my friends are same, at there I can enjoy the fresh air, listen the sound of the waves, we usually go there at the weekend and watch sunset together then go to cinema to watch action film, it helps us relax and feel better after along working week.</p><p><strong>Sample Answer 2:</strong> I have always been a music lover, so whenever I have free time, I just put on my earphones and enjoy my favorite tunes. To me, music provides an escape from the busy life as it is both relaxing and therapeutic.</p>",
+        "subQuestion": [
+          {
+            "content": "What do you like doing in your free time?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I like to go to beach in my free time, I really like the beach and my friends are same, at there I can enjoy the fresh air, listen the sound of the waves, we usually go there at the weekend and watch sunset together then go to cinema to watch action film, it helps us relax and feel better after along working week.</p><p><strong>Sample Answer 2:</strong> I have always been a music lover, so whenever I have free time, I just put on my earphones and enjoy my favorite tunes. To me, music provides an escape from the busy life as it is both relaxing and therapeutic.</p>",
+            "_id": "3127b8d5187e244a8f10ff20"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "594b635a01f71eb2b48fa028"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "f07201a8632617f428271682",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "626183b9a352c11ea3540020",
+    "title": "What did you do last night / on the weekend?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "What did you do last night / on the weekend?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I went to the beach with my friend last night, I really like the beach and my friends are same, at there I can enjoy the fresh air, listen the sound of the waves, we usually go there at the weekend and watch sunset together then go to cinema to watch action film, it helps us relax and feel better after along working week.</p><p><strong>Sample Answer 2:</strong> Last weekend, I listened to music in my free time. I put on my earphones and enjoyed my favorite songs. Music helps me relax and forget about the busy day. It's a good way for me to unwind after a long week.</p>",
+        "subQuestion": [
+          {
+            "content": "What did you do last night / on the weekend?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I went to the beach with my friend last night, I really like the beach and my friends are same, at there I can enjoy the fresh air, listen the sound of the waves, we usually go there at the weekend and watch sunset together then go to cinema to watch action film, it helps us relax and feel better after along working week.</p><p><strong>Sample Answer 2:</strong> Last weekend, I listened to music in my free time. I put on my earphones and enjoyed my favorite songs. Music helps me relax and forget about the busy day. It's a good way for me to unwind after a long week.</p>",
+            "_id": "47b0f8cc98c4c26719b05b66"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "8e93e18e6205bd7b130e9be5"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "40aad1a6a10a7e5a73eddb66",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "c0e21f36a5d596ff4341d707",
+    "title": "Please tell me about your first school?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Please tell me about your first school?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> To be honest, I don't remember much about my first school. But as far as I can remember, its name was Nguyen Truong To, in Hanoi. Every day, my mother took me to school. That school brings back many memories — of my teachers, my friends, and the first steps of my learning journey.</p><p><strong>Sample Answer 2:</strong> My first school was a small school in my hometown. It was near my house, so I walked there every day. The teachers were kind, and I had many friends. I liked learning there, especially playing games during break time. I was very happy in that school.</p>",
+        "subQuestion": [
+          {
+            "content": "Please tell me about your first school?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> To be honest, I don't remember much about my first school. But as far as I can remember, its name was Nguyen Truong To, in Hanoi. Every day, my mother took me to school. That school brings back many memories — of my teachers, my friends, and the first steps of my learning journey.</p><p><strong>Sample Answer 2:</strong> My first school was a small school in my hometown. It was near my house, so I walked there every day. The teachers were kind, and I had many friends. I liked learning there, especially playing games during break time. I was very happy in that school.</p>",
+            "_id": "49fd2cb54bac4391df5bdf52"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "afca57483518517ee413406a"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "a76d8f9219790133864e2e7e",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "457023d94645475143d8acbf",
+    "title": "Describe the room you are in?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Describe the room you are in?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I am in a big room with about forty people. We are taking an English exam. This room has about ten desks and ten computers. It also has four fans and one air conditioner. I'm very happy to be here because I have prepared for this exam for a long time. I hope I will get a high score today.</p><p><strong>Sample Answer 2:</strong> I am in a quite big room which is about 40 square meters with white walls. This room is equipped with 50 desks, 4 fans and 2 conditioners. I and other candidates are taking our exam on the computers. There are 3 supervisors who will help in case something goes wrong. The atmosphere in this room is fairly stressful.</p>",
+        "subQuestion": [
+          {
+            "content": "Describe the room you are in?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I am in a big room with about forty people. We are taking an English exam. This room has about ten desks and ten computers. It also has four fans and one air conditioner. I'm very happy to be here because I have prepared for this exam for a long time. I hope I will get a high score today.</p><p><strong>Sample Answer 2:</strong> I am in a quite big room which is about 40 square meters with white walls. This room is equipped with 50 desks, 4 fans and 2 conditioners. I and other candidates are taking our exam on the computers. There are 3 supervisors who will help in case something goes wrong. The atmosphere in this room is fairly stressful.</p>",
+            "_id": "498b543679ac02779b611d86"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "9bc70f739683fa805c47ec54"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "333e606ed1883d47ddc6d383",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "d4dd4a30c88247a16729192b",
+    "title": "Describe your journey here today?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Describe your journey here today?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I'm happy to tell you about my journey here today. I got up at around six o'clock and had breakfast. Then, I went to the Aptis testing center to take the Aptis General test. Because the testing center is near my home, I walked here by myself. And now, I'm talking to you about my journey today. I hope I will get a high score on this test.</p><p><strong>Sample Answer 2:</strong> Today, I came here by motorbike with my friend. It's very fast and I won't be late for exam... But it only takes 15 minutes to arrive here. It is a nice day. I both feel happy and worried for exam today.</p>",
+        "subQuestion": [
+          {
+            "content": "Describe your journey here today?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I'm happy to tell you about my journey here today. I got up at around six o'clock and had breakfast. Then, I went to the Aptis testing center to take the Aptis General test. Because the testing center is near my home, I walked here by myself. And now, I'm talking to you about my journey today. I hope I will get a high score on this test.</p><p><strong>Sample Answer 2:</strong> Today, I came here by motorbike with my friend. It's very fast and I won't be late for exam... But it only takes 15 minutes to arrive here. It is a nice day. I both feel happy and worried for exam today.</p>",
+            "_id": "035f5e66832bb8f401571da9"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "c1b41cc1b035ef61855fbe7e"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "bd579da1cf0a2b659bbe4126",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "195385e3b071cf2f4e2a9471",
+    "title": "What are you wearing today?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "What are you wearing today?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> Well I'm not really the fashionable type. Today I'm wearing a red jacket and a white jeans, I like red jacket because I really like red color, I don't know white but I feel very comfortable when I wearing red color, in that color it always make me relax and feel better every day.</p><p><strong>Sample Answer 2:</strong> Today, I'm wearing a blue t-shirt and a pair of jeans. It's a simple outfit because I'm just at home today. I also have on my comfortable sneakers. I like to wear something easy and casual on regular days.</p>",
+        "subQuestion": [
+          {
+            "content": "What are you wearing today?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> Well I'm not really the fashionable type. Today I'm wearing a red jacket and a white jeans, I like red jacket because I really like red color, I don't know white but I feel very comfortable when I wearing red color, in that color it always make me relax and feel better every day.</p><p><strong>Sample Answer 2:</strong> Today, I'm wearing a blue t-shirt and a pair of jeans. It's a simple outfit because I'm just at home today. I also have on my comfortable sneakers. I like to wear something easy and casual on regular days.</p>",
+            "_id": "d64ba71e388b414b4a4f078a"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "c4157e5cb9dc46300fbdf2be"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "6b35b046e9fbc4a0421ae0b3",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "d2f26db9438fc397d2963ff5",
+    "title": "When do you feel tired?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "When do you feel tired?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> Well, this is a very good question. It brings back many memories of my past. I don't feel tired when I work hard, but I do feel tired when I think about one person — my old friend. Now we live in different city. When I was young, she liked me, but I rejected her. Now she is married, and I always miss her whenever someone reminds me of her. At those times, I feel like my heart is truly tired.</p><p><strong>Sample Answer 2:</strong> I feel tired at the end of the day, especially after working or studying for a long time. When I have a lot of tasks to do, I get tired easily. I also feel tired when I don't sleep well the night before. That's when I need to rest or take a break.</p>",
+        "subQuestion": [
+          {
+            "content": "When do you feel tired?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> Well, this is a very good question. It brings back many memories of my past. I don't feel tired when I work hard, but I do feel tired when I think about one person — my old friend. Now we live in different city. When I was young, she liked me, but I rejected her. Now she is married, and I always miss her whenever someone reminds me of her. At those times, I feel like my heart is truly tired.</p><p><strong>Sample Answer 2:</strong> I feel tired at the end of the day, especially after working or studying for a long time. When I have a lot of tasks to do, I get tired easily. I also feel tired when I don't sleep well the night before. That's when I need to rest or take a break.</p>",
+            "_id": "86312ea6117f75aa8119cc71"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "36204e606b465304a960c1fc"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "a968a5c079ffb24c0433c506",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "2eef86d53af72cfa1eb45469",
+    "title": "Describe a typical Vietnamese meal?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Describe a typical Vietnamese meal?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> A typical Vietnamese meal includes rice, vegetables, meat or fish, and soup. Rice is the main dish and is eaten every day. The food is shared by everyone at the table. People use chopsticks and eat together as a family. It's not just about eating, but also about spending time and talking with each other.</p><p><strong>Sample Answer 2:</strong> A typical Vietnamese meal usually includes rice, a soup, and several dishes. The dishes are often made with vegetables, meat, or fish. For example, a common meal might be rice with grilled pork, pickled vegetables, and a bowl of clear soup. We also often eat with fish sauce, which adds flavor to the meal. It's fresh, tasty, and balanced.</p>",
+        "subQuestion": [
+          {
+            "content": "Describe a typical Vietnamese meal?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> A typical Vietnamese meal includes rice, vegetables, meat or fish, and soup. Rice is the main dish and is eaten every day. The food is shared by everyone at the table. People use chopsticks and eat together as a family. It's not just about eating, but also about spending time and talking with each other.</p><p><strong>Sample Answer 2:</strong> A typical Vietnamese meal usually includes rice, a soup, and several dishes. The dishes are often made with vegetables, meat, or fish. For example, a common meal might be rice with grilled pork, pickled vegetables, and a bowl of clear soup. We also often eat with fish sauce, which adds flavor to the meal. It's fresh, tasty, and balanced.</p>",
+            "_id": "d6f913d32a065713e96c8d45"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "96d31027dc6e98a594d0866d"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "be736a18b50a6016ac8bdb7e",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "c872135290e85d6a07b4a852",
+    "title": "Describe your typical day?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Describe your typical day?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I usually wake up at 6 o'clock. I eat breakfast, then go to work. I usually have lunch with my friends in the office and continue working in the afternoon. In the evening, I really like listening to music or reading a book. I go to bed around 10 p.m. This habit helps me stay healthy and happy every day.</p><p><strong>Sample Answer 2:</strong> My typical day starts early in the morning. I wake up, have breakfast, and then go to work or school. During the day, I focus on my tasks and take short breaks. In the evening, I relax by watching TV or reading a book. After dinner, I spend time with my family or friends before going to bed. It's a simple but busy routine.</p>",
+        "subQuestion": [
+          {
+            "content": "Describe your typical day?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I usually wake up at 6 o'clock. I eat breakfast, then go to work. I usually have lunch with my friends in the office and continue working in the afternoon. In the evening, I really like listening to music or reading a book. I go to bed around 10 p.m. This habit helps me stay healthy and happy every day.</p><p><strong>Sample Answer 2:</strong> My typical day starts early in the morning. I wake up, have breakfast, and then go to work or school. During the day, I focus on my tasks and take short breaks. In the evening, I relax by watching TV or reading a book. After dinner, I spend time with my family or friends before going to bed. It's a simple but busy routine.</p>",
+            "_id": "81c995faa2fe337c8ba67a89"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "0ab3ef0d0e01cb96391723a1"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "06a5f263879059a27ffece1b",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e4e61d53b4655eba3f0d80",
+    "title": "What do you like to do in your free time?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "What do you like to do in your free time?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> In my free time, I really like listening to music. It helps me relax and feel better after a long day. I usually listen to music on my phone using Youtube. I like pop music the most, but sometimes I also enjoy piano music. Music is good because it makes me happy every day.</p><p><strong>Sample Answer 2:</strong> I have always been a music lover, so whenever I have free time, I just put on my earphones and enjoy my favorite tunes. To me, music provides an escape from the busy life as it is both relaxing and therapeutic.</p>",
+        "subQuestion": [
+          {
+            "content": "What do you like to do in your free time?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> In my free time, I really like listening to music. It helps me relax and feel better after a long day. I usually listen to music on my phone using Youtube. I like pop music the most, but sometimes I also enjoy piano music. Music is good because it makes me happy every day.</p><p><strong>Sample Answer 2:</strong> I have always been a music lover, so whenever I have free time, I just put on my earphones and enjoy my favorite tunes. To me, music provides an escape from the busy life as it is both relaxing and therapeutic.</p>",
+            "_id": "68e4e61d53b4655eba3f0d83"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e4e61d53b4655eba3f0d81"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "68e4e61d53b4655eba3f0d85",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ba787623c04d2075eeea4b9",
+    "title": "Describe your favorite places",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Describe your favorite places",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> My favorite places is the beach. I really like going to the beach to relax, enjoy the fresh air, and listen to the sound of the waves. I usually go with my friends, and watch the sunset together. Being at the beach always makes me happy.</p><p><strong>Sample Answer 2:</strong> There are a lot of places I like but my favorite place is Nha Trang. I think it is the most beautiful city in Viet Nam with a beautiful beach. I love to be there for a long time as I can rest softly and I have a good time to play sea sports and eat seafood. Nha Trang is a great place to make new inspiration and relax.</p>",
+        "subQuestion": [
+          {
+            "content": "Describe your favorite places",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> My favorite places is the beach. I really like going to the beach to relax, enjoy the fresh air, and listen to the sound of the waves. I usually go with my friends, and watch the sunset together. Being at the beach always makes me happy.</p><p><strong>Sample Answer 2:</strong> There are a lot of places I like but my favorite place is Nha Trang. I think it is the most beautiful city in Viet Nam with a beautiful beach. I love to be there for a long time as I can rest softly and I have a good time to play sea sports and eat seafood. Nha Trang is a great place to make new inspiration and relax.</p>",
+            "_id": "f8720039873969630f422ad5"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "eaec2f355bb7325f43c80978"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "24afa4026cdb2bd7ca495ac2",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "6916ee5e00b45ff927f89c8d",
+    "title": "Tell me about the last time you talked with your mother",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Tell me about the last time you talked with your mother",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> Well, I really like this question, The last time I talked with my mother was this morning. We had breakfast together and chatted about my future, she gave me some advice about my career plans. I always feel happy when I talk to her. I hope my mother will be with me forever.</p><p><strong>Sample Answer 2:</strong> The last time I talked to my mother was yesterday. We chatted on the phone for about 20 minutes. She asked me how I was doing and if I had any plans for the weekend. We also talked about family and shared some news. It was a nice conversation, and it made me feel happy.</p>",
+        "subQuestion": [
+          {
+            "content": "Tell me about the last time you talked with your mother",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> Well, I really like this question, The last time I talked with my mother was this morning. We had breakfast together and chatted about my future, she gave me some advice about my career plans. I always feel happy when I talk to her. I hope my mother will be with me forever.</p><p><strong>Sample Answer 2:</strong> The last time I talked to my mother was yesterday. We chatted on the phone for about 20 minutes. She asked me how I was doing and if I had any plans for the weekend. We also talked about family and shared some news. It was a nice conversation, and it made me feel happy.</p>",
+            "_id": "5f4c6c9cc23aa45869d56f79"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "5b912987538c13760014ed14"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "c006e7ddc22f73b25868cf90",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "e6822c4fedc01e1d653d2d7a",
+    "title": "People like sport in your country",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "People like sport in your country",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> Yes, people in my country really like sports. The most popular sport is football. Many people play football in the parks or watch it on TV. Every day, there are many people playing sports at the football field near my house. Some people also like swimming or running. I think sport helps us stay healthy and make friends.</p><p><strong>Sample Answer 2:</strong> Yes, people in my country really love sports. Football is the most popular sport, and many people watch the matches or play it in their free time. Besides football, badminton and volleyball are also common. Sports bring people together, and they help everyone stay healthy and active.</p>",
+        "subQuestion": [
+          {
+            "content": "People like sport in your country",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> Yes, people in my country really like sports. The most popular sport is football. Many people play football in the parks or watch it on TV. Every day, there are many people playing sports at the football field near my house. Some people also like swimming or running. I think sport helps us stay healthy and make friends.</p><p><strong>Sample Answer 2:</strong> Yes, people in my country really love sports. Football is the most popular sport, and many people watch the matches or play it in their free time. Besides football, badminton and volleyball are also common. Sports bring people together, and they help everyone stay healthy and active.</p>",
+            "_id": "682d47f0a681a643f0d3e2da"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "3d671508d977c6b9175f9e98"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "b433e55caeaf8e490f8b5daf",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "e7e2251e94f850edd3072188",
+    "title": "What are you looking for in your new house?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "What are you looking for in your new house?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> Today, I want to talk about my dream house. My house will have three floors. The first floor will have a living room and a kitchen. The living room, I put a sofa and a large television to my family will watch TV together in the evening. My bedroom which I paint blue because it's my favorite color. I will raise vegetables and flowers in the garden. I hope it will be real in the future.</p><p><strong>Sample Answer 2:</strong> In my new house, I want a big kitchen where I can cook with my family. I also want a cozy living room with a comfortable sofa to relax. My bedroom will be quiet and peaceful, with a big bed and some plants. I want a small garden outside to grow flowers and trees. I look forward to having a place like this.</p>",
+        "subQuestion": [
+          {
+            "content": "What are you looking for in your new house?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> Today, I want to talk about my dream house. My house will have three floors. The first floor will have a living room and a kitchen. The living room, I put a sofa and a large television to my family will watch TV together in the evening. My bedroom which I paint blue because it's my favorite color. I will raise vegetables and flowers in the garden. I hope it will be real in the future.</p><p><strong>Sample Answer 2:</strong> In my new house, I want a big kitchen where I can cook with my family. I also want a cozy living room with a comfortable sofa to relax. My bedroom will be quiet and peaceful, with a big bed and some plants. I want a small garden outside to grow flowers and trees. I look forward to having a place like this.</p>",
+            "_id": "4383e7ae7bd8637f905d7cf1"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "94cb0b20483b12b7c4e4cccd"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "d34f5394dea99c6937e8380a",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "faab5e57e5da5df1e69cad18",
+    "title": "Why are you learning English?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Why are you learning English?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> As you know, nowadays English is a popular language in the world. Therefore, I need to improve my English because of two main reasons. Firstly, I want to get a better job in the future. When I have a English certificate, I can apply to the company with a high salary. Secondly, I want to travel around the world and have a foreign husband. With the reasons I have mentioned above, I believe that English is very important for me.</p><p><strong>Sample Answer 2:</strong> I am learning English because it is useful. First, I want to find a good job that needs English. Second, I like to travel, and speaking English will help me talk to people in other countries. I also want to understand movies and books in English, so learning the language is important for me.</p>",
+        "subQuestion": [
+          {
+            "content": "Why are you learning English?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> As you know, nowadays English is a popular language in the world. Therefore, I need to improve my English because of two main reasons. Firstly, I want to get a better job in the future. When I have a English certificate, I can apply to the company with a high salary. Secondly, I want to travel around the world and have a foreign husband. With the reasons I have mentioned above, I believe that English is very important for me.</p><p><strong>Sample Answer 2:</strong> I am learning English because it is useful. First, I want to find a good job that needs English. Second, I like to travel, and speaking English will help me talk to people in other countries. I also want to understand movies and books in English, so learning the language is important for me.</p>",
+            "_id": "4c346420d8c4555779b71a73"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "2c6498450797b3fdb0050275"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "13ba368f5df9894b517842ef",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "2460b7e21bd9cfdad9026026",
+    "title": "Describe your job",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Describe your job",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I am a teacher. I teach English at a school. My job is to help students learn new things, like vocabulary, grammar, and speaking skills. I also prepare lessons, give tests, and grade students' work. I enjoy my job because I like helping students improve and seeing them succeed.</p><p><strong>Sample Answer 2:</strong> Now, I'm an auditor. I work at Deloitte. My main responsibility is to communicate with the customer to obtain the documentation, audit evidence. Then, I and members of my team discuss together to expose the conclusion about the financial statement whether disclose true and fairly. I love my job very much because it helps me to improve my value every day.</p>",
+        "subQuestion": [
+          {
+            "content": "Describe your job",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I am a teacher. I teach English at a school. My job is to help students learn new things, like vocabulary, grammar, and speaking skills. I also prepare lessons, give tests, and grade students' work. I enjoy my job because I like helping students improve and seeing them succeed.</p><p><strong>Sample Answer 2:</strong> Now, I'm an auditor. I work at Deloitte. My main responsibility is to communicate with the customer to obtain the documentation, audit evidence. Then, I and members of my team discuss together to expose the conclusion about the financial statement whether disclose true and fairly. I love my job very much because it helps me to improve my value every day.</p>",
+            "_id": "730732309a8c783814a0da30"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "3d9ed9f807cadc041f32465d"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "488f271cfa161ceda3a39b9c",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e4bea153b4655eba3f0a88",
+    "title": "What is the food like in your country?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "What is the food like in your country?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> There are many traditional and delicious foods in Vietnam but I think the most famous food is Pho. It has become the must-try dish on VN for any visitors. It's tasty, cheap and available at all hours. The specialty of the food is the broth. It is made by stewing the bones of cows and pigs for a long time in a large pot. I love Pho very much so I can eat every day.</p><p><strong>Sample Answer 2:</strong> In Vietnam, we have many kinds of food. Rice is a very important part of our meals. We often eat rice with vegetables, meat, and soup. One of the most popular dishes is Pho, a noodle soup with beef or chicken. It is very tasty, and you can find it anywhere. People in Vietnam also enjoy fresh fruits and drinks like iced tea.</p>",
+        "subQuestion": [
+          {
+            "content": "What is the food like in your country?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> There are many traditional and delicious foods in Vietnam but I think the most famous food is Pho. It has become the must-try dish on VN for any visitors. It's tasty, cheap and available at all hours. The specialty of the food is the broth. It is made by stewing the bones of cows and pigs for a long time in a large pot. I love Pho very much so I can eat every day.</p><p><strong>Sample Answer 2:</strong> In Vietnam, we have many kinds of food. Rice is a very important part of our meals. We often eat rice with vegetables, meat, and soup. One of the most popular dishes is Pho, a noodle soup with beef or chicken. It is very tasty, and you can find it anywhere. People in Vietnam also enjoy fresh fruits and drinks like iced tea.</p>",
+            "_id": "68e4bea153b4655eba3f0a8c"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "68e4bea153b4655eba3f0a89"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "68e4bea153b4655eba3f0a8d",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "fcf89636e042b8d32ec3d89c",
+    "title": "When do you feel stressed?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "When do you feel stressed?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> Communication with foreigners is the thing that I find most stressful. Because I do not have good use of English to speak fluently and Lack of vocabulary & confidence. I understand fully my job's requirement of English Fluency; I remind myself of learning to spend more time looking for some interactive & visually engaging. Hopefully, in the next few months, I will no longer get stressed in that situation.</p><p><strong>Sample Answer 2:</strong> I feel stressed when I have too much work to do or when I have to meet deadlines. I also get stressed when I can't find the right words to say in English. To reduce stress, I try to take a break and relax by listening to music or taking a walk.</p>",
+        "subQuestion": [
+          {
+            "content": "When do you feel stressed?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> Communication with foreigners is the thing that I find most stressful. Because I do not have good use of English to speak fluently and Lack of vocabulary & confidence. I understand fully my job's requirement of English Fluency; I remind myself of learning to spend more time looking for some interactive & visually engaging. Hopefully, in the next few months, I will no longer get stressed in that situation.</p><p><strong>Sample Answer 2:</strong> I feel stressed when I have too much work to do or when I have to meet deadlines. I also get stressed when I can't find the right words to say in English. To reduce stress, I try to take a break and relax by listening to music or taking a walk.</p>",
+            "_id": "a6d87c5e33ba804e6a54436e"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "2ae508ed0be5d200c660f8be"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "627239995c0e63bf07438d31",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "774bcee047b8e8bdf9a30b8c",
+    "title": "Tell me why you are interested in travel?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Tell me why you are interested in travel?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> I love traveling because it helps me relax and feel happy. When I travel, I can visit beautiful places, see new things, and meet new people. I also enjoy trying delicious food from different places. Traveling helps me forget about work or stress. It makes me feel better and gives me energy. That's why I enjoy traveling so much.</p><p><strong>Sample Answer 2:</strong> When I feel tired, I am going to travel with my family or my friends because it helps me to relax and recharge my energy. I will go to the beautiful place and fresh air. I will eat the traditional and delicious food. I also take part in the activities at that place. In conclusion, I love traveling so much.</p>",
+        "subQuestion": [
+          {
+            "content": "Tell me why you are interested in travel?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> I love traveling because it helps me relax and feel happy. When I travel, I can visit beautiful places, see new things, and meet new people. I also enjoy trying delicious food from different places. Traveling helps me forget about work or stress. It makes me feel better and gives me energy. That's why I enjoy traveling so much.</p><p><strong>Sample Answer 2:</strong> When I feel tired, I am going to travel with my family or my friends because it helps me to relax and recharge my energy. I will go to the beautiful place and fresh air. I will eat the traditional and delicious food. I also take part in the activities at that place. In conclusion, I love traveling so much.</p>",
+            "_id": "cfdaa0b0dfe2ff788ffc771e"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "b771a702363467124a250d17"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "a3eb0e031265058f8b3f9f44",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "30ace0cb8630c2dd31fbd67d",
+    "title": "Favorite book in your country?",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "không có tiêu đề",
+        "content": "Favorite book in your country?",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "<p><strong>Sample Answer 1:</strong> My favorite book in my country is Mắt Biếc by Nguyễn Nhật Ánh. It's a beautiful story about childhood, love, and friendship. The main character is a boy who has a big love for a girl, and the book talks about his memories of growing up. Many people in my country love this book because it reminds them of their own childhood and dreams.</p><p><strong>Sample Answer 2:</strong> In my country, the most popular books are fiction. Many people, from teenagers to adults, like reading novels. These books have many interesting stories. Besides novels, comics are also very popular, especially with children. Some adults also like to read self-help books to improve themselves. In general, people in my country love reading books to relax and learn new things.</p>",
+        "subQuestion": [
+          {
+            "content": "Favorite book in your country?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": null,
+            "suggestion": "<p><strong>Sample Answer 1:</strong> My favorite book in my country is Mắt Biếc by Nguyễn Nhật Ánh. It's a beautiful story about childhood, love, and friendship. The main character is a boy who has a big love for a girl, and the book talks about his memories of growing up. Many people in my country love this book because it reminds them of their own childhood and dreams.</p><p><strong>Sample Answer 2:</strong> In my country, the most popular books are fiction. Many people, from teenagers to adults, like reading novels. These books have many interesting stories. Besides novels, comics are also very popular, especially with children. Some adults also like to read self-help books to improve themselves. In general, people in my country love reading books to relax and learn new things.</p>",
+            "_id": "b93b936d87eb21c495b0a0ad"
+          }
+        ],
+        "isExample": "",
+        "image": null,
+        "_id": "a746c2f6788f36208864be15"
+      }
+    ],
+    "questionPart": "ONE",
+    "questionType": "SPEAKING",
+    "id": "6ca6f14963085ece22fadd27",
+    "createdAt": "2026-07-06T15:41:52.265Z",
+    "updatedAt": "2026-07-06T15:41:52.265Z",
+    "__v": 0
+  }
+]

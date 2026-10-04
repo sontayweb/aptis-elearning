@@ -25,7 +25,7 @@ export function VoucherCard() {
             style={{ textTransform: "uppercase" }}
           />
           <button
-            className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 rounded-md px-3 h-9 shrink-0 bg-[#CC1C01] hover:bg-[#4D0D0D] text-primary-foreground"
+            className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 rounded-xl px-4 h-9 shrink-0 btn-brand-gradient shadow-glow-soft hover:shadow-md"
             type="button"
             disabled={!code.trim()}
           >

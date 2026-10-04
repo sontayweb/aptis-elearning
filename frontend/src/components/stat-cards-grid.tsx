@@ -72,7 +72,7 @@ export function StatCardsGrid({
 
       {/* 4. Trình độ */}
       <div className="group relative flex items-center gap-4 rounded-2xl border border-border bg-card/70 backdrop-blur-sm px-5 py-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-glow-soft">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ring-1 ring-inset ring-border from-[#a78bfa]/30 to-[#a78bfa]/5 text-[#a78bfa]">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ring-1 ring-inset ring-border from-[#1A3FA4]/30 to-[#1A3FA4]/5 text-[#1A3FA4] dark:text-[#3B82F6]">
           <TrendingUp className="h-7 w-7" />
         </div>
         <div className="min-w-0">
@@ -115,7 +115,7 @@ export function StatCardsGrid({
           <div className="text-[11px] text-muted-foreground truncate">Mở khóa toàn bộ</div>
           <button
             type="button"
-            className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] px-2.5 py-0.5 text-[11px] font-bold text-white shadow-sm hover:brightness-110"
+            className="mt-1.5 inline-flex items-center gap-1 rounded-full btn-brand-gradient px-2.5 py-0.5 text-[11px] font-bold text-white shadow-xs"
           >
             <Crown className="w-3 h-3" />
             <span>Nâng cấp</span>

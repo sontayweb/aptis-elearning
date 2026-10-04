@@ -40,9 +40,21 @@ router.post('/users/:id/adjust-quota', (req, res, next) =>
 // Quản lý đề thi
 router.get('/exams', (req, res, next) => adminController.listExams(req, res, next));
 router.post('/exams', (req, res, next) => adminController.createExam(req, res, next));
+router.get('/exams/:id/full', (req, res, next) => adminController.getExamFull(req, res, next));
 router.patch('/exams/:id', (req, res, next) => adminController.updateExam(req, res, next));
 router.post('/exams/:id/duplicate', (req, res, next) => adminController.duplicateExam(req, res, next));
 router.delete('/exams/:id', (req, res, next) => adminController.deleteExam(req, res, next));
+
+// Content Editor — Parts
+router.post('/exams/:id/parts', (req, res, next) => adminController.addPart(req, res, next));
+router.patch('/parts/:partId', (req, res, next) => adminController.updatePart(req, res, next));
+router.delete('/parts/:partId', (req, res, next) => adminController.deletePart(req, res, next));
+
+// Content Editor — Questions
+router.post('/parts/:partId/questions', (req, res, next) => adminController.addQuestion(req, res, next));
+router.patch('/questions/:questionId', (req, res, next) => adminController.updateQuestion(req, res, next));
+router.delete('/questions/:questionId', (req, res, next) => adminController.deleteQuestion(req, res, next));
+
 
 // Quản lý giao dịch SePay
 router.get('/transactions', (req, res, next) =>
@@ -59,9 +71,12 @@ router.post('/transactions/:id/resolve', (req, res, next) =>
 router.get('/plans', (req, res, next) => adminController.listPlans(req, res, next));
 router.patch('/plans/:id', (req, res, next) => adminController.updatePlan(req, res, next));
 
-// Thống kê Dashboard KPIs
+// Thống kê Dashboard KPIs & Xuất báo cáo
 router.get('/dashboard/stats', (req, res, next) =>
   adminController.getDashboardKPIs(req, res, next)
+);
+router.get('/dashboard/export', (req, res, next) =>
+  adminController.exportDashboardReport(req, res, next)
 );
 
 export default router;

@@ -3,11 +3,9 @@
 import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
-import { FloatingActions } from "@/components/floating-actions";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { ReadingSentenceOrder } from "@/components/reading-components";
 import {
   Clock,
   ArrowLeft,
@@ -20,13 +18,16 @@ import {
   Sparkles,
   BookOpen,
   Trophy,
-  ChevronUp,
-  ChevronDown,
   Award,
   HelpCircle,
   X,
   RefreshCw,
   Check,
+  List,
+  LogOut,
+  Info,
+  Loader2,
+  Eye,
 } from "lucide-react";
 
 /* ====================================================
@@ -281,6 +282,8 @@ function ReadingExamRunner() {
   const searchParams = useSearchParams();
   const examId = (params.id as string) || "reading-01";
   const partParam = searchParams.get("part"); // "1" | "2" | "4" | "5" | null
+  const modeParam = searchParams.get("mode"); // "review" | null
+  const submissionIdParam = searchParams.get("submissionId");
 
   const { isAuthenticated, user } = useAuth();
 
@@ -296,7 +299,14 @@ function ReadingExamRunner() {
   const [timeLeft, setTimeLeft] = useState(35 * 60);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
-  const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [isQuestionListOpen, setIsQuestionListOpen] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [submissionId, setSubmissionId] = useState<string | null>(submissionIdParam || null);
+
+  // Review Mode State
+  const [reviewMode, setReviewMode] = useState(modeParam === "review");
+  const [reviewPart, setReviewPart] = useState<"p1" | "p2" | "p3" | "p4">("p1");
+  const [reviewQuestionIdx, setReviewQuestionIdx] = useState(0);
 
   // Answers State
   const [p1Answers, setP1Answers] = useState<Record<string, string>>({});
@@ -322,33 +332,81 @@ function ReadingExamRunner() {
         setError(null);
 
         const res = await api.exams.getQuestions(examId);
+        let parsedData = DEFAULT_READING_TEST;
         if (res.success && res.data) {
           const apiData = res.data;
-          const parsed = parseApiToReadingData(apiData);
-          setExamData(parsed);
+          parsedData = parseApiToReadingData(apiData);
+          setExamData(parsedData);
           setTimeLeft((apiData.duration_minutes || 35) * 60);
-
-          // Initialize Part 2 sentences default order
-          const initialP2Orders: Record<string, string[]> = {};
-          parsed.part2.stories.forEach((st) => {
-            initialP2Orders[st.id] = st.sentences.map((s) => s.id);
-          });
-          setP2Orders(initialP2Orders);
         } else {
-          // Use default benchmark
           setExamData(DEFAULT_READING_TEST);
-          const initialP2Orders: Record<string, string[]> = {};
-          DEFAULT_READING_TEST.part2.stories.forEach((st) => {
-            initialP2Orders[st.id] = st.sentences.map((s) => s.id);
-          });
-          setP2Orders(initialP2Orders);
+        }
+
+        const initialP2Orders: Record<string, string[]> = {};
+        parsedData.part2.stories.forEach((st) => {
+          initialP2Orders[st.id] = [];
+        });
+        setP2Orders(initialP2Orders);
+
+        // Nếu ở chế độ Review và có submissionId, tải bài nộp cũ
+        if ((modeParam === "review" || submissionIdParam) && submissionIdParam) {
+          try {
+            const subRes = await api.submissions.getResult(submissionIdParam);
+            if (subRes.success && subRes.data) {
+              const sub = subRes.data;
+              setIsSubmitted(true);
+              setReviewMode(true);
+              if (sub.total_score !== undefined && sub.total_score !== null) {
+                setResultScore(Math.round(sub.total_score));
+              }
+              if (sub.cefr_level) setCefrBand(sub.cefr_level);
+
+              const newP1: Record<string, string> = {};
+              const newP2: Record<string, string[]> = { ...initialP2Orders };
+              const newP3: Record<string, string> = {};
+              const newP4: Record<string, string> = {};
+
+              (sub.answers || []).forEach((a: any) => {
+                const qId = a.question_id || a.questionId;
+                const val = a.selected_option || a.selectedOption || a.text_answer || a.textAnswer || "";
+                if (!qId) return;
+
+                // Check which part it belongs to
+                if (parsedData.part1.gaps.some((g) => g.id === qId)) {
+                  newP1[qId] = val;
+                } else if (parsedData.part3.questions.some((q) => q.id === qId)) {
+                  newP3[qId] = val;
+                } else if (parsedData.part4.paragraphs.some((p) => p.id === qId)) {
+                  newP4[qId] = val;
+                } else {
+                  // check part 2
+                  parsedData.part2.stories.forEach((st) => {
+                    if (st.id === qId || st.sentences.some((s) => s.id === qId)) {
+                      try {
+                        newP2[st.id] = Array.isArray(val) ? val : JSON.parse(val);
+                      } catch {
+                        // ignore
+                      }
+                    }
+                  });
+                }
+              });
+
+              setP1Answers(newP1);
+              setP2Orders(newP2);
+              setP3Answers(newP3);
+              setP4Answers(newP4);
+            }
+          } catch (e) {
+            console.warn("Could not load submission details for review:", e);
+          }
         }
       } catch (err: any) {
         console.warn("Using offline benchmark reading data:", err);
         setExamData(DEFAULT_READING_TEST);
         const initialP2Orders: Record<string, string[]> = {};
         DEFAULT_READING_TEST.part2.stories.forEach((st) => {
-          initialP2Orders[st.id] = st.sentences.map((s) => s.id);
+          initialP2Orders[st.id] = [];
         });
         setP2Orders(initialP2Orders);
       } finally {
@@ -357,7 +415,7 @@ function ReadingExamRunner() {
     }
 
     loadReadingExam();
-  }, [examId]);
+  }, [examId, modeParam, submissionIdParam]);
 
   // Adjust activeStage if URL contains ?part=
   useEffect(() => {
@@ -369,7 +427,7 @@ function ReadingExamRunner() {
 
   // 2. Countdown Timer
   useEffect(() => {
-    if (isSubmitted || loading) return;
+    if (isSubmitted || loading || reviewMode) return;
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -381,11 +439,12 @@ function ReadingExamRunner() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isSubmitted, loading]);
+  }, [isSubmitted, loading, reviewMode]);
 
-  // 3. Init Database Submission
+  // 3. Init Database Submission (chỉ khi làm mới, không làm khi đang review)
   useEffect(() => {
     async function initSubmission() {
+      if (modeParam === "review" || submissionIdParam) return;
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
       if (!token || !examId || submissionId) return;
       try {
@@ -398,40 +457,13 @@ function ReadingExamRunner() {
       }
     }
     initSubmission();
-  }, [examId]);
+  }, [examId, modeParam, submissionIdParam]);
 
   // Helper format time
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);
     const rem = secs % 60;
     return `${mins.toString().padStart(2, "0")}:${rem.toString().padStart(2, "0")}`;
-  };
-
-  // Reorder sentences helper in Part 2
-  const handleMoveSentence = (storyId: string, index: number, direction: "up" | "down") => {
-    if (isSubmitted) return;
-    const currentOrder = [...(p2Orders[storyId] || [])];
-    const targetIdx = direction === "up" ? index - 1 : index + 1;
-    if (targetIdx < 0 || targetIdx >= currentOrder.length) return;
-
-    const temp = currentOrder[index];
-    currentOrder[index] = currentOrder[targetIdx];
-    currentOrder[targetIdx] = temp;
-
-    setP2Orders((prev) => ({
-      ...prev,
-      [storyId]: currentOrder,
-    }));
-  };
-
-  const handleResetStoryOrder = (storyId: string) => {
-    if (isSubmitted) return;
-    const story = examData.part2.stories.find((s) => s.id === storyId);
-    if (!story) return;
-    setP2Orders((prev) => ({
-      ...prev,
-      [storyId]: story.sentences.map((s) => s.id),
-    }));
   };
 
   // Total questions count calculation
@@ -532,50 +564,50 @@ function ReadingExamRunner() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <Navbar />
+    <div className="notranslate exam-active exam-mode min-h-screen bg-exam-bg text-exam-text flex flex-col font-sans select-none">
+      {/* 0. Top thin progress bar */}
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-[3px]">
+        <div
+          className="h-full bg-gradient-to-r from-primary via-accent to-primary transition-all duration-500"
+          style={{ width: `${((activeStage + 1) / stages.length) * 100}%` }}
+        />
+      </div>
 
-      <main className="flex-1 pt-16 pb-12">
-        <div className="section-container pt-4 md:pt-6">
-          {/* Header Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-card border border-border shadow-sm mb-6">
-            <div className="flex items-center gap-3">
-              <Link
-                href="/reading"
-                className="w-9 h-9 rounded-lg border border-border hover:bg-muted flex items-center justify-center transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Link>
-              <div>
-                <h1 className="font-heading font-bold text-base md:text-lg">
-                  {examData.title}
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  Reading Aptis ESOL · Thời gian làm bài {examData.durationMinutes} phút
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* Timer */}
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary font-mono font-bold text-sm">
-                <Clock className="w-4 h-4" />
-                <span>{formatTime(timeLeft)}</span>
-              </div>
-
-              {/* Submit Button */}
-              {!isSubmitted && (
-                <button
-                  type="button"
-                  onClick={() => setIsSubmitModalOpen(true)}
-                  className="tech-btn inline-flex items-center gap-2 px-4 py-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow text-xs font-bold shadow-md transition-all"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Nộp bài</span>
-                </button>
-              )}
-            </div>
+      {/* 1. TOP HEADER (EXAM MODE) */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-exam-surface/95 backdrop-blur border-b border-exam-border">
+        <div className="max-w-6xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-xs font-bold text-exam-text truncate hidden sm:block">
+              {examData.title}
+            </span>
+            <span className="text-[10px] text-exam-text-muted hidden md:inline">
+              Reading Aptis ESOL
+            </span>
           </div>
+
+          {/* Countdown Timer */}
+          <div
+            className={`font-mono text-base font-black px-3 py-1 rounded-lg border flex items-center gap-1.5 ${
+              timeLeft < 300
+                ? "bg-red-500/20 border-red-500 text-red-500 animate-pulse"
+                : "bg-exam-bg border-exam-border text-exam-text"
+            }`}
+          >
+            <Clock className="w-4 h-4 text-primary" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-xs font-bold text-exam-text-muted">
+              {totalAnsweredCount}/{totalQuestionsCount} mục
+            </span>
+          </div>
+        </div>
+      </header>
+
+      {/* 2. MAIN WORKSPACE */}
+      <main className="flex-1 pt-16 pb-24 px-3 md:px-6 overflow-y-auto">
+        <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Loading State */}
           {loading && (
@@ -586,7 +618,7 @@ function ReadingExamRunner() {
           )}
 
           {/* Result Card Mode */}
-          {!loading && isSubmitted && (
+          {!loading && isSubmitted && !reviewMode && (
             <div className="max-w-3xl mx-auto space-y-6 animate-in zoom-in-95">
               <div className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-md text-center space-y-6">
                 <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
@@ -665,6 +697,18 @@ function ReadingExamRunner() {
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Làm lại đề này</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReviewMode(true);
+                      setReviewPart("p1");
+                      setReviewQuestionIdx(0);
+                    }}
+                    className="px-4 py-2 rounded-xl border border-primary/40 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors flex items-center gap-1.5"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Xem lại từng câu →</span>
+                  </button>
                   <Link
                     href="/history"
                     className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors"
@@ -682,12 +726,413 @@ function ReadingExamRunner() {
             </div>
           )}
 
-          {/* Exam Questions Workspace (Grid: Left 3 cols, Right 1 col) */}
+          {/* ================================================================ */}
+          {/* REVIEW MODE — Xem lại từng câu sau khi nộp bài                  */}
+          {/* ================================================================ */}
+          {!loading && isSubmitted && reviewMode && (
+            <div className="max-w-3xl mx-auto space-y-4 animate-in fade-in duration-200">
+              {/* Review Header */}
+              <div className="bg-card rounded-2xl border border-border p-4 shadow-sm">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setReviewMode(false)}
+                      className="p-1.5 rounded-lg border border-border hover:bg-muted transition-colors text-muted-foreground"
+                      title="Quay lại kết quả"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                    </button>
+                    <div>
+                      <span className="text-xs font-bold text-foreground">Xem lại bài làm</span>
+                      <p className="text-[11px] text-muted-foreground">{examData.title}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                      {resultScore}/50 điểm · {cefrBand}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Part Navigation Tabs */}
+                <div className="flex items-center gap-1 mt-4 overflow-x-auto pb-1">
+                  {([
+                    { key: "p1", label: "Part 1 – Gap Fill", count: examData.part1.gaps.length },
+                    { key: "p2", label: "Part 2+3 – Text Cohesion", count: examData.part2.stories.length },
+                    { key: "p3", label: "Part 4 – Opinion", count: examData.part3.questions.length },
+                    { key: "p4", label: "Part 5 – Long Reading", count: examData.part4.paragraphs.length },
+                  ] as const).map((tab) => (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => { setReviewPart(tab.key); setReviewQuestionIdx(0); }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
+                        reviewPart === tab.key
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "border border-border bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      {tab.label}
+                      <span className={`ml-1.5 px-1.5 py-0.5 rounded text-[10px] ${
+                        reviewPart === tab.key ? "bg-white/20" : "bg-muted"
+                      }`}>{tab.count}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ---- REVIEW PART 1: Gap Fill ---- */}
+              {reviewPart === "p1" && (() => {
+                const gaps = examData.part1.gaps;
+                const gap = gaps[reviewQuestionIdx];
+                if (!gap) return null;
+                const userAns = p1Answers[gap.id] || "";
+                const isCorrect = userAns.toLowerCase() === gap.correctAnswer.toLowerCase();
+                const parts = gap.prompt.split(/\[(?:gap|blank|\.\.\.)\]/i);
+
+                return (
+                  <div className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Reading</span>
+                      <span className="text-sm font-bold text-foreground">Question {reviewQuestionIdx + 1} of {gaps.length}</span>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground font-medium">{examData.part1.instructions}</p>
+
+                    {/* The sentence with gap highlighted */}
+                    <div className="p-4 rounded-xl bg-muted/20 border border-border flex flex-wrap items-center gap-2 text-sm leading-relaxed">
+                      <span>{parts[0]}</span>
+                      <span className={`px-3 py-1 rounded-lg border font-bold text-xs ${
+                        isCorrect
+                          ? "bg-emerald-100 border-emerald-300 text-emerald-700"
+                          : userAns
+                          ? "bg-red-100 border-red-300 text-red-600 line-through"
+                          : "bg-muted border-border text-muted-foreground italic"
+                      }`}>
+                        {userAns || "(Chưa trả lời)"}
+                      </span>
+                      <span>{parts[1] || ""}</span>
+                    </div>
+
+                    {/* Answer comparison */}
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Đáp án & dịch nghĩa</h4>
+                      <div className="space-y-2">
+                        {gap.options.map((opt, oi) => {
+                          const isUserPick = opt.toLowerCase() === userAns.toLowerCase();
+                          const isRight = opt.toLowerCase() === gap.correctAnswer.toLowerCase();
+                          return (
+                            <div key={oi} className={`flex items-center gap-3 p-3 rounded-xl border text-sm ${
+                              isRight
+                                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                                : isUserPick && !isRight
+                                ? "bg-red-50 border-red-200 text-red-700"
+                                : "bg-muted/30 border-border/50 text-muted-foreground"
+                            }`}>
+                              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                                isRight ? "bg-emerald-500 text-white" : isUserPick ? "bg-red-400 text-white" : "bg-muted text-muted-foreground"
+                              }`}>
+                                {isRight ? "✓" : isUserPick ? "✗" : String.fromCharCode(65 + oi)}
+                              </span>
+                              <span className="font-semibold">{opt}</span>
+                              {isRight && <span className="text-[11px] ml-auto font-bold text-emerald-600">Đáp án đúng</span>}
+                              {isUserPick && !isRight && <span className="text-[11px] ml-auto font-bold text-red-500">Bạn chọn</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <button
+                        type="button"
+                        disabled={reviewQuestionIdx === 0}
+                        onClick={() => setReviewQuestionIdx(i => i - 1)}
+                        className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Trang trước
+                      </button>
+                      <span className="text-xs text-muted-foreground font-mono">{reviewQuestionIdx + 1} / {gaps.length}</span>
+                      <button
+                        type="button"
+                        disabled={reviewQuestionIdx >= gaps.length - 1}
+                        onClick={() => setReviewQuestionIdx(i => i + 1)}
+                        className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                      >
+                        Trang sau <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ---- REVIEW PART 2+3: Text Cohesion (Stories) ---- */}
+              {reviewPart === "p2" && (() => {
+                const stories = examData.part2.stories;
+                const story = stories[reviewQuestionIdx];
+                if (!story) return null;
+                const userOrder = p2Orders[story.id] || [];
+                const correctOrder = story.correctOrder || [];
+
+                return (
+                  <div className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Reading</span>
+                      <span className="text-sm font-bold text-foreground">Đoạn văn {reviewQuestionIdx + 1} of {stories.length}</span>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-muted/20 border border-border">
+                      <span className="text-xs font-bold text-primary block mb-1">{story.title}</span>
+                      <p className="text-xs text-muted-foreground">{examData.part2.instructions}</p>
+                    </div>
+
+                    {/* Fixed first sentence */}
+                    <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-sm text-foreground font-medium">
+                      <span className="text-[10px] font-bold text-primary uppercase block mb-1">Câu mở đầu (cố định)</span>
+                      {story.fixedSentence}
+                    </div>
+
+                    {/* Sentence order comparison */}
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Thứ tự các câu</h4>
+                      {story.sentences.map((sentence, si) => {
+                        const correctPos = correctOrder.indexOf(sentence.id);
+                        const userPos = userOrder.indexOf(sentence.id);
+                        const isCorrectPos = correctPos === userPos && userPos !== -1;
+                        return (
+                          <div key={sentence.id} className={`flex gap-3 p-3 rounded-xl border text-xs ${
+                            isCorrectPos
+                              ? "bg-emerald-50 border-emerald-200"
+                              : userPos === -1
+                              ? "bg-muted/40 border-border/40 opacity-60"
+                              : "bg-red-50 border-red-200"
+                          }`}>
+                            <div className="flex flex-col items-center gap-0.5 shrink-0">
+                              <span className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center ${
+                                isCorrectPos ? "bg-emerald-500 text-white" : userPos !== -1 ? "bg-red-400 text-white" : "bg-muted-foreground/30 text-muted-foreground"
+                              }`}>{isCorrectPos ? "✓" : userPos !== -1 ? "✗" : "?"}</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-foreground/90 leading-relaxed">{sentence.text}</p>
+                              <div className="flex items-center gap-3 mt-1.5 text-[10px] font-mono">
+                                <span className="text-muted-foreground">Vị trí đúng: <strong className="text-emerald-600">{correctPos + 1}</strong></span>
+                                {userPos !== -1 && <span className="text-muted-foreground">Bạn đặt: <strong className={isCorrectPos ? "text-emerald-600" : "text-red-500"}>{userPos + 1}</strong></span>}
+                                {userPos === -1 && <span className="text-amber-500">Chưa xếp</span>}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <button
+                        type="button"
+                        disabled={reviewQuestionIdx === 0}
+                        onClick={() => setReviewQuestionIdx(i => i - 1)}
+                        className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Trang trước
+                      </button>
+                      <span className="text-xs text-muted-foreground font-mono">{reviewQuestionIdx + 1} / {stories.length}</span>
+                      <button
+                        type="button"
+                        disabled={reviewQuestionIdx >= stories.length - 1}
+                        onClick={() => setReviewQuestionIdx(i => i + 1)}
+                        className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                      >
+                        Trang sau <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ---- REVIEW PART 3: Opinion Matching ---- */}
+              {reviewPart === "p3" && (() => {
+                const questions = examData.part3.questions;
+                const q = questions[reviewQuestionIdx];
+                if (!q) return null;
+                const userAns = p3Answers[q.id] || "";
+                const isCorrect = userAns.toLowerCase() === q.correctAnswer.toLowerCase();
+
+                return (
+                  <div className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Reading</span>
+                      <span className="text-sm font-bold text-foreground">Question {reviewQuestionIdx + 1} of {questions.length}</span>
+                    </div>
+
+                    {/* Reviews reference */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {examData.part3.reviews.map((rev) => (
+                        <div key={rev.person} className={`p-3 rounded-xl border text-xs ${
+                          rev.person === q.correctAnswer
+                            ? "bg-emerald-50 border-emerald-200"
+                            : "bg-muted/20 border-border/50"
+                        }`}>
+                          <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px] inline-block mb-1.5">{rev.person}</span>
+                          <p className="text-foreground/80 leading-relaxed">{rev.review}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Question */}
+                    <div className="p-4 rounded-xl bg-muted/20 border border-border">
+                      <p className="text-sm font-semibold text-foreground">{q.prompt}</p>
+                    </div>
+
+                    {/* Answer comparison — Person pills */}
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Đáp án</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {["Person A", "Person B", "Person C", "Person D"].map((opt) => {
+                          const isUserPick = opt.toLowerCase() === userAns.toLowerCase();
+                          const isRight = opt.toLowerCase() === q.correctAnswer.toLowerCase();
+                          return (
+                            <div key={opt} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border ${
+                              isRight
+                                ? "bg-emerald-100 border-emerald-300 text-emerald-800"
+                                : isUserPick && !isRight
+                                ? "bg-red-100 border-red-300 text-red-700"
+                                : "bg-muted/30 border-border/50 text-muted-foreground"
+                            }`}>
+                              <span>{isRight ? "✓" : isUserPick ? "✗" : "○"}</span>
+                              <span>{opt}</span>
+                              {isRight && <span className="text-[10px] text-emerald-600">(Đúng)</span>}
+                              {isUserPick && !isRight && <span className="text-[10px] text-red-500">(Bạn chọn)</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {!userAns && <p className="text-xs text-amber-500 font-medium">⚠️ Bạn chưa trả lời câu này</p>}
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <button
+                        type="button"
+                        disabled={reviewQuestionIdx === 0}
+                        onClick={() => setReviewQuestionIdx(i => i - 1)}
+                        className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Trang trước
+                      </button>
+                      <span className="text-xs text-muted-foreground font-mono">{reviewQuestionIdx + 1} / {questions.length}</span>
+                      <button
+                        type="button"
+                        disabled={reviewQuestionIdx >= questions.length - 1}
+                        onClick={() => setReviewQuestionIdx(i => i + 1)}
+                        className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                      >
+                        Trang sau <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ---- REVIEW PART 4: Long Reading / Heading Match ---- */}
+              {reviewPart === "p4" && (() => {
+                const paragraphs = examData.part4.paragraphs;
+                const para = paragraphs[reviewQuestionIdx];
+                if (!para) return null;
+                const userAns = p4Answers[para.id] || "";
+                const isCorrect = userAns.toLowerCase() === para.correctHeading.toLowerCase();
+
+                return (
+                  <div className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Reading</span>
+                      <span className="text-sm font-bold text-foreground">Đoạn văn {reviewQuestionIdx + 1} of {paragraphs.length}</span>
+                    </div>
+
+                    {/* Paragraph text */}
+                    <div className="p-4 rounded-xl bg-muted/20 border border-border">
+                      <span className="text-[10px] font-bold text-primary uppercase block mb-2">Đoạn văn {para.paragraphNumber}</span>
+                      <p className="text-sm text-foreground/90 leading-relaxed">{para.text}</p>
+                    </div>
+
+                    {/* Answer comparison */}
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Đáp án & dịch nghĩa</h4>
+
+                      {/* User's answer */}
+                      <div className={`p-3 rounded-xl border flex items-start gap-2 text-xs ${
+                        isCorrect
+                          ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                          : userAns
+                          ? "bg-red-50 border-red-200 text-red-700"
+                          : "bg-amber-50 border-amber-200 text-amber-700"
+                      }`}>
+                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${
+                          isCorrect ? "bg-emerald-500 text-white" : userAns ? "bg-red-400 text-white" : "bg-amber-400 text-white"
+                        }`}>
+                          {isCorrect ? "✓" : userAns ? "✗" : "?"}
+                        </span>
+                        <div>
+                          <span className="font-bold block text-[10px] uppercase mb-0.5">
+                            {isCorrect ? "Đáp án của bạn (Đúng)" : userAns ? "Đáp án của bạn (Sai)" : "Chưa trả lời"}
+                          </span>
+                          <span>{userAns || "(Bỏ trống)"}</span>
+                        </div>
+                      </div>
+
+                      {/* Correct answer (show only if wrong) */}
+                      {!isCorrect && (
+                        <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 flex items-start gap-2 text-xs text-emerald-800">
+                          <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</span>
+                          <div>
+                            <span className="font-bold block text-[10px] uppercase mb-0.5 text-emerald-600">Đáp án đúng</span>
+                            <span>{para.correctHeading}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <button
+                        type="button"
+                        disabled={reviewQuestionIdx === 0}
+                        onClick={() => setReviewQuestionIdx(i => i - 1)}
+                        className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Trang trước
+                      </button>
+                      <span className="text-xs text-muted-foreground font-mono">{reviewQuestionIdx + 1} / {paragraphs.length}</span>
+                      <button
+                        type="button"
+                        disabled={reviewQuestionIdx >= paragraphs.length - 1}
+                        onClick={() => setReviewQuestionIdx(i => i + 1)}
+                        className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                      >
+                        Trang sau <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Back to result button */}
+              <div className="flex justify-center pb-4">
+                <button
+                  type="button"
+                  onClick={() => setReviewMode(false)}
+                  className="px-5 py-2 rounded-xl border border-border bg-muted/30 hover:bg-muted text-xs font-bold text-muted-foreground transition-colors flex items-center gap-1.5"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Quay lại kết quả
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Exam Questions Workspace */}
           {!loading && !isSubmitted && (
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Left 3 cols: Questions Main Workspace */}
-              <div className="lg:col-span-3 space-y-6">
-                <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm space-y-6">
+            <div className="rounded-2xl border border-exam-border bg-exam-surface p-6 md:p-8 shadow-sm space-y-6">
                   {/* Top Bar inside Card */}
                   <div className="flex items-center justify-between pb-4 border-b border-border/70">
                     <div className="flex items-center gap-2">
@@ -725,7 +1170,7 @@ function ReadingExamRunner() {
                     <div className="space-y-6">
                       <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80">
                         <p className="text-xs md:text-sm text-foreground font-semibold">
-                          📌 {examData.part1.instructions}
+                           {examData.part1.instructions}
                         </p>
                       </div>
 
@@ -791,86 +1236,32 @@ function ReadingExamRunner() {
                   {activeStage === 1 && (() => {
                     const story = examData.part2.stories[0];
                     if (!story) return null;
-                    const currentOrder = p2Orders[story.id] || story.sentences.map((s) => s.id);
+                    const currentOrder = p2Orders[story.id] || [];
 
                     return (
                       <div className="space-y-5">
-                        <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 flex items-center justify-between gap-3">
-                          <div>
-                            <span className="text-xs font-bold text-primary block">
-                              {story.title}
-                            </span>
-                            <p className="text-xs md:text-sm text-foreground">
-                              {examData.part2.instructions}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleResetStoryOrder(story.id)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
-                          >
-                            <RotateCcw className="w-3.5 h-3.5" />
-                            <span>Khôi phục</span>
-                          </button>
-                        </div>
-
-                        {/* Fixed Starter Sentence */}
-                        <div className="p-4 rounded-xl border border-primary/30 bg-primary/5 space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-                            📌 Câu mở đầu cố định (Vị trí 1):
+                        <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80">
+                          <span className="text-xs font-bold text-primary block">
+                            {story.title}
                           </span>
-                          <p className="text-sm md:text-base font-semibold text-foreground">
-                            {story.fixedSentence}
+                          <p className="text-xs md:text-sm text-foreground">
+                            {examData.part2.instructions}
                           </p>
                         </div>
 
-                        {/* Re-orderable sentences */}
-                        <div className="space-y-2.5">
-                          <span className="text-xs font-bold text-muted-foreground block">
-                            Sắp xếp 4 câu tiếp theo (Dùng nút ↑ và ↓ để đổi thứ tự):
-                          </span>
-                          {currentOrder.map((sId, sIdx) => {
-                            const sentenceObj = story.sentences.find((s) => s.id === sId);
-                            if (!sentenceObj) return null;
-
-                            return (
-                              <div
-                                key={sId}
-                                className="p-3.5 rounded-xl border border-border bg-card hover:border-primary/50 flex items-center justify-between gap-3 transition-all shadow-2xs"
-                              >
-                                <div className="flex items-center gap-3 flex-1 min-w-0">
-                                  <span className="w-6 h-6 rounded-md bg-muted text-muted-foreground font-bold text-xs flex items-center justify-center shrink-0">
-                                    {sIdx + 2}
-                                  </span>
-                                  <p className="text-xs md:text-sm font-medium text-foreground leading-relaxed">
-                                    {sentenceObj.text}
-                                  </p>
-                                </div>
-
-                                <div className="flex items-center gap-1 shrink-0">
-                                  <button
-                                    type="button"
-                                    disabled={sIdx === 0}
-                                    onClick={() => handleMoveSentence(story.id, sIdx, "up")}
-                                    className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                                    title="Di chuyển lên"
-                                  >
-                                    <ChevronUp className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={sIdx === currentOrder.length - 1}
-                                    onClick={() => handleMoveSentence(story.id, sIdx, "down")}
-                                    className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                                    title="Di chuyển xuống"
-                                  >
-                                    <ChevronDown className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        <ReadingSentenceOrder
+                          key={story.id}
+                          title={story.title}
+                          fixedSentence={story.fixedSentence}
+                          sentences={story.sentences}
+                          currentOrder={currentOrder}
+                          onChangeOrder={(newOrder) => {
+                            setP2Orders((prev) => ({
+                              ...prev,
+                              [story.id]: newOrder,
+                            }));
+                          }}
+                        />
                       </div>
                     );
                   })()}
@@ -881,86 +1272,32 @@ function ReadingExamRunner() {
                   {activeStage === 2 && (() => {
                     const story = examData.part2.stories[1];
                     if (!story) return null;
-                    const currentOrder = p2Orders[story.id] || story.sentences.map((s) => s.id);
+                    const currentOrder = p2Orders[story.id] || [];
 
                     return (
                       <div className="space-y-5">
-                        <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 flex items-center justify-between gap-3">
-                          <div>
-                            <span className="text-xs font-bold text-primary block">
-                              {story.title}
-                            </span>
-                            <p className="text-xs md:text-sm text-foreground">
-                              {examData.part2.instructions}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleResetStoryOrder(story.id)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
-                          >
-                            <RotateCcw className="w-3.5 h-3.5" />
-                            <span>Khôi phục</span>
-                          </button>
-                        </div>
-
-                        {/* Fixed Starter Sentence */}
-                        <div className="p-4 rounded-xl border border-primary/30 bg-primary/5 space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-                            📌 Câu mở đầu cố định (Vị trí 1):
+                        <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80">
+                          <span className="text-xs font-bold text-primary block">
+                            {story.title}
                           </span>
-                          <p className="text-sm md:text-base font-semibold text-foreground">
-                            {story.fixedSentence}
+                          <p className="text-xs md:text-sm text-foreground">
+                            {examData.part2.instructions}
                           </p>
                         </div>
 
-                        {/* Re-orderable sentences */}
-                        <div className="space-y-2.5">
-                          <span className="text-xs font-bold text-muted-foreground block">
-                            Sắp xếp 4 câu tiếp theo (Dùng nút ↑ và ↓ để đổi thứ tự):
-                          </span>
-                          {currentOrder.map((sId, sIdx) => {
-                            const sentenceObj = story.sentences.find((s) => s.id === sId);
-                            if (!sentenceObj) return null;
-
-                            return (
-                              <div
-                                key={sId}
-                                className="p-3.5 rounded-xl border border-border bg-card hover:border-primary/50 flex items-center justify-between gap-3 transition-all shadow-2xs"
-                              >
-                                <div className="flex items-center gap-3 flex-1 min-w-0">
-                                  <span className="w-6 h-6 rounded-md bg-muted text-muted-foreground font-bold text-xs flex items-center justify-center shrink-0">
-                                    {sIdx + 2}
-                                  </span>
-                                  <p className="text-xs md:text-sm font-medium text-foreground leading-relaxed">
-                                    {sentenceObj.text}
-                                  </p>
-                                </div>
-
-                                <div className="flex items-center gap-1 shrink-0">
-                                  <button
-                                    type="button"
-                                    disabled={sIdx === 0}
-                                    onClick={() => handleMoveSentence(story.id, sIdx, "up")}
-                                    className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                                    title="Di chuyển lên"
-                                  >
-                                    <ChevronUp className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={sIdx === currentOrder.length - 1}
-                                    onClick={() => handleMoveSentence(story.id, sIdx, "down")}
-                                    className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                                    title="Di chuyển xuống"
-                                  >
-                                    <ChevronDown className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        <ReadingSentenceOrder
+                          key={story.id}
+                          title={story.title}
+                          fixedSentence={story.fixedSentence}
+                          sentences={story.sentences}
+                          currentOrder={currentOrder}
+                          onChangeOrder={(newOrder) => {
+                            setP2Orders((prev) => ({
+                              ...prev,
+                              [story.id]: newOrder,
+                            }));
+                          }}
+                        />
                       </div>
                     );
                   })()}
@@ -1127,163 +1464,208 @@ function ReadingExamRunner() {
                     </div>
                   )}
 
-                  {/* Navigation Buttons inside Workspace */}
-                  <div className="flex items-center justify-between pt-6 border-t border-border/70">
-                    <button
-                      type="button"
-                      disabled={activeStage === 0}
-                      onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl border border-border hover:bg-muted disabled:opacity-30 transition-colors"
-                    >
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                      <span>Phần trước</span>
-                    </button>
-
-                    <div className="text-xs text-muted-foreground">
-                      Phần {activeStage + 1} / {stages.length}
-                    </div>
-
-                    <button
-                      type="button"
-                      disabled={activeStage === stages.length - 1}
-                      onClick={() => setActiveStage((p) => Math.min(stages.length - 1, p + 1))}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow disabled:opacity-30 transition-colors"
-                    >
-                      <span>Phần tiếp theo</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right 1 col: Question Palette (Danh sách câu hỏi) */}
-              <div className="space-y-4">
-                <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between border-b border-border/70 pb-3">
-                    <h3 className="font-heading font-bold text-sm text-foreground">
-                      Danh sách bài thi
-                    </h3>
-                    <span className="text-xs font-mono font-bold text-primary">
-                      {totalAnsweredCount}/{totalQuestionsCount}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {stages.map((stg) => {
-                      const isActive = activeStage === stg.id;
-                      const isFlg = flagged[stg.id];
-
-                      // Compute if this stage is completed
-                      let isComplete = false;
-                      if (stg.id === 0) {
-                        isComplete =
-                          Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length ===
-                          examData.part1.gaps.length;
-                      } else if (stg.id === 1 || stg.id === 2) {
-                        isComplete = true; // has an order
-                      } else if (stg.id === 3) {
-                        isComplete =
-                          Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length ===
-                          examData.part3.questions.length;
-                      } else if (stg.id === 4) {
-                        isComplete =
-                          Object.keys(p4Answers).filter((k) => !!p4Answers[k]).length ===
-                          examData.part4.paragraphs.length;
-                      }
-
-                      return (
-                        <button
-                          key={stg.id}
-                          type="button"
-                          onClick={() => setActiveStage(stg.id)}
-                          className={`w-full text-left p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${
-                            isActive
-                              ? "border-primary bg-primary/10 text-primary shadow-2xs ring-1 ring-primary"
-                              : isComplete
-                              ? "border-border/60 bg-muted/20 text-foreground hover:bg-muted/40"
-                              : "border-border bg-card text-muted-foreground hover:bg-muted"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 truncate">
-                            <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] shrink-0">
-                              {stg.id + 1}
-                            </span>
-                            <span className="truncate">{stg.label}</span>
-                          </div>
-
-                          <div className="flex items-center gap-1 shrink-0">
-                            {isFlg && <Flag className="w-3 h-3 text-amber-500 fill-amber-500" />}
-                            {isComplete && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="pt-2 border-t border-border/70">
-                    <button
-                      type="button"
-                      onClick={() => setIsSubmitModalOpen(true)}
-                      className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Nộp bài ngay</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Submit Confirmation Modal */}
-          {isSubmitModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-              <div className="bg-card rounded-2xl border border-border p-6 max-w-sm w-full space-y-4 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-heading font-bold text-base text-foreground">
-                    Xác nhận nộp bài thi
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={() => setIsSubmitModalOpen(false)}
-                    className="p-1 rounded-lg text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Bạn đã hoàn thành{" "}
-                  <span className="font-bold text-foreground">
-                    {totalAnsweredCount}/{totalQuestionsCount}
-                  </span>{" "}
-                  câu hỏi. Bạn có chắc chắn muốn kết thúc bài thi Reading và xem điểm ngay bây giờ?
-                </p>
-
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsSubmitModalOpen(false)}
-                    className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
-                  >
-                    Làm tiếp
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSubmitExam}
-                    className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary-glow shadow-sm"
-                  >
-                    Nộp bài
-                  </button>
-                </div>
-              </div>
             </div>
           )}
         </div>
       </main>
 
-      <Footer />
-      <FloatingActions />
+      {/* 3. FIXED BOTTOM BAR */}
+      {!loading && !isSubmitted && (
+        <footer className="fixed bottom-0 left-0 right-0 z-40 bg-exam-surface/95 backdrop-blur border-t border-exam-border">
+          <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsQuestionListOpen(true)}
+                className="h-9 px-3 flex items-center gap-2 rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 text-xs font-bold transition-colors cursor-pointer"
+              >
+                <List className="w-4 h-4" />
+                <span className="hidden sm:inline">Danh sách bài thi</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsInfoOpen(true)}
+                title="Thông tin bài thi"
+                className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 transition-colors cursor-pointer"
+              >
+                <Info className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Link
+                href="/reading"
+                title="Thoát"
+                className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
+                disabled={activeStage === 0}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-sm font-medium hover:bg-exam-border/40 transition-colors disabled:opacity-40 cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Previous</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeStage === stages.length - 1) {
+                    setIsSubmitModalOpen(true);
+                  } else {
+                    setActiveStage((p) => Math.min(stages.length - 1, p + 1));
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-brand-brown text-sm font-bold shadow-sm transition-all cursor-pointer"
+              >
+                <span>{activeStage === stages.length - 1 ? "Nộp bài" : "Next"}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </footer>
+      )}
+
+      {/* Question List Modal */}
+      {isQuestionListOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in"
+          onClick={() => setIsQuestionListOpen(false)}
+        >
+          <div
+            className="bg-exam-surface border border-exam-border rounded-2xl max-w-sm w-full p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-exam-border mb-4">
+              <h4 className="font-bold text-sm text-exam-text">
+                Danh sách phần thi ({totalAnsweredCount}/{totalQuestionsCount} mục)
+              </h4>
+              <button
+                type="button"
+                onClick={() => setIsQuestionListOpen(false)}
+                className="w-6 h-6 flex items-center justify-center rounded text-exam-text-muted hover:text-exam-text"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+              {stages.map((stg) => {
+                const isActive = activeStage === stg.id;
+                const isFlg = flagged[stg.id];
+                return (
+                  <button
+                    key={stg.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveStage(stg.id);
+                      setIsQuestionListOpen(false);
+                    }}
+                    className={`w-full text-left p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${
+                      isActive
+                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                        : "border-exam-border bg-exam-surface text-exam-text hover:border-primary/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="w-5 h-5 rounded-full bg-exam-bg text-exam-text flex items-center justify-center text-[10px] shrink-0 font-bold">
+                        {stg.id + 1}
+                      </span>
+                      <span className="truncate">{stg.label}</span>
+                    </div>
+                    {isFlg && <Flag className="w-3 h-3 text-amber-500 fill-amber-500 shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-4 pt-3 border-t border-exam-border">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsQuestionListOpen(false);
+                  setIsSubmitModalOpen(true);
+                }}
+                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown transition-colors cursor-pointer"
+              >
+                Nộp bài thi ngay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Info Modal */}
+      {isInfoOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in"
+          onClick={() => setIsInfoOpen(false)}
+        >
+          <div
+            className="bg-exam-surface border border-exam-border rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-exam-border">
+              <h4 className="font-bold text-sm text-exam-text">Thông tin bài thi Reading</h4>
+              <button
+                type="button"
+                onClick={() => setIsInfoOpen(false)}
+                className="w-6 h-6 flex items-center justify-center rounded text-exam-text-muted hover:text-exam-text"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-2 text-xs text-exam-text">
+              {[
+                { l: "Tên bài thi", v: examData.title },
+                { l: "Kỹ năng", v: "Reading Aptis ESOL" },
+                { l: "Thời lượng", v: `${examData.durationMinutes} phút` },
+                { l: "Tổng số phần", v: `${stages.length} phần` },
+                { l: "Đã hoàn thành", v: `${totalAnsweredCount}/${totalQuestionsCount} mục` },
+                { l: "Thời gian còn lại", v: formatTime(timeLeft) },
+              ].map((x) => (
+                <div key={x.l} className="flex justify-between">
+                  <span className="text-exam-text-muted">{x.l}:</span>
+                  <span className="font-bold">{x.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Submit Confirmation Modal */}
+      {isSubmitModalOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-exam-surface rounded-2xl border border-exam-border p-6 max-w-md w-full shadow-2xl space-y-4">
+            <h3 className="text-lg font-black text-exam-text">Xác nhận nộp bài thi?</h3>
+            <p className="text-sm text-exam-text-muted leading-relaxed">
+              Bạn đã hoàn thành <strong className="text-primary font-black">{totalAnsweredCount}/{totalQuestionsCount}</strong> mục câu hỏi. Hệ thống sẽ tiến hành chấm điểm và lập báo cáo kết quả.
+            </p>
+            {totalAnsweredCount < totalQuestionsCount && (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold">
+                ⚠️ Lưu ý: Bạn vẫn còn {totalQuestionsCount - totalAnsweredCount} mục chưa làm xong!
+              </div>
+            )}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsSubmitModalOpen(false)}
+                className="px-4 py-2 rounded-xl border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
+              >
+                Tiếp tục làm bài
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitExam}
+                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown transition-colors shadow-sm cursor-pointer"
+              >
+                Xác nhận nộp bài
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

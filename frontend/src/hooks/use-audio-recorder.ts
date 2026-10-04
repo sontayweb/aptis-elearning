@@ -391,8 +391,9 @@ export function useAudioRecorder() {
         formData.append("audio", state.audioBlob, `speech_q_${questionId}.${ext}`);
         formData.append("durationSeconds", String(state.recordingDuration || 30));
 
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
         const res = await fetch(
-          `http://localhost:5000/api/submissions/${submissionId}/answers/${questionId}/audio`,
+          `${apiBaseUrl}/submissions/${submissionId}/answers/${questionId}/audio`,
           {
             method: "POST",
             headers: {

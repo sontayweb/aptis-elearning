@@ -231,7 +231,7 @@ export default function MockExamListPage() {
                           MIỄN PHÍ
                         </span>
                       ) : (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white">
                           VIP PRO
                         </span>
                       )}

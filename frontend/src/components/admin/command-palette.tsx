@@ -223,7 +223,7 @@ export default function CommandPalette({ isOpen, onClose, onOpenTutorial }: Comm
                     <div
                       className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                         isSelected
-                          ? "bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white shadow-glow-soft"
+                          ? "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white shadow-glow-soft"
                           : "bg-muted text-muted-foreground"
                       }`}
                     >

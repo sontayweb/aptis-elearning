@@ -5,15 +5,18 @@ import "./globals.css";
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
-  title: "Aptis Kỳ Tích — Luyện thi Aptis & Thi thử miễn phí",
-  description: "Luyện thi Aptis với format làm bài mô phỏng đề thi thật, AI chấm bài nhận kết quả ngay.",
+  title: "APTIS ESOL PREMIER — Luyện thi Aptis ESOL chuẩn British Council",
+  description: "Nền tảng luyện thi Aptis ESOL chuẩn CEFR — Thi thử miễn phí, AI chấm Speaking & Writing, lộ trình đạt B2 nhanh nhất.",
 };
 
 import { AuthProvider } from "@/contexts/auth-context";
+import { EventThemeProvider } from "@/contexts/event-theme-context";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import { EventDecorations } from "@/components/event-decorations";
 
 export default function RootLayout({
   children,
@@ -23,7 +26,13 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
-        <AuthProvider>{children}</AuthProvider>
+        <EventThemeProvider>
+          <AuthProvider>
+            {children}
+            <EventDecorations />
+            <MobileBottomNav />
+          </AuthProvider>
+        </EventThemeProvider>
       </body>
     </html>
   );

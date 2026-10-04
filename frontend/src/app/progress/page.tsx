@@ -44,7 +44,7 @@ const SKILLS: SkillConfig[] = [
   { key: "grammar", label: "Grammar", color: "hsl(var(--primary))" },
   { key: "listening", label: "Listening", color: "hsl(217 91% 60%)" },
   { key: "reading", label: "Reading", color: "hsl(142 70% 45%)" },
-  { key: "speaking", label: "Speaking", color: "hsl(280 80% 55%)" },
+  { key: "speaking", label: "Speaking", color: "hsl(221 83% 53%)" },
   { key: "writing", label: "Writing", color: "hsl(340 75% 55%)" },
 ];
 

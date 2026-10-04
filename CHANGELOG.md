@@ -4,6 +4,68 @@ Tất cả các thay đổi và tiến độ nâng cấp hệ thống được g
 
 ---
 
+## [2.2.2] - 2026-09-30 (HUMAN-CENTERED ADMIN PERMISSIONS REDESIGN)
+
+### Redesigned & Humanized
+- **Tái Thiết Kế Toàn Diện Phân Hệ Phân Quyền Vai Trò (`/admin/permissions`) Từ Góc Nhìn Con Người:**
+  - **Loại bỏ triệt để giao diện chuyển quyền 2 cột cứng nhắc (Dual Listbox / Transfer Matrix):** Không còn nút bấm `>` `<` `>>` `<<` lỗi thời và các thông điệp chỉ dẫn mang tính máy móc ("Mẫu 1: Hai Cột Chuyển Quyền", "Bấm [ > ] để gán sang phải").
+  - **Phân nhóm theo 6 Khối Chức Năng Nghiệp Vụ Thực Tế:**
+    + 📚 Ngân Hàng Đề Thi & Khảo Thí (5 quyền)
+    + ✍️ Chấm Điểm & Quản Lý Lớp Học (4 quyền)
+    + 💳 Tài Chính & Doanh Thu SePay (4 quyền)
+    + 📖 Học Liệu & Từ Vựng Cốt Lõi (3 quyền)
+    + 👥 Người Dùng & Học Viên (3 quyền)
+    + 🛡️ Bảo Mật & Quản Trị Hệ Thống (2 quyền)
+  - **Trải Nghiệm Công Tắc Bật/Tắt Trực Quan (iOS-style Smooth Toggles):**
+    + Mỗi dòng quyền hạn là một thẻ công việc nhân bản với tên gọi tự nhiên, diễn giải mục đích thực tế và nhãn cảnh báo thao tác nhạy cảm.
+    + Thao tác 1-chạm: Bấm trực tiếp vào hàng hoặc gạt công tắc để cấp/thu hồi quyền ngay lập tức.
+    + Hỗ trợ nút tác vụ nhanh "Bật nhóm này / Tắt nhóm này" cho từng module và "Bật tất cả / Tắt tất cả" cho toàn vai trò.
+  - **4 Thẻ Vai Trò Hiện Đại Với Thước Đo Tiến Độ (%):**
+    + Hiển thị số lượng nhân sự/tài khoản thực tế đang nắm giữ vai trò.
+    + Thanh progress bar hiển thị tỷ lệ % quyền hạn đã kích hoạt trực quan.
+  - **Bổ Sung Chế Độ Xem Bảng Ma Trận Tổng Quan (Executive Matrix Grid View):**
+    + Cho phép Ban Giám Đốc/SuperAdmin so sánh trực tiếp quyền hạn giữa 4 vai trò trên cùng 1 bảng tổng hợp, hỗ trợ click toggle trực tiếp trên từng ô.
+  - **Thanh Lưu Nổi (Floating Save Bar):** Tự động xuất hiện mượt mà ở đáy màn hình khi có thay đổi chưa lưu, kèm thông báo trực quan và nút Hoàn tác/Lưu thay đổi.
+
+---
+
+## [2.2.1] - 2026-09-30 (EXAM SIMULATION LAYOUT UNIFICATION & READING DRAG-AND-DROP)
+
+### Added & Backed Up
+- **Tạo Bản Sao Lưu Độc Lập An Toàn Cho 5 Phòng Thi Trước Khi Quy Chuẩn:**
+  - Lưu trữ toàn bộ 5 tệp giao diện phòng thi ban đầu tại thư mục `frontend/src/backups/exam-layouts-pre-unification/`:
+    + `reading-page.tsx`
+    + `listening-page.tsx`
+    + `writing-page.tsx`
+    + `speaking-page.tsx`
+    + `grammar-page.tsx`
+  - Đảm bảo khả năng phục hồi (rollback) 1-click tức thì bất kỳ lúc nào người dùng yêu cầu.
+
+### Changed & Standardized
+- **Quy Chuẩn Đồng Bộ Toàn Diện Giao Diện 5 Kỹ Năng Theo Chuẩn "Exam Simulation Mode" Của Phòng Thi Thử (`/thi-thu/[id]`):**
+  - **Loại bỏ Navbar & Footer toàn trang:** Ẩn thanh menu điều hướng chung và chân trang web khi thí sinh đang làm bài, tạo không gian tập trung tối đa, không bị xao nhãng.
+  - **Thanh tiến độ siêu mỏng (3px Top Progress Bar):** Đặt cố định ở đỉnh màn hình (`fixed inset-x-0 top-0 z-[100]`), đổi màu gradient thương hiệu theo % hoàn thành câu hỏi.
+  - **Fixed Header Đề Thi Chuẩn (H-12):**
+    + Góc trái: Tên bài thi + Tên phân môn Aptis ESOL.
+    + Tâm giữa: Viên đếm ngược thời gian (Timer Pill) viền bo tròn, cảnh báo chuyển đỏ và nhấp nháy khi còn dưới 5 phút.
+    + Góc phải: Bộ đếm tiến độ làm bài dạng `X/Y câu` hoặc `X/Y mục`.
+  - **Main Canvas Không Gian Làm Bài Độc Lập:** Khoảng đệm `pt-16 pb-24`, thiết kế dạng thẻ thẻ kính (glassmorphism/card canvas) tập trung ở giữa với chiều rộng tối ưu (`max-w-3xl` / `max-w-4xl`).
+  - **Fixed Bottom Navigation Bar Chuẩn (H-14):**
+    + Góc trái: Nút danh sách câu hỏi / phần thi dạng Drawer (`≡`), Nút thông tin đề thi (`(i)`), Nút cờ đánh dấu (`🚩`) hoặc xem bài mẫu.
+    + Góc phải: Nút Thoát bài thi (`LogOut`), Nút `Previous` (tự động disabled khi ở câu/phần đầu), Nút `Next` / `Nộp bài` mang sắc đỏ cam thương hiệu (`bg-primary text-primary-foreground hover:bg-brand-brown font-bold`).
+  - **Đồng Bộ Modal Tiêu Chuẩn:** Tích hợp đồng nhất Modal Thông Tin Đề Thi (`InfoModal`) và Modal Xác Nhận Nộp Bài (`SubmitConfirmationModal`) cảnh báo số lượng câu chưa làm trước khi chấm điểm.
+- **Đồng Bộ Hoàn Toàn Cơ Chế Kéo Thả 2 Cột (Drag & Drop) Cho Kỹ Năng Reading (`/reading/[id]`):**
+  - Loại bỏ hoàn toàn giao diện nút mũi tên `↑` và `↓`.
+  - Tích hợp component `ReadingSentenceOrder` vào cả 2 bài đọc Part 2 (Story 1 & Story 2) với 2 cột: Cột trái cố định câu 1 và 4 ô trống; Cột phải ngân hàng câu lộn xộn hỗ trợ cả kéo thả chuột/chạm và click chọn.
+- **Chuẩn Hóa Màu Sắc Nút Next Phòng Thi Thử (`/thi-thu/[id]`):**
+  - Sửa nút `Next` từ màu tím/navy lệch hệ sang màu thương hiệu `bg-primary` với hiệu ứng `hover:bg-brand-brown`.
+  - Đồng bộ biến `--exam-accent` trong `globals.css` khớp màu chủ đạo.
+
+### Verified
+- **TypeScript:** Toàn bộ dự án `frontend` đạt **0 lỗi biên dịch** (`tsc --noEmit` Exit Code 0).
+
+---
+
 ## [2.2.0] - 2026-09-29 (SRS REFINEMENT & REAL-DATA METRICS INTEGRATION)
 
 ### Added

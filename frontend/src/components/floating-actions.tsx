@@ -11,17 +11,13 @@ export function FloatingActions() {
       {/* Floating Bottom Left: Bug Report Button */}
       <button
         type="button"
-        className="fixed z-[35] bottom-[72px] md:bottom-5 left-3 sm:left-4 flex items-center gap-1.5 rounded-full bg-card/90 backdrop-blur-md px-3 py-1.5 text-xs font-semibold shadow-md border transition-colors hover:bg-muted"
+        className="fixed z-[35] bottom-[72px] md:bottom-5 left-14 sm:left-16 md:left-5 flex items-center gap-1.5 rounded-full bg-card/95 backdrop-blur-md px-3 py-1.5 text-xs font-semibold shadow-md border border-border text-muted-foreground hover:text-foreground transition-colors hover:bg-muted"
         aria-label="Báo lỗi chức năng"
-        style={{
-          color: "rgb(0, 47, 95)",
-          borderColor: "rgba(0, 47, 95, 0.3)",
-        }}
         onClick={() => {
           alert("Tính năng báo lỗi: Vui lòng nhắn tin qua Zalo hoặc Facebook để được hỗ trợ!");
         }}
       >
-        <Flag className="w-3.5 h-3.5" />
+        <Flag className="w-3.5 h-3.5 text-muted-foreground" />
         <span>Báo lỗi</span>
       </button>
 
@@ -51,7 +47,7 @@ export function FloatingActions() {
               <span className="w-6 h-6 rounded-full bg-[#1877F2] text-white flex items-center justify-center text-[9px]">
                 FB
               </span>
-              <span>Facebook Aptis Kỳ Tích</span>
+              <span>Facebook APTIS ESOL PREMIER</span>
             </a>
           </div>
         )}
@@ -61,8 +57,7 @@ export function FloatingActions() {
           aria-label="Liên hệ hỗ trợ"
           aria-expanded={open}
           onClick={() => setOpen(!open)}
-          className="h-10 min-h-[40px] rounded-full text-white shadow-xl flex items-center justify-center gap-1.5 transition-all animate-support-fab-beat w-10 min-w-[40px] sm:w-auto sm:min-w-0 sm:px-3"
-          style={{ backgroundColor: "rgb(204, 28, 1)" }}
+          className="h-10 min-h-[40px] rounded-full text-white shadow-xl shadow-glow-soft flex items-center justify-center gap-1.5 transition-all animate-support-fab-beat w-10 min-w-[40px] sm:w-auto sm:min-w-0 sm:px-3 btn-brand-gradient"
         >
           {open ? (
             <X className="w-5 h-5" />

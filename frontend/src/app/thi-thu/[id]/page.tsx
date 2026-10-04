@@ -19,7 +19,7 @@ import { ReadingResultCard } from "@/components/reading-result-card";
 import {
   Clock, ArrowLeft, ArrowRight, List, Info, LogOut,
   Mic, Volume2, CheckCircle2, Award, Sparkles, X, Loader2,
-  StopCircle, Play, AlertTriangle, Upload, Pause, Check,
+  StopCircle, Play, AlertTriangle, Upload, Pause, Check, Eye,
 } from "lucide-react";
 
 /* ====================================================
@@ -232,18 +232,26 @@ export default function OfficialMockExamRoom() {
   const { user, isAuthenticated } = useAuth();
   const testId = params.id as string;
   const partParam = searchParams?.get("part");
+  const modeParam = searchParams?.get("mode");
+  const submissionIdParam = searchParams?.get("submissionId");
 
   // Core state
   const [examData, setExamData] = useState<any>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stagePhase, setStagePhase] = useState<"instruction" | "exam">("instruction");
+  const [stagePhase, setStagePhase] = useState<"instruction" | "exam">(
+    modeParam === "review" ? "exam" : "instruction"
+  );
   const [questionIdx, setQuestionIdx] = useState(0);
 
+  // Review Mode State
+  const [reviewMode, setReviewMode] = useState(modeParam === "review");
+  const [reviewFilter, setReviewFilter] = useState<"all" | "wrong" | "correct">("all");
+
   // Submission
-  const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [submissionId, setSubmissionId] = useState<string | null>(submissionIdParam || null);
   const [serverTime, setServerTime] = useState(0);
-  const [isFinished, setIsFinished] = useState(false);
+  const [isFinished, setIsFinished] = useState(modeParam === "review");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resultData, setResultData] = useState<any>(null);
 
@@ -315,6 +323,71 @@ export default function OfficialMockExamRoom() {
             }
           }
           setQuestions(flat);
+
+          // Nếu có submissionId & mode=review, tải bài nộp cũ để review
+          if (submissionIdParam) {
+            try {
+              const subRes = await api.submissions.getResult(submissionIdParam);
+              if (subRes.success && subRes.data) {
+                const sub = subRes.data;
+                setIsFinished(true);
+                setReviewMode(true);
+                setStagePhase("exam");
+                setResultData({
+                  totalScore: sub.total_score,
+                  cefrLevel: sub.cefr_level || "B1",
+                  correctCount: sub.correct_count,
+                  totalQuestions: flat.length,
+                });
+
+                const loadedSel: Record<string, number> = {};
+                const loadedText: Record<string, string> = {};
+                const loadedAudio: Record<string, string> = {};
+                const loadedOrder: Record<string, string[]> = {};
+                const loadedMatching: Record<string, string> = {};
+
+                (sub.answers || []).forEach((ans: any) => {
+                  const qIdx = flat.findIndex((q) => q.id === ans.question_id);
+                  if (qIdx >= 0) {
+                    const q = flat[qIdx];
+                    if (ans.selected_option) {
+                      if (q.question_type === "MULTIPLE_CHOICE") {
+                        const optChar = ans.selected_option.trim().toUpperCase();
+                        const optIdx = optChar.charCodeAt(0) - 65;
+                        if (optIdx >= 0 && optIdx < (q.options?.length || 4)) {
+                          loadedSel[qIdx] = optIdx;
+                        }
+                      } else {
+                        loadedMatching[q.id] = ans.selected_option;
+                      }
+                    }
+                    if (ans.text_answer) {
+                      if (q.question_type === "SENTENCE_ORDER") {
+                        try {
+                          loadedOrder[q.id] = JSON.parse(ans.text_answer);
+                        } catch {
+                          loadedText[q.id] = ans.text_answer;
+                        }
+                      } else {
+                        loadedText[q.id] = ans.text_answer;
+                      }
+                    }
+                    if (ans.audio_url) {
+                      loadedAudio[q.id] = ans.audio_url;
+                    }
+                  }
+                });
+
+                setSelectedAnswers(loadedSel);
+                setTextAnswers(loadedText);
+                setAudioUrls(loadedAudio);
+                setOrderAnswers(loadedOrder);
+                setMatchingAnswers(loadedMatching);
+              }
+            } catch (err) {
+              console.warn("Could not load full test submission result:", err);
+            }
+          }
         }
       } catch (e) {
         console.warn("Load exam failed:", e);
@@ -323,11 +396,12 @@ export default function OfficialMockExamRoom() {
       }
     }
     load();
-  }, [testId, partParam]);
+  }, [testId, partParam, submissionIdParam]);
 
   // ---- Init submission when exam starts ----
   useEffect(() => {
     async function init() {
+      if (modeParam === "review" || submissionIdParam) return;
       if (!isAuthenticated || !testId || stagePhase !== "exam") return;
       try {
         const res = await api.submissions.start(testId);
@@ -343,7 +417,7 @@ export default function OfficialMockExamRoom() {
     }
     init();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testId, isAuthenticated, stagePhase]);
+  }, [testId, isAuthenticated, stagePhase, modeParam, submissionIdParam]);
 
   // ---- Timer ----
   const handleExpired = useCallback(() => {
@@ -795,7 +869,7 @@ export default function OfficialMockExamRoom() {
   // ========================================================
   //  RENDER: Result
   // ========================================================
-  if (isFinished) {
+  if (isFinished && !reviewMode) {
     if (examData?.skill === "READING") {
       return (
         <ReadingResultCard
@@ -810,6 +884,10 @@ export default function OfficialMockExamRoom() {
             { partNumber: 4, title: "Part 4 – Opinion Matching", correctCount: 0, totalCount: 7, score: 0, maxScore: 13 },
             { partNumber: 5, title: "Part 5 – Long Reading", correctCount: 0, totalCount: 7, score: 0, maxScore: 13 },
           ]}
+          onReview={() => {
+            setReviewMode(true);
+            setQuestionIdx(0);
+          }}
           onRetry={() => {
             setIsFinished(false);
             setQuestionIdx(0);
@@ -883,6 +961,18 @@ export default function OfficialMockExamRoom() {
             </div>
 
             <div className="pt-4 border-t border-exam-border flex flex-wrap justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setReviewMode(true);
+                  setQuestionIdx(0);
+                }}
+                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:brightness-110 transition-all flex items-center gap-1.5"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Xem lại bài làm chi tiết</span>
+              </button>
+
               <Link
                 href="/history"
                 className="px-4 py-2 rounded-xl border border-exam-border text-xs font-bold hover:bg-exam-border/30 transition-colors"
@@ -897,12 +987,468 @@ export default function OfficialMockExamRoom() {
               </Link>
               <Link
                 href="/dashboard"
-                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-brand-brown transition-colors"
+                className="px-4 py-2 rounded-xl border border-exam-border text-xs font-bold hover:bg-exam-border/30 transition-colors"
               >
                 Về Dashboard
               </Link>
             </div>
           </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ========================================================
+  //  RENDER: REVIEW MODE CHO BÀI THI THỬ (FULL TEST / KỸ NĂNG)
+  // ========================================================
+  if (isFinished && reviewMode) {
+    const getStatus = (q: any, idx: number) => {
+      if (q.question_type === "MULTIPLE_CHOICE") {
+        const sel = selectedAnswers[idx];
+        if (sel === undefined) return "unanswered";
+        const chosen = q.options && q.options[sel] ? String(q.options[sel]).trim().toUpperCase() : "";
+        const cor = String(q.correct_answer || "").trim().toUpperCase();
+        return chosen === cor || String.fromCharCode(65 + sel) === cor ? "correct" : "wrong";
+      }
+      if (q.question_type === "GAP_FILL") {
+        const userVal = (textAnswers[q.id] || (selectedAnswers[idx] !== undefined && q.options ? q.options[selectedAnswers[idx]] : "") || "").trim().toLowerCase();
+        if (!userVal) return "unanswered";
+        return userVal === String(q.correct_answer || "").trim().toLowerCase() ? "correct" : "wrong";
+      }
+      if (q.question_type === "MATCHING") {
+        const userVal = (matchingAnswers[q.id] || "").trim().toLowerCase();
+        if (!userVal) return "unanswered";
+        return userVal === String(q.correct_answer || "").trim().toLowerCase() ? "correct" : "wrong";
+      }
+      if (q.question_type === "SENTENCE_ORDER") {
+        const userArr = orderAnswers[q.id];
+        if (!userArr || userArr.length === 0) return "unanswered";
+        try {
+          const corArr = JSON.parse(q.correct_answer || "[]");
+          if (userArr.length === corArr.length && userArr.every((v, i) => v === corArr[i])) return "correct";
+          return "wrong";
+        } catch {
+          return "correct";
+        }
+      }
+      if (q.question_type === "ESSAY") {
+        return textAnswers[q.id]?.trim() ? "answered" : "unanswered";
+      }
+      if (q.question_type === "SPEAKING_AUDIO") {
+        return audioUrls[q.id] ? "answered" : "unanswered";
+      }
+      return "unanswered";
+    };
+
+    const statusList = questions.map((q, idx) => getStatus(q, idx));
+    const totalCor = statusList.filter((s) => s === "correct" || s === "answered").length;
+    const totalWr = statusList.filter((s) => s === "wrong").length;
+
+    const filteredIndexes = questions
+      .map((_, idx) => idx)
+      .filter((idx) => {
+        if (reviewFilter === "wrong") return statusList[idx] === "wrong";
+        if (reviewFilter === "correct") return statusList[idx] === "correct" || statusList[idx] === "answered";
+        return true;
+      });
+
+    const activeRevQ = questions[questionIdx] || questions[0];
+    const activeStatus = activeRevQ ? getStatus(activeRevQ, questionIdx) : "unanswered";
+
+    return (
+      <div className="notranslate min-h-screen bg-exam-bg text-exam-text flex flex-col font-sans">
+        {/* Header Review Bar */}
+        <header className="sticky top-0 z-40 bg-exam-surface/95 backdrop-blur-md border-b border-exam-border px-4 md:px-8 py-3 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setReviewMode(false)}
+              className="p-1.5 rounded-lg border border-exam-border hover:bg-exam-border/40 text-exam-text-muted hover:text-exam-text transition-colors"
+              title="Quay lại bảng kết quả"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
+                  Xem lại bài thi thử
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
+                  {resultData?.totalScore !== undefined ? `${Math.round(resultData.totalScore)} điểm · ` : ""}Band {resultData?.cefrLevel || "B2"}
+                </span>
+              </div>
+              <span className="text-xs md:text-sm font-bold text-exam-text">
+                {examData?.title || "Bài thi thử Aptis ESOL"}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setReviewMode(false)}
+              className="px-3 py-1.5 rounded-xl border border-exam-border text-xs font-semibold hover:bg-exam-border/40 transition-colors"
+            >
+              Xem bảng điểm
+            </button>
+            <Link
+              href="/thi-thu"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 transition-all"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Thoát</span>
+            </Link>
+          </div>
+        </header>
+
+        {/* Content Container */}
+        <main className="flex-1 py-6 px-4 md:px-8 max-w-4xl mx-auto w-full space-y-6">
+          {/* Quick Heatmap Navigator */}
+          <div className="bg-exam-surface rounded-2xl border border-exam-border p-4 shadow-sm space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              {/* Filter pills */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setReviewFilter("all")}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    reviewFilter === "all"
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-exam-border text-exam-text-muted hover:text-exam-text"
+                  }`}
+                >
+                  Tất cả ({questions.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReviewFilter("wrong")}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    reviewFilter === "wrong"
+                      ? "bg-rose-500 text-white"
+                      : "border border-exam-border text-rose-600 dark:text-rose-400 hover:bg-rose-500/10"
+                  }`}
+                >
+                  Câu sai ({totalWr})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReviewFilter("correct")}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    reviewFilter === "correct"
+                      ? "bg-emerald-500 text-white"
+                      : "border border-exam-border text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
+                  }`}
+                >
+                  Câu đúng ({totalCor})
+                </button>
+              </div>
+
+              <span className="text-[11px] text-exam-text-muted font-mono">
+                Click vào số câu để xem lời giải
+              </span>
+            </div>
+
+            {/* Question pills grid */}
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {questions.map((_, idx) => {
+                const isCurrent = idx === questionIdx;
+                const st = statusList[idx];
+                const isVisible = filteredIndexes.includes(idx);
+                if (!isVisible) return null;
+
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setQuestionIdx(idx)}
+                    className={`w-8 h-8 rounded-lg text-xs font-bold transition-all flex items-center justify-center border ${
+                      isCurrent
+                        ? "ring-2 ring-primary ring-offset-2 scale-110 z-10"
+                        : ""
+                    } ${
+                      st === "correct" || st === "answered"
+                        ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25"
+                        : st === "wrong"
+                        ? "bg-rose-500/15 border-rose-500/40 text-rose-700 dark:text-rose-300 hover:bg-rose-500/25"
+                        : "bg-exam-border/30 border-exam-border text-exam-text-muted hover:bg-exam-border/50"
+                    }`}
+                    title={`Câu ${idx + 1}`}
+                  >
+                    {idx + 1}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Active Question Review Card */}
+          {activeRevQ && (
+            <div className="bg-exam-surface rounded-2xl border border-exam-border p-6 shadow-sm space-y-6 animate-in fade-in duration-200">
+              {/* Question Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-exam-border pb-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                      {activeRevQ.partTitle || "Câu hỏi thi thử"}
+                    </span>
+                    <span className="text-xs text-exam-text-muted font-mono">
+                      Câu {questionIdx + 1} / {questions.length}
+                    </span>
+                  </div>
+                  <h3 className="font-heading font-bold text-base text-exam-text mt-1">
+                    {activeRevQ.prompt}
+                  </h3>
+                </div>
+
+                {/* Status Badge */}
+                <div className="shrink-0">
+                  {activeStatus === "correct" ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      <span>Chính xác</span>
+                    </span>
+                  ) : activeStatus === "wrong" ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30">
+                      <X className="w-4 h-4 text-rose-500" />
+                      <span>Chưa đúng</span>
+                    </span>
+                  ) : activeStatus === "answered" ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/15 text-primary border border-primary/30">
+                      <Check className="w-4 h-4" />
+                      <span>Đã nộp bài</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-muted text-exam-text-muted border border-exam-border">
+                      <span>Chưa làm bài</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Passage text if any */}
+              {activeRevQ.partPassageText && (
+                <div className="p-4 rounded-xl bg-exam-bg/50 border border-exam-border text-xs md:text-sm leading-relaxed text-exam-text whitespace-pre-wrap font-sans">
+                  {activeRevQ.partPassageText}
+                </div>
+              )}
+
+              {/* Audio player if any */}
+              {activeRevQ.partAudioUrl && (
+                <div className="p-3 rounded-xl bg-exam-bg/40 border border-exam-border">
+                  <AudioPlayer src={activeRevQ.partAudioUrl} label="Audio câu hỏi:" />
+                </div>
+              )}
+
+              {/* Question Answer Comparison based on type */}
+              {/* 1. Multiple Choice */}
+              {activeRevQ.question_type === "MULTIPLE_CHOICE" && Array.isArray(activeRevQ.options) && (
+                <div className="space-y-2.5">
+                  <span className="text-xs font-bold text-exam-text-muted uppercase tracking-wider block">
+                    So sánh lựa chọn của bạn &amp; Đáp án đúng:
+                  </span>
+                  <div className="space-y-2">
+                    {activeRevQ.options.map((opt: any, oIdx: number) => {
+                      const userPickIdx = selectedAnswers[questionIdx];
+                      const isUserPick = userPickIdx === oIdx;
+                      const optStr = String(opt).trim().toUpperCase();
+                      const corStr = String(activeRevQ.correct_answer || "").trim().toUpperCase();
+                      const isRight = optStr === corStr || String.fromCharCode(65 + oIdx) === corStr;
+
+                      return (
+                        <div
+                          key={oIdx}
+                          className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs md:text-sm font-medium transition-all ${
+                            isRight
+                              ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-800 dark:text-emerald-200"
+                              : isUserPick && !isRight
+                              ? "bg-rose-500/10 border-rose-500/40 text-rose-800 dark:text-rose-200"
+                              : "bg-exam-bg/30 border-exam-border text-exam-text-muted"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span
+                              className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                                isRight
+                                  ? "bg-emerald-500 text-white"
+                                  : isUserPick && !isRight
+                                  ? "bg-rose-500 text-white"
+                                  : "bg-exam-border/50 text-exam-text-muted"
+                              }`}
+                            >
+                              {isRight ? "✓" : isUserPick ? "✕" : String.fromCharCode(65 + oIdx)}
+                            </span>
+                            <span className="truncate">{String(opt)}</span>
+                          </div>
+
+                          <div className="shrink-0 text-right">
+                            {isRight && (
+                              <span className="inline-block px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
+                                {isUserPick ? "✓ Bạn chọn đúng" : "Đáp án đúng"}
+                              </span>
+                            )}
+                            {isUserPick && !isRight && (
+                              <span className="inline-block px-2.5 py-0.5 rounded-md bg-rose-500/20 text-rose-700 dark:text-rose-300 font-bold text-[11px]">
+                                ✕ Lựa chọn của bạn
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* 2. Gap Fill */}
+              {activeRevQ.question_type === "GAP_FILL" && (
+                <div className="space-y-3">
+                  <span className="text-xs font-bold text-exam-text-muted uppercase tracking-wider block">
+                    Chi tiết điền từ:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40 space-y-1">
+                      <span className="text-[11px] text-exam-text-muted font-bold block">
+                        Câu trả lời của bạn:
+                      </span>
+                      <p className={`font-mono text-sm font-bold ${
+                        activeStatus === "correct" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                      }`}>
+                        {textAnswers[activeRevQ.id] || (selectedAnswers[questionIdx] !== undefined && activeRevQ.options ? activeRevQ.options[selectedAnswers[questionIdx]] : "") || "(Trống)"}
+                      </p>
+                    </div>
+                    <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 space-y-1">
+                      <span className="text-[11px] text-emerald-700 dark:text-emerald-300 font-bold block">
+                        Đáp án chính xác:
+                      </span>
+                      <p className="font-mono text-sm font-bold text-emerald-700 dark:text-emerald-300">
+                        {activeRevQ.correct_answer || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 3. Matching */}
+              {activeRevQ.question_type === "MATCHING" && (
+                <div className="space-y-3">
+                  <span className="text-xs font-bold text-exam-text-muted uppercase tracking-wider block">
+                    Chi tiết nối ý / chọn đáp án:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40 space-y-1">
+                      <span className="text-[11px] text-exam-text-muted font-bold block">
+                        Lựa chọn của bạn:
+                      </span>
+                      <p className={`text-sm font-bold ${
+                        activeStatus === "correct" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                      }`}>
+                        {matchingAnswers[activeRevQ.id] || "(Chưa chọn)"}
+                      </p>
+                    </div>
+                    <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 space-y-1">
+                      <span className="text-[11px] text-emerald-700 dark:text-emerald-300 font-bold block">
+                        Đáp án đúng:
+                      </span>
+                      <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
+                        {activeRevQ.correct_answer || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Sentence Order */}
+              {activeRevQ.question_type === "SENTENCE_ORDER" && (
+                <div className="space-y-3">
+                  <span className="text-xs font-bold text-exam-text-muted uppercase tracking-wider block">
+                    Chi tiết sắp xếp câu:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40 space-y-1">
+                      <span className="text-[11px] text-exam-text-muted font-bold block">
+                        Thứ tự bạn đã chọn:
+                      </span>
+                      <p className="text-xs font-mono text-exam-text">
+                        {Array.isArray(orderAnswers[activeRevQ.id]) ? orderAnswers[activeRevQ.id].join(" → ") : "(Chưa xếp)"}
+                      </p>
+                    </div>
+                    <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 space-y-1">
+                      <span className="text-[11px] text-emerald-700 dark:text-emerald-300 font-bold block">
+                        Thứ tự chính xác:
+                      </span>
+                      <p className="text-xs font-mono text-emerald-700 dark:text-emerald-300 font-bold">
+                        {activeRevQ.correct_answer || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 5. Speaking Audio */}
+              {activeRevQ.question_type === "SPEAKING_AUDIO" && (
+                <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-2">
+                  <span className="text-xs font-bold text-primary block">
+                    Bản ghi âm bài nói của bạn:
+                  </span>
+                  {audioUrls[activeRevQ.id] ? (
+                    <audio controls src={audioUrls[activeRevQ.id]!} className="w-full h-8" />
+                  ) : (
+                    <p className="text-xs text-exam-text-muted italic">(Không có file ghi âm)</p>
+                  )}
+                </div>
+              )}
+
+              {/* 6. Essay / Writing */}
+              {activeRevQ.question_type === "ESSAY" && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-1.5">
+                    <span className="text-xs font-bold text-exam-text-muted uppercase">Bài làm của bạn:</span>
+                    <p className="text-xs md:text-sm text-exam-text leading-relaxed whitespace-pre-wrap">
+                      {textAnswers[activeRevQ.id] || "(Chưa có nội dung)"}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Explanation Card */}
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-primary">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span>Giải thích chi tiết &amp; Phân tích đáp án:</span>
+                </div>
+                <p className="text-xs md:text-sm text-exam-text leading-relaxed">
+                  {activeRevQ.explanation || "Câu hỏi kiểm tra kiến thức ngôn ngữ chuẩn theo khung đánh giá Aptis ESOL."}
+                </p>
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex items-center justify-between pt-4 border-t border-exam-border">
+                <button
+                  type="button"
+                  disabled={questionIdx === 0}
+                  onClick={() => setQuestionIdx((p) => p - 1)}
+                  className="px-4 py-2 rounded-xl border border-exam-border text-xs font-bold hover:bg-exam-border/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Câu trước</span>
+                </button>
+
+                <span className="text-xs text-exam-text-muted font-mono font-bold">
+                  {questionIdx + 1} / {questions.length}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={questionIdx === questions.length - 1}
+                  onClick={() => setQuestionIdx((p) => p + 1)}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
+                >
+                  <span>Câu tiếp</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     );
@@ -974,7 +1520,7 @@ export default function OfficialMockExamRoom() {
                   src={
                     currentQ.partAudioUrl.startsWith("http")
                       ? currentQ.partAudioUrl
-                      : `http://localhost:5000${currentQ.partAudioUrl}`
+                      : `${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "")}${currentQ.partAudioUrl.startsWith("/") ? "" : "/"}${currentQ.partAudioUrl}`
                   }
                   label={currentQ.partTitle}
                 />
@@ -1265,8 +1811,7 @@ export default function OfficialMockExamRoom() {
             <button
               type="button"
               onClick={handleNext}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-bold transition-colors"
-              style={{ backgroundColor: "hsl(var(--exam-accent))", color: "hsl(var(--exam-accent-foreground))" }}
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-brand-brown text-sm font-bold shadow-sm transition-all cursor-pointer"
             >
               <span>{isLastStage ? "Nộp bài" : "Next"}</span>
               <ArrowRight className="w-4 h-4" />

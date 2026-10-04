@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1493b924-39f3-4f0f-8a6e-9976cee1c5bc",
+    "exam_set_id": "2f7bb4ff-b4c2-4523-b775-43a554ccbf9f",
+    "order_index": 0,
+    "question_text": "Young people are more into politics",
+    "question_type": "opinion_matching",
+    "options": [
+      "Man",
+      "Woman",
+      "Both"
+    ],
+    "correct_answer": 2,
+    "explanation": "M: Did you catch that debate programme last night? What struck me was the audience. Half of them looked about twenty years old.\nW: Funny you should say that, I noticed exactly the same thing while I was watching.\nM: It's a real shift, isn't it. Young people genuinely care about this stuff now, far more than my generation ever did at that age.\nW: I completely agree with you there. My niece is nineteen and she can argue about housing policy better than I can.\nM: And I'd put a lot of that down to social media. I think it has completely rewritten the way politics actually works these days.\nW: Hmm, I'm not so sure about that. I mean, the campaigning has moved online, fine, I'll give you that much. But the real deals are still done in back rooms by the same old people. Nothing fundamental has changed.\nM: Well, I'd argue the platforms now decide what we even talk about in the first place, and that's a change in itself.\nW: Maybe so. What I would say, though, is that ordinary voters understand the issues far better now than they used to, because everything is out in the open.\nM: Oh, I don't see it that way at all, to be honest. People have more headlines in front of them, certainly, but that isn't the same thing as understanding. If anything, I'd say most voters are more confused than they've ever been.\nW: That seems a bit harsh on people, doesn't it?\nM: Perhaps it is, yes. Anyway, one thing I'm genuinely pleased about is how many more women are standing for office these days.\nW: Yes, I agree with you on that one. The last council election here had more women candidates than men, which nobody expected.\nM: Long overdue, if you ask me.\nW: Couldn't agree more, honestly.\n\n--- GIẢI THÍCH ĐÁP ÁN ---\nKey: Giới trẻ quan tâm chính trị hơn = Both · Mạng xã hội thay đổi chính trị = Man · Người dân giờ hiểu biết hơn về chính trị = Woman · Nhiều phụ nữ theo đuổi chính trị hơn = Both\n\n1. Young people are more into politics → Both: người đàn ông nêu \"Young people genuinely care about this stuff now, far more than my generation ever did at that age.\" Người phụ nữ tán thành: \"I completely agree with you there. My niece is nineteen and she can argue about housing policy better than I can.\"\n\n2. Social media changes politics. → Man: người đàn ông nêu \"I think it has completely rewritten the way politics actually works these days.\" Người phụ nữ phản đối: \"Hmm, I'm not so sure about that... the real deals are still done in back rooms by the same old people. Nothing fundamental has changed.\"\n\n3. People are now better informed about politics. → Woman: người phụ nữ nêu \"ordinary voters understand the issues far better now than they used to, because everything is out in the open.\" Người đàn ông phản đối: \"Oh, I don't see it that way at all... that isn't the same thing as understanding.\"\n\n4. More women pursue politics. → Both: người đàn ông nêu \"how many more women are standing for office these days\", người phụ nữ đồng ý: \"Yes, I agree with you on that one.\"\n\n👉 Mẹo: Bẫy ở ý 2 — người phụ nữ nói \"the campaigning has moved online, fine, I'll give you that much\" (nhượng bộ một phần) rồi phủ nhận kết luận, nên vẫn là Man chứ không phải Both.",
+    "audio_url": "v5_p3_de02.mp3",
+    "image_url": null,
+    "response_time": null,
+    "extra_data": {},
+    "created_at": "2026-07-05T08:06:59.291325+00:00",
+    "updated_at": "2026-09-18T12:45:59.361686+00:00"
+  },
+  {
+    "id": "b5df4141-e1d7-48db-b446-49020b100e1b",
+    "exam_set_id": "ef163b21-f220-4bd3-a645-5b53fb48957f",
+    "order_index": 1,
+    "question_text": "A: I’ve just seen Mark. B: You ____ have seen him. He’s on holiday at the moment.",
+    "question_type": "multiple_choice",
+    "options": [
+      "can’t",
+      "shouldn’t",
+      "needn’t"
+    ],
+    "correct_answer": 0,
+    "explanation": "Cấu trúc “can’t have + V3” dùng để suy luận chắc chắn điều gì không thể đã xảy ra. Vì Mark đang đi nghỉ, người nói cho rằng bạn không thể đã nhìn thấy anh ấy.",
+    "audio_url": null,
+    "image_url": null,
+    "response_time": null,
+    "extra_data": {},
+    "created_at": "2026-06-28T17:47:09.709466+00:00",
+    "updated_at": "2026-06-28T17:47:09.709466+00:00"
+  },
+  {
+    "id": "26645be5-a4ec-43f0-ad0c-e13963fd01c8",
+    "exam_set_id": "ef163b21-f220-4bd3-a645-5b53fb48957f",
+    "order_index": 2,
+    "question_text": "He emphasised in his speech that ____ education he received when younger had been excellent.",
+    "question_type": "multiple_choice",
+    "options": [
+      "(-)",
+      "an",
+      "the"
+    ],
+    "correct_answer": 2,
+    "explanation": "Ở đây không nói về giáo dục nói chung, mà nói về nền giáo dục cụ thể mà ông ấy đã nhận khi còn trẻ: “the education he received”. Vì vậy cần mạo từ xác định “the”.",
+    "audio_url": null,
+    "image_url": null,
+    "response_time": null,
+    "extra_data": {},
+    "created_at": "2026-06-28T17:47:09.709466+00:00",
+    "updated_at": "2026-06-28T17:47:09.709466+00:00"
+  }
+]

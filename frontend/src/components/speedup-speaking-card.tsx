@@ -3,26 +3,26 @@ import { Mic, ArrowRight } from "lucide-react";
 
 export function SpeedupSpeakingCard() {
   return (
-    <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm shadow-md tech-card hover:border-primary/50 hover:shadow-glow-red p-6 overflow-hidden relative">
+    <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm shadow-md tech-card hover:border-primary/50 hover:shadow-glow-soft p-6 overflow-hidden relative">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 rounded-2xl opacity-60"
         style={{ background: "var(--gradient-radial-red)" }}
       />
       <div className="relative">
-        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
+        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-primary/15 blur-3xl pointer-events-none" />
         <div className="relative">
-          <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-[#7a0f00] text-primary-foreground mb-3 shadow-glow-soft">
+          <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl btn-brand-gradient text-white mb-3 shadow-glow-soft">
             <Mic className="w-5 h-5" />
           </div>
           <h2 className="font-heading font-extrabold text-foreground mb-1">
             Tăng tốc Speaking
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
-            AI Kỳ Tích chấm + feedback chi tiết. Chỉ 12 phút mỗi ngày.
+            AI PREMIER chấm + feedback chi tiết. Chỉ 12 phút mỗi ngày.
           </p>
           <Link
-            className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-glow-red hover:bg-primary-glow hover:shadow-glow-red transition-all duration-300 hover:-translate-y-0.5 h-9 rounded-md px-3 w-full"
+            className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 btn-brand-gradient shadow-glow-soft hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 h-9 rounded-xl px-3 w-full"
             href="/speaking"
             data-discover="true"
           >

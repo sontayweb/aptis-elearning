@@ -1,0 +1,1712 @@
+[
+  {
+    "_id": "68e4ee0953b4655eba3f0de6",
+    "title": "Topic 1",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 1",
+        "content": "Topic 1",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/1.png",
+            "suggestion": "In the photo, I can see a group of friends sitting at the same table and eating in a restaurant. It's a very beautiful place with lots of trees around. There are 2 men and 2 women, they are wearing different colored shirts. They are enjoying their food while smiling and talking to each other, it looks like they are talking about something very funny. Looking at the background of the picture, I can tell that this is a fast-food restaurant or a cake restaurant. They all look happy and full of energy.",
+            "_id": "68e4ee0953b4655eba3f0de8"
+          },
+          {
+            "content": "Why do people like eating out with friends?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/1.png",
+            "suggestion": "People are keen on eating out because it is one of the great ways to spend the time and it is fun and enjoyable activity. Besides, people like to share food with family and friends. Actually, eating out has become one of the most popular ways of recreation. It is a time to be out, see people and meet people. You can enjoy the delicious food that you usually do not cook at home while smiling and talking with your friends about some fun stories. I think that's why people are into eating out.",
+            "_id": "68e4ee0953b4655eba3f0de9"
+          },
+          {
+            "content": "Please talk about the last time you ate with friends?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/1.png",
+            "suggestion": "The last time I ate with my friends was last night. Me and my group of friends went to a Chinese restaurant in the city center. The purpose we went to eat was to celebrate a friend of mine who passed his English test that morning. We enjoyed our meal a lot while smiling and talking about the beautiful memories of our life. The restaurant had a homely atmosphere and soft music that made me comfortable and helped me let my hair down after a working day.",
+            "_id": "68e4ee0953b4655eba3f0dea"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/1.png"
+        ],
+        "_id": "68e4ee0953b4655eba3f0de7"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e4ee0953b4655eba3f0deb",
+    "createdAt": "2025-10-07T10:40:09.092Z",
+    "updatedAt": "2026-06-17T09:38:03.704Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5d19853b4655eba3f0eb3",
+    "title": "Topic 2",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 2",
+        "content": "Topic 2",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/2.png",
+            "suggestion": "As can be seen in this picture, there is a family in a car. There is a mother, a father, their 3 kids and they are all fastening their seat belts. The father in a red shirt is driving. Sitting next to him is the mother, she is smiling happily. Their children are sitting in the back seat. I think they are going to take a trip to somewhere far away from their home during holidays or weekends. By going on road trips, they can spend time together, which strengthens the family relationships. Everyone look happy and I can tell they're having a great family road trip together",
+            "_id": "68f065a153b4655eba3f21db"
+          },
+          {
+            "content": "Tell me the last time you traveled in a car?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/2.png",
+            "suggestion": "The last time I traveled by car was yesterday. I drove to HaLong city with my family, which is a coastal city in the north of Vietnam. It took us about 2 hours to get there and we had so many opportunities to experience the picturesque scenery along our way. We even pulled over several times to enjoy the gorgeous scenery and take some beautiful photos. I think that was one of the best experiences that I have ever had.",
+            "_id": "68f065a153b4655eba3f21dc"
+          },
+          {
+            "content": "How can people overcome the time of a long journey?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/2.png",
+            "suggestion": "There are so many ways to help people pass the time on a long journey and create more memorable travel experiences. I think the most common one is that we can listen to our favorite music or read a book to kill time. If you don't have the concentration to read books, then you should watch a film or TV series instead. Playing a fun game is also one of the best ways to make the time pass faster. In addition, carrying some snacks is also extremely popular, in case they feel hungry.",
+            "_id": "68f065a153b4655eba3f21dd"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/2.png"
+        ],
+        "_id": "68f065a153b4655eba3f21da"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5d19853b4655eba3f0eb8",
+    "createdAt": "2025-10-08T02:51:04.933Z",
+    "updatedAt": "2026-06-17T09:38:03.788Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5d3c053b4655eba3f0eeb",
+    "title": "Topic 3",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 3",
+        "content": "Topic 3",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/3.png",
+            "suggestion": "In this picture, I see a right hand holding a black remote facing the TV screen with many channels on the screen. There are many different channels on the screen such as music, sports, boxing, animation... I guess he/she is clicking and choosing the show he/she wants to watch. I can't guess if it's a woman or a man choosing a channel because I can only see the hand with the TV remote. Maybe he or she is in the living room because there is a white table and the desk shelf under the TV. It seems to be a smart TV because there are play, pause, stop, next, previous.",
+            "_id": "68f0671b53b4655eba3f2273"
+          },
+          {
+            "content": "How often do you watch films or programmers at home? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/3.png",
+            "suggestion": "Well, I'm keen on watching TV because it is one of my favorite activities. I often watch films or programs at home in my spare time like the evening on the weekend with my family. We are into watching comedy TV programs or action movies because we want to enjoy the fun of family weekends. Sometimes I watch a football game with my father on the weekend. Watching movies not only helps me let my hair down after a hard-working day but also makes me happy and expands my horizons. I think watching TV is very interesting.",
+            "_id": "68f0671b53b4655eba3f2274"
+          },
+          {
+            "content": "Which is better for learning, watching video or reading? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/3.png",
+            "suggestion": "Personally, I prefer watching videos to reading books. The graphics in the videos attract me and help me understand better. Besides, watching videos is extremely suitable for introductions to difficult topics, especially something unfamiliar. Furthermore, watching a video takes me less time than reading a book with the same content. Moreover, learning through a video can make us feel more comfortable and relaxed than reading. It not only expands my horizons but also helps me let my hair down after a hard-working day. But if you combine these two methods you can learn the best.",
+            "_id": "68f0671b53b4655eba3f2275"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/3.png"
+        ],
+        "_id": "68f0671b53b4655eba3f2272"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5d3c053b4655eba3f0ef0",
+    "createdAt": "2025-10-08T03:00:16.366Z",
+    "updatedAt": "2026-06-17T09:38:03.971Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5d60c53b4655eba3f0f07",
+    "title": "Topic 4",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 4",
+        "content": "Topic 4",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/4.png",
+            "suggestion": "Well, in the picture, I can see a man watching TV. He is lying on the sofa. It must have been his relaxing time after a hard day. He is wearing his nightwear and I can see the comfort on his face. Perhaps he is watching his favorite TV programs. I guess it may be a soccer match, a fashion show, a music concert or something like that. It is so great for us to have leisure time after long working hours, right? So don't forget to take your time to refresh your mind and prepare well for a new day.",
+            "_id": "68f069e553b4655eba3f22d1"
+          },
+          {
+            "content": "Do you often watch TV?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/4.png",
+            "suggestion": "I don't watch TV very often. I prefer spending my free time doing other activities like reading or going for a walk. However, I do watch TV occasionally, especially in the evening after a busy day. I enjoy watching movies or news programs to relax and stay updated.",
+            "_id": "68f069e553b4655eba3f22d2"
+          },
+          {
+            "content": "Why is free time important?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/4.png",
+            "suggestion": "Free time is important because it allows us to relax and recharge. After working or studying, it's essential to have time to do things we enjoy. This helps reduce stress and keeps us happy. It also gives us a chance to spend time with family or friends, which strengthens relationships. In short, free time helps maintain a healthy balance in life.",
+            "_id": "68f069e553b4655eba3f22d3"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/4.png"
+        ],
+        "_id": "68f069e553b4655eba3f22d0"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5d60c53b4655eba3f0f0c",
+    "createdAt": "2025-10-08T03:10:04.012Z",
+    "updatedAt": "2026-06-17T09:38:04.055Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5d68853b4655eba3f0f15",
+    "title": "Topic 5",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 5",
+        "content": "Topic 5",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/5.png",
+            "suggestion": "In this picture, I can see three people. I guess they are members of a family including father, mom and daughter. They are lying down on grass and reading a book. The girl is about 6-8 years old. They seem to be very happy to read the book together. Based on the background, maybe the picture is taken in a park. It seems that they are enjoying their free time.",
+            "_id": "68f06a0e53b4655eba3f22f7"
+          },
+          {
+            "content": "What do you usually read?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/5.png",
+            "suggestion": "Some kinds of books that I would prefer to read are romance novels, history books or science fiction books. During the holiday, science fiction is my favorite choice, such as exploring time travel, space travel, and future scientific and technological advances. I can sit and read these books for hours without getting bored, it not only expands my horizons and improves my mental health but also helps me to let my hair down after a hard working day.",
+            "_id": "68f06a0e53b4655eba3f22f8"
+          },
+          {
+            "content": "Why is reading important for children?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/5.png",
+            "suggestion": "I suppose that reading brings many benefits to children, especially for children's thinking and perception. Reading allows them to develop a better imagination and get more life information. When you start reading aloud to your child, you are basically giving them background information about the world, which helps them make sense of what they see, hear and read. In addition, I think reading is also good for children's health because it helps them limit their exposure to electronic devices.",
+            "_id": "68f06a0e53b4655eba3f22f9"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/5.png"
+        ],
+        "_id": "68f06a0e53b4655eba3f22f6"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5d68853b4655eba3f0f1a",
+    "createdAt": "2025-10-08T03:12:08.089Z",
+    "updatedAt": "2026-06-17T09:38:04.100Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5dafe53b4655eba3f0f4d",
+    "title": "Topic 6",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 6",
+        "content": "Topic 6",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/6.png",
+            "suggestion": "Looking at this picture, I see a mother and her child and the mother is carrying her child. They are looking very cheerful and full of energy. I guess that they are at the zoo or the park. Looking at the background, I can see a lot of trees and mountains. I see that the weather is very beautiful and lovely.",
+            "_id": "68f0973953b4655eba3f245f"
+          },
+          {
+            "content": "When was the last time you visited a new place?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/6.png",
+            "suggestion": "The last time I explored a new place was about a month ago. I visited a charming little town in the countryside. The main square was surrounded by quaint cafes and historic buildings, creating a picturesque setting. I spent the day wandering through cobblestone streets, discovering local shops, and indulging in regional cuisine. The highlight was stumbling upon a hidden garden with vibrant flowers and a peaceful atmosphere. It was a refreshing experience, and I enjoyed the blend of history, culture, and nature in that new locale. Exploring unfamiliar places always brings a sense of adventure and discovery.",
+            "_id": "68f0973953b4655eba3f2460"
+          },
+          {
+            "content": "Why do people like to go to new places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/6.png",
+            "suggestion": "People are drawn to new places for various reasons. The desire for adventure and exploration motivates individuals to discover different cultures, landscapes, and cuisines. Traveling to unfamiliar destinations provides a break from routine, fostering personal growth and creating lasting memories. It satisfies the innate curiosity to learn and experience new things. Whether it's the thrill of discovery, relaxation in a novel environment, or the chance to broaden one's perspectives, the allure of new places lies in the diverse and enriching experiences they offer.",
+            "_id": "68f0973953b4655eba3f2461"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/6.png"
+        ],
+        "_id": "68f0973953b4655eba3f245e"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5dafe53b4655eba3f0f52",
+    "createdAt": "2025-10-08T03:31:10.212Z",
+    "updatedAt": "2026-06-17T09:38:04.285Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5db8653b4655eba3f0f5b",
+    "title": "Topic 7",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 7",
+        "content": "Topic 7",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/7.png",
+            "suggestion": "In this photo, I see a man and a woman in an apartment or a living room, where there are many storage boxes surrounding them. The couple is doing the housework. The man in white T-shirt and blue jeans is sweeping the floor. He seems to be happy to do that. The woman is collecting some bottles of beer and putting them in a plastic bag. She looks so tired and uncomfortable.",
+            "_id": "68f0976c53b4655eba3f2485"
+          },
+          {
+            "content": "Describe the last time you did some physical work.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/7.png",
+            "suggestion": "The last time I did physical work was about a month ago. It's Tet. Everyone has a custom of cleaning the house before the Tet festival and so does my family. I had to sweep and clean 2 floors and besides, my mother and I had to clean and rearrange the cupboard, bookshelves and 2 wardrobes. The last days of the year are always the busiest, when everything had to be completed and the house also needed decorating. Although those are very tiring and heavy tasks, I found that they helped to strengthen the bonds between family members because we could create many unforgettable times with each other.",
+            "_id": "68f0976c53b4655eba3f2486"
+          },
+          {
+            "content": "Do you think machines will do all our hard work in the future? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/7.png",
+            "suggestion": "In my opinion, I don't think that machines can replace humans. Although many labor-saving devices have proved to be very useful in helping us save time and effort when doing housework such as washing the dishes, doing the laundry or vacuuming, I still believe that only humans can do non-standardized tasks. Robots are good at repetitive tasks but lousy at dealing with varied and unique situations. Machines make human skills more important. So, rather than undermining humans, we are much better off thinking hard about how to up skill ourselves and learn how to work.",
+            "_id": "68f0976c53b4655eba3f2487"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/7.png"
+        ],
+        "_id": "68f0976c53b4655eba3f2484"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5db8653b4655eba3f0f60",
+    "createdAt": "2025-10-08T03:33:26.620Z",
+    "updatedAt": "2026-06-17T09:38:04.328Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5e2ae53b4655eba3f0fde",
+    "title": "Topic 8",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 8",
+        "content": "Topic 8",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/8.png",
+            "suggestion": "Looking at the picture, I can see 4 people, including 2 men and 2 women discussing with each other in an office. There is a man in a gray vest, standing and pointing at a white board. The walls are all painted white. On the table, there are many cups of tea and coffee and some laptops as well. They all seem to be very concentrated, energetic and enthusiastic about their job. I guess this is a big and important project",
+            "_id": "68f09a2753b4655eba3f2523"
+          },
+          {
+            "content": "Tell us about the time you give a presentation. How did you feel?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/8.png",
+            "suggestion": "The last time I spoke in public was when I had to make a presentation about the benefits of nature. It was a project which was held by my club with the aim of raising public awareness about the environment and the measures to protect our nature. At first I was extremely nervous and scared. However I made sure that I knew what I wanted to say and I became more confident. I felt happy that I overcame my fear.",
+            "_id": "68f09a2753b4655eba3f2524"
+          },
+          {
+            "content": "Why are people scared of public speaking?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/8.png",
+            "suggestion": "There are many reasons why people become afraid when having to speak in public. First of all, public speaking is an art that requires lots of courage, confidence and will-power. Most people lack this skill because of its challenging type of nature. Besides, people are afraid of public speaking because the look of a lot of people may make them feel shy and unable to express their feelings and their thoughts.",
+            "_id": "68f09a2753b4655eba3f2525"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/8.png"
+        ],
+        "_id": "68f09a2753b4655eba3f2522"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5e2ae53b4655eba3f0fe3",
+    "createdAt": "2025-10-08T04:03:58.755Z",
+    "updatedAt": "2026-06-17T09:38:04.467Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5e3e653b4655eba3f1008",
+    "title": "Topic 9",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 9",
+        "content": "Topic 9",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/9.png",
+            "suggestion": "This picture feels so dreamy. A girl is chilling on a yacht, soaking in the view of the open sea. She's probably feeling the cool breeze in her hair while watching the waves sparkle under the sun. The vibe is super calm, like she's just enjoying a peaceful moment far away from all the noise. Behind her, the ocean stretches endlessly, blending into the horizon where the sky shows off some gorgeous colors. It's the kind of scene that makes you wanna be there too.",
+            "_id": "68f09ba453b4655eba3f260a"
+          },
+          {
+            "content": "Tell us the last time you went to the sea?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/9.png",
+            "suggestion": "The last time I went to the sea was about six months ago. I visited a beautiful coastal town with my family. We spent the day on the beach, enjoying the warm sun and refreshing breeze. We swam in the crystal-clear water and collected shells along the shore. In the evening, we watched the sunset over the ocean, which was absolutely breathtaking. It was a relaxing and memorable experience that I will always cherish.",
+            "_id": "68f09ba453b4655eba3f260b"
+          },
+          {
+            "content": "Why do some people dislike going to the sea?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/9.png",
+            "suggestion": "Not everyone enjoys going to the sea, and there are several reasons for this. Some people are afraid of deep water or cannot swim, which makes them feel unsafe near the ocean. Others dislike the feel of sand on their skin or in their clothes, as it can be quite uncomfortable. The strong sun at the beach can also cause sunburn, which is painful and unpleasant. Additionally, some people simply prefer quieter environments, like the mountains or forests, and find the noise and crowds at the beach overwhelming.",
+            "_id": "68f09ba453b4655eba3f260c"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/9.png"
+        ],
+        "_id": "68f09ba453b4655eba3f2609"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5e3e653b4655eba3f100d",
+    "createdAt": "2025-10-08T04:09:10.666Z",
+    "updatedAt": "2026-06-17T09:38:04.559Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0a60753b4655eba3f27f5",
+    "title": "Topic 10",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 10",
+        "content": "Topic 10",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/10.png",
+            "suggestion": "There's a guy standing confidently on a ship, rocking a sharp suit that screams elegance and style. Maybe he's a businessman, or perhaps he's just someone who knows how to enjoy life luxuriously. He's got this cool, composed vibe, with one hand casually resting on the railing as he gazes out at the open sea. The sunlight reflects off the water, creating a crisp and clean backdrop that makes him look even more refined. It's like a scene straight out of a movie or a luxury lifestyle ad—total power vibes!",
+            "_id": "68f0a60753b4655eba3f27f7"
+          },
+          {
+            "content": "Tell me about the last time you used public transport",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/10.png",
+            "suggestion": "The last time I used public transport was just a few days ago. I took the metro to meet a friend in the city. It was a pretty smooth ride, actually. The train was fairly crowded, but it was still faster than driving because I didn't have to deal with traffic or finding parking. Plus, it was nice not having to worry about the stress of navigating through the city, so I just put on some music and relaxed. I actually enjoy using public transport when it's easy and convenient!",
+            "_id": "68f0a60753b4655eba3f27f8"
+          },
+          {
+            "content": "How can we increase the number of people using public transport?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/10.png",
+            "suggestion": "To get more people using public transport, we could make it more convenient and reliable. This means better schedules, faster routes, and more frequent services. Also, making it cheaper or offering discounts might encourage people who usually drive to switch. Lastly, improving the overall experience—like cleaner buses, better seats, and free Wi-Fi—could make a big difference!",
+            "_id": "68f0a60753b4655eba3f27f9"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/10.png"
+        ],
+        "_id": "68f0a60753b4655eba3f27f6"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0a60753b4655eba3f27fa",
+    "createdAt": "2025-10-16T08:00:07.534Z",
+    "updatedAt": "2026-06-17T09:38:05.053Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0bea153b4655eba3f28d6",
+    "title": "Topic 11",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 11",
+        "content": "Topic 11",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/11.png",
+            "suggestion": "Looking at this picture I can see that there are many people. They wear basic clothes and they know how to combine clothes to create the most beautiful outfits. They were laughing and talking happily so I guess they were friends. Looking at the background I can see soft drinks, popcorn and sofas so they are in a movie theater. It reminds me of a memory with my friend when we were in college. This picture is very beautiful and I think it was taken by a professional photographer.",
+            "_id": "68f0bea153b4655eba3f28d8"
+          },
+          {
+            "content": "Tell me about a time you laughed a lot.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/11.png",
+            "suggestion": "One time I laughed so much was during a camping trip with some friends. We were sitting around the campfire, telling stories, and someone started doing impressions of famous celebrities, but in the most random situations. At one point, they did a dramatic reading of a cereal box as if it was Shakespeare, and we all lost it. We couldn't stop laughing for like 20 minutes, even though it was just so silly.",
+            "_id": "68f0bea153b4655eba3f28d9"
+          },
+          {
+            "content": "Do you think people from different countries laugh at different things?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/11.png",
+            "suggestion": "Yeah, I definitely think people from different countries laugh at different things. Humor is so tied to culture and language. For example, in some cultures, wordplay and puns are huge, while in others, physical comedy or sarcasm might be more appreciated. Plus, the way people view social norms and taboos can change what's considered funny, so a joke that works in one place might totally miss the mark in another.",
+            "_id": "68f0bea153b4655eba3f28da"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/11.png"
+        ],
+        "_id": "68f0bea153b4655eba3f28d7"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0bea153b4655eba3f28db",
+    "createdAt": "2025-10-16T09:45:05.397Z",
+    "updatedAt": "2026-06-17T09:38:05.735Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0fbe053b4655eba3f2ac4",
+    "title": "Topic 12",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 12",
+        "content": "Topic 12",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/12.png",
+            "suggestion": "It's such a wholesome scene! There's a teacher guiding four kids as they work together to knead dough for baking. The kids are all focused, their hands covered in flour, laughing and enjoying the messy fun. The teacher looks patient and encouraging, showing them step-by-step how to work the dough. There's a sense of teamwork, creativity, and learning in the air. The table is filled with baking tools—bowls, rolling pins, and maybe some sprinkles waiting to be added. It's the kind of moment that's both educational and heartwarming, full of joy and life lessons.",
+            "_id": "68f0fbe053b4655eba3f2ac6"
+          },
+          {
+            "content": "How do people learn to cook in your culture",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/12.png",
+            "suggestion": "Most people learn cooking from family—parents or grandparents are the first teachers. They pass down traditional recipes, and it's usually a mix of watching, helping out, and eventually doing it yourself. Some learn by trial and error, experimenting with food at home. Nowadays, cooking shows, YouTube tutorials, and food blogs are super popular ways to pick up new skills or explore different cuisines. Schools sometimes offer cooking classes, too. It's a blend of tradition, curiosity, and adapting to modern resources.",
+            "_id": "68f0fbe053b4655eba3f2ac7"
+          },
+          {
+            "content": "Why is it important for people to learn how to cook for themselves?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/12.png",
+            "suggestion": "Knowing how to cook is such a key life skill. It helps you eat healthier, save money, and control what goes into your meals. Cooking gives you independence—you don't have to rely on takeout or someone else to feed you. Plus, it's creative and satisfying to make something with your own hands. It's also great for connecting with others; cooking for family or friends can be a way to bond and show love. And let's be real, being able to whip up a tasty meal feels pretty awesome!",
+            "_id": "68f0fbe053b4655eba3f2ac8"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/12.png"
+        ],
+        "_id": "68f0fbe053b4655eba3f2ac5"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0fbe053b4655eba3f2ac9",
+    "createdAt": "2025-10-16T14:06:24.268Z",
+    "updatedAt": "2026-06-17T09:38:05.602Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0ff6653b4655eba3f2b90",
+    "title": "Topic 13",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 13",
+        "content": "Topic 13",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/13.png",
+            "suggestion": "It's a heartwarming moment—a father and his child riding bicycles together. The dad leads the way, glancing back with a big smile to check on the little one, who's pedaling along enthusiastically on a smaller bike. They're probably in a park or along a quiet path, surrounded by trees and sunlight filtering through the leaves. The child looks happy and determined, and the dad's body language is full of encouragement and pride. It's one of those simple yet meaningful moments of bonding, where it's all about spending quality time together.",
+            "_id": "68f0ffc453b4655eba3f2bb2"
+          },
+          {
+            "content": "In your country, do parents care about their children?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/13.png",
+            "suggestion": "Absolutely! Parents in my country put a lot of love and effort into raising their kids. They're involved in their education, health, and hobbies, always wanting what's best for them. It's common for parents to sacrifice their own needs to provide better opportunities for their children. They're also big on teaching life values, like respect and responsibility. And while every family is different, the idea of nurturing and protecting kids is a universal priority.",
+            "_id": "68f0ffc453b4655eba3f2bb3"
+          },
+          {
+            "content": "Why do parents care about their children?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/13.png",
+            "suggestion": "Parents care because their children are a part of them—there's a natural instinct to protect, nurture, and help them grow. They want to see their kids happy, healthy, and successful in life. It's also about love; there's this deep emotional bond that makes parents want to give their kids the best they can. Beyond that, many parents see raising their children well as a way to contribute positively to the future. It's rewarding for them to watch their kids thrive and become their own unique individuals.",
+            "_id": "68f0ffc453b4655eba3f2bb4"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/13.png"
+        ],
+        "_id": "68f0ffc453b4655eba3f2bb1"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0ff6653b4655eba3f2b95",
+    "createdAt": "2025-10-16T14:21:26.305Z",
+    "updatedAt": "2026-06-17T09:38:05.558Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5d4a953b4655eba3f0ef9",
+    "title": "Topic 14",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 14",
+        "content": "Topic 14",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/14.png",
+            "suggestion": "In this picture, I can see a big yellow school bus. There are some children. They are about to take the bus home. I think they are going home because they are in a line. There are six students. They look young, maybe primary school. It's a sunny day.",
+            "_id": "68f0fc5f53b4655eba3f2b01"
+          },
+          {
+            "content": "How do children go to school in your country?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/14.png",
+            "suggestion": "In my country, some children go to school by bus, some children go by car (with their parents or with a private driver), and some children walk to school. If the children live near the school, they walk. If the children live far away, they go by car or bus.",
+            "_id": "68f0fc5f53b4655eba3f2b02"
+          },
+          {
+            "content": "Is it common to live far from school in your country? Why?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/14.png",
+            "suggestion": "It is not common to live far from school in my country because there are many schools, so I don't have to travel far to find a school. There are private schools and public schools in my country. The schools are not far from the houses. Also, the schools check where the parents live. The parents should live near the school.",
+            "_id": "68f0fc5f53b4655eba3f2b03"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/14.png"
+        ],
+        "_id": "68f0fc5f53b4655eba3f2b00"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5d4a953b4655eba3f0efe",
+    "createdAt": "2025-10-08T03:04:09.739Z",
+    "updatedAt": "2026-06-17T09:38:04.013Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5d89b53b4655eba3f0f31",
+    "title": "Topic 15",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 15",
+        "content": "Topic 15",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/15.png",
+            "suggestion": "In this picture, I can see a man dancing. He's wearing yellow pants and a yellow shirt. He's wearing a cap too. He's moving his arms and legs. He looks very happy. Maybe he's listening to music. You cannot dance without music.",
+            "_id": "68f07aa953b4655eba3f2387"
+          },
+          {
+            "content": "Do you like dancing? Why? Why not?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/15.png",
+            "suggestion": "No, I don't like dancing. There are many reasons why I don't like dancing. I don't like dancing because I don't like listening to music, I don't think I'm good at dancing, and I don't know how to dance.",
+            "_id": "68f07aa953b4655eba3f2388"
+          },
+          {
+            "content": "On what occasions do people usually dance in your country?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/15.png",
+            "suggestion": "People usually dance in my country at weddings and other celebrations like birthdays. Everyone in the family dances together. Dancing is an important part of the party. When I dance with my friends and family, I feel very happy. I like dancing.",
+            "_id": "68f07aa953b4655eba3f2389"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/15.png"
+        ],
+        "_id": "68f07aa953b4655eba3f2386"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5d89b53b4655eba3f0f36",
+    "createdAt": "2025-10-08T03:20:59.440Z",
+    "updatedAt": "2026-06-17T09:38:04.194Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5e33853b4655eba3f0fec",
+    "title": "Topic 16",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 16",
+        "content": "Topic 16",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/16.png",
+            "suggestion": "In this picture, I can see a group of people in a big garden. It looks like a family. There are some children. There is a girl at the front. She is playing with a hoola hoop. There are two boys. They're playing with a hoola hoop too. The girl is wearing a white dress. The boy on the left is wearing a green shirt and pants. The boy on the right is wearing a blue shirt and shorts. They look happy.",
+            "_id": "68f0a3f853b4655eba3f2773"
+          },
+          {
+            "content": "Tell me about a game you played when you were a child.",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/16.png",
+            "suggestion": "When I was a child I played with a Playstation. I played a game called Crash. It was a very popular game. The game has an animal. He must jump and kick. To win the game you must eat the apples. It was a fun game.",
+            "_id": "68f0a3f853b4655eba3f2774"
+          },
+          {
+            "content": "How have the children's games changed in the last 50 years?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/16.png",
+            "suggestion": "In the last 50 years, children's games have changed a lot. In the past children played mostly outside. They played games like football or they played with toys. They didn't have phones or tablets. Nowadays children play inside a lot. They play games like Playstation games or they play games on their phones. I think it's not good for them to play inside so much.",
+            "_id": "68f0a3f853b4655eba3f2775"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/16.png"
+        ],
+        "_id": "68f0a3f853b4655eba3f2772"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5e33853b4655eba3f0ff1",
+    "createdAt": "2025-10-08T04:06:16.526Z",
+    "updatedAt": "2026-06-17T09:38:04.516Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5e46153b4655eba3f1016",
+    "title": "Topic 17",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 17",
+        "content": "Topic 17",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/17.png",
+            "suggestion": "It's an interesting picture. In this picture, I can see a man reading a newspaper. He's wearing a black suit and a blue tie. He looks about 30 years old. He has short brown hair. Behind him, there are many televisions. The TVs are showing some programs. I think they're news programs. The TVs are a little old now.",
+            "_id": "68f09c4753b4655eba3f2630"
+          },
+          {
+            "content": "How do most people in your country learn about world news?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/17.png",
+            "suggestion": "In my country, there are many ways to learn about world news. You can watch or read the news online, you can read a newspaper, and you can listen to the radio. I think the most popular way of receiving news is online. There are many websites, but you can also get news through social media like Twitter and Facebook. It's very convenient for me.",
+            "_id": "68f09c4753b4655eba3f2631"
+          },
+          {
+            "content": "How has the reporting of news changed in the last fifty years?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/17.png",
+            "suggestion": "50 years ago the news was reported by radio. People didn't have the internet and not many people had TVs. Radio was very important 50 years ago worldwide. People could listen to the radio at home, in their cars, or in the restaurant.",
+            "_id": "68f09c4753b4655eba3f2632"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/17.png"
+        ],
+        "_id": "68f09c4753b4655eba3f262f"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5e46153b4655eba3f101b",
+    "createdAt": "2025-10-08T04:11:13.068Z",
+    "updatedAt": "2026-06-17T09:38:04.604Z",
+    "__v": 0
+  },
+  {
+    "_id": "68ea011253b4655eba3f1710",
+    "title": "Topic 18",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 18",
+        "content": "Topic 18",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/18.png",
+            "suggestion": "Five men are climbing a rugged mountain, working together to reach the top. They're dressed in proper gear—hiking boots, backpacks, and jackets—ready to face the challenges of nature. The trail looks steep and rocky, but they seem determined, helping each other along the way. The background is stunning, with towering peaks and a clear blue sky that makes the scene feel adventurous and inspiring. It's a picture of teamwork, resilience, and the thrill of conquering challenges in the great outdoors.",
+            "_id": "68f0650453b4655eba3f21b5"
+          },
+          {
+            "content": "Do you like to climb mountains?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/18.png",
+            "suggestion": "Yes, I enjoy climbing mountains very much. There is something special about the challenge of reaching the top. The physical effort makes you feel strong and determined. When you finally reach the summit, the view is absolutely breathtaking and it makes all the hard work worthwhile. Climbing also allows you to connect with nature and enjoy the fresh mountain air. I find it very peaceful and refreshing.",
+            "_id": "68f0650453b4655eba3f21b6"
+          },
+          {
+            "content": "Do you think outdoor activities are important?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/18.png",
+            "suggestion": "Definitely! Outdoor activities are great for both physical and mental health. They get you moving, help you stay fit, and reduce stress. Being outside also connects you to nature, which can be super calming and refreshing. Activities like hiking, biking, or even just walking are perfect for recharging and breaking away from screens and routines. They're also great for bonding with friends or family and learning new skills like teamwork or resilience. It's all about balance, and outdoor time is a big part of that!",
+            "_id": "68f0650453b4655eba3f21b7"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/18.png"
+        ],
+        "_id": "68f0650453b4655eba3f21b4"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68ea011253b4655eba3f1715",
+    "createdAt": "2025-10-11T07:02:42.335Z",
+    "updatedAt": "2026-06-17T09:38:04.782Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0a49553b4655eba3f27cb",
+    "title": "Topic 19",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 19",
+        "content": "Topic 19",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/19.png",
+            "suggestion": "A family is gathered in a cozy living room, radiating warmth and happiness. The parents sit on a comfortable couch, smiling as their children play on the soft rug in front of them. The room is inviting, with a few toys scattered around, a coffee table with a book or two, and perhaps a family photo hanging on the wall. The kids are laughing, completely immersed in a game or activity, while the parents look relaxed and engaged. It's a scene full of love, connection, and the simple joy of being together at home.",
+            "_id": "68f0a49553b4655eba3f27cd"
+          },
+          {
+            "content": "Why is it important to play with children?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/19.png",
+            "suggestion": "Playing with kids isn't just fun—it's how they learn and grow! It helps them develop social, emotional, and problem-solving skills while creating a strong bond with their parents. When parents play, it shows kids they're valued, boosting their confidence and happiness. It also opens up communication, making it easier for kids to share their thoughts and feelings. Plus, playtime is a chance to create happy memories that stick with children for life.",
+            "_id": "68f0a49553b4655eba3f27ce"
+          },
+          {
+            "content": "How should parents spend time together with their children?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/19.png",
+            "suggestion": "Parents should spend quality time doing activities their kids enjoy, like playing games, reading, or doing crafts. Outdoor adventures, like a trip to the park or a nature walk, are great for bonding. Mealtimes are also perfect for connecting—talking about everyone's day over dinner. Even simple things, like helping with homework or cooking together, can create meaningful moments. The key is being present and giving kids undivided attention, making them feel loved and important.",
+            "_id": "68f0a49553b4655eba3f27cf"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/19.png"
+        ],
+        "_id": "68f0a49553b4655eba3f27cc"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0a49553b4655eba3f27d0",
+    "createdAt": "2025-10-16T07:53:57.075Z",
+    "updatedAt": "2026-06-17T09:38:04.922Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0b73b53b4655eba3f2834",
+    "title": "Topic 20",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 20",
+        "content": "Topic 20",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/20.png",
+            "suggestion": "A heartwarming moment of a mother and her baby riding a horse together. The baby, securely seated in front, looks wide-eyed and excited, while the mother holds the reins confidently, ensuring safety. They're likely in a peaceful countryside setting, surrounded by green fields and a clear sky. The horse is calm and steady, as if it understands the precious cargo it's carrying. The scene radiates love, trust, and the joy of introducing a child to the beauty of nature and animals.",
+            "_id": "68f0b73b53b4655eba3f2836"
+          },
+          {
+            "content": "Tell me about an animal that you like?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/20.png",
+            "suggestion": "I really like dogs! They're loyal, friendly, and always bring positive energy. They're also super smart and can learn all kinds of tricks or tasks. What's great about dogs is how they adapt to their owners—some are playful, while others are more protective or calm. Plus, they're always excited to see you, no matter what kind of day you've had. If I had a dog, I'd imagine it being my perfect adventure buddy.",
+            "_id": "68f0b73b53b4655eba3f2837"
+          },
+          {
+            "content": "How important are animals in our lives?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/20.png",
+            "suggestion": "Animals are incredibly important! They provide companionship, like pets that make us feel loved and less lonely. In nature, they're vital to ecosystems, helping maintain balance by pollinating plants or controlling populations. Some animals, like horses or dogs, help us work, while others give us food or materials. Beyond that, animals teach us empathy and responsibility, especially when we care for them. They remind us how connected we are to the world around us.",
+            "_id": "68f0b73b53b4655eba3f2838"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/20.png"
+        ],
+        "_id": "68f0b73b53b4655eba3f2835"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0b73b53b4655eba3f2839",
+    "createdAt": "2025-10-16T09:13:31.555Z",
+    "updatedAt": "2026-06-17T09:38:05.141Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0bb4b53b4655eba3f2890",
+    "title": "Topic 21",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 21",
+        "content": "Topic 21",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/21.png",
+            "suggestion": "In this picture, I see a father and his son. They are wearing different colored casual clothes. I could tell they were having fun playing soccer on a grass field. It looks like they are very on cloud nine and full of energy. Looking at the background, I can see a lot of trees. In this picture, I can tell that the weather is very lovely and gorgeous.",
+            "_id": "68f0bb4b53b4655eba3f2892"
+          },
+          {
+            "content": "What are the benefits of outdoor activities?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/21.png",
+            "suggestion": "Outdoor activities have many advantages. They keep you physically healthy by promoting exercise and fresh air, which helps your heart and lungs. They also boost mental well-being, reducing stress and lifting your mood. Being in nature creates a sense of connection to the environment and encourages social interactions. Lastly, outdoor activities help develop skills like teamwork and problem-solving. In summary, they're good for your physical health, mental happiness, social connections, and skill-building.",
+            "_id": "68f0bb4b53b4655eba3f2893"
+          },
+          {
+            "content": "Why do many people like outdoor activities?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/21.png",
+            "suggestion": "Many people enjoy outdoor activities for various reasons. Firstly, being outdoors allows them to connect with nature and enjoy the fresh air. Outdoor activities like hiking or biking provide opportunities for exercise, promoting physical health. Additionally, outdoor settings often reduce stress and improve overall well-being. The natural environment offers a break from daily routines, fostering a sense of relaxation. Moreover, outdoor activities can be a social experience, providing opportunities to spend time with friends and family. Overall, people appreciate outdoor activities for their physical, mental, and social benefits.",
+            "_id": "68f0bb4b53b4655eba3f2894"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/21.png"
+        ],
+        "_id": "68f0bb4b53b4655eba3f2891"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0bb4b53b4655eba3f2895",
+    "createdAt": "2025-10-16T09:30:51.313Z",
+    "updatedAt": "2026-06-17T09:38:05.966Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0bc2f53b4655eba3f289e",
+    "title": "Topic 22",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 22",
+        "content": "Topic 22",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/22.png",
+            "suggestion": "A father and child are in the kitchen, cooking together. The dad is wearing an apron, focused on chopping vegetables or stirring a pot, while the child excitedly helps, maybe holding a spoon or mixing something in a bowl. The kitchen is warm and lively, with ingredients and utensils neatly laid out. The child looks curious and happy, learning and bonding with their dad through this simple activity. It's a moment filled with love, teamwork, and the joy of creating something together.",
+            "_id": "68f0bc2f53b4655eba3f28a0"
+          },
+          {
+            "content": "In your country, do parents care about their children?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/22.png",
+            "suggestion": "Yes, parents care deeply about their children. They invest time and energy into ensuring their kids grow up happy, healthy, and successful. From helping with homework to preparing meals and guiding them through life's challenges, parents prioritize their children's well-being. It's common for parents to make sacrifices, like working extra hours or giving up personal comforts, to provide better opportunities for their kids. They also celebrate their children's achievements, big or small, showing constant support and love.",
+            "_id": "68f0bc2f53b4655eba3f28a1"
+          },
+          {
+            "content": "Why do parents care about their children?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/22.png",
+            "suggestion": "Parents care for their children because of the deep emotional connection and instinct to protect and nurture them. They see their kids as a reflection of themselves and want to help them succeed and thrive in life. Caring is also a way to pass down values, traditions, and skills. Beyond biology, it's about love and responsibility—parents feel fulfilled when they see their children happy, confident, and ready to face the world.",
+            "_id": "68f0bc2f53b4655eba3f28a2"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/22.png"
+        ],
+        "_id": "68f0bc2f53b4655eba3f289f"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0bc2f53b4655eba3f28a3",
+    "createdAt": "2025-10-16T09:34:39.965Z",
+    "updatedAt": "2026-06-17T09:38:05.920Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0bd0253b4655eba3f28ba",
+    "title": "Topic 23",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 23",
+        "content": "Topic 23",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/23.png",
+            "suggestion": "A young woman is walking through a supermarket, pushing a cart filled with groceries. She's casually dressed, with a shopping list in hand, navigating the aisles with focus. The shelves are neatly stocked with a variety of food and household items, and she seems to be in the process of picking out the essentials. The store is bright and bustling, filled with other shoppers picking out products. It's a typical scene of everyday life, where people go about their errands, making choices about what to buy.",
+            "_id": "68f0bd0253b4655eba3f28bc"
+          },
+          {
+            "content": "Tell me the time you shopped in a local store?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/23.png",
+            "suggestion": "The last time I shopped in a local store was just last week. I went to a nearby market to buy fresh vegetables and fruits for cooking. The market was lively, with vendors calling out their prices and displaying colorful produce. I enjoyed the experience of picking fresh items and even discovered some local specialties I hadn't tried before. It felt very personal and connected compared to shopping in a large supermarket.",
+            "_id": "68f0bd0253b4655eba3f28bd"
+          },
+          {
+            "content": "Nowadays, why do people like shopping online?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/23.png",
+            "suggestion": "Online shopping has become super popular because it's so convenient. People can shop anytime, anywhere, without leaving their homes, which saves time and effort. It's also easy to compare prices and find exactly what you're looking for with just a few clicks. There are tons of options, and many sites offer fast delivery or even same-day shipping. Plus, you can read reviews to make informed choices before buying. It's a huge time-saver, especially for busy people!",
+            "_id": "68f0bd0253b4655eba3f28be"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/23.png"
+        ],
+        "_id": "68f0bd0253b4655eba3f28bb"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0bd0253b4655eba3f28bf",
+    "createdAt": "2025-10-16T09:38:10.390Z",
+    "updatedAt": "2026-06-17T09:38:05.825Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f0fa1f53b4655eba3f2a01",
+    "title": "Topic 24",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 24",
+        "content": "Topic 24",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/24.png",
+            "suggestion": "In this image, a person is being interviewed, likely sitting across from someone with a microphone or recording device. The setting could be in an office, a studio, or another professional environment. The person being interviewed is looking attentive and engaged, while the interviewer is asking questions, maybe taking notes or making eye contact. There may be a camera or some equipment in the background, showing it's a formal interview. The overall vibe is one of communication, information exchange, and professional interaction.",
+            "_id": "68f0fa1f53b4655eba3f2a03"
+          },
+          {
+            "content": "Do you prefer reading newspapers or watching news?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/24.png",
+            "suggestion": "Personally, I prefer watching the news on TV or online. I find it more engaging because I can see and hear the stories rather than just reading about them. Watching the news feels more immediate and I can understand the events better through video footage and live coverage. However, I also read articles online when I want more detailed information about a specific topic. Both options are useful, but watching the news fits better into my daily routine.",
+            "_id": "68f0fa1f53b4655eba3f2a04"
+          },
+          {
+            "content": "Why do people need to watch the news?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/24.png",
+            "suggestion": "Watching the news is important because it keeps people informed about what's going on in the world. It provides updates on everything from politics and global events to weather and local issues. By staying informed, people can make better decisions in their personal and professional lives, stay aware of potential dangers, and engage in conversations about important topics. News also helps people understand different perspectives and can raise awareness on social or environmental issues, helping them make more conscious choices.",
+            "_id": "68f0fa1f53b4655eba3f2a05"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/24.png"
+        ],
+        "_id": "68f0fa1f53b4655eba3f2a02"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f0fa1f53b4655eba3f2a06",
+    "createdAt": "2025-10-16T13:58:55.245Z",
+    "updatedAt": "2026-06-17T09:38:05.692Z",
+    "__v": 0
+  },
+  {
+    "_id": "68f1014253b4655eba3f2c0b",
+    "title": "Topic 25",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 25",
+        "content": "Topic 25",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/25.png",
+            "suggestion": "In this picture, a crowd of people is walking across a busy street. Some are in a hurry, while others are strolling at a more relaxed pace. The street is filled with pedestrians, and in the background, you can see tall buildings, cars, and traffic lights. There's a sense of organized chaos—everyone moving in different directions, yet the flow of the crowd seems to be working despite the hustle and bustle. People are dressed in a mix of casual and work clothes, suggesting it's a busy time of day, like during a morning rush.",
+            "_id": "68f1014253b4655eba3f2c0d"
+          },
+          {
+            "content": "What do you think about living in a crowded city?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/25.png",
+            "suggestion": "Living in a crowded city can be exciting but also challenging. On one hand, there's so much to do—restaurants, events, cultural activities, and endless opportunities for socializing or networking. However, the noise, traffic, and lack of personal space can be overwhelming at times. Some people thrive in the fast-paced energy, while others might find it exhausting. It really depends on whether you enjoy the constant movement and convenience or prefer a slower, quieter lifestyle.",
+            "_id": "68f1014253b4655eba3f2c0e"
+          },
+          {
+            "content": "Why do many people hate crowded places?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/25.png",
+            "suggestion": "Many people dislike crowded places because they feel overwhelmed by the noise, the lack of personal space, and the constant movement around them. It can be hard to relax or focus when there are too many people, and the chaos can lead to feelings of stress or frustration. Additionally, crowded spaces can feel impersonal, and it can be difficult to enjoy an experience or even perform simple tasks like shopping or commuting when there are too many people around.",
+            "_id": "68f1014253b4655eba3f2c0f"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/25.png"
+        ],
+        "_id": "68f1014253b4655eba3f2c0c"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68f1014253b4655eba3f2c10",
+    "createdAt": "2025-10-16T14:29:22.219Z",
+    "updatedAt": "2026-06-17T09:38:05.511Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e4ef0353b4655eba3f0df4",
+    "title": "Topic 26",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 26",
+        "content": "Topic 26",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/26.png",
+            "suggestion": "In this picture, a woman is sitting comfortably on a bus, looking out the window, perhaps lost in thought or enjoying the view. She's dressed casually, with her bag by her side. The bus interior is typical—seats arranged in rows, with some space around her. The soft light coming through the window highlights the peacefulness of the moment. Other passengers can be seen, but the focus is on her, suggesting a moment of quiet reflection during a daily commute or a short trip.",
+            "_id": "68f064a553b4655eba3f2167"
+          },
+          {
+            "content": "When was the last time you went on vacation with someone else?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/26.png",
+            "suggestion": "The last time I went on vacation with someone else was about a year ago. I went with my close friends to the beach. It was a relaxing trip where we enjoyed swimming, sunbathing, and playing beach volleyball. We also visited some local restaurants and tried different types of food. It was a fun time because we were all able to relax and enjoy each other's company.",
+            "_id": "68f064a553b4655eba3f2168"
+          },
+          {
+            "content": "What are the benefits of hanging out with other people?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/26.png",
+            "suggestion": "Hanging out with others has a lot of benefits! It helps build strong social connections, which are important for emotional well-being. Spending time with friends or family can boost your mood, reduce stress, and provide support during tough times. It's also a great way to learn from others, try new things, and create fun memories. Being around people can even increase your sense of belonging and help you feel more connected to the world around you.",
+            "_id": "68f064a553b4655eba3f2169"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/26.png"
+        ],
+        "_id": "68f064a553b4655eba3f2166"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e4ef0353b4655eba3f0df9",
+    "createdAt": "2025-10-07T10:44:19.372Z",
+    "updatedAt": "2026-06-17T09:38:03.746Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5d96653b4655eba3f0f3f",
+    "title": "Topic 27",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 27",
+        "content": "Topic 27",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/27.png",
+            "suggestion": "As I can see in this picture, there are a girl and her mother. The girl is surprising her mother by covering her eyes with her hands, so her mother can't see the flowers. They both look very happy, and it seems like it might be Mother's Day or her mother's birthday.",
+            "_id": "68f096ec53b4655eba3f2413"
+          },
+          {
+            "content": "Tell me about a time you received or gave gifts?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/27.png",
+            "suggestion": "Last year, for my birthday, I received a special gift from a close friend. It was a handmade journal because they knew I liked writing. They wanted to help me organize my thoughts and ideas. It was such a thoughtful present, and it really touched me. It showed that they paid attention to what I enjoy. I still use it every day, and whenever I write in it, I remember them.",
+            "_id": "68f096ec53b4655eba3f2414"
+          },
+          {
+            "content": "On what occasions in your country do people give gifts?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/27.png",
+            "suggestion": "In my country, people give gifts for many reasons. The most common occasions are birthdays, weddings, and holidays. For example, during Tet (Lunar New Year), people often give gifts like fruits, cakes, or money in red envelopes to wish others good luck for the year. Gifts are also exchanged at weddings, anniversaries, or when visiting friends or family. It's a way of showing respect and good wishes. Even small gifts, like bringing something when visiting friends or family, are common.",
+            "_id": "68f096ec53b4655eba3f2415"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/27.png"
+        ],
+        "_id": "68f096ec53b4655eba3f2412"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5d96653b4655eba3f0f44",
+    "createdAt": "2025-10-08T03:24:22.210Z",
+    "updatedAt": "2026-06-17T09:38:04.241Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5dc8053b4655eba3f0f77",
+    "title": "Topic 28",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 28",
+        "content": "Topic 28",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/28.png",
+            "suggestion": "In this picture, a man is sitting at a desk, focused on writing a letter by hand. He holds a pen with careful attention, perhaps drafting a thoughtful message. The desk is organized, with a few stationery items, like an envelope and ink bottle, nearby. Soft light from a window or lamp illuminates the space, creating a peaceful, reflective atmosphere. The man's expression shows concentration, as he pours his thoughts onto the paper, adding a personal touch to his communication.",
+            "_id": "68f099c253b4655eba3f24d7"
+          },
+          {
+            "content": "Have you ever written a hand letter?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/28.png",
+            "suggestion": "Yes, I have written a hand letter before. I remember I wrote one to my best friend when she moved to another city. At that time, we didn't use email or social media very much, so writing a letter was the best way to share news. I told her about my school, my family, and the things we used to do together. I also decorated the envelope with some stickers. It felt more personal and special than sending a message on the phone. When I got her reply, I was very happy and kept it in a box. I think hand letters are a nice way to keep memories.",
+            "_id": "68f099c253b4655eba3f24d8"
+          },
+          {
+            "content": "Do you plan to write handwritten letters in the future?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/28.png",
+            "suggestion": "Yes, I do plan to write handwritten letters in the future. Although we can easily send messages or emails now, I think there's something special about receiving a hand letter. It's more personal, and it shows that you took time and effort to write it. I might write letters for special occasions like birthdays or holidays, or just to send a note to a close friend or family member. I believe handwritten letters can create meaningful memories, and they are a nice way to express feelings that might be hard to say in a text.",
+            "_id": "68f099c253b4655eba3f24d9"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/28.png"
+        ],
+        "_id": "68f099c253b4655eba3f24d6"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5dc8053b4655eba3f0f7c",
+    "createdAt": "2025-10-08T03:37:36.912Z",
+    "updatedAt": "2026-06-17T09:38:04.375Z",
+    "__v": 0
+  },
+  {
+    "_id": "68e5e63c53b4655eba3f104e",
+    "title": "Topic 29",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "",
+    "questions": [
+      {
+        "questionTitle": "Topic 29",
+        "content": "Topic 29",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/29.png",
+            "suggestion": "Looking at the picture, I can see a lot of people. They are wearing different casual clothes. It looks like they were at a museum or an art gallery and the paintings are very beautiful and profound. I can tell that they are looking very attentively at the paintings to evaluate them. I believe that they are on cloud nine and full of energy.",
+            "_id": "68e5e63c53b4655eba3f1050"
+          },
+          {
+            "content": "What are the benefits of viewing artworks?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/29.png",
+            "suggestion": "Viewing artworks has many benefits. First, it helps us to relax and reduce stress. When we look at beautiful paintings or sculptures, it can calm our minds and make us feel peaceful. Art also encourages creativity, as it can inspire new ideas or ways of thinking. Additionally, art allows us to learn about different cultures and histories, giving us a deeper understanding of the world. Lastly, viewing art can be an emotional experience, helping us connect with our feelings and express ourselves better.",
+            "_id": "68e5e63c53b4655eba3f1051"
+          },
+          {
+            "content": "Why do people like to go to art exhibitions?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/29.png",
+            "suggestion": "People like to go to art exhibitions for many reasons. First, it's a great way to experience new and unique artworks that they might not see anywhere else. Art exhibitions also provide an opportunity to learn more about different artists and their creative processes. For many people, visiting exhibitions is an enjoyable way to connect with art, which can be relaxing and inspiring. Additionally, exhibitions often have a special atmosphere that allows people to appreciate art in a quiet, focused environment. It's also a social activity, as people enjoy discussing their thoughts and feelings about the art with friends or other visitors.",
+            "_id": "68e5e63c53b4655eba3f1052"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/29.png"
+        ],
+        "_id": "68e5e63c53b4655eba3f104f"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68e5e63c53b4655eba3f1053",
+    "createdAt": "2025-10-08T04:19:08.723Z",
+    "updatedAt": "2026-06-17T09:38:04.690Z",
+    "__v": 0
+  },
+  {
+    "_id": "68eb768a53b4655eba3f18f3",
+    "title": "Topic 30",
+    "timeToDo": "1970-01-01T00:00:00.050Z",
+    "description": "không có sub title",
+    "questions": [
+      {
+        "questionTitle": "Topic 30",
+        "content": "Topic 30",
+        "answerList": [],
+        "correctAnswer": "",
+        "file": "",
+        "subQuestionAnswerList": [],
+        "suggestion": "",
+        "subQuestion": [
+          {
+            "content": "Describe the picture?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/30.png",
+            "suggestion": "The picture shows a group of women walking down a busy street. They are holding shopping bags and smiling happily. They are dressed nicely and look excited as they enjoy their shopping day. The street is full of people, and there are many shops with colorful windows. You can also see a café or two in the background. The atmosphere is lively, and everyone is enjoying the busy street. The women are talking and having fun as they walk.",
+            "_id": "68f0997353b4655eba3f24b1"
+          },
+          {
+            "content": "Tell me the last time you went shopping?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/30.png",
+            "suggestion": "The last time I went shopping was about a week ago. I needed to buy some clothes for an upcoming event. I went to a shopping mall near my house. It was a busy day, but I enjoyed it because I found a nice jacket that I really liked. I also bought a pair of shoes. After shopping, I went to a café to relax and have a drink.",
+            "_id": "68f0997353b4655eba3f24b2"
+          },
+          {
+            "content": "What is missing here?",
+            "correctAnswer": null,
+            "file": "",
+            "answerList": null,
+            "image": "https://aptiskey.com/images/speaking/part2/30.png",
+            "suggestion": "This is a placeholder answer since the text was truncated.",
+            "_id": "68f0997353b4655eba3f24b3"
+          }
+        ],
+        "isExample": "",
+        "image": [
+          "https://aptiskey.com/images/speaking/part2/30.png"
+        ],
+        "_id": "68f0997353b4655eba3f24b0"
+      }
+    ],
+    "questionPart": "TWO",
+    "questionType": "SPEAKING",
+    "id": "68eb768a53b4655eba3f18f8",
+    "createdAt": "2025-10-12T09:36:10.888Z",
+    "updatedAt": "2026-06-17T09:38:04.875Z",
+    "__v": 0
+  }
+]

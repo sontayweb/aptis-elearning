@@ -1,115 +1,105 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { api } from "@/lib/api-client";
 import {
   ShieldCheck,
-  ShieldAlert,
-  Users,
-  GraduationCap,
-  Sparkles,
   Search,
-  Check,
+  RotateCcw,
+  Save,
+  CheckCircle2,
+  Lock,
   ChevronRight,
   ChevronLeft,
   ChevronsRight,
   ChevronsLeft,
-  RotateCcw,
-  Save,
-  CheckCircle2,
-  FileCheck2,
-  Lock,
-  BookOpen,
-  PenTool,
-  CreditCard,
-  UserCheck,
-  Settings,
-  HelpCircle,
+  X,
   AlertCircle,
-  Eye,
-  Layers,
-  Filter,
+  CheckSquare,
+  Square,
+  Crown,
 } from "lucide-react";
 
 interface PermissionItem {
   id: string;
   code: string;
   name: string;
-  category: "EXAM" | "GRADING" | "CONTENT" | "PAYMENT" | "SECURITY" | "USER";
-  categoryName: string;
+  category: "EXAM" | "GRADING" | "PAYMENT" | "CONTENT" | "USER" | "SECURITY";
   description: string;
   isDangerous?: boolean;
 }
 
 interface RoleConfig {
   id: string;
-  code: string;
+  code: "SUPER_ADMIN" | "ADMIN" | "TEACHER" | "STUDENT";
   title: string;
+  subtitle: string;
   description: string;
-  icon: any;
-  color: string;
   memberCount: number;
   grantedIds: string[];
 }
 
+const CATEGORY_NAMES: Record<PermissionItem["category"], string> = {
+  EXAM: "Đề thi",
+  GRADING: "Chấm thi",
+  PAYMENT: "Tài chính",
+  CONTENT: "Học liệu",
+  USER: "Tài khoản",
+  SECURITY: "Bảo mật",
+};
+
 const ALL_PERMISSIONS: PermissionItem[] = [
-  // 1. ĐỀ THI & PHÒNG THI
+  // 1. Đề thi & Khảo thí
   {
     id: "p_exam_view",
     code: "EXAM:VIEW_ALL",
-    name: "Xem toàn bộ ngân hàng đề thi",
+    name: "Tra cứu thư viện đề thi",
     category: "EXAM",
-    categoryName: "Đề thi & Khảo thí",
-    description: "Tra cứu danh sách đề thi 4 kỹ năng, đề Key dự đoán và phòng thi thử.",
+    description: "Xem danh sách đề 4 kỹ năng, đề Key dự đoán và phòng thi thử.",
   },
   {
     id: "p_exam_create",
     code: "EXAM:CREATE_EDIT",
-    name: "Soạn thảo và sửa đề thi",
+    name: "Soạn thảo và chỉnh sửa đề thi",
     category: "EXAM",
-    categoryName: "Đề thi & Khảo thí",
-    description: "Tạo mới, chỉnh sửa nội dung part 1-4, audio, tranh ảnh và đáp án đề thi.",
+    description: "Tạo mới, chỉnh sửa nội dung part 1-4, audio, tranh ảnh và đáp án.",
   },
   {
     id: "p_exam_delete",
     code: "EXAM:DELETE",
     name: "Xóa & Ẩn đề thi khỏi thư viện",
     category: "EXAM",
-    categoryName: "Đề thi & Khảo thí",
     description: "Xóa hẳn đề hoặc chuyển trạng thái nháp không cho học viên làm bài.",
     isDangerous: true,
   },
   {
     id: "p_exam_room",
     code: "EXAM:CREATE_ROOM",
-    name: "Tạo phòng thi thử & phát mã PIN",
+    name: "Tổ chức phòng thi trực tuyến",
     category: "EXAM",
-    categoryName: "Đề thi & Khảo thí",
-    description: "Khởi tạo đợt thi thử trực tuyến 162 phút với thời gian bắt đầu đồng loạt.",
+    description: "Khởi tạo đợt thi thử 162 phút với thời gian bắt đầu đồng loạt và phát PIN.",
   },
   {
     id: "p_exam_prediction",
     code: "EXAM:PREDICTION_KEY",
-    name: "Quản lý Đề Key Dự Đoán VIP",
+    name: "Quản lý Đề Key dự đoán VIP",
     category: "EXAM",
-    categoryName: "Đề thi & Khảo thí",
-    description: "Cập nhật ngân hàng đề trúng tủ theo tuần và phân quyền truy cập VIP.",
+    description: "Cập nhật ngân hàng đề trúng tủ theo tuần và phân quyền truy cập học viên VIP.",
   },
 
-  // 2. CHẤM THI & GIẢNG DẠY
+  // 2. Chấm thi & Học vụ
   {
     id: "p_grade_queue",
     code: "GRADE:VIEW_QUEUE",
     name: "Xem hàng đợi bài nộp cần chấm",
     category: "GRADING",
-    categoryName: "Chấm thi & Học vụ",
-    description: "Xem danh sách bài thi Speaking & Writing đang chờ giáo viên đánh giá.",
+    description: "Xem danh sách bài Speaking & Writing học viên nộp đang chờ đánh giá.",
   },
   {
     id: "p_grade_evaluate",
     code: "GRADE:EVALUATE_SUBMISSION",
     name: "Chấm điểm Speaking & Writing",
     category: "GRADING",
-    categoryName: "Chấm thi & Học vụ",
     description: "Nghe audio thí sinh, chấm điểm rubric CEFR và gửi nhận xét chi tiết.",
   },
   {
@@ -117,25 +107,22 @@ const ALL_PERMISSIONS: PermissionItem[] = [
     code: "CLASS:MANAGE",
     name: "Tạo và quản lý lớp học",
     category: "GRADING",
-    categoryName: "Chấm thi & Học vụ",
-    description: "Tạo lớp, phát mã Class Code và quản lý học viên thuộc lớp.",
+    description: "Tạo lớp, phát mã Class Code và theo dõi sĩ số học viên trong lớp.",
   },
   {
     id: "p_student_progress",
     code: "CLASS:VIEW_STUDENT_SCORES",
-    name: "Xem bảng điểm học viên theo lớp",
+    name: "Xem bảng điểm và radar năng lực",
     category: "GRADING",
-    categoryName: "Chấm thi & Học vụ",
     description: "Xem radar 4 kỹ năng, lịch sử làm bài và tiến độ học tập của từng học viên.",
   },
 
-  // 3. TÀI CHÍNH & SEPAY
+  // 3. Tài chính & Thanh toán
   {
     id: "p_pay_view",
     code: "PAY:VIEW_TRANSACTIONS",
     name: "Xem lịch sử nạp tiền SePay",
     category: "PAYMENT",
-    categoryName: "Tài chính & Thanh toán",
     description: "Tra cứu sao kê VietQR MB Bank, trạng thái đơn hàng và mã giao dịch.",
   },
   {
@@ -143,7 +130,6 @@ const ALL_PERMISSIONS: PermissionItem[] = [
     code: "PAY:MANUAL_APPROVE",
     name: "Khớp lệnh & Duyệt nạp tiền thủ công",
     category: "PAYMENT",
-    categoryName: "Tài chính & Thanh toán",
     description: "Duyệt giao dịch cho trường hợp chuyển khoản sai cú pháp hoặc trễ webhook.",
     isDangerous: true,
   },
@@ -152,7 +138,6 @@ const ALL_PERMISSIONS: PermissionItem[] = [
     code: "PAY:REVENUE_REPORTS",
     name: "Xem báo cáo doanh thu tài chính",
     category: "PAYMENT",
-    categoryName: "Tài chính & Thanh toán",
     description: "Báo cáo tổng tiền thu, biểu đồ 7 ngày và số lượng gói VIP kích hoạt.",
   },
   {
@@ -160,128 +145,82 @@ const ALL_PERMISSIONS: PermissionItem[] = [
     code: "PAY:MANAGE_PLANS",
     name: "Cấu hình bảng giá gói cước VIP",
     category: "PAYMENT",
-    categoryName: "Tài chính & Thanh toán",
     description: "Thay đổi giá gói 30 ngày, 90 ngày, quyền lợi lượt chấm AI và giáo viên.",
   },
 
-  // 4. KHO NỘI DUNG & TỪ VỰNG
+  // 4. Nội dung & Tài nguyên
   {
     id: "p_vocab_manage",
     code: "CONTENT:VOCAB_MANAGE",
     name: "Quản lý 198 bộ từ vựng & Bulk Import",
     category: "CONTENT",
-    categoryName: "Nội dung & Tài nguyên",
     description: "Thêm sửa bộ từ vựng, phiên âm IPA, nghĩa tiếng Việt và ví dụ câu.",
   },
   {
     id: "p_dict_manage",
     code: "CONTENT:DICTATION_MANAGE",
-    name: "Quản lý bài Nghe chép chính tả",
+    name: "Quản lý bài nghe chép chính tả",
     category: "CONTENT",
-    categoryName: "Nội dung & Tài nguyên",
-    description: "Quản lý 3 Level (Foundation, Momentum, Mastery) và file audio luyện chép.",
+    description: "Biên tập đoạn audio cắt nhỏ theo mốc thời gian và đáp án chuẩn transcript.",
   },
   {
-    id: "p_review_moderate",
-    code: "CONTENT:MODERATE_REVIEWS",
-    name: "Kiểm duyệt Đánh giá & Bảng Kỳ Tích",
+    id: "p_hall_of_fame",
+    code: "CONTENT:HALL_OF_FAME",
+    name: "Quản lý Bảng Vàng vinh danh",
     category: "CONTENT",
-    categoryName: "Nội dung & Tài nguyên",
-    description: "Duyệt hiển thị feedback học viên lên trang chủ và vinh danh điểm cao.",
+    description: "Duyệt học viên đạt điểm cao B1/B2/C hiển thị trang chủ vinh danh.",
+  },
+  {
+    id: "p_blog_tips",
+    code: "CONTENT:BLOG_TIPS",
+    name: "Đăng bài viết chia sẻ kinh nghiệm Aptis",
+    category: "CONTENT",
+    description: "Soạn thảo bài viết mẹo làm bài, đề thi mẫu và cẩm nang phòng thi.",
   },
 
-  // 5. NGƯỜI DÙNG & TÀI KHOẢN
+  // 5. Quản trị người dùng
   {
-    id: "p_user_list",
+    id: "p_user_view",
     code: "USER:VIEW_LIST",
-    name: "Xem danh sách người dùng",
+    name: "Tra cứu danh sách học viên & tài khoản",
     category: "USER",
-    categoryName: "Quản lý Người dùng",
-    description: "Xem danh bạ học viên, giảng viên, trạng thái tài khoản và mục tiêu band điểm.",
+    description: "Tìm kiếm học viên theo SĐT, Email, lọc vai trò và xem lịch sử thi.",
   },
   {
     id: "p_user_lock",
-    code: "USER:LOCK_UNLOCK",
-    name: "Khóa / Mở tài khoản & Đổi mật khẩu",
+    code: "USER:LOCK_UNLOCK_GRANT_VIP",
+    name: "Khóa/Mở tài khoản & Cấp VIP đặc cách",
     category: "USER",
-    categoryName: "Quản lý Người dùng",
-    description: "Tạm khóa quyền truy cập hoặc gửi link reset mật khẩu cho người dùng.",
+    description: "Khóa tài khoản vi phạm, mở khóa học vụ hoặc cộng thêm ngày VIP.",
     isDangerous: true,
   },
-  {
-    id: "p_user_grant_vip",
-    code: "USER:GRANT_VIP",
-    name: "Cấp VIP & Tặng lượt chấm đặc cách",
-    category: "USER",
-    categoryName: "Quản lý Người dùng",
-    description: "Kích hoạt thời hạn VIP hoặc tặng thêm hạn ngạch chấm bài cho học viên.",
-  },
 
-  // 6. BẢO MẬT & HỆ THỐNG CỐT LÕI
+  // 6. Bảo mật & Quản trị cao cấp
   {
-    id: "p_audit_view",
-    code: "SYS:VIEW_AUDIT_LOGS",
-    name: "Xem nhật ký kiểm toán Audit Log",
+    id: "p_audit_log",
+    code: "SECURITY:AUDIT_LOG",
+    name: "Xem nhật ký hệ thống (Audit Log)",
     category: "SECURITY",
-    categoryName: "Bảo mật & Hệ thống",
-    description: "Tra cứu vết kiểm toán 5W1H và JSON Diff sự thay đổi dữ liệu nhạy cảm.",
+    description: "Theo dõi lịch sử đăng nhập, thay đổi đề thi và giao dịch tiền bạc.",
   },
   {
     id: "p_rbac_manage",
-    code: "SYS:MANAGE_RBAC",
-    name: "Cấu hình phân quyền hệ thống (SuperAdmin)",
+    code: "SECURITY:MANAGE_PERMISSIONS",
+    name: "Quản trị ma trận phân quyền RBAC",
     category: "SECURITY",
-    categoryName: "Bảo mật & Hệ thống",
-    description: "Được phép vào màn hình này để gán hoặc thu hồi quyền hạn của các vai trò.",
+    description: "Điều chỉnh quyền hạn chi tiết và gán vai trò nhân sự trong trung tâm.",
     isDangerous: true,
   },
 ];
 
 const DEFAULT_ROLES: RoleConfig[] = [
   {
-    id: "role_superadmin",
-    code: "SUPER_ADMIN",
-    title: "Super Admin (Chủ Trung Tâm)",
-    description: "Toàn quyền tối cao mọi phân hệ, bảo mật, tài chính và cấu hình RBAC.",
-    icon: ShieldAlert,
-    color: "from-rose-500 to-red-600 text-rose-500",
-    memberCount: 2,
-    grantedIds: ALL_PERMISSIONS.map((p) => p.id),
-  },
-  {
-    id: "role_admin",
-    code: "ADMIN",
-    title: "Quản Trị Viên (Vận Hành)",
-    description: "Quản lý đề thi, từ vựng, tài khoản học viên và duyệt giao dịch SePay.",
-    icon: ShieldCheck,
-    color: "from-blue-600 to-indigo-600 text-blue-500",
-    memberCount: 3,
-    grantedIds: [
-      "p_exam_view",
-      "p_exam_create",
-      "p_exam_room",
-      "p_exam_prediction",
-      "p_grade_queue",
-      "p_pay_view",
-      "p_pay_manual",
-      "p_pay_revenue",
-      "p_vocab_manage",
-      "p_dict_manage",
-      "p_review_moderate",
-      "p_user_list",
-      "p_user_lock",
-      "p_user_grant_vip",
-      "p_audit_view",
-    ],
-  },
-  {
     id: "role_teacher",
     code: "TEACHER",
-    title: "Giảng Viên & Trợ Giảng",
-    description: "Chấm điểm Speaking & Writing, quản lý lớp học và theo dõi bảng điểm học viên.",
-    icon: GraduationCap,
-    color: "from-emerald-500 to-teal-600 text-emerald-500",
-    memberCount: 14,
+    title: "Giảng Viên",
+    subtitle: "Học vụ & Chấm thi",
+    description: "Chấm Speaking & Writing, mở lớp học và theo dõi bảng điểm học viên.",
+    memberCount: 0,
     grantedIds: [
       "p_exam_view",
       "p_exam_room",
@@ -290,50 +229,140 @@ const DEFAULT_ROLES: RoleConfig[] = [
       "p_class_manage",
       "p_student_progress",
       "p_vocab_manage",
+      "p_blog_tips",
     ],
   },
   {
     id: "role_student",
     code: "STUDENT",
-    title: "Học Viên (Thí Sinh)",
-    description: "Quyền hạn người học tiêu chuẩn: làm đề thi, xem kết quả của chính mình.",
-    icon: Users,
-    color: "from-amber-500 to-orange-600 text-amber-500",
-    memberCount: 1840,
+    title: "Học Viên",
+    subtitle: "Luyện thi",
+    description: "Làm bài luyện tập 4 kỹ năng, thi thử phòng thi và xem kết quả cá nhân.",
+    memberCount: 0,
     grantedIds: ["p_exam_view"],
+  },
+  {
+    id: "role_admin",
+    code: "ADMIN",
+    title: "Quản Trị Viên",
+    subtitle: "Vận hành & Học vụ",
+    description: "Quản lý ngân hàng đề, từ vựng, tài khoản học viên và đối soát SePay.",
+    memberCount: 0,
+    grantedIds: [
+      "p_exam_view",
+      "p_exam_create",
+      "p_exam_delete",
+      "p_exam_room",
+      "p_exam_prediction",
+      "p_grade_queue",
+      "p_grade_evaluate",
+      "p_class_manage",
+      "p_student_progress",
+      "p_pay_view",
+      "p_pay_manual",
+      "p_pay_revenue",
+      "p_pay_plans",
+      "p_vocab_manage",
+      "p_dict_manage",
+      "p_hall_of_fame",
+      "p_blog_tips",
+      "p_user_view",
+      "p_user_lock",
+      "p_audit_log",
+    ],
+  },
+  {
+    id: "role_super_admin",
+    code: "SUPER_ADMIN",
+    title: "Chủ Trung Tâm",
+    subtitle: "Super Admin",
+    description: "Thẩm quyền tuyệt đối trên mọi phân hệ, bảo mật, tài chính và cấu hình RBAC.",
+    memberCount: 1,
+    grantedIds: ALL_PERMISSIONS.map((p) => p.id),
   },
 ];
 
-export default function PermissionsManagementPage() {
+export default function AdminPermissionsPage() {
   const [roles, setRoles] = useState<RoleConfig[]>(DEFAULT_ROLES);
   const [selectedRoleId, setSelectedRoleId] = useState<string>("role_teacher");
-  const [selectedLeftIds, setSelectedLeftIds] = useState<string[]>([]);
-  const [selectedRightIds, setSelectedRightIds] = useState<string[]>([]);
-  const [searchLeft, setSearchLeft] = useState("");
-  const [searchRight, setSearchRight] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
+  const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [hasChanges, setHasChanges] = useState(false);
 
-  // Load state from localStorage if exists
+  // Search & Filter state
+  const [leftSearch, setLeftSearch] = useState("");
+  const [rightSearch, setRightSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("ALL");
+
+  // Selection states for transfer box
+  const [selectedLeftIds, setSelectedLeftIds] = useState<string[]>([]);
+  const [selectedRightIds, setSelectedRightIds] = useState<string[]>([]);
+
+  // Load configuration and dynamic user count
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("aptis_rbac_matrix_config");
-      if (saved) {
-        const parsed = JSON.parse(saved);
+      const savedConfig = localStorage.getItem("aptis_rbac_matrix_config");
+      if (savedConfig) {
+        const parsed = JSON.parse(savedConfig);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setRoles(parsed);
+          setRoles((prev) =>
+            prev.map((role) => {
+              const matched = parsed.find((p: { id: string }) => p.id === role.id);
+              return matched ? { ...role, grantedIds: matched.grantedIds } : role;
+            })
+          );
         }
       }
-    } catch {
-      // Use defaults
+    } catch (err) {
+      console.error("Lỗi đọc cấu hình phân quyền từ localStorage:", err);
     }
+
+    async function syncMemberCounts() {
+      try {
+        const [kpiRes, teacherRes, adminRes] = await Promise.allSettled([
+          api.admin.getDashboardKPIs(),
+          api.admin.getUsers({ role: "TEACHER", limit: 1 }),
+          api.admin.getUsers({ role: "ADMIN", limit: 1 }),
+        ]);
+
+        let totalUsers = 0;
+        let teacherCount = 0;
+        let adminCount = 0;
+
+        if (kpiRes.status === "fulfilled" && kpiRes.value.success && kpiRes.value.data) {
+          totalUsers = kpiRes.value.data.totalUsers || 0;
+        }
+
+        if (teacherRes.status === "fulfilled" && teacherRes.value.success) {
+          teacherCount = (teacherRes.value as { meta?: { total?: number } }).meta?.total || 0;
+        }
+
+        if (adminRes.status === "fulfilled" && adminRes.value.success) {
+          adminCount = (adminRes.value as { meta?: { total?: number } }).meta?.total || 0;
+        }
+
+        const studentCount = Math.max(0, totalUsers - teacherCount - adminCount);
+
+        setRoles((prev) =>
+          prev.map((r) => {
+            if (r.code === "TEACHER") return { ...r, memberCount: teacherCount };
+            if (r.code === "STUDENT") return { ...r, memberCount: studentCount };
+            if (r.code === "ADMIN") return { ...r, memberCount: adminCount };
+            if (r.code === "SUPER_ADMIN") return { ...r, memberCount: 1 };
+            return r;
+          })
+        );
+      } catch (err) {
+        console.warn("Dùng role count mặc định:", err);
+      }
+    }
+
+    syncMemberCounts();
   }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3200);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   const activeRole = useMemo(
@@ -341,674 +370,705 @@ export default function PermissionsManagementPage() {
     [roles, selectedRoleId]
   );
 
-  // Available (Left) vs Granted (Right) lists
+  const isSuperAdmin = activeRole.code === "SUPER_ADMIN";
+
+  // Available permissions for left list
   const availablePermissions = useMemo(() => {
-    const grantedSet = new Set(activeRole.grantedIds);
-    return ALL_PERMISSIONS.filter((p) => !grantedSet.has(p.id));
-  }, [activeRole]);
+    return ALL_PERMISSIONS.filter((p) => !activeRole.grantedIds.includes(p.id));
+  }, [activeRole.grantedIds]);
 
+  // Granted permissions for right list
   const grantedPermissions = useMemo(() => {
-    const grantedSet = new Set(activeRole.grantedIds);
-    return ALL_PERMISSIONS.filter((p) => grantedSet.has(p.id));
-  }, [activeRole]);
+    return ALL_PERMISSIONS.filter((p) => activeRole.grantedIds.includes(p.id));
+  }, [activeRole.grantedIds]);
 
-  // Filtered by search & category
-  const filteredAvailable = useMemo(() => {
+  // Filtered Left list
+  const filteredLeft = useMemo(() => {
     return availablePermissions.filter((p) => {
-      const matchesSearch =
-        p.name.toLowerCase().includes(searchLeft.toLowerCase()) ||
-        p.code.toLowerCase().includes(searchLeft.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchLeft.toLowerCase());
-      const matchesCat = categoryFilter === "ALL" || p.category === categoryFilter;
-      return matchesSearch && matchesCat;
+      const matchCat = activeCategory === "ALL" || p.category === activeCategory;
+      const matchSearch =
+        p.name.toLowerCase().includes(leftSearch.toLowerCase()) ||
+        p.code.toLowerCase().includes(leftSearch.toLowerCase()) ||
+        p.description.toLowerCase().includes(leftSearch.toLowerCase());
+      return matchCat && matchSearch;
     });
-  }, [availablePermissions, searchLeft, categoryFilter]);
+  }, [availablePermissions, activeCategory, leftSearch]);
 
-  const filteredGranted = useMemo(() => {
+  // Filtered Right list
+  const filteredRight = useMemo(() => {
     return grantedPermissions.filter((p) => {
-      const matchesSearch =
-        p.name.toLowerCase().includes(searchRight.toLowerCase()) ||
-        p.code.toLowerCase().includes(searchRight.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchRight.toLowerCase());
-      const matchesCat = categoryFilter === "ALL" || p.category === categoryFilter;
-      return matchesSearch && matchesCat;
+      const matchCat = activeCategory === "ALL" || p.category === activeCategory;
+      const matchSearch =
+        p.name.toLowerCase().includes(rightSearch.toLowerCase()) ||
+        p.code.toLowerCase().includes(rightSearch.toLowerCase()) ||
+        p.description.toLowerCase().includes(rightSearch.toLowerCase());
+      return matchCat && matchSearch;
     });
-  }, [grantedPermissions, searchRight, categoryFilter]);
+  }, [grantedPermissions, activeCategory, rightSearch]);
 
-  // Toggle selection on left
-  const toggleLeftSelect = (id: string) => {
+  // Clear selections when role changes
+  useEffect(() => {
+    setSelectedLeftIds([]);
+    setSelectedRightIds([]);
+  }, [selectedRoleId]);
+
+  const toggleSelectLeft = (id: string) => {
     setSelectedLeftIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
-  // Toggle selection on right
-  const toggleRightSelect = (id: string) => {
+  const toggleSelectRight = (id: string) => {
     setSelectedRightIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
-  // Select all visible left
   const handleSelectAllLeft = () => {
-    if (selectedLeftIds.length === filteredAvailable.length) {
+    if (selectedLeftIds.length === filteredLeft.length) {
       setSelectedLeftIds([]);
     } else {
-      setSelectedLeftIds(filteredAvailable.map((p) => p.id));
+      setSelectedLeftIds(filteredLeft.map((p) => p.id));
     }
   };
 
-  // Select all visible right
   const handleSelectAllRight = () => {
-    if (selectedRightIds.length === filteredGranted.length) {
+    if (selectedRightIds.length === filteredRight.length) {
       setSelectedRightIds([]);
     } else {
-      setSelectedRightIds(filteredGranted.map((p) => p.id));
+      setSelectedRightIds(filteredRight.map((p) => p.id));
     }
   };
 
-  // MOVE RIGHT [ ▶ ]: Gán quyền
+  // Move selected to RIGHT
   const handleMoveRight = () => {
+    if (isSuperAdmin) {
+      showToast("Chủ Trung Tâm luôn giữ toàn bộ thẩm quyền.");
+      return;
+    }
     if (selectedLeftIds.length === 0) {
       showToast("Vui lòng tích chọn ít nhất 1 quyền ở cột trái để chuyển sang!");
       return;
     }
-    setRoles((prev) =>
-      prev.map((role) => {
-        if (role.id === selectedRoleId) {
-          const nextSet = new Set([...role.grantedIds, ...selectedLeftIds]);
-          return { ...role, grantedIds: Array.from(nextSet) };
-        }
-        return role;
-      })
-    );
-    showToast(`Đã gán thành công ${selectedLeftIds.length} quyền cho ${activeRole.title}!`);
-    setSelectedLeftIds([]);
-    setHasChanges(true);
-  };
 
-  // MOVE ALL RIGHT [ ⏩ ]: Gán toàn bộ
-  const handleMoveAllRight = () => {
-    const toAdd = filteredAvailable.map((p) => p.id);
-    if (toAdd.length === 0) return;
-    setRoles((prev) =>
-      prev.map((role) => {
-        if (role.id === selectedRoleId) {
-          const nextSet = new Set([...role.grantedIds, ...toAdd]);
-          return { ...role, grantedIds: Array.from(nextSet) };
-        }
-        return role;
-      })
-    );
-    showToast(`Đã cấp toàn bộ quyền cho ${activeRole.title}!`);
-    setSelectedLeftIds([]);
-    setHasChanges(true);
-  };
-
-  // MOVE LEFT [ ◀ ]: Gỡ quyền
-  const handleMoveLeft = () => {
-    if (selectedRightIds.length === 0) {
-      showToast("Vui lòng tích chọn quyền ở cột phải để gỡ bỏ!");
-      return;
-    }
-    const toRemoveSet = new Set(selectedRightIds);
     setRoles((prev) =>
       prev.map((role) => {
         if (role.id === selectedRoleId) {
           return {
             ...role,
-            grantedIds: role.grantedIds.filter((id) => !toRemoveSet.has(id)),
+            grantedIds: Array.from(new Set([...role.grantedIds, ...selectedLeftIds])),
           };
         }
         return role;
       })
     );
+
+    showToast(`Đã cấp thêm ${selectedLeftIds.length} quyền cho ${activeRole.title}!`);
+    setSelectedLeftIds([]);
+    setHasChanges(true);
+  };
+
+  // Move selected to LEFT
+  const handleMoveLeft = () => {
+    if (isSuperAdmin) {
+      showToast("Chủ Trung Tâm luôn giữ toàn bộ thẩm quyền.");
+      return;
+    }
+    if (selectedRightIds.length === 0) {
+      showToast("Vui lòng tích chọn ít nhất 1 quyền ở cột phải để gỡ bỏ!");
+      return;
+    }
+
+    setRoles((prev) =>
+      prev.map((role) => {
+        if (role.id === selectedRoleId) {
+          return {
+            ...role,
+            grantedIds: role.grantedIds.filter((id) => !selectedRightIds.includes(id)),
+          };
+        }
+        return role;
+      })
+    );
+
     showToast(`Đã gỡ ${selectedRightIds.length} quyền khỏi ${activeRole.title}!`);
     setSelectedRightIds([]);
     setHasChanges(true);
   };
 
-  // MOVE ALL LEFT [ ⏪ ]: Gỡ toàn bộ
-  const handleMoveAllLeft = () => {
-    const toRemoveSet = new Set(filteredGranted.map((p) => p.id));
-    if (toRemoveSet.size === 0) return;
+  // Move ALL visible to RIGHT
+  const handleMoveAllRight = () => {
+    if (isSuperAdmin) return;
+    if (filteredLeft.length === 0) return;
+
+    const idsToAdd = filteredLeft.map((p) => p.id);
     setRoles((prev) =>
       prev.map((role) => {
         if (role.id === selectedRoleId) {
           return {
             ...role,
-            grantedIds: role.grantedIds.filter((id) => !toRemoveSet.has(id)),
+            grantedIds: Array.from(new Set([...role.grantedIds, ...idsToAdd])),
           };
         }
         return role;
       })
     );
-    showToast(`Đã gỡ các quyền khỏi ${activeRole.title}!`);
+
+    showToast(`Đã cấp toàn bộ ${idsToAdd.length} quyền cho ${activeRole.title}!`);
+    setSelectedLeftIds([]);
+    setHasChanges(true);
+  };
+
+  // Move ALL visible to LEFT
+  const handleMoveAllLeft = () => {
+    if (isSuperAdmin) return;
+    if (filteredRight.length === 0) return;
+
+    const idsToRemove = filteredRight.map((p) => p.id);
+    setRoles((prev) =>
+      prev.map((role) => {
+        if (role.id === selectedRoleId) {
+          return {
+            ...role,
+            grantedIds: role.grantedIds.filter((id) => !idsToRemove.includes(id)),
+          };
+        }
+        return role;
+      })
+    );
+
+    showToast(`Đã gỡ toàn bộ ${idsToRemove.length} quyền khỏi ${activeRole.title}!`);
     setSelectedRightIds([]);
     setHasChanges(true);
   };
 
+  // Double click transfer
+  const handleDoubleClickLeft = (id: string) => {
+    if (isSuperAdmin) return;
+    setRoles((prev) =>
+      prev.map((role) => {
+        if (role.id === selectedRoleId) {
+          return {
+            ...role,
+            grantedIds: [...role.grantedIds, id],
+          };
+        }
+        return role;
+      })
+    );
+    setSelectedLeftIds((prev) => prev.filter((item) => item !== id));
+    setHasChanges(true);
+  };
+
+  const handleDoubleClickRight = (id: string) => {
+    if (isSuperAdmin) return;
+    setRoles((prev) =>
+      prev.map((role) => {
+        if (role.id === selectedRoleId) {
+          return {
+            ...role,
+            grantedIds: role.grantedIds.filter((item) => item !== id),
+          };
+        }
+        return role;
+      })
+    );
+    setSelectedRightIds((prev) => prev.filter((item) => item !== id));
+    setHasChanges(true);
+  };
+
   // Save changes
-  const handleSaveConfig = () => {
+  const handleSaveConfig = useCallback(() => {
     setIsSaving(true);
     setTimeout(() => {
       try {
         localStorage.setItem("aptis_rbac_matrix_config", JSON.stringify(roles));
         setIsSaving(false);
         setHasChanges(false);
-        showToast("Đã lưu bảng phân quyền RBAC thành công vào cơ sở dữ liệu!");
+        showToast("✓ Đã lưu cấu hình phân quyền vai trò thành công!");
       } catch {
         setIsSaving(false);
-        showToast("Không thể lưu cấu hình. Vui lòng thử lại!");
+        showToast("Không thể lưu phân quyền. Vui lòng thử lại!");
       }
-    }, 500);
-  };
+    }, 250);
+  }, [roles]);
+
+  // Ctrl + S shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        handleSaveConfig();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSaveConfig]);
 
   // Reset to default
   const handleResetDefaults = () => {
-    if (
-      confirm("Bạn có chắc chắn muốn khôi phục phân quyền về mẫu mặc định tiêu chuẩn?")
-    ) {
+    if (confirm("Khôi phục phân quyền của tất cả vai trò về trạng thái tiêu chuẩn ban đầu?")) {
       setRoles(DEFAULT_ROLES);
-      setSelectedLeftIds([]);
-      setSelectedRightIds([]);
       localStorage.removeItem("aptis_rbac_matrix_config");
       setHasChanges(false);
-      showToast("Đã khôi phục ma trận quyền mặc định tiêu chuẩn!");
+      setSelectedLeftIds([]);
+      setSelectedRightIds([]);
+      showToast("Đã khôi phục phân quyền tiêu chuẩn ban đầu.");
     }
   };
 
-  const getCategoryColor = (cat: string) => {
-    switch (cat) {
-      case "EXAM":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-      case "GRADING":
-        return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
-      case "PAYMENT":
-        return "bg-purple-500/10 text-purple-500 border-purple-500/20";
-      case "USER":
-        return "bg-amber-500/10 text-amber-500 border-amber-500/20";
-      case "SECURITY":
-        return "bg-rose-500/10 text-rose-500 border-rose-500/20";
-      default:
-        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
-    }
-  };
+  const grantedCount = activeRole.grantedIds.length;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 animate-in fade-in duration-200">
-      {/* 1. TOP HEADER & INTRO */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-card border border-border shadow-xs">
+    <div className="space-y-5 pb-20">
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 dark:bg-slate-800 text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5 border border-slate-700">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <span className="text-xs font-heading font-semibold">{toastMessage}</span>
+        </div>
+      )}
+
+      {/* 1. TOP HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-primary to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-primary/20">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
+            <ShieldCheck className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+            <span>Role-Based Access Control Studio (RBAC)</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <span>Phân Quyền Vai Trò & Chức Năng</span>
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
+            Chọn nhóm chức vụ và chuyển quyền giữa hai cột: Kho quyền khả dụng ➔ Thẩm quyền đã cấp
+          </p>
+
+          {/* Quick Metrics Chips */}
+          <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
+            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
+              Chỉ số:
+            </span>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <ShieldCheck className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+              <span>Nhóm: <strong className="text-slate-900 dark:text-white font-mono">{roles.length}</strong> vai trò</span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold font-heading text-foreground">
-                  Phân Quyền Vai Trò (RBAC Transfer Matrix)
-                </h1>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                  Mẫu 1: Hai Cột Chuyển Quyền
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Giao diện SuperAdmin trực quan — Tích chọn quyền ở kho bên trái rồi bấm{" "}
-                <strong className="text-primary font-bold">[ ▶ ]</strong> để gán sang bên phải.
-              </p>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <Lock className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+              <span>Tổng quyền: <strong className="text-slate-900 dark:text-white font-mono">{ALL_PERMISSIONS.length}</strong></span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
+              <span>Đang chọn: <strong className="text-slate-900 dark:text-white">{activeRole.title}</strong> (<span className="text-blue-600 dark:text-blue-400 font-mono font-bold">{grantedCount}</span> đã cấp)</span>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Top Action Buttons */}
         <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={handleResetDefaults}
-            className="px-3.5 py-2.5 rounded-xl border border-border hover:bg-muted font-bold text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
-            title="Khôi phục quyền mặc định"
+            className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            title="Đặt lại về phân quyền tiêu chuẩn"
           >
-            <RotateCcw className="w-4 h-4" />
-            <span>Mặc định</span>
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Khôi phục chuẩn</span>
           </button>
 
           <button
             type="button"
             onClick={handleSaveConfig}
             disabled={isSaving}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-xs transition-all flex items-center gap-2 ${
-              hasChanges
-                ? "bg-emerald-600 hover:bg-emerald-500 animate-pulse shadow-emerald-600/30"
-                : "bg-primary hover:bg-primary/90"
-            }`}
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            <span>{isSaving ? "Đang lưu..." : hasChanges ? "Lưu thay đổi *" : "Lưu phân quyền"}</span>
+            <Save className="w-3.5 h-3.5" />
+            <span>{isSaving ? "Đang lưu..." : "Lưu thay đổi"}</span>
           </button>
         </div>
       </div>
 
-      {/* 2. ROLE SELECTOR BAR */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {roles.map((r) => {
-          const isSelected = r.id === selectedRoleId;
-          const RoleIcon = r.icon;
-          return (
-            <button
-              key={r.id}
-              type="button"
-              onClick={() => {
-                setSelectedRoleId(r.id);
-                setSelectedLeftIds([]);
-                setSelectedRightIds([]);
-              }}
-              className={`text-left p-4 rounded-2xl border transition-all relative overflow-hidden flex flex-col justify-between group ${
-                isSelected
-                  ? "bg-card border-primary ring-2 ring-primary/20 shadow-md"
-                  : "bg-card/60 hover:bg-card border-border/80 hover:border-border"
-              }`}
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-tr ${r.color} text-white shadow-xs`}
-                  >
-                    <RoleIcon className="w-5 h-5" />
-                  </div>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border/60">
-                    {r.memberCount.toLocaleString()} tài khoản
-                  </span>
-                </div>
-                <h3 className="font-heading font-bold text-sm text-foreground group-hover:text-primary transition-colors">
-                  {r.title}
-                </h3>
-                <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
-                  {r.description}
-                </p>
-              </div>
-
-              <div className="mt-3 pt-2.5 border-t border-border/60 flex items-center justify-between text-[11px]">
-                <span className="font-semibold text-muted-foreground">Quyền sở hữu:</span>
-                <span className="font-bold text-primary">
-                  {r.grantedIds.length}/{ALL_PERMISSIONS.length} quyền
-                </span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 3. DUAL TRANSFER BOX MAIN CONTAINER */}
-      <div className="p-6 rounded-3xl bg-card border border-border shadow-sm">
-        {/* Active Role Indicator & Filter Bar */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 mb-5 border-b border-border">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-              Đang cấp quyền cho:
-            </span>
-            <div className="px-3 py-1 rounded-xl bg-primary/10 border border-primary/20 text-primary font-bold text-sm flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
-              <span>{activeRole.title}</span>
-            </div>
-            <span className="text-xs text-muted-foreground hidden sm:inline">
-              ({activeRole.code})
-            </span>
-          </div>
-
-          {/* Module Category Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-            <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1 mr-1 shrink-0">
-              <Filter className="w-3.5 h-3.5" /> Lọc:
-            </span>
-            {[
-              { id: "ALL", label: "Tất cả" },
-              { id: "EXAM", label: "Đề thi" },
-              { id: "GRADING", label: "Chấm thi" },
-              { id: "PAYMENT", label: "Tài chính" },
-              { id: "USER", label: "Người dùng" },
-              { id: "SECURITY", label: "Hệ thống" },
-            ].map((cat) => (
+      {/* 2. TOOLBAR CHỌN VAI TRÒ & CHUYÊN MỤC */}
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
+        {/* Role Tabs */}
+        <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-x-auto w-full md:w-auto">
+          {roles.map((r) => {
+            const isSelected = r.id === selectedRoleId;
+            const rCount = r.grantedIds.length;
+            return (
               <button
-                key={cat.id}
-                type="button"
-                onClick={() => setCategoryFilter(cat.id)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold shrink-0 transition-colors ${
-                  categoryFilter === cat.id
-                    ? "bg-foreground text-background"
-                    : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                key={r.id}
+                onClick={() => setSelectedRoleId(r.id)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+                  isSelected
+                    ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold ring-1 ring-slate-900/5 dark:ring-white/10"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
-                {cat.label}
+                <span>{r.title}</span>
+                <span
+                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                    isSelected
+                      ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
+                      : "bg-slate-200/60 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400"
+                  }`}
+                >
+                  {rCount}/{ALL_PERMISSIONS.length}
+                </span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">
+                  ({r.memberCount.toLocaleString()} user)
+                </span>
               </button>
-            ))}
+            );
+          })}
+        </div>
+
+        {/* Category Filter Dropdown */}
+        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+          <span className="text-xs font-heading font-semibold text-slate-400 dark:text-slate-500 whitespace-nowrap hidden sm:inline">
+            Lọc chuyên mục:
+          </span>
+          <select
+            value={activeCategory}
+            onChange={(e) => setActiveCategory(e.target.value)}
+            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-heading font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-slate-700 cursor-pointer"
+          >
+            <option value="ALL">Tất cả chuyên mục ({ALL_PERMISSIONS.length})</option>
+            <option value="EXAM">Đề Thi & Khảo Thí (5)</option>
+            <option value="GRADING">Chấm Thi & Lớp Học (4)</option>
+            <option value="PAYMENT">Tài Chính SePay (4)</option>
+            <option value="CONTENT">Học Liệu & Từ Vựng (4)</option>
+            <option value="USER">Người Dùng & VIP (2)</option>
+            <option value="SECURITY">Bảo Mật Hệ Thống (2)</option>
+          </select>
+        </div>
+      </div>
+
+      {/* 3. HAI CỘT CHUYỂN QUYỀN SANG BÊN (DUAL TRANSFER BOX) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_64px_1fr] gap-3 items-center">
+        {/* === CỘT TRÁI: KHO QUYỀN CÓ SẴN (CHƯA CẤP) === */}
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden flex flex-col h-[520px]">
+          {/* Header Cột Trái */}
+          <div className="px-4 py-3 bg-slate-50/80 dark:bg-slate-800/70 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-heading font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200">
+                Kho quyền có sẵn (Chưa cấp)
+              </span>
+              <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                {filteredLeft.length} mục
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSelectAllLeft}
+              disabled={filteredLeft.length === 0 || isSuperAdmin}
+              className="text-xs font-heading font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {selectedLeftIds.length === filteredLeft.length && filteredLeft.length > 0
+                ? "Bỏ chọn"
+                : "Chọn tất cả"}
+            </button>
+          </div>
+
+          {/* Search Box Cột Trái */}
+          <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+              <input
+                type="text"
+                value={leftSearch}
+                onChange={(e) => setLeftSearch(e.target.value)}
+                placeholder="Tìm nhanh quyền chưa cấp..."
+                className="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/70 text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800"
+              />
+              {leftSearch && (
+                <button
+                  type="button"
+                  onClick={() => setLeftSearch("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* List Cột Trái */}
+          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            {isSuperAdmin ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-500">
+                <Crown className="w-8 h-8 text-amber-500 mb-2 opacity-80" />
+                <p className="text-xs font-heading font-bold text-slate-700 dark:text-slate-300">
+                  Chủ Trung Tâm giữ 100% toàn quyền
+                </p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 max-w-xs">
+                  Không còn quyền nào chưa cấp cho vai trò này.
+                </p>
+              </div>
+            ) : filteredLeft.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-500">
+                <CheckCircle2 className="w-7 h-7 text-emerald-500 mb-2" />
+                <p className="text-xs font-heading font-semibold text-slate-600 dark:text-slate-300">
+                  {leftSearch ? "Không tìm thấy quyền phù hợp" : "Đã cấp toàn bộ quyền trong danh mục này"}
+                </p>
+              </div>
+            ) : (
+              filteredLeft.map((p) => {
+                const isSelected = selectedLeftIds.includes(p.id);
+
+                return (
+                  <div
+                    key={p.id}
+                    onClick={() => toggleSelectLeft(p.id)}
+                    onDoubleClick={() => handleDoubleClickLeft(p.id)}
+                    className={`px-3 py-2 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 select-none ${
+                      isSelected
+                        ? "bg-blue-50/80 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200 shadow-2xs font-semibold"
+                        : "bg-white dark:bg-slate-900 hover:bg-slate-50/80 dark:hover:bg-slate-800/60 border-slate-200/60 dark:border-slate-800/80 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="shrink-0 text-slate-400 dark:text-slate-500">
+                        {isSelected ? (
+                          <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        ) : (
+                          <Square className="w-4 h-4" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-heading font-bold text-slate-800 dark:text-slate-100 truncate">
+                            {p.name}
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono">
+                            {CATEGORY_NAMES[p.category]}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5 font-normal">
+                          {p.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {p.isDangerous && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 shrink-0">
+                        Nhạy cảm
+                      </span>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer Cột Trái */}
+          <div className="px-3.5 py-2 bg-slate-50/70 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            <span>Đã chọn: <strong className="text-slate-800 dark:text-slate-200 font-mono">{selectedLeftIds.length}</strong></span>
+            <span className="text-slate-400 dark:text-slate-500">Nhấp đúp để chuyển nhanh</span>
           </div>
         </div>
 
-        {/* THE 3-COLUMN TRANSFER GRID: Left Box | Center Buttons | Right Box */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,72px,1fr] gap-4 items-center">
-          {/* ========================================================
-              LEFT COLUMN: KHO QUYỀN CÓ SẴN (AVAILABLE PERMISSIONS)
-             ======================================================== */}
-          <div className="flex flex-col h-[520px] rounded-2xl border border-border bg-muted/20 overflow-hidden shadow-xs">
-            {/* Left Header */}
-            <div className="p-3.5 bg-muted/60 border-b border-border flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-400" />
-                <h3 className="font-heading font-bold text-xs text-foreground uppercase tracking-wider">
-                  Kho Quyền Có Sẵn
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
+        {/* === NÚT CHUYỂN Ở GIỮA === */}
+        <div className="flex flex-row lg:flex-col items-center justify-center gap-2 py-1">
+          {/* Cấp quyền đã chọn (▶) */}
+          <button
+            type="button"
+            onClick={handleMoveRight}
+            disabled={selectedLeftIds.length === 0 || isSuperAdmin}
+            title="Cấp quyền đã chọn sang bên phải"
+            className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 hover:border-blue-600 disabled:opacity-30 disabled:hover:bg-white dark:disabled:hover:bg-slate-800 disabled:hover:text-slate-400 disabled:hover:border-slate-200 dark:disabled:hover:border-slate-700 text-slate-700 dark:text-slate-200 shadow-2xs transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed group"
+          >
+            <ChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          </button>
+
+          {/* Gỡ quyền đã chọn (◀) */}
+          <button
+            type="button"
+            onClick={handleMoveLeft}
+            disabled={selectedRightIds.length === 0 || isSuperAdmin}
+            title="Gỡ quyền đã chọn trả về bên trái"
+            className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-rose-600 hover:text-white hover:border-rose-600 disabled:opacity-30 disabled:hover:bg-white dark:disabled:hover:bg-slate-800 disabled:hover:text-slate-400 disabled:hover:border-slate-200 dark:disabled:hover:border-slate-700 text-slate-700 dark:text-slate-200 shadow-2xs transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed group"
+          >
+            <ChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          </button>
+
+          {/* Cấp tất cả (⏩) */}
+          <button
+            type="button"
+            onClick={handleMoveAllRight}
+            disabled={filteredLeft.length === 0 || isSuperAdmin}
+            title="Cấp toàn bộ quyền hiển thị"
+            className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 disabled:opacity-20 text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
+          >
+            <ChevronsRight className="w-4 h-4" />
+          </button>
+
+          {/* Gỡ tất cả (⏪) */}
+          <button
+            type="button"
+            onClick={handleMoveAllLeft}
+            disabled={filteredRight.length === 0 || isSuperAdmin}
+            title="Gỡ toàn bộ quyền hiển thị"
+            className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-700 disabled:opacity-20 text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
+          >
+            <ChevronsLeft className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* === CỘT PHẢI: QUYỀN ĐÃ CẤP CHO VAI TRÒ NÀY === */}
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden flex flex-col h-[520px]">
+          {/* Header Cột Phải */}
+          <div className="px-4 py-3 bg-emerald-50/70 dark:bg-emerald-950/30 border-b border-emerald-100/80 dark:border-emerald-900/40 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-heading font-bold text-xs sm:text-sm text-emerald-950 dark:text-emerald-200">
+                Thẩm quyền ĐÃ CẤP ({activeRole.title})
+              </span>
+              <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300">
+                {filteredRight.length} mục
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSelectAllRight}
+              disabled={filteredRight.length === 0 || isSuperAdmin}
+              className="text-xs font-heading font-semibold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {selectedRightIds.length === filteredRight.length && filteredRight.length > 0
+                ? "Bỏ chọn"
+                : "Chọn tất cả"}
+            </button>
+          </div>
+
+          {/* Search Box Cột Phải */}
+          <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+              <input
+                type="text"
+                value={rightSearch}
+                onChange={(e) => setRightSearch(e.target.value)}
+                placeholder="Tìm nhanh quyền đã cấp..."
+                className="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/70 text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800"
+              />
+              {rightSearch && (
                 <button
                   type="button"
-                  onClick={handleSelectAllLeft}
-                  className="text-[11px] font-semibold text-primary hover:underline"
+                  onClick={() => setRightSearch("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
-                  {selectedLeftIds.length === filteredAvailable.length && filteredAvailable.length > 0
-                    ? "Bỏ chọn tất cả"
-                    : "Chọn tất cả"}
-                </button>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-muted text-muted-foreground border border-border">
-                  {filteredAvailable.length} quyền
-                </span>
-              </div>
-            </div>
-
-            {/* Left Search Bar */}
-            <div className="p-2.5 border-b border-border bg-card">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={searchLeft}
-                  onChange={(e) => setSearchLeft(e.target.value)}
-                  placeholder="Tìm nhanh quyền hạn theo tên hoặc mã..."
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-muted/40 border border-border text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
-            </div>
-
-            {/* Left Permission Items List */}
-            <div className="flex-1 overflow-y-auto p-2 space-y-1.5 divide-y divide-border/20">
-              {filteredAvailable.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
-                  <CheckCircle2 className="w-10 h-10 text-emerald-500/40 mb-2" />
-                  <p className="text-xs font-semibold text-foreground">
-                    Không còn quyền nào chưa cấp!
-                  </p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    {searchLeft
-                      ? "Không tìm thấy quyền phù hợp với từ khóa."
-                      : `Vai trò "${activeRole.title}" đã được cấp toàn bộ quyền trong danh mục này.`}
-                  </p>
-                </div>
-              ) : (
-                filteredAvailable.map((perm) => {
-                  const isChecked = selectedLeftIds.includes(perm.id);
-                  return (
-                    <div
-                      key={perm.id}
-                      onClick={() => toggleLeftSelect(perm.id)}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer select-none flex items-start gap-3 group ${
-                        isChecked
-                          ? "bg-primary/5 border-primary/60 shadow-xs"
-                          : "bg-card hover:bg-muted/40 border-border/80"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => {}} // Handled by parent click
-                        className="mt-1 w-4 h-4 rounded text-primary focus:ring-primary accent-primary cursor-pointer"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="font-heading font-bold text-xs text-foreground group-hover:text-primary transition-colors">
-                            {perm.name}
-                          </span>
-                          <span
-                            className={`px-1.5 py-0.2 rounded text-[10px] font-bold border ${getCategoryColor(
-                              perm.category
-                            )}`}
-                          >
-                            {perm.categoryName}
-                          </span>
-                          {perm.isDangerous && (
-                            <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center gap-0.5">
-                              <Lock className="w-2.5 h-2.5" /> Nhạy cảm
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
-                          {perm.description}
-                        </p>
-                        <span className="text-[10px] font-mono text-muted-foreground/70 mt-1 block">
-                          {perm.code}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
-            {/* Left Footer Selected Count */}
-            <div className="p-2.5 bg-muted/40 border-t border-border text-[11px] font-medium text-muted-foreground flex justify-between items-center">
-              <span>Đang chọn: {selectedLeftIds.length} mục</span>
-              {selectedLeftIds.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedLeftIds([])}
-                  className="text-xs text-primary hover:underline font-semibold"
-                >
-                  Xóa chọn
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
           </div>
 
-          {/* ========================================================
-              CENTER COLUMN: 4 TRANSFER ACTION BUTTONS
-             ======================================================== */}
-          <div className="flex lg:flex-col items-center justify-center gap-2 py-2">
-            <button
-              type="button"
-              onClick={handleMoveRight}
-              disabled={selectedLeftIds.length === 0}
-              className="w-12 h-12 rounded-xl bg-primary text-primary-foreground font-bold shadow-md hover:bg-primary/90 disabled:opacity-30 disabled:pointer-events-none transition-all flex items-center justify-center group"
-              title="Chuyển quyền đã chọn sang bên phải [ ▶ ]"
-            >
-              <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleMoveAllRight}
-              disabled={filteredAvailable.length === 0}
-              className="w-10 h-10 rounded-xl bg-muted border border-border text-foreground hover:bg-muted/80 disabled:opacity-30 disabled:pointer-events-none transition-all flex items-center justify-center"
-              title="Cấp toàn bộ quyền sang phải [ ⏩ ]"
-            >
-              <ChevronsRight className="w-5 h-5 text-primary" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleMoveAllLeft}
-              disabled={filteredGranted.length === 0}
-              className="w-10 h-10 rounded-xl bg-muted border border-border text-foreground hover:bg-muted/80 disabled:opacity-30 disabled:pointer-events-none transition-all flex items-center justify-center"
-              title="Gỡ toàn bộ quyền về trái [ ⏪ ]"
-            >
-              <ChevronsLeft className="w-5 h-5 text-rose-500" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleMoveLeft}
-              disabled={selectedRightIds.length === 0}
-              className="w-12 h-12 rounded-xl bg-muted border border-border text-foreground hover:bg-rose-500 hover:text-white hover:border-rose-500 disabled:opacity-30 disabled:pointer-events-none transition-all flex items-center justify-center group shadow-xs"
-              title="Gỡ quyền đã chọn về bên trái [ ◀ ]"
-            >
-              <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
-            </button>
-          </div>
-
-          {/* ========================================================
-              RIGHT COLUMN: QUYỀN ĐÃ CẤP CHO VAI TRÒ (GRANTED PERMISSIONS)
-             ======================================================== */}
-          <div className="flex flex-col h-[520px] rounded-2xl border border-primary/40 bg-primary/5 overflow-hidden shadow-xs">
-            {/* Right Header */}
-            <div className="p-3.5 bg-primary/10 border-b border-primary/20 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <h3 className="font-heading font-bold text-xs text-primary uppercase tracking-wider">
-                  Quyền ĐÃ CẤP Cho {activeRole.code}
-                </h3>
+          {/* List Cột Phải */}
+          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            {filteredRight.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-500">
+                <AlertCircle className="w-7 h-7 text-amber-500 mb-2" />
+                <p className="text-xs font-heading font-semibold text-slate-600 dark:text-slate-300">
+                  {rightSearch ? "Không tìm thấy quyền phù hợp" : "Chưa có quyền nào được cấp"}
+                </p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 max-w-xs">
+                  Chọn quyền ở cột trái và bấm nút [ ▶ ] để gán vào vai trò này.
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleSelectAllRight}
-                  className="text-[11px] font-semibold text-primary hover:underline"
-                >
-                  {selectedRightIds.length === filteredGranted.length && filteredGranted.length > 0
-                    ? "Bỏ chọn tất cả"
-                    : "Chọn tất cả"}
-                </button>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary text-primary-foreground">
-                  {filteredGranted.length} mục
-                </span>
-              </div>
-            </div>
+            ) : (
+              filteredRight.map((p) => {
+                const isSelected = selectedRightIds.includes(p.id);
 
-            {/* Right Search Bar */}
-            <div className="p-2.5 border-b border-border bg-card">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={searchRight}
-                  onChange={(e) => setSearchRight(e.target.value)}
-                  placeholder="Tìm trong danh sách quyền đã cấp..."
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-muted/40 border border-border text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
-            </div>
-
-            {/* Right Permission Items List */}
-            <div className="flex-1 overflow-y-auto p-2 space-y-1.5 divide-y divide-border/20">
-              {filteredGranted.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
-                  <AlertCircle className="w-10 h-10 text-amber-500/40 mb-2" />
-                  <p className="text-xs font-semibold text-foreground">Chưa có quyền hạn nào!</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Hãy tích chọn các quyền ở cột bên trái và bấm{" "}
-                    <strong className="text-primary font-bold">[ ▶ ]</strong> để gán quyền.
-                  </p>
-                </div>
-              ) : (
-                filteredGranted.map((perm) => {
-                  const isChecked = selectedRightIds.includes(perm.id);
-                  return (
-                    <div
-                      key={perm.id}
-                      onClick={() => toggleRightSelect(perm.id)}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer select-none flex items-start gap-3 group ${
-                        isChecked
-                          ? "bg-rose-500/10 border-rose-500/60 shadow-xs"
-                          : "bg-card hover:bg-muted/40 border-border/80"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => {}}
-                        className="mt-1 w-4 h-4 rounded text-rose-500 focus:ring-rose-500 accent-rose-500 cursor-pointer"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="font-heading font-bold text-xs text-foreground group-hover:text-primary transition-colors">
-                            {perm.name}
+                return (
+                  <div
+                    key={p.id}
+                    onClick={() => !isSuperAdmin && toggleSelectRight(p.id)}
+                    onDoubleClick={() => !isSuperAdmin && handleDoubleClickRight(p.id)}
+                    className={`px-3 py-2 rounded-xl border transition-all flex items-center justify-between gap-3 select-none ${
+                      isSuperAdmin
+                        ? "bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-800 text-slate-700 dark:text-slate-300 cursor-not-allowed"
+                        : isSelected
+                        ? "bg-rose-50/80 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200 shadow-2xs font-semibold cursor-pointer"
+                        : "bg-white dark:bg-slate-900 hover:bg-slate-50/80 dark:hover:bg-slate-800/60 border-slate-200/60 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 cursor-pointer"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="shrink-0 text-slate-400 dark:text-slate-500">
+                        {isSuperAdmin ? (
+                          <Lock className="w-4 h-4 text-rose-500" />
+                        ) : isSelected ? (
+                          <CheckSquare className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                        ) : (
+                          <Square className="w-4 h-4" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-heading font-bold text-slate-800 dark:text-slate-100 truncate">
+                            {p.name}
                           </span>
-                          <span
-                            className={`px-1.5 py-0.2 rounded text-[10px] font-bold border ${getCategoryColor(
-                              perm.category
-                            )}`}
-                          >
-                            {perm.categoryName}
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono">
+                            {CATEGORY_NAMES[p.category]}
                           </span>
-                          {perm.isDangerous && (
-                            <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center gap-0.5">
-                              <Lock className="w-2.5 h-2.5" /> Nhạy cảm
-                            </span>
-                          )}
                         </div>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
-                          {perm.description}
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5 font-normal">
+                          {p.description}
                         </p>
-                        <span className="text-[10px] font-mono text-muted-foreground/70 mt-1 block">
-                          {perm.code}
-                        </span>
                       </div>
                     </div>
-                  );
-                })
-              )}
-            </div>
 
-            {/* Right Footer Selected Count */}
-            <div className="p-2.5 bg-primary/10 border-t border-primary/20 text-[11px] font-medium text-primary flex justify-between items-center">
-              <span>Đang chọn để gỡ: {selectedRightIds.length} mục</span>
-              {selectedRightIds.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedRightIds([])}
-                  className="text-xs text-rose-500 hover:underline font-semibold"
-                >
-                  Xóa chọn
-                </button>
-              )}
-            </div>
+                    {p.isDangerous && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 shrink-0">
+                        Nhạy cảm
+                      </span>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer Cột Phải */}
+          <div className="px-3.5 py-2 bg-emerald-50/40 dark:bg-emerald-950/20 border-t border-emerald-100/60 dark:border-emerald-900/30 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            <span>Đã chọn: <strong className="text-slate-800 dark:text-slate-200 font-mono">{selectedRightIds.length}</strong></span>
+            {selectedRightIds.length > 0 && !isSuperAdmin && (
+              <span className="text-rose-600 dark:text-rose-400 font-semibold">Sẵn sàng gỡ ◀</span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 4. SUMMARY & AUDIT FOOTER */}
-      <div className="p-5 rounded-2xl bg-card border border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground">
-            <FileCheck2 className="w-5 h-5" />
+      {/* 4. FLOATING SAVE BAR (Hiện khi có thay đổi chưa lưu) */}
+      {hasChanges && (
+        <div className="fixed bottom-6 inset-x-4 max-w-xl mx-auto z-50 p-3.5 rounded-2xl bg-slate-900 dark:bg-slate-800 text-white shadow-2xl flex items-center justify-between gap-3 animate-in slide-in-from-bottom-4 duration-200 border border-slate-700">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+              <AlertCircle className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-xs font-heading font-bold text-white">Có thay đổi phân quyền chưa lưu</p>
+              <p className="text-[11px] text-slate-300 dark:text-slate-400">Nhấn Ctrl+S hoặc Lưu thay đổi để cập nhật</p>
+            </div>
           </div>
-          <div>
-            <h4 className="text-xs font-bold text-foreground">
-              Tổng kết phạm vi vai trò: {activeRole.title}
-            </h4>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              Được cấp quyền thực thi trên{" "}
-              <strong className="text-primary font-bold">
-                {activeRole.grantedIds.length} trên tổng số {ALL_PERMISSIONS.length}
-              </strong>{" "}
-              tính năng cốt lõi của nền tảng Aptis Kỳ Tích.
-            </p>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleResetDefaults}
+              className="px-3 py-1.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-xs font-heading font-semibold text-slate-300 transition-colors cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveConfig}
+              disabled={isSaving}
+              className="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>{isSaving ? "Đang lưu..." : "Lưu ngay"}</span>
+            </button>
           </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleSaveConfig}
-          disabled={isSaving}
-          className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-xs transition-all flex items-center gap-2 shrink-0"
-        >
-          <Check className="w-4 h-4" />
-          <span>Xác nhận & Cập nhật ma trận</span>
-        </button>
-      </div>
-
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-foreground text-background font-bold text-xs shadow-2xl flex items-center gap-2 animate-in slide-in-from-bottom-2 fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          <span>{toastMessage}</span>
         </div>
       )}
     </div>

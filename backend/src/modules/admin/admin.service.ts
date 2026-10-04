@@ -363,6 +363,211 @@ export class AdminService {
     return updated;
   }
 
+  // ──────────────────────────────────────────────────────────────
+  // CONTENT EDITOR: Get full exam with all parts & questions
+  // ──────────────────────────────────────────────────────────────
+  async getExamFull(examId: string) {
+    const exam = await prisma.exam.findUnique({
+      where: { id: examId },
+      include: {
+        parts: {
+          orderBy: { part_number: 'asc' },
+          include: {
+            questions: {
+              orderBy: { question_number: 'asc' },
+            },
+          },
+        },
+      },
+    });
+    if (!exam) throw { statusCode: 404, message: 'Đề thi không tồn tại' };
+    return exam;
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // CONTENT EDITOR: Update a Part (passage, audio, image, instructions)
+  // ──────────────────────────────────────────────────────────────
+  async updatePart(partId: string, input: any, req?: Request) {
+    const part = await prisma.examPart.findUnique({ where: { id: partId } });
+    if (!part) throw { statusCode: 404, message: 'Phần thi không tồn tại' };
+
+    const updated = await prisma.examPart.update({
+      where: { id: partId },
+      data: {
+        ...(input.title !== undefined && { title: input.title }),
+        ...(input.instructions !== undefined && { instructions: input.instructions }),
+        ...(input.passageText !== undefined && { passage_text: input.passageText }),
+        ...(input.audioUrl !== undefined && { audio_url: input.audioUrl }),
+        ...(input.imageUrl !== undefined && { image_url: input.imageUrl }),
+      },
+    });
+
+    auditService.record({
+      req,
+      action: AuditAction.EXAM_UPDATE,
+      entityType: 'EXAM_PART',
+      entityId: partId,
+      description: `Cập nhật nội dung phần thi #${updated.part_number}: "${updated.title}"`,
+      newValue: input,
+    });
+
+    return updated;
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // CONTENT EDITOR: Add a new Part to an exam
+  // ──────────────────────────────────────────────────────────────
+  async addPart(examId: string, input: any, req?: Request) {
+    const exam = await prisma.exam.findUnique({ where: { id: examId } });
+    if (!exam) throw { statusCode: 404, message: 'Đề thi không tồn tại' };
+
+    const maxPart = await prisma.examPart.findFirst({
+      where: { exam_id: examId },
+      orderBy: { part_number: 'desc' },
+    });
+
+    const newPartNumber = (maxPart?.part_number || 0) + 1;
+
+    const part = await prisma.examPart.create({
+      data: {
+        exam_id: examId,
+        part_number: input.partNumber || newPartNumber,
+        title: input.title || `Part ${newPartNumber}`,
+        instructions: input.instructions || null,
+        passage_text: input.passageText || null,
+        audio_url: input.audioUrl || null,
+        image_url: input.imageUrl || null,
+      },
+      include: { questions: true },
+    });
+
+    auditService.record({
+      req,
+      action: AuditAction.EXAM_UPDATE,
+      entityType: 'EXAM_PART',
+      entityId: part.id,
+      description: `Thêm phần thi mới #${part.part_number} vào đề "${exam.title}"`,
+      newValue: { examId, partNumber: part.part_number, title: part.title },
+    });
+
+    return part;
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // CONTENT EDITOR: Delete a Part (cascade deletes its questions)
+  // ──────────────────────────────────────────────────────────────
+  async deletePart(partId: string, req?: Request) {
+    const part = await prisma.examPart.findUnique({
+      where: { id: partId },
+      include: { _count: { select: { questions: true } } },
+    });
+    if (!part) throw { statusCode: 404, message: 'Phần thi không tồn tại' };
+
+    await prisma.examPart.delete({ where: { id: partId } });
+
+    auditService.record({
+      req,
+      action: AuditAction.EXAM_DELETE,
+      entityType: 'EXAM_PART',
+      entityId: partId,
+      description: `Xóa phần thi #${part.part_number} (${part._count.questions} câu hỏi bị xóa theo)`,
+      oldValue: { partId, title: part.title, questionCount: part._count.questions },
+    });
+
+    return { success: true };
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // CONTENT EDITOR: Update a single Question
+  // ──────────────────────────────────────────────────────────────
+  async updateQuestion(questionId: string, input: any, req?: Request) {
+    const question = await prisma.question.findUnique({ where: { id: questionId } });
+    if (!question) throw { statusCode: 404, message: 'Câu hỏi không tồn tại' };
+
+    const updated = await prisma.question.update({
+      where: { id: questionId },
+      data: {
+        ...(input.prompt !== undefined && { prompt: input.prompt }),
+        ...(input.questionType !== undefined && { question_type: input.questionType }),
+        ...(input.options !== undefined && { options: input.options }),
+        ...(input.correctAnswer !== undefined && { correct_answer: input.correctAnswer }),
+        ...(input.explanation !== undefined && { explanation: input.explanation }),
+        ...(input.maxScore !== undefined && { max_score: Number(input.maxScore) }),
+        ...(input.questionNumber !== undefined && { question_number: Number(input.questionNumber) }),
+      },
+    });
+
+    auditService.record({
+      req,
+      action: AuditAction.EXAM_UPDATE,
+      entityType: 'QUESTION',
+      entityId: questionId,
+      description: `Cập nhật câu hỏi #${updated.question_number}: "${(updated.prompt || '').slice(0, 50)}..."`,
+      newValue: input,
+    });
+
+    return updated;
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // CONTENT EDITOR: Add a Question to a Part
+  // ──────────────────────────────────────────────────────────────
+  async addQuestion(partId: string, input: any, req?: Request) {
+    const part = await prisma.examPart.findUnique({ where: { id: partId } });
+    if (!part) throw { statusCode: 404, message: 'Phần thi không tồn tại' };
+
+    const maxQ = await prisma.question.findFirst({
+      where: { part_id: partId },
+      orderBy: { question_number: 'desc' },
+    });
+    const nextNum = input.questionNumber || (maxQ?.question_number || 0) + 1;
+
+    const question = await prisma.question.create({
+      data: {
+        part_id: partId,
+        question_number: nextNum,
+        question_type: input.questionType || 'MULTIPLE_CHOICE',
+        prompt: input.prompt || '',
+        options: input.options || undefined,
+        correct_answer: input.correctAnswer || null,
+        explanation: input.explanation || null,
+        max_score: Number(input.maxScore || 1.0),
+      },
+    });
+
+    auditService.record({
+      req,
+      action: AuditAction.EXAM_UPDATE,
+      entityType: 'QUESTION',
+      entityId: question.id,
+      description: `Thêm câu hỏi #${question.question_number} vào Part #${part.part_number}`,
+      newValue: { partId, questionNumber: question.question_number },
+    });
+
+    return question;
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // CONTENT EDITOR: Delete a Question
+  // ──────────────────────────────────────────────────────────────
+  async deleteQuestion(questionId: string, req?: Request) {
+    const question = await prisma.question.findUnique({ where: { id: questionId } });
+    if (!question) throw { statusCode: 404, message: 'Câu hỏi không tồn tại' };
+
+    await prisma.question.delete({ where: { id: questionId } });
+
+    auditService.record({
+      req,
+      action: AuditAction.EXAM_DELETE,
+      entityType: 'QUESTION',
+      entityId: questionId,
+      description: `Xóa câu hỏi #${question.question_number}: "${(question.prompt || '').slice(0, 40)}..."`,
+      oldValue: { questionId, prompt: question.prompt, questionNumber: question.question_number },
+    });
+
+    return { success: true };
+  }
+
   async duplicateExam(examId: string, req?: Request) {
     const sourceExam = await prisma.exam.findUnique({
       where: { id: examId },
@@ -950,8 +1155,51 @@ export class AdminService {
     return updated;
   }
 
-  async getDashboardKPIs() {
-    const startOfToday = new Date();
+  async getDashboardKPIs(filter?: { period?: string; fromDate?: string; toDate?: string }) {
+    const now = new Date();
+    const period = filter?.period || 'week';
+
+    // Xác định rangeStart và rangeEnd theo Múi giờ Việt Nam
+    let rangeStart = new Date(now);
+    let rangeEnd = new Date(now);
+    let periodLabel = '7 ngày qua';
+
+    if (period === 'today') {
+      periodLabel = 'Hôm nay';
+      rangeStart.setHours(0, 0, 0, 0);
+      rangeEnd.setHours(23, 59, 59, 999);
+    } else if (period === 'week') {
+      periodLabel = 'Tuần này (7 ngày)';
+      rangeStart.setDate(now.getDate() - 6);
+      rangeStart.setHours(0, 0, 0, 0);
+      rangeEnd.setHours(23, 59, 59, 999);
+    } else if (period === 'month') {
+      periodLabel = 'Tháng này (30 ngày)';
+      rangeStart.setDate(now.getDate() - 29);
+      rangeStart.setHours(0, 0, 0, 0);
+      rangeEnd.setHours(23, 59, 59, 999);
+    } else if (period === 'year') {
+      periodLabel = `Năm ${now.getFullYear()}`;
+      rangeStart = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+      rangeEnd = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+    } else if (period === 'custom' && filter?.fromDate && filter?.toDate) {
+      const [fy, fm, fd] = filter.fromDate.split('-').map(Number);
+      const [ty, tm, td] = filter.toDate.split('-').map(Number);
+      rangeStart = new Date(fy, fm - 1, fd, 0, 0, 0, 0);
+      rangeEnd = new Date(ty, tm - 1, td, 23, 59, 59, 999);
+      periodLabel = `${filter.fromDate} → ${filter.toDate}`;
+    } else if (period === 'all') {
+      periodLabel = 'Toàn bộ thời gian';
+      rangeStart = new Date(2020, 0, 1);
+      rangeEnd.setHours(23, 59, 59, 999);
+    } else {
+      // Default: 7 ngày qua
+      rangeStart.setDate(now.getDate() - 6);
+      rangeStart.setHours(0, 0, 0, 0);
+      rangeEnd.setHours(23, 59, 59, 999);
+    }
+
+    const startOfToday = new Date(now);
     startOfToday.setHours(0, 0, 0, 0);
 
     const [
@@ -964,6 +1212,13 @@ export class AdminService {
       pendingTransactionsCount,
       pendingGradingCount,
       pendingTransactions,
+      // Thống kê trong kỳ lọc
+      periodRevenueRes,
+      periodAttempts,
+      periodCompletedAttempts,
+      periodNewUsers,
+      periodPaidTxCount,
+      periodAvgScoreRes,
     ] = await Promise.all([
       prisma.exam.count(),
       prisma.user.count(),
@@ -992,38 +1247,328 @@ export class AdminService {
           },
         },
       }),
+      // Kỳ lọc
+      prisma.transaction.aggregate({
+        where: {
+          status: TransactionStatus.COMPLETED,
+          created_at: { gte: rangeStart, lte: rangeEnd },
+        },
+        _sum: { amount: true },
+      }),
+      prisma.examSubmission.count({
+        where: { started_at: { gte: rangeStart, lte: rangeEnd } },
+      }),
+      prisma.examSubmission.count({
+        where: {
+          started_at: { gte: rangeStart, lte: rangeEnd },
+          status: { in: [SubmissionStatus.SUBMITTED, SubmissionStatus.GRADED] },
+        },
+      }),
+      prisma.user.count({
+        where: { created_at: { gte: rangeStart, lte: rangeEnd } },
+      }),
+      prisma.transaction.count({
+        where: {
+          status: TransactionStatus.COMPLETED,
+          created_at: { gte: rangeStart, lte: rangeEnd },
+        },
+      }),
+      prisma.examSubmission.aggregate({
+        where: {
+          started_at: { gte: rangeStart, lte: rangeEnd },
+          total_score: { not: null, gt: 0 },
+        },
+        _avg: { total_score: true },
+      }),
     ]);
 
-    // Lấy số liệu 7 ngày gần nhất để vẽ biểu đồ (Chạy song song đồng thời tăng tốc độ phản hồi Dashboard)
-    const daysArray = [6, 5, 4, 3, 2, 1, 0];
-    const dailyAttempts = await Promise.all(
-      daysArray.map(async (i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dayStart = new Date(d);
-        dayStart.setHours(0, 0, 0, 0);
-        const dayEnd = new Date(d);
-        dayEnd.setHours(23, 59, 59, 999);
+    // Xây dựng danh sách mốc thời gian động (Buckets) cho biểu đồ
+    let buckets: Array<{ start: Date; end: Date; label: string; date: string }> = [];
 
-        const count = await prisma.examSubmission.count({
-          where: {
-            started_at: {
-              gte: dayStart,
-              lte: dayEnd,
-            },
-          },
-        });
-
-        const dayStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+    if (period === 'today') {
+      // 6 khung giờ trong ngày: 00-04, 04-08, 08-12, 12-16, 16-20, 20-24
+      const hours = [0, 4, 8, 12, 16, 20];
+      buckets = hours.map((h) => {
+        const bStart = new Date(rangeStart);
+        bStart.setHours(h, 0, 0, 0);
+        const bEnd = new Date(rangeStart);
+        bEnd.setHours(h + 3, 59, 59, 999);
         return {
-          date: d.toISOString().split('T')[0],
-          label: dayStr,
-          attempts: count,
+          start: bStart,
+          end: bEnd,
+          label: `${String(h).padStart(2, '0')}:00`,
+          date: bStart.toISOString(),
         };
-      })
-    );
+      });
+    } else if (period === 'year') {
+      // 12 tháng trong năm
+      buckets = Array.from({ length: 12 }, (_, m) => {
+        const bStart = new Date(now.getFullYear(), m, 1, 0, 0, 0, 0);
+        const bEnd = new Date(now.getFullYear(), m + 1, 0, 23, 59, 59, 999);
+        return {
+          start: bStart,
+          end: bEnd,
+          label: `Th${m + 1}`,
+          date: `${now.getFullYear()}-${String(m + 1).padStart(2, '0')}-01`,
+        };
+      });
+    } else {
+      // Theo từng ngày (từ rangeStart đến rangeEnd, tối đa 31 ngày)
+      const diffDays = Math.max(1, Math.min(31, Math.round((rangeEnd.getTime() - rangeStart.getTime()) / (24 * 60 * 60 * 1000))));
+      buckets = Array.from({ length: diffDays }, (_, i) => {
+        const d = new Date(rangeStart);
+        d.setDate(rangeStart.getDate() + i);
+        const bStart = new Date(d);
+        bStart.setHours(0, 0, 0, 0);
+        const bEnd = new Date(d);
+        bEnd.setHours(23, 59, 59, 999);
+
+        const dayStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+        return {
+          start: bStart,
+          end: bEnd,
+          label: dayStr,
+          date: d.toISOString().split('T')[0],
+        };
+      });
+    }
+
+    // Truy vấn dữ liệu biểu đồ song song theo buckets
+    const [dailyAttempts, dailyRevenue] = await Promise.all([
+      Promise.all(
+        buckets.map(async (b) => {
+          const count = await prisma.examSubmission.count({
+            where: {
+              started_at: { gte: b.start, lte: b.end },
+            },
+          });
+          return {
+            date: b.date,
+            label: b.label,
+            attempts: count,
+          };
+        })
+      ),
+      Promise.all(
+        buckets.map(async (b) => {
+          const rev = await prisma.transaction.aggregate({
+            where: {
+              status: TransactionStatus.COMPLETED,
+              created_at: { gte: b.start, lte: b.end },
+            },
+            _sum: { amount: true },
+          });
+          return {
+            date: b.date,
+            label: b.label,
+            amount: rev._sum.amount || 0,
+          };
+        })
+      ),
+    ]);
+
+    // Thống kê phân bổ CEFR thật từ kết quả bài thi
+    const [bandC, bandB2, bandB1, bandA, avgScoreRes, completedSubmissionsCount, skillStats, recentSubmissions, recentTransactions] = await Promise.all([
+      prisma.examSubmission.count({
+        where: {
+          OR: [{ cefr_level: 'C1' }, { cefr_level: 'C2' }, { total_score: { gte: 160 } }],
+        },
+      }),
+      prisma.examSubmission.count({
+        where: {
+          OR: [
+            { cefr_level: 'B2' },
+            { AND: [{ total_score: { gte: 120 } }, { total_score: { lt: 160 } }] },
+          ],
+        },
+      }),
+      prisma.examSubmission.count({
+        where: {
+          OR: [
+            { cefr_level: 'B1' },
+            { AND: [{ total_score: { gte: 80 } }, { total_score: { lt: 120 } }] },
+          ],
+        },
+      }),
+      prisma.examSubmission.count({
+        where: {
+          OR: [
+            { cefr_level: 'A2' },
+            { cefr_level: 'A1' },
+            { AND: [{ total_score: { gt: 0 } }, { total_score: { lt: 80 } }] },
+          ],
+        },
+      }),
+      prisma.examSubmission.aggregate({
+        where: { total_score: { not: null, gt: 0 } },
+        _avg: { total_score: true },
+      }),
+      prisma.examSubmission.count({
+        where: {
+          status: { in: [SubmissionStatus.SUBMITTED, SubmissionStatus.GRADED] },
+        },
+      }),
+      prisma.exam.groupBy({
+        by: ['skill'],
+        _count: { id: true },
+      }),
+      prisma.examSubmission.findMany({
+        take: 8,
+        orderBy: { started_at: 'desc' },
+        include: {
+          user: { select: { id: true, full_name: true, email: true } },
+          exam: { select: { id: true, title: true, skill: true } },
+        },
+      }),
+      prisma.transaction.findMany({
+        take: 8,
+        orderBy: { created_at: 'desc' },
+        include: {
+          user: { select: { id: true, full_name: true, email: true } },
+        },
+      }),
+    ]);
+
+    // Tổng hợp sự kiện hoạt động học viên thực tế
+    const recentActivities: Array<{
+      id: string;
+      user: string;
+      avatar: string;
+      action: string;
+      detail: string;
+      time: string;
+      type: 'exam' | 'payment';
+      badge: string;
+      badgeColor: string;
+      createdAt: string;
+    }> = [];
+
+    const nowMs = Date.now();
+    const getRelativeTimeString = (date: Date) => {
+      const diffMs = nowMs - date.getTime();
+      const diffMin = Math.floor(diffMs / 60000);
+      if (diffMin < 1) return 'Vừa xong';
+      if (diffMin < 60) return `${diffMin} phút trước`;
+      const diffHours = Math.floor(diffMin / 60);
+      if (diffHours < 24) return `${diffHours} giờ trước`;
+      const diffDays = Math.floor(diffHours / 24);
+      return `${diffDays} ngày trước`;
+    };
+
+    for (const sub of recentSubmissions) {
+      const initials = sub.user?.full_name
+        ? sub.user.full_name
+            .trim()
+            .split(' ')
+            .map((n) => n[0])
+            .slice(-2)
+            .join('')
+            .toUpperCase()
+        : 'HV';
+
+      const scoreText = sub.total_score != null ? ` — ${Math.round(sub.total_score)}/200 điểm` : '';
+      const badge = sub.cefr_level ? `Band ${sub.cefr_level}` : sub.status === 'SUBMITTED' ? 'Đã nộp' : 'Đang thi';
+
+      recentActivities.push({
+        id: `sub_${sub.id}`,
+        user: sub.user?.full_name || 'Học viên ẩn danh',
+        avatar: initials,
+        action: sub.status === 'IN_PROGRESS' ? 'Bắt đầu làm bài thi' : 'Đã hoàn thành bài thi',
+        detail: `${sub.exam?.title || 'Bài thi Aptis'}${scoreText}`,
+        time: getRelativeTimeString(sub.started_at),
+        type: 'exam',
+        badge,
+        badgeColor: sub.cefr_level?.startsWith('C')
+          ? 'bg-purple-500/10 text-purple-600 border border-purple-500/20'
+          : sub.cefr_level?.startsWith('B')
+          ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+          : 'bg-blue-500/10 text-blue-600 border border-blue-500/20',
+        createdAt: sub.started_at.toISOString(),
+      });
+    }
+
+    for (const tx of recentTransactions) {
+      const initials = tx.user?.full_name
+        ? tx.user.full_name
+            .trim()
+            .split(' ')
+            .map((n) => n[0])
+            .slice(-2)
+            .join('')
+            .toUpperCase()
+        : 'HV';
+
+      recentActivities.push({
+        id: `tx_${tx.id}`,
+        user: tx.user?.full_name || 'Học viên nạp tiền',
+        avatar: initials,
+        action: tx.status === 'COMPLETED' ? 'Thanh toán thành công' : 'Đơn hàng mới tạo',
+        detail: `Đơn ${tx.order_code} qua ${tx.bank_name || tx.payment_method}`,
+        time: getRelativeTimeString(tx.created_at),
+        type: 'payment',
+        badge: `+${tx.amount.toLocaleString('vi-VN')} đ`,
+        badgeColor: tx.status === 'COMPLETED'
+          ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+          : 'bg-amber-500/10 text-amber-600 border border-amber-500/20',
+        createdAt: tx.created_at.toISOString(),
+      });
+    }
+
+    recentActivities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const totalGraded = bandC + bandB2 + bandB1 + bandA || 1;
+    const bandDistribution = [
+      {
+        band: 'Band C (C1 - C2)',
+        percent: Math.round((bandC / totalGraded) * 100),
+        count: bandC,
+        color: 'bg-purple-500',
+        desc: 'Xuất sắc & Thành thạo',
+      },
+      {
+        band: 'Band B2',
+        percent: Math.round((bandB2 / totalGraded) * 100),
+        count: bandB2,
+        color: 'bg-emerald-500',
+        desc: 'Chuẩn đầu ra Đại học & Du học',
+      },
+      {
+        band: 'Band B1',
+        percent: Math.round((bandB1 / totalGraded) * 100),
+        count: bandB1,
+        color: 'bg-blue-500',
+        desc: 'Nền tảng giao tiếp chuẩn CEFR',
+      },
+      {
+        band: 'Band A2 / Cần cải thiện',
+        percent: Math.round((bandA / totalGraded) * 100),
+        count: bandA,
+        color: 'bg-amber-500',
+        desc: 'Cần củng cố thêm từ vựng & ngữ pháp',
+      },
+    ];
+
+    const skillCounts: Record<string, number> = {
+      FULL_TEST: 0,
+      LISTENING: 0,
+      READING: 0,
+      WRITING: 0,
+      SPEAKING: 0,
+    };
+    for (const s of skillStats) {
+      skillCounts[s.skill] = s._count.id;
+    }
+
+    const completionRate = totalAttempts > 0 ? Math.round((completedSubmissionsCount / totalAttempts) * 100) : 100;
+    const averageScore = avgScoreRes._avg.total_score ? Math.round(avgScoreRes._avg.total_score) : 145;
+
+    const periodRevenueVND = periodRevenueRes._sum.amount || 0;
+    const avgOrderValue = periodPaidTxCount > 0 ? Math.round(periodRevenueVND / periodPaidTxCount) : 0;
+    const periodAvgScore = periodAvgScoreRes._avg.total_score ? Math.round(periodAvgScoreRes._avg.total_score) : 0;
+    const periodCompletionRate = periodAttempts > 0 ? Math.round((periodCompletedAttempts / periodAttempts) * 100) : 100;
 
     return {
+      // Chỉ số tổng lũy kế
       totalExams,
       totalUsers,
       activeUsers,
@@ -1033,8 +1578,85 @@ export class AdminService {
       pendingTransactionsCount,
       pendingGradingCount,
       pendingTransactions,
+      // Biểu đồ theo kỳ lọc
       dailyAttempts,
+      dailyRevenue,
+      bandDistribution,
+      skillCounts,
+      recentActivities,
+      averageScore,
+      completionRate,
+      // Chỉ số trong kỳ lọc được chọn
+      periodStats: {
+        period,
+        label: periodLabel,
+        rangeStart: rangeStart.toISOString(),
+        rangeEnd: rangeEnd.toISOString(),
+        revenueVND: periodRevenueVND,
+        attempts: periodAttempts,
+        completedAttempts: periodCompletedAttempts,
+        completionRate: periodCompletionRate,
+        newUsers: periodNewUsers,
+        paidTransactionsCount: periodPaidTxCount,
+        avgOrderValue,
+        avgScore: periodAvgScore,
+      },
     };
+  }
+
+  async exportDashboardReport(filter?: { period?: string; fromDate?: string; toDate?: string; format?: string }) {
+    const kpis = await this.getDashboardKPIs(filter);
+    const p = kpis.periodStats;
+
+    // Tạo nội dung CSV chuẩn UTF-8 kèm BOM
+    const lines: string[] = [];
+    lines.push('\uFEFF"BÁO CÁO THỐNG KÊ VẬN HÀNH & KINH DOANH APTIS ESOL PREMIER"');
+    lines.push(`"Thời điểm xuất báo cáo:","${new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}"`);
+    lines.push(`"Kỳ báo cáo:","${p.label}"`);
+    lines.push(`"Khoảng thời gian:","${p.rangeStart} đến ${p.rangeEnd}"`);
+    lines.push('');
+
+    // Bảng 1: KPI Trong kỳ
+    lines.push('"--- 1. CÁC CHỈ SỐ HOẠT ĐỘNG CHÍNH TRONG KỲ ---"');
+    lines.push('"Chỉ số","Giá trị","Đơn vị"');
+    lines.push(`"Doanh thu trong kỳ","${p.revenueVND.toLocaleString('vi-VN')}","VNĐ"`);
+    lines.push(`"Số đơn hàng thành công","${p.paidTransactionsCount}","Đơn"`);
+    lines.push(`"Giá trị đơn hàng trung bình (AOV)","${p.avgOrderValue.toLocaleString('vi-VN')}","VNĐ/đơn"`);
+    lines.push(`"Lượt thi trong kỳ","${p.attempts}","Lượt"`);
+    lines.push(`"Lượt thi hoàn thành","${p.completedAttempts}","Lượt (${p.completionRate}%)"`);
+    lines.push(`"Học viên đăng ký mới","${p.newUsers}","Học viên"`);
+    lines.push(`"Điểm thi trung bình trong kỳ","${p.avgScore}","Điểm"`);
+    lines.push('');
+
+    // Bảng 2: Tổng lũy kế toàn hệ thống
+    lines.push('"--- 2. CHỈ SỐ TỔNG QUAN TOÀN HỆ THỐNG (LŨY KẾ) ---"');
+    lines.push('"Chỉ số","Giá trị"');
+    lines.push(`"Tổng người dùng đăng ký","${kpis.totalUsers}"`);
+    lines.push(`"Người dùng đang hoạt động","${kpis.activeUsers}"`);
+    lines.push(`"Tổng số bộ đề thi","${kpis.totalExams}"`);
+    lines.push(`"Tổng lượt thi lũy kế","${kpis.totalAttempts}"`);
+    lines.push(`"Tổng doanh thu tích lũy","${kpis.totalRevenueVND.toLocaleString('vi-VN')} VNĐ"`);
+    lines.push(`"Giao dịch SePay chờ duyệt","${kpis.pendingTransactionsCount}"`);
+    lines.push(`"Bài thi tự luận chờ chấm","${kpis.pendingGradingCount}"`);
+    lines.push('');
+
+    // Bảng 3: Diễn biến theo thời gian (Biểu đồ)
+    lines.push('"--- 3. DIỄN BIẾN LƯỢT THI VÀ DOANH THU THEO THỜI GIAN ---"');
+    lines.push('"Thời gian / Mốc","Số lượt thi","Doanh thu (VNĐ)"');
+    kpis.dailyAttempts.forEach((item, idx) => {
+      const rev = kpis.dailyRevenue[idx]?.amount || 0;
+      lines.push(`"${item.label} (${item.date})","${item.attempts}","${rev.toLocaleString('vi-VN')}"`);
+    });
+    lines.push('');
+
+    // Bảng 4: Phân bố Band điểm
+    lines.push('"--- 4. PHÂN BỐ TRÌNH ĐỘ BAND CEFR CỦA HỌC VIÊN ---"');
+    lines.push('"Trình độ Band","Tỷ lệ %","Số lượng","Mô tả chuẩn"');
+    kpis.bandDistribution.forEach((b) => {
+      lines.push(`"${b.band}","${b.percent}%","${b.count} bài","${b.desc}"`);
+    });
+
+    return lines.join('\r\n');
   }
 }
 

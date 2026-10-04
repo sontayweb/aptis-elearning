@@ -1,0 +1,12 @@
+{
+  "name": "aptiskytich",
+  "displayName": "Aptis Kỳ Tích",
+  "baseUrl": "https://aptiskytich.vn/",
+  "supabaseUrl": "https://bacoamhbatqpxatrrflz.supabase.co",
+  "anonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhY29hbWhiYXRxcHhhdHJyZmx6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMTgyODgsImV4cCI6MjA4ODY5NDI4OH0.BcFLY1mFlFxCK7E0E89iLlh4am3mEXkbYZaFJ4O_mpw",
+  "account": {
+    "email": "sontayweb.admin@gmail.com",
+    "password": "Taovipko0!"
+  },
+  "remotePort": 9222
+}

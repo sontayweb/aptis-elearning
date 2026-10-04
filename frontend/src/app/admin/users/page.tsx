@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { api } from "@/lib/api-client";
+import { AdminPagination } from "@/components/admin/admin-pagination";
+import { SortableHeader, SortState } from "@/components/admin/sortable-header";
 import {
   Users,
   Search,
@@ -36,6 +38,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronUp,
+  MoreHorizontal,
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
 import { useAuth } from "@/contexts/auth-context";
@@ -105,8 +108,15 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [vipFilterOnly, setVipFilterOnly] = useState(false);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+
+  type UserSortKey = "full_name" | "phone_number" | "is_active" | "created_at" | "submissions";
+  const [sortState, setSortState] = useState<SortState<UserSortKey>>({
+    key: "created_at",
+    order: "desc",
+  });
 
   // Smart Toggle for KPI metrics strip (defaults to false for clean workhorse layout, persists in localStorage)
   const [showMetrics, setShowMetrics] = useState(false);
@@ -131,6 +141,22 @@ export default function AdminUsersPage() {
   // Multi-selection state
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [batchActionLoading, setBatchActionLoading] = useState(false);
+
+  // Table row 3-dot dropdown state
+  const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("[data-row-menu]")) {
+        setActiveDropdownId(null);
+      }
+    };
+    if (activeDropdownId) {
+      document.addEventListener("click", handleOutsideClick);
+      return () => document.removeEventListener("click", handleOutsideClick);
+    }
+  }, [activeDropdownId]);
 
   // Quick Assistance Drawer State
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
@@ -196,7 +222,7 @@ export default function AdminUsersPage() {
         search: searchTerm || undefined,
         role: roleFilter,
         page,
-        limit: 15,
+        limit: pageSize,
       });
 
       if (res.success && res.data) {
@@ -216,7 +242,7 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
     setSelectedUserIds([]);
-  }, [page, roleFilter]);
+  }, [page, roleFilter, pageSize]);
 
   // Lock body scroll and listen for Escape key when modals are open
   useEffect(() => {
@@ -559,6 +585,41 @@ export default function AdminUsersPage() {
     ? users.filter((u) => u.subscriptions && u.subscriptions.length > 0)
     : users;
 
+  const handleSort = (field: UserSortKey) => {
+    setSortState((prev) => {
+      if (prev.key !== field) return { key: field, order: "asc" };
+      if (prev.order === "asc") return { key: field, order: "desc" };
+      if (prev.order === "desc") return { key: field, order: null };
+      return { key: field, order: "asc" };
+    });
+  };
+
+  const sortedUsers = useMemo(() => {
+    const list = [...displayedUsers];
+    if (!sortState.order || !sortState.key) return list;
+
+    const { key, order } = sortState;
+    return list.sort((a, b) => {
+      let valA: any = a[key as keyof UserItem];
+      let valB: any = b[key as keyof UserItem];
+
+      if (key === "submissions") {
+        valA = a._count?.submissions || 0;
+        valB = b._count?.submissions || 0;
+      } else if (key === "is_active") {
+        valA = a.is_active ? 1 : 0;
+        valB = b.is_active ? 1 : 0;
+      } else if (typeof valA === "string") {
+        valA = valA.toLowerCase();
+        valB = (valB || "").toLowerCase();
+      }
+
+      if (valA < valB) return order === "asc" ? -1 : 1;
+      if (valA > valB) return order === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [displayedUsers, sortState]);
+
   // Calculated Stats
   const vipCount = users.filter((u) => u.subscriptions && u.subscriptions.length > 0).length;
   const teacherCount = users.filter((u) => u.role === "TEACHER").length;
@@ -589,38 +650,38 @@ export default function AdminUsersPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-semibold mb-1.5">
-            <Users className="w-3 h-3 text-slate-600" />
-            <span>Student & User Management Studio</span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
+            <Users className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+            <span>Quản trị Học viên & Tài khoản</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight">
             Quản Lý Tài Khoản Học Viên
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
             Tra cứu theo SĐT/Email, cấp gia hạn VIP 1 chạm, điều phối lượt chấm AI và xử lý tài vụ khẩn cấp
           </p>
 
-          {/* Compact Inline Metrics Strip (SRD 4.3 Clean Standard - Zero Space Overhead) */}
+          {/* Compact Inline Metrics Strip (Clean Subtext & Subtle Neutral Chips) */}
           {!showMetrics && (
             <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
-              <span className="text-[11px] text-slate-400 font-semibold font-heading uppercase tracking-wider">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
                 Chỉ số nhanh:
               </span>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200/80 text-[11px] font-semibold text-slate-700">
-                <Users className="w-3 h-3 text-slate-500" />
-                <span>Tổng: <strong className="text-slate-900 font-mono">{totalCount}</strong></span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <Users className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+                <span>Tổng: <strong className="text-slate-900 dark:text-white font-mono">{totalCount}</strong></span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-amber-50 border border-amber-200/80 text-[11px] font-semibold text-amber-800">
-                <Crown className="w-3 h-3 text-amber-600 fill-amber-500" />
-                <span>VIP: <strong className="text-amber-900 font-mono">{vipCount}</strong></span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
+                <span>VIP: <strong className="text-slate-900 dark:text-white font-mono">{vipCount}</strong></span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-blue-50 border border-blue-200/80 text-[11px] font-semibold text-blue-800">
-                <GraduationCap className="w-3 h-3 text-blue-600" />
-                <span>Giảng viên: <strong className="text-blue-900 font-mono">{teacherCount}</strong></span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <GraduationCap className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+                <span>Giảng viên: <strong className="text-slate-900 dark:text-white font-mono">{teacherCount}</strong></span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200/80 text-[11px] font-semibold text-emerald-800">
-                <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                <span>Hoạt động: <strong className="text-emerald-900 font-mono">{activeRate}%</strong></span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                <span>Hoạt động: <strong className="text-slate-900 dark:text-white font-mono">{activeRate}%</strong></span>
               </div>
             </div>
           )}
@@ -633,8 +694,8 @@ export default function AdminUsersPage() {
             onClick={toggleMetrics}
             className={`px-3.5 py-2 rounded-xl border text-xs font-heading font-semibold transition-all flex items-center gap-1.5 shadow-2xs ${
               showMetrics
-                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                : "border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
+                ? "bg-slate-900 dark:bg-slate-800 text-white border-slate-900 dark:border-slate-700 shadow-sm"
+                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
             }`}
             title={showMetrics ? "Thu gọn 4 thẻ chỉ số để giải phóng không gian bảng" : "Mở rộng 4 thẻ chỉ số thống kê"}
           >
@@ -645,10 +706,10 @@ export default function AdminUsersPage() {
 
           <button
             onClick={() => handleExportCSV(false)}
-            className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
             title="Xuất file danh sách ra Excel/CSV"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span className="hidden sm:inline">Xuất Excel</span>
           </button>
 
@@ -666,7 +727,7 @@ export default function AdminUsersPage() {
 
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
           >
             <UserPlus className="w-4 h-4" />
             <span>Thêm tài khoản</span>
@@ -678,72 +739,72 @@ export default function AdminUsersPage() {
       {showMetrics && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Tổng tài khoản */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition-all">
-            <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 flex items-center justify-center shrink-0">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 flex items-center justify-center shrink-0">
               <Users className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider font-heading">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider font-heading">
                 Tổng tài khoản
               </div>
-              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 mt-0.5 font-mono">
+              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 dark:text-white mt-0.5 font-mono">
                 {totalCount}
               </div>
-              <div className="text-[10px] text-slate-500 font-medium mt-0.5">
-                Hệ thống Aptis Kỳ Tích
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
+                Hệ thống APTIS ESOL PREMIER
               </div>
             </div>
           </div>
 
           {/* Học viên VIP */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition-all">
-            <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <Crown className="w-5 h-5 fill-amber-500" />
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider font-heading">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider font-heading">
                 Học viên VIP hoạt động
               </div>
-              <div className="text-xl sm:text-2xl font-heading font-extrabold text-amber-700 mt-0.5 font-mono">
+              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 dark:text-white mt-0.5 font-mono">
                 {vipCount}
               </div>
-              <div className="text-[10px] text-amber-700 font-medium mt-0.5">
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                 Có quyền truy cập kho VIP Pro
               </div>
             </div>
           </div>
 
           {/* Đội ngũ Giảng viên */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition-all">
-            <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <GraduationCap className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider font-heading">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider font-heading">
                 Giảng viên học vụ
               </div>
-              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 mt-0.5 font-mono">
+              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 dark:text-white mt-0.5 font-mono">
                 {teacherCount}
               </div>
-              <div className="text-[10px] text-slate-500 font-medium mt-0.5">
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                 Chấm thi & cố vấn chuyên môn
               </div>
             </div>
           </div>
 
           {/* Trạng thái hoạt động */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition-all">
-            <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider font-heading">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider font-heading">
                 Tỷ lệ hoạt động
               </div>
-              <div className="text-xl sm:text-2xl font-heading font-extrabold text-emerald-700 mt-0.5 font-mono">
+              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 dark:text-white mt-0.5 font-mono">
                 {activeRate}%
               </div>
-              <div className="text-[10px] text-emerald-700 font-medium mt-0.5">
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                 {activeCount} / {users.length} tài khoản hợp lệ
               </div>
             </div>
@@ -752,22 +813,22 @@ export default function AdminUsersPage() {
       )}
 
       {/* Filter and Search Bar */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
         {/* Search Input */}
         <form onSubmit={handleSearchSubmit} className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Tìm theo tên, email hoặc SĐT..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 font-sans"
+            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-sans"
           />
         </form>
 
         {/* Role Filters Tabs & VIP toggle */}
         <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          <div className="flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200/60">
+          <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
             {[
               { id: "ALL", label: "Tất cả" },
               { id: "STUDENT", label: "Học viên" },
@@ -783,8 +844,8 @@ export default function AdminUsersPage() {
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all ${
                   roleFilter === tab.id
-                    ? "bg-white text-slate-900 shadow-2xs font-bold"
-                    : "text-slate-500 hover:text-slate-800"
+                    ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold ring-1 ring-slate-900/5 dark:ring-white/10"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 {tab.label}
@@ -796,8 +857,8 @@ export default function AdminUsersPage() {
             onClick={() => setVipFilterOnly((prev) => !prev)}
             className={`px-3 py-1.5 rounded-xl text-xs font-heading font-semibold border transition-all flex items-center gap-1.5 whitespace-nowrap ${
               vipFilterOnly
-                ? "bg-amber-50 text-amber-700 border-amber-200 font-bold shadow-2xs"
-                : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                ? "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 font-bold shadow-2xs"
+                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
             }`}
           >
             <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
@@ -807,58 +868,86 @@ export default function AdminUsersPage() {
           <button
             onClick={fetchUsers}
             title="Làm mới danh sách"
-            className="p-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors border border-slate-200"
+            className="p-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors border border-slate-200 dark:border-slate-700"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-slate-900" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-slate-900 dark:text-white" : ""}`} />
           </button>
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden">
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-heading font-bold text-[10px] uppercase tracking-wider">
+              <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200/80 dark:border-slate-700/80 text-slate-500 dark:text-slate-400 font-heading font-bold text-[10px] uppercase tracking-wider">
                 <th className="py-3.5 pl-4 sm:pl-6 pr-2 w-10">
                   <button
                     onClick={handleToggleSelectAll}
                     title="Chọn tất cả trang này"
-                    className="text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center"
+                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
                   >
                     {selectedUserIds.length > 0 &&
                     selectedUserIds.length === displayedUsers.length ? (
-                      <CheckSquare className="w-4 h-4 text-slate-900" />
+                      <CheckSquare className="w-4 h-4 text-slate-900 dark:text-white" />
                     ) : (
                       <Square className="w-4 h-4" />
                     )}
                   </button>
                 </th>
-                <th className="py-3.5 px-4">Học viên / Tài khoản</th>
-                <th className="py-3.5 px-4">Số điện thoại</th>
-                <th className="py-3.5 px-4">Gói dịch vụ</th>
-                <th className="py-3.5 px-4">Trạng thái</th>
-                <th className="py-3.5 px-4 text-center">Lượt thi</th>
-                <th className="py-3.5 px-4">Ngày đăng ký</th>
-                <th className="py-3.5 px-4 text-right pr-6">Hỗ trợ học vụ</th>
+                <SortableHeader
+                  field="full_name"
+                  title="Học viên / Tài khoản"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  field="phone_number"
+                  title="Số điện thoại"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                />
+                <th className="py-3.5 px-4 text-left">Gói dịch vụ</th>
+                <SortableHeader
+                  field="is_active"
+                  title="Trạng thái"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                  align="center"
+                />
+                <SortableHeader
+                  field="submissions"
+                  title="Lượt thi"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                  align="right"
+                />
+                <SortableHeader
+                  field="created_at"
+                  title="Ngày đăng ký"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                  align="right"
+                />
+                <th className="py-3.5 px-4 text-right pr-6">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-medium text-slate-900">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium text-slate-900 dark:text-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-slate-400">
-                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-slate-600" />
+                  <td colSpan={8} className="py-16 text-center text-slate-400 dark:text-slate-500">
+                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-slate-600 dark:text-slate-400" />
                     Đang tải danh sách tài khoản...
                   </td>
                 </tr>
-              ) : displayedUsers.length === 0 ? (
+              ) : sortedUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-slate-400 font-normal">
+                  <td colSpan={8} className="py-16 text-center text-slate-400 dark:text-slate-500 font-normal">
                     Không tìm thấy tài khoản nào phù hợp bộ lọc
                   </td>
                 </tr>
               ) : (
-                displayedUsers.map((user) => {
+                sortedUsers.map((user) => {
                   const activeSub =
                     user.subscriptions && user.subscriptions.length > 0
                       ? user.subscriptions[0]
@@ -869,18 +958,18 @@ export default function AdminUsersPage() {
                   return (
                     <tr
                       key={user.id}
-                      className={`hover:bg-slate-50/70 transition-colors ${
-                        isSelected ? "bg-slate-50/80" : ""
+                      className={`hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors ${
+                        isSelected ? "bg-slate-50/80 dark:bg-slate-800/80" : ""
                       }`}
                     >
                       {/* Checkbox */}
                       <td className="py-3.5 pl-4 sm:pl-6 pr-2">
                         <button
                           onClick={() => handleToggleSelectUser(user.id)}
-                          className="text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center"
+                          className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
                         >
                           {isSelected ? (
-                            <CheckSquare className="w-4 h-4 text-slate-900" />
+                            <CheckSquare className="w-4 h-4 text-slate-900 dark:text-white" />
                           ) : (
                             <Square className="w-4 h-4" />
                           )}
@@ -888,10 +977,10 @@ export default function AdminUsersPage() {
                       </td>
 
                       {/* Name & Email & Role badge */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 text-left">
                         <div className="flex items-center gap-3">
                           <div className="relative">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                               {user.full_name.charAt(0)}
                             </div>
                             {isVip && (
@@ -901,26 +990,26 @@ export default function AdminUsersPage() {
                             )}
                           </div>
                           <div className="min-w-0">
-                            <div className="font-heading font-bold text-slate-900 flex items-center gap-1.5">
+                            <div className="font-heading font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                               <span className="truncate">{user.full_name}</span>
                               {user.role === "SUPER_ADMIN" && (
-                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-md bg-gradient-to-r from-rose-600 to-amber-600 text-white text-[9px] font-bold shadow-xs">
-                                  <Sparkles className="w-3 h-3" /> Super Admin
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 text-[9px] font-bold">
+                                  <Sparkles className="w-2.5 h-2.5" /> Super Admin
                                 </span>
                               )}
                               {user.role === "ADMIN" && (
-                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-md bg-slate-900 text-white text-[9px] font-bold">
-                                  <ShieldCheck className="w-3 h-3" /> Admin
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[9px] font-bold">
+                                  <ShieldCheck className="w-2.5 h-2.5" /> Admin
                                 </span>
                               )}
                               {user.role === "TEACHER" && (
-                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[9px] font-bold">
-                                  <GraduationCap className="w-3 h-3" /> GV
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/60 text-[9px] font-bold">
+                                  <GraduationCap className="w-2.5 h-2.5" /> GV
                                 </span>
                               )}
                             </div>
-                            <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
-                              <Mail className="w-3 h-3 text-slate-400 shrink-0" />
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
+                              <Mail className="w-3 h-3 text-slate-400 dark:text-slate-500 shrink-0" />
                               <span className="truncate">{user.email}</span>
                             </div>
                           </div>
@@ -928,90 +1017,160 @@ export default function AdminUsersPage() {
                       </td>
 
                       {/* Phone */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 text-left">
                         {user.phone_number ? (
                           <a
                             href={`tel:${user.phone_number}`}
-                            className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 font-mono text-[11px] font-medium"
+                            className="inline-flex items-center gap-1 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] font-medium"
                           >
-                            <Phone className="w-3 h-3 text-slate-400" />
+                            <Phone className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                             {user.phone_number}
                           </a>
                         ) : (
-                          <span className="text-slate-300 text-[11px]">—</span>
+                          <span className="text-slate-300 dark:text-slate-600 text-[11px]">—</span>
                         )}
                       </td>
 
                       {/* VIP Status */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 text-left">
                         {isVip ? (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-heading font-bold text-[10px]">
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 font-heading font-bold text-[10px]">
                             <Crown className="w-3 h-3 text-amber-500 fill-amber-500 shrink-0" />
                             <span>{activeSub.plan.name}</span>
                           </div>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium text-[10px]">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium text-[10px]">
                             FREE
                           </span>
                         )}
                       </td>
 
-                      {/* Active Status */}
-                      <td className="py-3.5 px-4">
+                      {/* Active Status (Centered per UX Guideline 5) */}
+                      <td className="py-3.5 px-4 text-center">
                         {user.is_active ? (
-                          <span className="inline-flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                          <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             Hoạt động
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 text-rose-600 font-semibold text-[11px]">
+                          <span className="inline-flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-semibold text-[11px]">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                             Đã khóa
                           </span>
                         )}
                       </td>
 
-                      {/* Submissions Count */}
-                      <td className="py-3.5 px-4 text-center">
-                        <span className="font-semibold text-slate-900 font-mono">
+                      {/* Submissions Count (Right-aligned per UX Guideline 5) */}
+                      <td className="py-3.5 px-4 text-right">
+                        <span className="font-semibold text-slate-900 dark:text-white font-mono">
                           {user._count?.submissions || 0}
                         </span>
                       </td>
 
-                      {/* Created At */}
-                      <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px]">
+                      {/* Created At (Right-aligned numbers per UX Guideline 5) */}
+                      <td className="py-3.5 px-4 text-right text-slate-500 dark:text-slate-400 font-mono text-[11px]">
                         {new Date(user.created_at).toLocaleDateString("vi-VN")}
                       </td>
 
-                      {/* Action Buttons */}
+                      {/* Action Buttons: 1 Primary + 3-dot Dropdown per UX Guideline 5 */}
                       <td className="py-3.5 px-4 text-right pr-6">
                         <div className="inline-flex items-center gap-1.5">
-                          {/* Quick Assistance Button */}
+                          {/* Primary Action Button */}
                           <button
                             onClick={() => handleOpenAssistance(user)}
-                            className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-heading font-semibold text-[11px] transition-colors flex items-center gap-1 shadow-2xs"
-                            title="Mở menu hỗ trợ: Cấp VIP, Cộng lượt AI, Đổi mật khẩu"
+                            className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-heading font-semibold text-[11px] transition-colors flex items-center gap-1 shadow-2xs"
+                            title="Mở menu hỗ trợ học vụ"
                           >
-                            <LifeBuoy className="w-3 h-3 text-slate-500" />
+                            <LifeBuoy className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                             <span>Hỗ trợ</span>
                           </button>
 
-                          {/* Lock / Unlock Toggle */}
-                          <button
-                            onClick={() => requestToggleStatus(user)}
-                            title={user.is_active ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                            className={`p-1.5 rounded-lg transition-colors border ${
-                              user.is_active
-                                ? "text-slate-400 hover:text-rose-600 hover:bg-rose-50 border-slate-200"
-                                : "text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100"
-                            }`}
-                          >
-                            {user.is_active ? (
-                              <Lock className="w-3.5 h-3.5" />
-                            ) : (
-                              <Unlock className="w-3.5 h-3.5" />
+                          {/* 3-Dot Secondary Action Dropdown */}
+                          <div className="relative" data-row-menu>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveDropdownId(activeDropdownId === user.id ? null : user.id);
+                              }}
+                              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors shadow-2xs"
+                              title="Thao tác khác"
+                            >
+                              <MoreHorizontal className="w-3.5 h-3.5" />
+                            </button>
+
+                            {activeDropdownId === user.id && (
+                              <div className="absolute right-0 top-full mt-1 w-44 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 text-left text-xs">
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    handleOpenAssistance(user);
+                                    setAssistanceTab("vip");
+                                  }}
+                                  className="w-full px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 font-medium"
+                                >
+                                  <Crown className="w-3.5 h-3.5 text-amber-500" />
+                                  <span>Cấp / Gia hạn VIP</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    handleOpenAssistance(user);
+                                    setAssistanceTab("quota");
+                                  }}
+                                  className="w-full px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 font-medium"
+                                >
+                                  <Zap className="w-3.5 h-3.5 text-sky-500" />
+                                  <span>Cộng lượt chấm AI</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    handleOpenAssistance(user);
+                                    setAssistanceTab("password");
+                                  }}
+                                  className="w-full px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 font-medium"
+                                >
+                                  <KeyRound className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                                  <span>Đặt lại mật khẩu</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    handleOpenAssistance(user);
+                                    setAssistanceTab("history");
+                                  }}
+                                  className="w-full px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 font-medium"
+                                >
+                                  <History className="w-3.5 h-3.5 text-indigo-500" />
+                                  <span>Lịch sử thi</span>
+                                </button>
+                                <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    requestToggleStatus(user);
+                                  }}
+                                  className={`w-full px-3 py-1.5 flex items-center gap-2 font-medium ${
+                                    user.is_active
+                                      ? "text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                                      : "text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                                  }`}
+                                >
+                                  {user.is_active ? (
+                                    <>
+                                      <Lock className="w-3.5 h-3.5" />
+                                      <span>Khóa tài khoản</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Unlock className="w-3.5 h-3.5" />
+                                      <span>Mở khóa tài khoản</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
                             )}
-                          </button>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -1022,33 +1181,20 @@ export default function AdminUsersPage() {
           </table>
         </div>
 
-        {/* Pagination Footer */}
-        <div className="py-3.5 px-4 sm:px-6 bg-slate-50/60 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <div>
-            Hiển thị <span className="font-bold text-slate-900">{displayedUsers.length}</span> /{" "}
-            <span className="font-bold text-slate-900">{totalCount}</span> tài khoản
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              disabled={page <= 1}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="font-medium text-slate-700 px-2 font-mono">
-              Trang {page} / {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-              disabled={page >= totalPages}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        {/* Standard Admin Pagination Footer */}
+        <AdminPagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalCount || sortedUsers.length}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 15, 25, 50]}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setPage(1);
+          }}
+          itemName="tài khoản"
+        />
       </div>
 
       {/* FLOATING BATCH ACTIONS BAR (Linear / Notion Style) */}
@@ -1109,7 +1255,7 @@ export default function AdminUsersPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg bg-white border-l border-slate-200 h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-200"
+            className="w-full max-w-lg bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-200"
           >
             {/* Drawer Header */}
             <div className="p-6 bg-slate-900 text-white flex items-center justify-between">
@@ -1145,7 +1291,7 @@ export default function AdminUsersPage() {
             </div>
 
             {/* Drawer Tabs */}
-            <div className="flex border-b border-slate-200 px-6 bg-slate-50/50">
+            <div className="flex border-b border-slate-200 dark:border-slate-800 px-6 bg-slate-50/50 dark:bg-slate-900/50">
               {[
                 { id: "vip", label: "Cấp / Gia hạn VIP", icon: Crown },
                 { id: "quota", label: "Cộng lượt AI", icon: Zap },
@@ -1160,8 +1306,8 @@ export default function AdminUsersPage() {
                     onClick={() => setAssistanceTab(tab.id as any)}
                     className={`py-3.5 px-3 text-xs font-heading font-semibold border-b-2 flex items-center gap-1.5 transition-all ${
                       isActive
-                        ? "border-slate-900 text-slate-900 font-bold"
-                        : "border-transparent text-slate-500 hover:text-slate-800"
+                        ? "border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 font-bold"
+                        : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -1183,32 +1329,32 @@ export default function AdminUsersPage() {
                   {/* TAB 1: GRANT VIP */}
                   {assistanceTab === "vip" && (
                     <div className="space-y-5">
-                      <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-xs space-y-1.5">
-                        <div className="font-heading font-bold text-amber-800 flex items-center gap-1.5">
-                          <Crown className="w-4 h-4 text-amber-600 fill-amber-500" />
+                      <div className="rounded-xl border border-amber-200 dark:border-amber-800/60 bg-amber-50/60 dark:bg-amber-950/40 p-4 text-xs space-y-1.5">
+                        <div className="font-heading font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                          <Crown className="w-4 h-4 text-amber-600 dark:text-amber-400 fill-amber-500" />
                           <span>Trạng thái VIP hiện tại:</span>
                         </div>
                         {summaryData?.subscriptions && summaryData.subscriptions.length > 0 ? (
-                          <div className="text-slate-700 font-medium">
+                          <div className="text-slate-700 dark:text-slate-300 font-medium">
                             Đang kích hoạt gói:{" "}
-                            <strong className="text-slate-900">
+                            <strong className="text-slate-900 dark:text-white">
                               {summaryData.subscriptions[0].plan.name}
                             </strong>
                             <br />
                             Thời hạn đến:{" "}
-                            <strong className="text-slate-900 font-mono">
+                            <strong className="text-slate-900 dark:text-white font-mono">
                               {new Date(summaryData.subscriptions[0].end_date).toLocaleDateString(
                                 "vi-VN"
                               )}
                             </strong>
                           </div>
                         ) : (
-                          <p className="text-slate-600">Học viên hiện đang dùng gói FREE (Chưa có VIP).</p>
+                          <p className="text-slate-600 dark:text-slate-400">Học viên hiện đang dùng gói FREE (Chưa có VIP).</p>
                         )}
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-xs font-heading font-bold text-slate-800 block">
+                        <label className="text-xs font-heading font-bold text-slate-800 dark:text-slate-200 block">
                           Chọn số ngày gia hạn thêm:
                         </label>
                         <div className="grid grid-cols-4 gap-2">
@@ -1224,8 +1370,8 @@ export default function AdminUsersPage() {
                               onClick={() => setVipDays(item.days)}
                               className={`py-2 px-1 rounded-xl text-xs font-heading font-semibold border transition-all text-center ${
                                 vipDays === item.days
-                                  ? "bg-slate-900 text-white border-slate-900 font-bold shadow-xs"
-                                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                                  ? "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white border-transparent font-bold shadow-xs shadow-blue-500/20"
+                                  : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                               }`}
                             >
                               {item.label}
@@ -1235,7 +1381,7 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-heading font-bold text-slate-800 block">
+                        <label className="text-xs font-heading font-bold text-slate-800 dark:text-slate-200 block">
                           Lý do kích hoạt / Ghi chú học vụ:
                         </label>
                         <input
@@ -1243,14 +1389,14 @@ export default function AdminUsersPage() {
                           value={vipReason}
                           onChange={(e) => setVipReason(e.target.value)}
                           placeholder="Ví dụ: Đóng tiền mặt tại quầy, Học bổng, Bù lỗi..."
-                          className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-slate-900 text-slate-900 font-normal"
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white font-normal"
                         />
                       </div>
 
                       <button
                         onClick={handleGrantVip}
                         disabled={vipSubmitting}
-                        className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-2.5 bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:from-[#1E40AF] hover:to-[#1D4ED8] text-white font-heading font-semibold text-xs rounded-xl shadow-xs shadow-blue-500/20 transition-colors flex items-center justify-center gap-2"
                       >
                         {vipSubmitting ? (
                           <RefreshCw className="w-4 h-4 animate-spin" />
@@ -1265,18 +1411,18 @@ export default function AdminUsersPage() {
                   {/* TAB 2: ADJUST QUOTA */}
                   {assistanceTab === "quota" && (
                     <div className="space-y-5">
-                      <div className="rounded-xl border border-sky-200 bg-sky-50/60 p-4 text-xs space-y-1">
-                        <div className="font-heading font-bold text-sky-800 flex items-center gap-1.5">
-                          <Zap className="w-4 h-4 text-sky-600" />
+                      <div className="rounded-xl border border-sky-200 dark:border-sky-800/60 bg-sky-50/60 dark:bg-sky-950/40 p-4 text-xs space-y-1">
+                        <div className="font-heading font-bold text-sky-800 dark:text-sky-300 flex items-center gap-1.5">
+                          <Zap className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>Hạn ngạch AI hiện tại:</span>
                         </div>
-                        <p className="text-slate-900 text-sm font-heading font-bold font-mono">
+                        <p className="text-slate-900 dark:text-white text-sm font-heading font-bold font-mono">
                           {summaryData?.subscriptions?.[0]?.ai_quota_left || 0} lượt chấm AI còn lại
                         </p>
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-xs font-heading font-bold text-slate-800 block">
+                        <label className="text-xs font-heading font-bold text-slate-800 dark:text-slate-200 block">
                           Chọn số lượt chấm AI muốn cộng thêm:
                         </label>
                         <div className="grid grid-cols-3 gap-2">
@@ -1287,8 +1433,8 @@ export default function AdminUsersPage() {
                               onClick={() => setAiQuotaAdd(num)}
                               className={`py-2.5 rounded-xl text-xs font-heading font-semibold border transition-all text-center ${
                                 aiQuotaAdd === num
-                                  ? "bg-slate-900 text-white border-slate-900 font-bold shadow-xs"
-                                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                                  ? "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white border-transparent font-bold shadow-xs shadow-blue-500/20"
+                                  : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                               }`}
                             >
                               +{num} lượt
@@ -1300,7 +1446,7 @@ export default function AdminUsersPage() {
                       <button
                         onClick={handleAdjustQuota}
                         disabled={quotaSubmitting}
-                        className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-2.5 bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:from-[#1E40AF] hover:to-[#1D4ED8] text-white font-heading font-semibold text-xs rounded-xl shadow-xs shadow-blue-500/20 transition-colors flex items-center justify-center gap-2"
                       >
                         {quotaSubmitting ? (
                           <RefreshCw className="w-4 h-4 animate-spin" />
@@ -1315,18 +1461,18 @@ export default function AdminUsersPage() {
                   {/* TAB 3: RESET PASSWORD */}
                   {assistanceTab === "password" && (
                     <div className="space-y-5">
-                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs space-y-1.5">
-                        <div className="font-heading font-bold text-slate-800 flex items-center gap-1.5">
-                          <KeyRound className="w-4 h-4 text-slate-700" />
+                      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 p-4 text-xs space-y-1.5">
+                        <div className="font-heading font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                          <KeyRound className="w-4 h-4 text-slate-700 dark:text-slate-300" />
                           <span>Đặt lại mật khẩu khẩn cấp</span>
                         </div>
-                        <p className="text-slate-500 text-[11px] leading-relaxed">
+                        <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
                           Sau khi đặt lại, học viên có thể dùng mật khẩu mới này để đăng nhập ngay lập tức.
                         </p>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-heading font-bold text-slate-800 block">
+                        <label className="text-xs font-heading font-bold text-slate-800 dark:text-slate-200 block">
                           Mật khẩu mới:
                         </label>
                         <div className="flex gap-2">
@@ -1334,14 +1480,14 @@ export default function AdminUsersPage() {
                             type="text"
                             value={resetPassNew}
                             onChange={(e) => setResetPassNew(e.target.value)}
-                            className="flex-1 px-3 py-2 text-xs font-mono font-bold rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-slate-900 text-slate-900"
+                            className="flex-1 px-3 py-2 text-xs font-mono font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
                           />
                           <button
                             type="button"
                             onClick={() => copyToClipboard(resetPassNew)}
-                            className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1 border border-slate-200"
+                            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1 border border-slate-200 dark:border-slate-700"
                           >
-                            <Copy className="w-3.5 h-3.5 text-slate-500" />
+                            <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                             <span>{copiedPass ? "Đã copy!" : "Copy"}</span>
                           </button>
                         </div>
@@ -1350,7 +1496,7 @@ export default function AdminUsersPage() {
                       <button
                         onClick={handleResetPassword}
                         disabled={resetPassSubmitting}
-                        className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-2.5 bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:from-[#1E40AF] hover:to-[#1D4ED8] text-white font-heading font-semibold text-xs rounded-xl shadow-xs shadow-blue-500/20 transition-colors flex items-center justify-center gap-2"
                       >
                         {resetPassSubmitting ? (
                           <RefreshCw className="w-4 h-4 animate-spin" />
@@ -1421,20 +1567,20 @@ export default function AdminUsersPage() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="max-w-md w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4 animate-in zoom-in-95"
+            className="max-w-md w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl space-y-4 animate-in zoom-in-95"
           >
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-center font-bold">
                   <UserPlus className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-heading font-bold text-slate-900">
+                <h3 className="text-base font-heading font-bold text-slate-900 dark:text-white">
                   Thêm Tài Khoản Mới
                 </h3>
               </div>
               <button
                 onClick={() => setCreateModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"
+                className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1442,7 +1588,7 @@ export default function AdminUsersPage() {
 
             <form onSubmit={handleCreateUser} className="space-y-3.5">
               <div className="space-y-1">
-                <label className="text-xs font-heading font-semibold text-slate-700 block">
+                <label className="text-xs font-heading font-semibold text-slate-700 dark:text-slate-300 block">
                   Họ và tên: *
                 </label>
                 <input
@@ -1451,12 +1597,12 @@ export default function AdminUsersPage() {
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   placeholder="Ví dụ: Nguyễn Văn A"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 text-slate-900"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-heading font-semibold text-slate-700 block">
+                <label className="text-xs font-heading font-semibold text-slate-700 dark:text-slate-300 block">
                   Địa chỉ Email: *
                 </label>
                 <input
@@ -1465,12 +1611,12 @@ export default function AdminUsersPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="name@example.com"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 text-slate-900"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-heading font-semibold text-slate-700 block">
+                <label className="text-xs font-heading font-semibold text-slate-700 dark:text-slate-300 block">
                   Số điện thoại:
                 </label>
                 <input
@@ -1478,12 +1624,12 @@ export default function AdminUsersPage() {
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                   placeholder="0912 345 678"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 text-slate-900"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-heading font-semibold text-slate-700 block">
+                <label className="text-xs font-heading font-semibold text-slate-700 dark:text-slate-300 block">
                   Mật khẩu khởi tạo: *
                 </label>
                 <input
@@ -1493,19 +1639,19 @@ export default function AdminUsersPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Tối thiểu 6 ký tự..."
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 text-slate-900"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-heading font-semibold text-slate-700 block">
+                  <label className="text-xs font-heading font-semibold text-slate-700 dark:text-slate-300 block">
                     Mục tiêu chứng chỉ:
                   </label>
                   <select
                     value={formData.targetBand}
                     onChange={(e) => setFormData({ ...formData, targetBand: e.target.value as any })}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 text-slate-900"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
                   >
                     <option value="B1_TARGET">B1 Target</option>
                     <option value="B2_TARGET">B2 Target (Khuyên dùng)</option>
@@ -1513,7 +1659,7 @@ export default function AdminUsersPage() {
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-heading font-semibold text-slate-700 block">
+                  <label className="text-xs font-heading font-semibold text-slate-700 dark:text-slate-300 block">
                     Ghi chú nội bộ học vụ:
                   </label>
                   <input
@@ -1521,19 +1667,19 @@ export default function AdminUsersPage() {
                     value={formData.internalNotes}
                     onChange={(e) => setFormData({ ...formData, internalNotes: e.target.value })}
                     placeholder="VD: Lớp cấp tốc K24..."
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 text-slate-900"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-heading font-semibold text-slate-700 block">
+                <label className="text-xs font-heading font-semibold text-slate-700 dark:text-slate-300 block">
                   Vai trò trên hệ thống:
                 </label>
                 <select
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 text-slate-900"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
                 >
                   <option value="STUDENT">Học viên (STUDENT)</option>
                   <option value="TEACHER">Giảng viên chấm thi (TEACHER)</option>
@@ -1544,18 +1690,18 @@ export default function AdminUsersPage() {
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setCreateModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
                   disabled={createLoading}
-                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold text-xs shadow-xs flex items-center gap-1.5 transition-colors"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:from-[#1E40AF] hover:to-[#1D4ED8] text-white font-heading font-semibold text-xs shadow-xs shadow-blue-500/20 flex items-center gap-1.5 transition-colors"
                 >
                   {createLoading ? (
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />

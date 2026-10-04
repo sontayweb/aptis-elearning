@@ -144,7 +144,7 @@ export function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalPr
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#CC1C01] to-[#FEAD5F] text-white shadow-lg mb-3">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#1D4ED8] to-[#2563EB] text-white shadow-lg shadow-blue-500/25 mb-3">
             <Sparkles className="w-6 h-6" />
           </div>
           <h3 className="font-heading font-bold text-xl text-foreground">
@@ -264,56 +264,58 @@ export function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalPr
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 mt-2 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] hover:brightness-110 transition-all shadow-md disabled:opacity-50"
+            className="w-full py-2.5 mt-2 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:brightness-110 transition-all shadow-md shadow-blue-500/25 disabled:opacity-50"
           >
             {loading ? "Đang xử lý..." : tab === "login" ? "Đăng nhập ngay" : "Tạo tài khoản"}
           </button>
         </form>
 
-        {/* Quick Demo Switcher */}
-        <div className="mt-5 pt-4 border-t border-border">
-          <p className="text-[11px] font-semibold text-muted-foreground text-center mb-2.5">
-            HOẶC ĐĂNG NHẬP NHANH VỚI TÀI KHOẢN MẪU:
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("student")}
-              className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
-            >
-              <GraduationCap className="w-4 h-4 text-primary mb-1" />
-              <span className="text-[11px] font-bold text-foreground">Học viên</span>
-              <span className="text-[9px] text-muted-foreground">Demo VIP</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("teacher")}
-              className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
-            >
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 mb-1" />
-              <span className="text-[11px] font-bold text-foreground">Giảng viên</span>
-              <span className="text-[9px] text-muted-foreground">Chấm bài</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("admin")}
-              className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
-            >
-              <ShieldCheck className="w-4 h-4 text-blue-500 mb-1" />
-              <span className="text-[11px] font-bold text-foreground">Học vụ</span>
-              <span className="text-[9px] text-muted-foreground">Đề thi/Lớp</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("super_admin")}
-              className="flex flex-col items-center p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors text-center"
-            >
-              <Sparkles className="w-4 h-4 text-rose-500 mb-1" />
-              <span className="text-[11px] font-bold text-rose-500">Super Admin</span>
-              <span className="text-[9px] text-muted-foreground">Toàn quyền</span>
-            </button>
+        {/* Quick Demo Switcher - Chỉ hiển thị khi development để bảo mật tài khoản quản trị khi Go-Live */}
+        {process.env.NODE_ENV !== "production" && (
+          <div className="mt-5 pt-4 border-t border-border">
+            <p className="text-[11px] font-semibold text-muted-foreground text-center mb-2.5">
+              HOẶC ĐĂNG NHẬP NHANH VỚI TÀI KHOẢN MẪU (DEV ONLY):
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("student")}
+                className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
+              >
+                <GraduationCap className="w-4 h-4 text-primary mb-1" />
+                <span className="text-[11px] font-bold text-foreground">Học viên</span>
+                <span className="text-[9px] text-muted-foreground">Demo VIP</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("teacher")}
+                className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
+              >
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 mb-1" />
+                <span className="text-[11px] font-bold text-foreground">Giảng viên</span>
+                <span className="text-[9px] text-muted-foreground">Chấm bài</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("admin")}
+                className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
+              >
+                <ShieldCheck className="w-4 h-4 text-blue-500 mb-1" />
+                <span className="text-[11px] font-bold text-foreground">Học vụ</span>
+                <span className="text-[9px] text-muted-foreground">Đề thi/Lớp</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("super_admin")}
+                className="flex flex-col items-center p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors text-center"
+              >
+                <Sparkles className="w-4 h-4 text-rose-500 mb-1" />
+                <span className="text-[11px] font-bold text-rose-500">Super Admin</span>
+                <span className="text-[9px] text-muted-foreground">Toàn quyền</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>,
     document.body

@@ -17,7 +17,7 @@ export function StartRightCard() {
           </p>
         </div>
         <Link
-          className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-brand-brown h-10 px-4 py-2 shrink-0"
+          className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-bold ring-offset-background transition-all btn-brand-gradient shadow-glow-soft h-10 px-5 shrink-0"
           href="/thi-thu"
           data-discover="true"
         >

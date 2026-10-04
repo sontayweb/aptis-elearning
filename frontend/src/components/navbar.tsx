@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/contexts/auth-context";
+import { useEventTheme } from "@/contexts/event-theme-context";
 import { AuthModal } from "@/components/auth-modal";
 import { NotificationDropdown } from "@/components/notification-dropdown";
+import { EventAnnouncementBar } from "@/components/event-decorations";
 import {
   ClipboardCheck,
   BookOpen,
@@ -17,6 +20,11 @@ import {
   Flame,
   Bell,
   Sun,
+  Moon,
+  Gift,
+  Check,
+  CheckCircle2,
+  Copy,
   Menu,
   X,
   LogIn,
@@ -35,15 +43,67 @@ import {
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { config: eventConfig, currentTheme, setTheme: setEventTheme } = useEventTheme();
+  const pathname = usePathname();
   const [skillsDropdown, setSkillsDropdown] = useState(false);
   const [moreDropdown, setMoreDropdown] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [referralModalOpen, setReferralModalOpen] = useState(false);
+  const [referralCopied, setReferralCopied] = useState(false);
+  const [referralLink, setReferralLink] = useState("");
 
   const skillsRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Auto-close all menus on route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setUserDropdown(false);
+    setSkillsDropdown(false);
+    setMoreDropdown(false);
+  }, [pathname]);
+
+  // Đồng bộ chiều cao thực tế của header (Navbar + EventAnnouncementBar) vào CSS variable --navbar-total-height
+  useEffect(() => {
+    const headerEl = headerRef.current;
+    if (!headerEl) return;
+
+    const syncHeaderHeight = () => {
+      const height = headerEl.offsetHeight;
+      if (height > 0) {
+        document.documentElement.style.setProperty("--navbar-total-height", `${height}px`);
+      }
+    };
+
+    syncHeaderHeight();
+    const ro = new ResizeObserver(syncHeaderHeight);
+    ro.observe(headerEl);
+
+    return () => ro.disconnect();
+  }, [eventConfig.enabled, eventConfig.bannerEnabled]);
+
+  // Initial theme sync is managed by EventThemeProvider
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && user) {
+      setReferralLink(`${window.location.origin}/?ref=${user.id || "invite"}`);
+    }
+  }, [user]);
+
+  const toggleTheme = (newTheme: string) => {
+    setEventTheme(newTheme);
+  };
+
+  const copyReferralLink = () => {
+    if (!referralLink) return;
+    navigator.clipboard.writeText(referralLink);
+    setReferralCopied(true);
+    setTimeout(() => setReferralCopied(false), 2000);
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -67,36 +127,41 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 xl:h-16 transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-primary/30 shadow-[0_4px_20px_-8px_hsl(var(--primary)/0.18)]">
+      <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <EventAnnouncementBar />
+        <nav className="xl:h-16 transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-primary/30 shadow-[0_4px_20px_-8px_hsl(var(--primary)/0.18)]">
         <div className="h-16 xl:h-full max-w-[1440px] mx-auto px-4 lg:px-6 flex items-center gap-3">
         {/* Brand Logo */}
         <Link
-          className="flex items-center gap-2 shrink-0 group"
-          href="/dashboard"
+          className="flex items-center gap-2 shrink-0 group mr-1 xl:mr-2"
+          href={isAuthenticated ? "/dashboard" : "/"}
+          onClick={() => setMobileMenuOpen(false)}
           data-discover="true"
         >
           <Image
             src="/logo.webp"
-            alt="Aptis Kỳ Tích"
-            width={40}
-            height={40}
-            className="h-10 w-10 px-0 pb-0 transition-transform duration-200 group-hover:scale-105"
+            alt="APTIS ESOL PREMIER"
+            width={38}
+            height={38}
+            className="h-9 w-9 px-0 pb-0 transition-transform duration-200 group-hover:scale-105 shrink-0"
             priority
           />
-          <span className="font-heading font-bold text-base text-foreground tracking-tight whitespace-nowrap">
-            Aptis <span className="gradient-text">Kỳ Tích</span>
+          <span className="font-heading whitespace-nowrap tracking-tight hidden sm:inline-flex items-center gap-0 font-extrabold text-sm xl:text-base">
+            <span className="brand-name-aptis">APTIS</span>
+            <span className="brand-name-esol mx-1">ESOL</span>
+            <span className="brand-name-premier">PREMIER</span>
           </span>
         </Link>
 
         {/* Center Nav Items */}
-        <div className="hidden xl:flex items-center flex-1 min-w-0 justify-start gap-1 ml-4 lg:ml-6">
+        <div className="hidden xl:flex items-center shrink-0 gap-0.5 xl:gap-1 ml-1 xl:ml-3">
           {/* Thi thử button */}
           <Link
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-full transition-transform duration-200 whitespace-nowrap shadow-[0_4px_14px_rgba(204,28,1,0.35)] hover:scale-105 bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white hover:shadow-[0_6px_18px_rgba(204,28,1,0.45)]"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs xl:text-sm font-bold rounded-full transition-transform duration-200 whitespace-nowrap shadow-glow-soft hover:scale-105 btn-brand-gradient text-white"
             href="/thi-thu"
             data-discover="true"
           >
-            <ClipboardCheck className="w-4 h-4" />
+            <ClipboardCheck className="w-3.5 h-3.5" />
             Thi thử
           </Link>
 
@@ -105,9 +170,9 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setSkillsDropdown((prev) => !prev)}
-              className="group flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
+              className="group flex items-center gap-1 px-2.5 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
             >
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className="w-3.5 h-3.5" />
               Luyện tập từng kỹ năng
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform duration-200 ${
@@ -234,21 +299,21 @@ export function Navbar() {
 
           {/* Đề Key Dự Đoán */}
           <Link
-            className="group flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
+            className="group flex items-center gap-1 px-2.5 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
             href="/key-du-doan"
             data-discover="true"
           >
-            <Sparkles className="w-4 h-4 text-accent" />
+            <Sparkles className="w-3.5 h-3.5 text-accent" />
             Đề Key Dự Đoán
           </Link>
 
           {/* Lịch sử học tập */}
           <Link
-            className="group flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
+            className="group flex items-center gap-1 px-2.5 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
             href="/history"
             data-discover="true"
           >
-            <History className="w-4 h-4" />
+            <History className="w-3.5 h-3.5" />
             Lịch sử học tập
           </Link>
 
@@ -257,12 +322,12 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMoreDropdown((prev) => !prev)}
-              className="group flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
+              className="group flex items-center gap-1 px-2 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
             >
-              <Ellipsis className="w-4 h-4" />
+              <Ellipsis className="w-3.5 h-3.5" />
               More
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                className={`w-3 h-3 transition-transform duration-200 ${
                   moreDropdown ? "rotate-180" : ""
                 }`}
               />
@@ -305,6 +370,13 @@ export function Navbar() {
                   Tiến độ học tập
                 </Link>
                 <Link
+                  href="/landing"
+                  onClick={() => setMoreDropdown(false)}
+                  className="flex items-center px-3 py-2 text-xs font-medium rounded-lg text-primary font-bold hover:bg-muted transition-colors"
+                >
+                  Giới thiệu nền tảng
+                </Link>
+                <Link
                   href="/about"
                   onClick={() => setMoreDropdown(false)}
                   className="flex items-center px-3 py-2 text-xs font-medium rounded-lg text-foreground hover:bg-muted transition-colors"
@@ -317,17 +389,17 @@ export function Navbar() {
         </div>
 
         {/* Right Action Controls */}
-        <div className="hidden xl:flex items-center gap-2 shrink-0">
+        <div className="hidden xl:flex items-center gap-1.5 xl:gap-2 shrink-0 ml-auto">
           {/* Nâng cấp */}
           <Link href="/pricing" data-discover="true">
-            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap transition-colors rounded-full h-8 px-3.5 text-xs font-extrabold gap-1 bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white hover:brightness-110 border-0 shadow-sm">
+            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap transition-all rounded-full h-8 px-3 text-xs font-bold gap-1 btn-brand-gradient text-white border-0 shadow-glow-soft">
               <Crown className="w-3.5 h-3.5" /> Nâng cấp
             </button>
           </Link>
 
-          {/* Dashboard Button */}
-          <Link href="/dashboard" data-discover="true">
-            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap font-medium hover:bg-accent/15 hover:text-accent-foreground rounded-md gap-1.5 text-sm h-8 px-3 transition-colors">
+          {/* Dashboard Button (Hiển thị trên màn hình rộng 2xl) */}
+          <Link href="/dashboard" data-discover="true" className="hidden 2xl:inline-flex">
+            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap font-medium hover:bg-accent/15 hover:text-accent-foreground rounded-md gap-1.5 text-xs xl:text-sm h-8 px-2.5 transition-colors">
               <Flame className="w-4 h-4 text-primary" />
               <span>Dashboard</span>
             </button>
@@ -342,115 +414,135 @@ export function Navbar() {
                 <button
                   onClick={() => setUserDropdown(!userDropdown)}
                   aria-label="Mở menu tài khoản"
-                  className="relative w-8 h-8 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center hover:opacity-90 transition-opacity"
+                  className="relative w-8 h-8 rounded-full bg-[#1A3FA4] text-white text-xs font-bold flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
                 >
-                  <span className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-primary/20 text-primary font-bold">
-                    {user.full_name ? user.full_name.charAt(0).toUpperCase() : "U"}
+                  <span className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-[#1A3FA4] text-white font-bold text-sm">
+                    {user.full_name ? user.full_name.charAt(0).toUpperCase() : "H"}
                   </span>
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-background" />
                 </button>
 
                 {userDropdown && (
                   <div
-                    onMouseLeave={() => setUserDropdown(false)}
-                    className="absolute top-full right-0 mt-2 w-64 rounded-2xl border border-border bg-popover p-3 shadow-xl z-50 animate-in fade-in zoom-in-95"
+                    className="absolute top-full right-0 mt-2.5 w-60 rounded-2xl border border-border bg-card p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 select-none"
                   >
-                    <div className="flex items-center gap-3 pb-3 border-b border-border">
-                      <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-base">
-                        {user.full_name?.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-foreground truncate">{user.full_name}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
-                        <div className="flex items-center gap-1 mt-1">
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-primary/15 text-primary">
-                            {user.role}
-                          </span>
-                          {user.user_subscriptions?.length ? (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-amber-500/15 text-amber-600">
-                              {user.user_subscriptions[0].plan.name}
-                            </span>
-                          ) : (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-muted text-muted-foreground">
-                              FREE
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                    {/* Giao diện */}
+                    <div className="px-3 pt-1.5 pb-1 text-xs font-semibold text-muted-foreground">
+                      Giao diện
                     </div>
 
-                    <div className="py-2 text-xs space-y-1">
-                      <div className="flex justify-between px-2 py-1 text-muted-foreground text-[11px]">
-                        <span>Lượt chấm AI còn lại:</span>
-                        <span className="font-bold text-primary">
-                          {user.ai_quotas ? user.ai_quotas.total_quota - user.ai_quotas.used_quota : 3}
-                        </span>
-                      </div>
-                      <div className="flex justify-between px-2 py-1 text-muted-foreground text-[11px]">
-                        <span>Lượt chấm Giảng viên:</span>
-                        <span className="font-bold text-emerald-500">
-                          {user.teacher_quotas ? user.teacher_quotas.total_quota - user.teacher_quotas.used_quota : 0}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-border space-y-1">
-                      <Link
-                        href="/profile"
-                        onClick={() => setUserDropdown(false)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl text-foreground hover:bg-muted transition-colors"
-                      >
-                        <User className="w-4 h-4 text-primary" />
-                        <span>Hồ sơ & Đổi mật khẩu</span>
-                      </Link>
-
-                      <Link
-                        href="/my-classes"
-                        onClick={() => setUserDropdown(false)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl text-foreground hover:bg-muted transition-colors"
-                      >
-                        <Users className="w-4 h-4 text-primary" />
-                        <span>Lớp học của tôi</span>
-                      </Link>
-
-                      {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
-                        <Link
-                          href="/admin"
-                          onClick={() => setUserDropdown(false)}
-                          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 transition-colors"
-                        >
-                          <ShieldCheck className="w-4 h-4" />
-                          <span>{user.role === "SUPER_ADMIN" ? "Vào Cổng Super Admin" : "Vào Trang Quản Trị (Admin)"}</span>
-                        </Link>
-                      )}
-                      {user.role === "TEACHER" && (
-                        <Link
-                          href="/teacher"
-                          onClick={() => setUserDropdown(false)}
-                          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
-                        >
-                          <GraduationCap className="w-4 h-4" />
-                          <span>Vào Cổng Giảng Viên</span>
-                        </Link>
-                      )}
+                    {/* Dynamic Event Theme (Halloween, Noel, Trung thu, Tết...) */}
+                    {eventConfig.enabled && (
                       <button
-                        onClick={() => {
-                          logout();
-                          setUserDropdown(false);
-                        }}
-                        className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl text-red-500 hover:bg-red-500/10 transition-colors"
+                        type="button"
+                        onClick={() => toggleTheme(eventConfig.activeTemplate)}
+                        className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors"
                       >
-                        <LogOut className="w-3.5 h-3.5" />
-                        Đăng xuất
+                        <div className="flex items-center gap-3">
+                          <span className="text-base leading-none">{eventConfig.icon || "🎃"}</span>
+                          <span>{eventConfig.name}</span>
+                        </div>
+                        {currentTheme === eventConfig.activeTemplate && (
+                          <span className="text-red-500 font-bold text-base leading-none">✓</span>
+                        )}
                       </button>
-                    </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => toggleTheme("light")}
+                      className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Sun className="w-4 h-4 text-foreground/80" />
+                        <span>Sáng</span>
+                      </div>
+                      {currentTheme === "light" && (
+                        <span className="text-red-500 font-bold text-base leading-none">✓</span>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleTheme("dark")}
+                      className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Moon className="w-4 h-4 text-foreground/80" />
+                        <span>Tối</span>
+                      </div>
+                      {currentTheme === "dark" && (
+                        <span className="text-red-500 font-bold text-base leading-none">✓</span>
+                      )}
+                    </button>
+
+                    <div className="my-1 border-t border-border/80" />
+
+                    {/* Thông tin tài khoản */}
+                    <Link
+                      href="/profile"
+                      onClick={() => setUserDropdown(false)}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors"
+                    >
+                      <User className="w-4 h-4 text-foreground/80" />
+                      <span>Thông tin tài khoản</span>
+                    </Link>
+
+                    {/* Giới thiệu bạn */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserDropdown(false);
+                        setReferralModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors text-left"
+                    >
+                      <Gift className="w-4 h-4 text-foreground/80" />
+                      <span>Giới thiệu bạn</span>
+                    </button>
+
+                    {/* Cổng điều hành Admin / Giảng viên nếu có */}
+                    {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setUserDropdown(false)}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-amber-600 hover:bg-amber-500/10 transition-colors"
+                      >
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>Quản trị hệ thống</span>
+                      </Link>
+                    )}
+                    {user.role === "TEACHER" && (
+                      <Link
+                        href="/teacher"
+                        onClick={() => setUserDropdown(false)}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-blue-600 hover:bg-blue-500/10 transition-colors"
+                      >
+                        <GraduationCap className="w-4 h-4" />
+                        <span>Cổng giảng viên</span>
+                      </Link>
+                    )}
+
+                    <div className="my-1 border-t border-border/80" />
+
+                    {/* Đăng xuất */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logout();
+                        setUserDropdown(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl text-red-500 hover:bg-red-500/10 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 text-red-500" />
+                      <span>Đăng xuất</span>
+                    </button>
                   </div>
                 )}
               </div>
             ) : (
               <button
                 onClick={() => setAuthModalOpen(true)}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] hover:brightness-110 shadow-sm transition-all"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-white btn-brand-gradient shadow-glow-soft transition-all"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 Đăng nhập
@@ -462,11 +554,26 @@ export function Navbar() {
         {/* Mobile menu and theme buttons */}
         <div className="xl:hidden flex items-center gap-1 ml-auto">
           <button
+            onClick={() => {
+              if (eventConfig.enabled) {
+                if (currentTheme === "light") toggleTheme("dark");
+                else if (currentTheme === "dark") toggleTheme(eventConfig.activeTemplate);
+                else toggleTheme("light");
+              } else {
+                toggleTheme(currentTheme === "dark" ? "light" : "dark");
+              }
+            }}
             className="flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent/20 text-foreground transition-colors"
             type="button"
-            aria-label="Toggle theme"
+            aria-label="Chuyển đổi giao diện"
           >
-            <Sun className="w-4 h-4" />
+            {currentTheme === "dark" ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : currentTheme === "light" ? (
+              <Moon className="w-4 h-4" />
+            ) : (
+              <span className="text-sm leading-none">{eventConfig.icon || "🎃"}</span>
+            )}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -487,7 +594,7 @@ export function Navbar() {
                 setMobileMenuOpen(false);
                 setAuthModalOpen(true);
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] rounded-xl shadow-md"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-white btn-brand-gradient rounded-xl shadow-glow-soft"
             >
               <LogIn className="w-4 h-4" />
               Đăng nhập / Đăng ký tài khoản
@@ -505,49 +612,177 @@ export function Navbar() {
           )}
           <Link
             href="/thi-thu"
-            className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] rounded-xl shadow-md"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white btn-brand-gradient rounded-xl shadow-glow-soft"
           >
             <ClipboardCheck className="w-4 h-4" />
             Thi thử Full Test
           </Link>
           <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
-            <Link href="/reading" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/reading"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Reading
             </Link>
-            <Link href="/listening" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/listening"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Listening
             </Link>
-            <Link href="/speaking" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/speaking"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Speaking (AI)
             </Link>
-            <Link href="/writing" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/writing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Writing (AI)
             </Link>
-            <Link href="/grammar" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/grammar"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Grammar & Vocab
             </Link>
-            <Link href="/vocabulary" className="p-2.5 bg-amber-500/10 text-amber-700 dark:text-amber-300 rounded-lg font-medium">
+            <Link
+              href="/vocabulary"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 rounded-lg font-medium transition-colors"
+            >
               Học từ vựng
             </Link>
-            <Link href="/nghe-chep" className="p-2.5 bg-rose-500/10 text-rose-700 dark:text-rose-300 rounded-lg font-medium">
+            <Link
+              href="/nghe-chep"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-rose-500/10 text-rose-700 dark:text-rose-300 hover:bg-rose-500/20 rounded-lg font-medium transition-colors"
+            >
               Dictation & Shadowing
             </Link>
-            <Link href="/key-du-doan" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/key-du-doan"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Đề Key Dự Đoán
             </Link>
-            <Link href="/tai-lieu" className="p-2.5 bg-primary/10 text-primary rounded-lg font-bold">
+            <Link
+              href="/tai-lieu"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg font-bold transition-colors"
+            >
               Kho tài liệu & Video
             </Link>
-            <Link href="/meo-thi-aptis" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/meo-thi-aptis"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Blog Mẹo thi
             </Link>
-            <Link href="/about" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/landing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 rounded-lg font-bold transition-colors"
+            >
+              Giới thiệu nền tảng
+            </Link>
+            <Link
+              href="/about"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Về chúng tôi
             </Link>
           </div>
         </div>
       )}
       </nav>
+      </header>
+
+      {/* Referral Modal */}
+      {referralModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl space-y-4 animate-in zoom-in-95">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Gift className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-bold text-base text-foreground">Giới thiệu bạn bè</h3>
+                  <p className="text-xs text-muted-foreground">Cùng học cùng tiến — nhận ưu đãi đặc biệt</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReferralModalOpen(false)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                aria-label="Đóng"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-muted/40 border border-border/50 space-y-2 text-xs text-foreground">
+              <div className="flex items-center gap-2">
+                <span className="text-primary font-bold">✓</span>
+                <span>Bạn bè được giảm <strong>10%</strong> học phí khi nhập link giới thiệu</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-primary font-bold">✓</span>
+                <span>Bạn nhận thêm <strong>10 lượt chấm AI</strong> và tích lũy phần thưởng</span>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">Liên kết giới thiệu của bạn</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={referralLink}
+                  className="flex-1 px-3 py-2 text-xs rounded-xl bg-muted/60 border border-border focus:outline-none select-all text-foreground"
+                />
+                <button
+                  type="button"
+                  onClick={copyReferralLink}
+                  className="px-3.5 py-2 text-xs font-bold text-white bg-primary hover:bg-brand-brown rounded-xl transition-colors shrink-0 flex items-center gap-1.5 shadow-sm"
+                >
+                  {referralCopied ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                      <span>Đã chép!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Sao chép</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setReferralModalOpen(false)}
+              className="w-full py-2.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Auth Modal rendered outside nav container */}
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />

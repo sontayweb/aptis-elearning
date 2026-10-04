@@ -17,13 +17,27 @@ export class StudentService {
           { skill: 'Writing', label: 'Writing', level: 'Chưa làm', pct: 0, completedExams: 0, totalExams: 8 },
           { skill: 'Grammar', label: 'Grammar & Vocab', level: 'Chưa làm', pct: 0, completedExams: 0, totalExams: 20 },
         ],
+        weakestSkill: { skill: 'Grammar', label: 'Grammar & Vocab', pct: 0, name: 'Grammar & Vocab' },
         weeklyStreak: {
           currentStreak: 0,
           completedThisWeek: 0,
           days: [false, false, false, false, false, false, false],
+          isTodayDone: false,
         },
+        todayRecommendation: {
+          weakestPartTitle: 'Làm 1 bài thi thử Full Test trước',
+          weakestPartSubtitle: 'Biết chính xác trình độ A2, B1 hay B2 của bạn để nhận lộ trình chuẩn',
+          weakestPartLink: '/thi-thu',
+          weakestPartButtonText: 'Vào thi thử ngay',
+          wrongQuestionsCount: 0,
+          wrongQuestionsDetail: 'Chưa có câu sai nào đang chờ ôn!',
+          wrongQuestionsLink: '/thi-thu',
+        },
+        timelineProgress: [],
       };
     }
+
+    const now = new Date();
 
     // 1. Lấy danh sách bài thi gần nhất
     const recentSubs = await prisma.examSubmission.findMany({
@@ -103,8 +117,8 @@ export class StudentService {
     const skillMap: Record<string, {
       count: number;
       totalScore: number;
-      cefrCounts: Record<string, number>; // đếm tần suất mỗi CEFR level
-      highestCefr: string;                // level cao nhất đạt được
+      cefrCounts: Record<string, number>;
+      highestCefr: string;
     }> = {
       LISTENING: { count: 0, totalScore: 0, cefrCounts: {}, highestCefr: 'Chưa làm' },
       READING: { count: 0, totalScore: 0, cefrCounts: {}, highestCefr: 'Chưa làm' },
@@ -120,10 +134,7 @@ export class StudentService {
         skillMap[sk].totalScore += sub.total_score || 0;
 
         if (sub.cefr_level) {
-          // Đếm tần suất để tính mode
           skillMap[sk].cefrCounts[sub.cefr_level] = (skillMap[sk].cefrCounts[sub.cefr_level] || 0) + 1;
-
-          // Cập nhật level cao nhất đạt được
           const currentHighestIdx = CEFR_ORDER.indexOf(skillMap[sk].highestCefr);
           const newIdx = CEFR_ORDER.indexOf(sub.cefr_level);
           if (newIdx > currentHighestIdx) {
@@ -133,7 +144,6 @@ export class StudentService {
       }
     }
 
-    /** Tính mode của CEFR: giá trị xuất hiện nhiều nhất, ưu tiên level cao hơn khi bằng nhau */
     function getModeCefr(cefrCounts: Record<string, number>): string {
       const entries = Object.entries(cefrCounts);
       if (entries.length === 0) return 'Chưa làm';
@@ -141,7 +151,6 @@ export class StudentService {
         const [bestBand, bestCount] = best;
         if (count > bestCount) return [band, count] as [string, number];
         if (count === bestCount) {
-          // Bằng nhau → ưu tiên level cao hơn
           return CEFR_ORDER.indexOf(band) > CEFR_ORDER.indexOf(bestBand)
             ? [band, count] as [string, number]
             : best;
@@ -155,9 +164,8 @@ export class StudentService {
         skill: 'Listening',
         label: 'Listening',
         level: skillMap.LISTENING.count > 0 ? getModeCefr(skillMap.LISTENING.cefrCounts) : 'Chưa làm',
-        // Vấn đề 4: pct = avgScore thực (0–100%) thay vì count*15
         pct: skillMap.LISTENING.count > 0
-          ? Math.round((skillMap.LISTENING.totalScore / skillMap.LISTENING.count / 50) * 100)
+          ? Math.min(100, Math.round((skillMap.LISTENING.totalScore / skillMap.LISTENING.count / 50) * 100))
           : 0,
         completedExams: skillMap.LISTENING.count,
         totalExams: 12,
@@ -171,7 +179,7 @@ export class StudentService {
         label: 'Reading',
         level: skillMap.READING.count > 0 ? getModeCefr(skillMap.READING.cefrCounts) : 'Chưa làm',
         pct: skillMap.READING.count > 0
-          ? Math.round((skillMap.READING.totalScore / skillMap.READING.count / 50) * 100)
+          ? Math.min(100, Math.round((skillMap.READING.totalScore / skillMap.READING.count / 50) * 100))
           : 0,
         completedExams: skillMap.READING.count,
         totalExams: 15,
@@ -185,7 +193,7 @@ export class StudentService {
         label: 'Speaking',
         level: skillMap.SPEAKING.count > 0 ? getModeCefr(skillMap.SPEAKING.cefrCounts) : 'Chưa làm',
         pct: skillMap.SPEAKING.count > 0
-          ? Math.round((skillMap.SPEAKING.totalScore / skillMap.SPEAKING.count / 50) * 100)
+          ? Math.min(100, Math.round((skillMap.SPEAKING.totalScore / skillMap.SPEAKING.count / 50) * 100))
           : 0,
         completedExams: skillMap.SPEAKING.count,
         totalExams: 10,
@@ -199,7 +207,7 @@ export class StudentService {
         label: 'Writing',
         level: skillMap.WRITING.count > 0 ? getModeCefr(skillMap.WRITING.cefrCounts) : 'Chưa làm',
         pct: skillMap.WRITING.count > 0
-          ? Math.round((skillMap.WRITING.totalScore / skillMap.WRITING.count / 50) * 100)
+          ? Math.min(100, Math.round((skillMap.WRITING.totalScore / skillMap.WRITING.count / 50) * 100))
           : 0,
         completedExams: skillMap.WRITING.count,
         totalExams: 8,
@@ -213,7 +221,7 @@ export class StudentService {
         label: 'Grammar & Vocab',
         level: skillMap.GRAMMAR_VOCABULARY.count > 0 ? getModeCefr(skillMap.GRAMMAR_VOCABULARY.cefrCounts) : 'Chưa làm',
         pct: skillMap.GRAMMAR_VOCABULARY.count > 0
-          ? Math.round((skillMap.GRAMMAR_VOCABULARY.totalScore / skillMap.GRAMMAR_VOCABULARY.count / 50) * 100)
+          ? Math.min(100, Math.round((skillMap.GRAMMAR_VOCABULARY.totalScore / skillMap.GRAMMAR_VOCABULARY.count / 50) * 100))
           : 0,
         completedExams: skillMap.GRAMMAR_VOCABULARY.count,
         totalExams: 20,
@@ -224,33 +232,68 @@ export class StudentService {
       },
     ];
 
-    // 4. Tính toán Streak & Weekly Streak
-    const now = new Date();
-    const startOfWeek = new Date(now);
-    const day = startOfWeek.getDay();
-    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // Thứ 2 đầu tuần
-    startOfWeek.setDate(diff);
-    startOfWeek.setHours(0, 0, 0, 0);
+    // Tìm kỹ năng yếu nhất
+    const skillsWithExams = skillProgress.filter((s) => s.completedExams > 0);
+    const weakestSkill = skillsWithExams.length > 0
+      ? skillsWithExams.reduce((prev, curr) => (curr.pct < prev.pct ? curr : prev), skillsWithExams[0])
+      : skillProgress.find((s) => s.skill === 'Grammar') || skillProgress[0];
 
-    const thisWeekSubs = await prisma.examSubmission.findMany({
+    // 4. Tính toán Streak thực tế chuẩn theo Múi giờ Việt Nam (Asia/Ho_Chi_Minh GMT+7)
+    const allSubs = await prisma.examSubmission.findMany({
       where: {
         user_id: userId,
-        started_at: { gte: startOfWeek },
+        status: { in: [SubmissionStatus.GRADED, SubmissionStatus.SUBMITTED, SubmissionStatus.PENDING_EVALUATION, SubmissionStatus.IN_PROGRESS] },
       },
-      select: { started_at: true },
+      select: { started_at: true, submitted_at: true },
+      orderBy: { started_at: 'desc' },
     });
 
-    const weekDaysActive = [false, false, false, false, false, false, false];
-    for (const s of thisWeekSubs) {
-      const dIndex = (s.started_at.getDay() + 6) % 7; // 0=Thứ 2 ... 6=Chủ nhật
-      weekDaysActive[dIndex] = true;
+    const getVnDateKey = (d: Date) =>
+      new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(d);
+
+    const activeDateStrings = new Set<string>();
+    for (const sub of allSubs) {
+      const d = sub.submitted_at || sub.started_at;
+      activeDateStrings.add(getVnDateKey(d));
     }
 
-    const completedThisWeek = weekDaysActive.filter(Boolean).length;
-    const streak = completedThisWeek > 0 ? completedThisWeek : 0;
+    const todayStr = getVnDateKey(now);
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const yesterdayStr = getVnDateKey(yesterday);
 
-    // 5. Ước tính Level hiện tại — dùng mode (CEFR xuất hiện nhiều nhất qua tất cả kỹ năng)
-    //    Nếu bằng nhau → ưu tiên level cao hơn (dùng CEFR_ORDER đã định nghĩa ở trên)
+    const isTodayDone = activeDateStrings.has(todayStr);
+
+    let streak = 0;
+    if (isTodayDone || activeDateStrings.has(yesterdayStr)) {
+      let checkTimestamp = isTodayDone ? now.getTime() : yesterday.getTime();
+      while (true) {
+        const key = getVnDateKey(new Date(checkTimestamp));
+        if (activeDateStrings.has(key)) {
+          streak++;
+          checkTimestamp -= 24 * 60 * 60 * 1000;
+        } else {
+          break;
+        }
+      }
+    }
+
+    // Weekly days (T2 -> CN của tuần này theo giờ Việt Nam)
+    const vnWeekdayStr = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'short' }).format(now);
+    const weekdayMap: Record<string, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+    const currentVnDayIdx = weekdayMap[vnWeekdayStr] ?? 0;
+
+    const weekDaysActive = [false, false, false, false, false, false, false];
+    for (let i = 0; i < 7; i++) {
+      const offsetDays = i - currentVnDayIdx;
+      const targetDate = new Date(now.getTime() + offsetDays * 24 * 60 * 60 * 1000);
+      const key = getVnDateKey(targetDate);
+      if (activeDateStrings.has(key)) {
+        weekDaysActive[i] = true;
+      }
+    }
+    const completedThisWeek = weekDaysActive.filter(Boolean).length;
+
+    // 5. Ước tính Level hiện tại — dùng mode
     const allBands = completedSubs.map((s) => s.cefr_level).filter(Boolean) as string[];
     let currentLevel = 'Chưa đủ dữ liệu';
     if (allBands.length > 0) {
@@ -266,6 +309,195 @@ export class StudentService {
       currentLevel = modeBand ? `${modeBand} Target` : 'Chưa đủ dữ liệu';
     }
 
+    // 6. Tính toán câu sai (Wrong Answers Aggregation)
+    const wrongAnswers = await prisma.submissionAnswer.findMany({
+      where: {
+        submission: {
+          user_id: userId,
+          status: { in: [SubmissionStatus.GRADED, SubmissionStatus.SUBMITTED] },
+        },
+        score: { lte: 0 },
+      },
+      select: {
+        id: true,
+        question: {
+          select: {
+            part: {
+              select: {
+                part_number: true,
+                title: true,
+                exam: {
+                  select: {
+                    skill: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      take: 200,
+    });
+
+    const totalWrongCount = wrongAnswers.length;
+    const partWrongCounts: Record<string, { skill: string; partNumber: number; count: number }> = {};
+
+    for (const ans of wrongAnswers) {
+      const sk = ans.question?.part?.exam?.skill;
+      const partNum = ans.question?.part?.part_number || 1;
+      if (sk) {
+        const key = `${sk}_Part${partNum}`;
+        if (!partWrongCounts[key]) {
+          partWrongCounts[key] = { skill: sk, partNumber: partNum, count: 0 };
+        }
+        partWrongCounts[key].count += 1;
+      }
+    }
+
+    const sortedWrongParts = Object.values(partWrongCounts).sort((a, b) => b.count - a.count);
+
+    let wrongQuestionsDetail = 'Chưa có câu sai nào đang chờ ôn!';
+    let wrongQuestionsLink = '/reading';
+
+    if (totalWrongCount > 0 && sortedWrongParts.length > 0) {
+      const topPartsStr = sortedWrongParts
+        .slice(0, 2)
+        .map((p) => {
+          const skLabel = p.skill === 'READING' ? 'reading' : p.skill === 'LISTENING' ? 'listening' : p.skill === 'GRAMMAR_VOCABULARY' ? 'grammar' : p.skill.toLowerCase();
+          return `${skLabel} Part ${p.partNumber} (${p.count} câu)`;
+        })
+        .join(', ');
+      wrongQuestionsDetail = topPartsStr;
+
+      const topSkill = sortedWrongParts[0].skill;
+      if (topSkill === 'READING') wrongQuestionsLink = '/reading';
+      else if (topSkill === 'LISTENING') wrongQuestionsLink = '/listening';
+      else if (topSkill === 'GRAMMAR_VOCABULARY') wrongQuestionsLink = '/grammar';
+      else if (topSkill === 'SPEAKING') wrongQuestionsLink = '/speaking';
+      else if (topSkill === 'WRITING') wrongQuestionsLink = '/writing';
+    }
+
+    // 7. Tạo mục Gợi ý Hôm Nay (⚡ Hôm nay nên làm)
+    const skillRouteMap: Record<string, string> = {
+      Grammar: '/grammar',
+      Reading: '/reading',
+      Listening: '/listening',
+      Speaking: '/speaking',
+      Writing: '/writing',
+    };
+
+    let weakestPartTitle = `${weakestSkill.label} đang là phần yếu nhất`;
+    let weakestPartSubtitle = weakestSkill.completedExams > 0
+      ? `${weakestSkill.completedExams} lượt gần đây trung bình ${weakestSkill.pct}%, thấp hơn các part khác`
+      : 'Chưa có lượt thi gần đây — nên bắt đầu luyện tập để nâng band';
+    let weakestPartLink = skillRouteMap[weakestSkill.skill] || '/grammar';
+    let weakestPartButtonText = `Luyện ${weakestSkill.label}`;
+
+    if (totalAnswers === 0) {
+      weakestPartTitle = 'Làm 1 bài thi thử Full Test trước';
+      weakestPartSubtitle = 'Biết chính xác trình độ A2, B1 hay B2 của bạn để nhận lộ trình chuẩn';
+      weakestPartLink = '/thi-thu';
+      weakestPartButtonText = 'Vào thi thử ngay';
+      wrongQuestionsDetail = 'Chưa có dữ liệu câu sai — làm bài để bắt đầu';
+      wrongQuestionsLink = '/thi-thu';
+    }
+
+    const todayRecommendation = {
+      weakestPartTitle,
+      weakestPartSubtitle,
+      weakestPartLink,
+      weakestPartButtonText,
+      wrongQuestionsCount: totalWrongCount,
+      wrongQuestionsDetail,
+      wrongQuestionsLink,
+    };
+
+    // 8. Tính biểu đồ năng lực theo thời gian (% chính xác qua các đợt thi)
+    const timelineSubs = await prisma.examSubmission.findMany({
+      where: {
+        user_id: userId,
+        status: { in: [SubmissionStatus.GRADED, SubmissionStatus.SUBMITTED] },
+        total_score: { not: null },
+      },
+      orderBy: { started_at: 'asc' },
+      select: {
+        started_at: true,
+        submitted_at: true,
+        total_score: true,
+        grammar_score: true,
+        reading_score: true,
+        listening_score: true,
+        speaking_score: true,
+        writing_score: true,
+        exam: {
+          select: { skill: true },
+        },
+      },
+      take: 50,
+    });
+
+    const timelineMap: Record<string, {
+      date: string;
+      scores: Record<string, number[]>;
+    }> = {};
+
+    const getVnDayMonth = (d: Date) =>
+      new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Ho_Chi_Minh',
+        day: '2-digit',
+        month: '2-digit',
+      }).format(d);
+
+    for (const sub of timelineSubs) {
+      const d = sub.submitted_at || sub.started_at;
+      const dateKey = getVnDayMonth(d);
+      if (!timelineMap[dateKey]) {
+        timelineMap[dateKey] = {
+          date: dateKey,
+          scores: {
+            grammar: [],
+            reading: [],
+            listening: [],
+            speaking: [],
+            writing: [],
+          },
+        };
+      }
+
+      const sk = sub.exam.skill;
+      const maxScore = 50;
+      const score = sub.total_score || 0;
+      const pct = Math.min(100, Math.round((score / maxScore) * 100));
+
+      if (sk === ExamSkill.GRAMMAR_VOCABULARY || sub.grammar_score != null) {
+        timelineMap[dateKey].scores.grammar.push(sub.grammar_score != null ? Math.round((sub.grammar_score / 50) * 100) : pct);
+      }
+      if (sk === ExamSkill.READING || sub.reading_score != null) {
+        timelineMap[dateKey].scores.reading.push(sub.reading_score != null ? Math.round((sub.reading_score / 50) * 100) : pct);
+      }
+      if (sk === ExamSkill.LISTENING || sub.listening_score != null) {
+        timelineMap[dateKey].scores.listening.push(sub.listening_score != null ? Math.round((sub.listening_score / 50) * 100) : pct);
+      }
+      if (sk === ExamSkill.SPEAKING || sub.speaking_score != null) {
+        timelineMap[dateKey].scores.speaking.push(sub.speaking_score != null ? Math.round((sub.speaking_score / 50) * 100) : pct);
+      }
+      if (sk === ExamSkill.WRITING || sub.writing_score != null) {
+        timelineMap[dateKey].scores.writing.push(sub.writing_score != null ? Math.round((sub.writing_score / 50) * 100) : pct);
+      }
+    }
+
+    const timelineProgress = Object.values(timelineMap).map((item) => {
+      const avg = (arr: number[]) => (arr.length > 0 ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : undefined);
+      return {
+        date: item.date,
+        grammar: avg(item.scores.grammar),
+        reading: avg(item.scores.reading),
+        listening: avg(item.scores.listening),
+        speaking: avg(item.scores.speaking),
+        writing: avg(item.scores.writing),
+      };
+    });
+
     return {
       streak,
       totalQuestionsAnswered: totalAnswers,
@@ -273,11 +505,20 @@ export class StudentService {
       currentLevel,
       recentTests,
       skillProgress,
+      weakestSkill: {
+        name: weakestSkill.label,
+        skill: weakestSkill.skill,
+        pct: weakestSkill.pct,
+        route: skillRouteMap[weakestSkill.skill] || '/grammar',
+      },
       weeklyStreak: {
         currentStreak: streak,
         completedThisWeek,
         days: weekDaysActive,
+        isTodayDone,
       },
+      todayRecommendation,
+      timelineProgress,
     };
   }
 

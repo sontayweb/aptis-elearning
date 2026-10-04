@@ -84,12 +84,13 @@ export default function HistoryPage() {
   const getExamLink = (item: ExamHistoryEntry) => {
     if (!item.examId) return "/dashboard";
     const skill = (item.skill || "").toLowerCase();
-    if (skill.includes("speaking")) return `/speaking/${item.examId}`;
-    if (skill.includes("writing")) return `/writing/${item.examId}`;
-    if (skill.includes("reading")) return `/reading/${item.examId}`;
-    if (skill.includes("listening")) return `/listening/${item.examId}`;
-    if (skill.includes("full") || skill.includes("thi thử")) return `/thi-thu/${item.examId}`;
-    return `/grammar/${item.examId}`;
+    const query = `?submissionId=${encodeURIComponent(item.id)}&mode=review`;
+    if (skill.includes("speaking")) return `/speaking/${item.examId}${query}`;
+    if (skill.includes("writing")) return `/writing/${item.examId}${query}`;
+    if (skill.includes("reading")) return `/reading/${item.examId}${query}`;
+    if (skill.includes("listening")) return `/listening/${item.examId}${query}`;
+    if (skill.includes("full") || skill.includes("thi thử")) return `/thi-thu/${item.examId}${query}`;
+    return `/grammar/${item.examId}${query}`;
   };
 
   return (

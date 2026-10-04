@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api-client";
 import {
@@ -174,7 +173,7 @@ export default function ProfilePage() {
             <div className="pt-2">
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white font-bold shadow-md hover:brightness-110 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-bold shadow-md shadow-blue-500/25 hover:brightness-110 transition-all"
               >
                 <LogIn className="w-4 h-4" />
                 Về trang chủ đăng nhập
@@ -183,7 +182,6 @@ export default function ProfilePage() {
           </div>
         </div>
         <Footer />
-        <MobileBottomNav />
       </div>
     );
   }
@@ -705,7 +703,7 @@ export default function ProfilePage() {
                 <div className="pt-2">
                   <Link
                     href="/pricing"
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white font-bold text-xs shadow-md hover:brightness-110 transition-all"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-bold text-xs shadow-md shadow-blue-500/20 hover:brightness-110 transition-all"
                   >
                     <Crown className="w-4 h-4" />
                     Nâng cấp / Gia hạn gói VIP
@@ -744,7 +742,7 @@ export default function ProfilePage() {
 
             {/* VIP Features list */}
             <div className="p-6 md:p-8 rounded-3xl border border-border bg-card shadow-sm space-y-6">
-              <h3 className="text-lg font-bold text-foreground">Đặc quyền học viên Aptis Kỳ Tích</h3>
+              <h3 className="text-lg font-bold text-foreground">Đặc quyền học viên APTIS ESOL PREMIER</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   {
@@ -782,7 +780,6 @@ export default function ProfilePage() {
 
       <Footer />
       <FloatingActions />
-      <MobileBottomNav />
     </div>
   );
 }

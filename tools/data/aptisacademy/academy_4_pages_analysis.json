@@ -1,0 +1,256 @@
+{
+  "results": {
+    "tu_vung": {
+      "name": "Từ Vựng",
+      "targetUrl": "https://aptisacademy.com.vn/tu-vung",
+      "finalUrl": "https://aptisacademy.com.vn/",
+      "status": 200,
+      "pageData": {
+        "title": "Aptis Tiên Phong - Ôn Thi Aptis Cấp Tốc | B2, C1 Trong 20H Học",
+        "textLength": 6243,
+        "textSample": "f\nFollow Us:\nZ\n0866 950 837\naptistienganh@gmail.com\nAPTIS\nTIÊN PHONG\nMenu\nWELCOME TO\nAPTIS TIÊN PHONG\n!\nLuyện thi Aptis\nCấp Tốc B1 B2 C\n\nChúng tôi đã tối ưu phương pháp giúp bạn đạt B1, B2, C trong khoảng 3 tuần — cho dù bạn mất gốc hay có ít thời gian luyện tập.\n\nTham Gia Nhóm Xoá Mù Aptis\nLIÊN HỆ NGAY\n01\nBộ Đề Key\nLuôn cập nhập bộ đề key chuẩn mới nhất, có tỷ lệ vào cao\n02\nPhầm Mềm Luyện Thi\nGiống thi thật, tích hợp AI giúp chấm điểm nhanh chóng.\n03\nApp luyện tập\nCập nhập bài tập được thiết kế riêng để luyện tập, có phân tích quá trình học.\n04\nPhương pháp học mới\nphương pháp học mới, giúp bạn học tập hiệu quả và tiết kiệm thời gian.\nĐỘC QUYỀN\nTẠI SAO NÊN CHỌN CHÚNG TÔI\nBỘ ĐỀ KEY\nTHÁNG 10\nHỌC NHANH · THI LÀ ĐỖ\nHỌC LÀ ĐỖ\n\nCHƯƠNG TRÌNH GIẢNG DẠY\n\nKhác biệt — Hiệu quả\n\nPhương pháp được thiết",
+        "links": [
+          {
+            "text": "0866 950 837",
+            "href": "https://zalo.me/0866950837"
+          },
+          {
+            "text": "APTISTIÊN PHONG",
+            "href": "https://aptisacademy.com.vn/"
+          },
+          {
+            "text": "Trang chủ",
+            "href": "https://aptisacademy.com.vn/"
+          },
+          {
+            "text": "Review đề thi",
+            "href": "https://aptisacademy.com.vn/review-exam"
+          },
+          {
+            "text": "Blog",
+            "href": "https://aptisacademy.com.vn/blog"
+          },
+          {
+            "text": "Liên hệ",
+            "href": "https://aptisacademy.com.vn/contact"
+          },
+          {
+            "text": "Giới thiệu",
+            "href": "https://aptisacademy.com.vn/about"
+          },
+          {
+            "text": "Đăng nhập→",
+            "href": "https://aptisacademy.com.vn/login"
+          },
+          {
+            "text": "Tham Gia Nhóm Xoá Mù Aptis",
+            "href": "https://www.facebook.com/groups/1382229237043789"
+          },
+          {
+            "text": "BỘ ĐỀ KEY",
+            "href": "https://aptisacademy.com.vn/bo-de-key"
+          },
+          {
+            "text": "Hỗ trợ chi tiết",
+            "href": "https://zalo.me/0866950837"
+          },
+          {
+            "text": "Zalo",
+            "href": "https://zalo.me/0866950837"
+          },
+          {
+            "text": "Hỗ trợ chi tiết",
+            "href": "https://zalo.me/0866950837"
+          },
+          {
+            "text": "Zalo",
+            "href": "https://zalo.me/0866950837"
+          },
+          {
+            "text": "Xem chi tiết",
+            "href": "https://aptisacademy.com.vn/bo-de-key/listening/4?id=6a799c0e55f812b856ff1b55"
+          },
+          {
+            "text": "Xem chi tiết",
+            "href": "https://aptisacademy.com.vn/bo-de-key/reading/2?tab=default&id=6a62ce979e697c44c86f1095"
+          },
+          {
+            "text": "Xem chi tiết",
+            "href": "https://aptisacademy.com.vn/bo-de-key/listening/3?id=b2c3d4e5f6a1b2c3d4e5f6a0"
+          },
+          {
+            "text": "Group Xóa Mù Aptis (nhóm mới)",
+            "href": "https://www.facebook.com/groups/1382229237043789"
+          },
+          {
+            "text": "Liên hệ",
+            "href": "https://zalo.me/0866950837"
+          },
+          {
+            "text": "Về chúng tôi",
+            "href": "https://aptisacademy.com.vn/about"
+          },
+          {
+            "text": "Liên hệ",
+            "href": "https://zalo.me/0866950837"
+          }
+        ],
+        "itemsCount": 100,
+        "itemsSample": [
+          "Follow Us:",
+          "Follow Us:",
+          "Follow Us:",
+          "0866 950 837",
+          "0866 950 837",
+          "aptistienganh@gmail.com",
+          "APTISTIÊN PHONG",
+          "APTIS",
+          "APTIS",
+          "Trang chủ"
+        ]
+      }
+    },
+    "bo_de_key": {
+      "error": "Execution context was destroyed, most likely because of a navigation."
+    },
+    "practice_test": {
+      "name": "Practice Test",
+      "targetUrl": "https://aptisacademy.com.vn/practice-test",
+      "finalUrl": "https://aptisacademy.com.vn/practice-test",
+      "status": 200,
+      "pageData": {
+        "title": "Aptis Tiên Phong",
+        "textLength": 950,
+        "textSample": "APTIS\nTIÊN PHONG\nMenu\nThi thử\n\nĐể làm bài thi thử, bạn cần đáp ứng đủ 2 điều kiện sau:\n\n1\n\nĐăng nhập tài khoản\n\nBạn cần có tài khoản trên hệ thống để sử dụng tính năng này.\n\n2\n\nSở hữu 1 gói dịch vụ đang active\n\nBộ Đề Key hoặc Khóa Học (KHB1/KHB2/KHC1) — bất kỳ gói nào còn hạn là đủ.\n\n⚠️ Bạn hiện chưa đăng nhập. Hãy đăng nhập để hệ thống kiểm tra quyền truy cập.\n\nYêu cầu đăng nhập\n\nBạn cần đăng nhập để có thể tham gia luyện tập và lưu lại kết quả của mình. Nếu chưa có tài khoản hãy tạo 1 tài khoản mới để tiếp tục\n\nĐăng nhập ngay\nĐăng ký tài khoản mới\nAptis Tiên Phong\n\nAptis Tiên Phong cung cấp các khóa học chất lượng cao giúp bạn nâng cao kỹ năng và kiến thức một cách hiệu quả.\n\nTÌM THẤY CHÚNG TÔI Ở ĐÂU\nFan Page Aptis Tiên Phong\nGroup Xóa Mù Aptis (nhóm mới)\nLiên hệ\nĐĂNG KÝ NHẬN BẢN TIN\n\nNh",
+        "links": [
+          {
+            "text": "APTISTIÊN PHONG",
+            "href": "https://aptisacademy.com.vn/"
+          },
+          {
+            "text": "Trang chủ",
+            "href": "https://aptisacademy.com.vn/"
+          },
+          {
+            "text": "Review đề thi",
+            "href": "https://aptisacademy.com.vn/review-exam"
+          },
+          {
+            "text": "Blog",
+            "href": "https://aptisacademy.com.vn/blog"
+          },
+          {
+            "text": "Liên hệ",
+            "href": "https://aptisacademy.com.vn/contact"
+          },
+          {
+            "text": "Giới thiệu",
+            "href": "https://aptisacademy.com.vn/about"
+          },
+          {
+            "text": "Đăng nhập→",
+            "href": "https://aptisacademy.com.vn/login"
+          },
+          {
+            "text": "Group Xóa Mù Aptis (nhóm mới)",
+            "href": "https://www.facebook.com/groups/1382229237043789"
+          },
+          {
+            "text": "Liên hệ",
+            "href": "https://zalo.me/0866950837"
+          },
+          {
+            "text": "Về chúng tôi",
+            "href": "https://aptisacademy.com.vn/about"
+          },
+          {
+            "text": "Liên hệ",
+            "href": "https://zalo.me/0866950837"
+          }
+        ],
+        "itemsCount": 18,
+        "itemsSample": [
+          "APTISTIÊN PHONG",
+          "APTIS",
+          "APTIS",
+          "Trang chủ",
+          "Đăng nhập→",
+          "→",
+          "Menu",
+          "1",
+          "2",
+          "Yêu cầu đăng nhập"
+        ]
+      }
+    },
+    "document": {
+      "name": "Document",
+      "targetUrl": "https://aptisacademy.com.vn/document",
+      "finalUrl": "https://aptisacademy.com.vn/document",
+      "status": 200,
+      "pageData": {
+        "title": "Aptis Tiên Phong",
+        "textLength": 417,
+        "textSample": "Trang Tài Liệu Dành Cho Học Viên\n\nĐể truy cập tài liệu phân tích chi tiết, bạn cần đáp ứng các điều kiện sau:\n\n1\n\nĐăng nhập tài khoản\n\nBạn cần có tài khoản trên hệ thống để sử dụng tính năng này.\n\n2\n\nSở hữu gói dịch vụ phù hợp\n\nBộ Đề Key — mở khóa Reading & Listening.\nKhóa Học Đột Phá — mở khóa tất cả 4 kỹ năng + full tính năng.\n\n⚠️ Bạn hiện chưa đăng nhập. Hãy đăng nhập để kiểm tra quyền truy cập.\n\nĐăng nhập ngay",
+        "links": [
+          {
+            "text": "Đăng nhập ngay",
+            "href": "https://aptisacademy.com.vn/login"
+          }
+        ],
+        "itemsCount": 3,
+        "itemsSample": [
+          "Để truy cập tài liệu phân tích chi tiết, bạn cần đáp ứng các điều kiện sau:",
+          "1",
+          "2"
+        ]
+      }
+    }
+  },
+  "capturedApis": {
+    "https://aptisacademy.com.vn/": [
+      {
+        "url": "https://aptisacademy.com.vn/api/public/announcements?limit=10",
+        "status": 200,
+        "contentType": "application/json",
+        "dataPreview": "{\"success\":true,\"data\":[{\"id\":16,\"title\":\"Key các phần đã được cập nhật thêm, mọi người lên web luyện tập nha\",\"content\":\"Đề vẫn ra nhiều key cũ vì vậy mọi người cần luyện tập đầy nha\",\"url\":null,\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-09-25T10:28:26.976Z\",\"updated_at\":\"202"
+      }
+    ],
+    "https://aptisacademy.com.vn/bo-de-key": [
+      {
+        "url": "https://aptisacademy.com.vn/data/exams/listing-summary.json",
+        "status": 200,
+        "contentType": "application/json",
+        "dataPreview": "[\r\n  {\r\n    \"skillType\": \"LISTENING\",\r\n    \"skillLabel\": \"Listening - Nghe\",\r\n    \"parts\": [\r\n      {\r\n        \"partNumber\": 1,\r\n        \"partLabel\": \"Part 1\",\r\n        \"totalQuestions\": 13,\r\n        \"freeQuestions\": 3\r\n      },\r\n      {\r\n        \"partNumber\": 2,\r\n        \"partLabel\": \"Part 2\",\r\n   "
+      },
+      {
+        "url": "https://aptisacademy.com.vn/?_rsc=saumu",
+        "status": 200,
+        "contentType": "text/x-component",
+        "dataPreview": "3:\"$Sreact.fragment\"\n4:I[31090,[\"9109\",\"static/chunks/9109-26e9436acfa055bb.js\",\"231\",\"static/chunks/231-ab87c5be3aacaab9.js\",\"2351\",\"static/chunks/2351-9a7c593f244babf6.js\",\"8472\",\"static/chunks/8472-7110df16b2ada005.js\",\"4025\",\"static/chunks/4025-ca21fe4ee0fcd172.js\",\"1444\",\"static/chunks/1444-307"
+      },
+      {
+        "url": "https://aptisacademy.com.vn/data/bo-de-free.json",
+        "status": 200,
+        "contentType": "application/json",
+        "dataPreview": "[\r\n  {\r\n    \"status\": 200,\r\n    \"message\": \"creat new Reading success!\",\r\n    \"metadata\": [\r\n      {\r\n        \"speaking\": {\r\n          \"part1\": [\r\n            {\r\n              \"_id\": \"68e4bf5f53b4655eba3f0a93\",\r\n              \"title\": \"Học một thứ mới\",\r\n              \"timeToDo\": \"1970-01-01T00:00:0"
+      }
+    ],
+    "https://aptisacademy.com.vn/practice-test": [
+      {
+        "url": "https://aptisacademy.com.vn/?_rsc=1xajh",
+        "status": 200,
+        "contentType": "text/x-component",
+        "dataPreview": "3:\"$Sreact.fragment\"\n4:I[31090,[\"9109\",\"static/chunks/9109-26e9436acfa055bb.js\",\"231\",\"static/chunks/231-ab87c5be3aacaab9.js\",\"2351\",\"static/chunks/2351-9a7c593f244babf6.js\",\"8472\",\"static/chunks/8472-7110df16b2ada005.js\",\"4025\",\"static/chunks/4025-ca21fe4ee0fcd172.js\",\"1444\",\"static/chunks/1444-307"
+      }
+    ],
+    "https://aptisacademy.com.vn/document": [
+      {
+        "url": "https://aptisacademy.com.vn/login?_rsc=qgnmk",
+        "status": 200,
+        "contentType": "text/x-component",
+        "dataPreview": "3:\"$Sreact.fragment\"\n4:I[31090,[\"9109\",\"static/chunks/9109-26e9436acfa055bb.js\",\"231\",\"static/chunks/231-ab87c5be3aacaab9.js\",\"2351\",\"static/chunks/2351-9a7c593f244babf6.js\",\"8472\",\"static/chunks/8472-7110df16b2ada005.js\",\"4025\",\"static/chunks/4025-ca21fe4ee0fcd172.js\",\"1444\",\"static/chunks/1444-307"
+      }
+    ]
+  }
+}
