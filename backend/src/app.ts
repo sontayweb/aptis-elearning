@@ -19,6 +19,9 @@ import { errorHandler } from './middlewares/error.handler';
 
 const app = express();
 
+// Trust reverse proxy (Nginx / Cloudflare / Docker network) for accurate client IP in rate limiting
+app.set('trust proxy', 1);
+
 // Security & Parsing Middlewares
 app.use(helmet());
 app.use(

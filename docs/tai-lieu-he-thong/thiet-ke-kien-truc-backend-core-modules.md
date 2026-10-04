@@ -136,6 +136,26 @@ graph TD
 
 ---
 
+### 3.5. Module Giới Hạn Tần Suất Gọi API (Rate Limiting): `backend/src/middlewares/rate-limit.middleware.ts`
+- **Mục đích:** Bảo vệ hệ thống khỏi tấn công dò mật khẩu tự động (Brute-force) và kiểm soát chi phí token API khi gọi các model AI.
+- **Cấu hình chuẩn hóa:**
+  1. `trust proxy`: Bật trong `app.ts` (`app.set('trust proxy', 1)`) để nhận diện đúng IP người dùng phía sau Nginx/Cloudflare/Docker.
+  2. `authRateLimiter`: 30 requests / 15 phút (gắn vào `/api/auth/register`, `/login`, `/forgot-password`, `/reset-password`).
+  3. `aiGradingRateLimiter`: 10 requests / 1 phút (gắn vào `/api/ai-grading/:id/evaluate-ai`).
+- **Phản hồi chuẩn:** Trả về HTTP Status `429 Too Many Requests` với mã lỗi `RATE_LIMIT_EXCEEDED` và kèm standard headers (`RateLimit-Limit`, `RateLimit-Remaining`).
+
+---
+
+### 3.6. Cơ Chế Tắt Máy An Toàn (Graceful Shutdown): `backend/src/server.ts`
+- **Mục đích:** Đảm bảo khi server restart, cập nhật mã nguồn hoặc deploy container mới, tất cả in-flight request được hoàn tất và kết nối cơ sở dữ liệu được giải phóng triệt để.
+- **Xử lý tín hiệu:** Bắt cả `SIGTERM` và `SIGINT`.
+- **Hành động:** 
+  1. Dừng nhận request mới qua `server.close()`.
+  2. Thực thi `await prisma.$disconnect()` để đóng TCP session tới PostgreSQL một cách chủ động, triệt tiêu hoàn toàn log `Connection reset by peer`.
+  3. Timeout an toàn 10s tự động force kill nếu có tác vụ treo.
+
+---
+
 ## 4. KẾT QUẢ KIỂM THỬ VÀ XÁC MINH HỆ THỐNG
 
 ### 4.1. Kiểm thử TypeScript Compiler
