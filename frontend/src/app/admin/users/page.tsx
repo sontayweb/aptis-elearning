@@ -38,6 +38,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronUp,
+  MoreHorizontal,
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
 import { useAuth } from "@/contexts/auth-context";
@@ -140,6 +141,22 @@ export default function AdminUsersPage() {
   // Multi-selection state
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [batchActionLoading, setBatchActionLoading] = useState(false);
+
+  // Table row 3-dot dropdown state
+  const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("[data-row-menu]")) {
+        setActiveDropdownId(null);
+      }
+    };
+    if (activeDropdownId) {
+      document.addEventListener("click", handleOutsideClick);
+      return () => document.removeEventListener("click", handleOutsideClick);
+    }
+  }, [activeDropdownId]);
 
   // Quick Assistance Drawer State
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
@@ -633,38 +650,38 @@ export default function AdminUsersPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-semibold mb-1.5">
-            <Users className="w-3 h-3 text-slate-600" />
-            <span>Student & User Management Studio</span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
+            <Users className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+            <span>Quản trị Học viên & Tài khoản</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight">
             Quản Lý Tài Khoản Học Viên
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
             Tra cứu theo SĐT/Email, cấp gia hạn VIP 1 chạm, điều phối lượt chấm AI và xử lý tài vụ khẩn cấp
           </p>
 
-          {/* Compact Inline Metrics Strip (SRD 4.3 Clean Standard - Zero Space Overhead) */}
+          {/* Compact Inline Metrics Strip (Clean Subtext & Subtle Neutral Chips) */}
           {!showMetrics && (
             <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
-              <span className="text-[11px] text-slate-400 font-semibold font-heading uppercase tracking-wider">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
                 Chỉ số nhanh:
               </span>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200/80 text-[11px] font-semibold text-slate-700">
-                <Users className="w-3 h-3 text-slate-500" />
-                <span>Tổng: <strong className="text-slate-900 font-mono">{totalCount}</strong></span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <Users className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+                <span>Tổng: <strong className="text-slate-900 dark:text-white font-mono">{totalCount}</strong></span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-amber-50 border border-amber-200/80 text-[11px] font-semibold text-amber-800">
-                <Crown className="w-3 h-3 text-amber-600 fill-amber-500" />
-                <span>VIP: <strong className="text-amber-900 font-mono">{vipCount}</strong></span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
+                <span>VIP: <strong className="text-slate-900 dark:text-white font-mono">{vipCount}</strong></span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-blue-50 border border-blue-200/80 text-[11px] font-semibold text-blue-800">
-                <GraduationCap className="w-3 h-3 text-blue-600" />
-                <span>Giảng viên: <strong className="text-blue-900 font-mono">{teacherCount}</strong></span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <GraduationCap className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+                <span>Giảng viên: <strong className="text-slate-900 dark:text-white font-mono">{teacherCount}</strong></span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200/80 text-[11px] font-semibold text-emerald-800">
-                <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                <span>Hoạt động: <strong className="text-emerald-900 font-mono">{activeRate}%</strong></span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                <span>Hoạt động: <strong className="text-slate-900 dark:text-white font-mono">{activeRate}%</strong></span>
               </div>
             </div>
           )}
@@ -677,8 +694,8 @@ export default function AdminUsersPage() {
             onClick={toggleMetrics}
             className={`px-3.5 py-2 rounded-xl border text-xs font-heading font-semibold transition-all flex items-center gap-1.5 shadow-2xs ${
               showMetrics
-                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                : "border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
+                ? "bg-slate-900 dark:bg-slate-800 text-white border-slate-900 dark:border-slate-700 shadow-sm"
+                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
             }`}
             title={showMetrics ? "Thu gọn 4 thẻ chỉ số để giải phóng không gian bảng" : "Mở rộng 4 thẻ chỉ số thống kê"}
           >
@@ -689,10 +706,10 @@ export default function AdminUsersPage() {
 
           <button
             onClick={() => handleExportCSV(false)}
-            className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
             title="Xuất file danh sách ra Excel/CSV"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span className="hidden sm:inline">Xuất Excel</span>
           </button>
 
@@ -710,7 +727,7 @@ export default function AdminUsersPage() {
 
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
           >
             <UserPlus className="w-4 h-4" />
             <span>Thêm tài khoản</span>
@@ -722,72 +739,72 @@ export default function AdminUsersPage() {
       {showMetrics && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Tổng tài khoản */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition-all">
-            <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 flex items-center justify-center shrink-0">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 flex items-center justify-center shrink-0">
               <Users className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider font-heading">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider font-heading">
                 Tổng tài khoản
               </div>
-              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 mt-0.5 font-mono">
+              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 dark:text-white mt-0.5 font-mono">
                 {totalCount}
               </div>
-              <div className="text-[10px] text-slate-500 font-medium mt-0.5">
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                 Hệ thống APTIS ESOL PREMIER
               </div>
             </div>
           </div>
 
           {/* Học viên VIP */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition-all">
-            <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <Crown className="w-5 h-5 fill-amber-500" />
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider font-heading">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider font-heading">
                 Học viên VIP hoạt động
               </div>
-              <div className="text-xl sm:text-2xl font-heading font-extrabold text-amber-700 mt-0.5 font-mono">
+              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 dark:text-white mt-0.5 font-mono">
                 {vipCount}
               </div>
-              <div className="text-[10px] text-amber-700 font-medium mt-0.5">
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                 Có quyền truy cập kho VIP Pro
               </div>
             </div>
           </div>
 
           {/* Đội ngũ Giảng viên */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition-all">
-            <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <GraduationCap className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider font-heading">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider font-heading">
                 Giảng viên học vụ
               </div>
-              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 mt-0.5 font-mono">
+              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 dark:text-white mt-0.5 font-mono">
                 {teacherCount}
               </div>
-              <div className="text-[10px] text-slate-500 font-medium mt-0.5">
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                 Chấm thi & cố vấn chuyên môn
               </div>
             </div>
           </div>
 
           {/* Trạng thái hoạt động */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition-all">
-            <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider font-heading">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider font-heading">
                 Tỷ lệ hoạt động
               </div>
-              <div className="text-xl sm:text-2xl font-heading font-extrabold text-emerald-700 mt-0.5 font-mono">
+              <div className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 dark:text-white mt-0.5 font-mono">
                 {activeRate}%
               </div>
-              <div className="text-[10px] text-emerald-700 font-medium mt-0.5">
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                 {activeCount} / {users.length} tài khoản hợp lệ
               </div>
             </div>
@@ -859,20 +876,20 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden">
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-heading font-bold text-[10px] uppercase tracking-wider">
+              <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200/80 dark:border-slate-700/80 text-slate-500 dark:text-slate-400 font-heading font-bold text-[10px] uppercase tracking-wider">
                 <th className="py-3.5 pl-4 sm:pl-6 pr-2 w-10">
                   <button
                     onClick={handleToggleSelectAll}
                     title="Chọn tất cả trang này"
-                    className="text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center"
+                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
                   >
                     {selectedUserIds.length > 0 &&
                     selectedUserIds.length === displayedUsers.length ? (
-                      <CheckSquare className="w-4 h-4 text-slate-900" />
+                      <CheckSquare className="w-4 h-4 text-slate-900 dark:text-white" />
                     ) : (
                       <Square className="w-4 h-4" />
                     )}
@@ -890,40 +907,42 @@ export default function AdminUsersPage() {
                   currentSort={sortState}
                   onSort={handleSort}
                 />
-                <th className="py-3.5 px-4">Gói dịch vụ</th>
+                <th className="py-3.5 px-4 text-left">Gói dịch vụ</th>
                 <SortableHeader
                   field="is_active"
                   title="Trạng thái"
                   currentSort={sortState}
                   onSort={handleSort}
+                  align="center"
                 />
                 <SortableHeader
                   field="submissions"
                   title="Lượt thi"
                   currentSort={sortState}
                   onSort={handleSort}
-                  align="center"
+                  align="right"
                 />
                 <SortableHeader
                   field="created_at"
                   title="Ngày đăng ký"
                   currentSort={sortState}
                   onSort={handleSort}
+                  align="right"
                 />
-                <th className="py-3.5 px-4 text-right pr-6">Hỗ trợ học vụ</th>
+                <th className="py-3.5 px-4 text-right pr-6">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-medium text-slate-900">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium text-slate-900 dark:text-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-slate-400">
-                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-slate-600" />
+                  <td colSpan={8} className="py-16 text-center text-slate-400 dark:text-slate-500">
+                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-slate-600 dark:text-slate-400" />
                     Đang tải danh sách tài khoản...
                   </td>
                 </tr>
               ) : sortedUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-slate-400 font-normal">
+                  <td colSpan={8} className="py-16 text-center text-slate-400 dark:text-slate-500 font-normal">
                     Không tìm thấy tài khoản nào phù hợp bộ lọc
                   </td>
                 </tr>
@@ -939,18 +958,18 @@ export default function AdminUsersPage() {
                   return (
                     <tr
                       key={user.id}
-                      className={`hover:bg-slate-50/70 transition-colors ${
-                        isSelected ? "bg-slate-50/80" : ""
+                      className={`hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors ${
+                        isSelected ? "bg-slate-50/80 dark:bg-slate-800/80" : ""
                       }`}
                     >
                       {/* Checkbox */}
                       <td className="py-3.5 pl-4 sm:pl-6 pr-2">
                         <button
                           onClick={() => handleToggleSelectUser(user.id)}
-                          className="text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center"
+                          className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center"
                         >
                           {isSelected ? (
-                            <CheckSquare className="w-4 h-4 text-slate-900" />
+                            <CheckSquare className="w-4 h-4 text-slate-900 dark:text-white" />
                           ) : (
                             <Square className="w-4 h-4" />
                           )}
@@ -958,10 +977,10 @@ export default function AdminUsersPage() {
                       </td>
 
                       {/* Name & Email & Role badge */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 text-left">
                         <div className="flex items-center gap-3">
                           <div className="relative">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                               {user.full_name.charAt(0)}
                             </div>
                             {isVip && (
@@ -971,26 +990,26 @@ export default function AdminUsersPage() {
                             )}
                           </div>
                           <div className="min-w-0">
-                            <div className="font-heading font-bold text-slate-900 flex items-center gap-1.5">
+                            <div className="font-heading font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                               <span className="truncate">{user.full_name}</span>
                               {user.role === "SUPER_ADMIN" && (
-                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-md bg-gradient-to-r from-rose-600 to-amber-600 text-white text-[9px] font-bold shadow-xs">
-                                  <Sparkles className="w-3 h-3" /> Super Admin
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 text-[9px] font-bold">
+                                  <Sparkles className="w-2.5 h-2.5" /> Super Admin
                                 </span>
                               )}
                               {user.role === "ADMIN" && (
-                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-md bg-slate-900 text-white text-[9px] font-bold">
-                                  <ShieldCheck className="w-3 h-3" /> Admin
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[9px] font-bold">
+                                  <ShieldCheck className="w-2.5 h-2.5" /> Admin
                                 </span>
                               )}
                               {user.role === "TEACHER" && (
-                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[9px] font-bold">
-                                  <GraduationCap className="w-3 h-3" /> GV
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/60 text-[9px] font-bold">
+                                  <GraduationCap className="w-2.5 h-2.5" /> GV
                                 </span>
                               )}
                             </div>
-                            <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
-                              <Mail className="w-3 h-3 text-slate-400 shrink-0" />
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
+                              <Mail className="w-3 h-3 text-slate-400 dark:text-slate-500 shrink-0" />
                               <span className="truncate">{user.email}</span>
                             </div>
                           </div>
@@ -998,90 +1017,160 @@ export default function AdminUsersPage() {
                       </td>
 
                       {/* Phone */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 text-left">
                         {user.phone_number ? (
                           <a
                             href={`tel:${user.phone_number}`}
-                            className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 font-mono text-[11px] font-medium"
+                            className="inline-flex items-center gap-1 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] font-medium"
                           >
-                            <Phone className="w-3 h-3 text-slate-400" />
+                            <Phone className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                             {user.phone_number}
                           </a>
                         ) : (
-                          <span className="text-slate-300 text-[11px]">—</span>
+                          <span className="text-slate-300 dark:text-slate-600 text-[11px]">—</span>
                         )}
                       </td>
 
                       {/* VIP Status */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 text-left">
                         {isVip ? (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-heading font-bold text-[10px]">
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 font-heading font-bold text-[10px]">
                             <Crown className="w-3 h-3 text-amber-500 fill-amber-500 shrink-0" />
                             <span>{activeSub.plan.name}</span>
                           </div>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium text-[10px]">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium text-[10px]">
                             FREE
                           </span>
                         )}
                       </td>
 
-                      {/* Active Status */}
-                      <td className="py-3.5 px-4">
+                      {/* Active Status (Centered per UX Guideline 5) */}
+                      <td className="py-3.5 px-4 text-center">
                         {user.is_active ? (
-                          <span className="inline-flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                          <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             Hoạt động
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 text-rose-600 font-semibold text-[11px]">
+                          <span className="inline-flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-semibold text-[11px]">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                             Đã khóa
                           </span>
                         )}
                       </td>
 
-                      {/* Submissions Count */}
-                      <td className="py-3.5 px-4 text-center">
-                        <span className="font-semibold text-slate-900 font-mono">
+                      {/* Submissions Count (Right-aligned per UX Guideline 5) */}
+                      <td className="py-3.5 px-4 text-right">
+                        <span className="font-semibold text-slate-900 dark:text-white font-mono">
                           {user._count?.submissions || 0}
                         </span>
                       </td>
 
-                      {/* Created At */}
-                      <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px]">
+                      {/* Created At (Right-aligned numbers per UX Guideline 5) */}
+                      <td className="py-3.5 px-4 text-right text-slate-500 dark:text-slate-400 font-mono text-[11px]">
                         {new Date(user.created_at).toLocaleDateString("vi-VN")}
                       </td>
 
-                      {/* Action Buttons */}
+                      {/* Action Buttons: 1 Primary + 3-dot Dropdown per UX Guideline 5 */}
                       <td className="py-3.5 px-4 text-right pr-6">
                         <div className="inline-flex items-center gap-1.5">
-                          {/* Quick Assistance Button */}
+                          {/* Primary Action Button */}
                           <button
                             onClick={() => handleOpenAssistance(user)}
-                            className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-heading font-semibold text-[11px] transition-colors flex items-center gap-1 shadow-2xs"
-                            title="Mở menu hỗ trợ: Cấp VIP, Cộng lượt AI, Đổi mật khẩu"
+                            className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-heading font-semibold text-[11px] transition-colors flex items-center gap-1 shadow-2xs"
+                            title="Mở menu hỗ trợ học vụ"
                           >
-                            <LifeBuoy className="w-3 h-3 text-slate-500" />
+                            <LifeBuoy className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                             <span>Hỗ trợ</span>
                           </button>
 
-                          {/* Lock / Unlock Toggle */}
-                          <button
-                            onClick={() => requestToggleStatus(user)}
-                            title={user.is_active ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                            className={`p-1.5 rounded-lg transition-colors border ${
-                              user.is_active
-                                ? "text-slate-400 hover:text-rose-600 hover:bg-rose-50 border-slate-200"
-                                : "text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100"
-                            }`}
-                          >
-                            {user.is_active ? (
-                              <Lock className="w-3.5 h-3.5" />
-                            ) : (
-                              <Unlock className="w-3.5 h-3.5" />
+                          {/* 3-Dot Secondary Action Dropdown */}
+                          <div className="relative" data-row-menu>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveDropdownId(activeDropdownId === user.id ? null : user.id);
+                              }}
+                              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors shadow-2xs"
+                              title="Thao tác khác"
+                            >
+                              <MoreHorizontal className="w-3.5 h-3.5" />
+                            </button>
+
+                            {activeDropdownId === user.id && (
+                              <div className="absolute right-0 top-full mt-1 w-44 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 text-left text-xs">
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    handleOpenAssistance(user);
+                                    setAssistanceTab("vip");
+                                  }}
+                                  className="w-full px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 font-medium"
+                                >
+                                  <Crown className="w-3.5 h-3.5 text-amber-500" />
+                                  <span>Cấp / Gia hạn VIP</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    handleOpenAssistance(user);
+                                    setAssistanceTab("quota");
+                                  }}
+                                  className="w-full px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 font-medium"
+                                >
+                                  <Zap className="w-3.5 h-3.5 text-sky-500" />
+                                  <span>Cộng lượt chấm AI</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    handleOpenAssistance(user);
+                                    setAssistanceTab("password");
+                                  }}
+                                  className="w-full px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 font-medium"
+                                >
+                                  <KeyRound className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                                  <span>Đặt lại mật khẩu</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    handleOpenAssistance(user);
+                                    setAssistanceTab("history");
+                                  }}
+                                  className="w-full px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 font-medium"
+                                >
+                                  <History className="w-3.5 h-3.5 text-indigo-500" />
+                                  <span>Lịch sử thi</span>
+                                </button>
+                                <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    requestToggleStatus(user);
+                                  }}
+                                  className={`w-full px-3 py-1.5 flex items-center gap-2 font-medium ${
+                                    user.is_active
+                                      ? "text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                                      : "text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                                  }`}
+                                >
+                                  {user.is_active ? (
+                                    <>
+                                      <Lock className="w-3.5 h-3.5" />
+                                      <span>Khóa tài khoản</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Unlock className="w-3.5 h-3.5" />
+                                      <span>Mở khóa tài khoản</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
                             )}
-                          </button>
+                          </div>
                         </div>
                       </td>
                     </tr>

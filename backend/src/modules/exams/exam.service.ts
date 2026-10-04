@@ -29,12 +29,14 @@ export class ExamService {
       where.creator_id = userId;
     }
 
+    const orderBy: any = skill === 'FULL_TEST' ? { title: 'asc' } : { created_at: 'desc' };
+
     const [exams, total] = await Promise.all([
       prisma.exam.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { created_at: 'desc' },
+        orderBy,
         include: {
           parts: {
             select: {

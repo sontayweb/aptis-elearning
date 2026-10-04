@@ -270,50 +270,52 @@ export function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalPr
           </button>
         </form>
 
-        {/* Quick Demo Switcher */}
-        <div className="mt-5 pt-4 border-t border-border">
-          <p className="text-[11px] font-semibold text-muted-foreground text-center mb-2.5">
-            HOẶC ĐĂNG NHẬP NHANH VỚI TÀI KHOẢN MẪU:
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("student")}
-              className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
-            >
-              <GraduationCap className="w-4 h-4 text-primary mb-1" />
-              <span className="text-[11px] font-bold text-foreground">Học viên</span>
-              <span className="text-[9px] text-muted-foreground">Demo VIP</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("teacher")}
-              className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
-            >
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 mb-1" />
-              <span className="text-[11px] font-bold text-foreground">Giảng viên</span>
-              <span className="text-[9px] text-muted-foreground">Chấm bài</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("admin")}
-              className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
-            >
-              <ShieldCheck className="w-4 h-4 text-blue-500 mb-1" />
-              <span className="text-[11px] font-bold text-foreground">Học vụ</span>
-              <span className="text-[9px] text-muted-foreground">Đề thi/Lớp</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("super_admin")}
-              className="flex flex-col items-center p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors text-center"
-            >
-              <Sparkles className="w-4 h-4 text-rose-500 mb-1" />
-              <span className="text-[11px] font-bold text-rose-500">Super Admin</span>
-              <span className="text-[9px] text-muted-foreground">Toàn quyền</span>
-            </button>
+        {/* Quick Demo Switcher - Chỉ hiển thị khi development để bảo mật tài khoản quản trị khi Go-Live */}
+        {process.env.NODE_ENV !== "production" && (
+          <div className="mt-5 pt-4 border-t border-border">
+            <p className="text-[11px] font-semibold text-muted-foreground text-center mb-2.5">
+              HOẶC ĐĂNG NHẬP NHANH VỚI TÀI KHOẢN MẪU (DEV ONLY):
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("student")}
+                className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
+              >
+                <GraduationCap className="w-4 h-4 text-primary mb-1" />
+                <span className="text-[11px] font-bold text-foreground">Học viên</span>
+                <span className="text-[9px] text-muted-foreground">Demo VIP</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("teacher")}
+                className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
+              >
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 mb-1" />
+                <span className="text-[11px] font-bold text-foreground">Giảng viên</span>
+                <span className="text-[9px] text-muted-foreground">Chấm bài</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("admin")}
+                className="flex flex-col items-center p-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors text-center"
+              >
+                <ShieldCheck className="w-4 h-4 text-blue-500 mb-1" />
+                <span className="text-[11px] font-bold text-foreground">Học vụ</span>
+                <span className="text-[9px] text-muted-foreground">Đề thi/Lớp</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("super_admin")}
+                className="flex flex-col items-center p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors text-center"
+              >
+                <Sparkles className="w-4 h-4 text-rose-500 mb-1" />
+                <span className="text-[11px] font-bold text-rose-500">Super Admin</span>
+                <span className="text-[9px] text-muted-foreground">Toàn quyền</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>,
     document.body

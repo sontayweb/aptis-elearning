@@ -26,6 +26,7 @@
   --input: 0 0% 90%;
   --ring: 221 83% 53%;
   --radius: 0.875rem;
+  --navbar-total-height: 64px;
 
   --sidebar: 0 0% 98%;
   --sidebar-foreground: 0 0% 25%;
@@ -58,10 +59,10 @@
   --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.04);
   --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.06);
   --shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.1);
-  --shadow-glow: 0 0 30px hsl(221 83% 53% / 0.25);
-  --shadow-glow-red: 0 0 24px hsl(221 83% 53% / 0.35), 0 0 60px hsl(221 83% 53% / 0.18);
-  --shadow-glow-blue: 0 0 24px hsl(221 83% 53% / 0.35), 0 0 60px hsl(221 83% 53% / 0.18);
-  --shadow-glow-soft: 0 0 20px hsl(221 83% 53% / 0.18);
+  --shadow-glow: 0 0 25px hsl(var(--primary) / 0.28);
+  --shadow-glow-red: 0 4px 16px hsl(var(--primary) / 0.28);
+  --shadow-glow-blue: 0 4px 16px hsl(var(--primary) / 0.28);
+  --shadow-glow-soft: 0 4px 14px hsl(var(--primary) / 0.22);
   --shadow-elevated: 0 12px 40px -8px hsl(0 0% 0% / 0.12), 0 0 0 1px hsl(0 0% 0% / 0.04);
 }
 
@@ -112,10 +113,10 @@
 
   --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.3);
   --shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.4);
-  --shadow-glow: 0 0 30px hsl(221 83% 63% / 0.35);
-  --shadow-glow-red: 0 0 28px hsl(221 83% 63% / 0.5), 0 0 70px hsl(221 83% 63% / 0.22);
-  --shadow-glow-blue: 0 0 28px hsl(221 83% 63% / 0.4), 0 0 70px hsl(221 83% 63% / 0.18);
-  --shadow-glow-soft: 0 0 24px hsl(221 83% 63% / 0.2);
+  --shadow-glow: 0 0 30px hsl(var(--primary) / 0.35);
+  --shadow-glow-red: 0 4px 16px hsl(var(--primary) / 0.35);
+  --shadow-glow-blue: 0 4px 16px hsl(var(--primary) / 0.35);
+  --shadow-glow-soft: 0 4px 14px hsl(var(--primary) / 0.28);
   --shadow-elevated: 0 16px 50px -10px hsl(0 0% 0% / 0.6), 0 0 0 1px hsl(220 18% 16%);
 }
 
@@ -209,9 +210,14 @@ body {
   letter-spacing: 0.05em;
 }
 
-/* Gradient CTA button — brand standard Highlight Blue */
+/* Gradient CTA button — brand standard Highlight Blue or active Event Theme */
 .btn-brand-gradient {
-  background: linear-gradient(to right, #1D4ED8, #2563EB);
+  background: var(--gradient-primary) !important;
+  color: #FFFFFF !important;
+}
+
+.btn-brand-gradient:hover {
+  filter: brightness(1.08);
 }
 
 .tech-card {
@@ -368,29 +374,155 @@ body {
   animation: petalFall linear infinite;
 }
 
-/* Event Theme Color Overrides */
-[data-event-theme="halloween"] {
-  --primary: 24 95% 53%; /* Vivid Orange #EA580C */
-  --primary-glow: 27 96% 61%;
-  --accent: 271 81% 56%; /* Purple */
-}
+/* Event Theme Color Palettes & Harmony Engine */
 
-[data-event-theme="noel"] {
-  --primary: 0 72% 51%; /* Noel Red #DC2626 */
-  --primary-glow: 142 71% 45%; /* Pine Green */
-  --accent: 142 71% 45%;
-}
-
-[data-event-theme="mid_autumn"] {
-  --primary: 38 92% 50%; /* Golden Amber #D97706 */
-  --primary-glow: 45 93% 47%;
-  --accent: 32 95% 44%;
-}
-
+/* 1. TET NGUYEN DAN (Spring / Lunar New Year) — Rich Crimson & Imperial Gold */
 [data-event-theme="tet"] {
-  --primary: 347 77% 50%; /* Tet Crimson #E11D48 */
-  --primary-glow: 48 96% 53%; /* Gold */
-  --accent: 48 96% 53%;
+  --primary: 350 82% 48%;          /* #DE1A35 Đỏ cờ hoa may mắn sang trọng, không bị hồng cánh sen */
+  --primary-glow: 352 86% 62%;     /* #F43F5E Hồng ngọc lấp lánh */
+  --accent: 43 96% 50%;            /* #F59E0B Vàng kim hoàng gia */
+  --accent-foreground: 0 0% 100%;
+  --ring: 350 82% 48%;
+
+  --gradient-primary: linear-gradient(135deg, #BE123C 0%, #DE1A35 50%, #E11D48 100%);
+  --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(350 100% 98%) 45%, hsl(43 100% 97%) 100%);
+  --gradient-aurora: linear-gradient(135deg, hsl(350 82% 48% / 0.12), hsl(43 96% 50% / 0.1), transparent);
+  --gradient-radial-red: radial-gradient(circle at 50% 50%, hsl(350 82% 48% / 0.16) 0%, transparent 65%);
+}
+
+[data-event-theme="tet"].dark,
+.dark [data-event-theme="tet"] {
+  --gradient-hero: linear-gradient(135deg, hsl(350 30% 6%) 0%, hsl(220 20% 6%) 50%, hsl(350 40% 10%) 100%);
+}
+
+[data-event-theme="tet"] .gradient-text {
+  background: linear-gradient(135deg, #BE123C 0%, #DE1A35 45%, #D97706 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-event-theme="tet"] .glow-orb-blue {
+  background: hsl(350 82% 48% / 0.22) !important;
+}
+[data-event-theme="tet"] .glow-orb-navy {
+  background: hsl(43 96% 50% / 0.22) !important;
+}
+
+/* 2. HALLOWEEN — Vivid Pumpkin Orange & Witch Purple */
+[data-event-theme="halloween"] {
+  --primary: 24 95% 53%;           /* #EA580C Cam bí ngô rực cháy */
+  --primary-glow: 27 96% 61%;      /* #F97316 Cam sáng */
+  --accent: 271 81% 56%;           /* #7C3AED Tím huyền bí */
+  --accent-foreground: 0 0% 100%;
+  --ring: 24 95% 53%;
+
+  --gradient-primary: linear-gradient(135deg, #C2410C 0%, #EA580C 50%, #F97316 100%);
+  --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(24 100% 98%) 45%, hsl(271 100% 98%) 100%);
+  --gradient-aurora: linear-gradient(135deg, hsl(24 95% 53% / 0.14), hsl(271 81% 56% / 0.12), transparent);
+  --gradient-radial-red: radial-gradient(circle at 50% 50%, hsl(24 95% 53% / 0.18) 0%, transparent 65%);
+}
+
+[data-event-theme="halloween"].dark,
+.dark [data-event-theme="halloween"] {
+  --gradient-hero: linear-gradient(135deg, hsl(270 25% 6%) 0%, hsl(24 35% 7%) 50%, hsl(271 35% 10%) 100%);
+}
+
+[data-event-theme="halloween"] .gradient-text {
+  background: linear-gradient(135deg, #C2410C 0%, #EA580C 45%, #9333EA 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-event-theme="halloween"] .glow-orb-blue {
+  background: hsl(24 95% 53% / 0.22) !important;
+}
+[data-event-theme="halloween"] .glow-orb-navy {
+  background: hsl(271 81% 56% / 0.22) !important;
+}
+
+/* 3. NOEL (Christmas) — Pine Green & Holiday Red */
+[data-event-theme="noel"] {
+  --primary: 142 71% 45%;          /* #16A34A Xanh thông Giáng Sinh */
+  --primary-glow: 142 76% 56%;     /* #22C55E Xanh sáng lấp lánh */
+  --accent: 0 72% 51%;             /* #DC2626 Đỏ Noel rực rỡ */
+  --accent-foreground: 0 0% 100%;
+  --ring: 142 71% 45%;
+
+  --gradient-primary: linear-gradient(135deg, #15803D 0%, #16A34A 50%, #22C55E 100%);
+  --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(142 60% 98%) 45%, hsl(0 80% 98%) 100%);
+  --gradient-aurora: linear-gradient(135deg, hsl(142 71% 45% / 0.14), hsl(0 72% 51% / 0.12), transparent);
+  --gradient-radial-red: radial-gradient(circle at 50% 50%, hsl(142 71% 45% / 0.16) 0%, transparent 65%);
+}
+
+[data-event-theme="noel"].dark,
+.dark [data-event-theme="noel"] {
+  --gradient-hero: linear-gradient(135deg, hsl(142 30% 6%) 0%, hsl(220 20% 6%) 50%, hsl(0 30% 8%) 100%);
+}
+
+[data-event-theme="noel"] .gradient-text {
+  background: linear-gradient(135deg, #15803D 0%, #16A34A 50%, #DC2626 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-event-theme="noel"] .glow-orb-blue {
+  background: hsl(142 71% 45% / 0.22) !important;
+}
+[data-event-theme="noel"] .glow-orb-navy {
+  background: hsl(0 72% 51% / 0.22) !important;
+}
+
+/* 4. TRUNG THU (Mid-Autumn) — Moonlight Gold & Lantern Amber */
+[data-event-theme="mid_autumn"] {
+  --primary: 38 92% 50%;           /* #D97706 Vàng hổ phách trăng rằm */
+  --primary-glow: 45 93% 47%;      /* #F59E0B Vàng trăng sáng */
+  --accent: 24 95% 53%;            /* #EA580C Cam lồng đèn rực rỡ */
+  --accent-foreground: 0 0% 100%;
+  --ring: 38 92% 50%;
+
+  --gradient-primary: linear-gradient(135deg, #B45309 0%, #D97706 50%, #F59E0B 100%);
+  --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(45 100% 98%) 45%, hsl(38 95% 96%) 100%);
+  --gradient-aurora: linear-gradient(135deg, hsl(38 92% 50% / 0.14), hsl(24 95% 53% / 0.12), transparent);
+  --gradient-radial-red: radial-gradient(circle at 50% 50%, hsl(38 92% 50% / 0.16) 0%, transparent 65%);
+}
+
+[data-event-theme="mid_autumn"].dark,
+.dark [data-event-theme="mid_autumn"] {
+  --gradient-hero: linear-gradient(135deg, hsl(38 25% 6%) 0%, hsl(220 20% 6%) 50%, hsl(38 35% 9%) 100%);
+}
+
+[data-event-theme="mid_autumn"] .gradient-text {
+  background: linear-gradient(135deg, #B45309 0%, #D97706 50%, #F59E0B 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-event-theme="mid_autumn"] .glow-orb-blue {
+  background: hsl(38 92% 50% / 0.22) !important;
+}
+[data-event-theme="mid_autumn"] .glow-orb-navy {
+  background: hsl(24 95% 53% / 0.22) !important;
+}
+
+/* 5. CUSTOM EVENT — Royal Indigo & Electric Blue */
+[data-event-theme="custom"] {
+  --primary: 238 82% 59%;          /* Indigo #4F46E5 */
+  --primary-glow: 245 90% 68%;
+  --accent: 221 83% 53%;           /* Royal Blue #2563EB */
+  --accent-foreground: 0 0% 100%;
+  --ring: 238 82% 59%;
+
+  --gradient-primary: linear-gradient(135deg, #4338CA 0%, #4F46E5 50%, #2563EB 100%);
+  --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(238 100% 98%) 45%, hsl(221 100% 97%) 100%);
+  --gradient-aurora: linear-gradient(135deg, hsl(238 82% 59% / 0.14), hsl(221 83% 53% / 0.12), transparent);
+  --gradient-radial-red: radial-gradient(circle at 50% 50%, hsl(238 82% 59% / 0.16) 0%, transparent 65%);
+}
+
+/* Global Safety Catch: Harmonize legacy hardcoded button classes with active event theme */
+[data-event-theme]:not([data-event-theme=""]) .from-\[\#1D4ED8\].to-\[\#2563EB\],
+[data-event-theme]:not([data-event-theme=""]) .from-\[\#1d4ed8\].to-\[\#2563eb\] {
+  background-image: var(--gradient-primary) !important;
+  box-shadow: var(--shadow-glow-soft) !important;
 }
 
 /* ==========================================================================

@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useEventTheme } from "@/contexts/event-theme-context";
 import { AuthModal } from "@/components/auth-modal";
 import { NotificationDropdown } from "@/components/notification-dropdown";
+import { EventAnnouncementBar } from "@/components/event-decorations";
 import {
   ClipboardCheck,
   BookOpen,
@@ -56,6 +57,7 @@ export function Navbar() {
   const skillsRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
   // Auto-close all menus on route changes
   useEffect(() => {
@@ -64,6 +66,25 @@ export function Navbar() {
     setSkillsDropdown(false);
     setMoreDropdown(false);
   }, [pathname]);
+
+  // Đồng bộ chiều cao thực tế của header (Navbar + EventAnnouncementBar) vào CSS variable --navbar-total-height
+  useEffect(() => {
+    const headerEl = headerRef.current;
+    if (!headerEl) return;
+
+    const syncHeaderHeight = () => {
+      const height = headerEl.offsetHeight;
+      if (height > 0) {
+        document.documentElement.style.setProperty("--navbar-total-height", `${height}px`);
+      }
+    };
+
+    syncHeaderHeight();
+    const ro = new ResizeObserver(syncHeaderHeight);
+    ro.observe(headerEl);
+
+    return () => ro.disconnect();
+  }, [eventConfig.enabled, eventConfig.bannerEnabled]);
 
   // Initial theme sync is managed by EventThemeProvider
 
@@ -106,7 +127,9 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 xl:h-16 transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-primary/30 shadow-[0_4px_20px_-8px_hsl(var(--primary)/0.18)]">
+      <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <EventAnnouncementBar />
+        <nav className="xl:h-16 transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-primary/30 shadow-[0_4px_20px_-8px_hsl(var(--primary)/0.18)]">
         <div className="h-16 xl:h-full max-w-[1440px] mx-auto px-4 lg:px-6 flex items-center gap-3">
         {/* Brand Logo */}
         <Link
@@ -134,7 +157,7 @@ export function Navbar() {
         <div className="hidden xl:flex items-center shrink-0 gap-0.5 xl:gap-1 ml-1 xl:ml-3">
           {/* Thi thử button */}
           <Link
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs xl:text-sm font-bold rounded-full transition-transform duration-200 whitespace-nowrap shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:scale-105 bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white hover:shadow-[0_6px_18px_rgba(37,99,235,0.5)]"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs xl:text-sm font-bold rounded-full transition-transform duration-200 whitespace-nowrap shadow-glow-soft hover:scale-105 btn-brand-gradient text-white"
             href="/thi-thu"
             data-discover="true"
           >
@@ -369,7 +392,7 @@ export function Navbar() {
         <div className="hidden xl:flex items-center gap-1.5 xl:gap-2 shrink-0 ml-auto">
           {/* Nâng cấp */}
           <Link href="/pricing" data-discover="true">
-            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap transition-colors rounded-full h-8 px-3 text-xs font-bold gap-1 bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white hover:brightness-110 border-0 shadow-sm shadow-blue-500/20">
+            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap transition-all rounded-full h-8 px-3 text-xs font-bold gap-1 btn-brand-gradient text-white border-0 shadow-glow-soft">
               <Crown className="w-3.5 h-3.5" /> Nâng cấp
             </button>
           </Link>
@@ -519,7 +542,7 @@ export function Navbar() {
             ) : (
               <button
                 onClick={() => setAuthModalOpen(true)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:brightness-110 shadow-sm shadow-blue-500/20 transition-all"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-white btn-brand-gradient shadow-glow-soft transition-all"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 Đăng nhập
@@ -571,7 +594,7 @@ export function Navbar() {
                 setMobileMenuOpen(false);
                 setAuthModalOpen(true);
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] rounded-xl shadow-md shadow-blue-500/20"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-white btn-brand-gradient rounded-xl shadow-glow-soft"
             >
               <LogIn className="w-4 h-4" />
               Đăng nhập / Đăng ký tài khoản
@@ -590,7 +613,7 @@ export function Navbar() {
           <Link
             href="/thi-thu"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] rounded-xl shadow-md shadow-blue-500/20"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white btn-brand-gradient rounded-xl shadow-glow-soft"
           >
             <ClipboardCheck className="w-4 h-4" />
             Thi thử Full Test
@@ -684,6 +707,7 @@ export function Navbar() {
         </div>
       )}
       </nav>
+      </header>
 
       {/* Referral Modal */}
       {referralModalOpen && (

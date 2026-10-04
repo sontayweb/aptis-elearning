@@ -2,12 +2,25 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEventTheme } from "@/contexts/event-theme-context";
 import { X, Sparkles, ArrowRight } from "lucide-react";
 
 export function EventAnnouncementBar() {
+  const pathname = usePathname();
   const { config, isEventActive } = useEventTheme();
   const [dismissed, setDismissed] = useState(false);
+
+  // Hide on admin routes or exam sessions
+  if (
+    !pathname ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/teacher") ||
+    pathname.startsWith("/exams") ||
+    /^\/(thi-thu|reading|listening|speaking|writing|grammar)\/[^/]+$/.test(pathname)
+  ) {
+    return null;
+  }
 
   if (!config.enabled || !config.bannerEnabled || dismissed) {
     return null;
@@ -49,13 +62,22 @@ export function EventAnnouncementBar() {
 }
 
 export function EventDecorations() {
+  const pathname = usePathname();
   const { config, currentTheme } = useEventTheme();
 
-  // Show decorations if event is enabled AND the current theme is the event template (or forced)
-  const shouldRender =
-    config.enabled &&
-    (currentTheme === config.activeTemplate ||
-      (config.forceEventTheme && currentTheme !== "light" && currentTheme !== "dark"));
+  // Hide decorations on admin routes
+  if (
+    !pathname ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/teacher") ||
+    pathname.startsWith("/exams") ||
+    /^\/(thi-thu|reading|listening|speaking|writing|grammar)\/[^/]+$/.test(pathname)
+  ) {
+    return null;
+  }
+
+  // Show decorations whenever event is enabled in admin
+  const shouldRender = config.enabled;
 
   if (!shouldRender || config.decorationType === "none") {
     return null;

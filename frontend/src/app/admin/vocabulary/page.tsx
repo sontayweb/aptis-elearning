@@ -405,35 +405,38 @@ export default function AdminVocabularyPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <BookMarked className="w-7 h-7 text-slate-800" />
-            Kho Từ vựng Aptis
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
+            <BookMarked className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+            <span>Kho Từ Vựng Khảo Thí</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <span>Kho Từ vựng Aptis</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
             Ngân hàng từ vựng học thuật CEFR B1 - C2, từ điển chuyên ngành và công cụ biên tập trực tiếp
           </p>
 
-          {/* Compact Inline Metrics Strip (SRD 4.4 Clean Standard - Zero Space Overhead) */}
+          {/* Compact Inline Metrics Strip (Subtle Neutral Gray Chips) */}
           {!selectedSet && !showMetrics && (
             <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
-              <span className="text-[11px] text-slate-400 font-semibold font-heading uppercase tracking-wider">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
                 Chỉ số nhanh:
               </span>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50 border border-indigo-200/80 text-[11px] font-semibold text-indigo-800">
-                <BookMarked className="w-3 h-3 text-indigo-600" />
-                <span>Tổng: <strong className="text-indigo-900 font-mono">{sets.length}</strong> bộ</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <BookMarked className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+                <span>Tổng: <strong className="text-slate-900 dark:text-white font-mono">{sets.length}</strong> bộ</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200/80 text-[11px] font-semibold text-emerald-800">
-                <Layers className="w-3 h-3 text-emerald-600" />
-                <span>Từ vựng: <strong className="text-emerald-900 font-mono">{totalWordsInSystem}</strong> từ</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <Layers className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+                <span>Từ vựng: <strong className="text-slate-900 dark:text-white font-mono">{totalWordsInSystem}</strong> từ</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-amber-50 border border-amber-200/80 text-[11px] font-semibold text-amber-800">
-                <Crown className="w-3 h-3 text-amber-600 fill-amber-500" />
-                <span>VIP: <strong className="text-amber-900 font-mono">{proSetsCount}</strong> ({sets.length - proSetsCount} Free)</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
+                <span>VIP: <strong className="text-slate-900 dark:text-white font-mono">{proSetsCount}</strong> ({sets.length - proSetsCount} Free)</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-purple-50 border border-purple-200/80 text-[11px] font-semibold text-purple-800">
-                <Sparkles className="w-3 h-3 text-purple-600" />
-                <span>Độ phủ: <strong className="text-purple-900 font-mono">B1 — C2</strong></span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <Sparkles className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+                <span>Độ phủ: <strong className="text-slate-900 dark:text-white font-mono">B1 — C2</strong></span>
               </div>
             </div>
           )}
@@ -447,8 +450,8 @@ export default function AdminVocabularyPage() {
               onClick={toggleMetrics}
               className={`px-3.5 py-2 rounded-xl border text-xs font-heading font-semibold transition-all flex items-center gap-1.5 shadow-2xs ${
                 showMetrics
-                  ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                  : "border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
+                  ? "bg-slate-900 dark:bg-slate-800 text-white border-slate-900 dark:border-slate-700 shadow-sm"
+                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
               }`}
               title={showMetrics ? "Thu gọn 4 thẻ chỉ số để giải phóng không gian danh sách từ" : "Mở rộng 4 thẻ chỉ số thống kê"}
             >
@@ -460,7 +463,7 @@ export default function AdminVocabularyPage() {
           {!selectedSet ? (
             <button
               onClick={() => setCreateSetModalOpen(true)}
-              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               <span>Tạo bộ từ mới</span>
@@ -469,16 +472,16 @@ export default function AdminVocabularyPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setImportModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
                 title="Nhập danh sách từ hàng loạt"
               >
-                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span className="hidden sm:inline">Nhập hàng loạt</span>
               </button>
 
               <button
                 onClick={() => setAddModalOpen(true)}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 <span>Thêm từ vào bộ</span>
@@ -491,67 +494,67 @@ export default function AdminVocabularyPage() {
       {/* 4 Executive KPI Cards (Shown on sets view, Collapsible via Smart Toggle) */}
       {!selectedSet && showMetrics && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 font-heading">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 font-heading">
                 Tổng số bộ từ vựng
               </span>
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                 <BookMarked className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-heading font-extrabold text-slate-900 font-mono">
+            <div className="text-2xl font-heading font-extrabold text-slate-900 dark:text-white font-mono">
               {sets.length}
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">Đã phân loại chủ đề</div>
+            <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Đã phân loại chủ đề</div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 font-heading">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 font-heading">
                 Tổng từ vựng trong kho
               </span>
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <Layers className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-heading font-extrabold text-slate-900 font-mono">
+            <div className="text-2xl font-heading font-extrabold text-slate-900 dark:text-white font-mono">
               {totalWordsInSystem}
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">Chuẩn phát âm IPA & Ví dụ</div>
+            <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Chuẩn phát âm IPA & Ví dụ</div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 font-heading">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 font-heading">
                 Bộ từ VIP PRO
               </span>
-              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                 <Crown className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-heading font-extrabold text-slate-900 font-mono">
+            <div className="text-2xl font-heading font-extrabold text-slate-900 dark:text-white font-mono">
               {proSetsCount}{" "}
-              <span className="text-xs text-slate-400 font-normal">
+              <span className="text-xs text-slate-400 dark:text-slate-500 font-normal">
                 / {sets.length - proSetsCount} Free
               </span>
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">Dành riêng cho học viên VIP</div>
+            <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Dành riêng cho học viên VIP</div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 font-heading">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 font-heading">
                 Cấp độ CEFR
               </span>
-              <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
                 <Sparkles className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-heading font-extrabold text-slate-900 font-mono">
+            <div className="text-2xl font-heading font-extrabold text-slate-900 dark:text-white font-mono">
               B1 — C2
             </div>
-            <div className="text-[11px] text-purple-700 font-medium mt-1">Phục vụ mục tiêu Aptis</div>
+            <div className="text-[11px] text-purple-700 dark:text-purple-400 font-medium mt-1">Phục vụ mục tiêu Aptis</div>
           </div>
         </div>
       )}
@@ -560,19 +563,19 @@ export default function AdminVocabularyPage() {
       {!selectedSet ? (
         <div className="space-y-4">
           {/* Filters & Search Bar */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
             <div className="relative w-full md:w-80">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Tìm theo tên bộ từ..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 font-sans"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-sans"
               />
             </div>
 
-            <div className="p-1 rounded-xl bg-slate-100 border border-slate-200/70 flex items-center gap-1 w-full md:w-auto overflow-x-auto">
+            <div className="p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 flex items-center gap-1 w-full md:w-auto overflow-x-auto">
               {[
                 { id: "ALL", label: "Tất cả" },
                 { id: "B1", label: "Aptis B1" },
@@ -588,8 +591,8 @@ export default function AdminVocabularyPage() {
                     onClick={() => setCategoryFilter(tab.id)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all ${
                       isActive
-                        ? "bg-white text-slate-900 shadow-2xs font-bold"
-                        : "text-slate-500 hover:text-slate-800"
+                        ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                     }`}
                   >
                     {tab.label}
@@ -599,34 +602,34 @@ export default function AdminVocabularyPage() {
             </div>
           </div>
 
-          {/* Sets Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Sets Grid - Responsive 4 Columns on XL per Guideline 4 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {loading ? (
-              <div className="col-span-3 py-16 text-center text-slate-400">
-                <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-slate-600" />
+              <div className="col-span-full py-16 text-center text-slate-400 dark:text-slate-500">
+                <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-slate-600 dark:text-slate-400" />
                 Đang tải các bộ từ vựng...
               </div>
             ) : filteredSets.length === 0 ? (
-              <div className="col-span-3 py-16 text-center text-slate-400 rounded-2xl border border-slate-200/80 bg-white">
+              <div className="col-span-full py-16 text-center text-slate-400 dark:text-slate-500 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
                 Không tìm thấy bộ từ vựng nào phù hợp.
               </div>
             ) : (
               filteredSets.map((set) => (
                 <div
                   key={set.id}
-                  className="rounded-2xl p-5 border border-slate-200/80 bg-white shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between group"
+                  className="rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm transition-all flex flex-col justify-between group"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-heading font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-heading font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                         {set.category || "Aptis Core"}
                       </span>
                       {set.is_free ? (
-                        <span className="text-[10px] font-heading font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                        <span className="text-[10px] font-heading font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full">
                           Miễn phí
                         </span>
                       ) : (
-                        <span className="text-[10px] font-heading font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                        <span className="text-[10px] font-heading font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                           <Crown className="w-3 h-3 fill-amber-500 text-amber-500" /> VIP PRO
                         </span>
                       )}
@@ -634,24 +637,24 @@ export default function AdminVocabularyPage() {
 
                     <h3
                       onClick={() => handleSelectSet(set)}
-                      className="font-heading font-bold text-slate-900 text-sm mb-1.5 cursor-pointer hover:text-indigo-600 transition-colors"
+                      className="font-heading font-bold text-slate-900 dark:text-white text-sm mb-1.5 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       {set.title}
                     </h3>
-                    <p className="text-xs text-slate-500 leading-relaxed font-normal">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
                       Kho từ vựng chuẩn khung CEFR ôn thi Aptis ESOL
                     </p>
                   </div>
 
-                  <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between mt-4">
-                    <span className="text-xs font-mono font-medium text-slate-600">
+                  <div className="pt-3.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between mt-4">
+                    <span className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400">
                       {set.total_words} từ vựng
                     </span>
 
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => handleSelectSet(set)}
-                        className="px-3 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-heading font-semibold transition-colors flex items-center gap-1 shadow-2xs"
+                        className="px-3 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-heading font-semibold transition-colors flex items-center gap-1 shadow-2xs"
                       >
                         <span>Quản lý từ</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -659,7 +662,7 @@ export default function AdminVocabularyPage() {
 
                       <button
                         onClick={() => setConfirmDeleteSet(set)}
-                        className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                        className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                         title="Xóa bộ từ"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -677,41 +680,41 @@ export default function AdminVocabularyPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <button
               onClick={() => setSelectedSet(null)}
-              className="inline-flex items-center gap-1.5 text-xs font-heading font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 px-3.5 py-1.5 rounded-xl border border-slate-200 transition-colors w-fit shadow-2xs"
+              className="inline-flex items-center gap-1.5 text-xs font-heading font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors w-fit shadow-2xs"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Quay lại danh sách bộ</span>
             </button>
 
-            <div className="text-xs font-heading font-medium text-slate-500">
-              Đang xem bộ: <span className="text-slate-900 font-bold">{selectedSet.title}</span> (
-              <span className="font-mono text-slate-900 font-semibold">{words.length}</span> từ)
+            <div className="text-xs font-heading font-medium text-slate-500 dark:text-slate-400">
+              Đang xem bộ: <span className="text-slate-900 dark:text-white font-bold">{selectedSet.title}</span> (
+              <span className="font-mono text-slate-900 dark:text-white font-semibold">{words.length}</span> từ)
             </div>
           </div>
 
           {/* Search in Set */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-2.5 shadow-xs flex items-center justify-between">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-xs flex items-center justify-between">
             <div className="relative w-full max-w-sm">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Tìm từ tiếng Anh hoặc nghĩa tiếng Việt..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-slate-900 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 font-sans"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-sans"
               />
             </div>
 
-            <div className="text-xs text-slate-400 font-medium">
+            <div className="text-xs text-slate-400 dark:text-slate-500 font-medium">
               Bấm biểu tượng loa để nghe phát âm giọng bản xứ
             </div>
           </div>
 
           {/* Words Table with Inline Edit */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-heading font-bold uppercase tracking-wider text-[10px]">
+                <thead className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200/80 dark:border-slate-700/80 text-slate-500 dark:text-slate-400 font-heading font-bold uppercase tracking-wider text-[10px]">
                   <tr>
                     <th className="py-3.5 px-4 sm:px-6">Từ vựng (English)</th>
                     <th className="py-3.5 px-4">Phiên âm IPA</th>
@@ -721,17 +724,17 @@ export default function AdminVocabularyPage() {
                     <th className="py-3.5 px-4 sm:px-6 text-right">Thao tác</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-medium text-slate-900">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium text-slate-900 dark:text-slate-100">
                   {wordsLoading ? (
                     <tr>
-                      <td colSpan={6} className="py-16 text-center text-slate-400">
-                        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-slate-600" />
+                      <td colSpan={6} className="py-16 text-center text-slate-400 dark:text-slate-500">
+                        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-slate-600 dark:text-slate-400" />
                         Đang tải danh sách từ vựng...
                       </td>
                     </tr>
                   ) : filteredWords.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-16 text-center text-slate-400 font-normal">
+                      <td colSpan={6} className="py-16 text-center text-slate-400 dark:text-slate-500 font-normal">
                         Chưa có từ vựng nào trong bộ này. Bấm &quot;Thêm từ vào bộ&quot; để bắt đầu.
                       </td>
                     </tr>
@@ -740,14 +743,14 @@ export default function AdminVocabularyPage() {
                       const isEditing = editingWordId === w.id;
 
                       return (
-                        <tr key={w.id} className="hover:bg-slate-50/60 transition-colors">
+                        <tr key={w.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/50 transition-colors">
                           {/* Word */}
-                          <td className="py-3.5 px-4 sm:px-6 font-heading font-bold text-slate-900 text-xs">
+                          <td className="py-3.5 px-4 sm:px-6 font-heading font-bold text-slate-900 dark:text-white text-xs">
                             <div className="flex items-center gap-2">
                               <span>{w.word}</span>
                               <button
                                 onClick={() => handleSpeak(w.word)}
-                                className="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                                className="p-1 rounded-md text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 title="Phát âm từ này"
                               >
                                 <Volume2 className="w-3.5 h-3.5" />
@@ -762,10 +765,10 @@ export default function AdminVocabularyPage() {
                                 type="text"
                                 value={editPhonetic}
                                 onChange={(e) => setEditPhonetic(e.target.value)}
-                                className="p-1.5 text-xs border border-slate-300 rounded-lg bg-white text-slate-900 font-mono w-28 focus:outline-none focus:border-slate-900"
+                                className="p-1.5 text-xs border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono w-28 focus:outline-none focus:ring-1 focus:ring-blue-500"
                               />
                             ) : (
-                              <span className="font-mono text-slate-500 text-[11px]">
+                              <span className="font-mono text-slate-500 dark:text-slate-400 text-[11px]">
                                 {w.phonetic || "—"}
                               </span>
                             )}
@@ -778,12 +781,12 @@ export default function AdminVocabularyPage() {
                                 type="text"
                                 value={editMeaning}
                                 onChange={(e) => setEditMeaning(e.target.value)}
-                                className="p-1.5 text-xs border border-slate-300 rounded-lg bg-white text-slate-900 w-full focus:outline-none focus:border-slate-900"
+                                className="p-1.5 text-xs border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white w-full focus:outline-none focus:ring-1 focus:ring-blue-500"
                               />
                             ) : (
                               <div
                                 onClick={() => handleStartEdit(w)}
-                                className="cursor-pointer hover:text-indigo-600 transition-colors font-normal text-slate-800"
+                                className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-normal text-slate-800 dark:text-slate-200"
                                 title="Bấm để chỉnh sửa"
                               >
                                 {w.meaning_vi}
@@ -797,7 +800,7 @@ export default function AdminVocabularyPage() {
                               <select
                                 value={editCefr}
                                 onChange={(e) => setEditCefr(e.target.value)}
-                                className="p-1 text-xs border border-slate-300 rounded-lg bg-white text-slate-900 focus:outline-none"
+                                className="p-1 text-xs border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none"
                               >
                                 <option value="A1">A1</option>
                                 <option value="A2">A2</option>
@@ -807,7 +810,7 @@ export default function AdminVocabularyPage() {
                                 <option value="C2">C2</option>
                               </select>
                             ) : (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                 {w.cefr_level || "B1"}
                               </span>
                             )}
@@ -820,10 +823,10 @@ export default function AdminVocabularyPage() {
                                 type="text"
                                 value={editExample}
                                 onChange={(e) => setEditExample(e.target.value)}
-                                className="p-1.5 text-xs border border-slate-300 rounded-lg bg-white text-slate-900 w-full focus:outline-none focus:border-slate-900"
+                                className="p-1.5 text-xs border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white w-full focus:outline-none focus:ring-1 focus:ring-blue-500"
                               />
                             ) : (
-                              <span className="text-[11px] text-slate-500 italic font-normal leading-relaxed">
+                              <span className="text-[11px] text-slate-500 dark:text-slate-400 italic font-normal leading-relaxed">
                                 {w.example_sentence ? `"${w.example_sentence}"` : "—"}
                               </span>
                             )}
@@ -836,14 +839,14 @@ export default function AdminVocabularyPage() {
                                 <>
                                   <button
                                     onClick={() => handleSaveEdit(w.id)}
-                                    className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors"
+                                    className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors"
                                     title="Lưu"
                                   >
                                     <Save className="w-3.5 h-3.5" />
                                   </button>
                                   <button
                                     onClick={() => setEditingWordId(null)}
-                                    className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 transition-colors"
+                                    className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                     title="Hủy"
                                   >
                                     <X className="w-3.5 h-3.5" />
@@ -853,14 +856,14 @@ export default function AdminVocabularyPage() {
                                 <>
                                   <button
                                     onClick={() => handleStartEdit(w)}
-                                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                     title="Chỉnh sửa trực tiếp"
                                   >
                                     <Edit2 className="w-3.5 h-3.5" />
                                   </button>
                                   <button
                                     onClick={() => setConfirmDeleteWord(w)}
-                                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                                     title="Xóa từ khỏi bộ"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />

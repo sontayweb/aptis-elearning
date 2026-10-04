@@ -27,87 +27,10 @@ import {
   Square,
 } from "lucide-react";
 
-interface DictationSentence {
-  id: string | number;
-  level: string;
-  topic: string;
-  originalText: string;
-  hint?: string;
-  audioTime: string;
-}
-
-const DEFAULT_SENTENCES: Record<string, DictationSentence[]> = {
-  foundation: [
-    {
-      id: "f-1",
-      level: "Level 1 - Foundation",
-      topic: "Đề 24 - Part 1 - Bài 07",
-      originalText: "Could you point me somewhere?",
-      hint: "point / somewhere",
-      audioTime: "00:02",
-    },
-    {
-      id: "f-2",
-      level: "Level 1 - Foundation",
-      topic: "Đề 29 - Part 1 - Bài 12",
-      originalText: "You've missed the bus, haven't you?",
-      hint: "missed / haven't",
-      audioTime: "00:03",
-    },
-    {
-      id: "f-3",
-      level: "Level 1 - Foundation",
-      topic: "Đề 35 - Part 1 - Bài 12",
-      originalText: "Please remind me they shouldn't keep the Monday morning meeting.",
-      hint: "remind / shouldn't / morning",
-      audioTime: "00:03",
-    },
-    {
-      id: "f-4",
-      level: "Level 1 - Foundation",
-      topic: "Đề 30 - Part 1 - Bài 02",
-      originalText: "Please make sure you hand in your assignments before noon.",
-      hint: "hand in / assignments",
-      audioTime: "00:04",
-    },
-    {
-      id: "f-5",
-      level: "Level 1 - Foundation",
-      topic: "Đề 30 - Part 1 - Bài 03",
-      originalText: "Could you tell me what time the flight departs tomorrow morning?",
-      hint: "departs / tomorrow",
-      audioTime: "00:04",
-    },
-  ],
-  momentum: [
-    {
-      id: "m-1",
-      level: "Level 2 - Momentum",
-      topic: "Đề 14 - Part 2 - Bài 01",
-      originalText: "The company announced substantial improvements in its annual environmental report.",
-      hint: "substantial / environmental",
-      audioTime: "00:06",
-    },
-    {
-      id: "m-2",
-      level: "Level 2 - Momentum",
-      topic: "Đề 14 - Part 2 - Bài 02",
-      originalText: "Most participants agreed that collaborative learning significantly enhances cognitive development.",
-      hint: "collaborative / enhances",
-      audioTime: "00:07",
-    },
-  ],
-  mastery: [
-    {
-      id: "mas-1",
-      level: "Level 3 - Mastery",
-      topic: "Đề 05 - Part 3 - Bài 01",
-      originalText: "From my vantage point, sustainable urban planning requires immediate integration of renewable energy grids.",
-      hint: "sustainable / integration / renewable",
-      audioTime: "00:09",
-    },
-  ],
-};
+import {
+  DictationSentence,
+  DEFAULT_DICTATION_SENTENCES as DEFAULT_SENTENCES,
+} from "@/data/dictation-data";
 
 export default function NgheChepPage() {
   const { isAuthenticated } = useAuth();

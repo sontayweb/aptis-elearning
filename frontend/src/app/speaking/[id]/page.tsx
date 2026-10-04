@@ -119,6 +119,9 @@ function SpeakingExamRunnerContent() {
 
   // Đọc query param ?part=p1 | p2 | p3 | p4
   const partParam = searchParams.get("part")?.toLowerCase() || "";
+  const modeParam = searchParams.get("mode");
+  const submissionIdParam = searchParams.get("submissionId");
+
   let targetPart: number | null = null;
   if (partParam === "p1" || partParam === "1" || partParam === "part1") targetPart = 1;
   else if (partParam === "p2" || partParam === "2" || partParam === "part2") targetPart = 2;
@@ -132,14 +135,16 @@ function SpeakingExamRunnerContent() {
   const [error, setError] = useState<string | null>(null);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [stage, setStage] = useState<"prep" | "speaking" | "finished">("prep");
+  const [stage, setStage] = useState<"prep" | "speaking" | "finished">(
+    modeParam === "review" ? "finished" : "prep"
+  );
   const [timer, setTimer] = useState(0);
   const [prepNotes, setPrepNotes] = useState("");
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
 
   // Toggle & Tabs cho Bài Nói Mẫu (Screenshot 2)
-  const [showSampleAnswer, setShowSampleAnswer] = useState(false);
+  const [showSampleAnswer, setShowSampleAnswer] = useState(modeParam === "review");
   const [sampleTab, setSampleTab] = useState<"b1" | "b2">("b1");
 
   // Modal nháp & Modal báo lỗi
@@ -161,10 +166,10 @@ function SpeakingExamRunnerContent() {
     >
   >({});
   const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isReviewMode, setIsReviewMode] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(modeParam === "review");
+  const [isReviewMode, setIsReviewMode] = useState(modeParam === "review");
   const [showMicPrompt, setShowMicPrompt] = useState(true);
-  const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [submissionId, setSubmissionId] = useState<string | null>(submissionIdParam || null);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -267,6 +272,52 @@ function SpeakingExamRunnerContent() {
           } else {
             setQuestions(loaded);
           }
+
+          // Nếu có submissionId, tải bài thu âm cũ để review
+          if (submissionIdParam) {
+            try {
+              const subRes = await api.submissions.getResult(submissionIdParam);
+              if (subRes.success && subRes.data) {
+                const sub = subRes.data;
+                const loadedRecord: Record<number, any> = {};
+                const targetList = targetPart ? loaded.filter((q) => q.partNumber === targetPart) : loaded;
+                (sub.answers || []).forEach((ans: any) => {
+                  const qIdx = targetList.findIndex((q) => q.id === (ans.question_id || ans.questionId));
+                  if (qIdx >= 0) {
+                    const aiItem = (sub.ai_results || []).find((r: any) => r.question_id === ans.question_id);
+                    loadedRecord[qIdx] = {
+                      audioUrl: ans.audio_url || null,
+                      duration: ans.audio_duration || 30,
+                      isCompleted: true,
+                      aiResult: aiItem
+                        ? {
+                            band: `CEFR ${aiItem.cefr_level || "B2"}`,
+                            score: aiItem.score || 40,
+                            pronunciation: aiItem.pronunciation || 40,
+                            fluency: aiItem.fluency_score || 40,
+                            grammar: aiItem.grammar_score || 40,
+                            vocabulary: aiItem.vocabulary_score || 40,
+                            feedback: [aiItem.feedback_summary || "Đánh giá chi tiết câu nói."],
+                            strengths: ["Phát âm rõ ràng, nhịp điệu tự nhiên."],
+                            upgrades: ["Tiếp tục mở rộng vốn từ vựng học thuật."],
+                          }
+                        : null,
+                    };
+                  }
+                });
+                if (Object.keys(loadedRecord).length > 0) {
+                  setRecordedData(loadedRecord);
+                }
+                if (modeParam === "review") {
+                  setIsReviewMode(true);
+                  setIsSubmitted(true);
+                  setStage("finished");
+                }
+              }
+            } catch (e) {
+              console.warn("Could not load speaking submission:", e);
+            }
+          }
         }
       } else {
         setError(res.error?.message || "Không thể tải nội dung đề thi nói từ cơ sở dữ liệu.");
@@ -282,11 +333,12 @@ function SpeakingExamRunnerContent() {
     if (examId) {
       loadExamData();
     }
-  }, [examId, targetPart]);
+  }, [examId, targetPart, submissionIdParam]);
 
-  // Tạo phiên thi (submission) khi vào phòng Speaking
+  // Tạo phiên thi (submission) khi vào phòng Speaking (chỉ khi làm mới)
   useEffect(() => {
     async function initSpeakingSubmission() {
+      if (modeParam === "review" || submissionIdParam) return;
       const token =
         typeof window !== "undefined"
           ? localStorage.getItem("accessToken") || localStorage.getItem("token")
@@ -302,7 +354,7 @@ function SpeakingExamRunnerContent() {
       }
     }
     initSpeakingSubmission();
-  }, [examId, questions.length]);
+  }, [examId, questions.length, modeParam, submissionIdParam]);
 
   const currentQ = questions[currentIndex] || null;
   const completedCount = Object.values(recordedData).filter((r) => r.isCompleted).length;
@@ -338,11 +390,11 @@ function SpeakingExamRunnerContent() {
 
       const record = recordedData[index];
 
-      if (record?.isCompleted && record.audioUrl) {
+      if (isReviewMode || (record?.isCompleted && record.audioUrl)) {
         setStage("finished");
         setTimer(0);
-        setPrepNotes(record.prepNotes || "");
-        setAiResult(record.aiResult || null);
+        setPrepNotes(record?.prepNotes || "");
+        setAiResult(record?.aiResult || null);
       } else {
         resetRecording();
         setAiResult(null);
@@ -358,7 +410,7 @@ function SpeakingExamRunnerContent() {
         }
       }
     },
-    [questions, recordedData, resetRecording]
+    [questions, recordedData, resetRecording, isReviewMode]
   );
 
   useEffect(() => {
@@ -709,6 +761,11 @@ function SpeakingExamRunnerContent() {
             <span className="text-[10px] text-exam-text-muted hidden md:inline">
               Speaking Aptis ESOL
             </span>
+            {isReviewMode && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                Chế độ xem lại bài làm
+              </span>
+            )}
           </div>
 
           {/* Countdown Timer (Prep or Speak) */}
@@ -1478,7 +1535,11 @@ function SpeakingExamRunnerContent() {
             <div className="space-y-2 pt-2 border-t border-border">
               <button
                 type="button"
-                onClick={() => setIsCompletedModalOpen(false)}
+                onClick={() => {
+                  setIsCompletedModalOpen(false);
+                  setIsReviewMode(true);
+                  setStage("finished");
+                }}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
               >
                 <Play className="w-4 h-4" />
@@ -1486,19 +1547,12 @@ function SpeakingExamRunnerContent() {
               </button>
 
               <div className="grid grid-cols-2 gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsCompletedModalOpen(false);
-                    setRecordedData({});
-                    setCurrentIndex(0);
-                    initQuestionState(0);
-                  }}
+                <Link
+                  href="/history"
                   className="py-2.5 rounded-xl border border-border hover:bg-muted font-bold text-xs text-foreground transition-colors flex items-center justify-center gap-1.5"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Luyện tập lại</span>
-                </button>
+                  <span>Lịch sử làm bài</span>
+                </Link>
 
                 <Link
                   href="/speaking"

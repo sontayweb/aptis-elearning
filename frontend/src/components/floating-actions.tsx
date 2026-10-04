@@ -11,13 +11,13 @@ export function FloatingActions() {
       {/* Floating Bottom Left: Bug Report Button */}
       <button
         type="button"
-        className="fixed z-[35] bottom-[72px] md:bottom-5 left-14 sm:left-16 md:left-5 flex items-center gap-1.5 rounded-full bg-card/95 backdrop-blur-md px-3 py-1.5 text-xs font-semibold shadow-md border border-blue-600/30 text-blue-700 dark:text-blue-300 transition-colors hover:bg-muted"
+        className="fixed z-[35] bottom-[72px] md:bottom-5 left-14 sm:left-16 md:left-5 flex items-center gap-1.5 rounded-full bg-card/95 backdrop-blur-md px-3 py-1.5 text-xs font-semibold shadow-md border border-border text-muted-foreground hover:text-foreground transition-colors hover:bg-muted"
         aria-label="Báo lỗi chức năng"
         onClick={() => {
           alert("Tính năng báo lỗi: Vui lòng nhắn tin qua Zalo hoặc Facebook để được hỗ trợ!");
         }}
       >
-        <Flag className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+        <Flag className="w-3.5 h-3.5 text-muted-foreground" />
         <span>Báo lỗi</span>
       </button>
 
@@ -57,7 +57,7 @@ export function FloatingActions() {
           aria-label="Liên hệ hỗ trợ"
           aria-expanded={open}
           onClick={() => setOpen(!open)}
-          className="h-10 min-h-[40px] rounded-full text-white shadow-xl shadow-blue-500/30 flex items-center justify-center gap-1.5 transition-all animate-support-fab-beat w-10 min-w-[40px] sm:w-auto sm:min-w-0 sm:px-3 bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:brightness-110"
+          className="h-10 min-h-[40px] rounded-full text-white shadow-xl shadow-glow-soft flex items-center justify-center gap-1.5 transition-all animate-support-fab-beat w-10 min-w-[40px] sm:w-auto sm:min-w-0 sm:px-3 btn-brand-gradient"
         >
           {open ? (
             <X className="w-5 h-5" />

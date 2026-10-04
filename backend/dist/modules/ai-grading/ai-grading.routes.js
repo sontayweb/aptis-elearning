@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const ai_grading_controller_1 = require("./ai-grading.controller");
+const auth_guard_1 = require("../../middlewares/auth.guard");
+const router = (0, express_1.Router)();
+router.use(auth_guard_1.authGuard);
+router.post('/:id/evaluate-ai', (req, res, next) => ai_grading_controller_1.aiGradingController.evaluate(req, res, next));
+router.get('/:id/ai-feedback', (req, res, next) => ai_grading_controller_1.aiGradingController.getFeedback(req, res, next));
+exports.default = router;

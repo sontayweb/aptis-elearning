@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { prisma } from '../../config/database';
 import { ExamSkill, QuestionType, SubmissionStatus } from '@prisma/client';
 import { audioService } from '../audio/audio.service';
+import { geminiRotator } from './gemini-rotator.service';
 
 export class AiGradingService {
   private getOpenAIClient(): OpenAI | null {
@@ -226,17 +227,34 @@ ${transcriptText}
         let evalResult: any = null;
         let modelUsed = 'heuristic-evaluator';
 
-        if (openai && text.trim().length > 10) {
-          try {
-            evalResult = await this.evaluateWritingWithAI(
-              openai,
-              question.prompt,
-              part.passage_text || part.instructions || '',
-              text
-            );
-            modelUsed = 'gpt-4o';
-          } catch (aiErr) {
-            console.warn('Writing real AI evaluation fallback triggered:', aiErr);
+        if (text.trim().length > 10) {
+          // 1. Ưu tiên chấm bằng Gemini với cơ chế xoay vòng model thông minh
+          if (geminiRotator.isAvailable()) {
+            try {
+              evalResult = await geminiRotator.evaluateWriting(
+                question.prompt,
+                part.passage_text || part.instructions || '',
+                text
+              );
+              modelUsed = evalResult?.usedModel || 'gemini';
+            } catch (geminiErr: any) {
+              console.warn('[AI Grading] Gemini Rotator writing failed:', geminiErr?.message);
+            }
+          }
+
+          // 2. Dự phòng OpenAI GPT-4o nếu Gemini gặp sự cố hoặc chưa cấu hình
+          if (!evalResult && openai) {
+            try {
+              evalResult = await this.evaluateWritingWithAI(
+                openai,
+                question.prompt,
+                part.passage_text || part.instructions || '',
+                text
+              );
+              modelUsed = 'gpt-4o';
+            } catch (aiErr) {
+              console.warn('[AI Grading] OpenAI writing evaluation fallback triggered:', aiErr);
+            }
           }
         }
 
@@ -309,25 +327,48 @@ ${transcriptText}
           ans.created_at || submission.started_at || undefined
         );
 
-        if (openai && audioFilePath && fs.existsSync(audioFilePath)) {
-          try {
-            evalResult = await this.evaluateSpeakingWithAI(
-              openai,
-              audioFilePath,
-              question.prompt,
-              audioDuration
-            );
-            modelUsed = 'whisper-1 + gpt-4o';
-            if (evalResult?.transcriptText) {
-              transcriptText = evalResult.transcriptText;
-              // Lưu bóc băng Whisper vào đáp án
-              await prisma.submissionAnswer.update({
-                where: { id: ans.id },
-                data: { transcript_text: transcriptText },
-              });
+        if (audioFilePath && fs.existsSync(audioFilePath)) {
+          // 1. Ưu tiên chấm bằng Gemini Multimodal Audio với cơ chế xoay vòng model
+          if (geminiRotator.isAvailable()) {
+            try {
+              evalResult = await geminiRotator.evaluateSpeaking(
+                audioFilePath,
+                question.prompt,
+                audioDuration
+              );
+              modelUsed = evalResult?.usedModel || 'gemini-multimodal';
+              if (evalResult?.transcriptText) {
+                transcriptText = evalResult.transcriptText;
+                await prisma.submissionAnswer.update({
+                  where: { id: ans.id },
+                  data: { transcript_text: transcriptText },
+                });
+              }
+            } catch (geminiErr: any) {
+              console.warn('[AI Grading] Gemini Rotator speaking failed:', geminiErr?.message);
             }
-          } catch (aiErr) {
-            console.warn('Speaking real AI evaluation fallback triggered:', aiErr);
+          }
+
+          // 2. Dự phòng OpenAI Whisper + GPT-4o nếu Gemini chưa bật hoặc lỗi
+          if (!evalResult && openai) {
+            try {
+              evalResult = await this.evaluateSpeakingWithAI(
+                openai,
+                audioFilePath,
+                question.prompt,
+                audioDuration
+              );
+              modelUsed = 'whisper-1 + gpt-4o';
+              if (evalResult?.transcriptText) {
+                transcriptText = evalResult.transcriptText;
+                await prisma.submissionAnswer.update({
+                  where: { id: ans.id },
+                  data: { transcript_text: transcriptText },
+                });
+              }
+            } catch (aiErr) {
+              console.warn('Speaking real AI evaluation fallback triggered:', aiErr);
+            }
           }
         }
 

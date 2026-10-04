@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { AuthModal } from "@/components/auth-modal";
 import {
   Crown,
   Check,
@@ -106,6 +107,7 @@ export default function PricingPage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "success">("pending");
   const [loading, setLoading] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   // States for Enterprise Payment Resilience
   const [verifyingPayment, setVerifyingPayment] = useState(false);
@@ -175,9 +177,10 @@ export default function PricingPage() {
       return;
     }
 
-    // If not logged in, auto quick-login student
+    // If not logged in, prompt user to login/register real account
     if (!isAuthenticated) {
-      await quickLogin("student");
+      setAuthModalOpen(true);
+      return;
     }
 
     setSelectedPlan(plan);
@@ -527,14 +530,16 @@ export default function PricingPage() {
                 <span>Đang chờ tín hiệu chuyển khoản từ SePay (3 - 5s)...</span>
               </div>
 
-              {/* Demo button to simulate instant bank payment webhook */}
-              <button
-                type="button"
-                onClick={handleSimulatePaymentSuccess}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-colors"
-              >
-                ✓ Mô phỏng đã chuyển khoản thành công (SePay Webhook)
-              </button>
+              {/* Demo button to simulate instant bank payment webhook (Chỉ hiển thị khi development) */}
+              {process.env.NODE_ENV !== "production" && (
+                <button
+                  type="button"
+                  onClick={handleSimulatePaymentSuccess}
+                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-colors"
+                >
+                  ✓ [DEV] Mô phỏng đã chuyển khoản thành công (SePay Webhook)
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -542,6 +547,7 @@ export default function PricingPage() {
 
       <Footer />
       <FloatingActions />
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </div>
   );
 }

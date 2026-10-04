@@ -318,6 +318,40 @@ export class SubmissionService {
       else calculatedCefr = 'A0';
     }
 
+    const skill = submission.exam.skill;
+    let readingScore: number | undefined = skill === 'READING' ? totalScore : undefined;
+    let listeningScore: number | undefined = skill === 'LISTENING' ? totalScore : undefined;
+    let grammarScore: number | undefined = skill === 'GRAMMAR_VOCABULARY' ? totalScore : undefined;
+
+    // Nếu là FULL_TEST, bóc tách điểm từng kỹ năng dựa theo part title
+    if (skill === 'FULL_TEST') {
+      let rScore = 0, lScore = 0, gScore = 0;
+      let hasReading = false, hasListening = false, hasGrammar = false;
+
+      for (const ans of submission.answers) {
+        const q = questionsMap.get(ans.question_id);
+        if (!q) continue;
+        const qScore = answerUpdates.find((u) => u.id === ans.id)?.score || 0;
+        const part = submission.exam.parts.find((p) => p.id === q.part_id);
+        const partTitle = (part?.title || '').toLowerCase();
+
+        if (partTitle.includes('reading')) {
+          rScore += qScore;
+          hasReading = true;
+        } else if (partTitle.includes('listening')) {
+          lScore += qScore;
+          hasListening = true;
+        } else if (partTitle.includes('grammar') || partTitle.includes('vocab')) {
+          gScore += qScore;
+          hasGrammar = true;
+        }
+      }
+
+      if (hasReading) readingScore = rScore;
+      if (hasListening) listeningScore = lScore;
+      if (hasGrammar) grammarScore = gScore;
+    }
+
     // Atomic transaction cập nhật điểm từng câu và trạng thái bài nộp
     const updatedSubmission = await prisma.$transaction(async (tx) => {
       for (const item of answerUpdates) {
@@ -327,7 +361,6 @@ export class SubmissionService {
         });
       }
 
-      const skill = submission.exam.skill;
       return tx.examSubmission.update({
         where: { id: submissionId },
         data: {
@@ -335,9 +368,9 @@ export class SubmissionService {
           submitted_at: new Date(),
           total_score: totalScore,
           cefr_level: calculatedCefr,
-          reading_score: skill === 'READING' ? totalScore : undefined,
-          listening_score: skill === 'LISTENING' ? totalScore : undefined,
-          grammar_score: skill === 'GRAMMAR_VOCABULARY' ? totalScore : undefined,
+          reading_score: readingScore,
+          listening_score: listeningScore,
+          grammar_score: grammarScore,
         },
         include: {
           exam: true,

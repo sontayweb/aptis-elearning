@@ -282,6 +282,8 @@ function ReadingExamRunner() {
   const searchParams = useSearchParams();
   const examId = (params.id as string) || "reading-01";
   const partParam = searchParams.get("part"); // "1" | "2" | "4" | "5" | null
+  const modeParam = searchParams.get("mode"); // "review" | null
+  const submissionIdParam = searchParams.get("submissionId");
 
   const { isAuthenticated, user } = useAuth();
 
@@ -299,10 +301,10 @@ function ReadingExamRunner() {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isQuestionListOpen, setIsQuestionListOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [submissionId, setSubmissionId] = useState<string | null>(submissionIdParam || null);
 
   // Review Mode State
-  const [reviewMode, setReviewMode] = useState(false);
+  const [reviewMode, setReviewMode] = useState(modeParam === "review");
   const [reviewPart, setReviewPart] = useState<"p1" | "p2" | "p3" | "p4">("p1");
   const [reviewQuestionIdx, setReviewQuestionIdx] = useState(0);
 
@@ -330,26 +332,74 @@ function ReadingExamRunner() {
         setError(null);
 
         const res = await api.exams.getQuestions(examId);
+        let parsedData = DEFAULT_READING_TEST;
         if (res.success && res.data) {
           const apiData = res.data;
-          const parsed = parseApiToReadingData(apiData);
-          setExamData(parsed);
+          parsedData = parseApiToReadingData(apiData);
+          setExamData(parsedData);
           setTimeLeft((apiData.duration_minutes || 35) * 60);
-
-          // Initialize Part 2 sentences default order (empty slots awaiting drag and drop)
-          const initialP2Orders: Record<string, string[]> = {};
-          parsed.part2.stories.forEach((st) => {
-            initialP2Orders[st.id] = [];
-          });
-          setP2Orders(initialP2Orders);
         } else {
-          // Use default benchmark
           setExamData(DEFAULT_READING_TEST);
-          const initialP2Orders: Record<string, string[]> = {};
-          DEFAULT_READING_TEST.part2.stories.forEach((st) => {
-            initialP2Orders[st.id] = [];
-          });
-          setP2Orders(initialP2Orders);
+        }
+
+        const initialP2Orders: Record<string, string[]> = {};
+        parsedData.part2.stories.forEach((st) => {
+          initialP2Orders[st.id] = [];
+        });
+        setP2Orders(initialP2Orders);
+
+        // Nếu ở chế độ Review và có submissionId, tải bài nộp cũ
+        if ((modeParam === "review" || submissionIdParam) && submissionIdParam) {
+          try {
+            const subRes = await api.submissions.getResult(submissionIdParam);
+            if (subRes.success && subRes.data) {
+              const sub = subRes.data;
+              setIsSubmitted(true);
+              setReviewMode(true);
+              if (sub.total_score !== undefined && sub.total_score !== null) {
+                setResultScore(Math.round(sub.total_score));
+              }
+              if (sub.cefr_level) setCefrBand(sub.cefr_level);
+
+              const newP1: Record<string, string> = {};
+              const newP2: Record<string, string[]> = { ...initialP2Orders };
+              const newP3: Record<string, string> = {};
+              const newP4: Record<string, string> = {};
+
+              (sub.answers || []).forEach((a: any) => {
+                const qId = a.question_id || a.questionId;
+                const val = a.selected_option || a.selectedOption || a.text_answer || a.textAnswer || "";
+                if (!qId) return;
+
+                // Check which part it belongs to
+                if (parsedData.part1.gaps.some((g) => g.id === qId)) {
+                  newP1[qId] = val;
+                } else if (parsedData.part3.questions.some((q) => q.id === qId)) {
+                  newP3[qId] = val;
+                } else if (parsedData.part4.paragraphs.some((p) => p.id === qId)) {
+                  newP4[qId] = val;
+                } else {
+                  // check part 2
+                  parsedData.part2.stories.forEach((st) => {
+                    if (st.id === qId || st.sentences.some((s) => s.id === qId)) {
+                      try {
+                        newP2[st.id] = Array.isArray(val) ? val : JSON.parse(val);
+                      } catch {
+                        // ignore
+                      }
+                    }
+                  });
+                }
+              });
+
+              setP1Answers(newP1);
+              setP2Orders(newP2);
+              setP3Answers(newP3);
+              setP4Answers(newP4);
+            }
+          } catch (e) {
+            console.warn("Could not load submission details for review:", e);
+          }
         }
       } catch (err: any) {
         console.warn("Using offline benchmark reading data:", err);
@@ -365,7 +415,7 @@ function ReadingExamRunner() {
     }
 
     loadReadingExam();
-  }, [examId]);
+  }, [examId, modeParam, submissionIdParam]);
 
   // Adjust activeStage if URL contains ?part=
   useEffect(() => {
@@ -377,7 +427,7 @@ function ReadingExamRunner() {
 
   // 2. Countdown Timer
   useEffect(() => {
-    if (isSubmitted || loading) return;
+    if (isSubmitted || loading || reviewMode) return;
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -389,11 +439,12 @@ function ReadingExamRunner() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isSubmitted, loading]);
+  }, [isSubmitted, loading, reviewMode]);
 
-  // 3. Init Database Submission
+  // 3. Init Database Submission (chỉ khi làm mới, không làm khi đang review)
   useEffect(() => {
     async function initSubmission() {
+      if (modeParam === "review" || submissionIdParam) return;
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
       if (!token || !examId || submissionId) return;
       try {
@@ -406,7 +457,7 @@ function ReadingExamRunner() {
       }
     }
     initSubmission();
-  }, [examId]);
+  }, [examId, modeParam, submissionIdParam]);
 
   // Helper format time
   const formatTime = (secs: number) => {

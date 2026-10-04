@@ -8,10 +8,12 @@ import { Navbar } from "@/components/navbar";
 import { HeroBanner } from "@/components/hero-banner";
 import { RoadmapBanner } from "@/components/roadmap-banner";
 import { StartRightCard } from "@/components/start-right-card";
+import { TodayRecommendationCard } from "@/components/today-recommendation-card";
 import { VoucherCard } from "@/components/voucher-card";
 import { UpgradeProBanner } from "@/components/upgrade-pro-banner";
 import { WeeklyStreakCard } from "@/components/weekly-streak-card";
 import { SkillProgressCard } from "@/components/skill-progress-card";
+import { TimelineProgressChart } from "@/components/progress-chart";
 import { TipsSection } from "@/components/tips-section";
 import { ReferralGiftCard } from "@/components/referral-gift-card";
 import { SpeedupSpeakingCard } from "@/components/speedup-speaking-card";
@@ -60,7 +62,7 @@ export function DashboardView({ user }: DashboardViewProps) {
       <Navbar />
 
       {/* Main Content Area */}
-      <main className="flex-1 pt-18 sm:pt-20 md:pt-24 pb-28 md:pb-20">
+      <main className="flex-1 pt-[calc(var(--navbar-total-height,64px)+20px)] sm:pt-[calc(var(--navbar-total-height,64px)+26px)] md:pt-[calc(var(--navbar-total-height,64px)+32px)] pb-28 md:pb-20 transition-all duration-300">
         <div className="section-container space-y-4 sm:space-y-6 px-3 sm:px-4 md:px-6">
           {/* 1. Hero Greeting Banner (Đồng bộ nguyên khối gồm Header + 6 Thẻ Metric) */}
           <HeroBanner
@@ -84,6 +86,9 @@ export function DashboardView({ user }: DashboardViewProps) {
           {/* 4. Start Right Way Action Card */}
           <StartRightCard />
 
+          {/* 4.1. Today's Recommended Action (⚡ Hôm nay nên làm) */}
+          <TodayRecommendationCard data={stats?.todayRecommendation} />
+
           {/* 5. Voucher / Promo Code Card */}
           <VoucherCard />
 
@@ -92,15 +97,20 @@ export function DashboardView({ user }: DashboardViewProps) {
 
           {/* 7. Main Dashboard 2-Column Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* Left 2 Cols: Streak Meter + Skill Progress */}
+            {/* Left 2 Cols: Streak Meter + Skill Progress + Timeline Chart */}
             <div className="lg:col-span-2 space-y-6">
               <WeeklyStreakCard
                 currentStreak={stats?.weeklyStreak?.currentStreak ?? 0}
                 completedThisWeek={stats?.weeklyStreak?.completedThisWeek ?? 0}
                 totalDays={7}
                 activeDays={stats?.weeklyStreak?.days}
+                practiceRoute={stats?.weakestSkill?.route || stats?.todayRecommendation?.practiceRoute || "/thi-thu"}
               />
-              <SkillProgressCard skills={stats?.skillProgress} />
+              <SkillProgressCard
+                skills={stats?.skillProgress}
+                weakestSkill={stats?.weakestSkill}
+              />
+              <TimelineProgressChart data={stats?.timelineProgress} />
             </div>
 
             {/* Right 1 Col: Blog Tips + Referral + Speedup Speaking + History */}

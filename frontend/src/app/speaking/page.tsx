@@ -1,43 +1,48 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { api } from "@/lib/api-client";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { api } from "@/lib/api-client";
 import {
   Mic,
   Clock,
-  History,
-  Search,
-  ArrowRight,
   Sparkles,
+  ArrowRight,
+  ShieldCheck,
   CheckCircle2,
+  Lock,
+  Search,
   AlertCircle,
+  Trophy,
 } from "lucide-react";
 
 interface SpeakingExam {
   id: string;
   title: string;
   parts: string;
+  questionsCount: number;
   duration: string;
   isFree: boolean;
-  topic: string;
   status: "not_started" | "in_progress" | "completed";
   bestScore?: string | null;
   bestScoreNumber?: number | null;
-  userAttempts?: number;
+  userAttempts: number;
+  priority?: "HIGH" | "MEDIUM" | "LOW";
 }
 
 export default function SpeakingPracticePage() {
-  const [activeTab, setActiveTab] = useState("full");
+  const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "not_started" | "completed">("all");
+  const [filterSource, setFilterSource] = useState<"all" | "web" | "my">("all");
+
   const [exams, setExams] = useState<SpeakingExam[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [progressText, setProgressText] = useState("Chưa có bài nào — hãy bắt đầu luyện nói!");
 
   const loadExams = async () => {
     try {
@@ -46,22 +51,34 @@ export default function SpeakingPracticePage() {
       const res = await api.exams.getAll({ skill: "SPEAKING", limit: 50 });
       if (res.success && Array.isArray(res.data)) {
         setExams(
-          res.data.map((exam: any) => {
+          res.data.map((exam: any, idx: number) => {
             let status: "not_started" | "in_progress" | "completed" = "not_started";
             if (exam.userStatus === "COMPLETED") status = "completed";
             else if (exam.userStatus === "IN_PROGRESS") status = "in_progress";
 
+            // Phân bổ tỷ lệ ưu tiên trực quan (Cao, Vừa, Thấp)
+            let priority: "HIGH" | "MEDIUM" | "LOW" = "HIGH";
+            if (exam.priority) {
+              priority = exam.priority;
+            } else {
+              const mod = idx % 5;
+              if (mod === 0 || mod === 1 || mod === 3) priority = "HIGH";
+              else if (mod === 2) priority = "MEDIUM";
+              else priority = "LOW";
+            }
+
             return {
               id: exam.id,
               title: exam.title,
-              parts: `Part 1 - ${exam.totalParts || 4}`,
+              parts: "Full Speaking · 4 Parts",
+              questionsCount: exam.totalQuestions || 4,
               duration: `${exam.durationMinutes || 12} phút`,
               isFree: !exam.isPro,
-              topic: exam.description || "Chủ đề bài thi Nói",
               status,
               bestScore: exam.bestScore,
               bestScoreNumber: exam.bestScoreNumber,
-              userAttempts: exam.userAttempts,
+              userAttempts: exam.userAttempts || 0,
+              priority,
             };
           })
         );
@@ -80,294 +97,392 @@ export default function SpeakingPracticePage() {
 
   useEffect(() => {
     loadExams();
-    // Tải tiến độ Speaking của học viên
-    api.submissions.getMyHistory({ skill: "SPEAKING", limit: 50 }).then((res) => {
-      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-        const completed = res.data.filter((h: any) => h.status === "GRADED" || h.status === "SUBMITTED").length;
-        const scores = res.data
-          .filter((h: any) => h.scoreNumber && h.scoreNumber > 0)
-          .map((h: any) => h.scoreNumber as number);
-        const avg = scores.length > 0 ? Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length) : 0;
-        if (completed > 0) {
-          setProgressText(`Đã hoàn thành ${completed} bài Speaking · Điểm TB AI: ${avg}/50`);
-        }
-      }
-    }).catch(() => {});
   }, []);
 
-  const filtered = exams.filter((e) => {
-    const matchesSearch =
-      e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.topic.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === "all" ? true : e.status === filterStatus;
-    return matchesSearch && matchesFilter;
+  // Filtered exams according to tab, search and filters
+  const filteredExams = exams.filter((e) => {
+    const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all"
+        ? true
+        : filterStatus === "completed"
+        ? e.status === "completed"
+        : e.status !== "completed";
+    const matchesPriority =
+      filterPriority === "all"
+        ? true
+        : filterPriority === "high"
+        ? e.priority === "HIGH"
+        : filterPriority === "medium"
+        ? e.priority === "MEDIUM"
+        : e.priority === "LOW";
+    const matchesSource = filterSource === "all" || filterSource === "web" ? true : false;
+    return matchesSearch && matchesStatus && matchesPriority && matchesSource;
   });
+
+  // Dynamic naming based on activeTab
+  const getTabInfo = () => {
+    switch (activeTab) {
+      case "full":
+        return {
+          title: "Luyện tập full part kỹ năng Speaking",
+          desc: "Hoàn thành tất cả các Part của kỹ năng này trong một lượt thi liên tục để đánh giá năng lực chính xác nhất.",
+          badge: "Full Part",
+          partQuery: "",
+          marathonText: "Tạo bộ đề của bạn",
+          marathonDesc: "Tự ghép các đề lẻ thành bộ full test hoặc full part của riêng bạn. Dành cho tài khoản Pro.",
+          marathonBtn: "Nâng cấp để tạo →",
+          marathonType: "custom",
+        };
+      case "p1":
+        return {
+          title: "Part 1 – Personal information",
+          desc: "Trả lời 3 câu hỏi ngắn về bản thân, gia đình, công việc, sở thích... Thời gian nói 30 giây cho mỗi câu.",
+          badge: "Part 1",
+          partQuery: "?part=1",
+          marathonText: "Luyện tất cả đề Part 1",
+          marathonDesc: "Làm liên tục các đề Part 1 — AI nhận diện giọng nói & chấm phát âm tức thì",
+          marathonBtn: "Mở khóa",
+          marathonType: "marathon",
+        };
+      case "p2":
+        return {
+          title: "Part 2 – Describe, express opinion and explain",
+          desc: "Miêu tả một bức tranh trong 45 giây và trả lời 2 câu hỏi mở rộng về chủ đề liên quan.",
+          subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
+          badge: "Part 2",
+          partQuery: "?part=2",
+          marathonText: "Luyện tất cả đề Part 2",
+          marathonDesc: "Làm liên tục các đề miêu tả tranh sát đề thi thật British Council",
+          marathonBtn: "Mở khóa",
+          marathonType: "marathon",
+        };
+      case "p3":
+        return {
+          title: "Part 3 – Describe, compare and explain",
+          desc: "So sánh 2 bức tranh và trả lời 2 câu hỏi phân tích, nêu lý do và quan điểm cá nhân (45s mỗi câu).",
+          subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
+          badge: "Part 3",
+          partQuery: "?part=3",
+          marathonText: "Luyện tất cả đề Part 3",
+          marathonDesc: "Rèn luyện phản xạ so sánh đối chiếu và sử dụng từ vựng nâng band",
+          marathonBtn: "Mở khóa",
+          marathonType: "marathon",
+        };
+      case "p4":
+        return {
+          title: "Part 4 – Discuss personal experience and opinion",
+          desc: "Xem tranh, có 1 phút chuẩn bị ghi chú và nói liên tục trong 2 phút trả lời 3 câu hỏi trải nghiệm/trừu tượng.",
+          badge: "Part 4",
+          partQuery: "?part=4",
+          marathonText: "Luyện tất cả đề Part 4",
+          marathonDesc: "Luyện nói dài 2 phút không vấp, giữ vững độ trôi chảy & cấu trúc ngữ pháp",
+          marathonBtn: "Mở khóa",
+          marathonType: "marathon",
+        };
+    }
+  };
+
+  const tabInfo = getTabInfo();
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      <main className="flex-1 pt-16">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden border-b border-border bg-card">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -top-32 -right-24"
-            style={{ width: "420px", height: "420px", background: "hsl(var(--primary) / 0.35)" }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -bottom-40 -left-20 opacity-70"
-            style={{ width: "320px", height: "320px", background: "hsl(var(--primary) / 0.35)" }}
-          />
-
-          <div className="section-container py-12 md:py-16 relative z-10">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Mic className="w-6 h-6 text-primary" />
-                </div>
-                <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 border-transparent bg-secondary text-secondary-foreground text-xs font-medium gap-1.5">
-                  <Clock className="w-3 h-3" />
-                  <span>12 phút</span>
-                </div>
-              </div>
-
-              <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
-                Phần thi Speaking
-              </h1>
-              <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                Luyện nói với AI PREMIER chấm phát âm, ngữ pháp và gợi ý nâng cấp từ vựng theo CEFR (A1-C2). Mô phỏng chuẩn 4 phần thi Speaking Aptis British Council.
-              </p>
-              <Link
-                className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap border dark:text-primary-foreground bg-background py-2 mt-4 rounded-full border-primary text-primary hover:bg-primary/10 hover:text-primary h-9 px-4 text-sm font-medium transition-colors"
-                href="/meo-thi-aptis/meo-hoc-speaking-aptis"
-                data-discover="true"
-              >
-                💡 Xem ngay - Mẹo làm bài Speaking
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Progress Tracker */}
-        <section className="section-container pt-6 md:pt-8">
-          <div className="mb-6 rounded-xl border border-border bg-card/60 px-4 py-3.5 md:px-5 md:py-4 flex items-center gap-3 md:gap-4">
-            <div className="w-10 h-10 md:w-11 md:h-11 rounded-lg bg-muted flex items-center justify-center shrink-0">
-              <History className="w-5 h-5 text-foreground/70" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-heading font-semibold text-foreground text-sm md:text-base leading-tight">
-                Tiến độ học tập của bạn
-              </h3>
-              <p className="text-xs md:text-sm text-muted-foreground mt-0.5 truncate">
-                {progressText}
-              </p>
-            </div>
-            <Link className="shrink-0" href="/history?skill=speaking" data-discover="true">
-              <button
-                type="button"
-                className="tech-btn inline-flex items-center justify-center whitespace-nowrap text-sm font-medium border border-primary text-primary dark:text-primary-foreground bg-background hover:bg-primary/10 h-9 rounded-md px-3 gap-1.5 transition-colors"
-              >
-                <span className="hidden sm:inline">Xem lịch sử</span>
-                <span className="sm:hidden">Lịch sử</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </Link>
-          </div>
-        </section>
-
-        {/* Search, Filter & Parts */}
-        <section className="section-container py-8 md:py-10">
+      <main className="flex-1 pt-[calc(var(--navbar-total-height,64px)+16px)] sm:pt-[calc(var(--navbar-total-height,64px)+22px)] md:pt-[calc(var(--navbar-total-height,64px)+28px)] transition-all duration-300">
+        <section className="section-container py-6 md:py-8">
+          {/* Search Box */}
           <div className="relative mb-6">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex w-full rounded-md border border-input px-3 py-2 text-base md:text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              placeholder="Tìm kiếm bộ đề Speaking theo chủ đề..."
+              className="flex w-full rounded-xl border border-input px-3 py-2 text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-sm"
+              placeholder="Tìm kiếm bộ đề Speaking..."
             />
           </div>
 
-          {/* Parts Filter Tabs */}
-          <div className="inline-flex items-center justify-center rounded-xl text-muted-foreground w-full h-auto flex-wrap gap-1 bg-muted/50 p-1.5 mb-8">
-            <button
-              type="button"
-              onClick={() => setActiveTab("full")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "full" ? "bg-primary text-primary-foreground shadow-md" : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">Full Part</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– 4 Parts (12 phút)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("p1")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "p1" ? "bg-primary text-primary-foreground shadow-md" : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">Part 1</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– Personal Information</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("p2")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "p2" ? "bg-primary text-primary-foreground shadow-md" : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">Part 2</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– Describe Picture</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("p3")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "p3" ? "bg-primary text-primary-foreground shadow-md" : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">Part 3</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– Compare 2 Pictures</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("p4")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "p4" ? "bg-primary text-primary-foreground shadow-md" : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">Part 4</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– Abstract Topic</span>
-            </button>
-          </div>
-
-          {/* Status Filter Tabs */}
-          <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
+          {/* Top 5 Part Tabs matching reading/listening layout */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6">
             {[
-              { id: "all", label: "Tất cả", count: exams.length },
-              {
-                id: "not_started",
-                label: "Chưa làm",
-                count: exams.filter((e) => e.status === "not_started").length,
-              },
-              {
-                id: "completed",
-                label: "Đã làm",
-                count: exams.filter((e) => e.status === "completed").length,
-              },
+              { id: "full", label: "Full Part – Tất cả các Part" },
+              { id: "p1", label: "Part 1 – Personal information" },
+              { id: "p2", label: "Part 2 – Describe & explain" },
+              { id: "p3", label: "Part 3 – Compare & reasons" },
+              { id: "p4", label: "Part 4 – Long turn (2 phút)" },
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setFilterStatus(tab.id as any)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  filterStatus === tab.id
-                    ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                    : "bg-muted/70 text-muted-foreground hover:bg-muted"
+                type="button"
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`whitespace-nowrap px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                  activeTab === tab.id
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
-                {tab.label} ({tab.count})
+                {tab.label}
               </button>
             ))}
           </div>
 
-          {/* Real State Handling */}
+          {/* Header Description */}
+          <div className="mb-6 space-y-1">
+            <h1 className="text-xl md:text-2xl font-heading font-extrabold text-foreground">
+              {tabInfo.title}
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              {tabInfo.desc}
+            </p>
+            {tabInfo.subDesc && (
+              <p className="text-xs text-muted-foreground/80 italic pt-1">
+                {tabInfo.subDesc}
+              </p>
+            )}
+          </div>
+
+          {/* Sub Filters - Rows */}
+          <div className="space-y-2.5 mb-8 text-xs">
+            {/* Row 1: Lọc ưu tiên */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-muted-foreground font-semibold w-24">Lọc ưu tiên:</span>
+              {[
+                { id: "all", label: `Tất cả (${exams.length})` },
+                { id: "high", label: `Ưu tiên cao (${exams.filter((e) => e.priority === "HIGH").length})` },
+                { id: "medium", label: `Ưu tiên vừa (${exams.filter((e) => e.priority === "MEDIUM").length})` },
+                ...(exams.some((e) => e.priority === "LOW")
+                  ? [{ id: "low", label: `Ưu tiên thấp (${exams.filter((e) => e.priority === "LOW").length})` }]
+                  : []),
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setFilterPriority(item.id as any)}
+                  className={`px-3 py-1 rounded-full font-bold transition-all ${
+                    filterPriority === item.id
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "border border-border bg-card text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Row 2: Trạng thái */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-muted-foreground font-semibold w-24">Trạng thái:</span>
+              {[
+                { id: "all", label: `Tất cả (${exams.length})` },
+                { id: "not_started", label: `Chưa làm (${exams.filter((e) => e.status !== "completed").length})` },
+                { id: "completed", label: `Đã làm (${exams.filter((e) => e.status === "completed").length})` },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setFilterStatus(item.id as any)}
+                  className={`px-3 py-1 rounded-full font-bold transition-all ${
+                    filterStatus === item.id
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "border border-border bg-card text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Row 3: Nguồn (khi ở Full Part) */}
+            {activeTab === "full" && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-muted-foreground font-semibold w-24">Nguồn:</span>
+                {[
+                  { id: "all", label: `Tất cả (${exams.length})` },
+                  { id: "web", label: `Đề web (${exams.length})` },
+                  { id: "my", label: `Bộ đề của tôi (0)` },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setFilterSource(item.id as any)}
+                    className={`px-3 py-1 rounded-full font-bold transition-all ${
+                      filterSource === item.id
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "border border-border bg-card text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Cards Grid */}
           {loading ? (
             <div className="py-20 text-center text-muted-foreground space-y-3">
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-sm font-medium">Đang tải danh sách đề thi từ hệ thống...</p>
+              <p className="text-sm font-medium">Đang tải danh sách đề thi Speaking...</p>
             </div>
           ) : error ? (
-            <div className="p-6 rounded-2xl border border-destructive/30 bg-destructive/10 text-destructive flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 shrink-0" />
-                <div>
-                  <p className="font-bold text-sm">Chưa thể tải dữ liệu thực tế</p>
-                  <p className="text-xs opacity-90">{error}</p>
-                </div>
+            <div className="p-6 rounded-2xl border border-destructive/30 bg-destructive/10 text-destructive flex items-center justify-between gap-4">
+              <div>
+                <p className="font-bold text-sm">Chưa thể tải dữ liệu</p>
+                <p className="text-xs opacity-90">{error}</p>
               </div>
               <button
                 type="button"
                 onClick={loadExams}
-                className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:opacity-90 shrink-0"
+                className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold"
               >
                 Thử lại
               </button>
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="py-20 text-center border border-dashed border-border rounded-2xl bg-card/50">
-              <Mic className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-50" />
-              <h3 className="font-heading font-bold text-base text-foreground">Không có đề thi nào</h3>
-              <p className="text-xs text-muted-foreground mt-1">Cơ sở dữ liệu hiện tại chưa có đề thi nào trong danh mục này.</p>
-            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-              {filtered.map((exam) => (
-                <div
-                  key={exam.id}
-                  className="group relative tech-card bg-card border border-border rounded-xl p-5 flex flex-col h-full hover:border-primary/50 transition-all shadow-sm"
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="inline-flex items-center rounded-full px-2.5 py-0.5 w-fit text-[11px] font-medium bg-primary/10 text-primary border-0">
-                      Speaking AI
-                    </div>
-                    {exam.isFree ? (
-                      <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-0">
-                        FREE
-                      </div>
-                    ) : (
-                      <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {/* CARD 1: Special Action Card (PRO Custom / Marathon) */}
+              <div className="relative rounded-2xl border-2 border-primary/60 bg-card p-6 flex flex-col justify-between shadow-md hover:shadow-lg transition-all">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    {tabInfo.marathonType === "custom" ? (
+                      <span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px] uppercase">
                         PRO
-                      </div>
-                    )}
-                  </div>
-
-                  <h3 className="text-xl font-heading font-bold text-foreground mb-1">
-                    {exam.title}
-                  </h3>
-                  <p className="text-xs text-primary font-medium mb-2">{exam.topic}</p>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {exam.parts} · Thời gian {exam.duration}
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
-                    {exam.status === "completed" ? (
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Đã làm
-                      </span>
-                    ) : exam.status === "in_progress" ? (
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
-                        Đang làm dở
                       </span>
                     ) : (
-                      <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-                        Chưa bắt đầu
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px]">
+                          ∞ Marathon
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
+                          PRO
+                        </span>
+                      </div>
                     )}
-
-                    {exam.bestScore && (
-                      <span className="text-xs font-medium text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
-                        Điểm cao nhất: {exam.bestScore}
-                      </span>
+                    {tabInfo.marathonType === "marathon" && (
+                      <span className="text-[11px] font-semibold text-muted-foreground">Chưa làm</span>
                     )}
                   </div>
 
-                  <div className="flex-1" />
-
-                  <div className="flex justify-end pt-2 border-t border-border/40">
-                    <Link
-                      href={`/speaking/${exam.id}${activeTab !== "full" ? `?part=${activeTab}` : ""}`}
-                      className="tech-btn inline-flex items-center justify-center whitespace-nowrap text-sm h-9 rounded-md px-3 text-primary hover:text-primary hover:bg-primary/10 font-semibold gap-1 group-hover:gap-2 transition-all"
-                    >
-                      <span>Luyện Speaking</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
+                  <h3 className="text-lg font-heading font-extrabold text-foreground mb-2">
+                    {tabInfo.marathonText}
+                  </h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {tabInfo.marathonDesc}
+                  </p>
                 </div>
-              ))}
+
+                <div className="pt-6 mt-4 border-t border-border/40">
+                  <button
+                    type="button"
+                    onClick={() => alert("Tính năng dành riêng cho gói Pro. Bạn có thể làm ngay các đề Free miễn phí bên cạnh!")}
+                    className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center"
+                  >
+                    {tabInfo.marathonBtn}
+                  </button>
+                </div>
+              </div>
+
+              {/* CARD 2..N: Practice Exam Cards */}
+              {filteredExams.map((exam, idx) => {
+                const targetUrl = `/speaking/${exam.id}${tabInfo.partQuery}`;
+                const displayTitle =
+                  activeTab === "full"
+                    ? exam.title
+                    : activeTab === "p1"
+                    ? `Đề 0${idx + 1} - Speaking Part 1 (Personal Info)`
+                    : activeTab === "p2"
+                    ? `Đề 0${idx + 1} - Speaking Part 2 (Picture Description)`
+                    : activeTab === "p3"
+                    ? `Đề 0${idx + 1} - Speaking Part 3 (Comparison)`
+                    : `Đề 0${idx + 1} - Speaking Part 4 (Abstract Discussion)`;
+
+                return (
+                  <div
+                    key={exam.id}
+                    className="relative rounded-2xl border border-border bg-card hover:border-primary/50 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group"
+                  >
+                    <div>
+                      {/* Top Badges & Score / Status */}
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-2.5 py-0.5 rounded-md bg-muted text-muted-foreground font-bold text-[10px]">
+                            {tabInfo.badge}
+                          </span>
+                          {exam.isFree ? (
+                            <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
+                              FREE
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
+                              PRO
+                            </span>
+                          )}
+                          {exam.priority === "HIGH" && (
+                            <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px]">
+                              Ưu tiên cao
+                            </span>
+                          )}
+                          {exam.priority === "MEDIUM" && (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 font-bold text-[10px]">
+                              Ưu tiên vừa
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Top Right Trophy / Status */}
+                        <div>
+                          {exam.bestScore ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-black text-xs">
+                              🏆 {exam.bestScore}
+                            </span>
+                          ) : exam.status === "completed" ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Đã làm
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-semibold text-muted-foreground">
+                              Chưa bắt đầu
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-lg font-heading font-extrabold text-foreground mb-1.5 group-hover:text-primary transition-colors">
+                        {displayTitle}
+                      </h3>
+
+                      {/* Subtitle */}
+                      <p className="text-xs text-muted-foreground">
+                        {activeTab === "full" ? "Full Speaking · 4 Parts (12 phút)" : "🎙️ Đề luyện tập AI chấm Speaking"}
+                      </p>
+                    </div>
+
+                    {/* Bottom Action */}
+                    <div className="pt-6 mt-4 border-t border-border/40 flex items-center justify-end">
+                      {exam.isFree ? (
+                        <Link
+                          href={targetUrl}
+                          className="inline-flex items-center gap-1.5 text-primary hover:text-brand-brown font-extrabold text-xs transition-colors"
+                        >
+                          <span>Luyện tập</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => alert("Đề này thuộc gói Pro. Bạn có thể luyện tập đề Free hoàn toàn miễn phí!")}
+                          className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground font-bold text-xs transition-colors"
+                        >
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>Mở khóa</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </section>

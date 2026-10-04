@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -33,11 +33,112 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { AuthModal } from "@/components/auth-modal";
+import { useEventTheme } from "@/contexts/event-theme-context";
+
+function hexToRgb(hex?: string): { r: number; g: number; b: number } {
+  if (!hex || !hex.startsWith("#")) return { r: 37, g: 99, b: 235 };
+  const cleanHex = hex.replace("#", "");
+  const num = parseInt(cleanHex.length === 3 ? cleanHex.split("").map((c) => c + c).join("") : cleanHex, 16);
+  if (isNaN(num)) return { r: 37, g: 99, b: 235 };
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+}
 
 export function LandingPage() {
+  const { config } = useEventTheme();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [activeFeatureTab, setActiveFeatureTab] = useState<number>(0);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const rgb = config.enabled && config.primaryColor
+      ? hexToRgb(config.primaryColor)
+      : { r: 37, g: 99, b: 235 };
+
+    let animationFrameId: number;
+    let width = (canvas.width = canvas.offsetWidth);
+    let height = (canvas.height = canvas.offsetHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    const count = 35;
+    const particles: Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      radius: number;
+    }> = [];
+
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        radius: Math.random() * 1.5 + 0.8,
+      });
+    }
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      // Faint lines connecting particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${0.16 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.6;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Floating points
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)`;
+        ctx.fill();
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [config.enabled, config.primaryColor]);
 
   const toggleFaq = (index: number) => {
     setActiveFaq(activeFaq === index ? null : index);
@@ -241,54 +342,159 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* ====================================================
-            2. HERO SECTION
+            2. HERO SECTION — Đồng bộ màu sắc & event theme cùng hero-banner.tsx
             ==================================================== */}
-        <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0B1120] text-white">
-          {/* Ambient Glows */}
+        <section
+          className="relative pt-20 pb-16 md:pt-28 md:pb-24 overflow-hidden border-b border-border text-foreground transition-colors duration-500"
+          style={{
+            background: "var(--gradient-hero)",
+          }}
+        >
+          {/* Decorative Grid & Glow Orbs (Đồng bộ chuẩn hero-banner.tsx) */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute inset-0 tech-grid-bg animate-grid-drift opacity-60" />
+            <div className="glow-orb glow-orb-blue -top-24 -left-24 w-[480px] h-[480px]" />
+            <div className="glow-orb glow-orb-blue top-1/3 -right-32 w-[400px] h-[400px]" />
+            <div className="glow-orb glow-orb-navy bottom-0 left-1/3 w-[360px] h-[360px]" />
+          </div>
+
+          {/* Particle Canvas */}
+          <canvas
+            ref={canvasRef}
+            aria-hidden="true"
+            className="particles-bg pointer-events-none absolute inset-0 w-full h-full"
+          />
+
+          {/* Ambient Breathing Halos (Đồng bộ chuẩn hero-banner.tsx) */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-blue-600/30 to-indigo-500/20 blur-[130px] rounded-full"
+            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -top-20 -right-20"
+            style={{
+              width: "360px",
+              height: "360px",
+              background: config.enabled && config.primaryColor
+                ? `${config.primaryColor}22`
+                : "hsl(var(--primary) / 0.22)",
+            }}
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute top-1/3 -right-20 w-[450px] h-[450px] bg-blue-500/15 blur-[120px] rounded-full"
+            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -bottom-20 -left-20"
+            style={{
+              width: "320px",
+              height: "320px",
+              background: config.enabled && config.accentColor
+                ? `${config.accentColor}1c`
+                : "hsl(var(--accent) / 0.18)",
+            }}
           />
 
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
               {/* Left Column: Headlines & CTAs */}
               <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-                {/* AI Badge */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/30 backdrop-blur-md shadow-xs">
-                  <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-blue-300">
-                    Nền tảng luyện thi Aptis ESOL ứng dụng Trí Tuệ Nhân Tạo (AI)
-                  </span>
-                </div>
+                {/* Dynamic Event or AI Badge */}
+                {config.enabled ? (
+                  <div
+                    className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border backdrop-blur-md shadow-xs animate-in fade-in transition-all"
+                    style={{
+                      backgroundColor: `${config.primaryColor}14`,
+                      borderColor: `${config.primaryColor}35`,
+                      color: config.primaryColor,
+                    }}
+                  >
+                    <span className="text-sm shrink-0 animate-bounce">{config.icon}</span>
+                    <span className="text-[11px] font-bold tracking-wide uppercase">
+                      {config.badge} — {config.name}
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/25 backdrop-blur-md shadow-xs text-primary">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                    <span className="text-[11px] font-semibold tracking-wide">
+                      Nền tảng luyện thi Aptis ESOL ứng dụng Trí Tuệ Nhân Tạo (AI)
+                    </span>
+                  </div>
+                )}
 
                 {/* Main Headline */}
-                <h1 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]">
+                <h1 className="font-heading text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight leading-[1.18] text-foreground">
                   Luyện thi Aptis{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300">
+                  <span
+                    className="text-transparent bg-clip-text transition-all duration-500"
+                    style={{
+                      backgroundImage: config.enabled
+                        ? `linear-gradient(90deg, ${config.primaryColor}, ${config.accentColor || config.primaryColor})`
+                        : "linear-gradient(to right, #2563EB, #0284C7, #4F46E5)",
+                    }}
+                  >
                     chuẩn đề thật
                   </span>
                   <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-amber-200">
+                  <span
+                    className="text-transparent bg-clip-text transition-all duration-500"
+                    style={{
+                      backgroundImage: config.enabled
+                        ? `linear-gradient(90deg, ${config.accentColor || config.primaryColor}, #EA580C)`
+                        : "linear-gradient(to right, #EA580C, #D97706, #CA8A04)",
+                    }}
+                  >
                     AI chấm điểm tức thì
                   </span>
                 </h1>
 
                 {/* Subtitle */}
-                <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                  Hơn <strong className="text-white font-bold">870+ đề thi</strong> sát thực tế kỳ thi British Council.
-                  AI chấm <strong className="text-blue-300">Speaking & Writing</strong> chuẩn 4 tiêu chí CEFR, trả band điểm và gợi ý lộ trình bứt phá B2 chỉ sau vài phút.
+                <p className="text-muted-foreground text-sm sm:text-[15px] max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+                  Hơn <strong className="text-foreground font-bold">870+ đề thi</strong> sát thực tế kỳ thi British Council.
+                  AI chấm{" "}
+                  <strong
+                    style={{ color: config.enabled ? config.primaryColor : "hsl(var(--primary))" }}
+                    className="font-bold"
+                  >
+                    Speaking & Writing
+                  </strong>{" "}
+                  chuẩn 4 tiêu chí CEFR, trả band điểm và gợi ý lộ trình bứt phá B2 chỉ sau vài phút.
                 </p>
+
+                {/* Seasonal Event Callout Banner */}
+                {config.enabled && config.bannerEnabled && (
+                  <div
+                    className="p-3 sm:p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-left backdrop-blur-md shadow-xs animate-in fade-in"
+                    style={{
+                      backgroundColor: `${config.primaryColor}12`,
+                      borderColor: `${config.primaryColor}35`,
+                    }}
+                  >
+                    <div className="flex items-center gap-2.5 text-xs text-foreground">
+                      <span className="text-xl shrink-0">{config.icon}</span>
+                      <span className="font-medium text-foreground/90 leading-snug">
+                        {config.bannerText}
+                      </span>
+                    </div>
+                    {config.bannerLink && (
+                      <Link
+                        href={config.bannerLink}
+                        className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white shrink-0 hover:brightness-110 shadow-xs flex items-center gap-1 transition-all"
+                        style={{ backgroundColor: config.primaryColor }}
+                      >
+                        <span>Nhận ngay</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
+                  </div>
+                )}
 
                 {/* CTAs */}
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
                   <Link
                     href="/thi-thu"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-extrabold text-sm sm:text-base shadow-[0_8px_25px_rgba(37,99,235,0.45)] hover:shadow-[0_12px_32px_rgba(37,99,235,0.6)] hover:brightness-110 active:scale-95 transition-all"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-2.5 sm:py-3 rounded-xl text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:brightness-110 active:scale-95 transition-all"
+                    style={{
+                      background: config.enabled
+                        ? `linear-gradient(135deg, ${config.primaryColor}, ${config.accentColor || config.primaryColor})`
+                        : "var(--gradient-primary)",
+                    }}
                   >
                     <Zap className="w-5 h-5 text-amber-300 fill-amber-300" />
                     <span>Thi thử miễn phí ngay</span>
@@ -297,77 +503,111 @@ export function LandingPage() {
 
                   <Link
                     href="/listening"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-sm sm:text-base backdrop-blur-md active:scale-95 transition-all"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3 rounded-xl bg-card hover:bg-muted border border-border text-foreground font-semibold text-xs sm:text-sm shadow-xs hover:border-primary/40 active:scale-95 transition-all"
                   >
-                    <BookOpen className="w-4 h-4 text-blue-300" />
+                    <BookOpen
+                      className="w-4 h-4"
+                      style={{ color: config.enabled ? config.primaryColor : "hsl(var(--primary))" }}
+                    />
                     <span>Xem kho đề luyện</span>
                   </Link>
                 </div>
 
                 {/* 3 Core Trust Badges */}
-                <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs text-slate-300">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-[11px] text-muted-foreground">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-card/80 border border-border shadow-2xs">
+                    <CheckCircle2
+                      className="w-3.5 h-3.5"
+                      style={{ color: config.enabled ? config.primaryColor : "hsl(var(--primary))" }}
+                    />
                     <span>Mô phỏng 100% đề máy tính thật</span>
                   </div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-card/80 border border-border shadow-2xs">
+                    <CheckCircle2
+                      className="w-3.5 h-3.5"
+                      style={{ color: config.enabled ? config.primaryColor : "hsl(var(--primary))" }}
+                    />
                     <span>AI chấm Speaking–Writing CEFR</span>
                   </div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-card/80 border border-border shadow-2xs">
+                    <CheckCircle2
+                      className="w-3.5 h-3.5"
+                      style={{ color: config.enabled ? config.primaryColor : "hsl(var(--primary))" }}
+                    />
                     <span>Có band điểm & giải thích ngay</span>
                   </div>
                 </div>
               </div>
 
-              {/* Right Column: Visual Mockup Showcase */}
+              {/* Right Column: Visual Mockup Showcase (Đồng bộ tone nền card/border) */}
               <div className="lg:col-span-5 relative">
                 {/* Mockup Browser Window */}
-                <div className="relative rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl shadow-2xl p-4 sm:p-5 overflow-hidden animate-in zoom-in-95 duration-500">
+                <div className="relative rounded-2xl border border-border bg-card/95 backdrop-blur-xl shadow-2xl p-4 sm:p-5 overflow-hidden animate-in zoom-in-95 duration-500">
                   {/* Browser Bar */}
-                  <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4 text-xs text-slate-400">
+                  <div className="flex items-center justify-between pb-3 border-b border-border mb-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <span className="w-3 h-3 rounded-full bg-rose-500/80" />
                       <span className="w-3 h-3 rounded-full bg-amber-500/80" />
                       <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
                     </div>
-                    <div className="px-3 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-mono text-slate-300">
+                    <div className="px-3 py-0.5 rounded-md bg-muted/60 border border-border text-[11px] font-mono text-muted-foreground">
                       aptisesolpremier.vn/thi-thu
                     </div>
-                    <span className="text-[10px] text-emerald-400 font-bold">● Đang thi</span>
+                    <span className="text-[10px] text-emerald-500 font-bold">● Đang thi</span>
                   </div>
 
                   {/* Inside Exam Content Demo */}
                   <div className="space-y-3.5">
                     {/* Exam Header */}
-                    <div className="flex items-center justify-between bg-white/5 p-2.5 rounded-xl border border-white/5">
+                    <div className="flex items-center justify-between bg-muted/40 p-2.5 rounded-xl border border-border">
                       <div>
-                        <span className="text-[11px] text-blue-400 font-bold block uppercase tracking-wide">
+                        <span
+                          className="text-[11px] font-bold block uppercase tracking-wide transition-colors"
+                          style={{ color: config.enabled ? config.primaryColor : "hsl(var(--primary))" }}
+                        >
                           Reading & Vocabulary
                         </span>
-                        <h4 className="text-xs font-bold text-white">Question 24 of 30</h4>
+                        <h4 className="text-xs font-bold text-foreground">Question 24 of 30</h4>
                       </div>
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-mono font-bold">
+                      <div
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-bold border transition-colors"
+                        style={{
+                          backgroundColor: config.enabled ? `${config.primaryColor}15` : "hsl(var(--primary) / 0.1)",
+                          borderColor: config.enabled ? `${config.primaryColor}35` : "hsl(var(--primary) / 0.25)",
+                          color: config.enabled ? config.primaryColor : "hsl(var(--primary))",
+                        }}
+                      >
                         <Clock className="w-3.5 h-3.5" />
                         <span>00:24:39</span>
                       </div>
                     </div>
 
                     {/* Question text snippet */}
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-200 space-y-2">
-                      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
+                    <div className="p-3 rounded-xl bg-muted/30 border border-border text-xs text-foreground space-y-2">
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
                         Part 2: Sentence Ordering
                       </p>
-                      <p className="text-xs leading-relaxed text-slate-200">
+                      <p className="text-xs leading-relaxed text-foreground/90 font-medium">
                         Sắp xếp 5 câu sau thành một đoạn văn hoàn chỉnh theo mạch sự kiện:
                       </p>
                       <div className="space-y-1.5 pt-1">
-                        <div className="p-2 rounded-lg bg-blue-950/60 border border-blue-500/30 text-[11px] text-blue-200 flex items-center justify-between">
-                          <span>1. The annual science exhibition opened its doors on Monday.</span>
-                          <span className="text-[10px] text-blue-400 font-bold">✓ Chuẩn</span>
+                        <div
+                          className="p-2 rounded-lg border text-[11px] flex items-center justify-between transition-colors shadow-2xs"
+                          style={{
+                            backgroundColor: config.enabled ? `${config.primaryColor}14` : "hsl(var(--primary) / 0.08)",
+                            borderColor: config.enabled ? `${config.primaryColor}35` : "hsl(var(--primary) / 0.25)",
+                            color: config.enabled ? config.primaryColor : "hsl(var(--primary))",
+                          }}
+                        >
+                          <span className="font-medium text-foreground">1. The annual science exhibition opened its doors on Monday.</span>
+                          <span
+                            className="text-[10px] font-bold shrink-0 ml-2"
+                            style={{ color: config.enabled ? config.primaryColor : "hsl(var(--primary))" }}
+                          >
+                            ✓ Chuẩn
+                          </span>
                         </div>
-                        <div className="p-2 rounded-lg bg-slate-800/80 border border-white/10 text-[11px] text-slate-300">
+                        <div className="p-2 rounded-lg bg-card border border-border text-[11px] text-muted-foreground">
                           2. Hundreds of students from nearby schools arrived early...
                         </div>
                       </div>
@@ -375,12 +615,19 @@ export function LandingPage() {
 
                     {/* Quick Button Bar */}
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-[11px] text-slate-400">Đã làm: 24/30 câu</span>
+                      <span className="text-[11px] text-muted-foreground">Đã làm: 24/30 câu</span>
                       <div className="flex gap-2">
-                        <button className="px-3 py-1 text-xs rounded-lg bg-white/10 text-slate-200 font-semibold">
+                        <button className="px-3 py-1 text-xs rounded-lg bg-muted text-foreground font-semibold hover:bg-muted/80 transition-colors">
                           Câu trước
                         </button>
-                        <button className="px-3 py-1 text-xs rounded-lg bg-blue-600 text-white font-bold">
+                        <button
+                          className="px-3 py-1 text-xs rounded-lg text-white font-bold transition-all hover:brightness-110 active:scale-95 shadow-xs"
+                          style={{
+                            background: config.enabled
+                              ? `linear-gradient(135deg, ${config.primaryColor}, ${config.accentColor || config.primaryColor})`
+                              : "var(--gradient-primary)",
+                          }}
+                        >
                           Câu kế tiếp →
                         </button>
                       </div>
@@ -389,26 +636,55 @@ export function LandingPage() {
                 </div>
 
                 {/* Floating Card 1: AI Writing Evaluation (Top Right) */}
-                <div className="absolute -top-6 -right-4 sm:-right-6 bg-slate-900/95 border border-blue-500/40 rounded-2xl p-3.5 shadow-2xl backdrop-blur-md flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center shrink-0 shadow-md">
+                <div
+                  className="absolute -top-6 -right-4 sm:-right-6 bg-card/95 border rounded-2xl p-3.5 shadow-xl backdrop-blur-md flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700 transition-colors"
+                  style={{
+                    borderColor: config.enabled ? `${config.primaryColor}40` : "hsl(var(--primary) / 0.3)",
+                  }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-xl text-white flex items-center justify-center shrink-0 shadow-md"
+                    style={{
+                      background: config.enabled
+                        ? `linear-gradient(135deg, ${config.primaryColor}, ${config.accentColor || config.primaryColor})`
+                        : "linear-gradient(to top right, #F59E0B, #FB923C)",
+                    }}
+                  >
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">AI Chấm Writing</span>
-                    <span className="text-sm font-extrabold text-white flex items-center gap-1.5">
-                      Band B2 <span className="text-xs text-emerald-400 font-bold">● 18/20 điểm</span>
+                    <span className="text-[11px] text-muted-foreground block font-medium">AI Chấm Writing</span>
+                    <span className="text-sm font-extrabold text-foreground flex items-center gap-1.5">
+                      Band B2 <span className="text-xs text-emerald-500 font-bold">● 18/20 điểm</span>
                     </span>
                   </div>
                 </div>
 
                 {/* Floating Card 2: Streak (Bottom Left) */}
-                <div className="absolute -bottom-5 -left-4 sm:-left-6 bg-slate-900/95 border border-amber-500/40 rounded-2xl p-3 shadow-2xl backdrop-blur-md flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-md">
+                <div
+                  className="absolute -bottom-5 -left-4 sm:-left-6 bg-card/95 border rounded-2xl p-3 shadow-xl backdrop-blur-md flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 transition-colors"
+                  style={{
+                    borderColor: config.enabled ? `${config.accentColor || config.primaryColor}40` : "hsl(var(--accent) / 0.3)",
+                  }}
+                >
+                  <div
+                    className="w-9 h-9 rounded-xl text-white flex items-center justify-center shrink-0 shadow-md"
+                    style={{
+                      background: config.enabled
+                        ? `linear-gradient(135deg, ${config.accentColor || config.primaryColor}, ${config.primaryColor})`
+                        : "linear-gradient(to top right, #F59E0B, #EA580C)",
+                    }}
+                  >
                     <Flame className="w-5 h-5 fill-white" />
                   </div>
                   <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Chuỗi học liên tục</span>
-                    <span className="text-sm font-extrabold text-amber-300">18 ngày streak</span>
+                    <span className="text-[11px] text-muted-foreground block font-medium">Chuỗi học liên tục</span>
+                    <span
+                      className="text-sm font-extrabold"
+                      style={{ color: config.enabled ? config.accentColor || config.primaryColor : "hsl(var(--primary))" }}
+                    >
+                      18 ngày streak
+                    </span>
                   </div>
                 </div>
               </div>
@@ -423,11 +699,11 @@ export function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 p-4 sm:p-6 rounded-3xl bg-card border border-border shadow-xl backdrop-blur-xl">
             {stats.map((s, idx) => (
               <div key={idx} className="p-3 sm:p-4 text-center border-r last:border-r-0 border-border/60">
-                <div className="font-heading text-2xl sm:text-4xl font-black text-primary tracking-tight">
+                <div className="font-heading text-xl sm:text-2xl font-black text-primary tracking-tight">
                   {s.value}
                 </div>
-                <div className="text-xs sm:text-sm font-bold text-foreground mt-1">{s.label}</div>
-                <div className="text-[11px] text-muted-foreground mt-0.5 hidden sm:block">{s.desc}</div>
+                <div className="text-[11px] sm:text-xs font-semibold text-foreground mt-0.5">{s.label}</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block">{s.desc}</div>
               </div>
             ))}
           </div>
@@ -446,8 +722,8 @@ export function LandingPage() {
                     <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <h2 className="text-sm font-bold text-foreground">{item.title}</h2>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                    <h2 className="text-xs sm:text-[13px] font-bold text-foreground">{item.title}</h2>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
                   </div>
                 );
               })}
@@ -461,13 +737,13 @@ export function LandingPage() {
         <section className="py-12 md:py-20 bg-muted/30 border-y border-border">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <span className="text-xs font-bold uppercase tracking-widest text-primary">
+              <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
                 LỘ TRÌNH DÀNH CHO NGƯỜI MỚI
               </span>
-              <h2 className="font-heading text-2xl sm:text-4xl font-extrabold text-foreground">
+              <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
                 Bắt đầu học với <span className="text-primary">4 bước này</span>
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-[11.5px] text-muted-foreground">
                 Được xây dựng từ kinh nghiệm của hơn 8.500 thí sinh đã thi đỗ B1 & B2 Aptis ESOL
               </p>
             </div>
@@ -479,13 +755,13 @@ export function LandingPage() {
                   className="relative rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:border-primary/40 transition-all flex flex-col justify-between"
                 >
                   <div className="space-y-4">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1D4ED8] to-[#2563EB] text-white flex items-center justify-center font-heading font-black text-sm shadow-md shadow-blue-500/20">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1D4ED8] to-[#2563EB] text-white flex items-center justify-center font-heading font-black text-xs shadow-xs">
                       {st.step}
                     </div>
-                    <h3 className="font-heading font-bold text-base text-foreground leading-snug">
+                    <h3 className="font-heading font-bold text-xs sm:text-[13px] text-foreground leading-snug">
                       {st.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
+                    <p className="text-[11.5px] text-muted-foreground leading-relaxed">
                       {st.desc}
                     </p>
                   </div>
@@ -493,7 +769,7 @@ export function LandingPage() {
                   <div className="pt-6 mt-4 border-t border-border/60">
                     <Link
                       href={st.href}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-blue-700 transition-colors"
+                      className="inline-flex items-center gap-1.5 text-[11px] font-bold text-primary hover:text-blue-700 transition-colors"
                     >
                       <span>{st.actionText}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -510,13 +786,13 @@ export function LandingPage() {
             ==================================================== */}
         <section id="tinh-nang" className="py-16 md:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-primary">
+            <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
               TÍNH NĂNG NỔI BẬT
             </span>
-            <h2 className="font-heading text-2xl sm:text-4xl font-extrabold text-foreground">
+            <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
               Trải nghiệm luyện thi cùng <span className="text-primary">APTIS ESOL PREMIER</span>
             </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-[11.5px] text-muted-foreground">
               Mọi công cụ bạn cần để đạt band mục tiêu, gói gọn trên một nền tảng thông minh duy nhất.
             </p>
           </div>
@@ -524,14 +800,14 @@ export function LandingPage() {
           {/* Feature 01: Thi thử & AI chấm Speaking - Writing */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-lg">
             <div className="lg:col-span-6 space-y-5">
-              <span className="font-heading text-4xl font-black text-primary/30">01</span>
-              <h3 className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground">
+              <span className="font-heading text-base font-black text-primary/30">01</span>
+              <h3 className="font-heading text-base sm:text-lg font-bold text-foreground">
                 Thi thử & AI chấm Speaking – Writing
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
                 Làm bài mô phỏng đề thật, AI thông minh chấm cả Speaking & Writing — trả điểm số, band CEFR và phân tích chi tiết từng lỗi sai ngay sau khi nộp.
               </p>
-              <div className="space-y-3 text-xs sm:text-sm text-foreground pt-2">
+              <div className="space-y-2.5 text-xs text-foreground pt-2">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                   <span><strong>Chấm theo 4 tiêu chí CEFR:</strong> Task Fulfillment, Grammar, Vocab, Cohesion.</span>
@@ -609,14 +885,14 @@ export function LandingPage() {
             </div>
 
             <div className="lg:col-span-6 order-1 lg:order-2 space-y-5">
-              <span className="font-heading text-4xl font-black text-primary/30">02</span>
-              <h3 className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground">
+              <span className="font-heading text-base font-black text-primary/30">02</span>
+              <h3 className="font-heading text-base sm:text-lg font-bold text-foreground">
                 Luyện theo kỹ năng sát đề thi thật
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
                 5 kỹ năng riêng biệt với đúng thao tác bài thi: kéo thả (drag & drop), dropdown inline, bấm giờ. Luyện từng phần nhỏ hoặc trọn bộ như thi thật.
               </p>
-              <div className="space-y-3 text-xs sm:text-sm text-foreground pt-2">
+              <div className="space-y-2.5 text-xs text-foreground pt-2">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                   <span><strong>Kéo thả & dropdown y hệt máy thi:</strong> Làm quen thao tác trước ngày thi.</span>
@@ -645,14 +921,14 @@ export function LandingPage() {
           {/* Feature 03: Theo dõi tiến độ & Giữ streak */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-lg">
             <div className="lg:col-span-6 space-y-5">
-              <span className="font-heading text-4xl font-black text-primary/30">03</span>
-              <h3 className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground">
+              <span className="font-heading text-base font-black text-primary/30">03</span>
+              <h3 className="font-heading text-base sm:text-lg font-bold text-foreground">
                 Theo dõi tiến độ & giữ streak
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
                 Xem band tăng theo từng kỹ năng, biểu đồ tiến bộ theo thời gian thực và giữ chuỗi streak học tập để duy trì thói quen mỗi ngày.
               </p>
-              <div className="space-y-3 text-xs sm:text-sm text-foreground pt-2">
+              <div className="space-y-2.5 text-xs text-foreground pt-2">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                   <span><strong>Biểu đồ tiến bộ từng kỹ năng:</strong> Nhìn thấy sự bứt phá từ B1 lên B2.</span>
@@ -678,7 +954,7 @@ export function LandingPage() {
               <div className="flex items-center justify-between pb-3 border-b border-border/80 text-xs">
                 <div>
                   <span className="text-[11px] text-muted-foreground block">Tiến độ tuần này</span>
-                  <span className="font-heading font-black text-lg text-foreground">B1 → B2</span>
+                  <span className="font-heading font-black text-base text-foreground">B1 → B2</span>
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 font-bold text-xs">
                   <Flame className="w-3.5 h-3.5 fill-amber-500" />
@@ -709,13 +985,13 @@ export function LandingPage() {
         <section className="py-16 md:py-24 bg-muted/20 border-y border-border">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <span className="text-xs font-bold uppercase tracking-widest text-primary">
+              <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
                 ĐIỂM MẠNH VƯỢT TRỘI
               </span>
-              <h2 className="font-heading text-2xl sm:text-4xl font-extrabold text-foreground">
+              <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
                 Vì sao chọn <span className="text-primary">APTIS ESOL PREMIER</span>?
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-[11.5px] text-muted-foreground">
                 Được tin tưởng bởi hàng nghìn sinh viên các trường đại học hàng đầu trên toàn quốc.
               </p>
             </div>
@@ -731,8 +1007,8 @@ export function LandingPage() {
                     <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <h3 className="font-heading font-bold text-base text-foreground">{w.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{w.desc}</p>
+                    <h3 className="font-heading font-bold text-xs sm:text-[13px] text-foreground">{w.title}</h3>
+                    <p className="text-[11.5px] text-muted-foreground leading-relaxed">{w.desc}</p>
                   </div>
                 );
               })}
@@ -745,13 +1021,13 @@ export function LandingPage() {
             ==================================================== */}
         <section className="py-16 md:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-primary">
+            <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
               CÔNG CỤ ÔN TẬP TOÀN DIỆN
             </span>
-            <h2 className="font-heading text-2xl sm:text-4xl font-extrabold text-foreground">
+            <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
               Hệ sinh thái công cụ hỗ trợ <span className="text-primary">toàn diện</span>
             </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-[11.5px] text-muted-foreground">
               Đầy đủ mọi tiện ích từ nghe chép chính tả, flashcard từ vựng cho đến bộ đề dự đoán sát lịch thi.
             </p>
           </div>
@@ -765,7 +1041,7 @@ export function LandingPage() {
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-heading font-bold text-base text-foreground group-hover:text-primary transition-colors">
+                    <span className="font-heading font-bold text-xs sm:text-[13px] text-foreground group-hover:text-primary transition-colors">
                       {t.title}
                     </span>
                     <span
@@ -774,7 +1050,7 @@ export function LandingPage() {
                       {t.tag}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{t.desc}</p>
+                  <p className="text-[11.5px] text-muted-foreground leading-relaxed">{t.desc}</p>
                 </div>
                 <div className="pt-4 mt-4 border-t border-border/60 flex items-center gap-1 text-xs font-bold text-primary group-hover:translate-x-1 transition-transform">
                   <span>Trải nghiệm ngay</span>
@@ -791,13 +1067,13 @@ export function LandingPage() {
         <section className="py-16 md:py-24 bg-muted/20 border-y border-border">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <span className="text-xs font-bold uppercase tracking-widest text-primary">
+              <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
                 KẾT QUẢ THỰC TẾ
               </span>
-              <h2 className="font-heading text-2xl sm:text-4xl font-extrabold text-foreground">
+              <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
                 Feedback từ <span className="text-primary">thí sinh đã đạt chứng chỉ</span>
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-[11.5px] text-muted-foreground">
                 Hàng nghìn học viên đã đạt chuẩn đầu ra B1, B2 và C1 ngay trong lần thi đầu tiên.
               </p>
             </div>
@@ -811,7 +1087,7 @@ export function LandingPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-bold text-sm text-foreground">{f.name}</h3>
+                        <h3 className="font-semibold text-xs text-foreground">{f.name}</h3>
                         <p className="text-[11px] text-muted-foreground">{f.school}</p>
                       </div>
                       <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 font-extrabold text-xs">
@@ -825,7 +1101,7 @@ export function LandingPage() {
                       ))}
                     </div>
 
-                    <p className="text-xs text-foreground/90 leading-relaxed italic">
+                    <p className="text-[11.5px] text-foreground/90 leading-relaxed italic">
                       "{f.text}"
                     </p>
                   </div>
@@ -844,13 +1120,13 @@ export function LandingPage() {
             ==================================================== */}
         <section className="py-16 md:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-primary">
+            <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
               BẢNG GIÁ ƯU ĐÃI
             </span>
-            <h2 className="font-heading text-2xl sm:text-4xl font-extrabold text-foreground">
+            <h2 className="font-heading text-lg sm:text-2xl font-extrabold text-foreground">
               Đầu tư một lần — <span className="text-primary">Đỗ Aptis chắc chắn</span>
             </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Chọn gói học phù hợp với quỹ thời gian và mục tiêu điểm số của bạn.
             </p>
           </div>
@@ -862,7 +1138,7 @@ export function LandingPage() {
                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-muted text-muted-foreground inline-block">
                   GÓI TRẢI NGHIỆM
                 </span>
-                <div className="font-heading text-3xl font-extrabold text-foreground">
+                <div className="font-heading text-2xl font-extrabold text-foreground">
                   0đ <span className="text-xs font-normal text-muted-foreground">/ Miễn phí</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -894,8 +1170,15 @@ export function LandingPage() {
 
             {/* Pro Tier (Featured) */}
             <div className="relative p-8 rounded-3xl border-2 border-primary bg-gradient-to-b from-primary/5 via-card to-card shadow-xl flex flex-col justify-between space-y-6">
-              <div className="absolute -top-3.5 right-6 px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold text-[10px] uppercase tracking-wider shadow-sm">
-                KHUYÊN DÙNG
+              <div
+                className="absolute -top-3.5 right-6 px-3 py-0.5 rounded-full text-white font-extrabold text-[10px] uppercase tracking-wider shadow-sm"
+                style={{
+                  background: config.enabled
+                    ? `linear-gradient(90deg, ${config.primaryColor}, ${config.accentColor || config.primaryColor})`
+                    : "linear-gradient(to right, #F59E0B, #EA580C)",
+                }}
+              >
+                {config.enabled ? `${config.icon} ƯU ĐÃI ${config.badge.toUpperCase()}` : "KHUYÊN DÙNG"}
               </div>
 
               <div className="space-y-4">
@@ -903,7 +1186,7 @@ export function LandingPage() {
                   <Crown className="w-3.5 h-3.5" />
                   GÓI VIP PRO TRỌN GÓI
                 </span>
-                <div className="font-heading text-3xl font-extrabold text-foreground">
+                <div className="font-heading text-2xl font-extrabold text-foreground">
                   199.000đ{" "}
                   <span className="text-xs font-normal line-through text-muted-foreground">
                     499.000đ
@@ -929,6 +1212,21 @@ export function LandingPage() {
                     <Check className="w-4 h-4 text-primary font-bold shrink-0" />
                     <span>Hỗ trợ giải đáp thắc mắc 24/7 từ đội ngũ Admin</span>
                   </div>
+
+                  {config.enabled && (
+                    <div
+                      className="flex items-center gap-2 p-2 rounded-xl text-xs font-semibold animate-in fade-in"
+                      style={{
+                        backgroundColor: `${config.primaryColor}15`,
+                        color: config.primaryColor,
+                      }}
+                    >
+                      <span className="text-base">{config.icon}</span>
+                      <span>
+                        <strong>Đặc quyền {config.name}:</strong> Nhân đôi quyền lợi chấm AI & quà tặng
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -948,10 +1246,10 @@ export function LandingPage() {
         <section className="py-16 md:py-24 bg-muted/20 border-t border-border">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             <div className="text-center space-y-3">
-              <span className="text-xs font-bold uppercase tracking-widest text-primary">
+              <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
                 HỎI ĐÁP THẮC MẮC
               </span>
-              <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground">
+              <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
                 Câu hỏi thường gặp
               </h2>
             </div>
@@ -967,7 +1265,7 @@ export function LandingPage() {
                     <button
                       type="button"
                       onClick={() => toggleFaq(idx)}
-                      className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-heading font-bold text-sm text-foreground hover:text-primary transition-colors"
+                      className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-heading font-semibold text-xs sm:text-sm text-foreground hover:text-primary transition-colors"
                     >
                       <span>{faq.q}</span>
                       <ChevronDown
@@ -1000,13 +1298,13 @@ export function LandingPage() {
             />
 
             <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-blue-200 bg-white/10 px-3 py-1 rounded-full inline-block">
+              <span className="text-[10.5px] font-bold uppercase tracking-widest text-blue-200 bg-white/10 px-2.5 py-0.5 rounded-full inline-block">
                 CHINH PHỤC CHỨNG CHỈ TIẾNG ANH
               </span>
-              <h2 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+              <h2 className="font-heading text-lg sm:text-2xl font-extrabold tracking-tight leading-snug">
                 Sẵn sàng đạt B1 & B2 Aptis ESOL ngay hôm nay?
               </h2>
-              <p className="text-xs sm:text-sm text-blue-100 leading-relaxed font-normal">
+              <p className="text-xs sm:text-[13px] text-blue-100/90 leading-relaxed font-normal">
                 Bắt đầu với bài thi thử miễn phí, nhận band điểm AI chuẩn xác và trải nghiệm cảm giác làm bài như trong phòng thi thật.
               </p>
             </div>
@@ -1014,14 +1312,14 @@ export function LandingPage() {
             <div className="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               <Link
                 href="/thi-thu"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-white text-blue-700 font-extrabold text-sm sm:text-base shadow-xl hover:bg-blue-50 active:scale-95 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3 rounded-xl bg-white text-blue-700 font-bold text-xs sm:text-sm shadow-lg hover:bg-blue-50 active:scale-95 transition-all"
               >
                 <Zap className="w-4 h-4 fill-blue-700" />
                 <span>Bắt đầu thi thử miễn phí</span>
               </Link>
               <Link
                 href="/pricing"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold text-sm sm:text-base backdrop-blur-md active:scale-95 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold text-xs sm:text-sm backdrop-blur-md active:scale-95 transition-all"
               >
                 <span>Xem các gói VIP PRO</span>
               </Link>

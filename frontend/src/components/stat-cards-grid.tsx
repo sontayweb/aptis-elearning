@@ -115,7 +115,7 @@ export function StatCardsGrid({
           <div className="text-[11px] text-muted-foreground truncate">Mở khóa toàn bộ</div>
           <button
             type="button"
-            className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] px-2.5 py-0.5 text-[11px] font-bold text-white shadow-sm shadow-blue-500/20 hover:brightness-110"
+            className="mt-1.5 inline-flex items-center gap-1 rounded-full btn-brand-gradient px-2.5 py-0.5 text-[11px] font-bold text-white shadow-xs"
           >
             <Crown className="w-3 h-3" />
             <span>Nâng cấp</span>

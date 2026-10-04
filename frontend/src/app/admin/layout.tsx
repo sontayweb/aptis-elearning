@@ -67,10 +67,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
 
-  // Modals
+  // Modals & Popovers
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [sidebarProfileOpen, setSidebarProfileOpen] = useState(false);
 
   // Pending transactions for real-time badge
   const [pendingTxCount, setPendingTxCount] = useState(0);
@@ -133,8 +135,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           title: "Giao dịch SePay",
           href: "/admin/transactions",
           icon: CreditCard,
-          badge: pendingTxCount > 0 ? `${pendingTxCount} cần duyệt` : null,
-          badgeColor: "bg-primary text-white shadow-glow-red animate-pulse",
+          badge: pendingTxCount > 0 ? String(pendingTxCount) : null,
+          badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono font-bold",
         },
       ],
     },
@@ -168,8 +170,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           title: "Phân quyền (RBAC)",
           href: "/admin/permissions",
           icon: ShieldCheck,
-          badge: "Mới",
-          badgeColor: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+          badge: null,
         },
         {
           title: "Gói cước VIP",
@@ -181,15 +182,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           title: "Nhật ký Audit",
           href: "/admin/audit-logs",
           icon: History,
-          badge: "Audit",
-          badgeColor: "bg-purple-500/20 text-purple-300 border border-purple-500/30",
+          badge: null,
         },
         {
           title: "Sự kiện & Giao diện",
           href: "/admin/events",
           icon: Sparkles,
-          badge: "Theme",
-          badgeColor: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
+          badge: null,
         },
       ],
     },
@@ -236,21 +235,25 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           <div className="space-y-2 pt-2 border-t border-slate-100">
-            <button
-              onClick={() => quickLogin("super_admin")}
-              className="w-full py-2.5 px-4 bg-gradient-to-r from-rose-600 to-amber-600 hover:brightness-110 text-white font-heading font-semibold rounded-xl transition-all flex items-center justify-center gap-2 text-xs shadow-md"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Đăng nhập Tổng Quản Trị (Super Admin)</span>
-            </button>
+            {process.env.NODE_ENV !== "production" && (
+              <>
+                <button
+                  onClick={() => quickLogin("super_admin")}
+                  className="w-full py-2.5 px-4 bg-gradient-to-r from-rose-600 to-amber-600 hover:brightness-110 text-white font-heading font-semibold rounded-xl transition-all flex items-center justify-center gap-2 text-xs shadow-md"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>[DEV] Đăng nhập Tổng Quản Trị (Super Admin)</span>
+                </button>
 
-            <button
-              onClick={() => quickLogin("admin")}
-              className="w-full py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-xs shadow-xs"
-            >
-              <LogIn className="w-4 h-4" />
-              <span>Đăng nhập Quản Trị Học Vụ (Admin)</span>
-            </button>
+                <button
+                  onClick={() => quickLogin("admin")}
+                  className="w-full py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white font-heading font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-xs shadow-xs"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>[DEV] Đăng nhập Quản Trị Học Vụ (Admin)</span>
+                </button>
+              </>
+            )}
 
             <Link
               href="/dashboard"
@@ -442,61 +445,97 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           ))}
         </nav>
 
-        {/* Footer Profile & Quick Portal Jump */}
-        <div id="tour-profile-footer" className="p-3 border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2 shrink-0">
-          {!isCollapsed ? (
-            <>
-              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm">
-                  {user?.full_name?.charAt(0) || "A"}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-slate-900 dark:text-white truncate">
-                      {user?.full_name || "Quản trị viên"}
-                    </span>
-                    <span className={`text-[9px] font-mono px-1 py-0.2 rounded font-bold ${
-                      isSuperAdmin ? "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400" : "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400"
-                    }`}>
-                      {isSuperAdmin ? "SUPER ADMIN" : "ADMIN"}
-                    </span>
+        {/* Footer Profile with Neat Popover Menu (Guideline 6) */}
+        <div id="tour-profile-footer" className="p-3 pb-4 border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 relative">
+          {/* Trigger: Avatar + Name only */}
+          <button
+            type="button"
+            onClick={() => setSidebarProfileOpen(!sidebarProfileOpen)}
+            className={`w-full flex items-center ${
+              isCollapsed ? "justify-center p-1" : "justify-between p-2"
+            } rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left group`}
+            title={isCollapsed ? user?.full_name || "Quản trị viên" : undefined}
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                {user?.full_name?.charAt(0) || "A"}
+              </div>
+              {!isCollapsed && (
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                    {user?.full_name || "Quản trị viên"}
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">{user?.email}</div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono truncate">
+                    {isSuperAdmin ? "Super Admin" : "Admin"}
+                  </div>
+                </div>
+              )}
+            </div>
+            {!isCollapsed && (
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                  sidebarProfileOpen ? "rotate-180" : ""
+                }`}
+              />
+            )}
+          </button>
+
+          {/* Popover Menu */}
+          {sidebarProfileOpen && (
+            <div
+              onClick={() => setSidebarProfileOpen(false)}
+              className={`absolute ${
+                isCollapsed ? "left-16 bottom-2 w-56" : "bottom-full left-3 right-3 mb-2"
+              } rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-50 text-xs animate-in fade-in slide-in-from-bottom-2`}
+            >
+              <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-heading font-bold text-slate-900 dark:text-white truncate">
+                    {user?.full_name}
+                  </span>
+                  <span
+                    className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                      isSuperAdmin
+                        ? "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400"
+                        : "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400"
+                    }`}
+                  >
+                    {isSuperAdmin ? "SUPER ADMIN" : "ADMIN"}
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono mt-0.5">
+                  {user?.email}
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              <div className="space-y-0.5">
                 <Link
                   href="/dashboard"
-                  className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-200/80 dark:border-slate-700 shadow-2xs"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                  <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
                   <span>Portal Học viên</span>
                 </Link>
+
                 <button
-                  onClick={logout}
-                  title="Đăng xuất"
-                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors border border-slate-200/80 dark:border-slate-700"
+                  type="button"
+                  onClick={() => setTutorialOpen(true)}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <Sparkles className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Hướng dẫn vận hành</span>
                 </button>
               </div>
-            </>
-          ) : (
-            <div className="flex flex-col items-center gap-2">
-              <Link
-                href="/dashboard"
-                title="Về Portal Học viên"
-                className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-200/80 dark:border-slate-700"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Link>
+
+              <div className="h-px bg-slate-100 dark:border-slate-800 my-1" />
+
               <button
+                type="button"
                 onClick={logout}
-                title="Đăng xuất"
-                className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors border border-slate-200/80 dark:border-slate-700"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors font-medium text-left"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Đăng xuất</span>
               </button>
             </div>
           )}
@@ -509,7 +548,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           isCollapsed ? "lg:pl-20" : "lg:pl-68"
         }`}
       >
-        {/* Apple/Stripe Clean Header */}
+        {/* Clean Executive Header (Guideline 1) */}
         <header className="h-16 px-5 sm:px-8 border-b border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between gap-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.02)]">
           <div className="flex items-center gap-3">
             <button
@@ -529,7 +568,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </div>
           </div>
 
-          {/* Action Tools */}
+          {/* Action Tools: Search, Theme Toggle, Notification Popover, Status Pill, Avatar */}
           <div className="flex items-center gap-2.5">
             {/* Quick Command Search (Ctrl + K) */}
             <button
@@ -559,28 +598,67 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               )}
             </button>
 
-            {/* Tutorial Walkthrough Launcher */}
-            <button
-              id="tour-tutorial-btn"
-              onClick={() => setTutorialOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold transition-all shadow-2xs"
-              title="Mở hướng dẫn vận hành hệ thống"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-rose-500" />
-              <span className="hidden sm:inline">Hướng dẫn</span>
-            </button>
-
-            {/* Pending Transactions Alert Badge */}
-            {pendingTxCount > 0 && (
-              <Link
-                href="/admin/transactions"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 text-xs font-heading font-bold transition-all shadow-2xs"
-                title={`${pendingTxCount} đơn hàng SePay cần khớp lệnh`}
+            {/* Notifications Popover (Guideline 1: Popovers only) */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setNotificationsOpen(!notificationsOpen)}
+                className="relative flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors shadow-2xs"
+                title="Thông báo hệ thống"
+                aria-label="Thông báo hệ thống"
               >
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                <span>{pendingTxCount} đơn chờ</span>
-              </Link>
-            )}
+                <Bell className="w-4 h-4" />
+                {pendingTxCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
+                )}
+              </button>
+
+              {notificationsOpen && (
+                <div
+                  onClick={() => setNotificationsOpen(false)}
+                  className="absolute right-0 mt-2 w-80 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-3 z-50 text-xs animate-in fade-in zoom-in-95"
+                >
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-2">
+                    <span className="font-heading font-bold text-slate-900 dark:text-white">
+                      Thông báo vận hành
+                    </span>
+                    {pendingTxCount > 0 && (
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                        {pendingTxCount} cần xử lý
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    {pendingTxCount > 0 ? (
+                      <Link
+                        href="/admin/transactions"
+                        className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-2.5 hover:bg-amber-500/15 transition-colors block"
+                      >
+                        <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                        <div>
+                          <div className="font-semibold text-amber-900 dark:text-amber-300">
+                            {pendingTxCount} đơn nạp SePay đang chờ duyệt
+                          </div>
+                          <div className="text-[11px] text-amber-700/80 dark:text-amber-400/80 mt-0.5">
+                            Bấm để mở trang giao dịch và khớp lệnh thủ công
+                          </div>
+                        </div>
+                      </Link>
+                    ) : (
+                      <div className="p-3 text-center text-slate-400">
+                        Không có đơn hàng nào tồn đọng
+                      </div>
+                    )}
+
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800 flex items-center gap-2.5 text-slate-600 dark:text-slate-300">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="text-[11px]">MB Bank VietQR Webhook đang lắng nghe 24/7</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Realtime Status Pill */}
             <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-[11px] font-medium font-mono">
@@ -666,8 +744,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
         </header>
 
-        {/* Page Inner Container */}
-        <main className="admin-main flex-1 p-5 sm:p-8 max-w-7xl w-full mx-auto">{children}</main>
+        {/* Page Inner Container (Flexible wide screen layout per Guideline 4) */}
+        <main className="admin-main flex-1 p-5 sm:p-8 w-full max-w-[1680px] mx-auto">{children}</main>
       </div>
     </div>
   );

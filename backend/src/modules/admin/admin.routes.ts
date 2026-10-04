@@ -71,9 +71,12 @@ router.post('/transactions/:id/resolve', (req, res, next) =>
 router.get('/plans', (req, res, next) => adminController.listPlans(req, res, next));
 router.patch('/plans/:id', (req, res, next) => adminController.updatePlan(req, res, next));
 
-// Thống kê Dashboard KPIs
+// Thống kê Dashboard KPIs & Xuất báo cáo
 router.get('/dashboard/stats', (req, res, next) =>
   adminController.getDashboardKPIs(req, res, next)
+);
+router.get('/dashboard/export', (req, res, next) =>
+  adminController.exportDashboardReport(req, res, next)
 );
 
 export default router;

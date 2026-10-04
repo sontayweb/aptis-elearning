@@ -184,8 +184,30 @@ export class AdminController {
 
   async getDashboardKPIs(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const kpis = await adminService.getDashboardKPIs();
+      const period = req.query.period as string | undefined;
+      const fromDate = req.query.fromDate as string | undefined;
+      const toDate = req.query.toDate as string | undefined;
+      const kpis = await adminService.getDashboardKPIs({ period, fromDate, toDate });
       sendSuccess(res, kpis, 'Lấy chỉ số KPI Dashboard thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async exportDashboardReport(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const period = req.query.period as string | undefined;
+      const fromDate = req.query.fromDate as string | undefined;
+      const toDate = req.query.toDate as string | undefined;
+      const format = (req.query.format as string) || 'csv';
+
+      const csvContent = await adminService.exportDashboardReport({ period, fromDate, toDate, format });
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="bao-cao-aptis-${period || 'custom'}-${Date.now()}.csv"`
+      );
+      res.send(csvContent);
     } catch (error) {
       next(error);
     }

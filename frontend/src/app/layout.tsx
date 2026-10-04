@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 import { AuthProvider } from "@/contexts/auth-context";
 import { EventThemeProvider } from "@/contexts/event-theme-context";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
-import { EventAnnouncementBar, EventDecorations } from "@/components/event-decorations";
+import { EventDecorations } from "@/components/event-decorations";
 
 export default function RootLayout({
   children,
@@ -28,7 +28,6 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         <EventThemeProvider>
           <AuthProvider>
-            <EventAnnouncementBar />
             {children}
             <EventDecorations />
             <MobileBottomNav />

@@ -4,24 +4,24 @@ import { BookOpen, FileText, ArrowRight } from "lucide-react";
 const articles = [
   {
     title: "Hướng dẫn sử dụng APTIS ESOL PREMIER cho người mới",
-    date: "16-09",
-    href: "/meo-thi-aptis/huong-dan-hoc-tren-aptis-ky-tich-cho-nguoi-moi",
+    date: "Cập nhật",
+    href: "/meo-thi-aptis",
   },
   {
-    title: "Mẹo học Reading Aptis",
-    date: "09-07",
-    href: "/meo-thi-aptis/meo-hoc-reading-aptis",
+    title: "Mẹo học & Chiến thuật Reading Aptis đạt Band C",
+    date: "Chiến thuật",
+    href: "/meo-thi-aptis",
   },
   {
-    title: "Mẹo học Grammar Aptis",
-    date: "09-07",
-    href: "/meo-thi-aptis/meo-hoc-grammar-aptis",
+    title: "Mẹo làm bài Grammar & Vocabulary chuẩn British Council",
+    date: "Ngữ pháp",
+    href: "/meo-thi-aptis",
   },
 ];
 
 export function TipsSection() {
   return (
-    <div className="relative rounded-2xl border bg-card/80 backdrop-blur-sm shadow-md tech-card hover:border-primary/50 hover:shadow-glow-red p-6 border-accent/30">
+    <div className="relative rounded-2xl border bg-card/80 backdrop-blur-sm shadow-md tech-card hover:border-primary/50 hover:shadow-glow-soft p-6 border-accent/30">
       <div className="relative">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">

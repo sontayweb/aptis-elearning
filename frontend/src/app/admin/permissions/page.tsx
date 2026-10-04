@@ -620,28 +620,47 @@ export default function AdminPermissionsPage() {
   const grantedCount = activeRole.grantedIds.length;
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-5 pb-20">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5 border border-slate-700">
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 dark:bg-slate-800 text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5 border border-slate-700">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <span className="text-xs font-heading font-semibold">{toastMessage}</span>
         </div>
       )}
 
-      {/* 1. TOP HEADER (Đồng bộ chuẩn 100% với các trang Quản trị học viên / Đề thi) */}
+      {/* 1. TOP HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-semibold mb-1.5">
-            <ShieldCheck className="w-3 h-3 text-slate-600" />
-            <span>Role-Based Access Control Studio</span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
+            <ShieldCheck className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+            <span>Role-Based Access Control Studio (RBAC)</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
-            Phân Quyền Vai Trò
+          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <span>Phân Quyền Vai Trò & Chức Năng</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
             Chọn nhóm chức vụ và chuyển quyền giữa hai cột: Kho quyền khả dụng ➔ Thẩm quyền đã cấp
           </p>
+
+          {/* Quick Metrics Chips */}
+          <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
+            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
+              Chỉ số:
+            </span>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <ShieldCheck className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+              <span>Nhóm: <strong className="text-slate-900 dark:text-white font-mono">{roles.length}</strong> vai trò</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <Lock className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+              <span>Tổng quyền: <strong className="text-slate-900 dark:text-white font-mono">{ALL_PERMISSIONS.length}</strong></span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
+              <span>Đang chọn: <strong className="text-slate-900 dark:text-white">{activeRole.title}</strong> (<span className="text-blue-600 dark:text-blue-400 font-mono font-bold">{grantedCount}</span> đã cấp)</span>
+            </div>
+          </div>
         </div>
 
         {/* Top Action Buttons */}
@@ -649,7 +668,7 @@ export default function AdminPermissionsPage() {
           <button
             type="button"
             onClick={handleResetDefaults}
-            className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
             title="Đặt lại về phân quyền tiêu chuẩn"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -660,7 +679,7 @@ export default function AdminPermissionsPage() {
             type="button"
             onClick={handleSaveConfig}
             disabled={isSaving}
-            className="tech-btn px-5 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             <Save className="w-3.5 h-3.5" />
             <span>{isSaving ? "Đang lưu..." : "Lưu thay đổi"}</span>
@@ -668,7 +687,7 @@ export default function AdminPermissionsPage() {
         </div>
       </div>
 
-      {/* 2. TOOLBAR CHỌN VAI TRÒ & CHUYÊN MỤC (Thanh ngang gọn gàng, giống hệt trang admin/users) */}
+      {/* 2. TOOLBAR CHỌN VAI TRÒ & CHUYÊN MỤC */}
       <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
         {/* Role Tabs */}
         <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-x-auto w-full md:w-auto">
@@ -705,13 +724,13 @@ export default function AdminPermissionsPage() {
 
         {/* Category Filter Dropdown */}
         <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-          <span className="text-xs font-heading font-semibold text-slate-400 whitespace-nowrap hidden sm:inline">
+          <span className="text-xs font-heading font-semibold text-slate-400 dark:text-slate-500 whitespace-nowrap hidden sm:inline">
             Lọc chuyên mục:
           </span>
           <select
             value={activeCategory}
             onChange={(e) => setActiveCategory(e.target.value)}
-            className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-heading font-medium text-slate-700 focus:outline-none focus:bg-white cursor-pointer"
+            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-heading font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-slate-700 cursor-pointer"
           >
             <option value="ALL">Tất cả chuyên mục ({ALL_PERMISSIONS.length})</option>
             <option value="EXAM">Đề Thi & Khảo Thí (5)</option>
@@ -724,17 +743,17 @@ export default function AdminPermissionsPage() {
         </div>
       </div>
 
-      {/* 3. MẪU 1: HAI CỘT CHUYỂN QUYỀN SANG BÊN (DUAL TRANSFER BOX) */}
+      {/* 3. HAI CỘT CHUYỂN QUYỀN SANG BÊN (DUAL TRANSFER BOX) */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_64px_1fr] gap-3 items-center">
         {/* === CỘT TRÁI: KHO QUYỀN CÓ SẴN (CHƯA CẤP) === */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden flex flex-col h-[520px]">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden flex flex-col h-[520px]">
           {/* Header Cột Trái */}
-          <div className="px-4 py-3 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between">
+          <div className="px-4 py-3 bg-slate-50/80 dark:bg-slate-800/70 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-heading font-bold text-xs sm:text-sm text-slate-800">
+              <span className="font-heading font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200">
                 Kho quyền có sẵn (Chưa cấp)
               </span>
-              <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-600">
+              <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                 {filteredLeft.length} mục
               </span>
             </div>
@@ -743,7 +762,7 @@ export default function AdminPermissionsPage() {
               type="button"
               onClick={handleSelectAllLeft}
               disabled={filteredLeft.length === 0 || isSuperAdmin}
-              className="text-xs font-heading font-semibold text-primary hover:underline cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-xs font-heading font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {selectedLeftIds.length === filteredLeft.length && filteredLeft.length > 0
                 ? "Bỏ chọn"
@@ -752,21 +771,21 @@ export default function AdminPermissionsPage() {
           </div>
 
           {/* Search Box Cột Trái */}
-          <div className="p-2 border-b border-slate-100 bg-white">
+          <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 type="text"
                 value={leftSearch}
                 onChange={(e) => setLeftSearch(e.target.value)}
                 placeholder="Tìm nhanh quyền chưa cấp..."
-                className="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white"
+                className="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/70 text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800"
               />
               {leftSearch && (
                 <button
                   type="button"
                   onClick={() => setLeftSearch("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -777,19 +796,19 @@ export default function AdminPermissionsPage() {
           {/* List Cột Trái */}
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
             {isSuperAdmin ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-500">
                 <Crown className="w-8 h-8 text-amber-500 mb-2 opacity-80" />
-                <p className="text-xs font-heading font-bold text-slate-700">
+                <p className="text-xs font-heading font-bold text-slate-700 dark:text-slate-300">
                   Chủ Trung Tâm giữ 100% toàn quyền
                 </p>
-                <p className="text-[11px] text-slate-400 mt-1 max-w-xs">
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 max-w-xs">
                   Không còn quyền nào chưa cấp cho vai trò này.
                 </p>
               </div>
             ) : filteredLeft.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
-                <CheckCircle2 className="w-7 h-7 text-emerald-400 mb-2" />
-                <p className="text-xs font-heading font-semibold text-slate-600">
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-500">
+                <CheckCircle2 className="w-7 h-7 text-emerald-500 mb-2" />
+                <p className="text-xs font-heading font-semibold text-slate-600 dark:text-slate-300">
                   {leftSearch ? "Không tìm thấy quyền phù hợp" : "Đã cấp toàn bộ quyền trong danh mục này"}
                 </p>
               </div>
@@ -804,35 +823,35 @@ export default function AdminPermissionsPage() {
                     onDoubleClick={() => handleDoubleClickLeft(p.id)}
                     className={`px-3 py-2 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 select-none ${
                       isSelected
-                        ? "bg-blue-50/80 border-blue-200 text-blue-900 shadow-2xs font-semibold"
-                        : "bg-white hover:bg-slate-50/80 border-slate-200/60 text-slate-700"
+                        ? "bg-blue-50/80 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200 shadow-2xs font-semibold"
+                        : "bg-white dark:bg-slate-900 hover:bg-slate-50/80 dark:hover:bg-slate-800/60 border-slate-200/60 dark:border-slate-800/80 text-slate-700 dark:text-slate-300"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="shrink-0 text-slate-400">
+                      <div className="shrink-0 text-slate-400 dark:text-slate-500">
                         {isSelected ? (
-                          <CheckSquare className="w-4 h-4 text-primary" />
+                          <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                         ) : (
                           <Square className="w-4 h-4" />
                         )}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-xs font-heading font-bold text-slate-800 truncate">
+                          <span className="text-xs font-heading font-bold text-slate-800 dark:text-slate-100 truncate">
                             {p.name}
                           </span>
-                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono">
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono">
                             {CATEGORY_NAMES[p.category]}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-400 truncate mt-0.5 font-normal">
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5 font-normal">
                           {p.description}
                         </p>
                       </div>
                     </div>
 
                     {p.isDangerous && (
-                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-50 text-rose-600 border border-rose-200 shrink-0">
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 shrink-0">
                         Nhạy cảm
                       </span>
                     )}
@@ -843,9 +862,9 @@ export default function AdminPermissionsPage() {
           </div>
 
           {/* Footer Cột Trái */}
-          <div className="px-3.5 py-2 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-            <span>Đã chọn: <strong className="text-slate-800 font-mono">{selectedLeftIds.length}</strong></span>
-            <span className="text-slate-400">Nhấp đúp để chuyển nhanh</span>
+          <div className="px-3.5 py-2 bg-slate-50/70 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            <span>Đã chọn: <strong className="text-slate-800 dark:text-slate-200 font-mono">{selectedLeftIds.length}</strong></span>
+            <span className="text-slate-400 dark:text-slate-500">Nhấp đúp để chuyển nhanh</span>
           </div>
         </div>
 
@@ -857,7 +876,7 @@ export default function AdminPermissionsPage() {
             onClick={handleMoveRight}
             disabled={selectedLeftIds.length === 0 || isSuperAdmin}
             title="Cấp quyền đã chọn sang bên phải"
-            className="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-primary hover:text-white hover:border-primary disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-slate-400 disabled:hover:border-slate-200 text-slate-700 shadow-2xs transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed group"
+            className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 hover:border-blue-600 disabled:opacity-30 disabled:hover:bg-white dark:disabled:hover:bg-slate-800 disabled:hover:text-slate-400 disabled:hover:border-slate-200 dark:disabled:hover:border-slate-700 text-slate-700 dark:text-slate-200 shadow-2xs transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed group"
           >
             <ChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
@@ -868,7 +887,7 @@ export default function AdminPermissionsPage() {
             onClick={handleMoveLeft}
             disabled={selectedRightIds.length === 0 || isSuperAdmin}
             title="Gỡ quyền đã chọn trả về bên trái"
-            className="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-rose-600 hover:text-white hover:border-rose-600 disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-slate-400 disabled:hover:border-slate-200 text-slate-700 shadow-2xs transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed group"
+            className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-rose-600 hover:text-white hover:border-rose-600 disabled:opacity-30 disabled:hover:bg-white dark:disabled:hover:bg-slate-800 disabled:hover:text-slate-400 disabled:hover:border-slate-200 dark:disabled:hover:border-slate-700 text-slate-700 dark:text-slate-200 shadow-2xs transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed group"
           >
             <ChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
@@ -879,7 +898,7 @@ export default function AdminPermissionsPage() {
             onClick={handleMoveAllRight}
             disabled={filteredLeft.length === 0 || isSuperAdmin}
             title="Cấp toàn bộ quyền hiển thị"
-            className="w-8 h-8 rounded-lg border border-slate-200 bg-slate-50 hover:bg-primary/10 hover:text-primary hover:border-primary/40 disabled:opacity-20 text-slate-500 transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
+            className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 disabled:opacity-20 text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
           >
             <ChevronsRight className="w-4 h-4" />
           </button>
@@ -890,21 +909,21 @@ export default function AdminPermissionsPage() {
             onClick={handleMoveAllLeft}
             disabled={filteredRight.length === 0 || isSuperAdmin}
             title="Gỡ toàn bộ quyền hiển thị"
-            className="w-8 h-8 rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 disabled:opacity-20 text-slate-500 transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
+            className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-700 disabled:opacity-20 text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
           >
             <ChevronsLeft className="w-4 h-4" />
           </button>
         </div>
 
         {/* === CỘT PHẢI: QUYỀN ĐÃ CẤP CHO VAI TRÒ NÀY === */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden flex flex-col h-[520px]">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden flex flex-col h-[520px]">
           {/* Header Cột Phải */}
-          <div className="px-4 py-3 bg-emerald-50/70 border-b border-emerald-100/80 flex items-center justify-between">
+          <div className="px-4 py-3 bg-emerald-50/70 dark:bg-emerald-950/30 border-b border-emerald-100/80 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-heading font-bold text-xs sm:text-sm text-emerald-950">
+              <span className="font-heading font-bold text-xs sm:text-sm text-emerald-950 dark:text-emerald-200">
                 Thẩm quyền ĐÃ CẤP ({activeRole.title})
               </span>
-              <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+              <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300">
                 {filteredRight.length} mục
               </span>
             </div>
@@ -913,7 +932,7 @@ export default function AdminPermissionsPage() {
               type="button"
               onClick={handleSelectAllRight}
               disabled={filteredRight.length === 0 || isSuperAdmin}
-              className="text-xs font-heading font-semibold text-emerald-700 hover:underline cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-xs font-heading font-semibold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {selectedRightIds.length === filteredRight.length && filteredRight.length > 0
                 ? "Bỏ chọn"
@@ -922,21 +941,21 @@ export default function AdminPermissionsPage() {
           </div>
 
           {/* Search Box Cột Phải */}
-          <div className="p-2 border-b border-slate-100 bg-white">
+          <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 type="text"
                 value={rightSearch}
                 onChange={(e) => setRightSearch(e.target.value)}
                 placeholder="Tìm nhanh quyền đã cấp..."
-                className="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white"
+                className="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/70 text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800"
               />
               {rightSearch && (
                 <button
                   type="button"
                   onClick={() => setRightSearch("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -947,12 +966,12 @@ export default function AdminPermissionsPage() {
           {/* List Cột Phải */}
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
             {filteredRight.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
-                <AlertCircle className="w-7 h-7 text-amber-400 mb-2" />
-                <p className="text-xs font-heading font-semibold text-slate-600">
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-500">
+                <AlertCircle className="w-7 h-7 text-amber-500 mb-2" />
+                <p className="text-xs font-heading font-semibold text-slate-600 dark:text-slate-300">
                   {rightSearch ? "Không tìm thấy quyền phù hợp" : "Chưa có quyền nào được cấp"}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-1 max-w-xs">
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 max-w-xs">
                   Chọn quyền ở cột trái và bấm nút [ ▶ ] để gán vào vai trò này.
                 </p>
               </div>
@@ -967,39 +986,39 @@ export default function AdminPermissionsPage() {
                     onDoubleClick={() => !isSuperAdmin && handleDoubleClickRight(p.id)}
                     className={`px-3 py-2 rounded-xl border transition-all flex items-center justify-between gap-3 select-none ${
                       isSuperAdmin
-                        ? "bg-slate-50/70 border-slate-200/60 text-slate-700 cursor-not-allowed"
+                        ? "bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-800 text-slate-700 dark:text-slate-300 cursor-not-allowed"
                         : isSelected
-                        ? "bg-rose-50/80 border-rose-200 text-rose-900 shadow-2xs font-semibold cursor-pointer"
-                        : "bg-white hover:bg-slate-50/80 border-slate-200/60 text-slate-700 cursor-pointer"
+                        ? "bg-rose-50/80 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200 shadow-2xs font-semibold cursor-pointer"
+                        : "bg-white dark:bg-slate-900 hover:bg-slate-50/80 dark:hover:bg-slate-800/60 border-slate-200/60 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 cursor-pointer"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="shrink-0 text-slate-400">
+                      <div className="shrink-0 text-slate-400 dark:text-slate-500">
                         {isSuperAdmin ? (
                           <Lock className="w-4 h-4 text-rose-500" />
                         ) : isSelected ? (
-                          <CheckSquare className="w-4 h-4 text-rose-600" />
+                          <CheckSquare className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                         ) : (
                           <Square className="w-4 h-4" />
                         )}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-xs font-heading font-bold text-slate-800 truncate">
+                          <span className="text-xs font-heading font-bold text-slate-800 dark:text-slate-100 truncate">
                             {p.name}
                           </span>
-                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono">
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono">
                             {CATEGORY_NAMES[p.category]}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-400 truncate mt-0.5 font-normal">
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5 font-normal">
                           {p.description}
                         </p>
                       </div>
                     </div>
 
                     {p.isDangerous && (
-                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-50 text-rose-600 border border-rose-200 shrink-0">
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 shrink-0">
                         Nhạy cảm
                       </span>
                     )}
@@ -1010,10 +1029,10 @@ export default function AdminPermissionsPage() {
           </div>
 
           {/* Footer Cột Phải */}
-          <div className="px-3.5 py-2 bg-emerald-50/40 border-t border-emerald-100/60 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-            <span>Đã chọn: <strong className="text-slate-800 font-mono">{selectedRightIds.length}</strong></span>
+          <div className="px-3.5 py-2 bg-emerald-50/40 dark:bg-emerald-950/20 border-t border-emerald-100/60 dark:border-emerald-900/30 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            <span>Đã chọn: <strong className="text-slate-800 dark:text-slate-200 font-mono">{selectedRightIds.length}</strong></span>
             {selectedRightIds.length > 0 && !isSuperAdmin && (
-              <span className="text-rose-600 font-semibold">Sẵn sàng gỡ ◀</span>
+              <span className="text-rose-600 dark:text-rose-400 font-semibold">Sẵn sàng gỡ ◀</span>
             )}
           </div>
         </div>
@@ -1021,14 +1040,14 @@ export default function AdminPermissionsPage() {
 
       {/* 4. FLOATING SAVE BAR (Hiện khi có thay đổi chưa lưu) */}
       {hasChanges && (
-        <div className="fixed bottom-6 inset-x-4 max-w-xl mx-auto z-50 p-3.5 rounded-2xl bg-slate-900 text-white shadow-2xl flex items-center justify-between gap-3 animate-in slide-in-from-bottom-4 duration-200 border border-slate-700">
+        <div className="fixed bottom-6 inset-x-4 max-w-xl mx-auto z-50 p-3.5 rounded-2xl bg-slate-900 dark:bg-slate-800 text-white shadow-2xl flex items-center justify-between gap-3 animate-in slide-in-from-bottom-4 duration-200 border border-slate-700">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
               <AlertCircle className="w-4 h-4" />
             </div>
             <div>
               <p className="text-xs font-heading font-bold text-white">Có thay đổi phân quyền chưa lưu</p>
-              <p className="text-[11px] text-slate-300">Nhấn Ctrl+S hoặc Lưu thay đổi để cập nhật</p>
+              <p className="text-[11px] text-slate-300 dark:text-slate-400">Nhấn Ctrl+S hoặc Lưu thay đổi để cập nhật</p>
             </div>
           </div>
 
@@ -1044,7 +1063,7 @@ export default function AdminPermissionsPage() {
               type="button"
               onClick={handleSaveConfig}
               disabled={isSaving}
-              className="tech-btn px-4 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5" />
               <span>{isSaving ? "Đang lưu..." : "Lưu ngay"}</span>
