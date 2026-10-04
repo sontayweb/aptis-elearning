@@ -49,7 +49,7 @@ export default function AboutPage() {
               <span>Tiên phong khảo thí Aptis ESOL trực tuyến tại Việt Nam</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-heading font-extrabold tracking-tight mb-6 leading-tight">
-              Giới thiệu về <span className="gradient-text">Aptis Kỳ Tích</span>
+              Giới thiệu về <span className="brand-name-aptis">APTIS</span> <span className="brand-name-esol">ESOL</span> <span className="brand-name-premier">PREMIER</span>
             </h1>
             <p className="text-base md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8">
               {pageData?.content ||

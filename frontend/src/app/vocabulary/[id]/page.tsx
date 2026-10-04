@@ -538,7 +538,7 @@ export default function VocabularyDetailPage() {
         {/* Dynamic Progress line */}
         <div className="w-full h-1 bg-muted/50">
           <div
-            className="h-full bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] transition-all duration-300"
+            className="h-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] transition-all duration-300"
             style={{
               width:
                 mode === "browse"
@@ -559,7 +559,7 @@ export default function VocabularyDetailPage() {
             onClick={() => setMode("browse")}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
               mode === "browse"
-                ? "bg-[#CC1C01] text-white shadow-sm"
+                ? "bg-primary text-white shadow-sm shadow-blue-500/20"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
             }`}
           >
@@ -572,7 +572,7 @@ export default function VocabularyDetailPage() {
             onClick={() => setMode("flashcard")}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
               mode === "flashcard"
-                ? "bg-[#CC1C01] text-white shadow-sm"
+                ? "bg-primary text-white shadow-sm shadow-blue-500/20"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
             }`}
           >
@@ -585,7 +585,7 @@ export default function VocabularyDetailPage() {
             onClick={() => setMode("quiz")}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
               mode === "quiz"
-                ? "bg-[#CC1C01] text-white shadow-sm"
+                ? "bg-primary text-white shadow-sm shadow-blue-500/20"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
             }`}
           >
@@ -598,7 +598,7 @@ export default function VocabularyDetailPage() {
             onClick={() => setMode("matching")}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
               mode === "matching"
-                ? "bg-[#CC1C01] text-white shadow-sm"
+                ? "bg-primary text-white shadow-sm shadow-blue-500/20"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
             }`}
           >
@@ -640,7 +640,7 @@ export default function VocabularyDetailPage() {
                 <button
                   type="button"
                   onClick={() => speak(currentWord.word, "en-US")}
-                  className="w-10 h-10 rounded-full border border-red-500/40 text-[#CC1C01] hover:bg-red-500/10 flex items-center justify-center transition-all shrink-0 hover:scale-105 active:scale-95 shadow-xs"
+                  className="w-10 h-10 rounded-full border border-blue-500/40 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 flex items-center justify-center transition-all shrink-0 hover:scale-105 active:scale-95 shadow-xs"
                   title="Phát âm tiếng Anh"
                 >
                   <Volume2 className="w-5 h-5" />

@@ -27,7 +27,7 @@ const skills = [
   { key: "grammar", label: "Grammar & Vocab", color: "hsl(8 99% 50%)", pct: 85 },
   { key: "reading", label: "Reading", color: "hsl(200 80% 50%)", pct: 76 },
   { key: "listening", label: "Listening", color: "hsl(30 99% 68%)", pct: 82 },
-  { key: "speaking", label: "Speaking", color: "hsl(280 80% 55%)", pct: 70 },
+  { key: "speaking", label: "Speaking", color: "hsl(221 83% 53%)", pct: 70 },
   { key: "writing", label: "Writing", color: "hsl(142 60% 45%)", pct: 68 },
 ];
 

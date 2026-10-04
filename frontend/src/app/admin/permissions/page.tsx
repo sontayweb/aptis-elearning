@@ -669,9 +669,9 @@ export default function AdminPermissionsPage() {
       </div>
 
       {/* 2. TOOLBAR CHỌN VAI TRÒ & CHUYÊN MỤC (Thanh ngang gọn gàng, giống hệt trang admin/users) */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
         {/* Role Tabs */}
-        <div className="flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200/60 overflow-x-auto w-full md:w-auto">
+        <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-x-auto w-full md:w-auto">
           {roles.map((r) => {
             const isSelected = r.id === selectedRoleId;
             const rCount = r.grantedIds.length;
@@ -681,21 +681,21 @@ export default function AdminPermissionsPage() {
                 onClick={() => setSelectedRoleId(r.id)}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
                   isSelected
-                    ? "bg-white text-slate-900 shadow-2xs font-bold"
-                    : "text-slate-500 hover:text-slate-800"
+                    ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold ring-1 ring-slate-900/5 dark:ring-white/10"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 <span>{r.title}</span>
                 <span
                   className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
                     isSelected
-                      ? "bg-slate-100 text-slate-700 font-bold"
-                      : "bg-slate-200/60 text-slate-500"
+                      ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
+                      : "bg-slate-200/60 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400"
                   }`}
                 >
                   {rCount}/{ALL_PERMISSIONS.length}
                 </span>
-                <span className="text-[10px] text-slate-400 font-normal">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">
                   ({r.memberCount.toLocaleString()} user)
                 </span>
               </button>

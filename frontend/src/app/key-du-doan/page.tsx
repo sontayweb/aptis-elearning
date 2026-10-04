@@ -102,7 +102,7 @@ export default function KeyDuDoanPage() {
 
           <div className="section-container py-12 md:py-16 relative z-10">
             <div className="max-w-3xl">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white w-fit text-xs font-bold mb-4 shadow-sm">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white w-fit text-xs font-bold mb-4 shadow-sm shadow-blue-500/20">
                 <Flame className="w-4 h-4" />
                 <span>Cập nhật liên tục 24/7 theo từng ca thi thật</span>
               </div>

@@ -455,7 +455,7 @@ export default function VocabularyPage() {
                   <button
                     type="button"
                     onClick={() => setIsAddWordModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white hover:brightness-110 font-bold text-xs shadow-sm transition-all"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white hover:brightness-110 font-bold text-xs shadow-sm shadow-blue-500/20 transition-all"
                   >
                     <FolderPlus className="w-4 h-4" />
                     <span>Tạo danh sách mới</span>

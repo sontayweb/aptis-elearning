@@ -84,7 +84,7 @@ export function HeroBanner({
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 110) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(204, 28, 1, ${0.12 * (1 - dist / 110)})`;
+            ctx.strokeStyle = `rgba(37, 99, 235, ${0.15 * (1 - dist / 110)})`;
             ctx.lineWidth = 0.6;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -104,7 +104,7 @@ export function HeroBanner({
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(224, 38, 2, 0.35)";
+        ctx.fillStyle = "rgba(37, 99, 235, 0.4)";
         ctx.fill();
       });
 
@@ -130,9 +130,9 @@ export function HeroBanner({
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <div className="absolute inset-0 tech-grid-bg animate-grid-drift" />
-        <div className="glow-orb glow-orb-red -top-24 -left-24 w-[420px] h-[420px]" />
-        <div className="glow-orb glow-orb-orange top-1/3 -right-32 w-[360px] h-[360px]" />
-        <div className="glow-orb glow-orb-violet bottom-0 left-1/3 w-[320px] h-[320px]" />
+        <div className="glow-orb glow-orb-blue -top-24 -left-24 w-[420px] h-[420px]" />
+        <div className="glow-orb glow-orb-blue top-1/3 -right-32 w-[360px] h-[360px]" />
+        <div className="glow-orb glow-orb-navy bottom-0 left-1/3 w-[320px] h-[320px]" />
       </div>
 
       {/* Particle Canvas */}
@@ -190,7 +190,7 @@ export function HeroBanner({
           </div>
 
           <Link
-            className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-xs sm:text-sm font-bold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow-glow-red hover:bg-primary-glow hover:shadow-glow-red transition-all duration-300 hover:-translate-y-0.5 h-10 sm:h-11 rounded-xl px-6 sm:px-8 shrink-0 w-full sm:w-auto"
+            className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-xs sm:text-sm font-bold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow-glow-blue hover:bg-primary-glow hover:shadow-glow-blue transition-all duration-300 hover:-translate-y-0.5 h-10 sm:h-11 rounded-xl px-6 sm:px-8 shrink-0 w-full sm:w-auto"
             href="/thi-thu"
             data-discover="true"
           >
@@ -248,14 +248,14 @@ export function HeroBanner({
 
           {/* Card 4: Trình độ */}
           <div className="group relative flex items-center gap-2.5 sm:gap-4 rounded-xl sm:rounded-2xl border border-border bg-card/70 backdrop-blur-sm p-3 sm:px-5 sm:py-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-glow-soft">
-            <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br ring-1 ring-inset ring-border from-[#a78bfa]/30 to-[#a78bfa]/5 text-[#a78bfa]">
+            <div className="flex h-10 w-10 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br ring-1 ring-inset ring-border from-[#1A3FA4]/30 to-[#1A3FA4]/5 text-[#1A3FA4] dark:text-[#3B82F6]">
               <TrendingUp className="h-5 w-5 sm:h-7 sm:w-7" />
             </div>
             <div className="min-w-0">
               <div className="text-[11px] sm:text-sm text-muted-foreground truncate">
                 Trình độ
               </div>
-              <div className="text-base sm:text-2xl font-heading font-extrabold text-foreground leading-tight truncate">
+              <div className="text-sm sm:text-xl font-heading font-extrabold text-foreground leading-tight truncate">
                 {currentLevel}
               </div>
             </div>
@@ -296,7 +296,7 @@ export function HeroBanner({
               <div className="text-sm sm:text-xl font-heading font-extrabold leading-tight truncate text-foreground">
                 {planName}
               </div>
-              <span className="mt-1 inline-flex items-center gap-0.5 sm:gap-1 rounded-full bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] px-2 py-0.2 sm:px-2.5 sm:py-0.5 text-[9.5px] sm:text-[11px] font-bold text-white shadow-xs hover:brightness-110">
+              <span className="mt-1 inline-flex items-center gap-0.5 sm:gap-1 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] px-2 py-0.2 sm:px-2.5 sm:py-0.5 text-[9.5px] sm:text-[11px] font-bold text-white shadow-xs hover:brightness-110">
                 <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 Nâng cấp
               </span>

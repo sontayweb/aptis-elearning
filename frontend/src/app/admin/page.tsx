@@ -178,7 +178,7 @@ export default function AdminDashboardPage() {
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-mono text-[11px] font-semibold">
                 <Sparkles className="w-3 h-3 text-primary" />
-                <span>Trung tâm Điều hành Aptis Kỳ Tích</span>
+                <span>Trung tâm Điều hành APTIS ESOL PREMIER</span>
               </span>
               <span className="text-muted-foreground/40">•</span>
               <span className="text-muted-foreground font-mono text-[11px]">

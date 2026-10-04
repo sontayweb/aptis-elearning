@@ -397,7 +397,7 @@ function WritingExamRunnerContent() {
             {/* Waiting Text */}
             <div className="space-y-2">
               <h3 className="font-heading font-bold text-base text-foreground">
-                AI Kỳ Tích đang chấm bài viết
+                AI PREMIER đang chấm bài viết
               </h3>
               <p className="text-xs md:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
                 Quá trình phân tích CEFR thường mất từ 1-3 phút. Bạn có thể thoát ra làm đề khác, bài chấm hoàn tất sẽ tự động lưu trong Lịch sử làm bài.
@@ -466,11 +466,11 @@ function WritingExamRunnerContent() {
               </div>
             </div>
 
-            {/* Card 2: Nhận xét của AI Kỳ Tích */}
+            {/* Card 2: Nhận xét của AI PREMIER */}
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="font-heading font-bold text-sm text-foreground">
-                  Nhận xét của AI Kỳ Tích
+                  Nhận xét của AI PREMIER
                 </h3>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border">
                   0/30

@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/contexts/auth-context";
+import { useEventTheme } from "@/contexts/event-theme-context";
 import { AuthModal } from "@/components/auth-modal";
 import { NotificationDropdown } from "@/components/notification-dropdown";
 import {
@@ -40,12 +42,13 @@ import {
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { config: eventConfig, currentTheme, setTheme: setEventTheme } = useEventTheme();
+  const pathname = usePathname();
   const [skillsDropdown, setSkillsDropdown] = useState(false);
   const [moreDropdown, setMoreDropdown] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [referralModalOpen, setReferralModalOpen] = useState(false);
   const [referralCopied, setReferralCopied] = useState(false);
   const [referralLink, setReferralLink] = useState("");
@@ -54,20 +57,15 @@ export function Navbar() {
   const moreRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
 
+  // Auto-close all menus on route changes
   useEffect(() => {
-    // Check initial theme from localStorage or document class
-    const savedTheme = localStorage.getItem("theme");
-    const isDark =
-      savedTheme === "dark" ||
-      (!savedTheme && document.documentElement.classList.contains("dark"));
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      setTheme("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      setTheme("light");
-    }
-  }, []);
+    setMobileMenuOpen(false);
+    setUserDropdown(false);
+    setSkillsDropdown(false);
+    setMoreDropdown(false);
+  }, [pathname]);
+
+  // Initial theme sync is managed by EventThemeProvider
 
   useEffect(() => {
     if (typeof window !== "undefined" && user) {
@@ -75,15 +73,8 @@ export function Navbar() {
     }
   }, [user]);
 
-  const toggleTheme = (newTheme: "light" | "dark") => {
-    setTheme(newTheme);
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
+  const toggleTheme = (newTheme: string) => {
+    setEventTheme(newTheme);
   };
 
   const copyReferralLink = () => {
@@ -119,32 +110,35 @@ export function Navbar() {
         <div className="h-16 xl:h-full max-w-[1440px] mx-auto px-4 lg:px-6 flex items-center gap-3">
         {/* Brand Logo */}
         <Link
-          className="flex items-center gap-2 shrink-0 group"
-          href="/dashboard"
+          className="flex items-center gap-2 shrink-0 group mr-1 xl:mr-2"
+          href={isAuthenticated ? "/dashboard" : "/"}
+          onClick={() => setMobileMenuOpen(false)}
           data-discover="true"
         >
           <Image
             src="/logo.webp"
-            alt="Aptis Kỳ Tích"
-            width={40}
-            height={40}
-            className="h-10 w-10 px-0 pb-0 transition-transform duration-200 group-hover:scale-105"
+            alt="APTIS ESOL PREMIER"
+            width={38}
+            height={38}
+            className="h-9 w-9 px-0 pb-0 transition-transform duration-200 group-hover:scale-105 shrink-0"
             priority
           />
-          <span className="font-heading font-bold text-base text-foreground tracking-tight whitespace-nowrap">
-            Aptis <span className="gradient-text">Kỳ Tích</span>
+          <span className="font-heading whitespace-nowrap tracking-tight hidden sm:inline-flex items-center gap-0 font-extrabold text-sm xl:text-base">
+            <span className="brand-name-aptis">APTIS</span>
+            <span className="brand-name-esol mx-1">ESOL</span>
+            <span className="brand-name-premier">PREMIER</span>
           </span>
         </Link>
 
         {/* Center Nav Items */}
-        <div className="hidden xl:flex items-center flex-1 min-w-0 justify-start gap-1 ml-4 lg:ml-6">
+        <div className="hidden xl:flex items-center shrink-0 gap-0.5 xl:gap-1 ml-1 xl:ml-3">
           {/* Thi thử button */}
           <Link
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-full transition-transform duration-200 whitespace-nowrap shadow-[0_4px_14px_rgba(204,28,1,0.35)] hover:scale-105 bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white hover:shadow-[0_6px_18px_rgba(204,28,1,0.45)]"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs xl:text-sm font-bold rounded-full transition-transform duration-200 whitespace-nowrap shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:scale-105 bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white hover:shadow-[0_6px_18px_rgba(37,99,235,0.5)]"
             href="/thi-thu"
             data-discover="true"
           >
-            <ClipboardCheck className="w-4 h-4" />
+            <ClipboardCheck className="w-3.5 h-3.5" />
             Thi thử
           </Link>
 
@@ -153,9 +147,9 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setSkillsDropdown((prev) => !prev)}
-              className="group flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
+              className="group flex items-center gap-1 px-2.5 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
             >
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className="w-3.5 h-3.5" />
               Luyện tập từng kỹ năng
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform duration-200 ${
@@ -282,21 +276,21 @@ export function Navbar() {
 
           {/* Đề Key Dự Đoán */}
           <Link
-            className="group flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
+            className="group flex items-center gap-1 px-2.5 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
             href="/key-du-doan"
             data-discover="true"
           >
-            <Sparkles className="w-4 h-4 text-accent" />
+            <Sparkles className="w-3.5 h-3.5 text-accent" />
             Đề Key Dự Đoán
           </Link>
 
           {/* Lịch sử học tập */}
           <Link
-            className="group flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
+            className="group flex items-center gap-1 px-2.5 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
             href="/history"
             data-discover="true"
           >
-            <History className="w-4 h-4" />
+            <History className="w-3.5 h-3.5" />
             Lịch sử học tập
           </Link>
 
@@ -305,12 +299,12 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMoreDropdown((prev) => !prev)}
-              className="group flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
+              className="group flex items-center gap-1 px-2 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
             >
-              <Ellipsis className="w-4 h-4" />
+              <Ellipsis className="w-3.5 h-3.5" />
               More
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                className={`w-3 h-3 transition-transform duration-200 ${
                   moreDropdown ? "rotate-180" : ""
                 }`}
               />
@@ -353,6 +347,13 @@ export function Navbar() {
                   Tiến độ học tập
                 </Link>
                 <Link
+                  href="/landing"
+                  onClick={() => setMoreDropdown(false)}
+                  className="flex items-center px-3 py-2 text-xs font-medium rounded-lg text-primary font-bold hover:bg-muted transition-colors"
+                >
+                  Giới thiệu nền tảng
+                </Link>
+                <Link
                   href="/about"
                   onClick={() => setMoreDropdown(false)}
                   className="flex items-center px-3 py-2 text-xs font-medium rounded-lg text-foreground hover:bg-muted transition-colors"
@@ -365,17 +366,17 @@ export function Navbar() {
         </div>
 
         {/* Right Action Controls */}
-        <div className="hidden xl:flex items-center gap-2 shrink-0">
+        <div className="hidden xl:flex items-center gap-1.5 xl:gap-2 shrink-0 ml-auto">
           {/* Nâng cấp */}
           <Link href="/pricing" data-discover="true">
-            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap transition-colors rounded-full h-8 px-3.5 text-xs font-extrabold gap-1 bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white hover:brightness-110 border-0 shadow-sm">
+            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap transition-colors rounded-full h-8 px-3 text-xs font-bold gap-1 bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white hover:brightness-110 border-0 shadow-sm shadow-blue-500/20">
               <Crown className="w-3.5 h-3.5" /> Nâng cấp
             </button>
           </Link>
 
-          {/* Dashboard Button */}
-          <Link href="/dashboard" data-discover="true">
-            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap font-medium hover:bg-accent/15 hover:text-accent-foreground rounded-md gap-1.5 text-sm h-8 px-3 transition-colors">
+          {/* Dashboard Button (Hiển thị trên màn hình rộng 2xl) */}
+          <Link href="/dashboard" data-discover="true" className="hidden 2xl:inline-flex">
+            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap font-medium hover:bg-accent/15 hover:text-accent-foreground rounded-md gap-1.5 text-xs xl:text-sm h-8 px-2.5 transition-colors">
               <Flame className="w-4 h-4 text-primary" />
               <span>Dashboard</span>
             </button>
@@ -390,9 +391,9 @@ export function Navbar() {
                 <button
                   onClick={() => setUserDropdown(!userDropdown)}
                   aria-label="Mở menu tài khoản"
-                  className="relative w-8 h-8 rounded-full bg-[#0d4a44] text-white text-xs font-bold flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
+                  className="relative w-8 h-8 rounded-full bg-[#1A3FA4] text-white text-xs font-bold flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
                 >
-                  <span className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-[#0d4a44] text-white font-bold text-sm">
+                  <span className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-[#1A3FA4] text-white font-bold text-sm">
                     {user.full_name ? user.full_name.charAt(0).toUpperCase() : "H"}
                   </span>
                 </button>
@@ -406,6 +407,23 @@ export function Navbar() {
                       Giao diện
                     </div>
 
+                    {/* Dynamic Event Theme (Halloween, Noel, Trung thu, Tết...) */}
+                    {eventConfig.enabled && (
+                      <button
+                        type="button"
+                        onClick={() => toggleTheme(eventConfig.activeTemplate)}
+                        className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl text-foreground hover:bg-muted/70 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-base leading-none">{eventConfig.icon || "🎃"}</span>
+                          <span>{eventConfig.name}</span>
+                        </div>
+                        {currentTheme === eventConfig.activeTemplate && (
+                          <span className="text-red-500 font-bold text-base leading-none">✓</span>
+                        )}
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       onClick={() => toggleTheme("light")}
@@ -415,7 +433,7 @@ export function Navbar() {
                         <Sun className="w-4 h-4 text-foreground/80" />
                         <span>Sáng</span>
                       </div>
-                      {theme === "light" && (
+                      {currentTheme === "light" && (
                         <span className="text-red-500 font-bold text-base leading-none">✓</span>
                       )}
                     </button>
@@ -429,7 +447,7 @@ export function Navbar() {
                         <Moon className="w-4 h-4 text-foreground/80" />
                         <span>Tối</span>
                       </div>
-                      {theme === "dark" && (
+                      {currentTheme === "dark" && (
                         <span className="text-red-500 font-bold text-base leading-none">✓</span>
                       )}
                     </button>
@@ -501,7 +519,7 @@ export function Navbar() {
             ) : (
               <button
                 onClick={() => setAuthModalOpen(true)}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] hover:brightness-110 shadow-sm transition-all"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:brightness-110 shadow-sm shadow-blue-500/20 transition-all"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 Đăng nhập
@@ -513,12 +531,26 @@ export function Navbar() {
         {/* Mobile menu and theme buttons */}
         <div className="xl:hidden flex items-center gap-1 ml-auto">
           <button
-            onClick={() => toggleTheme(theme === "dark" ? "light" : "dark")}
+            onClick={() => {
+              if (eventConfig.enabled) {
+                if (currentTheme === "light") toggleTheme("dark");
+                else if (currentTheme === "dark") toggleTheme(eventConfig.activeTemplate);
+                else toggleTheme("light");
+              } else {
+                toggleTheme(currentTheme === "dark" ? "light" : "dark");
+              }
+            }}
             className="flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent/20 text-foreground transition-colors"
             type="button"
-            aria-label="Chuyển đổi giao diện Sáng / Tối"
+            aria-label="Chuyển đổi giao diện"
           >
-            {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
+            {currentTheme === "dark" ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : currentTheme === "light" ? (
+              <Moon className="w-4 h-4" />
+            ) : (
+              <span className="text-sm leading-none">{eventConfig.icon || "🎃"}</span>
+            )}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -539,7 +571,7 @@ export function Navbar() {
                 setMobileMenuOpen(false);
                 setAuthModalOpen(true);
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] rounded-xl shadow-md"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] rounded-xl shadow-md shadow-blue-500/20"
             >
               <LogIn className="w-4 h-4" />
               Đăng nhập / Đăng ký tài khoản
@@ -557,43 +589,95 @@ export function Navbar() {
           )}
           <Link
             href="/thi-thu"
-            className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] rounded-xl shadow-md"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] rounded-xl shadow-md shadow-blue-500/20"
           >
             <ClipboardCheck className="w-4 h-4" />
             Thi thử Full Test
           </Link>
           <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
-            <Link href="/reading" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/reading"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Reading
             </Link>
-            <Link href="/listening" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/listening"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Listening
             </Link>
-            <Link href="/speaking" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/speaking"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Speaking (AI)
             </Link>
-            <Link href="/writing" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/writing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Writing (AI)
             </Link>
-            <Link href="/grammar" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/grammar"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Grammar & Vocab
             </Link>
-            <Link href="/vocabulary" className="p-2.5 bg-amber-500/10 text-amber-700 dark:text-amber-300 rounded-lg font-medium">
+            <Link
+              href="/vocabulary"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 rounded-lg font-medium transition-colors"
+            >
               Học từ vựng
             </Link>
-            <Link href="/nghe-chep" className="p-2.5 bg-rose-500/10 text-rose-700 dark:text-rose-300 rounded-lg font-medium">
+            <Link
+              href="/nghe-chep"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-rose-500/10 text-rose-700 dark:text-rose-300 hover:bg-rose-500/20 rounded-lg font-medium transition-colors"
+            >
               Dictation & Shadowing
             </Link>
-            <Link href="/key-du-doan" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/key-du-doan"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Đề Key Dự Đoán
             </Link>
-            <Link href="/tai-lieu" className="p-2.5 bg-primary/10 text-primary rounded-lg font-bold">
+            <Link
+              href="/tai-lieu"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg font-bold transition-colors"
+            >
               Kho tài liệu & Video
             </Link>
-            <Link href="/meo-thi-aptis" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/meo-thi-aptis"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Blog Mẹo thi
             </Link>
-            <Link href="/about" className="p-2.5 bg-muted/40 rounded-lg font-medium">
+            <Link
+              href="/landing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 rounded-lg font-bold transition-colors"
+            >
+              Giới thiệu nền tảng
+            </Link>
+            <Link
+              href="/about"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+            >
               Về chúng tôi
             </Link>
           </div>

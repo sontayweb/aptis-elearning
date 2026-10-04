@@ -17,17 +17,19 @@ export function Footer() {
             <div className="flex items-center gap-2 mb-4">
               <Image
                 src="/logo.webp"
-                alt="Aptis Kỳ Tích"
+                alt="APTIS ESOL PREMIER"
                 width={40}
                 height={40}
                 className="h-10 w-auto"
               />
-              <span className="font-heading font-bold text-lg text-sidebar-foreground">
-                Aptis <span className="gradient-text">Kỳ Tích</span>
+              <span className="font-heading whitespace-nowrap tracking-wide inline-flex items-center gap-0">
+                <span className="brand-name-aptis text-base">APTIS</span>
+                <span className="brand-name-esol text-base mx-1">ESOL</span>
+                <span className="brand-name-premier text-base">PREMIER</span>
               </span>
             </div>
             <p className="text-sm text-sidebar-foreground/50 leading-relaxed mb-5">
-              Nền tảng luyện thi Aptis có AI Kỳ Tích hỗ trợ. Giúp bạn đạt B1–B2 nhanh nhất.
+              Nền tảng luyện thi Aptis ESOL chuẩn CEFR có AI hỗ trợ. Giúp bạn đạt B1–B2 nhanh nhất.
             </p>
           </div>
 
@@ -132,7 +134,7 @@ export function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-primary" />
-                <span>aptiskytich.admin@gmail.com</span>
+                <span>aptisesolpremier@gmail.com</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-primary" />
@@ -170,7 +172,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-primary transition-colors"
                 >
-                  Facebook: Aptis Kỳ Tích
+                  Facebook: APTIS ESOL PREMIER
                 </a>
               </li>
             </ul>
@@ -179,9 +181,9 @@ export function Footer() {
 
         {/* Bottom copyright */}
         <div className="border-t border-sidebar-border/60 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-sidebar-foreground/40">
-          <div>© 2026 Aptis Kỳ Tích. All rights reserved.</div>
+          <div>© 2026 APTIS ESOL PREMIER. All rights reserved.</div>
           <div className="text-xs">
-            Made with <span className="text-primary">♥</span> from Aptis Kỳ Tích
+            Made with <span className="text-primary">♥</span> from APTIS ESOL PREMIER
           </div>
         </div>
       </div>

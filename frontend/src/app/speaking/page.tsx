@@ -137,7 +137,7 @@ export default function SpeakingPracticePage() {
                 Phần thi Speaking
               </h1>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                Luyện nói với AI Kỳ Tích chấm phát âm, ngữ pháp và gợi ý nâng cấp từ vựng theo CEFR (A1-C2). Mô phỏng chuẩn 4 phần thi Speaking Aptis British Council.
+                Luyện nói với AI PREMIER chấm phát âm, ngữ pháp và gợi ý nâng cấp từ vựng theo CEFR (A1-C2). Mô phỏng chuẩn 4 phần thi Speaking Aptis British Council.
               </p>
               <Link
                 className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap border dark:text-primary-foreground bg-background py-2 mt-4 rounded-full border-primary text-primary hover:bg-primary/10 hover:text-primary h-9 px-4 text-sm font-medium transition-colors"

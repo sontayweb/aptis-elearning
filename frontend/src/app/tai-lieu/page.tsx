@@ -209,7 +209,7 @@ export default function TaiLieuPage() {
   const handleDownload = (doc: DocumentItem) => {
     setDownloadSuccessModal(doc);
     // Tạo tệp tải về giả lập
-    const dummyContent = `# ${doc.title}\n\nHệ thống Luyện thi & Khảo thí Aptis Kỳ Tích\nTài liệu học tập chính thức dành cho học viên ôn luyện Aptis ESOL.\nTrang: ${doc.pages}\nKích thước: ${doc.fileSize}\n\nChúc bạn ôn tập tốt và đạt mục tiêu Band ${doc.targetBand}!`;
+    const dummyContent = `# ${doc.title}\n\nHệ thống Luyện thi & Khảo thí APTIS ESOL PREMIER\nTài liệu học tập chính thức dành cho học viên ôn luyện Aptis ESOL.\nTrang: ${doc.pages}\nKích thước: ${doc.fileSize}\n\nChúc bạn ôn tập tốt và đạt mục tiêu Band ${doc.targetBand}!`;
     const blob = new Blob([dummyContent], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

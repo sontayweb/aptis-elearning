@@ -19,7 +19,7 @@ export function SpeedupSpeakingCard() {
             Tăng tốc Speaking
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
-            AI Kỳ Tích chấm + feedback chi tiết. Chỉ 12 phút mỗi ngày.
+            AI PREMIER chấm + feedback chi tiết. Chỉ 12 phút mỗi ngày.
           </p>
           <Link
             className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-glow-red hover:bg-primary-glow hover:shadow-glow-red transition-all duration-300 hover:-translate-y-0.5 h-9 rounded-md px-3 w-full"

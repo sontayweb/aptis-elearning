@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: 0 0% 100%;
   --foreground: 0 0% 5%;
@@ -7,22 +9,22 @@
   --card-foreground: 0 0% 5%;
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 5%;
-  --primary: 8 99% 40%;
+  --primary: 221 83% 53%;          /* ĐỔI: đỏ → xanh dương highlight #2563EB */
   --primary-foreground: 0 0% 100%;
-  --primary-glow: 8 99% 55%;
+  --primary-glow: 217 91% 60%;     /* #3B82F6 */
   --secondary: 0 0% 96%;
   --secondary-foreground: 0 0% 5%;
   --muted: 0 0% 96%;
   --muted-foreground: 0 0% 40%;
-  --accent: 30 99% 68%;
-  --accent-foreground: 0 0% 5%;
+  --accent: 224 76% 48%;           /* Xanh đậm #1D4ED8 */
+  --accent-foreground: 0 0% 100%;
   --destructive: 8 99% 40%;
   --destructive-foreground: 0 0% 100%;
   --success: 142 60% 40%;
   --success-foreground: 0 0% 100%;
   --border: 0 0% 90%;
   --input: 0 0% 90%;
-  --ring: 8 99% 40%;
+  --ring: 221 83% 53%;
   --radius: 0.875rem;
 
   --sidebar: 0 0% 98%;
@@ -34,82 +36,87 @@
   --exam-text: 0 0% 5%;
   --exam-text-muted: 0 0% 40%;
   --exam-border: 0 0% 88%;
-  --exam-header: 0 75% 18%;
+  --exam-header: 220 72% 23%;      /* navy xanh */
   --exam-header-foreground: 0 0% 100%;
-  --exam-accent: 8 99% 40%;
+  --exam-accent: 221 83% 53%;
   --exam-accent-foreground: 0 0% 100%;
 
-  --brand-red: 8 99% 40%;
-  --brand-orange: 30 99% 68%;
-  --brand-brown: 0 75% 18%;
+  /* Brand tokens — APTIS ESOL PREMIER */
+  --brand-red: 8 99% 40%;          /* #CC1C01 (accent phụ) */
+  --brand-blue: 221 83% 53%;       /* #2563EB — Primary chủ đạo */
+  --brand-blue-light: 217 91% 60%; /* #3B82F6 */
+  --brand-blue-dark: 224 76% 48%;  /* #1D4ED8 */
 
-  --gradient-primary: linear-gradient(135deg, hsl(8 99% 40%), hsl(0 75% 18%));
-  --gradient-hero: linear-gradient(135deg, hsl(0 0% 5%) 0%, hsl(240 30% 12%) 50%, hsl(8 99% 25%) 100%);
+  /* Gradients — Tông Xanh Highlight */
+  --gradient-primary: linear-gradient(135deg, hsl(224 76% 48%), hsl(221 83% 53%));
+  --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(220 30% 97%) 50%, hsl(221 83% 96%) 100%);
   --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 98%));
-  --gradient-text-glow: linear-gradient(135deg, hsl(8 99% 50%) 0%, hsl(30 99% 68%) 100%);
-  --gradient-radial-red: radial-gradient(circle at 50% 50%, hsl(8 99% 40% / 0.18) 0%, transparent 60%);
-  --gradient-aurora: linear-gradient(135deg, hsl(8 99% 40% / 0.18), hsl(280 80% 50% / 0.12), hsl(30 99% 68% / 0.18));
+  --gradient-text-glow: linear-gradient(135deg, hsl(224 76% 48%) 0%, hsl(217 91% 60%) 100%);
+  --gradient-radial-red: radial-gradient(circle at 50% 50%, hsl(221 83% 53% / 0.18) 0%, transparent 60%);
+  --gradient-aurora: linear-gradient(135deg, hsl(224 76% 48% / 0.18), hsl(221 83% 53% / 0.15), hsl(0 0% 100% / 0.06));
 
   --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.04);
   --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.06);
   --shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.1);
-  --shadow-glow: 0 0 30px hsl(8 99% 40% / 0.18);
-  --shadow-glow-red: 0 0 24px hsl(8 99% 40% / 0.35), 0 0 60px hsl(8 99% 40% / 0.18);
-  --shadow-glow-soft: 0 0 20px hsl(8 99% 40% / 0.12);
+  --shadow-glow: 0 0 30px hsl(221 83% 53% / 0.25);
+  --shadow-glow-red: 0 0 24px hsl(221 83% 53% / 0.35), 0 0 60px hsl(221 83% 53% / 0.18);
+  --shadow-glow-blue: 0 0 24px hsl(221 83% 53% / 0.35), 0 0 60px hsl(221 83% 53% / 0.18);
+  --shadow-glow-soft: 0 0 20px hsl(221 83% 53% / 0.18);
   --shadow-elevated: 0 12px 40px -8px hsl(0 0% 0% / 0.12), 0 0 0 1px hsl(0 0% 0% / 0.04);
 }
 
 .dark {
-  --background: 240 12% 4%;
+  --background: 220 20% 4%;        /* xanh-đen */
   --foreground: 0 0% 100%;
-  --card: 240 15% 7%;
+  --card: 220 18% 7%;
   --card-foreground: 0 0% 100%;
-  --popover: 240 15% 8%;
+  --popover: 220 18% 8%;
   --popover-foreground: 0 0% 100%;
-  --primary: 8 99% 50%;
+  --primary: 221 83% 60%;          /* Xanh highlight sáng cho dark */
   --primary-foreground: 0 0% 100%;
-  --primary-glow: 8 99% 60%;
-  --secondary: 240 10% 12%;
+  --primary-glow: 217 91% 70%;
+  --secondary: 220 15% 12%;
   --secondary-foreground: 0 0% 100%;
-  --muted: 240 10% 12%;
+  --muted: 220 15% 12%;
   --muted-foreground: 0 0% 65%;
-  --accent: 30 99% 68%;
-  --accent-foreground: 0 0% 5%;
+  --accent: 221 83% 63%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 8 99% 50%;
   --destructive-foreground: 0 0% 100%;
   --success: 142 60% 45%;
   --success-foreground: 0 0% 100%;
-  --border: 240 15% 16%;
-  --input: 240 15% 14%;
-  --ring: 8 99% 50%;
-  --sidebar: 240 15% 6%;
+  --border: 220 18% 16%;
+  --input: 220 18% 14%;
+  --ring: 221 83% 60%;
+  --sidebar: 220 18% 6%;
   --sidebar-foreground: 0 0% 90%;
-  --sidebar-border: 240 15% 15%;
+  --sidebar-border: 220 18% 15%;
 
-  --exam-bg: 240 10% 7%;
-  --exam-surface: 240 8% 16%;
+  --exam-bg: 220 15% 7%;
+  --exam-surface: 220 12% 16%;
   --exam-text: 0 0% 95%;
   --exam-text-muted: 0 0% 72%;
-  --exam-border: 240 10% 34%;
-  --exam-header: 0 75% 18%;
+  --exam-border: 220 15% 34%;
+  --exam-header: 220 72% 23%;
   --exam-header-foreground: 0 0% 100%;
-  --exam-accent: 8 99% 50%;
+  --exam-accent: 221 83% 60%;
   --exam-accent-foreground: 0 0% 100%;
-  --background-elevated: 240 18% 10%;
-  --surface-glass: 240 18% 10%;
-  --border-glow: 8 99% 50%;
+  --background-elevated: 220 20% 10%;
+  --surface-glass: 220 20% 10%;
+  --border-glow: 221 83% 60%;
 
-  --gradient-hero: linear-gradient(135deg, hsl(240 15% 4%) 0%, hsl(240 30% 8%) 45%, hsl(8 99% 22%) 100%);
-  --gradient-card: linear-gradient(145deg, hsl(240 18% 10%), hsl(240 15% 7%));
-  --gradient-radial-red: radial-gradient(circle at 50% 50%, hsl(8 99% 50% / 0.28) 0%, transparent 60%);
-  --gradient-aurora: linear-gradient(135deg, hsl(8 99% 50% / 0.22), hsl(280 80% 55% / 0.18), hsl(30 99% 68% / 0.22));
+  --gradient-hero: linear-gradient(135deg, hsl(220 20% 4%) 0%, hsl(220 30% 8%) 45%, hsl(220 72% 23%) 100%);
+  --gradient-card: linear-gradient(145deg, hsl(220 20% 10%), hsl(220 18% 7%));
+  --gradient-radial-red: radial-gradient(circle at 50% 50%, hsl(221 83% 63% / 0.28) 0%, transparent 60%);
+  --gradient-aurora: linear-gradient(135deg, hsl(220 72% 38% / 0.22), hsl(221 83% 63% / 0.18), hsl(0 0% 100% / 0.05));
 
   --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.3);
   --shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.4);
-  --shadow-glow: 0 0 30px hsl(8 99% 50% / 0.35);
-  --shadow-glow-red: 0 0 28px hsl(8 99% 50% / 0.5), 0 0 70px hsl(8 99% 50% / 0.22);
-  --shadow-glow-soft: 0 0 24px hsl(8 99% 50% / 0.2);
-  --shadow-elevated: 0 16px 50px -10px hsl(0 0% 0% / 0.6), 0 0 0 1px hsl(240 15% 16%);
+  --shadow-glow: 0 0 30px hsl(221 83% 63% / 0.35);
+  --shadow-glow-red: 0 0 28px hsl(221 83% 63% / 0.5), 0 0 70px hsl(221 83% 63% / 0.22);
+  --shadow-glow-blue: 0 0 28px hsl(221 83% 63% / 0.4), 0 0 70px hsl(221 83% 63% / 0.18);
+  --shadow-glow-soft: 0 0 24px hsl(221 83% 63% / 0.2);
+  --shadow-elevated: 0 16px 50px -10px hsl(0 0% 0% / 0.6), 0 0 0 1px hsl(220 18% 16%);
 }
 
 @theme {
@@ -178,9 +185,33 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, hsl(8 99% 50%) 0%, hsl(30 99% 68%) 100%);
+  background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 50%, #3B82F6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Brand name — APTIS ESOL PREMIER */
+.brand-name-aptis {
+  color: #1A237E;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.brand-name-esol {
+  color: #CC1C01;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.brand-name-premier {
+  color: #1A237E;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+/* Gradient CTA button — brand standard Highlight Blue */
+.btn-brand-gradient {
+  background: linear-gradient(to right, #1D4ED8, #2563EB);
 }
 
 .tech-card {
@@ -190,7 +221,7 @@ body {
 .tech-card:hover {
   transform: translateY(-2px);
   border-color: hsl(var(--primary) / 0.5);
-  box-shadow: var(--shadow-glow-red);
+  box-shadow: var(--shadow-glow-blue);
 }
 
 .tech-grid-bg {
@@ -210,15 +241,26 @@ body {
 }
 
 .glow-orb-red {
-  background: hsl(var(--primary) / 0.35);
+  background: hsl(221 83% 53% / 0.25);
 }
 
+/* ĐỔI: cam → xanh dương */
+.glow-orb-blue {
+  background: hsl(221 83% 53% / 0.28);
+}
+
+/* ĐỔI: tím → navy */
+.glow-orb-navy {
+  background: hsl(220 72% 23% / 0.35);
+}
+
+/* Giữ tên cũ để tương thích ngược nếu cần */
 .glow-orb-orange {
-  background: hsl(var(--accent) / 0.32);
+  background: hsl(221 83% 53% / 0.28); /* Redirect → xanh */
 }
 
 .glow-orb-violet {
-  background: rgba(171, 48, 232, 0.25);
+  background: hsl(220 72% 23% / 0.35); /* Redirect → navy */
 }
 
 @keyframes gridDrift {
@@ -248,4 +290,350 @@ body {
 .animate-breathing {
   animation: breathing 8s ease-in-out infinite;
 }
+
+/* Event Theme Animations */
+@keyframes floatBat {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(15px, -12px) rotate(8deg);
+  }
+  50% {
+    transform: translate(-10px, 8px) rotate(-6deg);
+  }
+  75% {
+    transform: translate(8px, 12px) rotate(4deg);
+  }
+}
+
+@keyframes snowFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(105vh) rotate(360deg);
+    opacity: 0.2;
+  }
+}
+
+@keyframes lanternSwing {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes petalFall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(0.9);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(50vh) rotate(180deg) scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(105vh) rotate(360deg) scale(0.8);
+    opacity: 0.2;
+  }
+}
+
+.animate-float-bat {
+  animation: floatBat 6s ease-in-out infinite;
+}
+
+.animate-float-bat-delay {
+  animation: floatBat 8s ease-in-out infinite 2s;
+}
+
+.animate-snow-fall {
+  animation: snowFall linear infinite;
+}
+
+.animate-swing {
+  transform-origin: top center;
+  animation: lanternSwing 3.5s ease-in-out infinite;
+}
+
+.animate-swing-delay {
+  transform-origin: top center;
+  animation: lanternSwing 4s ease-in-out infinite 1s;
+}
+
+.animate-petal-fall {
+  animation: petalFall linear infinite;
+}
+
+/* Event Theme Color Overrides */
+[data-event-theme="halloween"] {
+  --primary: 24 95% 53%; /* Vivid Orange #EA580C */
+  --primary-glow: 27 96% 61%;
+  --accent: 271 81% 56%; /* Purple */
+}
+
+[data-event-theme="noel"] {
+  --primary: 0 72% 51%; /* Noel Red #DC2626 */
+  --primary-glow: 142 71% 45%; /* Pine Green */
+  --accent: 142 71% 45%;
+}
+
+[data-event-theme="mid_autumn"] {
+  --primary: 38 92% 50%; /* Golden Amber #D97706 */
+  --primary-glow: 45 93% 47%;
+  --accent: 32 95% 44%;
+}
+
+[data-event-theme="tet"] {
+  --primary: 347 77% 50%; /* Tet Crimson #E11D48 */
+  --primary-glow: 48 96% 53%; /* Gold */
+  --accent: 48 96% 53%;
+}
+
+/* ==========================================================================
+   ADMIN PREMIER DESIGN SYSTEM — Professional Enterprise Dashboard Layer
+   ========================================================================== */
+
+/* 1. Custom Slim Scrollbar for Admin Area */
+.admin-root ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-root ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+.admin-root ::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+.dark .admin-root ::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.5);
+}
+
+.dark .admin-root ::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.8);
+}
+
+/* 2. Admin Form Controls & Input Polish */
+.admin-root input:not([type="checkbox"]):not([type="radio"]),
+.admin-root select,
+.admin-root textarea {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.admin-root input:not([type="checkbox"]):not([type="radio"]):focus,
+.admin-root select:focus,
+.admin-root textarea:focus {
+  outline: none !important;
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
+}
+
+/* 3. Dark Mode Universal Overrides for Admin Surfaces */
+.dark .admin-root {
+  background-color: #0B0F19 !important;
+  color: #F8FAFC !important;
+}
+
+.dark .admin-root header {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-color: #1E293B !important;
+}
+
+.dark .admin-root aside {
+  background-color: #0F172A !important;
+  border-color: #1E293B !important;
+}
+
+.dark .admin-root main {
+  background-color: #0B0F19 !important;
+}
+
+.dark .admin-root .bg-white {
+  background-color: #0F172A !important;
+}
+
+.dark .admin-root .bg-slate-50,
+.dark .admin-root .bg-slate-50\/50,
+.dark .admin-root .bg-slate-50\/60,
+.dark .admin-root .bg-slate-50\/70,
+.dark .admin-root .bg-slate-50\/80 {
+  background-color: #172033 !important;
+}
+
+.dark .admin-root .bg-slate-100 {
+  background-color: #1E293B !important;
+}
+
+.dark .admin-root .border-slate-200,
+.dark .admin-root .border-slate-200\/70,
+.dark .admin-root .border-slate-200\/80,
+.dark .admin-root .border-slate-200\/90,
+.dark .admin-root .border-slate-100,
+.dark .admin-root .border-slate-300 {
+  border-color: #1E293B !important;
+}
+
+.dark .admin-root .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.dark .admin-root .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1E293B !important;
+}
+
+/* Dark Mode Text Contrast Fixes */
+.dark .admin-root .text-slate-900 {
+  color: #F8FAFC !important;
+}
+
+.dark .admin-root .text-slate-800 {
+  color: #F1F5F9 !important;
+}
+
+.dark .admin-root .text-slate-700 {
+  color: #E2E8F0 !important;
+}
+
+.dark .admin-root .text-slate-600 {
+  color: #CBD5E1 !important;
+}
+
+.dark .admin-root .text-slate-500 {
+  color: #94A3B8 !important;
+}
+
+.dark .admin-root .text-slate-400 {
+  color: #64748B !important;
+}
+
+/* Dark Mode Hover States */
+.dark .admin-root .hover\:bg-slate-50:hover,
+.dark .admin-root .hover\:bg-slate-50\/50:hover,
+.dark .admin-root .hover\:bg-slate-50\/60:hover,
+.dark .admin-root .hover\:bg-slate-100:hover {
+  background-color: #1E293B !important;
+}
+
+.dark .admin-root .hover\:text-slate-900:hover {
+  color: #FFFFFF !important;
+}
+
+.dark .admin-root .hover\:text-slate-800:hover {
+  color: #F8FAFC !important;
+}
+
+.dark .admin-root .hover\:text-slate-700:hover {
+  color: #E2E8F0 !important;
+}
+
+.dark .admin-root .hover\:border-slate-300:hover {
+  border-color: #334155 !important;
+}
+
+/* Dark Mode Input Elements */
+.dark .admin-root input:not([type="checkbox"]):not([type="radio"]),
+.dark .admin-root select,
+.dark .admin-root textarea {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+  border-color: #334155 !important;
+}
+
+.dark .admin-root input::placeholder,
+.dark .admin-root textarea::placeholder {
+  color: #64748B !important;
+}
+
+/* Dark Mode Buttons: Upgrade legacy black buttons to signature Highlight Blue */
+.dark .admin-root button.bg-slate-900,
+.dark .admin-root a.bg-slate-900 {
+  background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+}
+
+.dark .admin-root button.bg-slate-900:hover,
+.dark .admin-root a.bg-slate-900:hover {
+  background: linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%) !important;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35) !important;
+}
+
+/* 4. Table Polishing */
+.admin-root table {
+  width: 100%;
+}
+
+.admin-root tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.dark .admin-root thead tr {
+  background-color: #172033 !important;
+  border-bottom: 1px solid #1E293B !important;
+}
+
+.dark .admin-root thead th {
+  color: #94A3B8 !important;
+}
+
+.dark .admin-root tbody tr:hover {
+  background-color: rgba(30, 41, 59, 0.55) !important;
+}
+
+/* 5. Status Badges in Dark Mode */
+.dark .admin-root .bg-emerald-50 {
+  background-color: rgba(6, 78, 59, 0.35) !important;
+  border-color: rgba(5, 150, 105, 0.4) !important;
+  color: #34D399 !important;
+}
+
+.dark .admin-root .bg-amber-50 {
+  background-color: rgba(120, 53, 15, 0.35) !important;
+  border-color: rgba(217, 119, 6, 0.4) !important;
+  color: #FBBF24 !important;
+}
+
+.dark .admin-root .bg-blue-50 {
+  background-color: rgba(30, 58, 138, 0.35) !important;
+  border-color: rgba(37, 99, 235, 0.4) !important;
+  color: #60A5FA !important;
+}
+
+.dark .admin-root .bg-purple-50 {
+  background-color: rgba(88, 28, 135, 0.35) !important;
+  border-color: rgba(147, 51, 234, 0.4) !important;
+  color: #C084FC !important;
+}
+
+.dark .admin-root .bg-rose-50 {
+  background-color: rgba(136, 19, 55, 0.35) !important;
+  border-color: rgba(225, 29, 72, 0.4) !important;
+  color: #FB7185 !important;
+}
+
+/* 6. Card Hover & Glassmorphism Utilities */
+.admin-card-hover {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+.dark .admin-card-hover:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  border-color: rgba(59, 130, 246, 0.4) !important;
+}
+
 

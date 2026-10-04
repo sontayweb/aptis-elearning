@@ -3,7 +3,7 @@ import { BookOpen, FileText, ArrowRight } from "lucide-react";
 
 const articles = [
   {
-    title: "Hướng dẫn sử dụng Aptis Kỳ Tích cho người mới",
+    title: "Hướng dẫn sử dụng APTIS ESOL PREMIER cho người mới",
     date: "16-09",
     href: "/meo-thi-aptis/huong-dan-hoc-tren-aptis-ky-tich-cho-nguoi-moi",
   },

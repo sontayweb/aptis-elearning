@@ -79,7 +79,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
                 Cổng Giảng Viên
               </div>
               <div className="text-[10px] text-blue-600 font-semibold uppercase tracking-wider">
-                Aptis Kỳ Tích
+                APTIS ESOL PREMIER
               </div>
             </div>
           </Link>

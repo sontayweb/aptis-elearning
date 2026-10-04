@@ -509,7 +509,7 @@ export default function NgheChepPage() {
                         onClick={() => setNumQuestions(num)}
                         className={`py-2 rounded-xl text-xs font-bold transition-all border ${
                           numQuestions === num
-                            ? "bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white border-transparent shadow-xs"
+                            ? "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white border-transparent shadow-xs"
                             : "bg-muted/40 text-foreground border-border hover:bg-muted"
                         }`}
                       >
@@ -529,7 +529,7 @@ export default function NgheChepPage() {
                         onClick={() => setPlaybackSpeed(speed)}
                         className={`py-2 rounded-xl text-xs font-bold transition-all border ${
                           playbackSpeed === speed
-                            ? "bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white border-transparent shadow-xs"
+                            ? "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white border-transparent shadow-xs"
                             : "bg-muted/40 text-foreground border-border hover:bg-muted"
                         }`}
                       >
@@ -556,7 +556,7 @@ export default function NgheChepPage() {
                         onClick={() => setDifficulty(item.id as any)}
                         className={`py-2 px-1 rounded-xl text-[11px] font-bold transition-all border truncate ${
                           difficulty === item.id
-                            ? "bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white border-transparent shadow-xs"
+                            ? "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white border-transparent shadow-xs"
                             : "bg-muted/40 text-foreground border-border hover:bg-muted"
                         }`}
                       >
@@ -582,7 +582,7 @@ export default function NgheChepPage() {
                         onClick={() => setMaxListens(item.val as any)}
                         className={`py-2 rounded-xl text-xs font-bold transition-all border ${
                           maxListens === item.val
-                            ? "bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white border-transparent shadow-xs"
+                            ? "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white border-transparent shadow-xs"
                             : "bg-muted/40 text-foreground border-border hover:bg-muted"
                         }`}
                       >
@@ -619,7 +619,7 @@ export default function NgheChepPage() {
                 <button
                   type="button"
                   onClick={handleStartSession}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white font-bold text-sm shadow-md hover:brightness-110 transition-all"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-bold text-sm shadow-md hover:brightness-110 transition-all"
                 >
                   Bắt đầu
                 </button>
@@ -697,7 +697,7 @@ export default function NgheChepPage() {
                   type="button"
                   disabled={currentIndex === sentenceList.length - 1}
                   onClick={() => setCurrentIndex((prev) => prev + 1)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white text-xs font-bold hover:brightness-110 disabled:opacity-30 shadow-xs"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white text-xs font-bold hover:brightness-110 disabled:opacity-30 shadow-xs"
                 >
                   <span>Câu tiếp theo</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -721,7 +721,7 @@ export default function NgheChepPage() {
                           <button
                             type="button"
                             onClick={() => handlePlayAudio(playbackSpeed)}
-                            className="w-10 h-10 rounded-full bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white flex items-center justify-center shadow-md hover:brightness-110 transition-all shrink-0"
+                            className="w-10 h-10 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white flex items-center justify-center shadow-md hover:brightness-110 transition-all shrink-0"
                           >
                             {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
                           </button>
@@ -904,7 +904,7 @@ export default function NgheChepPage() {
                               <button
                                 type="button"
                                 onClick={handleCheck}
-                                className="px-3.5 py-1 rounded-lg bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white text-xs font-bold flex items-center gap-1 hover:brightness-110 shadow-xs transition-all"
+                                className="px-3.5 py-1 rounded-lg bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white text-xs font-bold flex items-center gap-1 hover:brightness-110 shadow-xs transition-all"
                               >
                                 <Check className="w-3 h-3" />
                                 <span>Kiểm tra</span>
@@ -1013,7 +1013,7 @@ export default function NgheChepPage() {
                                 className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm ${
                                   isRecording
                                     ? "bg-destructive text-white animate-pulse"
-                                    : "bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white hover:brightness-110"
+                                    : "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white hover:brightness-110"
                                 }`}
                               >
                                 {isRecording ? (
@@ -1088,7 +1088,7 @@ export default function NgheChepPage() {
                             </p>
                             <Link
                               href="/pricing"
-                              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white font-bold text-xs shadow-xs hover:brightness-110"
+                              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-bold text-xs shadow-xs hover:brightness-110"
                             >
                               <Crown className="w-3.5 h-3.5" />
                               <span>Nâng cấp Pro</span>
@@ -1108,7 +1108,7 @@ export default function NgheChepPage() {
                     type="button"
                     disabled={currentIndex === sentenceList.length - 1}
                     onClick={() => setCurrentIndex((prev) => prev + 1)}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#CC1C01] to-[#FEAD5F] text-white text-xs font-bold hover:brightness-110 disabled:opacity-40 flex items-center gap-1.5 shadow-xs"
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white text-xs font-bold hover:brightness-110 disabled:opacity-40 flex items-center gap-1.5 shadow-xs"
                   >
                     <span>Câu tiếp theo</span>
                     <ArrowRight className="w-3.5 h-3.5" />

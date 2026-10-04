@@ -330,9 +330,9 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
         )}
 
         {/* Card Body */}
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden flex flex-col">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="p-4 sm:p-5 bg-slate-900 text-white relative">
+          <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-white relative">
             <button
               onClick={handleClose}
               title="Đóng hướng dẫn (Esc)"
@@ -346,14 +346,14 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
                 Bước {currentStep + 1} / {steps.length}
               </span>
               <span className="text-[11px] font-heading font-medium text-slate-300 flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-rose-400" />
+                <Sparkles className="w-3 h-3 text-blue-400" />
                 <span>{current.badge}</span>
               </span>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 border border-white/15">
-                <Icon className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-400/30 text-blue-400">
+                <Icon className="w-4 h-4 text-blue-300" />
               </div>
               <h3 className="text-sm font-heading font-bold text-white tracking-tight leading-snug">
                 {current.title}
@@ -363,17 +363,17 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
 
           {/* Content */}
           <div className="p-5 space-y-4 text-xs">
-            <p className="text-slate-700 leading-relaxed font-normal text-xs sm:text-[13px]">
+            <p className="text-slate-700 dark:text-slate-200 leading-relaxed font-normal text-xs sm:text-[13px]">
               {current.description}
             </p>
 
             {/* Key Tips */}
-            <div className="rounded-xl border border-slate-200/80 bg-slate-50 p-3.5 space-y-2">
-              <div className="font-heading font-bold text-slate-800 flex items-center gap-1.5 text-[11px]">
-                <Zap className="w-3.5 h-3.5 text-rose-500 fill-rose-500/20" />
+            <div className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-3.5 space-y-2">
+              <div className="font-heading font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5 text-[11px]">
+                <Zap className="w-3.5 h-3.5 text-blue-500 fill-blue-500/20" />
                 <span>Gợi ý thao tác:</span>
               </div>
-              <ul className="space-y-1 pl-4 list-disc text-slate-600 text-[11px]">
+              <ul className="space-y-1 pl-4 list-disc text-slate-600 dark:text-slate-300 text-[11px]">
                 {current.tips.map((tip, idx) => (
                   <li key={idx} className="leading-relaxed">
                     {tip}
@@ -384,7 +384,7 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
           </div>
 
           {/* Footer Controls */}
-          <div className="p-4 bg-slate-50/70 border-t border-slate-100 flex flex-col gap-3">
+          <div className="p-4 bg-slate-50/70 dark:bg-slate-900/90 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3">
             {/* Top row: progress dots & checkbox */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
@@ -395,19 +395,19 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
                     title={`Chuyển đến bước ${idx + 1}`}
                     className={`h-1.5 rounded-full transition-all ${
                       currentStep === idx
-                        ? "w-5 bg-slate-900"
-                        : "w-1.5 bg-slate-300 hover:bg-slate-400"
+                        ? "w-5 bg-blue-600 dark:bg-blue-500"
+                        : "w-1.5 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
                     }`}
                   />
                 ))}
               </div>
 
-              <label className="flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-slate-900 cursor-pointer select-none">
+              <label className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={dontShowAgain}
                   onChange={(e) => setDontShowAgain(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 accent-slate-900"
+                  className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 accent-blue-600"
                 />
                 <span>Không hiện lại</span>
               </label>
@@ -418,7 +418,7 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
               <button
                 type="button"
                 onClick={handleClose}
-                className="text-xs text-slate-500 hover:text-slate-900 font-heading font-medium transition-colors px-2 py-1.5"
+                className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-heading font-medium transition-colors px-2 py-1.5"
               >
                 Bỏ qua tour
               </button>
@@ -428,7 +428,7 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
                   <button
                     type="button"
                     onClick={() => setCurrentStep((prev) => prev - 1)}
-                    className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-heading font-medium transition-colors flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-medium transition-colors flex items-center gap-1"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                     <span>Trước</span>
@@ -439,7 +439,7 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
                   <button
                     type="button"
                     onClick={() => setCurrentStep((prev) => prev + 1)}
-                    className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-heading font-semibold shadow-xs flex items-center gap-1.5 transition-colors"
+                    className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:from-[#1E40AF] hover:to-[#1D4ED8] text-white text-xs font-heading font-semibold shadow-xs shadow-blue-500/20 flex items-center gap-1.5 transition-all"
                   >
                     <span>Tiếp theo</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -448,7 +448,7 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-heading font-semibold shadow-xs flex items-center gap-1.5 transition-colors"
+                    className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:from-[#1E40AF] hover:to-[#1D4ED8] text-white text-xs font-heading font-semibold shadow-xs shadow-blue-500/20 flex items-center gap-1.5 transition-all"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>Hoàn tất & Khám phá</span>

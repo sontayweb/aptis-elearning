@@ -59,25 +59,25 @@ export function AdminPagination({
 
   return (
     <div
-      className={`py-3.5 px-4 sm:px-6 bg-slate-50/70 border-t border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500 ${className}`}
+      className={`py-3.5 px-4 sm:px-6 bg-slate-50/70 dark:bg-slate-900/60 border-t border-slate-200/80 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 ${className}`}
     >
       {/* Left: Items counter & Page size selector */}
       <div className="flex flex-wrap items-center gap-3">
         <div>
           Hiển thị{" "}
-          <span className="font-bold text-slate-900 font-mono">
+          <span className="font-bold text-slate-900 dark:text-white font-mono">
             {totalItems > 0 ? `${startItem}-${endItem}` : 0}
           </span>{" "}
-          / <span className="font-bold text-slate-900 font-mono">{totalItems}</span> {itemName}
+          / <span className="font-bold text-slate-900 dark:text-white font-mono">{totalItems}</span> {itemName}
         </div>
 
         {onPageSizeChange && (
-          <div className="flex items-center gap-1.5 pl-3 border-l border-slate-200">
-            <span className="text-[11px] text-slate-400">Số dòng:</span>
+          <div className="flex items-center gap-1.5 pl-3 border-l border-slate-200 dark:border-slate-700">
+            <span className="text-[11px] text-slate-400 dark:text-slate-500">Số dòng:</span>
             <select
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="px-2 py-1 rounded-lg border border-slate-200 bg-white font-mono text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer shadow-2xs"
+              className="px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer shadow-2xs"
             >
               {pageSizeOptions.map((opt) => (
                 <option key={opt} value={opt}>
@@ -94,11 +94,11 @@ export function AdminPagination({
         {/* Quick Jump Dropdown */}
         {safeTotalPages > 1 && (
           <div className="flex items-center gap-1 mr-1">
-            <span className="text-[11px] text-slate-400">Đến:</span>
+            <span className="text-[11px] text-slate-400 dark:text-slate-500">Đến:</span>
             <select
               value={currentPage}
               onChange={(e) => onPageChange(Number(e.target.value))}
-              className="px-2 py-1 rounded-lg border border-slate-200 bg-white font-mono text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer shadow-2xs"
+              className="px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer shadow-2xs"
             >
               {Array.from({ length: safeTotalPages }, (_, i) => i + 1).map((p) => (
                 <option key={p} value={p}>
@@ -115,7 +115,7 @@ export function AdminPagination({
           onClick={() => onPageChange(1)}
           disabled={currentPage <= 1}
           title="Về trang đầu tiên"
-          className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 transition-colors shadow-2xs cursor-pointer"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 dark:text-slate-300 transition-colors shadow-2xs cursor-pointer"
         >
           <ChevronsLeft className="w-3.5 h-3.5" />
         </button>
@@ -126,7 +126,7 @@ export function AdminPagination({
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage <= 1}
           title="Trang trước"
-          className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 transition-colors shadow-2xs cursor-pointer"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 dark:text-slate-300 transition-colors shadow-2xs cursor-pointer"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
         </button>
@@ -138,7 +138,7 @@ export function AdminPagination({
               return (
                 <span
                   key={`ellipsis-${idx}`}
-                  className="px-1.5 text-slate-400 font-mono select-none"
+                  className="px-1.5 text-slate-400 dark:text-slate-600 font-mono select-none"
                 >
                   …
                 </span>
@@ -152,8 +152,8 @@ export function AdminPagination({
                 onClick={() => onPageChange(Number(p))}
                 className={`min-w-[28px] h-7 px-1.5 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer ${
                   isCurrent
-                    ? "bg-slate-900 text-white border border-slate-900 shadow-2xs"
-                    : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs"
+                    ? "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white shadow-xs font-bold ring-1 ring-blue-400/40"
+                    : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-2xs"
                 }`}
               >
                 {p}
@@ -163,7 +163,7 @@ export function AdminPagination({
         </div>
 
         {/* Fallback compact text for mobile */}
-        <span className="sm:hidden font-mono font-bold text-slate-800 px-1.5 text-xs">
+        <span className="sm:hidden font-mono font-bold text-slate-800 dark:text-slate-200 px-1.5 text-xs">
           {currentPage}/{safeTotalPages}
         </span>
 
@@ -173,7 +173,7 @@ export function AdminPagination({
           onClick={() => onPageChange(Math.min(safeTotalPages, currentPage + 1))}
           disabled={currentPage >= safeTotalPages}
           title="Trang tiếp"
-          className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 transition-colors shadow-2xs cursor-pointer"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 dark:text-slate-300 transition-colors shadow-2xs cursor-pointer"
         >
           <ChevronRight className="w-3.5 h-3.5" />
         </button>
@@ -184,7 +184,7 @@ export function AdminPagination({
           onClick={() => onPageChange(safeTotalPages)}
           disabled={currentPage >= safeTotalPages}
           title="Đến trang cuối cùng"
-          className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 transition-colors shadow-2xs cursor-pointer"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 dark:text-slate-300 transition-colors shadow-2xs cursor-pointer"
         >
           <ChevronsRight className="w-3.5 h-3.5" />
         </button>

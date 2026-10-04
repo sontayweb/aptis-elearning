@@ -137,7 +137,7 @@ export default function WritingPracticePage() {
                 Phần thi Writing
               </h1>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                Luyện viết theo cấu trúc Aptis Writing 4 phần: Điền thông tin cá nhân, Đơn đăng ký câu lạc bộ, Trò chuyện mạng xã hội, và Viết thư trang trọng/thân mật. AI Kỳ Tích chấm bài chi tiết theo chuẩn CEFR.
+                Luyện viết theo cấu trúc Aptis Writing 4 phần: Điền thông tin cá nhân, Đơn đăng ký câu lạc bộ, Trò chuyện mạng xã hội, và Viết thư trang trọng/thân mật. AI PREMIER chấm bài chi tiết theo chuẩn CEFR.
               </p>
               <Link
                 className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap border dark:text-primary-foreground bg-background py-2 mt-4 rounded-full border-primary text-primary hover:bg-primary/10 hover:text-primary h-9 px-4 text-sm font-medium transition-colors"
