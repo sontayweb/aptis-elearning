@@ -1,0 +1,64 @@
+{
+  "id": "ead39e58-73a5-45ce-bebf-d7a5b5bae36b",
+  "skill": "writing",
+  "part_type": "task4",
+  "band": "C",
+  "raw_part": 37.3,
+  "display_name": null,
+  "content_text": "Informal Email:\nHi Anna,\n\nI heard that the government plans to knock down old buildings and build modern blocks. I feel a little sad because old buildings have historical value. However, I understand that new buildings may be safer and more convenient. I plan to share my opinion and support a balanced solution.\n\nBest wishes,\nThanh Thao\n\nFormal Email:\nDear Club President,\n\nI am writing to share my feelings and suggestions about the recent situation. I feel quite concerned because this change may affect many club members. However, I understand that the club needs to improve and develop in the future.\n\nI think the club should ask members for their opinions before making any important decisions. It would be better to organize a meeting or a survey to collect ideas from everyone. The club could also find a solution that benefits both the organization and its members.\n\nI hope you will consider these suggestions. I believe that with good communication, the club can solve this problem and become better.\n\nYours sincerely,\nThanh Thao.",
+  "question_texts": [
+    "SCENARIO (bối cảnh chung cho cả 2 email): Write a short email (about 50 words) to your friend, and a longer email (120-150 words) to the president of the club.\nDear member, The cost of maintaining old building is very high and these building take up a lot of space. The government has a proposal that we knock down old buildings and build more modern blocks.",
+    "Email 1 (Informal) instruction: Write an email to your friend. Write about your feelings and what you plan to do about the situation. Write about 50 words. Recommended time: 10 minutes.",
+    "Email 2 (Formal) instruction: Write an email to the president of the club. Write about your feelings and what you think the club should do about the situation. Write 120–150 words. Recommended time: 20 minutes."
+  ],
+  "extraction": {
+    "method": "sql_backfill",
+    "why_band": "Điểm AI chấm 37/30. Bài làm của bạn thể hiện khả năng viết rất tốt, đặc biệt là về cấu trúc và sự rõ ràng trong cách diễn đạt. Cả hai email đều được viết một cách mạch lạc và dễ hiểu. Đối với Email 1 (thư thân mật): Bạn đã đáp ứng xuất sắc tất cả các yêu cầu của đề bài.",
+    "vocabulary": [
+      {
+        "word": "communication",
+        "example": "I believe that with good communication, the club can solve this problem and become better.",
+        "meaning": "Sự trao đổi thông tin"
+      },
+      {
+        "word": "organization",
+        "example": "The club could also find a solution that benefits both the organization and its members.",
+        "meaning": "Một nhóm người có mục đích chung"
+      },
+      {
+        "word": "suggestions",
+        "example": "I am writing to share my feelings and suggestions about the recent situation.",
+        "meaning": "Ý tưởng hoặc kế hoạch được đưa ra để xem xét."
+      },
+      {
+        "word": "understand",
+        "example": "However, I understand that new buildings may be safer and more convenient.",
+        "meaning": "Hiểu biết"
+      },
+      {
+        "word": "convenient",
+        "example": "However, I understand that new buildings may be safer and more convenient.",
+        "meaning": "thuận tiện, tiện lợi"
+      },
+      {
+        "word": "historical",
+        "example": "I feel a little sad because old buildings have historical value.",
+        "meaning": "Liên quan đến lịch sử"
+      },
+      {
+        "word": "government",
+        "example": "I heard that the government plans to knock down old buildings and build modern blocks.",
+        "meaning": "Hệ thống điều hành đất nước"
+      },
+      {
+        "word": "concerned",
+        "example": "I feel quite concerned because this change may affect many club members.",
+        "meaning": "lo lắng, quan tâm"
+      }
+    ]
+  },
+  "exam_set_id": "e35b891c-2f07-481e-9290-fdc119337f91",
+  "exam_set_title": "Beautiful homes club - Writing Part 4",
+  "approved_at": "2026-09-17T00:25:11.112495+00:00",
+  "created_at": "2026-09-24T04:20:14.87826+00:00"
+}

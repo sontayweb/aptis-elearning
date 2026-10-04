@@ -1,0 +1,3826 @@
+[
+  {
+    "id": "68e09b9453b4655eba3efc22",
+    "part": "PART1",
+    "title": "Art Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes. ",
+        "subQuestions": [
+          {
+            "prompt": "How many people are there in your family?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "A place you would like to visit in your country?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where are you from?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What’s your favorite food?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite season?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e09bff53b4655eba3efc2e",
+    "part": "PART1",
+    "title": "Book Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is your surname name?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where are you from?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How often do you go shopping?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What animals do you like?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where would you like to go on holiday?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e3910953b4655eba3f00ef",
+    "part": "PART1",
+    "title": "Language Club",
+    "questions": [
+      {
+        "prompt": "You want to join a Music club. Fill in the form. Use 1 – 5 words.",
+        "subQuestions": [
+          {
+            "prompt": "Who do you often go to the movies with?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What’s the weather like today?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What was your first school?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Who do you like spending time with?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where do you live?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e3917453b4655eba3f00fb",
+    "part": "PART1",
+    "title": "Beautiful Homes Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is your favorite device?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What languages do you speak?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How do you get to work or school?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What time do you get up?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you ever sleep during the day?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e3920453b4655eba3f0107",
+    "part": "PART1",
+    "title": "Photography Club",
+    "questions": [
+      {
+        "prompt": "You want to join a photography club. Fill in the form. Use 1 – 5 words.",
+        "subQuestions": [
+          {
+            "prompt": " Where are you from?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How many people in your family?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you do in your free time?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your hobby?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Who do you usually go to the movies with?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e396aa53b4655eba3f0113",
+    "part": "PART1",
+    "title": "Music Club",
+    "questions": [
+      {
+        "prompt": "You want to join a Music club. Fill in the form. Use 1 – 5 words.",
+        "subQuestions": [
+          {
+            "prompt": "What's your favorite sport?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What kind of movies do you like?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How often do you play golf?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your first language?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How do you go to school?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e3974453b4655eba3f011f",
+    "part": "PART1",
+    "title": "Sport Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "How do you go to work?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What kind of music do you like?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What time of day do you like most?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How do you get to work?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What hobbies do you have? ",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e398cb53b4655eba3f012b",
+    "part": "PART1",
+    "title": "Social Club",
+    "questions": [
+      {
+        "prompt": "You want to join a Social Club. Fill in the form. Use 1 – 5 words.",
+        "subQuestions": [
+          {
+            "prompt": "What did you do last week?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How are you?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite time of year?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Why do you learn English?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you like to do in the evening?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e3997e53b4655eba3f0137",
+    "part": "PART1",
+    "title": "Walking Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is your favorite place?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What kind of people do you like?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What did you do yesterday?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite animal?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How often do you exercise?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e39a7453b4655eba3f0143",
+    "part": "PART1",
+    "title": "Computer Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is your favorite type of music?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you do on the weekends?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where was your best holiday?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Have you ever lived in another country?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How much time do you spend on your phone?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e39b4e53b4655eba3f014f",
+    "part": "PART1",
+    "title": "Home Living Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is your full name?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What job would you like to do?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is the first thing you do in the morning?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What family member makes you laugh most?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where do you buy your clothes?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e3d64753b4655eba3f02d9",
+    "part": "PART1",
+    "title": "Debate Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes. ",
+        "subQuestions": [
+          {
+            "prompt": "What’s your favorite board game?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What did you do on the weekend?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What school do you go to?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you like to do every morning?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What language do you speak?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e3d7c853b4655eba3f02e5",
+    "part": "PART1",
+    "title": "Technology Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What do you do?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "When do you usually watch TV?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What’s your favorite food?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you often use Facebook?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where do you meet your friends?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e3d92b53b4655eba3f02f1",
+    "part": "PART1",
+    "title": "Science Club",
+    "questions": [
+      {
+        "prompt": "You want to join a Science Club. Fill in the form. Use 1 – 5 words.",
+        "subQuestions": [
+          {
+            "prompt": "What is your favorite color?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": " What is your first school?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you like doing exercise?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where do you like to go on holiday?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What did you do last night?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e3da7053b4655eba3f02fd",
+    "part": "PART1",
+    "title": "Museum Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is your favorite time of the day?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you like to do in free time?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How many phones do you have?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What kinds of films do you like?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favourite colour?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8e90f53b4655eba3f45ff",
+    "part": "PART1",
+    "title": "Fitness Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "How is the weather today?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite season of the year?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What’s your favorite hobby?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What’s your favorite hobby?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where do you like to go on weekends?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8e96753b4655eba3f460b",
+    "part": "PART1",
+    "title": "Food Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "How are you?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favourite time of year?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you usually do in the evening?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What’s your favorite animal?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "When was the last time you went out?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8e99753b4655eba3f4617",
+    "part": "PART1",
+    "title": "Travel Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "Which is your favorite season?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite kind of music?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What are you wearing today?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Which sport is the most popular in your country?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What's your favourite colour?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8e9d153b4655eba3f4623",
+    "part": "PART1",
+    "title": "English Club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is the weather today?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you like to do in the evening?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where do you wanna go on holiday?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favourite day?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "When is your birthday?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8e9fc53b4655eba3f462f",
+    "part": "PART1",
+    "title": "Garden club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "Who do you usually go to the movies with?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is the weather like today?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How do you travel around your city/town?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What time do you go to bed?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your first language?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8ea2f53b4655eba3f463b",
+    "part": "PART1",
+    "title": "Outdoor club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is your favorite time of the year?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you usually do in the morning?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is a place you would like to visit in your country?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is the weather like today?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where would you like to go on holiday?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8ea5b53b4655eba3f4647",
+    "part": "PART1",
+    "title": "Car club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "How do you get here?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": " What are you wearing today?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is a place you would like to visit in your country?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How many people are in your family?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where would you like to live?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8ea9053b4655eba3f4653",
+    "part": "PART1",
+    "title": "Fashion club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is your favorite time of the year?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you do in your free time?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Which place would you like to visit in your country?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What's the weather like today?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What's your favourite season?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8eabe53b4655eba3f465f",
+    "part": "PART1",
+    "title": "Community club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What's your favorite hobby?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How do you get to work?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you like to do in the evening?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What kinds of movies do you like?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What's your favorite food?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f01153b4655eba3f4689",
+    "part": "PART1",
+    "title": "Business club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "How many people are there in your family?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How do you relax?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite season/time of the year?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What did you do last night?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Who do you usually go to the movies with?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f04553b4655eba3f4695",
+    "part": "PART1",
+    "title": "Nature club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "Where do you come from?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": " What do you do in your free time?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite sport?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Who do you like spending time with?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": " Do you like to take photos?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f07053b4655eba3f46a1",
+    "part": "PART1",
+    "title": "Nature club  - Version 2",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "Where are you living now?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you usually do on weekends?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite color?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you like taking photos?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where do you like to go on holiday?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f0d353b4655eba3f46ad",
+    "part": "PART1",
+    "title": "Writing club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "A place you visit in your country?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Who do you usually/often go to the movies/theatres/films with?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you like shopping?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you often use Facebook?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Why are you interested in travel?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f0fe53b4655eba3f46b9",
+    "part": "PART1",
+    "title": "Movie club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "What is your job?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "When do you usually watch TV?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What are you wearing today?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Tell me the last time you watched TV.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Tell me a place you often visit?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f12753b4655eba3f46c5",
+    "part": "PART1",
+    "title": "College club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "Which job would you like to do in the future?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What kinds/types of movies/films do you like?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite kind of music?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite food?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where do you like to go in the summer?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f15253b4655eba3f46d1",
+    "part": "PART1",
+    "title": "Film club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "Why do you learn English?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite film?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Which sport do you like to play the most?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you like doing with your friend?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What kinds of movies do you like?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f17d53b4655eba3f46dd",
+    "part": "PART1",
+    "title": "Cinema club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "How do you go to school?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite animal?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite subject in high school?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Tell me the last time you watched TV?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Where did you go last night?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f1ac53b4655eba3f46e9",
+    "part": "PART1",
+    "title": "Cooking club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "How do you get to work?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What's your favorite hobby?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Which sport is the most popular in your country?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you like to do every morning?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What's your favorite food?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f8f1d853b4655eba3f46f5",
+    "part": "PART1",
+    "title": "Healthy club",
+    "questions": [
+      {
+        "prompt": "You are joining a club. Fill out the form. Write short answers (1-5 words) for each message. You have 3 minutes.",
+        "subQuestions": [
+          {
+            "prompt": "Who do you usually/often go to the movies/theatres/films with?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "A place you visit in your country?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you like shopping?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you often use Facebook?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "When is your birthday?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e0542e53b4655eba3ef8b0",
+    "part": "PART2",
+    "title": "Art Club",
+    "questions": [
+      {
+        "prompt": "You are a new member of an Art club. Tell me about your knowledgeTalk to them using sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me about a painting or a photo that you like.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e055d853b4655eba3ef8b8",
+    "part": "PART2",
+    "title": "Book Club",
+    "questions": [
+      {
+        "prompt": "You are a new member of a book club. Fill in the form. Write in sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Please tell me about your free time and hobbies?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e0561d53b4655eba3ef8c0",
+    "part": "PART2",
+    "title": "Language Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a new member of a language club. Fill in the form. Write in sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me about your free time and interests.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e0565053b4655eba3ef8c8",
+    "part": "PART2",
+    "title": "Language Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a new member of a language club. Fill in the form. Write in sentences.",
+        "subQuestions": [
+          {
+            "prompt": "In which cases do you often use foreign languages?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e0568353b4655eba3ef8d0",
+    "part": "PART2",
+    "title": "Beautiful Homes Club",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Beautiful Homes Club. Tell me about your knowledgeTalk to them using sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Why do you want to join the beautiful homes club?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e056a053b4655eba3ef8d8",
+    "part": "PART2",
+    "title": "Photography Club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Photography Club. Fill in the form. Write in sentences. Use 20-30 words. ",
+        "subQuestions": [
+          {
+            "prompt": "What is your favorite time and place to take pictures?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e056c953b4655eba3ef8e0",
+    "part": "PART2",
+    "title": "Photography Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a new member of a photography club. Fill in the form. Write in sentences. ",
+        "subQuestions": [
+          {
+            "prompt": "Please tell me the last time you took a picture?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e0572753b4655eba3ef8e8",
+    "part": "PART2",
+    "title": "Music Club",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Music Club. Fill in the form. Write in sentences. Use 20 – 30 words",
+        "subQuestions": [
+          {
+            "prompt": "Please tell us about the last time you listened to music.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e0576853b4655eba3ef8f0",
+    "part": "PART2",
+    "title": "Sport Club - Version 1",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Sport Club. Fill in the form. Write in sentences. Use 20-30 words. ",
+        "subQuestions": [
+          {
+            "prompt": "How often do you play sports?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e0579953b4655eba3ef8f8",
+    "part": "PART2",
+    "title": "Sport Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a new member of the sports club. Fill in the form. Write in sentences. ",
+        "subQuestions": [
+          {
+            "prompt": "Why did you decide to join the club?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e057cf53b4655eba3ef900",
+    "part": "PART2",
+    "title": "Social Club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Social Club. Fill in the form. Write in sentences. Use 20-30 words. ",
+        "subQuestions": [
+          {
+            "prompt": "What do you like to do with friends and where do you go?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e0594e53b4655eba3ef908",
+    "part": "PART2",
+    "title": "Walking Club",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Walking Club. Fill in the form. Write in sentences. Use 20 – 30 words",
+        "subQuestions": [
+          {
+            "prompt": "Where and when do you like to walk?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e0599e53b4655eba3ef910",
+    "part": "PART2",
+    "title": "Computer Club",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Computer Club. Tell me about your knowledgeTalk to them using sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "When and where do you use a computer?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e059e153b4655eba3ef918",
+    "part": "PART2",
+    "title": "Home Living Club",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Home living club. Fill in the form. Write in sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Describe the area that you live in.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e05a1a53b4655eba3ef920",
+    "part": "PART2",
+    "title": "Debate Club",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Debate Club. Tell me about your knowledgeTalk to them using sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "What do you usually talk about with your friends?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e05a5253b4655eba3ef928",
+    "part": "PART2",
+    "title": "Technology Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Technology club. Fill in the form. Write in sentences. Use 20 – 30 words",
+        "subQuestions": [
+          {
+            "prompt": "What do you usually use your laptop for?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e05aa653b4655eba3ef930",
+    "part": "PART2",
+    "title": "Science Club - Version 1",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Science Club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Do you like Science? Why?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e05af153b4655eba3ef938",
+    "part": "PART2",
+    "title": "Science Club - Version 2",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Science Club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Why do you like science?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e05b5653b4655eba3ef94d",
+    "part": "PART2",
+    "title": "Museum Club",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Museum Club. Fill in the form. Write in sentences. Use 20 – 30 words",
+        "subQuestions": [
+          {
+            "prompt": "Tell me the last time you went to a museum.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e05c3a53b4655eba3efa4c",
+    "part": "PART2",
+    "title": "Fitness Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Fitness club. Fill in the form. Write in sentences. Use 20 – 30 words",
+        "subQuestions": [
+          {
+            "prompt": "Please talk about the last time you had to run somewhere?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e05c7053b4655eba3efa54",
+    "part": "PART2",
+    "title": "Food Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Food Club. Tell me about your knowledgeTalk to them using sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "What did you eat for breakfast?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e05c9953b4655eba3efa5c",
+    "part": "PART2",
+    "title": "Food Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Food Club. Tell me about your knowledgeTalk to them using sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "What was the last time you ate out and where did you eat it?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e099b553b4655eba3efbf2",
+    "part": "PART2",
+    "title": "Travel Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Travel club. Fill in the form. Write in sentences. Use 20 – 30 words",
+        "subQuestions": [
+          {
+            "prompt": "Why are you interested in travel?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e099ce53b4655eba3efbfa",
+    "part": "PART2",
+    "title": "Travel Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Travel club. Fill in the form. Write in sentences. Use 20 – 30 words",
+        "subQuestions": [
+          {
+            "prompt": "Tell me a place you often visit.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e09a1953b4655eba3efc02",
+    "part": "PART2",
+    "title": "Television Club - Version 1",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Television Club. Fill in the form. Write in sentences. Use 20-30 words. You have 7 minutes in total.",
+        "subQuestions": [
+          {
+            "prompt": "Do you usually watch TV?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e09a3053b4655eba3efc0a",
+    "part": "PART2",
+    "title": "Television Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a new member of a Television club. Fill in the form. Write in sentences. Use 20 – 30 words",
+        "subQuestions": [
+          {
+            "prompt": "When do you usually watch TV? What do you usually watch?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e09a6353b4655eba3efc12",
+    "part": "PART2",
+    "title": "English Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a new member of an English Club. Tell me about your knowledgeTalk to them using sentences. Use 20 – 30 words.",
+        "subQuestions": [
+          {
+            "prompt": "What do you usually use the Internet for?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e09abd53b4655eba3efc1a",
+    "part": "PART2",
+    "title": "English Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a new member of the English Club. Fill in the form. Write in sentences. Use 20–30 words.",
+        "subQuestions": [
+          {
+            "prompt": "When do you usually have to come into contact with English?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f755af53b4655eba3f41a8",
+    "part": "PART2",
+    "title": "Garden club",
+    "questions": [
+      {
+        "prompt": "You are joining a Garden club. Fill out the form.",
+        "subQuestions": [
+          {
+            "prompt": "Why did you join the club?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f755db53b4655eba3f41b0",
+    "part": "PART2",
+    "title": "Outdoor club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Outdoor club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Which outdoor activities do you like? Why?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f755f553b4655eba3f41b8",
+    "part": "PART2",
+    "title": "Car club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Car club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Do you usually travel by car?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7560c53b4655eba3f41c0",
+    "part": "PART2",
+    "title": "Fashion club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Fashion club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "When was the last time you went shopping for clothes?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7562453b4655eba3f41c8",
+    "part": "PART2",
+    "title": "Community club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Community club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Why did you join this Community club?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7564753b4655eba3f41d0",
+    "part": "PART2",
+    "title": "Business club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Business club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Where do you usually go shopping?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7569453b4655eba3f41d8",
+    "part": "PART2",
+    "title": "Nature club - Version 1",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Nature club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Please tell me about your free time and hobbies?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f756b953b4655eba3f41e0",
+    "part": "PART2",
+    "title": "Writing club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Writing club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me about the last time you wrote something.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f756c953b4655eba3f41e8",
+    "part": "PART2",
+    "title": "Movie club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Movie club. Fill in the form. Write in sentences. Use 20-30 words (Viết 20 đến 30 từ thôi nhé!).",
+        "subQuestions": [
+          {
+            "prompt": "Why did you join the club?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f756e353b4655eba3f41f0",
+    "part": "PART2",
+    "title": "College club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the College club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Please tell us about the days and times you can attend courses and what you would like to study?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f756fa53b4655eba3f41f8",
+    "part": "PART2",
+    "title": "Film club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Film club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Please write some of your favorite films and why do you like watching them?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7572253b4655eba3f4210",
+    "part": "PART2",
+    "title": "Cinema club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Cinema club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "When and how often do you watch films?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7573c53b4655eba3f4218",
+    "part": "PART2",
+    "title": "Cooking club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Cooking club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me about the day and time you can join the club and which food/dish you want to cook.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7575053b4655eba3f4220",
+    "part": "PART2",
+    "title": "Healthy club",
+    "questions": [
+      {
+        "prompt": "Now you've become a new member of the Healthy club. Fill in the form. Write in sentences. Use 20-30 words.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me the classes you want to take and what times and days are suitable for you?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df0aea53b4655eba3eed34",
+    "part": "PART3",
+    "title": "Art Club",
+    "questions": [
+      {
+        "prompt": "You are a member of an Art club. You are talking to other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "I kept a painting for a long time. Tell me a thing that you have had for a long time. ",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I would like to learn to paint, but I have not found an effective way. Should I take a course at my local college? Please, give me some advice.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Street art – where people paint on the building – is becoming popular. However, some people criticize that it is bad. What is your opinion?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df0b4e53b4655eba3eed3e",
+    "part": "PART3",
+    "title": "Book Club",
+    "questions": [
+      {
+        "prompt": "You are a member of a book club. You are talking to three other members in the book club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Hi! Welcome to the club. When and where do you like reading books?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Hi! I would like to give my friend a book. What would you suggest for me to buy?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "C: Do online books replace traditional books? What do you think about that?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df0b8453b4655eba3eed48",
+    "part": "PART3",
+    "title": "Language Club",
+    "questions": [
+      {
+        "prompt": "You are a member of a Language Club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Why did you choose this course?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How have you found the course so far? What’s been difficult?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What are you hoping to do when you finish the course?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df0bd953b4655eba3eed52",
+    "part": "PART3",
+    "title": "Language Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a member of the language club. You are talking to three other members in the language club chat room. Talk to them using sentences.",
+        "subQuestions": [
+          {
+            "prompt": "I used to learn French and found it very interesting. Tell me about a memory you have with a foreign language?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I am very forgetful. Can you give me some tips on how to remember new words?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Some people learn English through videos and reading books. However, there are also many private classes and teachers. What do you think is the most effective way to learn?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df0c2553b4655eba3eed5c",
+    "part": "PART3",
+    "title": "Beautiful Homes Club",
+    "questions": [
+      {
+        "prompt": "You are a member of a Beautiful Homes Club. You are talking to other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "I have a bad relationship with my neighbors because they often make noise. Tell me how is your relationship with your neighbors?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you prefer living in old buildings or modern buildings? Why?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "The house should be designed in a way that is good for the environment. Do you agree?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df561f53b4655eba3eee53",
+    "part": "PART3",
+    "title": "Photography Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of a Photography Club. You are talking to three other members in the Photography Club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Hi! Welcome to the club. What is your favorite photo?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Hi! What kind of photos do you like to take?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Is it good to take pictures with the phone?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df567153b4655eba3eee5d",
+    "part": "PART3",
+    "title": "Photography Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a member of a photography club. You are talking to three other members in the photography club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Hi! Welcome to the club. How to have a beautiful picture?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I often save my photos as files on my computer or print them out. How do you save your photos?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What skills do you need to take good photos?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df56e353b4655eba3eee67",
+    "part": "PART3",
+    "title": "Music Club",
+    "questions": [
+      {
+        "prompt": "You are a member of a Music Club. You are talking to three other members in the Music Club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Hi! How often do you listen to music?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I plan to give my son music lessons but he doesn't like it. What should I do?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you agree that music is important in culture?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df574f53b4655eba3eee71",
+    "part": "PART3",
+    "title": "Sport Club",
+    "questions": [
+      {
+        "prompt": "You are a member of a Sport club. You are talking to three other members in the Sport club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "When was the last time you played sports?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I usually play sports with my friends and watch sports programs. What about you?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I like playing sports with my friend but my brother likes playing sports alone. What do you think about this issue?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df57b853b4655eba3eee7b",
+    "part": "PART3",
+    "title": "Social Club",
+    "questions": [
+      {
+        "prompt": "You are a member of a Social Club You are talking to three other members in the  Social Club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Where did you meet your friends for the first time and how did you become friends?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I have just moved to the city and want to make some friends. Can you give me some advice?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "It is much easier to make new friends these days because of computers and mobile phones. Do you agree? Why or why not?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df583553b4655eba3eee85",
+    "part": "PART3",
+    "title": "Walking Club Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of a Walking club. You are talking to three other members in the Walking club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "I usually go for a walk. Do you like walking?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I like walking but when it rains I get wet. Tell me about a time you had a bad experience while hiking.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Walking is the best form of exercise. What do you think when many people walk and know it's good for their health?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df8a4053b4655eba3eef8a",
+    "part": "PART3",
+    "title": "Walking Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are communicating with other members of the club in the chat room. Reply to their questions. Write in sentences. Use 30–40 words per answer.",
+        "subQuestions": [
+          {
+            "prompt": "I prefer to go to the countryside for a walk. Walking in the city is stressful and noisy. What do you think?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "In the past, people walked long distances as part of their lives. These days, they don’t walk anymore. Why?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Walking is good. What are useful ways to encourage people to walk more?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df8a9653b4655eba3eef94",
+    "part": "PART3",
+    "title": "Computer Club",
+    "questions": [
+      {
+        "prompt": "You are a member of a Computer club. You are talking to other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "My grandmother doesn’t know how to use the computer. Your solutions",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "The last time you used your computer. Your purpose.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Nowadays people use computers a lot. This is not good. Your opinion.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df8aee53b4655eba3eef9e",
+    "part": "PART3",
+    "title": "Home Living Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of a Home Living Club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me something about your childhood home.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Which do you prefer living in, the country or the city, and why?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "The benefits of living in the city.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df8b3353b4655eba3eefa8",
+    "part": "PART3",
+    "title": "Home Living Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a member of a Home Living Club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "You have to stay in the bedroom but have to share with your brother. How do you feel?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "It is better to live in the city than in the countryside. Do you agree? Why?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Nowadays, old buildings are demolished and replaced with modern buildings. I feel we should protect historic buildings. What do you think?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df8b9353b4655eba3eefb2",
+    "part": "PART3",
+    "title": "Debate Club",
+    "questions": [
+      {
+        "prompt": "You are a member of a Debate Club. You are talking to other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Hi! Nowadays, there are many ways to update news. How do you keep up with world issues?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I am going to join a debate in front of 50 people next week. How can I make a good impression?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Before making a decision about something, you should consider two sides of the problem. What do you think about that?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df8c3d53b4655eba3eeff3",
+    "part": "PART3",
+    "title": "Technology Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of a Technology club. You are talking to three other members in the Technology club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Do you often watch movies on your laptop or go to the theater?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Some people prefer watching movies at home to watching in the cinema. Please give your opinion.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you like watching TV alone or with others?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df8c8553b4655eba3ef003",
+    "part": "PART3",
+    "title": "Technology Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a member of a Technology club. You are talking to three other members in the Technology club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Do you often watch movies on your laptop or go to the theater?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I used to work on a laptop and it stopped and I lost all my notes. Tell me about a bad time with your computer?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Technological improvements have made our lives easier. What do you think?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df8ece53b4655eba3ef2c0",
+    "part": "PART3",
+    "title": "Science Club",
+    "questions": [
+      {
+        "prompt": "You are a member of a Science Club You are talking to three other members in the  Science Club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Why did you decide to join our Science Club? How often can you go to the club?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "In the past, you learned about Science in school. Do you remember something about Science?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Who is your favorite inventor or scientist? Why? ",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfa0ed53b4655eba3ef437",
+    "part": "PART3",
+    "title": "Museum Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of a Museum Club. You are talking to three other members in the Museum Club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me the time you went to a museum when you were a kid.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What do you prefer: A history museum or a Sports museum?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Nowadays, many museums use technology to create online exhibitions. Do you think that will be successful?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfa16253b4655eba3ef441",
+    "part": "PART3",
+    "title": "Museum Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are communicating with other members of the club in the chat room. Reply to their questions. Write in sentences. Use 30-40 words per answer.",
+        "subQuestions": [
+          {
+            "prompt": "Please talk about the first museum you visited when you were a child.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What kind of museums do you prefer: sports museums and history museums?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "A lot of museums use technology screens and videos in their exhibitions. Why are they so successful?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfa1db53b4655eba3ef44b",
+    "part": "PART3",
+    "title": "Fitness Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of a Fitness Club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "I often go jogging because it is good for my health. What about you?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Why did you want to join the Fitness Club? ",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Nowadays, technology makes people's lives easier, but it also makes them lazy and dislike exercise. Do you agree with this opinion?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfcf9153b4655eba3ef7ef",
+    "part": "PART3",
+    "title": "Fitness Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a member of a Fitness Club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Why do you want to join this club",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Give advice for busy people wanting to keep fit?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How to improve the quality of the fitness club?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfd00153b4655eba3ef7f9",
+    "part": "PART3",
+    "title": "Food Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of a Food Club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Nowadays, lots of people order pizza instead of cooking by themselves when they are busy. What about you? When you are busy, what do you usually eat?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Is it important for children to participate in cooking courses at school?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Should everyone know how to cook?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfd12253b4655eba3ef803",
+    "part": "PART3",
+    "title": "Food Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a member of a Food Club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me about the most memorable meal of your life.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Some people like to eat out with friends, do you like eating out or eating at home?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Nowadays, people in other countries have too many unhealthy food choices. Should there be a tax on fast food to improve this situation. Why?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfd21653b4655eba3ef80d",
+    "part": "PART3",
+    "title": "Travel Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of a Travel club. You are talking to three other members in the Travel club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me a time you had a trip in bad weather.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Traveling a long distance by some means of transportation is not good for the environment. Do you agree?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What are the most interesting places to visit in your country?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfd27253b4655eba3ef817",
+    "part": "PART3",
+    "title": "Travel Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a member of a Travel club. You are talking to three other members in the Travel club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "Describe your recent vacation.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Tell me about a vacation you like most.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Some people like taking photos when they have a vacation. Your opinion?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfd2b253b4655eba3ef821",
+    "part": "PART3",
+    "title": "Television Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of a Television club. You are talking to three other members in the book club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "What do you like to do when you watch TV?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you like watching TV alone or with others?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Is it good for children to watch TV programs too much?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfd32c53b4655eba3ef82b",
+    "part": "PART3",
+    "title": "Television Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a member of a Television club. You are talking to three other members in the Television club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "I usually like to eat and sit on a chair while watching TV. What about you?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I often feel uncomfortable watching TV with people who talk a lot. What about you?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "People say that it is not good for children to watch too much TV. Do you agree?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfd37753b4655eba3ef835",
+    "part": "PART3",
+    "title": "English Club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are a member of an English Club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30 – 40 words.",
+        "subQuestions": [
+          {
+            "prompt": "I usually spend 6 hours a day studying English. How do you learn English?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "English is a popular language in the world. What are your thoughts on this idea?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "When do you usually use English?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfd3fb53b4655eba3ef83f",
+    "part": "PART3",
+    "title": "English Club - Version 2",
+    "questions": [
+      {
+        "prompt": "You are a member of the English club. You are talking to three other members in the English club chat room. Talk to them using sentences. ",
+        "subQuestions": [
+          {
+            "prompt": " Hi! I heard that you attended a club meeting this afternoon. How do you feel about the meeting?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "We have weekly meetings on Saturday afternoons. What topic are you expecting us to talk about?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "We are thinking of holding some English games next week. Can you suggest some?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dfd44753b4655eba3ef849",
+    "part": "PART3",
+    "title": "English Club - Version 3",
+    "questions": [
+      {
+        "prompt": "You are communicating with other members of the club in the chat room. Reply to their questions. Write in sentences. Use 30–40 words per answer.",
+        "subQuestions": [
+          {
+            "prompt": "Tell me about your English learning experience?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I can read and write, but I can't speak English. Do you have any advice for me?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "English is a popular language in the world. What are your thoughts on this opinion?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74b9053b4655eba3f4056",
+    "part": "PART3",
+    "title": "Garden club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Garden club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "Describe your garden?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do people in your country like gardening?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What is your favorite season? Why?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74bc353b4655eba3f4060",
+    "part": "PART3",
+    "title": "Outdoor club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Outdoor club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "Hi! Welcome to the club. Tell me about the outdoor activities in the bad weather",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Hi! Please give your ideas and advice for hiking?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What are the most popular outdoor activities in your country?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74c3d53b4655eba3f4091",
+    "part": "PART3",
+    "title": "Car club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Car club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "Tell me about a time you traveled by car.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Tell me about memories when traveling by car.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Should we take public transportation or buy a car?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74c8553b4655eba3f409b",
+    "part": "PART3",
+    "title": "Fashion club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Fashion club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "Some people like to buy clothes to try on themselves. Some prefer to buy online. How do you like it and why?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Hi! Why did you decide to join the club?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Why do people like fashion?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74d3553b4655eba3f40d9",
+    "part": "PART3",
+    "title": "Community club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Community club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "My friend wants to go to the hair salon, but her car isn't working. Can you suggest some ways for her to get there?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Volunteering provides great learning opportunities and helps others a lot. Do you agree with this?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you agree with the view that volunteering is a form of learning, especially for young people? Why?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74dba53b4655eba3f40e3",
+    "part": "PART3",
+    "title": "Business club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Business club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "I know there are a lot of successful small businesses these days. Tell me about a successful small business in your area.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I have a friend who wants to open a second coffee shop. She opened her first one a year ago and it was quite successful. What advice do you have to help her be more successful in her second shop?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Can you tell me what qualities and skills are needed to create a successful small business?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74e3b53b4655eba3f40ed",
+    "part": "PART3",
+    "title": "Nature club - Version 1",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Nature club 2 in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "I went for a walk in the forest last month and I got lost. Can you tell me about a time when you got lost?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I like visiting the mountains because they are so peaceful. What kinds of places do you like to visit and why?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Large group holidays in areas of natural beauty are becoming more and more popular. I'm not sure that's a good thing. Do you agree? Why or why not?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74e7f53b4655eba3f40f7",
+    "part": "PART3",
+    "title": "Writing club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Writing club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "I usually write at the coffee shop. What about you?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Do you prefer handwriting or typing?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "There are many people who like to write, but only a few become writers. What makes a successful writer?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74eab53b4655eba3f4101",
+    "part": "PART3",
+    "title": "Movie club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Movie club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "Hi! When and where do you usually watch movies?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I want to make movies for young children. Give me some suggestions?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How do you think technology affects the way we watch movies in the future?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74ed453b4655eba3f410b",
+    "part": "PART3",
+    "title": "College club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the College club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "Hi! Welcome to the college. What course are you doing and why did you choose it?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Welcome! How do you feel about the college so far?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Did you hear that the college sports club has closed? What do you think about this?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74f0753b4655eba3f4115",
+    "part": "PART3",
+    "title": "Film club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Film club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "Hi. Welcome to the club. How often do you watch films?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Hi. Can you remember the first film you what? What was it like?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "What would you like to learn from the film club?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7543b53b4655eba3f4150",
+    "part": "PART3",
+    "title": "Cinema club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Cinema club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "I like to sit near the screen when I go to the cinema? I never drink or eat anything during the film. What about you?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "I don’t like watching old back-and-white. They are boring. I prefer modern films, which do you prefer, and why?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Some people say we don’t need cinemas anymore. We can watch everything on TV or online at home? What do you think about this?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7547953b4655eba3f415a",
+    "part": "PART3",
+    "title": "Cooking club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Cooking club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": " Hi! Welcome to the club. Why did you decide to join the club?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Hi! What do you think about the club’s price/ membership fee?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "How often do you go to the club?",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f754b453b4655eba3f4164",
+    "part": "PART3",
+    "title": "Healthy club",
+    "questions": [
+      {
+        "prompt": "You are speaking to fellow members of the Healthy club in a group chat. Respond to them in full sentences (30-40 words per answer).",
+        "subQuestions": [
+          {
+            "prompt": "Hi! Welcome to the club. How did you hear about the club?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Hi! What do you hope to achieve by joining the club?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "A manager of Fitness club has an announcement for club’s members.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd36df53b4655eba3ee4b8",
+    "part": "PART4",
+    "title": "Art Club",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>You are a member of an Art club. You received this email from the club.</em></strong></p><p><strong><em>“Dear all members,&nbsp;</em></strong></p><p><strong><em>The Art Club is organizing a talk to the public to attract more attention. We are going to invite an artist to give a talk to the members. As a member of our club, could you give us an artist to join our talk and what topic should they share to gain more attention? We would like to have more both young and elderly members.”</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend – also a member of the club.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the organizer of the plan.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd37d853b4655eba3ee4ee",
+    "part": "PART4",
+    "title": "Book Club",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>You are a member of a book club. You received this email from the club.</em></strong></p><p><strong><em>\"Dear member,</em></strong></p><p><strong><em>From next month we will no longer be able to continue our offer of one free book every month. Also, because of problems with our delivery service, please expect a wait of 4-6 weeks before your order arrives.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write to show your feeling and what would you like to do? Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write to show your feeling and recommendation about this situation. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd383e53b4655eba3ee4f7",
+    "part": "PART4",
+    "title": "Language Club",
+    "questions": [
+      {
+        "prompt": "<h2><strong style=\"color: rgb(255, 255, 255);\"><em><span class=\"ql-cursor\">﻿</span></em></strong><strong><em>You are a member of a Language Club. You received this email from the club administrator. You are taking an English Course at the American Dream Center. After studying for 2 months, you find the course effective and useful.</em></strong></h2>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about your feelings and recommend the course to her/him. Write about 50 words. You have 10 minutes.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "You have registered for an English course at A Level Speaking Center but in the end, you can’t arrange the time to attend the course. Write about your feelings, the reason why you can’t attend and what you would like to do. Write 120-150 words. You have 20 minutes.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd391e53b4655eba3ee500",
+    "part": "PART4",
+    "title": "Language Club - Version 2",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>\"Dear members,</em></strong></p><p class=\"ql-align-justify\"><strong><em>The club will have a lecture soon. The club needs a guest speaker and a theme of learning language.</em></strong></p><p class=\"ql-align-justify\"><strong><em>Write an email expressing your desire to be a speaker and give the topic of the talk?\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the club.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd39c653b4655eba3ee5fc",
+    "part": "PART4",
+    "title": "Beautiful Homes Club",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>You are a member of a Beautiful Homes Club. You received this email from the club.</em></strong></p><p><strong><em>\"Dear member,</em></strong></p><p><strong><em>The cost of maintaining old buildings is very high and these buildings take up a lot of space. The government has a proposal that we knock down old buildings and build more modern blocks.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write to a friend (50 words).",
+            "correctAnswer": null
+          },
+          {
+            "prompt": " Write to the manager club.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3a0453b4655eba3ee605",
+    "part": "PART4",
+    "title": "Photography Club",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>You are a member of a Photography Club. You received this email from the club.</em></strong></p><p><strong><em>\"Dear member,</em></strong></p><p><strong><em>Our club is organizing an exhibition to show people’s best photos. We will have a talk. Please give some suggestions to attract all ages to join.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3ad253b4655eba3ee617",
+    "part": "PART4",
+    "title": "Music Club - Version 1",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of a Music Club. You received this email from the club administrator. Your music club is planning to hold a concert. The club wants members to come up with suggestions to attract both young and old people to participate</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3b3853b4655eba3ee620",
+    "part": "PART4",
+    "title": "Music Club - Version 2",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of a Music Club. You received this email from the club administrator. Our music club holds a concert in the evening, so the surrounding residents complain. Please give us some suggestions to solve the above problem</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3bd953b4655eba3ee629",
+    "part": "PART4",
+    "title": "Sport Club - Version 1",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of a Sport Club. You received this email from the club.</em></strong></p><p class=\"ql-align-justify\"><strong><em>\"Dear members,</em></strong></p><p class=\"ql-align-justify\"><strong><em>Please give your suggestions about the organization of playing sports for young members.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3caf53b4655eba3ee632",
+    "part": "PART4",
+    "title": "Social Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of a Social Club. You received this email from the club. </em></strong></p><p class=\"ql-align-justify\"><strong><em>\"Dear members, </em></strong></p><p class=\"ql-align-justify\"><strong><em>We would like to organize some monthly face-to-face meetings. We would like your suggestions about when and where we could meet. It suits both young and older people. Please send us your suggestions and your reasons.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3d5d53b4655eba3ee63b",
+    "part": "PART4",
+    "title": "Walking Club Version 1",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of a Walking Club. You received this email from the club.</em></strong></p><p class=\"ql-align-justify\"><strong><em>\"Dear member,</em></strong></p><p class=\"ql-align-justify\"><strong><em>As club members know. The club will organize a 2-week walking tour through European countries. Some members' opinions differ on this issue. What do you think, please give your opinion or suggestion about this plan.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3df053b4655eba3ee644",
+    "part": "PART4",
+    "title": "Walking Club - Version 2",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of a Walking Club. You received this email from the club. </em></strong></p><p><strong><em>“Currently, at walking clubs, there is a phenomenon of many pedestrians not paying attention and using their phones while walking on the street. The club wants members to give their opinions and suggestions on this issue.”</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3e4053b4655eba3ee64d",
+    "part": "PART4",
+    "title": "Computer Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>\"Dear member</em></strong></p><p class=\"ql-align-justify\"><strong><em>The club has a plan to adjust our website in order to attract more members. Your feelings and suggestions\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words. ",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3eb253b4655eba3ee656",
+    "part": "PART4",
+    "title": "Home Living Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of a college. You received this email from the college administrator.</em></strong></p><p class=\"ql-align-justify\"><strong><em>\"Dear member,</em></strong></p><p class=\"ql-align-justify\"><strong><em>Currently, there are many young families who want to buy a house or an apartment. The club wants the members to make suggestions to help them find homes. Can you contribute your ideas?\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words. ",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68dd3f2f53b4655eba3ee65f",
+    "part": "PART4",
+    "title": "Debate Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of a college. You received this email from the college administrator. We want to encourage many young people to join the club, unfortunately, young people usually think that debating is not for them. What do you think is the benefit of debating and speaking in public? Please two benefits that you think are the most important and why?</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend who is also a member of the club. Write about how you feel and what you think the club should do. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ddb9f453b4655eba3ee8ba",
+    "part": "PART4",
+    "title": "Technology Club - Version 1",
+    "questions": [
+      {
+        "prompt": "<p><strong style=\"color: rgb(0, 0, 0);\"><em>You are a member of a Technology Club. You received this email from the club.</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear member,</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>Members often post on the website’s club. But lately, there’s been a few negatives on the other member’s post. Please give your opinion to fix the situation.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ddba6553b4655eba3ee8c3",
+    "part": "PART4",
+    "title": "Technology Club - Version 2",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>You are a member of a Technology Club. You received this email from the club. We are going to set up an event and want to choose a place so that foreigners can attend. Please recommend us a destination that is special to hold our event.</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ddbb1e53b4655eba3ee8cc",
+    "part": "PART4",
+    "title": "Technology Club - Version 3",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>The club will hold a technology fair. The club wants to find a volunteer for this event.</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write to a friend.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write to the club manager about the importance of technology and why you should be selected ",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ddbb6653b4655eba3ee8d5",
+    "part": "PART4",
+    "title": "Science Club - Version 1",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>You are a member of a Science Club. You received this email from the club.</em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>“Dear all members of our club, our club is preparing to organize the science exhibition next month. Both young people and elderly people can take part in our activities in the exhibition. We are planning for our exhibition. Could you contribute some ideas for our event team? Whether our club issue tickets for participants? I would like to hear your contribution.”</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ddbc1453b4655eba3ee8de",
+    "part": "PART4",
+    "title": "Museum Club - Version 1",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of a Museum Club. You received this email from the club administrator.</em></strong></p><p class=\"ql-align-justify\"><strong><em>\"Dear members,</em></strong></p><p class=\"ql-align-justify\"><strong><em>Currently, the museum club is considering that members must pay a fee to visit the museum. Please give your opinions.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ddbd4653b4655eba3eea13",
+    "part": "PART4",
+    "title": "Fitness Club - Version 1",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>You are a member of a college. You received this email from the college administrator.</em></strong></p><p><strong><em>\"Dear members,</em></strong></p><p><strong><em>Some equipment in the club is old and needs to be replaced. Our club is planning to hold a sponsorship event to raise money for the upgrade of sports equipment. On the other hand, there are also some opinions that the club should increase the membership fee to 50%. Please give your opinions.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words. ",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ddbdef53b4655eba3eea1c",
+    "part": "PART4",
+    "title": "Fitness Club - Version 2",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>You are a member of a college. You received this email from the college administrator.</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear members,</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>In order to cut costs, the club reduces some equipment that can be offered to members. Some members offer that we can close the fitness shop and cafe.</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>Please give your opinions.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df025053b4655eba3eeaa7",
+    "part": "PART4",
+    "title": "Food Club - Version 1",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>You are a member of a college. You received this email from the college administrator.</em></strong></p><p><strong><em>\"Dear members,</em></strong></p><p><strong><em>Our food club is planning to encourage young people to cook at home. Can you give some suggestions and explain them?\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words. ",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df02ca53b4655eba3eeab0",
+    "part": "PART4",
+    "title": "Food Club - Version 2",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>The club is going to organize a meeting, invite a famous chef, and hope many people can participate. What topic should the chef talk about and what kind of meal should he share?</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. ",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df03a253b4655eba3eec44",
+    "part": "PART4",
+    "title": "Travel Club Version 1",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>You are a member of a Travel Club. You received this email from the club.</em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>“Dear members, Our club is planning to encourage tourists to visit an area. We also want visitors coming to our areas to behave politely. Please raise your voice and give some suggestions for this plan.”</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df040e53b4655eba3eec4d",
+    "part": "PART4",
+    "title": "Travel Club Version 2",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>You are a member of a Travel Club. You received this email from the club.</em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear member,</em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>The club wants members to give their opinions to make it easier for people traveling abroad for the first time and the best way to communicate conveniently abroad.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df067c53b4655eba3eec56",
+    "part": "PART4",
+    "title": "Television Club - Version 1",
+    "questions": [
+      {
+        "prompt": "<p><strong style=\"color: rgb(0, 0, 0);\"><em>You are a member of an Televison club. You received this email from the club.</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear members,</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>We are going to set up an event and want to choose a place so that foreigners can attend. Please recommend us a destination that is special to hold our event.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write to a friend ( 50 words ).",
+            "correctAnswer": null
+          },
+          {
+            "prompt": " Write to the manager club. ( 120-125 words )",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df071c53b4655eba3eec5f",
+    "part": "PART4",
+    "title": "Television Club - Version 2",
+    "questions": [
+      {
+        "prompt": "<p><strong style=\"color: rgb(0, 0, 0);\"><em>You are a member of a Television Club. You received this email from the club.</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>“Dear members,</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>The club is planning to organise a conference to invite all members. The members come from different countries and have only communicated with each other online before. The club would like to get your suggestions on the venue of this conference and the activities held during the conference.”</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write to your friend.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write to the manager of the club.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df076e53b4655eba3eec68",
+    "part": "PART4",
+    "title": "English Club  - Version 1",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>You are a member of a college. You received this email from the college administrator.</em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear members, </em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>Nowadays more and more new words and phrases are added to the language, so many people have strong reactions to this issue. Some people gladly accept others and argue that there should be rules for language. Write a letter to your friend and the club manager to express your views and explain why so many people react like this.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write to a friend (50 words)",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write to a manager (120 – 150 words)",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df07c453b4655eba3eec71",
+    "part": "PART4",
+    "title": "English Club - Version 2",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>You are a member of the English Club. You have received this email from the club:</em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>\"Our club is going to organize a meeting. We want more people to join our club. How should we organize an event? What should be the theme of this event? We want to attract as many audiences as possible, both young and older people.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the club manager. Write 120–150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df091c53b4655eba3eed22",
+    "part": "PART4",
+    "title": "English Club - Version 3",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>You are a member of the English club. You have just received the following email from the club.</em></strong></p><p class=\"ql-align-justify\"><strong><em>\"Dear Members,</em></strong></p><p class=\"ql-align-justify\"><strong><em>We are sorry to inform you that the Talk show has been canceled as the guests are unexpectedly busy. We do not have any back-up plan, so there will be no meeting this week. We will inform you of the reopening of the Talk show as soon as we can. We are sorry for the inconvenience.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about your feelings and what you would like to do. ",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club. Write about your feelings suggest possible.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68df0a1f53b4655eba3eed2b",
+    "part": "PART4",
+    "title": "Social Club - Version 2",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>Our social club plans to organise an evening event. We have to options. First is have online meeting. Second is a live event and include games and quizzes. Which one are you in favor of and why?</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the club manager. Write 120–150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f70a1a53b4655eba3f3e96",
+    "part": "PART4",
+    "title": "Garden Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong>You are a member of the garden club. You received this email from the club.</strong></p><p class=\"ql-align-justify\"><strong><em>\"Dear members,</em></strong></p><p class=\"ql-align-justify\"><strong><em>We are writing to tell you that the talk and slide show on The Gardens of Japan by Mr.Seiko has been canceled because the speaker has been taken ill. Mr.Jones has kindly agreed to give his talk on The Gardens of England again. I know that many of you have already heard Mr. Jones before but I hope you will be happy to hear him once again.</em></strong></p><p class=\"ql-align-justify\"><strong><em>Please give your suggestions.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about 120 - 150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f70a7553b4655eba3f3e9f",
+    "part": "PART4",
+    "title": "Outdoor Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>Write a short email (about 50 words) to your friend, and a longer email (120-150 words) to the president of the club.</em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear member, The club organizes travel in the summer. Do you want to go to the mountains or the coast? Please give a suggestion for both young and old people.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words).",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words).",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f70b6553b4655eba3f3ea8",
+    "part": "PART4",
+    "title": "Car Club",
+    "questions": [
+      {
+        "prompt": "<p><strong><em>There will be a car program running across Europe. The program invites the Car Club to send 2 representatives (1 main driver and 1 passenger) and both must have good driving skills.</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words).",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words).",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f70c6353b4655eba3f3eb1",
+    "part": "PART4",
+    "title": "Fashion Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>The club is planning to hold meetings with famous designers who will talk about their clothing designs and answer members' questions. We need feedback on organizations. There are opinions that it should be held online, while others want to organize a fashion show-style event.</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write to a friend to express which way of organization you prefer.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write to the club's manager to express which way of organization you prefer and explain.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f70d1d53b4655eba3f3eba",
+    "part": "PART4",
+    "title": "Community Club",
+    "questions": [
+      {
+        "prompt": "<p><strong style=\"color: rgb(0, 0, 0);\"><em>Write a short email (about 50 words) to your friend, and a longer email (120-150 words) to the president of the club.</em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear Member, Our club needs support with several tasks this year. First, we need more members who can actively participate in our ongoing projects. Second, we are looking for creative ideas to develop new activities. Could you share some suggestions with us to help support our projects this year?\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words). Write about your feelings and what you would like to do.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words). Write about your feelings and what you would like to do.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f70d7253b4655eba3f3ec3",
+    "part": "PART4",
+    "title": "Business Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>Currently our club is planning to support local individuals who want to start up a small business. The club has 2 proposals: First, create a call center where customers can call to ask questions and request help. Second, create free courses to support local universities nearby. Let us know which option you would use and why.</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words). Write a letter to a friend about your choice and the idea.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words). Write a letter to the club manager about your choice and why.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f70e0753b4655eba3f3ecc",
+    "part": "PART4",
+    "title": "Nature club - Version 1",
+    "questions": [
+      {
+        "prompt": "<p><strong style=\"color: rgb(0, 0, 0);\"><em>Write a short email (about 50 words) to your friend, and a longer email (120-150 words) to the president of the club.</em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear Member, this year we are planning a campaign to encourage young children to think more about nature and the natural world. Unfortunately, a lot of children prefer staying indoors and playing computer games. How can we get them to spend more time outdoors and explore? Please send us your ideas for encouraging young people to become more engaged with nature. Also, what do you think is the best way for us to communicate our messages to them?\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend, who is also a member of the club. Write about your ideas and how to communicate them. Write about 50 words.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Tell the manager your suggestions for promoting nature to young people and how best to communicate them. Write 120-150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f70e6653b4655eba3f3ed5",
+    "part": "PART4",
+    "title": "Writing Club",
+    "questions": [
+      {
+        "prompt": "<p><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear members, many people complain that the website is unprofessional and difficult to use. Please send us your suggestions.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words).",
+            "correctAnswer": null
+          },
+          {
+            "prompt": " Write an email to the president of the club (about 120-150 words).",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f70fa553b4655eba3f3f13",
+    "part": "PART4",
+    "title": "Movie Club",
+    "questions": [
+      {
+        "prompt": "<p><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear member, The club will be repaired. Please suggest an alternative meeting or activity.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words).",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words).",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7100053b4655eba3f3f1c",
+    "part": "PART4",
+    "title": "College Club",
+    "questions": [
+      {
+        "prompt": "<p><strong style=\"color: rgb(0, 0, 0);\"><em>\"We are writing to inform you that the end of course exams will now take place two weeks earlier than originally planned. You exam, which was scheduled for the 21st of next month, will now take place on the 7th of next month. We apologize for any difficulty this may cause.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words). Tell them what you think the college should do about the situation.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words). Tell them what you think the college should do about the situation.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7153553b4655eba3f3f37",
+    "part": "PART4",
+    "title": "Film Club Version 1",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>\"We are writing to tell you that the guest actor, James Mc Avoy, will unfortunately not be able to give a talk at our next club meeting due to personal reasons. He has requested we reschedule the talk for the next year in either January or March. Please contact the club secretary if you have a preference for one of the two months. Our meeting will take place as usual with a discussion on the advantages and disadvantages of learning on the Internet.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about your feelings and what you would like to do (50 words).",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email the the manager of the club. Write about your feelings and possible alternatives (120 – 150 words)",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74a4653b4655eba3f400e",
+    "part": "PART4",
+    "title": "Cinema Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>As you know, our weekly film shows are very popular. However, we have had a nume of complaints about people (who use) using their mobile phones during the film. We have started asking people to turn off their phones before the film starts but this hasn't solved the problem. We are thinking of banning mobile phones from our cinema in the future and would be interested to hear your view on this. Do you have any other suggestions?</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words). Tell your friend what suggestions you will make and why?",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words). Write about your ideas and what you think about the situation.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f7158e53b4655eba3f3f40",
+    "part": "PART4",
+    "title": "Film Club Version 2",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear Member,</em></strong></p><p class=\"ql-align-justify\"><strong style=\"color: rgb(0, 0, 0);\"><em>We are writing to inform you that the film - maker Malsolm G unfortunately won't be able to attend the screening of this latest film tomorrow. Luckily, you will have the opportunity to buy a signed DVD copy of the films at a specially reduces \"Film Club\" price of $40. We only have a limited number of copies, so please write to the club secretary if you'd like to reserve one.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words).",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words).",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74a9e53b4655eba3f4017",
+    "part": "PART4",
+    "title": "Design Club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>\"Dear members, </em></strong></p><p class=\"ql-align-justify\"><strong><em>We would like to design a poster to attract more people to join. We would like members to contribute ideas about colors, images and design styles for the poster. Please send us your suggestions and your reasons.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write an email to your friend. Write about your feelings and what you would like to do. Write about 50 words",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the manager of the club. Write about your feelings and what you think the club should do about the situation. Write about 120-150 words.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74aeb53b4655eba3f4020",
+    "part": "PART4",
+    "title": "Cooking club",
+    "questions": [
+      {
+        "prompt": "<p class=\"ql-align-justify\"><strong><em>\"Dear member, </em></strong></p><p class=\"ql-align-justify\"><strong><em>All classes will be canceled next week. Because the instructor will go on holiday. Classes will be announced later. Fees won’t be refunded to the participants.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words). Tell your friend your feelings about this and what you plan to do.",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words). Tell them your thoughts about this and what you would like to do.",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f74b2753b4655eba3f4029",
+    "part": "PART4",
+    "title": "Healthy club",
+    "questions": [
+      {
+        "prompt": "<p><strong style=\"color: rgb(0, 0, 0);\"><em>\"Dear all, </em></strong></p><p><strong style=\"color: rgb(0, 0, 0);\"><em>Because of personal reasons, the instructor will be away for the next two weeks. We will use our facilities by ourselves without the assistance of an instructor. I am so sorry about this situation and hope you doing well in next two weeks.\"</em></strong></p>",
+        "subQuestions": [
+          {
+            "prompt": "Write a short email to your friend (about 50 words).",
+            "correctAnswer": null
+          },
+          {
+            "prompt": "Write an email to the president of the club (about 120-150 words).",
+            "correctAnswer": null
+          }
+        ]
+      }
+    ]
+  }
+]

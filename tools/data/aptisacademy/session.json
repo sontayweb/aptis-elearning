@@ -1,0 +1,214 @@
+{
+  "account": "Aptisonthi7@gmail.com",
+  "finalUrl": "https://aptisacademy.com.vn/",
+  "isSuccess": true,
+  "cookies": [
+    {
+      "name": "ttcsid_D7GFG93C77UDOSQMGFP0",
+      "value": "1791031048162::kogCA0kblVr057JJ2KkG.1.1791031766627.1",
+      "domain": ".aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1824727766,
+      "size": 80,
+      "httpOnly": false,
+      "secure": false,
+      "session": false,
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    },
+    {
+      "name": "aptis_device_fp",
+      "value": "3de491b9-6f4b-4273-a87c-db9a47bd903f",
+      "domain": "aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1822567765.138721,
+      "size": 51,
+      "httpOnly": false,
+      "secure": false,
+      "session": false,
+      "sameSite": "Lax",
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    },
+    {
+      "name": "_tt_enable_cookie",
+      "value": "1",
+      "domain": ".aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1824727762,
+      "size": 18,
+      "httpOnly": false,
+      "secure": false,
+      "session": false,
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.1177730311.1791031047",
+      "domain": ".aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1825591047.312567,
+      "size": 30,
+      "httpOnly": false,
+      "secure": false,
+      "session": false,
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    },
+    {
+      "name": "_ttp",
+      "value": "01M40W9XYVPG9PP2706ZVCGJJ6_.tt.2.1791031048156",
+      "domain": ".aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1824727762,
+      "size": 50,
+      "httpOnly": false,
+      "secure": false,
+      "session": false,
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    },
+    {
+      "name": "accessToken",
+      "value": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjE0MjAwLCJlbWFpbCI6IkFwdGlzb250aGk3QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaXNQcmVtaXVtIjp0cnVlLCJpc3MiOiJhcHRpcy1hY2FkZW15IiwiYXVkIjoiYXB0aXMtYXBpIiwiZXhwIjoxNzkxMDM1MzY1fQ.7PgKuFSUuNvI7r1W0AG8cLCt9B_W5dMf7bRKYQoNexI",
+      "domain": "aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1791035365.997237,
+      "size": 258,
+      "httpOnly": true,
+      "secure": true,
+      "session": false,
+      "sameSite": "Lax",
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    },
+    {
+      "name": "refreshToken",
+      "value": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjE0MjAwLCJlbWFpbCI6IkFwdGlzb250aGk3QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaXNQcmVtaXVtIjp0cnVlLCJpc3MiOiJhcHRpcy1hY2FkZW15IiwiYXVkIjoiYXB0aXMtYXBpIiwiZXhwIjoxNzkxMjA0NTY1fQ.xDi4kYiUNHgPSDeybzaHeQfdKNC9scU5HSLcslkZUz0",
+      "domain": "aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1791636565.997331,
+      "size": 259,
+      "httpOnly": true,
+      "secure": true,
+      "session": false,
+      "sameSite": "Lax",
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    },
+    {
+      "name": "aptis_device_id",
+      "value": "3de491b9-6f4b-4273-a87c-db9a47bd903f",
+      "domain": "aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1822567765.997379,
+      "size": 51,
+      "httpOnly": true,
+      "secure": true,
+      "session": false,
+      "sameSite": "Lax",
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    },
+    {
+      "name": "_ga_QZZSS0FD04",
+      "value": "GS2.1.s1791031047$o1$g1$t1791031767$j54$l0$h0",
+      "domain": ".aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1825591767.292784,
+      "size": 59,
+      "httpOnly": false,
+      "secure": false,
+      "session": false,
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    },
+    {
+      "name": "ttcsid",
+      "value": "1791031048163::hmy582ey2w--1KPK9emv.1.1791031766627.0::1.718115.714774::716521.7.400.357::379892.3.4984",
+      "domain": ".aptisacademy.com.vn",
+      "path": "/",
+      "expires": 1824727766,
+      "size": 109,
+      "httpOnly": false,
+      "secure": false,
+      "session": false,
+      "priority": "Medium",
+      "sourceScheme": "Secure"
+    }
+  ],
+  "localStorage": {
+    "tokenKey": "true",
+    "aptis-device-fingerprint": "3de491b9-6f4b-4273-a87c-db9a47bd903f"
+  },
+  "sessionStorage": {
+    "REACT_QUERY_OFFLINE_CACHE": "{\"buster\":\"\",\"timestamp\":1791031766459,\"clientState\":{\"mutations\":[],\"queries\":[{\"dehydratedAt\":1791031766459,\"state\":{\"data\":{\"user\":{\"id\":14200,\"email\":\"Aptisonthi7@gmail.com\",\"name\":\"Nguyễn Thị Phương Linh\",\"phone\":\"0977565728\",\"role\":\"user\",\"balance\":0,\"avatar_url\":null,\"is_active\":true,\"email_verified\":false,\"created_at\":\"2026-10-02T03:09:29.000Z\",\"updated_at\":\"2026-10-03T12:35:28.507Z\"},\"services\":[{\"id\":850,\"user_id\":14200,\"service_id\":1,\"service_name\":\"Luyện tập Bộ đề key\",\"service_slug\":\"BDK\",\"started_at\":\"2026-10-02T04:08:34.950Z\",\"expired_at\":\"2026-11-01T04:08:34.950Z\",\"is_active\":true,\"auto_renew\":false,\"purchase_price\":199000,\"created_at\":\"2026-10-02T04:08:34.950Z\",\"updated_at\":\"2026-10-02T04:08:34.950Z\"}],\"usage_stats\":{\"today_usage\":0,\"monthly_usage\":0,\"total_usage\":0,\"by_resource\":{}}},\"dataUpdateCount\":1,\"dataUpdatedAt\":1791031766001,\"error\":null,\"errorUpdateCount\":0,\"errorUpdatedAt\":0,\"fetchFailureCount\":0,\"fetchFailureReason\":null,\"fetchMeta\":null,\"isInvalidated\":false,\"status\":\"success\",\"fetchStatus\":\"idle\"},\"queryKey\":[\"auth\",\"profile\"],\"queryHash\":\"[\\\"auth\\\",\\\"profile\\\"]\"},{\"dehydratedAt\":1791031766459,\"state\":{\"data\":[{\"id\":16,\"title\":\"Key các phần đã được cập nhật thêm, mọi người lên web luyện tập nha\",\"content\":\"Đề vẫn ra nhiều key cũ vì vậy mọi người cần luyện tập đầy nha\",\"url\":null,\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-09-25T10:28:26.976Z\",\"updated_at\":\"2026-09-25T10:28:26.976Z\"},{\"id\":15,\"title\":\"cập nhật thêm 8 câu Listening part 1 vào trong bộ key aptis Tiên Phong\",\"content\":\"\",\"url\":\"\",\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-08-27T04:45:14.242Z\",\"updated_at\":\"2026-08-28T03:15:06.592Z\"},{\"id\":14,\"title\":\"update thêm đề key mới của listening part 4: The Greek Artist Jim Panos\",\"content\":\"Key mới này sẽ được cập nhật bộ key chuyên sau của aptis Tiên Phong\",\"url\":\"https://aptisacademy.com.vn/bo-de-key/listening/4?id=6a799c0e55f812b856ff1b55\",\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-08-10T09:39:49.078Z\",\"updated_at\":\"2026-08-11T08:56:15.891Z\"},{\"id\":13,\"title\":\"update key mới của listening part 1 \",\"content\":\"key được cập nhật ở tab key chuyên sâu Aptis Tien Phong\",\"url\":\"\",\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-08-03T10:02:07.092Z\",\"updated_at\":\"2026-08-03T10:28:42.361Z\"},{\"id\":12,\"title\":\"Cập nhật key mới reading part 2 : Homework next week\",\"content\":\"Đề được cập nhật ở tab bộ key chuyên sâu Aptis Tien Phong\",\"url\":\"https://aptisacademy.com.vn/bo-de-key/reading/2?tab=default&id=6a62ce979e697c44c86f1095\",\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-07-29T08:20:32.477Z\",\"updated_at\":\"2026-07-30T08:58:27.817Z\"},{\"id\":11,\"title\":\"Đề listening part 3:  Home schooling cập nhật full đề bài và file nghe\",\"content\":\"Đã được cập nhật tại tab bộ đề key aptis Tiên Phong\",\"url\":\"https://aptisacademy.com.vn/bo-de-key/listening/3?id=b2c3d4e5f6a1b2c3d4e5f6a0\",\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-07-22T10:37:33.547Z\",\"updated_at\":\"2026-07-22T10:47:35.271Z\"},{\"id\":10,\"title\":\"Đã Cập Nhật 20 đề reading part 1 mới \",\"content\":\"Được cập nhật ở bộ key độc quyền Aptis Tiên Phong\",\"url\":null,\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-07-21T13:48:19.885Z\",\"updated_at\":\"2026-07-21T13:48:19.885Z\"},{\"id\":9,\"title\":\"Thông báo 21/7-22/7: sẽ cập nhật key mới của listening và reading part 1\",\"content\":\"Mọi người lưu ý để luyên tập ( key cập nhật sẽ được cập nhật tại key đọc quyền aptis tiên phong nha)\",\"url\":\"\",\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-07-20T08:22:27.278Z\",\"updated_at\":\"2026-07-20T08:23:50.187Z\"},{\"id\":8,\"title\":\"Cập nhật đề mới Work Business / Business and Cultural  của listening part 3\",\"content\":\"\",\"url\":\"\",\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-07-01T05:04:39.375Z\",\"updated_at\":\"2026-07-01T05:22:26.984Z\"},{\"id\":7,\"title\":\"Đề Local Culture diffirent, Children and young people with technology : đã có nội dung và file nghe\",\"content\":\"\",\"url\":\"\",\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-07-01T04:45:02.517Z\",\"updated_at\":\"2026-07-01T05:22:21.857Z\"}],\"dataUpdateCount\":9,\"dataUpdatedAt\":1791031766459,\"error\":null,\"errorUpdateCount\":0,\"errorUpdatedAt\":0,\"fetchFailureCount\":0,\"fetchFailureReason\":null,\"fetchMeta\":null,\"isInvalidated\":false,\"status\":\"success\",\"fetchStatus\":\"idle\"},\"queryKey\":[\"announcements\",\"active\",10],\"queryHash\":\"[\\\"announcements\\\",\\\"active\\\",10]\"}]}}",
+    "tt_sessionId": "\"31459b2e-bf27-11f1-8533-b83fd2fadb2e::gqVAckPybpVFfawIuE8_\"",
+    "tt_pixel_is_enrich_ipv6_triggered_by_enrich_am": "true",
+    "tt_pixel_session_index": "{\"index\":8,\"main\":5}",
+    "tt_appInfo": "{\"platform\":\"pc\"}"
+  },
+  "networkEvents": [
+    {
+      "url": "https://aptisacademy.com.vn/login",
+      "status": 200,
+      "text": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no\"/><link rel=\"preload\" as=\"image\" href=\"/img/logo.png\"/><link rel=\"stylesheet\" href=\"/_next/static/css/f9da8c6f67f1973a.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"/_next/static/css/9038931003336d76.css\" data-precedence=\"next\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_next/static/chunks/webpack-ea3d9a13ff"
+    },
+    {
+      "url": "https://aptisacademy.com.vn/_next/static/chunks/app/(website)/login/page-fb1787d87cceb72e.js",
+      "status": 200,
+      "text": "(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[9773],{42480:()=>{},68973:(e,t,s)=>{Promise.resolve().then(s.bind(s,95041))},47019:(e,t,s)=>{\"use strict\";s.d(t,{Z:()=>n});let n=(0,s(78030).Z)(\"EyeOff\",[[\"path\",{d:\"M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49\",key:\"ct8e1f\"}],[\"path\",{d:\"M14.084 14.158a3 3 0 0 1-4.242-4.242\",key:\"151rxh\"}],[\"path\",{d:\"M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5."
+    },
+    {
+      "url": "https://analytics.tiktok.com/api/v2/pixel",
+      "status": 200,
+      "text": ""
+    },
+    {
+      "url": "https://analytics.tiktok.com/api/v2/pixel/act",
+      "status": 200,
+      "text": ""
+    },
+    {
+      "url": "https://aptisacademy.com.vn/api/auth/login",
+      "status": 200,
+      "text": "{\"success\":true,\"data\":{\"user\":{\"id\":14200,\"email\":\"Aptisonthi7@gmail.com\",\"name\":\"Nguyễn Thị Phương Linh\",\"phone\":\"0977565728\",\"role\":\"user\",\"balance\":0,\"avatar_url\":null,\"is_active\":true,\"email_verified\":false,\"created_at\":\"2026-10-02T03:09:29.000Z\",\"updated_at\":\"2026-10-03T12:35:28.507Z\"},\"services\":[{\"id\":850,\"user_id\":14200,\"service_id\":1,\"service_name\":\"Luyện tập Bộ đề key\",\"service_slug\":\"BDK\",\"started_at\":\"2026-10-02T04:08:34.950Z\",\"expired_at\":\"2026-11-01T04:08:34.950Z\",\"is_active\":true"
+    },
+    {
+      "url": "https://analytics.tiktok.com/api/v2/pixel",
+      "status": 200,
+      "text": ""
+    },
+    {
+      "url": "https://lh3.googleusercontent.com/aida-public/AB6AXuCvTILfnhaki5r2A9x3F6XqHua3wnZMlkE962gvEiaF2qHnz7MIWOnZNP8vPdqBy3-I_lBsCIPdABrv6Jk4qRUZkbdPEA4a7foUX2wm61coCrHN5rdhLVgEqzkh9oZMtm967fWvYzhQRAf7AmUU_vX34-oHChXLTIj99CBInCuFjkRpzI55CJv6kYz4JEFQUQfLJw0BxD4okmJt8QOG7RBj5E98QuglpmmwdyhYvASzbDG32WvWmTP7cpKU_fTXYmQ2Nj_cGvp1Py8",
+      "status": 200,
+      "text": "�PNG\r\n\u001a\n\u0000\u0000\u0000\rIHDR\u0000\u0000\u0002\u0000\u0000\u0000\u0002\u0000\b\u0002\u0000\u0000\u0000{\u001aC�\u0000\u0000\u0000\u0003sBIT\b\b\b��O�\u0000\u0000\u0017�zTXtRaw profile type APP1\u0000\u0000h���K�$9rm�\n.\u0001P��\u0003U\u0000O(B!)����ZDWW�krƌ�\f\u000f\u000fs3\u0000z�~������~��_�_������ݿ�\u000bZm���겝R���OI)[����?~���+�����~��5G��n�|��{6�����?\u001f�_��>���-�\u0017���=;i�z����a���������_�+���9���)�����t^U�/e��5�QJI���\u001f#ȿ��׬�2���y�?>�׵)����w)6﴿���ϫ�����ye�\u001f�c���ym��>����\\��6u�����{g�w�7�\u001dl����U��:��\u001aYc|��*��yվ��*\u0005�\u001c�_/9_+E��e�K�����ȃ�5�ܾ�&���t�z�W��̪Y�V�����c$����{��3]��ܫ����^hy��PP�� �*��RG��UT$�o�ʷ��O��S����l,\t\u0007�糵�@�\u0003���z��͕�9��B}xjg\u0000��M�qc"
+    },
+    {
+      "url": "https://lh3.googleusercontent.com/aida-public/AB6AXuAQHyUMTwck4bUHZeUeT68k1AMSbqVAfWtmBSbCMGaH0lYq-G7YkIPUVPLVkBYmYUYh4531Qkm5_mL_AgjlcGIdUzPbvhdtGrLqsraJHHhAGOhTtlQtY_4gY92XXMD_pi6v_9QWXa9gxYo7EpePyPAKx_bUl-ZJWnMESllyX01ydtsVUKVeA7UGG_FfLgogmbuAb4e3GgI2-nAQnJ-hjiFDL-C-9nDgeCPU0ZlLULN41eoGLOHkzKFjofY_tziDk_ZqdnQvdgQW7GU",
+      "status": 200,
+      "text": "�PNG\r\n\u001a\n\u0000\u0000\u0000\rIHDR\u0000\u0000\u0002\u0000\u0000\u0000\u0002\u0000\b\u0002\u0000\u0000\u0000{\u001aC�\u0000\u0000\u0000\u0003sBIT\b\b\b��O�\u0000\u0000\u001e>zTXtRaw profile type APP1\u0000\u0000h���[�%�m�ߵ\n-�w��!@ҡ\b����\u001f��Y���X�������9�I��\u00019���\u001f�������������_�ʟ�������N)Y��SS�%e}�ߟ?����O�\u001f������l�������랝O�:����\u0005�g�ܧ�㱵��=v�W�N\u001a�W~{ؿz��������n�D���Y�ß�Fg,��:4�����\\;�N������\b����K]�~���y�߮�Gl��?~�b�J���y����O�ߟ����>巘��Ǧ��\u000f����3��}l��v�����c��� ���K��S��眫5�����U����}\r�\u0014d������R�^.|���<r����w��k���o���}�<K)��|K����o#ɿ�:��^�k��ƽZ���_�U�Jկ\nrъi�����S�O>�V�~�ͿE��4��E�R��_?W��I�/]�O4\u001eh_\u0004��!��\u0005�{1\u0014B�k#�#;Q)��$ȋ0s"
+    },
+    {
+      "url": "https://aptisacademy.com.vn/api/public/announcements?limit=10",
+      "status": 200,
+      "text": "{\"success\":true,\"data\":[{\"id\":16,\"title\":\"Key các phần đã được cập nhật thêm, mọi người lên web luyện tập nha\",\"content\":\"Đề vẫn ra nhiều key cũ vì vậy mọi người cần luyện tập đầy nha\",\"url\":null,\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"2026-09-25T10:28:26.976Z\",\"updated_at\":\"2026-09-25T10:28:26.976Z\"},{\"id\":15,\"title\":\"cập nhật thêm 8 câu Listening part 1 vào trong bộ key aptis Tiên Phong\",\"content\":\"\",\"url\":\"\",\"is_active\":true,\"sort_order\":0,\"created_by\":6,\"created_at\":\"202"
+    },
+    {
+      "url": "https://analytics.tiktok.com/api/v2/pixel",
+      "status": 200,
+      "text": ""
+    },
+    {
+      "url": "https://analytics.tiktok.com/api/v2/pixel/act",
+      "status": 200,
+      "text": ""
+    }
+  ],
+  "screenText": {
+    "alerts": [],
+    "bodySnippet": "f\nFollow Us:\nZ\n0866 950 837\naptistienganh@gmail.com\nAPTIS\nTIÊN PHONG\nMenu\nWELCOME TO\nAPTIS TIÊN PHONG\n!\nLuyện thi Aptis\nCấp Tốc B1 B2 C\n\nChúng tôi đã tối ưu phương pháp giúp bạn đạt B1, B2, C trong khoảng 3 tuần — cho dù bạn mất gốc hay có ít thời gian luyện tập.\n\nTham Gia Nhóm Xoá Mù Aptis\nLIÊN HỆ NGAY\n01\nBộ Đề Key\nLuôn cập nhập bộ đề key chuẩn mới nhất, có tỷ lệ vào cao\n02\nPhầm Mềm Luyện Thi\nGiống thi thật, tích hợp AI giúp chấm điểm nhanh chóng.\n03\nApp luyện tập\nCập nhập bài tập được thiết kế"
+  },
+  "updatedAt": "2026-10-03T12:49:31.171Z"
+}

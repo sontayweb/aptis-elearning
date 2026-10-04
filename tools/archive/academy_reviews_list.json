@@ -1,0 +1,659 @@
+{
+  "reviews": [],
+  "apiPayloads": [
+    {
+      "url": "https://aptisacademy.com.vn/api/reviews?limit=20&page=1&sort_by=created_at&sort_order=desc",
+      "json": {
+        "success": true,
+        "data": {
+          "reviews": [
+            {
+              "id": 830,
+              "title": "Review đề Aptis 27/9",
+              "exam_date": "2026-09-27",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"New coffee shop (key)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a39d410b9d3fe9bd39373\"},{\"title\":\"New coffee shop (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a558e10b9d3fe9bd39975\"},{\"title\":\"Weekend activities\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a384f10b9d3fe9bd39301\"},{\"title\":\"Music festival - Version 4\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"69c2123c683ec8b79c9101bf\"},{\"title\":\"Music festival - Version 2\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a7b0010b9d3fe9bd3a9d7\"},{\"title\":\"Music festival - Version 1\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a776f10b9d3fe9bd3a8af\"},{\"title\":\"Music festival - Version 3\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955e1bc5723012229d3fd3b\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"Fashion club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68f8ea9053b4655eba3f4653\"},{\"title\":\"Fashion club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68f7560c53b4655eba3f41c0\"},{\"title\":\"Fashion club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68f74c8553b4655eba3f409b\"},{\"title\":\"Fashion Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68f70c6353b4655eba3f3eb1\"},{\"title\":\"Nhận quà\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68e4914a53b4655eba3f0915\"},{\"title\":\"Nhận quà Version 2\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68f352e253b4655eba3f39d4\"},{\"title\":\"Gia đình trong phòng khách\",\"skill\":\"speaking\",\"part\":2,\"review_id\":\"68f0fbe053b4655eba3f2ac4\"},{\"title\":\"The Internet\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d2efc88028aa29a1b7cc\"},{\"title\":\"Managing financial spending\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69c11275e521b65aeedbe49d\"},{\"title\":\"Managing Financial Spending (Phiên bản 2)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69ea379a94821544ed40fd5c\"},{\"title\":\"Managing Financial Spending (Phiên bản 3)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69ea386c94821544ed40fde0\"},{\"title\":\"A new novel of a famous writer\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"6957edb6c88028aa29a1d181\"},{\"title\":\"Criticism of the new novel\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"6957eed0c88028aa29a1d1a9\"},{\"title\":\"Criticism Of The New Novel (Phiên bản 3)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69e8fb415e1769f65cd39335\"},{\"title\":\"Criticism of the new novel (Phiên bản 2)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69e8fae15e1769f65cd39328\"}]",
+              "content": "Review đề Aptis 27/9\n\nREADING: Part 1 đổi đề mới · Part 2 new café · Part 3 hoạt động cuối tuần · Part 4 lễ hội âm nhạc · Part 5 four-day workweek\nLISTENING: câu 14 bảo vệ môi trường (đảo thứ tự đáp án ABCD) · câu 15 The Internet · câu 16 quản lý tài chính · câu 17 new novel\nSPEAKING: Part 2 người mẹ ôm con gái đọc truyện · Part 3 người đàn ông thuyết trình ở hội nghị vs người phụ nữ nói chuyện trong phòng họp · Part 4 kể về một lần được nhận quà\nWRITING: Fashion club (chọn live event hay online)",
+              "created_at": "2026-09-28 07:46:33",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 829,
+              "title": "Review đề Aptis 26/9 – HMĐ ca chiều ",
+              "exam_date": "2026-09-26",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"The place to run\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6957c4aec88028aa29a1af7d\"},{\"title\":\"Urban farming\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d6e2c88028aa29a1bc32\"},{\"title\":\"Script Production (Phiên bản 2)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69ea30ce94821544ed40fbe1\"},{\"title\":\"Script Production (Phiên bản 3)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69ea313b94821544ed40fbee\"},{\"title\":\"Script production\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69c111a3e521b65aeedbe449\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955d4ed5723012229d3efa0\"},{\"title\":\"Topic: Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695299dc17d3f9f552a5441f\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a380b10b9d3fe9bd392ee\"},{\"title\":\"Games from childhood\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a768810b9d3fe9bd3a87f\"},{\"title\":\"Women mathematicians (Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696368637ccc2d518f3e3bc3\"},{\"title\":\"Women mathematicians (phiên bản 2)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696372d27ccc2d518f3e4048\"},{\"title\":\"Woman Mathematics  ( phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6963c0c37ccc2d518f3e4b90\"},{\"title\":\"Language Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68e3910953b4655eba3f00ef\"},{\"title\":\"Language Club - Version 1\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e0561d53b4655eba3ef8c0\"},{\"title\":\"Language Club - Version 2\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e0565053b4655eba3ef8c8\"},{\"title\":\"Language Club - Version 2\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df0bd953b4655eba3eed52\"},{\"title\":\"Language Club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df0b8453b4655eba3eed48\"},{\"title\":\"Language Club - Version 2\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd391e53b4655eba3ee500\"},{\"title\":\"Language Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd383e53b4655eba3ee4f7\"}]",
+              "content": "Review đề Aptis 26/9 – HMĐ ca chiều \n\nSPEAKING: Part 1 first school; favourite film star; làm gì cùng gia đình · Part 2 tranh gia đình đang ăn · Part 3 hai tranh làm việc nhóm vs làm việc một mình · Part 4 kể về lần tiết kiệm tiền để mua một thứ\nLISTENING: câu 1–13 trúng key · câu 14 Running · câu 15 Urban farming · câu 16–17 Script production\nREADING: Part 1 trúng key · Part 2+3 phim xưa và nay, trúng key · Part 4 Games from childhood, trúng key · Part 5 Women Mathematicians (có 3 câu thay bằng từ đồng nghĩa)\nWRITING: Language club",
+              "created_at": "2026-09-28 07:43:16",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 828,
+              "title": "Review đề Aptis 26/9 – HMĐ (HCM), ca chiều 13h30 ",
+              "exam_date": "2026-09-26",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Listening to music\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"695688450731243929b0ceae\"},{\"title\":\"Information and technology\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957ce41c88028aa29a1b402\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955d4ed5723012229d3efa0\"},{\"title\":\"Topic: Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695299dc17d3f9f552a5441f\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a380b10b9d3fe9bd392ee\"},{\"title\":\"Family Sport Day (phiên bản 1)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955dd3f5723012229d3fbf2\"},{\"title\":\"Family sports day (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a38df10b9d3fe9bd39327\"},{\"title\":\"Music festival - Version 4\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"69c2123c683ec8b79c9101bf\"},{\"title\":\"Music festival - Version 2\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a7b0010b9d3fe9bd3a9d7\"},{\"title\":\"Music festival - Version 1\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a776f10b9d3fe9bd3a8af\"},{\"title\":\"Music festival - Version 3\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955e1bc5723012229d3fd3b\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"Nhận được sự giúp đỡ\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68f3529053b4655eba3f39c9\"},{\"title\":\"Photography Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd3a0453b4655eba3ee605\"},{\"title\":\"Photography Club - Version 1\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df561f53b4655eba3eee53\"},{\"title\":\"Photography Club - Version 2\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df567153b4655eba3eee5d\"},{\"title\":\"Photography Club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e056a053b4655eba3ef8d8\"},{\"title\":\"Photography Club - Version 2\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e056c953b4655eba3ef8e0\"},{\"title\":\"Photography Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68e3920453b4655eba3f0107\"}]",
+              "content": "Review đề Aptis 26/9 – HMĐ (HCM), ca chiều 13h30 \n\nSPEAKING: Part 1 dễ, câu hỏi cá nhân · Part 2 tranh hai cô gái ngồi trên tàu · Part 3 làm việc ngoài trời vs làm việc trong công ty — thích làm outdoor hay indoor, lợi ích của làm việc ngoài trời · Part 4 kể một lần giúp đỡ người khác hoặc được người khác giúp đỡ\nLISTENING: \nkhó nghe · câu 1–13 nghe được khoảng 10 câu · \ncâu 14 thích nghe nhạc ở đâu · câu 15 technology, như web nhưng lời thoại khó nghe ·\ncâu 16–17 có trên web nhưng khó nghe, phải hiểu chứ không đọc key được\nREADING: Part 1 dễ, trúng hết · Part 2+3 Making films + Family sports day, y hệt web · Part 4 Music Festival, đổi thứ tự và nhiều thông tin gây nhiễu · Part 5 The four-day work week, đoạn văn para khá khó nhưng các tiêu đề y hệt web\nWRITING: Photography club — hỏi chủ đề nào thú vị, không phải dạng chọn 1 trong 2 phương án",
+              "created_at": "2026-09-28 07:41:24",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 827,
+              "title": "Review đề Aptis 25/9 – Huế, ca tối ",
+              "exam_date": "2026-09-25",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Outdoor activities\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6956892b0731243929b0d147\"},{\"title\":\"The music\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d526c88028aa29a1b992\"},{\"title\":\"A new guide\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"6957ee3bc88028aa29a1d195\"},{\"title\":\"The famous singer\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a388d10b9d3fe9bd39314\"},{\"title\":\"The famous singer (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a52f110b9d3fe9bd39490\"},{\"title\":\"The famous singer ( phiên bản 4)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"69c0ea9ee521b65aeedbcb96\"},{\"title\":\"The famous singer (phiên bản 3)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a532610b9d3fe9bd394a3\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"Một thử thách\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68e4960453b4655eba3f0936\"},{\"title\":\"Fashion club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68f8ea9053b4655eba3f4653\"},{\"title\":\"Fashion club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68f7560c53b4655eba3f41c0\"},{\"title\":\"Fashion club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68f74c8553b4655eba3f409b\"},{\"title\":\"Fashion Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68f70c6353b4655eba3f3eb1\"}]",
+              "content": "Review đề Aptis 25/9 – Huế, ca tối \n\nSPEAKING: \nPart 1 gia đình; đất nước của bạn; kế hoạch tối nay ·\nPart 2 tranh nhóm bạn đi cà phê · Part 3 họp ngoài trời vs họp trong nhà · \nPart 4 kể về một thử thách\nLISTENING: \ncâu 1–13 có đổi, đề lạ · \ncâu 14 Outdoor activities · \ncâu 15 Singers and music · câu 16–17 new guide + một bài bạn không nhớ\nREADING: trúng full key · Part 1 về home · Part 2+3 The famous singer + tham gia chạy vào thứ Bảy · Part 4 hobby · Part 5 The four-day work week\nWRITING: Fashion club\n\nBáo cáo nội dung",
+              "created_at": "2026-09-28 07:39:00",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 826,
+              "title": "Review đề Aptis 25/9 ",
+              "exam_date": "2026-09-25",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Topic: Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695299dc17d3f9f552a5441f\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955d4ed5723012229d3efa0\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a380b10b9d3fe9bd392ee\"},{\"title\":\"Family Sport Day (phiên bản 1)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955dd3f5723012229d3fbf2\"},{\"title\":\"Family sports day (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a38df10b9d3fe9bd39327\"},{\"title\":\"Games from childhood\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a768810b9d3fe9bd3a87f\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"A new museum\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6a38b38f9e4ccda11bf0df07\"},{\"title\":\"homeschooling\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"b2c3d4e5f6a1b2c3d4e5f6a0\"},{\"title\":\"2 vợ chồng dọn nhà\",\"skill\":\"speaking\",\"part\":2,\"review_id\":\"68f0a49553b4655eba3f27cb\"},{\"title\":\"Photography Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68e3920453b4655eba3f0107\"},{\"title\":\"Photography Club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e056a053b4655eba3ef8d8\"},{\"title\":\"Photography Club - Version 2\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e056c953b4655eba3ef8e0\"},{\"title\":\"Photography Club - Version 2\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df567153b4655eba3eee5d\"},{\"title\":\"Photography Club - Version 1\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df561f53b4655eba3eee53\"},{\"title\":\"Photography Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd3a0453b4655eba3ee605\"}]",
+              "content": "Review đề Aptis 25/9 \n\nREADING: \nPart 2+3 phim xưa và nay + sports — giống key khoảng 90%, khác chút ít nhưng cơ bản vẫn vậy · Part 4 về games, khó hơn bản trên web ·\n Part 5 The four-day work week\nLISTENING: \ncâu 1–13 có câu giống key, đa phần khác nhưng dễ nghe, tốc độ nói chậm hơn trên web · \ncâu 14 na ná bài thăm bảo tàng (Visiting a new museum) · \ncâu 15 Homeschooling ·\ncâu 16–17 khó, bạn không bắt được đáp án nào dù trên web luyện nhiều\nSPEAKING: Part 2 một cặp đôi đang dọn nhà cùng nhau rất vui vẻ · Part 3 một cô gái đọc sách vs gia đình ba người đang xem TV · Part 4 kể về lần đi thăm một công trình lịch sử\nWRITING: Photography club\n\nBáo cáo nội dung",
+              "created_at": "2026-09-28 07:35:53",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 825,
+              "title": "Review đề Aptis 23/9 – Vincom Thủ Đức, ca chiều ",
+              "exam_date": "2026-09-23",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"The Art\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6957c6bbc88028aa29a1b086\"},{\"title\":\"Local Culture diffirent\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6a3c8ca25b4af1f9e232a19a\"},{\"title\":\"Local festivals\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d77ac88028aa29a1bc41\"},{\"title\":\"New coffee shop (key)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a39d410b9d3fe9bd39373\"},{\"title\":\"New coffee shop (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a558e10b9d3fe9bd39975\"},{\"title\":\"Topic: Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695299dc17d3f9f552a5441f\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955d4ed5723012229d3efa0\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a380b10b9d3fe9bd392ee\"},{\"title\":\"Music festival - Version 1\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a776f10b9d3fe9bd3a8af\"},{\"title\":\"Music festival - Version 2\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a7b0010b9d3fe9bd3a9d7\"},{\"title\":\"Music festival - Version 3\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955e1bc5723012229d3fd3b\"},{\"title\":\"Music festival - Version 4\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"69c2123c683ec8b79c9101bf\"},{\"title\":\"Mountain ( Phiên bản 2)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6963106e7ccc2d518f3e356e\"},{\"title\":\"Mountain Submmits \",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955d82d5723012229d3f1b6\"},{\"title\":\"Mountain Summits ( phiên bản 3) Cùng đáp án với các đề Mountain Submits\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"697c759bfda7aa93bd8396e0\"},{\"title\":\"Mountain (phiển bản 4)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"697cc8bf6d2610a5acfd84f1\"},{\"title\":\"English Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68f8e9d153b4655eba3f4623\"},{\"title\":\"English Club - Version 1\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e09a6353b4655eba3efc12\"},{\"title\":\"English Club - Version 2\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e09abd53b4655eba3efc1a\"},{\"title\":\"English Club - Version 3\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68dfd44753b4655eba3ef849\"},{\"title\":\"English Club - Version 2\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68dfd3fb53b4655eba3ef83f\"},{\"title\":\"English Club - Version 1\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68dfd37753b4655eba3ef835\"},{\"title\":\"English Club  - Version 1\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df076e53b4655eba3eec68\"},{\"title\":\"English Club - Version 3\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df091c53b4655eba3eed22\"},{\"title\":\"English Club - Version 2\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df07c453b4655eba3eec71\"}]",
+              "content": "Review đề Aptis 23/9 – Vincom Thủ Đức, ca chiều \n\nLISTENING: \ncâu 1–13 đa phần là đề mới · \ncâu 14 Doing arts · \ncâu 15 Local centre ·\n câu 16–17 trúng key\nREADING: trúng full key · \nPart 2 New coffee shop ·\n Part 3 Films · \nPart 4 Music Festival (para cả đoạn văn lẫn câu hỏi) · \nPart 5 Mountain (para đoạn văn, đáp án vẫn như key)\nWRITING: English club",
+              "created_at": "2026-09-27 07:48:38",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 824,
+              "title": "Review đề Aptis 23/9 – ca chiều ",
+              "exam_date": "2026-09-27",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"End of term project\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a564310b9d3fe9bd399ae\"},{\"title\":\"Music festival - Version 3\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955e1bc5723012229d3fd3b\"},{\"title\":\"Music festival - Version 1\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a776f10b9d3fe9bd3a8af\"},{\"title\":\"Music festival - Version 4\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"69c2123c683ec8b79c9101bf\"},{\"title\":\"Music festival - Version 2\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a7b0010b9d3fe9bd3a9d7\"},{\"title\":\"Writing about a place\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a391c10b9d3fe9bd3933a\"},{\"title\":\"Writing about a place (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a537010b9d3fe9bd394b6\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"Chuyến du lịch\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68e47b9053b4655eba3f06fa\"},{\"title\":\"Du lịch đường dài\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68f3502053b4655eba3f397c\"},{\"title\":\"Community club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68f8eabe53b4655eba3f465f\"},{\"title\":\"Community club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68f7562453b4655eba3f41c8\"},{\"title\":\"Community club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68f74d3553b4655eba3f40d9\"},{\"title\":\"Community Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68f70d1d53b4655eba3f3eba\"},{\"title\":\"Outdoor activities\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6956892b0731243929b0d147\"},{\"title\":\"The music\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d526c88028aa29a1b992\"},{\"title\":\"A musician's life\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"6957edf5c88028aa29a1d18b\"},{\"title\":\"Security cameras\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"6957ed6ec88028aa29a1d177\"}]",
+              "content": "Review đề Aptis 23/9 – ca chiều \n\nREADING: trúng key cả bài · \nPart 1 dễ · \nPart 2+3 End of term project + Writing about a place · \nPart 4 Music Festival · \nPart 5 The four-day work week\n\nSPEAKING: \nPart 1 thời tiết hôm nay; bạn thân của bạn (câu còn lại bạn quên) · Part 2 ảnh hai cha con cùng nấu ăn — có thích nấu ăn không, thích nấu cùng ai ·\nPart 3 ảnh 1 một người đàn ông lớn tuổi tập gym một mình, ảnh 2 nhóm bốn người tập cùng nhau — thích kiểu nào, thể thao mang lại lợi ích gì · \nPart 4 kể về một chuyến du lịch dài\nLISTENING: \ncâu 1–13 bạn ôn key thấy giống · câu 14 Outdoor activities · \ncâu 15 Music (nữ nói trước) · \ncâu 16 A musician's life · \ncâu 17 Security cameras — 16 và 17 đều trúng key\nWRITING: Community club",
+              "created_at": "2026-09-27 07:44:28",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 823,
+              "title": "Review đề 21.9",
+              "exam_date": "2026-09-21",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "",
+              "content": "W vào film club\nR vào p3: childhood activities, \nP2: films, vào bài miss gì gì đấy \nP4: moutain\nLis vào key hết nhưng p2 music thay đổi pra khó nghe nên e k chắc phần này, p3 uban farming, p4: script, main weekend \nSpeaking: p1, người bạn, phòng bạn, địa điểm nổi tiếng , p2: hai người đàn ông nấu trong bếp ,p3: tập thể dục,p4 : kể chuyến du lịch",
+              "created_at": "2026-09-21 15:16:44",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 822,
+              "title": "Review đề Aptis 18/9",
+              "exam_date": "2026-09-18",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Family Sport Day (phiên bản 1)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955dd3f5723012229d3fbf2\"},{\"title\":\"Family sports day (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a38df10b9d3fe9bd39327\"},{\"title\":\"End of term project\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a564310b9d3fe9bd399ae\"},{\"title\":\"childhood\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955d6815723012229d3efef\"},{\"title\":\"Women mathematicians (Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696368637ccc2d518f3e3bc3\"},{\"title\":\"Woman Mathematics  ( phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6963c0c37ccc2d518f3e4b90\"},{\"title\":\"Women mathematicians (phiên bản 2)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696372d27ccc2d518f3e4048\"},{\"title\":\"English Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68f8e9d153b4655eba3f4623\"},{\"title\":\"English Club - Version 2\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e09abd53b4655eba3efc1a\"},{\"title\":\"English Club - Version 1\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e09a6353b4655eba3efc12\"},{\"title\":\"English Club - Version 3\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68dfd44753b4655eba3ef849\"},{\"title\":\"English Club - Version 1\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68dfd37753b4655eba3ef835\"},{\"title\":\"English Club - Version 2\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68dfd3fb53b4655eba3ef83f\"},{\"title\":\"English Club  - Version 1\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df076e53b4655eba3eec68\"},{\"title\":\"English Club - Version 3\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df091c53b4655eba3eed22\"},{\"title\":\"English Club - Version 2\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df07c453b4655eba3eec71\"}]",
+              "content": "Review đề Aptis 18/9\n\nREADING: full key · Part 2+3 Family sports day + End of term project · Part 4 Childhood · Part 5 Women Mathematicians\nLISTENING: full key (Part 1 bạn tự nghe nên không đối chiếu được với key)\nWRITING: English club",
+              "created_at": "2026-09-19 10:49:14",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 1
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 821,
+              "title": "Review đề Aptis 15/9 ",
+              "exam_date": "2026-09-15",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Nhận quà\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68e4914a53b4655eba3f0915\"},{\"title\":\"Nhận quà Version 2\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68f352e253b4655eba3f39d4\"},{\"title\":\"Urban farming\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d6e2c88028aa29a1bc32\"},{\"title\":\"Topic: Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695299dc17d3f9f552a5441f\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955d4ed5723012229d3efa0\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a380b10b9d3fe9bd392ee\"},{\"title\":\"childhood\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955d6815723012229d3efef\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"Reading Book Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"a9f09ec7dc0600ec5ccaccda\"},{\"title\":\"Reading Book Club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"9196f2780ee4b6c26f0883e4\"},{\"title\":\"Reading Book Club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"ad8e67a3505ea3f554c85753\"},{\"title\":\"Reading Book Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"9b78bea483ee8c5c5a24fc3d\"}]",
+              "content": "Review đề Aptis 15/9 – Tích Phước Đại.\n\nSPEAKING: Part 1 phim truyền hình, bộ phim bạn thích nhất · Part 2 nhóm người đang xem phim trong rạp · Part 3 tranh 1 người trên xe ngoài đường, tranh 2 trong nhà hàng · Part 4 kể về lần đầu bạn được nhận quà\n\nLISTENING: Part 1 có vài câu lạ · Part 2 Urban farming · Part 3, 4 không nhớ\nREADING: Part 1 full key · Part 2 Film · Part 3 Childhood · Part 4 Four-day work week\nWRITING: Reading club",
+              "created_at": "2026-09-19 10:47:22",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 820,
+              "title": "Review đề Aptis 13/9",
+              "exam_date": "2026-09-13",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Cười trong rạp chiếu phim\",\"skill\":\"speaking\",\"part\":2,\"review_id\":\"68e5dd2b53b4655eba3f0f85\"},{\"title\":\"Nhận quà\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68e4914a53b4655eba3f0915\"},{\"title\":\"Nhận quà Version 2\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68f352e253b4655eba3f39d4\"},{\"title\":\"Do exercise\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6957c58bc88028aa29a1b068\"},{\"title\":\"homeschooling\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"b2c3d4e5f6a1b2c3d4e5f6a0\"},{\"title\":\"Topic: Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695299dc17d3f9f552a5441f\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955d4ed5723012229d3efa0\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a380b10b9d3fe9bd392ee\"},{\"title\":\"childhood\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955d6815723012229d3efef\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"Music Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68e396aa53b4655eba3f0113\"},{\"title\":\"Music Club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e0572753b4655eba3ef8e8\"},{\"title\":\"Music Club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df56e353b4655eba3eee67\"},{\"title\":\"Music Club - Version 2\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd3b3853b4655eba3ee620\"},{\"title\":\"Music Club - Version 1\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd3ad253b4655eba3ee617\"}]",
+              "content": "Review đề Aptis 13/9 \n\nSPEAKING: Part 1 bạn hay xem phim khi nào, phim truyền hình, bộ phim bạn thích nhất · Part 2 nhóm người đang xem phim trong rạp · Part 3 tranh 1 người trên xe ngoài đường, tranh 2 trong nhà hàng · Part 4 lần đầu bạn được nhận quà\n\nLISTENING: Part 1 lạ nhưng dễ nghe · Part 2 Tập thể dục (Exercise) · Part 3 Homeschooling, giọng nữ nói trước · Part 4 trong key, không nhớ bài\n\nREADING: Part 1 full key · Part 2 Film · Part 3 Childhood · Part 4 Four-day work week\n\nWRITING: Music club — Part 3 âm nhạc ảnh hưởng thế nào đến văn hoá; đăng ký lớp nhạc cho con trai nhưng bé không thích, gợi ý để bé tham gia · Part 4 buổi concert của CLB gây ồn ào, đề xuất giải pháp",
+              "created_at": "2026-09-19 10:45:10",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 819,
+              "title": "Review đề Aptis 13/9 – Cần Thơ ca sáng.",
+              "exam_date": "2026-09-13",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"The famous singer (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a52f110b9d3fe9bd39490\"},{\"title\":\"The famous singer (phiên bản 3)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a532610b9d3fe9bd394a3\"},{\"title\":\"The famous singer ( phiên bản 4)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"69c0ea9ee521b65aeedbcb96\"},{\"title\":\"Movies then and now (key)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a394e10b9d3fe9bd3934d\"},{\"title\":\"childhood\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955d6815723012229d3efef\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"Cô gái đi siêu thị\",\"skill\":\"speaking\",\"part\":2,\"review_id\":\"68e5dafe53b4655eba3f0f4d\"},{\"title\":\"Ăn đồ ăn nhanh, nấu ăn healthy\",\"skill\":\"speaking\",\"part\":3,\"review_id\":\"68e7387553b4655eba3f1470\"},{\"title\":\"Thể thao mạo hiểm\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68e4895053b4655eba3f0768\"},{\"title\":\"Sport Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68e3974453b4655eba3f011f\"},{\"title\":\"Sport Club - Version 1\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e0576853b4655eba3ef8f0\"},{\"title\":\"Sport Club - Version 2\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e0579953b4655eba3ef8f8\"},{\"title\":\"Sport Club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df574f53b4655eba3eee71\"},{\"title\":\"Sport Club - Version 1\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd3bd953b4655eba3ee629\"}]",
+              "content": "Review đề Aptis 13/9 – Cần Thơ ca sáng.\n\nREADING: Part 1 hỏi sở thích bản thân, đơn giản · Part 2+3 đề mới về người nổi tiếng + Movies then and now (có para) · Part 4 Childhood (có para) · Part 5 Four-day work week\n\nLISTENING: Part 1 có vài câu trong key · Câu 14 không nhớ · Câu 15 Information technology · Câu 16–17 trong key\n\nSPEAKING: Part 1 thời tiết, rảnh rỗi làm gì · Part 2 người phụ nữ đi mua sắm trong siêu thị · Part 3 một người đàn ông với đồ ăn healthy vs ba người bạn ăn pizza · Part 4 Extreme sports\n\nWRITING: Sports club",
+              "created_at": "2026-09-19 10:42:24",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 818,
+              "title": "Review đề Aptis chiều 12/9 tại BC Huỳnh Mẫn Đạt ",
+              "exam_date": "2026-09-12",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Family sports day (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a38df10b9d3fe9bd39327\"},{\"title\":\"Family Sport Day (phiên bản 1)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955dd3f5723012229d3fbf2\"},{\"title\":\"Music festival - Version 3\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955e1bc5723012229d3fd3b\"},{\"title\":\"Music festival - Version 1\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a776f10b9d3fe9bd3a8af\"},{\"title\":\"Music festival - Version 2\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a7b0010b9d3fe9bd3a9d7\"},{\"title\":\"Music festival - Version 4\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"69c2123c683ec8b79c9101bf\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"Language Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68e3910953b4655eba3f00ef\"},{\"title\":\"Language Club - Version 1\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e0561d53b4655eba3ef8c0\"},{\"title\":\"Language Club - Version 2\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e0565053b4655eba3ef8c8\"},{\"title\":\"Language Club - Version 2\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df0bd953b4655eba3eed52\"},{\"title\":\"Language Club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df0b8453b4655eba3eed48\"},{\"title\":\"Language Club - Version 2\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd391e53b4655eba3ee500\"},{\"title\":\"Language Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd383e53b4655eba3ee4f7\"}]",
+              "content": "Review đề Aptis chiều 12/9 tại BC Huỳnh Mẫn Đạt \n\nSpeak\nP2: Hình cô gái cầm bút nhìn xa xăm suy nghĩ, trên bàn có cuốn vở\nP3: Bức 1 mẹ và con chơi điện tử\nBức 2 cả nhà ông bà cha mẹ con cái chơi board game\n Câu 1: Miêu tả\nCâu 2: Prefer computer game hay board game\nCâu 3: Computer games có tốt cho trẻ em ko?\nP4: Topic về Change in life\nHỏi về kỉ niệm đổi trường đổi job? Thay đổi có gì cho xã hội\n\n\nListening (Khó)\nP2: 4 người topic running\nP2: Politic\nP3: về sách và author's block\n\n\nRead \nCâu 2-3: TV trắng đen - Sports for adults and children \nCâu 4: Music festival\nCâu 5: Working 4 days per week\n\nWri: Language club\nP4 email về public lecture. Viết proposal về buổi đó và lý do bản thân muốn làm guest speaker\n\nPhần lis khá khó, tricky ngay từ câu 10 nên phải nghe kĩ, các câu cuối p4 siêu khó nghe, dài",
+              "created_at": "2026-09-19 10:39:18",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 817,
+              "title": "Ngày 18.9 ca chiều 188 Cầu Giấy",
+              "exam_date": "2026-09-18",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Đường phố đông đúc\",\"skill\":\"speaking\",\"part\":2,\"review_id\":\"68e5d22b53b4655eba3f0ec1\"},{\"title\":\"Thể thao chuyên nghiệp, thể thao nghiệp dư\",\"skill\":\"speaking\",\"part\":3,\"review_id\":\"68e663aa53b4655eba3f1191\"},{\"title\":\"Thể thao mạo hiểm\",\"skill\":\"speaking\",\"part\":4,\"review_id\":\"68e4895053b4655eba3f0768\"},{\"title\":\"Actors\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957cd96c88028aa29a1b3f3\"},{\"title\":\"End of term project\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a564310b9d3fe9bd399ae\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955d4ed5723012229d3efa0\"},{\"title\":\"Topic: Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695299dc17d3f9f552a5441f\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a380b10b9d3fe9bd392ee\"},{\"title\":\"Music festival - Version 1\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a776f10b9d3fe9bd3a8af\"},{\"title\":\"Music festival - Version 3\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955e1bc5723012229d3fd3b\"},{\"title\":\"Music festival - Version 2\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a7b0010b9d3fe9bd3a9d7\"},{\"title\":\"Music festival - Version 4\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"69c2123c683ec8b79c9101bf\"},{\"title\":\"Mountain Submmits \",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955d82d5723012229d3f1b6\"},{\"title\":\"Mountain ( Phiên bản 2)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6963106e7ccc2d518f3e356e\"},{\"title\":\"Mountain (phiển bản 4)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"697cc8bf6d2610a5acfd84f1\"},{\"title\":\"Book Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68e09bff53b4655eba3efc2e\"},{\"title\":\"Book Club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e055d853b4655eba3ef8b8\"},{\"title\":\"Book Club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df0b4e53b4655eba3eed3e\"},{\"title\":\"Book Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd37d853b4655eba3ee4ee\"}]",
+              "content": "📌 SPEAKING\nPart 1: Nơi nổi tiếng, bộ phim yêu thích, chương trình thường xem trên TV.   \nPart 2: Mô tả tranh đường phố đông người.   \nPart 3: So sánh chơi bóng rổ trong nhà (indoor) và tennis ngoài trời (outdoor).   \nPart 4: Thảo luận về các môn thể thao mạo hiểm (extreme sports).   \n\n📌 LISTENING\nPart 2: Phương tiện di chuyển (travel by).   \nPart 3: Diễn viên (actor).   \nPart 4: 1 câu về công việc không như tưởng tượng, 1 câu về quyết định (decision).   \n\n📌 READING\nPart 2: Kết thúc dự án (end of project) & Phim xưa và nay.   \nPart 3: Lễ hội âm nhạc (music festival).   \nPart 4: Chủ đề về núi (mountain).   \n📌 WRITING: Chủ đề Book club.   ",
+              "created_at": "2026-09-19 05:01:09",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 816,
+              "title": "Review đề 13.9 tại Huế",
+              "exam_date": "2026-09-13",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": null,
+              "content": "Speaking \nPart 1 \n- kể về đứa bạn thân \n- kể về thời gian rảnh rỗi \ncâu còn lại thì em k nhớ nơi\npart 2\nTranh 2 người nam nữ đang ngồi nhìn nhau đập tay nhau \nPart 3\nTranh 1: một người phụ nữ đang ngồi trên ghế sofa đọc sách \nTranh 2: 3 người trong 1 gia đình đang ngồi xem tivi và ăn bỏng ngô\nPart 4\nTranh về khu di tích lịch sử\n em chỉ nhớ sơ sơ vậy thôi ad chơ run quá🥲\nLISTENING\nPart 1:\n chỉ có 4 5 câu trong key còn lại mới hết đều dễ nghe khoảng 70%\nPart 2 \nProtect the environment (phiên bản 2)\nnó lạ lắm án thì giống nhưng đoạn văn thì khác\nPart 3\nInformation & Technology Nam trước\nPart 4\n16,17 trong key\nREADING \ntrúng full key luôn ạ\nWRITING \nArt Club giống khoản 80 % đề trên web",
+              "created_at": "2026-09-14 04:04:05",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 815,
+              "title": "Review đề Aptis 9/9 – HMĐ.",
+              "exam_date": "2026-09-09",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Online shopping\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"695687630731243929b0ce9f\"},{\"title\":\"The music\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d526c88028aa29a1b992\"},{\"title\":\"End of term project\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a564310b9d3fe9bd399ae\"},{\"title\":\"Writing about a place\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a391c10b9d3fe9bd3933a\"},{\"title\":\"Music festival - Version 2\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a7b0010b9d3fe9bd3a9d7\"},{\"title\":\"Music festival - Version 4\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"69c2123c683ec8b79c9101bf\"},{\"title\":\"Music festival - Version 3\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955e1bc5723012229d3fd3b\"},{\"title\":\"Music festival - Version 1\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a776f10b9d3fe9bd3a8af\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"Social Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68e398cb53b4655eba3f012b\"},{\"title\":\"Social Club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e057cf53b4655eba3ef900\"},{\"title\":\"Social Club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df57b853b4655eba3eee7b\"},{\"title\":\"Social Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd3caf53b4655eba3ee632\"},{\"title\":\"Social Club - Version 2\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df0a1f53b4655eba3eed2b\"}]",
+              "content": "Review đề Aptis 9/9 – HMĐ.\n\nLISTENING: Part 1 còn khoảng 10 câu trong key · Câu 14 Shopping online (trong key, đổi thứ tự, para nhẹ) · Câu 15 Singers and music · Câu 16–17 trong key (không nhớ rõ)\nREADING: full key · Part 1 dễ · Part 2+3 End of term project + Writing about a place · Part 4 Music festival · Part 5 Four-day work week\nWRITING: Social club",
+              "created_at": "2026-09-12 04:20:31",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 814,
+              "title": "Review đề Aptis 8/9 – 188CG ca chiều.",
+              "exam_date": "2026-09-08",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Studying\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6957c9c0c88028aa29a1b0a4\"},{\"title\":\"Studying (phiên bản 2)\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6957ca55c88028aa29a1b0b3\"},{\"title\":\"Urban farming\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d6e2c88028aa29a1bc32\"},{\"title\":\"Film club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68f8f15253b4655eba3f46d1\"},{\"title\":\"Film club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68f756fa53b4655eba3f41f8\"},{\"title\":\"Film club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68f74f0753b4655eba3f4115\"},{\"title\":\"Film Club Version 1\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68f7153553b4655eba3f3f37\"}]",
+              "content": "Review đề Aptis 8/9 – 188CG ca chiều.\n\nSPEAKING: Part 1 bộ phim yêu thích · hôm qua làm gì · Part 2 ba đứa trẻ đá bóng · Part 3 về động vật\nLISTENING: Part 1 vài câu hơi khó nghe · Câu 14 Studying · Câu 15 Urban farming · Câu 16–17 para nhẹ\nREADING: full key\nWRITING: Film club",
+              "created_at": "2026-09-12 04:18:22",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 813,
+              "title": "Review đề Aptis 8/9 – HMĐ ca chiều.",
+              "exam_date": "2026-09-08",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Topic: Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695299dc17d3f9f552a5441f\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955d4ed5723012229d3efa0\"},{\"title\":\"Films\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a380b10b9d3fe9bd392ee\"},{\"title\":\"Family Sport Day (phiên bản 1)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"6955dd3f5723012229d3fbf2\"},{\"title\":\"Family sports day (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a38df10b9d3fe9bd39327\"},{\"title\":\"Games from childhood\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a768810b9d3fe9bd3a87f\"},{\"title\":\"Mountain Submmits \",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955d82d5723012229d3f1b6\"},{\"title\":\"Mountain (phiển bản 4)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"697cc8bf6d2610a5acfd84f1\"},{\"title\":\"Mountain ( Phiên bản 2)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6963106e7ccc2d518f3e356e\"},{\"title\":\"Language Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68e3910953b4655eba3f00ef\"},{\"title\":\"Language Club - Version 2\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e0565053b4655eba3ef8c8\"},{\"title\":\"Language Club - Version 1\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e0561d53b4655eba3ef8c0\"},{\"title\":\"Language Club - Version 2\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df0bd953b4655eba3eed52\"},{\"title\":\"Language Club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68df0b8453b4655eba3eed48\"},{\"title\":\"Language Club - Version 2\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd391e53b4655eba3ee500\"},{\"title\":\"Language Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68dd383e53b4655eba3ee4f7\"}]",
+              "content": "Review đề Aptis 8/9 – HMĐ ca chiều.\n\nSPEAKING: Part 1 mùa thích nhất trong năm · người nước bạn thích đọc bằng hình thức nào · Part 2 ba người tập gym (đang plank) – có hay tập thể dục không, khi nào, ở đâu · Part 3 nơi làm việc: nhiều người ở văn phòng vs một phụ nữ cầm laptop ngồi nhìn ra đồi – thích học ở đâu hơn, vì sao nhiều người học online · Part 4 An adventure\nGRAMMAR: khó hơn trên web nhiều\n\nLISTENING: Part 1 có 1–5 câu lạ hoàn toàn · Câu 15 Thói quen đọc (4 đáp án giữ nguyên nhưng đảo thứ tự, hội thoại para nhiều) · Câu 16–17 như key (bài dài)\n\nREADING: Part 1 dễ · Part 2+3 Making film (khác chút) + Family sports day · Part 4 Games from childhood (para nhiều) · Part 5 Mountain\nWRITING: Language club – Part 4: CLB sắp thêm tính năng mới trên website để thu hút mọi người; nêu lời khuyên cho người mới học ngôn ngữ mới và vì sao học thêm ngôn ngữ mới quan trọng",
+              "created_at": "2026-09-12 04:17:13",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 812,
+              "title": "Review đề Aptis 7/9 – 188CG ca chiều.",
+              "exam_date": "2026-09-07",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Music festival - Version 1\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a776f10b9d3fe9bd3a8af\"},{\"title\":\"Music festival - Version 3\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"6955e1bc5723012229d3fd3b\"},{\"title\":\"Music festival - Version 4\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"69c2123c683ec8b79c9101bf\"},{\"title\":\"Music festival - Version 2\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a7b0010b9d3fe9bd3a9d7\"},{\"title\":\"The arrival of four-day week ( Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696363d17ccc2d518f3e39bf\"},{\"title\":\"The arrival of four-day week\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6955e3155723012229d3fd53\"},{\"title\":\"University and technology\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d573c88028aa29a1b99e\"},{\"title\":\"Fashion club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68f8ea9053b4655eba3f4653\"},{\"title\":\"Fashion club\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68f7560c53b4655eba3f41c0\"},{\"title\":\"Fashion club\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68f74c8553b4655eba3f409b\"},{\"title\":\"Fashion Club\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68f70c6353b4655eba3f3eb1\"}]",
+              "content": "Review đề Aptis 7/9 – 188CG ca chiều.\n\nSPEAKING: Part 1 giới thiệu bản thân · Part 2 cặp đôi đi mua sắm · Part 3 cặp đôi ở rừng tuyết vs cặp đôi ở biển – chọn cái nào, thời tiết thay đổi tâm trạng con người thế nào · Part 4 kể một lần bạn và bạn của bạn cười đùa với nhau, câu chuyện đùa là gì\n\nLISTENING: Part 1 hơi khó nghe nhưng có trong key · Câu 14 không nhớ · Câu 15 University education · Câu 16–17 liên quan tiết kiệm tiền (không học theo key nên không nhớ rõ)\n\nREADING: Part 2+3 trong key · Part 4 Music festival ·\nPart 5 Four-day workweek (có đổi para)\nWRITING: Fashion club",
+              "created_at": "2026-09-12 04:09:38",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            },
+            {
+              "id": 811,
+              "title": "Chia sẽ đề HMĐ chiều CN 6/9/2026",
+              "exam_date": "2026-09-06",
+              "exam_location": null,
+              "exam_session": null,
+              "exam_type": "aptis_general",
+              "status": "approved",
+              "view_count": 0,
+              "guest_name": null,
+              "submission_type": "authenticated",
+              "key_exercises": "[{\"title\":\"Urban farming\",\"skill\":\"listening\",\"part\":3,\"review_id\":\"6957d6e2c88028aa29a1bc32\"},{\"title\":\"Studying\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6957c9c0c88028aa29a1b0a4\"},{\"title\":\"Studying (phiên bản 2)\",\"skill\":\"listening\",\"part\":2,\"review_id\":\"6957ca55c88028aa29a1b0b3\"},{\"title\":\"The sport\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"6957e9b2c88028aa29a1cfbb\"},{\"title\":\"The sport (Phiên bản 2)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69e8ea515e1769f65cd38ef4\"},{\"title\":\"The Sport (Phiên bản 3)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69e8eac45e1769f65cd38f19\"},{\"title\":\"Script Production (Phiên bản 2)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69ea30ce94821544ed40fbe1\"},{\"title\":\"Script Production (Phiên bản 3)\",\"skill\":\"listening\",\"part\":4,\"review_id\":\"69ea313b94821544ed40fbee\"},{\"title\":\"New coffee shop (key)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a39d410b9d3fe9bd39373\"},{\"title\":\"My visit to a new coffee shop(key)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a545910b9d3fe9bd39916\"},{\"title\":\"New coffee shop (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a558e10b9d3fe9bd39975\"},{\"title\":\"Busy coffee shop\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a541910b9d3fe9bd398f0\"},{\"title\":\"My visit to a new coffee shop\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a545810b9d3fe9bd39905\"},{\"title\":\"The history of transportation\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"695a398c10b9d3fe9bd39360\"},{\"title\":\"The history of transportation (phiên bản 2)\",\"skill\":\"reading\",\"part\":2,\"review_id\":\"69b12d2927e8fed25149469d\"},{\"title\":\"Job and trainning\",\"skill\":\"reading\",\"part\":3,\"review_id\":\"695a7e8610b9d3fe9bd3aa1f\"},{\"title\":\"Women mathematicians (Phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696368637ccc2d518f3e3bc3\"},{\"title\":\"Women mathematicians (phiên bản 2)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"696372d27ccc2d518f3e4048\"},{\"title\":\"Woman Mathematics  ( phiên bản 1)\",\"skill\":\"reading\",\"part\":4,\"review_id\":\"6963c0c37ccc2d518f3e4b90\"},{\"title\":\"English Club\",\"skill\":\"writing\",\"part\":1,\"review_id\":\"68f8e9d153b4655eba3f4623\"},{\"title\":\"English Club - Version 2\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e09abd53b4655eba3efc1a\"},{\"title\":\"English Club - Version 1\",\"skill\":\"writing\",\"part\":2,\"review_id\":\"68e09a6353b4655eba3efc12\"},{\"title\":\"English Club - Version 3\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68dfd44753b4655eba3ef849\"},{\"title\":\"English Club - Version 2\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68dfd3fb53b4655eba3ef83f\"},{\"title\":\"English Club - Version 1\",\"skill\":\"writing\",\"part\":3,\"review_id\":\"68dfd37753b4655eba3ef835\"},{\"title\":\"English Club  - Version 1\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df076e53b4655eba3eec68\"},{\"title\":\"English Club - Version 2\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df07c453b4655eba3eec71\"},{\"title\":\"English Club - Version 3\",\"skill\":\"writing\",\"part\":4,\"review_id\":\"68df091c53b4655eba3eed22\"}]",
+              "content": "Chia sẽ đề HMĐ chiều CN 6/9/2026\nspeaking\n- thời tiết hôm nay thế nào ?\n- bức tranh các đứa trẻ đang vẽ trên bàn gỗ\n- lợi ích của việc tham gia lớp hội họa (art)\n- có nên cho trẻ em tham gia lớp học vẽ trong trường không ? tại sao\n- hai bức tranh về party ngoài trời trên đồi và nhóm bạn uống cafe trong quán\n- bạn thích hoạt động nào hơn ?\n- bức tranh cảnh trồng cây ở cộng đồng hãy cho biết tầm quan trọng của local community\n- bạn cảm thấy thế nào khi tham gia hoạt động cộng đồng\n- hãy kể về lần tham gia của bạn\nListen\n- 1-12 key (vài câu mới trong aptis tiên phong cập nhật)\n- Urban farming (WBMW)\n- Studying (phiên bản 2)\n- The sport\n- Script Production (Phiên bản 3)\nReading\nNew coffee shop - có đổi nội dung \nThe history of transportation - có đổi nội dung\nJob and trainning\nWomen mathematicians (phiên bản 2) - nhưng khi đọc kỹ nội dung thấy vị trí các đoạn hơi khác ở phần 3,4,5 có thể bị đổi vị trí\nWriting English Club",
+              "created_at": "2026-09-06 16:38:44",
+              "author": {
+                "id": 6,
+                "name": "Admin",
+                "email": "duongabc11@gmail.com",
+                "avatar_url": null
+              },
+              "reaction_counts": {
+                "helpful": 0,
+                "not_helpful": 0
+              },
+              "user_reaction": null
+            }
+          ],
+          "pagination": {
+            "total": 477,
+            "page": 1,
+            "limit": 20,
+            "total_pages": 24
+          }
+        }
+      }
+    },
+    {
+      "url": "https://aptisacademy.com.vn/api/public/announcements?limit=10",
+      "json": {
+        "success": true,
+        "data": [
+          {
+            "id": 16,
+            "title": "Key các phần đã được cập nhật thêm, mọi người lên web luyện tập nha",
+            "content": "Đề vẫn ra nhiều key cũ vì vậy mọi người cần luyện tập đầy nha",
+            "url": null,
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-09-25T10:28:26.976Z",
+            "updated_at": "2026-09-25T10:28:26.976Z"
+          },
+          {
+            "id": 15,
+            "title": "cập nhật thêm 8 câu Listening part 1 vào trong bộ key aptis Tiên Phong",
+            "content": "",
+            "url": "",
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-08-27T04:45:14.242Z",
+            "updated_at": "2026-08-28T03:15:06.592Z"
+          },
+          {
+            "id": 14,
+            "title": "update thêm đề key mới của listening part 4: The Greek Artist Jim Panos",
+            "content": "Key mới này sẽ được cập nhật bộ key chuyên sau của aptis Tiên Phong",
+            "url": "https://aptisacademy.com.vn/bo-de-key/listening/4?id=6a799c0e55f812b856ff1b55",
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-08-10T09:39:49.078Z",
+            "updated_at": "2026-08-11T08:56:15.891Z"
+          },
+          {
+            "id": 13,
+            "title": "update key mới của listening part 1 ",
+            "content": "key được cập nhật ở tab key chuyên sâu Aptis Tien Phong",
+            "url": "",
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-08-03T10:02:07.092Z",
+            "updated_at": "2026-08-03T10:28:42.361Z"
+          },
+          {
+            "id": 12,
+            "title": "Cập nhật key mới reading part 2 : Homework next week",
+            "content": "Đề được cập nhật ở tab bộ key chuyên sâu Aptis Tien Phong",
+            "url": "https://aptisacademy.com.vn/bo-de-key/reading/2?tab=default&id=6a62ce979e697c44c86f1095",
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-07-29T08:20:32.477Z",
+            "updated_at": "2026-07-30T08:58:27.817Z"
+          },
+          {
+            "id": 11,
+            "title": "Đề listening part 3:  Home schooling cập nhật full đề bài và file nghe",
+            "content": "Đã được cập nhật tại tab bộ đề key aptis Tiên Phong",
+            "url": "https://aptisacademy.com.vn/bo-de-key/listening/3?id=b2c3d4e5f6a1b2c3d4e5f6a0",
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-07-22T10:37:33.547Z",
+            "updated_at": "2026-07-22T10:47:35.271Z"
+          },
+          {
+            "id": 10,
+            "title": "Đã Cập Nhật 20 đề reading part 1 mới ",
+            "content": "Được cập nhật ở bộ key độc quyền Aptis Tiên Phong",
+            "url": null,
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-07-21T13:48:19.885Z",
+            "updated_at": "2026-07-21T13:48:19.885Z"
+          },
+          {
+            "id": 9,
+            "title": "Thông báo 21/7-22/7: sẽ cập nhật key mới của listening và reading part 1",
+            "content": "Mọi người lưu ý để luyên tập ( key cập nhật sẽ được cập nhật tại key đọc quyền aptis tiên phong nha)",
+            "url": "",
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-07-20T08:22:27.278Z",
+            "updated_at": "2026-07-20T08:23:50.187Z"
+          },
+          {
+            "id": 8,
+            "title": "Cập nhật đề mới Work Business / Business and Cultural  của listening part 3",
+            "content": "",
+            "url": "",
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-07-01T05:04:39.375Z",
+            "updated_at": "2026-07-01T05:22:26.984Z"
+          },
+          {
+            "id": 7,
+            "title": "Đề Local Culture diffirent, Children and young people with technology : đã có nội dung và file nghe",
+            "content": "",
+            "url": "",
+            "is_active": true,
+            "sort_order": 0,
+            "created_by": 6,
+            "created_at": "2026-07-01T04:45:02.517Z",
+            "updated_at": "2026-07-01T05:22:21.857Z"
+          }
+        ]
+      }
+    }
+  ]
+}

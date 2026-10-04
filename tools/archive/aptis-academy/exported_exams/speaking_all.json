@@ -1,0 +1,4812 @@
+[
+  {
+    "id": "68e4bf5f53b4655eba3f0a93",
+    "part": "PART1",
+    "title": "Học một thứ mới",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Học một thứ mới",
+        "subQuestions": [
+          {
+            "id": "68e4bf5f53b4655eba3f0a95",
+            "prompt": "Tell me about the last time you went to the cinema.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4bf5f53b4655eba3f0a96",
+            "prompt": "Which dish is your favorite to cook?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4bf5f53b4655eba3f0a97",
+            "prompt": "Which is the best way to travel around your country?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4bea153b4655eba3f0a88",
+    "part": "PART1",
+    "title": "Vội vã",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Vội vã",
+        "subQuestions": [
+          {
+            "id": "68e4bea153b4655eba3f0a8a",
+            "prompt": "Describe the room you are in.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4bea153b4655eba3f0a8b",
+            "prompt": "Please tell me about the last thing you saw on television.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4bea153b4655eba3f0a8c",
+            "prompt": "What is the food like in your country?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4bfb453b4655eba3f0a9e",
+    "part": "PART1",
+    "title": "Thứ mà bạn muốn nhưng không thể có",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Thứ mà bạn muốn nhưng không thể có",
+        "subQuestions": [
+          {
+            "id": "68e4bfb453b4655eba3f0aa0",
+            "prompt": "Please tell me about your family.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4bfb453b4655eba3f0aa1",
+            "prompt": "Please tell me about a famous place in your country.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4bfb453b4655eba3f0aa2",
+            "prompt": "Tell me about your hobby.",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4c00653b4655eba3f0aa9",
+    "part": "PART1",
+    "title": "Công viên giải trí",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Công viên giải trí",
+        "subQuestions": [
+          {
+            "id": "68e4c00653b4655eba3f0aab",
+            "prompt": "Describe the way you went to the exam room.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c00653b4655eba3f0aac",
+            "prompt": "Tell me about your country’s weather.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c00653b4655eba3f0aad",
+            "prompt": "What is your favorite film? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4c05853b4655eba3f0ab4",
+    "part": "PART1",
+    "title": "Nỗ lực",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Nỗ lực",
+        "subQuestions": [
+          {
+            "id": "68e4c05853b4655eba3f0ab6",
+            "prompt": "Tell me about your childhood home.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c05853b4655eba3f0ab7",
+            "prompt": "Describe something you are planning to do in the future.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c05853b4655eba3f0ab8",
+            "prompt": "Which dish is your favorite to cook?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4c0a353b4655eba3f0abf",
+    "part": "PART1",
+    "title": "Chuyến du lịch",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Chuyến du lịch",
+        "subQuestions": [
+          {
+            "id": "68e4c0a353b4655eba3f0ac1",
+            "prompt": "Which place should people visit in your country?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c0a353b4655eba3f0ac2",
+            "prompt": "What are you doing for the rest of today?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c0a353b4655eba3f0ac3",
+            "prompt": "What sports do people in your country like?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4c17753b4655eba3f0aca",
+    "part": "PART1",
+    "title": "Chủ đề khó",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Chủ đề khó",
+        "subQuestions": [
+          {
+            "id": "68e4c17753b4655eba3f0acc",
+            "prompt": "Please tell me about the last time you visited friends.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c17753b4655eba3f0acd",
+            "prompt": "Tell me about a scenic spot in your country.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c17753b4655eba3f0ace",
+            "prompt": "Describe the place you are in.",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4c23753b4655eba3f0ad5",
+    "part": "PART1",
+    "title": "Đứng trước nhiều lựa chọn",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Đứng trước nhiều lựa chọn",
+        "subQuestions": [
+          {
+            "id": "68e4c23753b4655eba3f0ad7",
+            "prompt": "What is the city you live in?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c23753b4655eba3f0ad8",
+            "prompt": "Tell me about your first school.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c23753b4655eba3f0ad9",
+            "prompt": "Describe your typical day.",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4c29153b4655eba3f0ae0",
+    "part": "PART1",
+    "title": "Gặp người ở thế hệ khác",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Gặp người ở thế hệ khác",
+        "subQuestions": [
+          {
+            "id": "68e4c29153b4655eba3f0ae2",
+            "prompt": "Please tell me about your favorite film star/singer.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c29153b4655eba3f0ae3",
+            "prompt": "Please describe your house.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4c29153b4655eba3f0ae4",
+            "prompt": "What sports do you like?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4c3ec53b4655eba3f0b22",
+    "part": "PART1",
+    "title": "Nhận một email hoặc thông báo",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Nhận một email hoặc thông báo",
+        "subQuestions": [
+          {
+            "id": "68e4e56c53b4655eba3f0d60",
+            "prompt": "Please tell me about yourself.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e56c53b4655eba3f0d61",
+            "prompt": "What do you find relaxing?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e56c53b4655eba3f0d62",
+            "prompt": "Can you describe your favorite dish?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4e61d53b4655eba3f0d80",
+    "part": "PART1",
+    "title": "Mất nhiều công sức làm một món đồ",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Mất nhiều công sức làm một món đồ",
+        "subQuestions": [
+          {
+            "id": "68e4e61d53b4655eba3f0d82",
+            "prompt": "Please describe the place where you live.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e61d53b4655eba3f0d83",
+            "prompt": "What do you like to do in your free time?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e61d53b4655eba3f0d84",
+            "prompt": "Can you play a musical instrument?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4e69a53b4655eba3f0d8b",
+    "part": "PART1",
+    "title": "Gặp gỡ người bạn mới",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Gặp gỡ người bạn mới",
+        "subQuestions": [
+          {
+            "id": "68e4e69a53b4655eba3f0d8d",
+            "prompt": "Please tell me about your friend.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e69a53b4655eba3f0d8e",
+            "prompt": "How do you relax in the evening?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e69a53b4655eba3f0d8f",
+            "prompt": "Tell me about your country.",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4e77353b4655eba3f0d96",
+    "part": "PART1",
+    "title": "Sử dụng Internet",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Sử dụng Internet",
+        "subQuestions": [
+          {
+            "id": "68e4e77353b4655eba3f0d98",
+            "prompt": "Would you like to live in the countryside?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e77353b4655eba3f0d99",
+            "prompt": "Please tell me what you do on the weekend.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e77353b4655eba3f0d9a",
+            "prompt": "What's your favorite season? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4e83c53b4655eba3f0da1",
+    "part": "PART1",
+    "title": "Thành quả",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Thành quả",
+        "subQuestions": [
+          {
+            "id": "68e4e83c53b4655eba3f0da3",
+            "prompt": "What activities do you usually do with your friends?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e83c53b4655eba3f0da4",
+            "prompt": "Describe what makes you happy.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e83c53b4655eba3f0da5",
+            "prompt": "What’s your favorite kind of music?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4e9e753b4655eba3f0dac",
+    "part": "PART1",
+    "title": "Thể thao mạo hiểm",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Thể thao mạo hiểm",
+        "subQuestions": [
+          {
+            "id": "68e4e9e753b4655eba3f0dae",
+            "prompt": "Can you describe yourself?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e9e753b4655eba3f0daf",
+            "prompt": "What is your village/town/city like?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4e9e753b4655eba3f0db0",
+            "prompt": "What do you like doing with your friends?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4eb3453b4655eba3f0db7",
+    "part": "PART1",
+    "title": "Save money",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Save money",
+        "subQuestions": [
+          {
+            "id": "68e4eb3453b4655eba3f0db9",
+            "prompt": "Tell me about the person you love the most.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4eb3453b4655eba3f0dba",
+            "prompt": "What will you do next weekend?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4eb3453b4655eba3f0dbb",
+            "prompt": "What's your favorite music?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4ec1e53b4655eba3f0dc2",
+    "part": "PART1",
+    "title": "Sự sáng tạo",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Sự sáng tạo",
+        "subQuestions": [
+          {
+            "id": "68e4ec1e53b4655eba3f0dc4",
+            "prompt": "Please tell me what you do at the weekend.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4ec1e53b4655eba3f0dc5",
+            "prompt": "Do you like shopping?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4ec1e53b4655eba3f0dc6",
+            "prompt": "Will you go on holiday next summer?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4ecff53b4655eba3f0dcd",
+    "part": "PART1",
+    "title": "Hòa mình vào thiên nhiên",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Hòa mình vào thiên nhiên",
+        "subQuestions": [
+          {
+            "id": "68e4ecff53b4655eba3f0dcf",
+            "prompt": "Do you have a large family?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4ecff53b4655eba3f0dd0",
+            "prompt": "Please tell me about your favorite place.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4ecff53b4655eba3f0dd1",
+            "prompt": "Do you like walking?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4ed3e53b4655eba3f0dd8",
+    "part": "PART1",
+    "title": "Nhận quà",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Nhận quà",
+        "subQuestions": [
+          {
+            "id": "68e4ed3e53b4655eba3f0dda",
+            "prompt": "Describe a member of your family.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4ed3e53b4655eba3f0ddb",
+            "prompt": "What food do you like?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4ed3e53b4655eba3f0ddc",
+            "prompt": "Tell me about a time you cooked for your family.",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4ee0953b4655eba3f0de6",
+    "part": "PART2",
+    "title": "Vội vã",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1759833607835_d1df7b050dc39360_1_11.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Vội vã",
+        "subQuestions": [
+          {
+            "id": "68e4ee0953b4655eba3f0de8",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4ee0953b4655eba3f0de9",
+            "prompt": "Do you prefer reading newspapers or watching the news?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4ee0953b4655eba3f0dea",
+            "prompt": "Why do people need to watch the news?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4ef0353b4655eba3f0df4",
+    "part": "PART2",
+    "title": "Làm việc khi người khác ngủ",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Làm việc khi người khác ngủ",
+        "subQuestions": [
+          {
+            "id": "68f064a553b4655eba3f2167",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f064a553b4655eba3f2168",
+            "prompt": "Tell me the last time you worked when others slept.",
+            "suggestion": null
+          },
+          {
+            "id": "68f064a553b4655eba3f2169",
+            "prompt": "The older we get, the more responsibility we have. Do you agree?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d19853b4655eba3f0eb3",
+    "part": "PART2",
+    "title": "Đi đâu đó với bạn bè",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Đi đâu đó với bạn bè",
+        "subQuestions": [
+          {
+            "id": "68f065a153b4655eba3f21db",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f065a153b4655eba3f21dc",
+            "prompt": "When was the last time you went somewhere with your friends?",
+            "suggestion": null
+          },
+          {
+            "id": "68f065a153b4655eba3f21dd",
+            "prompt": "Why do people enjoy doing things together?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d22b53b4655eba3f0ec1",
+    "part": "PART2",
+    "title": "Đường phố đông đúc",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Đường phố đông đúc",
+        "subQuestions": [
+          {
+            "id": "68f0660053b4655eba3f2201",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0660053b4655eba3f2202",
+            "prompt": "A time when you were in a crowded place.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0660053b4655eba3f2203",
+            "prompt": "Why don't people like crowded places?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d2f653b4655eba3f0ecf",
+    "part": "PART2",
+    "title": "Cuộc họp văn phòng",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Cuộc họp văn phòng",
+        "subQuestions": [
+          {
+            "id": "68f09af053b4655eba3f25b2",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f09af053b4655eba3f25b3",
+            "prompt": "Tell us about the time you give a presentation. How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68f09af053b4655eba3f25b4",
+            "prompt": "Why are people scared of public speaking?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d36453b4655eba3f0edd",
+    "part": "PART2",
+    "title": "Treo tranh lên tường",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Treo tranh lên tường",
+        "subQuestions": [
+          {
+            "id": "68f0a43f53b4655eba3f27ac",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a43f53b4655eba3f27ad",
+            "prompt": "Tell me about a time you decorated your house.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a43f53b4655eba3f27ae",
+            "prompt": "In modern life, people pay more attention to home decoration than in the past. Do you agree? ",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d3c053b4655eba3f0eeb",
+    "part": "PART2",
+    "title": "Làm việc trong văn phòng",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Làm việc trong văn phòng",
+        "subQuestions": [
+          {
+            "id": "68f0671b53b4655eba3f2273",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0671b53b4655eba3f2274",
+            "prompt": "Tell me about a time when you did some work.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0671b53b4655eba3f2275",
+            "prompt": "Why is it important for people to enjoy their work?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d4a953b4655eba3f0ef9",
+    "part": "PART2",
+    "title": "Hai mẹ con cưỡi ngựa",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Hai mẹ con cưỡi ngựa",
+        "subQuestions": [
+          {
+            "id": "68f0fc5f53b4655eba3f2b01",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0fc5f53b4655eba3f2b02",
+            "prompt": "Tell me about an animal that you like",
+            "suggestion": null
+          },
+          {
+            "id": "68f0fc5f53b4655eba3f2b03",
+            "prompt": "How important are animals in our lives?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d60c53b4655eba3f0f07",
+    "part": "PART2",
+    "title": "1 người đọc sách, một người chơi game",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "1 người đọc sách, một người chơi game",
+        "subQuestions": [
+          {
+            "id": "68f069e553b4655eba3f22d1",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f069e553b4655eba3f22d2",
+            "prompt": "The last time you read the news.",
+            "suggestion": null
+          },
+          {
+            "id": "68f069e553b4655eba3f22d3",
+            "prompt": "Do you think that technological advancements and the Internet make people distant?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d68853b4655eba3f0f15",
+    "part": "PART2",
+    "title": "Xem triển lãm tranh",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Xem triển lãm tranh",
+        "subQuestions": [
+          {
+            "id": "68f06a0e53b4655eba3f22f7",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f06a0e53b4655eba3f22f8",
+            "prompt": "Tell me the last time you visited the exhibition.",
+            "suggestion": null
+          },
+          {
+            "id": "68f06a0e53b4655eba3f22f9",
+            "prompt": "Why do people like those pictures/exhibitions?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d73153b4655eba3f0f23",
+    "part": "PART2",
+    "title": "Hai bố con đang chơi bóng",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Hai bố con đang chơi bóng",
+        "subQuestions": [
+          {
+            "id": "68f07a4853b4655eba3f235b",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f07a4853b4655eba3f235c",
+            "prompt": "Tell me the last time you did an outdoor activity.",
+            "suggestion": null
+          },
+          {
+            "id": "68f07a4853b4655eba3f235d",
+            "prompt": "Why should people do outdoor activities?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d89b53b4655eba3f0f31",
+    "part": "PART2",
+    "title": "Cô gái đọc sách trên bãi cỏ",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Cô gái đọc sách trên bãi cỏ",
+        "subQuestions": [
+          {
+            "id": "68f07aa953b4655eba3f2387",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f07aa953b4655eba3f2388",
+            "prompt": "Tell me about a time you feel relaxing",
+            "suggestion": null
+          },
+          {
+            "id": "68f07aa953b4655eba3f2389",
+            "prompt": "The reason making relaxing be an important part in our life.",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5d96653b4655eba3f0f3f",
+    "part": "PART2",
+    "title": "Người đi xe Bus",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Người đi xe Bus",
+        "subQuestions": [
+          {
+            "id": "68f096ec53b4655eba3f2413",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f096ec53b4655eba3f2414",
+            "prompt": "Tell me about a time when you used public transport?",
+            "suggestion": null
+          },
+          {
+            "id": "68f096ec53b4655eba3f2415",
+            "prompt": "People should use public transport more. Do you agree? Why, or why not?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5dafe53b4655eba3f0f4d",
+    "part": "PART2",
+    "title": "Cô gái đi siêu thị",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Cô gái đi siêu thị",
+        "subQuestions": [
+          {
+            "id": "68f0973953b4655eba3f245f",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0973953b4655eba3f2460",
+            "prompt": "The last time you went to a small shop?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0973953b4655eba3f2461",
+            "prompt": "Why is shopping on the internet so popular?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5db8653b4655eba3f0f5b",
+    "part": "PART2",
+    "title": "Nấu ăn cho gia đình",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Nấu ăn cho gia đình",
+        "subQuestions": [
+          {
+            "id": "68f0976c53b4655eba3f2485",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0976c53b4655eba3f2486",
+            "prompt": "Why do people enjoy eating together?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0976c53b4655eba3f2487",
+            "prompt": "Young people are too busy to cook for their families?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5dc8053b4655eba3f0f77",
+    "part": "PART2",
+    "title": "Trò chuyện chân thành",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Trò chuyện chân thành",
+        "subQuestions": [
+          {
+            "id": "68f099c253b4655eba3f24d7",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f099c253b4655eba3f24d8",
+            "prompt": "Tell me about the last time you had a heart-to-heart conversation with someone.",
+            "suggestion": null
+          },
+          {
+            "id": "68f099c253b4655eba3f24d9",
+            "prompt": "Talking is the best way to solve problems. Do you agree with this opinion?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5dd2b53b4655eba3f0f85",
+    "part": "PART2",
+    "title": "Cười trong rạp chiếu phim",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Cười trong rạp chiếu phim",
+        "subQuestions": [
+          {
+            "id": "68f099f653b4655eba3f24fd",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f099f653b4655eba3f24fe",
+            "prompt": "Tell me a time you laughed a lot.",
+            "suggestion": null
+          },
+          {
+            "id": "68f099f653b4655eba3f24ff",
+            "prompt": "Do you think people from different countries laugh at different things?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5e2ae53b4655eba3f0fde",
+    "part": "PART2",
+    "title": "Đi du lịch theo nhóm",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Đi du lịch theo nhóm",
+        "subQuestions": [
+          {
+            "id": "68f09a2753b4655eba3f2523",
+            "prompt": "Please describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f09a2753b4655eba3f2524",
+            "prompt": "Tell me about the last time you traveled with a group.",
+            "suggestion": null
+          },
+          {
+            "id": "68f09a2753b4655eba3f2525",
+            "prompt": "What are the benefits of traveling with a group?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5e33853b4655eba3f0fec",
+    "part": "PART2",
+    "title": "Gia đình ngồi trên ô tô",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Gia đình ngồi trên ô tô",
+        "subQuestions": [
+          {
+            "id": "68f0a3f853b4655eba3f2773",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a3f853b4655eba3f2774",
+            "prompt": "The last time you went somewhere in a car?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a3f853b4655eba3f2775",
+            "prompt": "Is it important for people to learn to drive? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5e3e653b4655eba3f1008",
+    "part": "PART2",
+    "title": "Mua sắm cùng bạn bè",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Mua sắm cùng bạn bè",
+        "subQuestions": [
+          {
+            "id": "68f09ba453b4655eba3f260a",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f09ba453b4655eba3f260b",
+            "prompt": "Tell me about a time you went shopping with your friend.",
+            "suggestion": null
+          },
+          {
+            "id": "68f09ba453b4655eba3f260c",
+            "prompt": "Some people are not interested in online shopping. How about you?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5e46153b4655eba3f1016",
+    "part": "PART2",
+    "title": "Ăn ở ngoài",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Ăn ở ngoài",
+        "subQuestions": [
+          {
+            "id": "68f09c4753b4655eba3f2630",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f09c4753b4655eba3f2631",
+            "prompt": "How difficult is it for young people to learn to cook these days?",
+            "suggestion": null
+          },
+          {
+            "id": "68f09c4753b4655eba3f2632",
+            "prompt": "When was the last time you went out to eat?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5e52d53b4655eba3f1032",
+    "part": "PART2",
+    "title": "Cô giáo và đám trẻ trong lớp học",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Cô giáo và đám trẻ trong lớp học",
+        "subQuestions": [
+          {
+            "id": "68f09d5253b4655eba3f2665",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f09d5253b4655eba3f2666",
+            "prompt": "What kind of games did you play when you were a child?",
+            "suggestion": null
+          },
+          {
+            "id": "68f09d5253b4655eba3f2667",
+            "prompt": "Why do children spend time playing?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5e63c53b4655eba3f104e",
+    "part": "PART2",
+    "title": "Nhận tin tốt",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1759897148158_54010c521f349f63_karavi_taxidi.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Nhận tin tốt",
+        "subQuestions": [
+          {
+            "id": "68e5e63c53b4655eba3f1050",
+            "prompt": "Please describe what you see in the picture",
+            "suggestion": null
+          },
+          {
+            "id": "68e5e63c53b4655eba3f1051",
+            "prompt": "Can you tell me the last time I went sightseeing by the beach?",
+            "suggestion": null
+          },
+          {
+            "id": "68e5e63c53b4655eba3f1052",
+            "prompt": "Why do people dislike traveling by seaway?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5e74353b4655eba3f105c",
+    "part": "PART2",
+    "title": "Ăn nhà hàng với gia đình",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Ăn nhà hàng với gia đình",
+        "subQuestions": [
+          {
+            "id": "68f09e8253b4655eba3f26f7",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f09e8253b4655eba3f26f8",
+            "prompt": "What makes a restaurant good?",
+            "suggestion": null
+          },
+          {
+            "id": "68f09e8253b4655eba3f26f9",
+            "prompt": "Why do people choose to spend money in restaurants?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ea011253b4655eba3f1710",
+    "part": "PART2",
+    "title": "Gọi điện thoại",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Gọi điện thoại",
+        "subQuestions": [
+          {
+            "id": "68f0650453b4655eba3f21b5",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0650453b4655eba3f21b6",
+            "prompt": "A time you talked on phone recently.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0650453b4655eba3f21b7",
+            "prompt": "Will writing messages replace talking on the phone?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68eb6ab553b4655eba3f18e5",
+    "part": "PART2",
+    "title": "Ăn nhà hàng với bạn bè",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Ăn nhà hàng với bạn bè",
+        "subQuestions": [
+          {
+            "id": "68f0972153b4655eba3f2439",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0972153b4655eba3f243a",
+            "prompt": "Tell me the last time you went to a restaurant with your friends.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0972153b4655eba3f243b",
+            "prompt": "Why do people enjoy eating out with their friends?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68eb768a53b4655eba3f18f3",
+    "part": "PART2",
+    "title": "Sử dụng máy tính",
+    "timeLimitSeconds": null,
+    "image": [],
+    "questions": [
+      {
+        "prompt": "Sử dụng máy tính",
+        "subQuestions": [
+          {
+            "id": "68f0997353b4655eba3f24b1",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0997353b4655eba3f24b2",
+            "prompt": "Your experience of using a computer.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0997353b4655eba3f24b3",
+            "prompt": "Do you think technology makes life easier?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0a49553b4655eba3f27cb",
+    "part": "PART2",
+    "title": "2 vợ chồng dọn nhà",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760601235863_15c6ad7909d7e7d9_istockphoto_1217811794_612x612.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "2 vợ chồng dọn nhà",
+        "subQuestions": [
+          {
+            "id": "68f0a49553b4655eba3f27cd",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a49553b4655eba3f27ce",
+            "prompt": "Tell me the time you did housework.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a49553b4655eba3f27cf",
+            "prompt": "Why do people like to decorate their houses?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0a51f53b4655eba3f27d9",
+    "part": "PART2",
+    "title": "Điều khiển và màn hình smart TV",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760601374154_0447f86095159985_hand_remote_controller_pointing_at_internet_or_on_demand_tv_display_on_white_P8Y8H8.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Điều khiển và màn hình smart TV",
+        "subQuestions": [
+          {
+            "id": "68f0a51f53b4655eba3f27db",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a51f53b4655eba3f27dc",
+            "prompt": "How often do you watch films or programmes at home? Why?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a51f53b4655eba3f27dd",
+            "prompt": "Which is better for learning, watching video or reading? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0a5b453b4655eba3f27e7",
+    "part": "PART2",
+    "title": "Người đàn ông nằm trên sofa xem TV",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760601522908_0d010a84519e76d4_tivitoshibakhonglenhinh_730x419.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Người đàn ông nằm trên sofa xem TV",
+        "subQuestions": [
+          {
+            "id": "68f0a5b453b4655eba3f27e9",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a5b453b4655eba3f27ea",
+            "prompt": "Do you often watch TV?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a5b453b4655eba3f27eb",
+            "prompt": "Why is it important to have some free time every day?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0a60753b4655eba3f27f5",
+    "part": "PART2",
+    "title": "3 người nằm trên cỏ đọc sách",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760601606383_8b62b7dda7341015_istockphoto_503892523_170667a.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "3 người nằm trên cỏ đọc sách",
+        "subQuestions": [
+          {
+            "id": "68f0a60753b4655eba3f27f7",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a60753b4655eba3f27f8",
+            "prompt": "What books do you read?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0a60753b4655eba3f27f9",
+            "prompt": "Why is reading books important to children?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0b65453b4655eba3f281d",
+    "part": "PART2",
+    "title": "Mẹ cõng con",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760605779360_524c067465833b66_csm_Mutter_und_Kind_1693292837.webp"
+    ],
+    "questions": [
+      {
+        "prompt": "Mẹ cõng con",
+        "subQuestions": [
+          {
+            "id": "68f0b65453b4655eba3f281f",
+            "prompt": "Describe the picture",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b65453b4655eba3f2820",
+            "prompt": "Tell me a time that you visited a new place?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b65453b4655eba3f2821",
+            "prompt": "Why do people like to visit new places?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0b73b53b4655eba3f2834",
+    "part": "PART2",
+    "title": "Ảnh cưới",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760606010311_e6580c313117f5ac_Screenshot_2025_10_16_161314.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Ảnh cưới",
+        "subQuestions": [
+          {
+            "id": "68f0b73b53b4655eba3f2836",
+            "prompt": "Please describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b73b53b4655eba3f2837",
+            "prompt": " When did you last attend a wedding?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b73b53b4655eba3f2838",
+            "prompt": "Why are weddings important to the families involved?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0b87253b4655eba3f2858",
+    "part": "PART2",
+    "title": "Con tặng hoa mẹ",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760606321442_c25a91fe8af997d4_istockphoto_170169442_612x612__1_.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Con tặng hoa mẹ",
+        "subQuestions": [
+          {
+            "id": "68f0b87253b4655eba3f285a",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b87253b4655eba3f285b",
+            "prompt": "Tell me about a time when you gave or received some flowers.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b87253b4655eba3f285c",
+            "prompt": "On what occasions in your country do people give flowers?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0b90753b4655eba3f2866",
+    "part": "PART2",
+    "title": "Người đàn ông đọc báo",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760606470278_b542b63482394e7a_istockphoto_108348850_612x612.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Người đàn ông đọc báo",
+        "subQuestions": [
+          {
+            "id": "68f0b90753b4655eba3f2868",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b90753b4655eba3f2869",
+            "prompt": "How do most people in your country learn about world news?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b90753b4655eba3f286a",
+            "prompt": "How has the reporting of news changed in the last fifty years?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0b9f353b4655eba3f2874",
+    "part": "PART2",
+    "title": "Trẻ em đi xe bus",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760606705782_6a5190cd37a4750f_istockphoto_185208032_1024x1024.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Trẻ em đi xe bus",
+        "subQuestions": [
+          {
+            "id": "68f0b9f353b4655eba3f2876",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b9f353b4655eba3f2877",
+            "prompt": "How do children go to school in your country?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0b9f353b4655eba3f2878",
+            "prompt": "Is it common to live far from school in your country? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0bac253b4655eba3f2882",
+    "part": "PART2",
+    "title": "Con tặng quà bố",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760606913094_706aeea040f0d6c7_chon_tang_qua_cho_bo_theo_so_thich.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Con tặng quà bố",
+        "subQuestions": [
+          {
+            "id": "68f0bac253b4655eba3f2884",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bac253b4655eba3f2885",
+            "prompt": "Tell me about a time when you gave or received a gift.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bac253b4655eba3f2886",
+            "prompt": "Why is it important to give people gifts on special occasions?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f1b5e753b4655eba3f2db8",
+    "part": "PART2",
+    "title": "1 người đàn ông ngồi vẽ tranh",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760671207144_6467501425e6d908_29122014155226491VTBM2.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "1 người đàn ông ngồi vẽ tranh",
+        "subQuestions": [
+          {
+            "id": "68f1b5e753b4655eba3f2dba",
+            "prompt": "Describe the picture?",
+            "suggestion": null
+          },
+          {
+            "id": "68f1b5e753b4655eba3f2dbb",
+            "prompt": "Describe the last time you looked at some art.",
+            "suggestion": null
+          },
+          {
+            "id": "68f1b5e753b4655eba3f2dbc",
+            "prompt": "Why do people enjoy creating art?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f1b5af53b4655eba3f2daa",
+    "part": "PART2",
+    "title": "1 người đàn ông mặc vest đứng đợi tàu",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760671150660_e64263456c747426_2_3.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "1 người đàn ông mặc vest đứng đợi tàu",
+        "subQuestions": [
+          {
+            "id": "68f1b5af53b4655eba3f2dac",
+            "prompt": "Describe the picture?",
+            "suggestion": null
+          },
+          {
+            "id": "68f1b5af53b4655eba3f2dad",
+            "prompt": "Tell me about the last time you used public transport.",
+            "suggestion": null
+          },
+          {
+            "id": "68f1b5af53b4655eba3f2dae",
+            "prompt": "How can we increase the number of people using public transport?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f1b54753b4655eba3f2d9c",
+    "part": "PART2",
+    "title": " Cô gái ngồi trên du thuyền, ngắm cảnh biển",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760671046750_5c17a5f0f21289b5_thu_1553291282_8575_1553293633.webp"
+    ],
+    "questions": [
+      {
+        "prompt": " Cô gái ngồi trên du thuyền, ngắm cảnh biển",
+        "subQuestions": [
+          {
+            "id": "68f1b54753b4655eba3f2d9e",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f1b54753b4655eba3f2d9f",
+            "prompt": "Tell us the last time you went to the sea?",
+            "suggestion": null
+          },
+          {
+            "id": "68f1b54753b4655eba3f2da0",
+            "prompt": "Why do some people dislike going to the sea?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f1014253b4655eba3f2c0b",
+    "part": "PART2",
+    "title": "2 bố con ăn sáng",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760624961001_95aff3ab3a752d40_thuc_pham_giup_tre_tang_can_7889_7188_png.webp"
+    ],
+    "questions": [
+      {
+        "prompt": "2 bố con ăn sáng",
+        "subQuestions": [
+          {
+            "id": "68f1014253b4655eba3f2c0d",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f1014253b4655eba3f2c0e",
+            "prompt": "What do you usually eat for breakfast?",
+            "suggestion": null
+          },
+          {
+            "id": "68f1014253b4655eba3f2c0f",
+            "prompt": "Is it important to eat a good breakfast? Why?\n",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0ff6653b4655eba3f2b90",
+    "part": "PART2",
+    "title": "Người đàn ông viết thư",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760624579384_6ee52a601fb9a8db_inline_image_preview.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Người đàn ông viết thư",
+        "subQuestions": [
+          {
+            "id": "68f0ffc453b4655eba3f2bb2",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0ffc453b4655eba3f2bb3",
+            "prompt": "Have you ever written a hand letter?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0ffc453b4655eba3f2bb4",
+            "prompt": "Do you plan to write handwritten letters in the future?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0fbe053b4655eba3f2ac4",
+    "part": "PART2",
+    "title": "Gia đình trong phòng khách",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760623583100_d9053db49ceabeb7_istockphoto_945104294_612x612.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Gia đình trong phòng khách",
+        "subQuestions": [
+          {
+            "id": "68f0fbe053b4655eba3f2ac6",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0fbe053b4655eba3f2ac7",
+            "prompt": "Why is it important to play with children?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0fbe053b4655eba3f2ac8",
+            "prompt": "How should parents spend time together with their children?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0fad953b4655eba3f2a70",
+    "part": "PART2",
+    "title": "Hoạt động làm bánh",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760623320557_1a59d02259c56197_image.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Hoạt động làm bánh",
+        "subQuestions": [
+          {
+            "id": "68f0fad953b4655eba3f2a72",
+            "prompt": "Describe the picture",
+            "suggestion": null
+          },
+          {
+            "id": "68f0fad953b4655eba3f2a73",
+            "prompt": "How do people learn to cook in your culture?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0fad953b4655eba3f2a74",
+            "prompt": "Why is it important for people to learn how to cook for themselves?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0fa1f53b4655eba3f2a01",
+    "part": "PART2",
+    "title": "4 người đàn ông leo núi",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760623133820_b82087656577c818_747c3a02cada70076a180a8709c1e988.webp"
+    ],
+    "questions": [
+      {
+        "prompt": "4 người đàn ông leo núi",
+        "subQuestions": [
+          {
+            "id": "68f0fa1f53b4655eba3f2a03",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0fa1f53b4655eba3f2a04",
+            "prompt": "Do you like to climb mountains?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0fa1f53b4655eba3f2a05",
+            "prompt": "Do you think outdoor activities are important?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0bea153b4655eba3f28d6",
+    "part": "PART2",
+    "title": "Mẹ và con đọc sách trên giường",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760607904152_f5b00e3bdd3d9ebe_8_dieu_nen_doc_01.webp"
+    ],
+    "questions": [
+      {
+        "prompt": "Mẹ và con đọc sách trên giường",
+        "subQuestions": [
+          {
+            "id": "68f0bea153b4655eba3f28d8",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bea153b4655eba3f28d9",
+            "prompt": "What sorts of things help you sleep easily?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bea153b4655eba3f28da",
+            "prompt": "Why is it important to sleep enough per night?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0bdbf53b4655eba3f28c8",
+    "part": "PART2",
+    "title": "Sử dụng máy tính - Version 2",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760607678038_69fcabdb22f6ac38_con_nghien_game_phu_huynh_nen_lam_gi_191633297.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Sử dụng máy tính - Version 2",
+        "subQuestions": [
+          {
+            "id": "68f0bdbf53b4655eba3f28ca",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bdbf53b4655eba3f28cb",
+            "prompt": "Tell me the last time you used a computer?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bdbf53b4655eba3f28cc",
+            "prompt": "Should children use computers?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0bd0253b4655eba3f28ba",
+    "part": "PART2",
+    "title": "Gia đình đi picnic",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760607489272_e5fda7c224217280_bai196.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Gia đình đi picnic",
+        "subQuestions": [
+          {
+            "id": "68f0bd0253b4655eba3f28bc",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bd0253b4655eba3f28bd",
+            "prompt": "Tell me how you and your family spend free time together.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bd0253b4655eba3f28be",
+            "prompt": "Do you think today’s parents should spend more quality time with their children and why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0bcb453b4655eba3f28ac",
+    "part": "PART2",
+    "title": "Cô gái ăn đồ ăn nhanh",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760607411175_99bf0d07c5b65f8d_url.webp"
+    ],
+    "questions": [
+      {
+        "prompt": "Cô gái ăn đồ ăn nhanh",
+        "subQuestions": [
+          {
+            "id": "68f0bcb453b4655eba3f28ae",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bcb453b4655eba3f28af",
+            "prompt": "What kinds of food are not good for our health?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bcb453b4655eba3f28b0",
+            "prompt": "What should we do to keep healthy?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0bc2f53b4655eba3f289e",
+    "part": "PART2",
+    "title": "Nhóm người chơi vòng lắc eo",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760607278726_ab6599efa6aa122d_phan_ung_nhanh1.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Nhóm người chơi vòng lắc eo",
+        "subQuestions": [
+          {
+            "id": "68f0bc2f53b4655eba3f28a0",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bc2f53b4655eba3f28a1",
+            "prompt": "Tell me about a game you played when you were a child.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bc2f53b4655eba3f28a2",
+            "prompt": "How have the children’s games changed in the last 50 years?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f0bb4b53b4655eba3f2890",
+    "part": "PART2",
+    "title": "Người đàn ông đang nhảy",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1760607050222_afae00f346c1c4e2_Hiring_Mojo2.webp"
+    ],
+    "questions": [
+      {
+        "prompt": "Người đàn ông đang nhảy",
+        "subQuestions": [
+          {
+            "id": "68f0bb4b53b4655eba3f2892",
+            "prompt": "Describe this picture.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bb4b53b4655eba3f2893",
+            "prompt": "Do you like dancing? Why? Why not?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0bb4b53b4655eba3f2894",
+            "prompt": "On what occasions do people usually dance in your country?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5e8c353b4655eba3f10cd",
+    "part": "PART3",
+    "title": "1 cô gái đọc sách giấy, 1 cô gái nhìn màn hình máy tính",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759897785252_2d4df9a33b186449_1725769613614_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759897785254_5074f469a8d4f106_1725769616483_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "1 cô gái đọc sách giấy, 1 cô gái nhìn màn hình máy tính",
+        "subQuestions": [
+          {
+            "id": "69709c5e79e903cc0a1f3b70",
+            "prompt": "Tell me what you see from the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709c5e79e903cc0a1f3b71",
+            "prompt": "Do you prefer reading printed books or e-books?",
+            "suggestion": null
+          },
+          {
+            "id": "69709c5e79e903cc0a1f3b72",
+            "prompt": "Does technology affect the way we read books?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e5e92353b4655eba3f10db",
+    "part": "PART3",
+    "title": "1 người đàn ông đọc sách, 1 cậu bé đang chơi game",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759897887485_1a9e4cfa8607f3fd_1725772817410_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759897887486_ebce815486ef7005_1725772820072_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "1 người đàn ông đọc sách, 1 cậu bé đang chơi game",
+        "subQuestions": [
+          {
+            "id": "69709ccb79e903cc0a1f3c59",
+            "prompt": "Tell me what you see in the two photographs?",
+            "suggestion": null
+          },
+          {
+            "id": "69709ccb79e903cc0a1f3c5a",
+            "prompt": "How do you schedule your day to include focused studying and entertainment breaks?",
+            "suggestion": null
+          },
+          {
+            "id": "69709ccb79e903cc0a1f3c5b",
+            "prompt": "Playing video games is not for adults. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e663aa53b4655eba3f1191",
+    "part": "PART3",
+    "title": "Thể thao chuyên nghiệp, thể thao nghiệp dư",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929256986_15fbe2e086274b10_1725780539830_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929256987_602f7fd3fa8c80ad_1725780543359_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Thể thao chuyên nghiệp, thể thao nghiệp dư",
+        "subQuestions": [
+          {
+            "id": "69709cd579e903cc0a1f3c9d",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709cd579e903cc0a1f3c9e",
+            "prompt": "What are the benefits of indoor and outdoor sports?",
+            "suggestion": null
+          },
+          {
+            "id": "69709cd579e903cc0a1f3c9f",
+            "prompt": "Playing a game is to win. What do you think ?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e6646d53b4655eba3f119f",
+    "part": "PART3",
+    "title": "Mua sắm trong siêu thị, mua sắm trong chợ",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929452923_296f145706533cfb_istockphoto_1211356109_1024x1024.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929452924_9b5d81bdfa1be71c_t___i_xu___ng.jpeg"
+    ],
+    "questions": [
+      {
+        "prompt": "Mua sắm trong siêu thị, mua sắm trong chợ",
+        "subQuestions": [
+          {
+            "id": "69709cdb79e903cc0a1f3ce1",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709cdb79e903cc0a1f3ce2",
+            "prompt": "Benefits of markets and supermarkets?",
+            "suggestion": null
+          },
+          {
+            "id": "69709cdb79e903cc0a1f3ce3",
+            "prompt": "Why do many people not like shopping?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e664f553b4655eba3f11ad",
+    "part": "PART3",
+    "title": "1 gia đình đang đi picnic, 1 bãi biển đông đúc",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929589108_0a7dce445a9d22d7_1725781316047_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929589109_175ec4a3ea23b306_1725781319435_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "1 gia đình đang đi picnic, 1 bãi biển đông đúc",
+        "subQuestions": [
+          {
+            "id": "69709ce179e903cc0a1f3d25",
+            "prompt": "Tell me what you see in the two photographs.",
+            "suggestion": null
+          },
+          {
+            "id": "69709ce179e903cc0a1f3d26",
+            "prompt": "Which one do you prefer: eating out or eating at home?",
+            "suggestion": null
+          },
+          {
+            "id": "69709ce179e903cc0a1f3d27",
+            "prompt": "Why do people prefer eating out to eating at home?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e6657553b4655eba3f11bb",
+    "part": "PART3",
+    "title": "Mua đồ xa xỉ, mua đồ bình dân",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929716904_35cf342679946924_1725781582775_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929716906_7d52a6c402e62cf5_1725781584886_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Mua đồ xa xỉ, mua đồ bình dân",
+        "subQuestions": [
+          {
+            "id": "69709ce779e903cc0a1f3d69",
+            "prompt": "Compare 2 pictures",
+            "suggestion": null
+          },
+          {
+            "id": "69709ce779e903cc0a1f3d6a",
+            "prompt": "What is different about these two shopping experiences?",
+            "suggestion": null
+          },
+          {
+            "id": "69709ce779e903cc0a1f3d6b",
+            "prompt": "Why are people people are attracted to expensive by expensive things?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e665d653b4655eba3f11c9",
+    "part": "PART3",
+    "title": "Trèo thuyền theo team, đạp xe một mình",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929814083_5a4d18f47d1dd922_Shayok.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759929814084_ee55d585091a0790_Cyclist_in_the_mountains_listing.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Trèo thuyền theo team, đạp xe một mình",
+        "subQuestions": [
+          {
+            "id": "69709ced79e903cc0a1f3dad",
+            "prompt": "Describe these two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709ced79e903cc0a1f3dae",
+            "prompt": "What are the difficulties of each sport?",
+            "suggestion": null
+          },
+          {
+            "id": "69709ced79e903cc0a1f3daf",
+            "prompt": "Why do some people prefer team sports to individual sports?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e6673c53b4655eba3f11d7",
+    "part": "PART3",
+    "title": "Cưỡi lạc đà, cưỡi ngựa",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2026/01/1769007289830_c49d1486bf98e545_capp1.webp",
+      "https://files.aptisacademy.com.vn/speaking/2026/01/1769007289831_e7f5746e2487ec7a_1759930172162_3d69becf7f98b187_cuoi_ngua_925596.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Cưỡi lạc đà, cưỡi ngựa",
+        "subQuestions": [
+          {
+            "id": "6970e8ba58cb12223e943b79",
+            "prompt": "Tell me what you see from the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "6970e8ba58cb12223e943b7a",
+            "prompt": "Have you ever ridden a camel or a horse before?",
+            "suggestion": null
+          },
+          {
+            "id": "6970e8ba58cb12223e943b7b",
+            "prompt": "Is riding animals popular in your country?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e6679e53b4655eba3f11e5",
+    "part": "PART3",
+    "title": "1 gia đình chụp ảnh, 1 người đàn ông viết nhật ký",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759930269920_a640f50ec3118184_1725782955283_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759930269922_7a750704d25a049c_1725782959096_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "1 gia đình chụp ảnh, 1 người đàn ông viết nhật ký",
+        "subQuestions": [
+          {
+            "id": "69709cfa79e903cc0a1f3e35",
+            "prompt": "Describe the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709cfa79e903cc0a1f3e36",
+            "prompt": "Do you like to preserve memories by photo or writing?",
+            "suggestion": null
+          },
+          {
+            "id": "69709cfa79e903cc0a1f3e37",
+            "prompt": "Why do people today like to use photos to save memories?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e6683153b4655eba3f11f3",
+    "part": "PART3",
+    "title": "Sống 1 mình, sống với gia đình",
+    "timeLimitSeconds": null,
+    "image": [
+      "speaking/2025/10/1759930619067_1503c100bb60aeac_1725783964508_file.png",
+      "speaking/2025/10/1759930619068_a2b767494b7dd360_1725783966825_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Sống 1 mình, sống với gia đình",
+        "subQuestions": [
+          {
+            "id": "68f1b9dc53b4655eba3f2fa7",
+            "prompt": "Tell me what you see in the two photographs.",
+            "suggestion": null
+          },
+          {
+            "id": "68f1b9dc53b4655eba3f2fa8",
+            "prompt": "Do you prefer living alone or living with your family?",
+            "suggestion": null
+          },
+          {
+            "id": "68f1b9dc53b4655eba3f2fa9",
+            "prompt": "Is it necessary for young people to live independently from their families?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e6698753b4655eba3f12cc",
+    "part": "PART3",
+    "title": "Cô gái nghe nhạc trên sofa, ban nhạc đang chơi nhạc",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759930758410_9b171971cfe6c08d_1725785884651_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759930758412_deb38972c5c91c44_1725785888339_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Cô gái nghe nhạc trên sofa, ban nhạc đang chơi nhạc",
+        "subQuestions": [
+          {
+            "id": "69709d0979e903cc0a1f3f22",
+            "prompt": "Compare 2 pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d0979e903cc0a1f3f23",
+            "prompt": "Which would you prefer to be in?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d0979e903cc0a1f3f24",
+            "prompt": "What are the benefits of listening to music?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e669ed53b4655eba3f12da",
+    "part": "PART3",
+    "title": "Bé gái đang đi thang dây, 1 lớp học đang xem tranh thiên nhiên",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759930860609_fd7bed6632e3cabd_1725787805324_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759930860610_2e2f6d92897f6617_1725787811952_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Bé gái đang đi thang dây, 1 lớp học đang xem tranh thiên nhiên",
+        "subQuestions": [
+          {
+            "id": "69709d0f79e903cc0a1f3f66",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d0f79e903cc0a1f3f67",
+            "prompt": "What are the benefits for children doing these two activities?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d0f79e903cc0a1f3f68",
+            "prompt": "It is easier to learn something if you enjoy doing it. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e66a4653b4655eba3f12e8",
+    "part": "PART3",
+    "title": "1 người đàn ông đang đứng ở sân bay, 1 người đàn ông đang chờ tàu hỏa",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759930949154_99038b3452af423c_1725788172224_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759930949155_b74b864813f4a079_1725788176715_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "1 người đàn ông đang đứng ở sân bay, 1 người đàn ông đang chờ tàu hỏa",
+        "subQuestions": [
+          {
+            "id": "69709d1479e903cc0a1f3faa",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d1479e903cc0a1f3fab",
+            "prompt": "Which means of transport do you prefer? Why?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d1479e903cc0a1f3fac",
+            "prompt": "Why do people usually not choose to travel by plane?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e66ad753b4655eba3f12f6",
+    "part": "PART3",
+    "title": "Ăn một mình, ăn cùng gia đình",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759931094457_bff42820a34939fb_1725788515198_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759931094459_0cd9f9e30aea0344_1725788518658_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Ăn một mình, ăn cùng gia đình",
+        "subQuestions": [
+          {
+            "id": "69709d1a79e903cc0a1f3fee",
+            "prompt": "Compare 2 pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d1a79e903cc0a1f3fef",
+            "prompt": "Which two kinds of food would you prefer, and why?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d1a79e903cc0a1f3ff0",
+            "prompt": "Why is it  important to eat different food?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e737a453b4655eba3f1454",
+    "part": "PART3",
+    "title": "Đám trẻ đọc sách, người đàn ông làm việc trên iPad",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759983523185_2c75f70316dfd288_1725788835105_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759983523186_6987f812465a79c1_1725788838904_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Đám trẻ đọc sách, người đàn ông làm việc trên iPad",
+        "subQuestions": [
+          {
+            "id": "69709d2579e903cc0a1f4069",
+            "prompt": "Describe 2 the pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d2579e903cc0a1f406a",
+            "prompt": "What difficulties do you encounter when studying at the library or coffee shop?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d2579e903cc0a1f406b",
+            "prompt": "Which place do you prefer? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e7382553b4655eba3f1462",
+    "part": "PART3",
+    "title": "đội tuyển đá bóng, vận động viên nhảy sào",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2026/01/1769007193029_8e2ff3790805d56b_cap1.png",
+      "https://files.aptisacademy.com.vn/speaking/2026/01/1769007193030_e175800e9d88e6ae_cap2.png"
+    ],
+    "questions": [
+      {
+        "prompt": "đội tuyển đá bóng, vận động viên nhảy sào",
+        "subQuestions": [
+          {
+            "id": "6970e85b58cb12223e9438b9",
+            "prompt": "Compare 2 pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "6970e85b58cb12223e9438ba",
+            "prompt": "The attractions of these different kinds of sport?",
+            "suggestion": null
+          },
+          {
+            "id": "6970e85b58cb12223e9438bb",
+            "prompt": "Why are sports more popular than others?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e7387553b4655eba3f1470",
+    "part": "PART3",
+    "title": "Ăn đồ ăn nhanh, nấu ăn healthy",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759983732671_6da2fa86448466ce_1725790470669_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759983732673_ae7ad0428723e657_1725790475751_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Ăn đồ ăn nhanh, nấu ăn healthy",
+        "subQuestions": [
+          {
+            "id": "69709d3579e903cc0a1f4135",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d3579e903cc0a1f4136",
+            "prompt": "Which kind of food in those pictures is healthier?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d3579e903cc0a1f4137",
+            "prompt": "What are the benefits of them?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e739c953b4655eba3f147e",
+    "part": "PART3",
+    "title": "Nhóm người đi leo núi, bãi biển xanh",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760266266724_a491f030f855d8d9_shutterstock_548961493.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760266266725_12538cf34bddf3c5_istockphoto_825026648_2048x2048.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Nhóm người đi leo núi, bãi biển xanh",
+        "subQuestions": [
+          {
+            "id": "69709d3a79e903cc0a1f4179",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d3a79e903cc0a1f417a",
+            "prompt": "What's so attractive about these two places?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d3a79e903cc0a1f417b",
+            "prompt": "How to protect natural beauty?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e73ab753b4655eba3f149a",
+    "part": "PART3",
+    "title": "Cô gái đang bê khay đồ ăn, 2 người đang ăn và 1 người phục vụ",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759984309883_2d305000373950c9_1725773228290_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759984309884_e6f6e99c661ffdb6_1725773230931_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Cô gái đang bê khay đồ ăn, 2 người đang ăn và 1 người phục vụ",
+        "subQuestions": [
+          {
+            "id": "69709d4079e903cc0a1f41bd",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d4079e903cc0a1f41be",
+            "prompt": "What are the attractions of eating in these different places?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d4079e903cc0a1f41bf",
+            "prompt": "Why do some people like to eat out on special occasions?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e73b1853b4655eba3f14a8",
+    "part": "PART3",
+    "title": "bãi biển đông đúc, 1 cô gái đang ngồi ở một nơi yên tĩnh",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759984407302_8b48e5780cda3905_1725789222615_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759984407303_94da2f0515ef0cb0_1725789225988_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "bãi biển đông đúc, 1 cô gái đang ngồi ở một nơi yên tĩnh",
+        "subQuestions": [
+          {
+            "id": "69709d4579e903cc0a1f4201",
+            "prompt": "Describe those pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d4579e903cc0a1f4202",
+            "prompt": "Do you like going to crowded beaches?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d4579e903cc0a1f4203",
+            "prompt": "Why do many people like quiet places?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e73d7b53b4655eba3f14b6",
+    "part": "PART3",
+    "title": "Thành thị đông đúc, vùng quê thanh tĩnh",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985018273_abd0e8847143f80a_1725789692403_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985018274_5404c4c2ff648ce8_1725789695534_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Thành thị đông đúc, vùng quê thanh tĩnh",
+        "subQuestions": [
+          {
+            "id": "69709d4f79e903cc0a1f4273",
+            "prompt": "Describe the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d4f79e903cc0a1f4274",
+            "prompt": "What are the differences between life in the countryside and in the city?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d4f79e903cc0a1f4275",
+            "prompt": "Do you prefer living in the countryside or living in the city?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e73def53b4655eba3f14c4",
+    "part": "PART3",
+    "title": "1 gia đình đi ô tô, 2 người đi tàu hỏa",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985135390_892de273836c2dc3_1725786741385_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985135391_1e650c0b3ff16308_1725786744713_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "1 gia đình đi ô tô, 2 người đi tàu hỏa",
+        "subQuestions": [
+          {
+            "id": "69c16338c68879da1b92c372",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69c16338c68879da1b92c373",
+            "prompt": "What means of transport do you like to travel by?",
+            "suggestion": null
+          },
+          {
+            "id": "69c16338c68879da1b92c374",
+            "prompt": "Why do some people like to travel by train?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e73e3c53b4655eba3f14d2",
+    "part": "PART3",
+    "title": "1 cô gái ôm mèo, 1 cậu bé đang chơi với một con sâu",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985211491_0c8eca8202ed3c04_1725787131830_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985211492_16e27e6c436f4d3d_1725787134760_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "1 cô gái ôm mèo, 1 cậu bé đang chơi với một con sâu",
+        "subQuestions": [
+          {
+            "id": "69709d5979e903cc0a1f42fb",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d5979e903cc0a1f42fc",
+            "prompt": "What are the attractions of keeping these animals as pets?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d5979e903cc0a1f42fd",
+            "prompt": "Some say animals should not be kept in the home. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e73e9553b4655eba3f14e0",
+    "part": "PART3",
+    "title": "1 cặp đôi trò chuyện dưới tuyết, 2 cô gái đang tắm nắng",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985301379_35c9818c70d4c91c_1725787448623_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985301380_414821f507b1b3d3_1725787452611_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "1 cặp đôi trò chuyện dưới tuyết, 2 cô gái đang tắm nắng",
+        "subQuestions": [
+          {
+            "id": "69709d5f79e903cc0a1f433f",
+            "prompt": "Tell me what you see in the two pictures. ",
+            "suggestion": null
+          },
+          {
+            "id": "69709d5f79e903cc0a1f4340",
+            "prompt": "Between the two locations, where do you prefer to go? Why?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d5f79e903cc0a1f4341",
+            "prompt": "Do you think the weather affects people’s emotions on trips?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e73ef253b4655eba3f14ee",
+    "part": "PART3",
+    "title": "1 người đàn ông tập gym, 2 người đi leo núi",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985393555_6cf279d3b4560fd3_1725783436659_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1759985393557_01ad1a461c031028_1725783439232_file.png"
+    ],
+    "questions": [
+      {
+        "prompt": "1 người đàn ông tập gym, 2 người đi leo núi",
+        "subQuestions": [
+          {
+            "id": "69709d6479e903cc0a1f4383",
+            "prompt": "Please describe the 2 pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d6479e903cc0a1f4384",
+            "prompt": "What the difference of these two exercises?",
+            "suggestion": "<p><br></p>"
+          },
+          {
+            "id": "69709d6479e903cc0a1f4385",
+            "prompt": "How important is it to do daily exercises?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ea019e53b4655eba3f171e",
+    "part": "PART3",
+    "title": "1 người đàn ông chạy bộ, 1 đội thể thao chuyên nghiệp",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760166301348_87ca25d8ca4c3e8c_Screen_Shot_2018_09_13_at_5_27_58_PM_300x182.webp",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760166301349_28a14f785519987c_basketball_players_sit_bench_and_footage_010857158_iconl.webp"
+    ],
+    "questions": [
+      {
+        "prompt": "1 người đàn ông chạy bộ, 1 đội thể thao chuyên nghiệp",
+        "subQuestions": [
+          {
+            "id": "69709d6e79e903cc0a1f43c7",
+            "prompt": "Please describe the 2 pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d6e79e903cc0a1f43c8",
+            "prompt": "How are these experiences of sport different?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d6e79e903cc0a1f43c9",
+            "prompt": "What kinds of sports are popular in your country? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ea05f453b4655eba3f1737",
+    "part": "PART3",
+    "title": "Trang trí nhà cửa",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760167411045_fe323b6743a6f344_110719_Religion_009_2500.webp",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760167411046_a5a33e7305a0e82d_przestrzen_dla_studenta_400_63412477.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Trang trí nhà cửa",
+        "subQuestions": [
+          {
+            "id": "69709d7579e903cc0a1f440b",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d7579e903cc0a1f440c",
+            "prompt": "Where would you rather live? Why?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d7579e903cc0a1f440d",
+            "prompt": "Why do people like to decorate their home?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68eb7e3653b4655eba3f1901",
+    "part": "PART3",
+    "title": "Ăn ở nhà bình dân, ăn ở nhà hàng cao cấp",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760263733329_77c06fd36a860bd1_1725790916466_file.png",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760263733330_a7d7376f0858e7da_Screenshot_15.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Ăn ở nhà bình dân, ăn ở nhà hàng cao cấp",
+        "subQuestions": [
+          {
+            "id": "69709d7c79e903cc0a1f444f",
+            "prompt": "Tell me what you see in two the pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d7c79e903cc0a1f4450",
+            "prompt": "What would it be like to eat in two places?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d7c79e903cc0a1f4451",
+            "prompt": "Which of the two places would be healthier to eat in? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f20a6b53b4655eba3f372c",
+    "part": "PART3",
+    "title": "3 người đang thu hoạch táo, ông và cháu đang tưới cây",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760692842496_c8003acc9b8d9255_Apple_Picking_Season_in_the_United_States1_1024x576.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760692842498_4cae473df594bdb9_istockphoto_984448864_2048x2048.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "3 người đang thu hoạch táo, ông và cháu đang tưới cây",
+        "subQuestions": [
+          {
+            "id": "69709d8279e903cc0a1f4493",
+            "prompt": "Describe the picture.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d8279e903cc0a1f4494",
+            "prompt": "What are the attractions of the two pictures?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d8279e903cc0a1f4495",
+            "prompt": "What is the appeal of growing plants and doing gardening?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f20b6353b4655eba3f373a",
+    "part": "PART3",
+    "title": "2 bố con cho ngựa ăn, trẻ con chơi với rắn",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760693072284_b08684c2af32687f_istockphoto_873973612_1024x1024.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760693072286_b0e001f04845722f_IMG_1261.webp"
+    ],
+    "questions": [
+      {
+        "prompt": "2 bố con cho ngựa ăn, trẻ con chơi với rắn",
+        "subQuestions": [
+          {
+            "id": "69709d8b79e903cc0a1f44d7",
+            "prompt": "Tell me what you see in two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d8b79e903cc0a1f44d8",
+            "prompt": "Do you like to play with horses or with snakes?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d8b79e903cc0a1f44d9",
+            "prompt": "Should children be exposed to animals?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f20bcb53b4655eba3f3748",
+    "part": "PART3",
+    "title": "Du lịch vùng núi, du lịch thành phố",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760693189315_1f156f0a9263d451_1731628120959.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760693189316_b058b97c72733e9f_du_khach_tu_ha_noi_di_chuyen_den_mui_ne_bang_may_bay_va_xe_dua_don.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Du lịch vùng núi, du lịch thành phố",
+        "subQuestions": [
+          {
+            "id": "69709d9679e903cc0a1f4549",
+            "prompt": "Tell me what you see in these two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709d9679e903cc0a1f454a",
+            "prompt": "What are the benefits of two ways of traveling?",
+            "suggestion": null
+          },
+          {
+            "id": "69709d9679e903cc0a1f454b",
+            "prompt": "What are the disadvantages of two ways of traveling?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f20ca353b4655eba3f3766",
+    "part": "PART3",
+    "title": "Nhiều người trên xe bus, 1 người mở cửa vào ô tô",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760693410701_f8334d0b0b5bdcf1_1415246439734_wps_21_EGYPT_MAY_05_Outriders_cl.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760693410702_58c7d10624a97e77_man_going_inside_a_posh_car_3BK7MH1.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Nhiều người trên xe bus, 1 người mở cửa vào ô tô",
+        "subQuestions": [
+          {
+            "id": "69709da079e903cc0a1f458d",
+            "prompt": "Tell me what you see in these two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709da079e903cc0a1f458e",
+            "prompt": "What are the benefits of two ways of traveling?",
+            "suggestion": null
+          },
+          {
+            "id": "69709da079e903cc0a1f458f",
+            "prompt": "Why do some people like traveling by car?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f20da653b4655eba3f37a3",
+    "part": "PART3",
+    "title": "1 người đầu bếp, 2 công nhân mỏ",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760693670036_1df75f48b33bfce1_chat_luong_mon_an_trong_nha_hang_3.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760693670037_e5cad00257b5f1c7_anh_tho_mo_thai_hoang_linh_750x375.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "1 người đầu bếp, 2 công nhân mỏ",
+        "subQuestions": [
+          {
+            "id": "69709da579e903cc0a1f45d1",
+            "prompt": "Describe two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709da579e903cc0a1f45d2",
+            "prompt": "What is your opinion about these 2 jobs?",
+            "suggestion": null
+          },
+          {
+            "id": "69709da579e903cc0a1f45d3",
+            "prompt": "Which job do you think is more interesting?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f211b553b4655eba3f37b1",
+    "part": "PART3",
+    "title": "thuyết trình không có công nghệ, thuyết trình với công nghệ",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760694708008_215633b703917ad3_photo_1627653126.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760694708009_70ce06edad2e70d0_laser_projector_landing_fg_office.png"
+    ],
+    "questions": [
+      {
+        "prompt": "thuyết trình không có công nghệ, thuyết trình với công nghệ",
+        "subQuestions": [
+          {
+            "id": "69709dad79e903cc0a1f4615",
+            "prompt": "Tell me what you see from the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709dad79e903cc0a1f4616",
+            "prompt": "What are the problems of giving a presentation in these situations?",
+            "suggestion": null
+          },
+          {
+            "id": "69709dad79e903cc0a1f4617",
+            "prompt": "Technology has improved the ability to communicate with other people. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f212b953b4655eba3f3807",
+    "part": "PART3",
+    "title": "1 gia đình đi biển, 1 nhóm bạn đi leo núi",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760694968699_85d9ad55f8868dd4_family_tours.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760694968700_04c751d8e348bdc9_istockphoto_941249992_2048x2048.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "1 gia đình đi biển, 1 nhóm bạn đi leo núi",
+        "subQuestions": [
+          {
+            "id": "69709db279e903cc0a1f4659",
+            "prompt": "Describe these two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709db279e903cc0a1f465a",
+            "prompt": "Which place in these two pictures do you prefer to go?",
+            "suggestion": null
+          },
+          {
+            "id": "69709db279e903cc0a1f465b",
+            "prompt": "Do you prefer spending time with your family or your friends?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f2132c53b4655eba3f3815",
+    "part": "PART3",
+    "title": "chung cư, nhà mặt đất",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760695084186_f23610f79e726bdf_interagency_mous.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760695084187_9d8d14d19d4c134f_4183ed124dc5403d9b06b388e59bd413_crop_576x384.webp"
+    ],
+    "questions": [
+      {
+        "prompt": "chung cư, nhà mặt đất",
+        "subQuestions": [
+          {
+            "id": "69709db879e903cc0a1f469d",
+            "prompt": "Tell me what you see in the two pictures. ",
+            "suggestion": null
+          },
+          {
+            "id": "69709db879e903cc0a1f469e",
+            "prompt": "What would it be like living in these two places?",
+            "suggestion": null
+          },
+          {
+            "id": "69709db879e903cc0a1f469f",
+            "prompt": "Which of these two places would it be better for old people to live in? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f2145a53b4655eba3f3823",
+    "part": "PART3",
+    "title": "Mua sắm trong siêu thị, mua sắm trong chợ ( Version 2)",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760695383809_5b08440017730814_istockphoto_157511642_1024x1024__1_.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760695383810_8da25a06287f21fa_90672d456c949228f8e37e1b915b924d__1_.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Mua sắm trong siêu thị, mua sắm trong chợ ( Version 2)",
+        "subQuestions": [
+          {
+            "id": "69709dbe79e903cc0a1f46e1",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709dbe79e903cc0a1f46e2",
+            "prompt": "What sort of people shop in these two places?",
+            "suggestion": null
+          },
+          {
+            "id": "69709dbe79e903cc0a1f46e3",
+            "prompt": "Which of these two places would you prefer to shop in? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f2177c53b4655eba3f3831",
+    "part": "PART3",
+    "title": "Làm việc trong văn phòng, làm việc trong nhà máy",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760696185456_11c74473d1733a4d_images.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760696185458_462fc15a5a303628_istockphoto_135456139_1024x1024.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Làm việc trong văn phòng, làm việc trong nhà máy",
+        "subQuestions": [
+          {
+            "id": "69709dc479e903cc0a1f4725",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709dc479e903cc0a1f4726",
+            "prompt": "What would it be like to work in these two places?",
+            "suggestion": null
+          },
+          {
+            "id": "69709dc479e903cc0a1f4727",
+            "prompt": "Which of these two places would you prefer to work in? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f2184153b4655eba3f383f",
+    "part": "PART3",
+    "title": "Cô gái ngồi trước máy tính, lớp học trực tuyến",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760696376930_b0aa89685d0afce6_pngtree_stressed_student_with_laptop_in_cafe_struggling_to_work_and_study_photo_image_51040858.jpg",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760696376931_be4923cea49bc001_londra_excursie_si_cursuri_420x290.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Cô gái ngồi trước máy tính, lớp học trực tuyến",
+        "subQuestions": [
+          {
+            "id": "69709dc879e903cc0a1f4769",
+            "prompt": "Tell me what you see in the two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709dc879e903cc0a1f476a",
+            "prompt": "Which place looks better to learn in?",
+            "suggestion": null
+          },
+          {
+            "id": "69709dc879e903cc0a1f476b",
+            "prompt": "Is it better to study in groups or face to face or on the internet? Why? ",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f345ee53b4655eba3f38b2",
+    "part": "PART3",
+    "title": "Âm nhạc sôi động, âm nhạc du dương",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760773613116_3571ce8eee1cd357_images__5_.jfif",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760773613117_ec336d21b7aaa52d_istockphoto_495237705_612x612.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Âm nhạc sôi động, âm nhạc du dương",
+        "subQuestions": [
+          {
+            "id": "69709dcd79e903cc0a1f47ad",
+            "prompt": "Tell me what you can see in these two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709dcd79e903cc0a1f47ae",
+            "prompt": "What sort of people go to these two events?",
+            "suggestion": null
+          },
+          {
+            "id": "69709dcd79e903cc0a1f47af",
+            "prompt": "Which of these two events would you prefer to go to? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f3470e53b4655eba3f38c0",
+    "part": "PART3",
+    "title": "1 ngọn núi tuyết, 1 bãi biển đẹp",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760773901839_2d85fee57c9d6d5c_images__6_.jfif",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760773901840_8c79e06b858ae502_chairs_under_palm_trees_at_a_beach_in_cdwheatley.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "1 ngọn núi tuyết, 1 bãi biển đẹp",
+        "subQuestions": [
+          {
+            "id": "69709dd279e903cc0a1f4803",
+            "prompt": "Describe these two pictures.",
+            "suggestion": null
+          },
+          {
+            "id": "69709dd279e903cc0a1f4804",
+            "prompt": "Which of these two places would you prefer to go on holiday to? Why? ",
+            "suggestion": null
+          },
+          {
+            "id": "69709dd279e903cc0a1f4805",
+            "prompt": "Which of these two places do you think children would prefer? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f34d1753b4655eba3f38ce",
+    "part": "PART3",
+    "title": "1 cuộc đua xe đạp, 1 cuộc đua xe máy",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760775446166_f5058f97fab79155_images__7_.jfif",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760775446168_5e404d98b0e63ef6_images__8_.jfif"
+    ],
+    "questions": [
+      {
+        "prompt": "1 cuộc đua xe đạp, 1 cuộc đua xe máy",
+        "subQuestions": [
+          {
+            "id": "69709dd779e903cc0a1f482b",
+            "prompt": "What do you see in the two pictures?",
+            "suggestion": null
+          },
+          {
+            "id": "69709dd779e903cc0a1f482c",
+            "prompt": "What kinds of people play these two sports?",
+            "suggestion": null
+          },
+          {
+            "id": "69709dd779e903cc0a1f482d",
+            "prompt": "Which of these two sports is more difficult to do?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f34e0d53b4655eba3f38dc",
+    "part": "PART3",
+    "title": "Bãi biển, thảo nguyên xanh",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760775692721_9bca4c01f92b2160_Tropical_Paradise_Seychelles_Tropics_Islands_Indian_Ocean_Beach_Wallpaper_Hd_1920x1200_840x525.webp",
+      "https://files.aptisacademy.com.vn/speaking/2025/10/1760775692722_0f721338d30eebb7_wall_murals_far_west_spirit.jpg"
+    ],
+    "questions": [
+      {
+        "prompt": "Bãi biển, thảo nguyên xanh",
+        "subQuestions": [
+          {
+            "id": "69709ddb79e903cc0a1f4853",
+            "prompt": "What do you see in the two pictures?",
+            "suggestion": null
+          },
+          {
+            "id": "69709ddb79e903cc0a1f4854",
+            "prompt": "Which of these two places do you think children would prefer? Why?",
+            "suggestion": null
+          },
+          {
+            "id": "69709ddb79e903cc0a1f4855",
+            "prompt": "Which of these two places would you prefer to go on holiday? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "69c1640ac68879da1b92c704",
+    "part": "PART3",
+    "title": "2 đứa trẻ chơi cờ vua, 2 đứa trẻ đang chơi điện tử",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774281736264_9da91809b4bae7a6_de02_1.png",
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774281736273_9028725b9bfca7b0_de02_2.png"
+    ],
+    "questions": [
+      {
+        "prompt": "2 đứa trẻ chơi cờ vua, 2 đứa trẻ đang chơi điện tử",
+        "subQuestions": [
+          {
+            "id": "69c1640ac68879da1b92c706",
+            "prompt": "Describe the picture?",
+            "suggestion": null
+          },
+          {
+            "id": "69c1640ac68879da1b92c707",
+            "prompt": "Do you prefer playing chess or video games, why?",
+            "suggestion": null
+          },
+          {
+            "id": "69c1640ac68879da1b92c708",
+            "prompt": "Are outdoor activities important and why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "69c164c0c68879da1b92cdc9",
+    "part": "PART3",
+    "title": "rừng thông, bãi biển",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774281919835_5c53b059ccdaf753_de03_1.png",
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774281919836_76e07c332cad60e5_de03_2.png"
+    ],
+    "questions": [
+      {
+        "prompt": "rừng thông, bãi biển",
+        "subQuestions": [
+          {
+            "id": "69c164c0c68879da1b92cdcb",
+            "prompt": "Describe the picture?",
+            "suggestion": null
+          },
+          {
+            "id": "69c164c0c68879da1b92cdcc",
+            "prompt": "Which place do you like better? Pine forest or beach?",
+            "suggestion": null
+          },
+          {
+            "id": "69c164c0c68879da1b92cdcd",
+            "prompt": "Does weather affect human emotions? Why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "69c1659cc68879da1b92d179",
+    "part": "PART3",
+    "title": "Người đàn ông trong rừng thông, nhóm người cưỡi lạc đà trên sa mạc",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774282139794_d134cdc463103dbd_de10_1.png",
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774282139795_ed1d84fb042d8058_de10_2.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Người đàn ông trong rừng thông, nhóm người cưỡi lạc đà trên sa mạc",
+        "subQuestions": [
+          {
+            "id": "69c1659cc68879da1b92d17b",
+            "prompt": "Describe the picture?",
+            "suggestion": null
+          },
+          {
+            "id": "69c1659cc68879da1b92d17c",
+            "prompt": "What types of people live in these places?",
+            "suggestion": null
+          },
+          {
+            "id": "69c1659cc68879da1b92d17d",
+            "prompt": "Which place would you rather visit, and why?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "69c167b5c68879da1b92d850",
+    "part": "PART3",
+    "title": "Chơi đàn trong nhà, chơi đàn ngoài trời",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774282676285_a942f29369ef5d5e_de14_1.png",
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774282676286_6b9c9a8a5be6c550_de14_2.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Chơi đàn trong nhà, chơi đàn ngoài trời",
+        "subQuestions": [
+          {
+            "id": "69c167b5c68879da1b92d852",
+            "prompt": "Describe the picture?",
+            "suggestion": null
+          },
+          {
+            "id": "69c167b5c68879da1b92d853",
+            "prompt": "Where do you like to play music and why?",
+            "suggestion": null
+          },
+          {
+            "id": "69c167b5c68879da1b92d854",
+            "prompt": "How will playing music in different places bring different emotions?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "69c16a4ac68879da1b92d9f3",
+    "part": "PART3",
+    "title": "Cô gái trồng rau, 2 cha con trồng hoa",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774283583746_8eddceaa4d670623_de17_1.png",
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774283583747_0f46c1d09de99d27_de17_2.png"
+    ],
+    "questions": [
+      {
+        "prompt": "Cô gái trồng rau, 2 cha con trồng hoa",
+        "subQuestions": [
+          {
+            "id": "69c16b40c68879da1b92e136",
+            "prompt": "Describe the picture?",
+            "suggestion": "<p><span style=\"background-color: rgb(255, 255, 255); color: rgb(33, 37, 41);\"> As I can see in the first picture, there is a young woman sitting in a greenhouse. She is picking red tomatoes and placing them into a basket. The greenhouse is full of fresh vegetables, creating a peaceful atmosphere.</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(33, 37, 41);\">On the other hand, in the second picture, I see a father and his young child working together in a garden. The father is helping the child plant yellow flowers, using small tools and a watering can. It looks like they are in their backyard, enjoying time together.</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(33, 37, 41);\">Both pictures show people working with plants, but in different ways. I prefer the first image because I enjoy seeing fresh vegetables being picked. However, the second image also looks nice because it shows a father and child spending time together.</span></p>"
+          },
+          {
+            "id": "69c16b40c68879da1b92e137",
+            "prompt": "Growing a garden has many wonderful benefits?",
+            "suggestion": "<p>It allows people to have fresh vegetables and beautiful flowers, making their surroundings healthier and more attractive. Gardening also helps reduce stress, improves mental well-being, and encourages physical activity, which is good for overall health. Moreover, it teaches patience and responsibility, as plants require daily care, watering, and attention to grow properly. In addition, gardening can be a rewarding and relaxing hobby, giving people a sense of accomplishment when they see their plants grow and thrive. It also promotes environmental awareness, as people learn how to take care of nature and appreciate the beauty of green spaces.</p><p>Đóng</p>"
+          },
+          {
+            "id": "69c16b40c68879da1b92e138",
+            "prompt": "Growing vegetables and flowers is appealing for many reasons?",
+            "suggestion": "<p>Vegetables provide fresh, nutritious food, reducing grocery expenses and promoting a healthy diet. Homegrown produce is often tastier and free from harmful chemicals, making it a better option for families. Flowers, on the other hand, make any space more colorful, attractive, and peaceful, creating a pleasant and welcoming atmosphere. Both activities offer a deep connection with nature, a sense of accomplishment, and the joy of watching plants flourish over time. Additionally, gardening can be a great way to spend time outdoors, socialize with others who share the same interest, and develop new skills related to plant care and sustainability.</p><p>Đóng</p>"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "69c16b1ec68879da1b92e054",
+    "part": "PART3",
+    "title": "2 cha con nấu ăn, người đàn ông ăn đồ ăn nhanh",
+    "timeLimitSeconds": null,
+    "image": [
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774283549661_05e29a0900634270_de20_1.png",
+      "https://files.aptisacademy.com.vn/speaking/2026/03/1774283549661_007bd1c2afba705b_de20_2.png"
+    ],
+    "questions": [
+      {
+        "prompt": "2 cha con nấu ăn, người đàn ông ăn đồ ăn nhanh",
+        "subQuestions": [
+          {
+            "id": "69c16b1ec68879da1b92e056",
+            "prompt": "Describe the picture?",
+            "suggestion": null
+          },
+          {
+            "id": "69c16b1ec68879da1b92e057",
+            "prompt": "Why is it appealing to eat at different places?",
+            "suggestion": null
+          },
+          {
+            "id": "69c16b1ec68879da1b92e058",
+            "prompt": "Where do people like to eat on special occasions?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4770953b4655eba3f06ce",
+    "part": "PART4",
+    "title": "Phỏng vấn",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68f0646953b4655eba3f20c7",
+            "prompt": "Tell me a time when you were in a hurry.",
+            "suggestion": null
+          },
+          {
+            "id": "68f0646953b4655eba3f20c8",
+            "prompt": "How do you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68f0646953b4655eba3f20c9",
+            "prompt": "Modern life makes us busier and more rushed. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e478fb53b4655eba3f06d9",
+    "part": "PART4",
+    "title": "Học một thứ mới",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e478fb53b4655eba3f06db",
+            "prompt": "Tell me the last time you learn something new.",
+            "suggestion": null
+          },
+          {
+            "id": "68e478fb53b4655eba3f06dc",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e478fb53b4655eba3f06dd",
+            "prompt": "Lifelong learning is necessary for everyone. Do you agree?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e47a7053b4655eba3f06e4",
+    "part": "PART4",
+    "title": "Thứ mà bạn muốn nhưng không thể có",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68ea06ea53b4655eba3f1784",
+            "prompt": "Tell me about a time when you wanted something but couldn't have it.",
+            "suggestion": null
+          },
+          {
+            "id": "68ea06ea53b4655eba3f1785",
+            "prompt": "How did you feel about it?",
+            "suggestion": null
+          },
+          {
+            "id": "68ea06ea53b4655eba3f1786",
+            "prompt": "Material possessions can't bring happiness. What are your thoughts on this?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e47aea53b4655eba3f06ef",
+    "part": "PART4",
+    "title": "Công viên giải trí",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68ea0a8653b4655eba3f1848",
+            "prompt": "A time you went to an amusement park?",
+            "suggestion": null
+          },
+          {
+            "id": "68ea0a8653b4655eba3f1849",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68ea0a8653b4655eba3f184a",
+            "prompt": "Rides in amusement parks are scary. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e47b9053b4655eba3f06fa",
+    "part": "PART4",
+    "title": "Chuyến du lịch",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e47b9053b4655eba3f06fc",
+            "prompt": "Tell me about a time you traveled somewhere?",
+            "suggestion": null
+          },
+          {
+            "id": "68e47b9053b4655eba3f06fd",
+            "prompt": "How did you feel before the trip?",
+            "suggestion": null
+          },
+          {
+            "id": "68e47b9053b4655eba3f06fe",
+            "prompt": "People spend more and more money on traveling?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e47d3753b4655eba3f0705",
+    "part": "PART4",
+    "title": "Chủ đề khó",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e47d3753b4655eba3f0707",
+            "prompt": "Tell me a time when you asked a question.",
+            "suggestion": null
+          },
+          {
+            "id": "68e47d3753b4655eba3f0708",
+            "prompt": "How you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e47d3753b4655eba3f0709",
+            "prompt": "Some subjects are too difficult for most people to understand. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e47e7a53b4655eba3f0710",
+    "part": "PART4",
+    "title": "Vô cùng bận rộn",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e47e7a53b4655eba3f0712",
+            "prompt": "Tell me a time when you asked a question.",
+            "suggestion": null
+          },
+          {
+            "id": "68e47e7a53b4655eba3f0713",
+            "prompt": "How you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e47e7a53b4655eba3f0714",
+            "prompt": "Some subjects are too difficult for most people to understand. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e47f1a53b4655eba3f071b",
+    "part": "PART4",
+    "title": "Đứng trước nhiều lựa chọn",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e47f1a53b4655eba3f071d",
+            "prompt": "Tell me a time when you had many choices.",
+            "suggestion": null
+          },
+          {
+            "id": "68e47f1a53b4655eba3f071e",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e47f1a53b4655eba3f071f",
+            "prompt": "Do we have so many choices to make?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e47fdf53b4655eba3f0726",
+    "part": "PART4",
+    "title": "Gặp người ở thế hệ khác",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e47fdf53b4655eba3f0728",
+            "prompt": "The last time you met a person of the older or younger generation?",
+            "suggestion": null
+          },
+          {
+            "id": "68e47fdf53b4655eba3f0729",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e47fdf53b4655eba3f072a",
+            "prompt": "What lessons did each generation give you?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4824653b4655eba3f0731",
+    "part": "PART4",
+    "title": "Nhận một email hoặc thông báo",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e4824653b4655eba3f0733",
+            "prompt": "Tell me a time you received an email or a notification.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4824653b4655eba3f0734",
+            "prompt": "Which do you use to receive that email or notification?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4824653b4655eba3f0735",
+            "prompt": "A lot of people think that information is available these days. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4833b53b4655eba3f073c",
+    "part": "PART4",
+    "title": "Mất nhiều công sức làm một món đồ",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e4833b53b4655eba3f073e",
+            "prompt": "The last time you made something by yourself that took a lot of effort? ",
+            "suggestion": null
+          },
+          {
+            "id": "68e4833b53b4655eba3f073f",
+            "prompt": "How did you feel when you finished it?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4833b53b4655eba3f0740",
+            "prompt": "People should make as many items as they can instead of buying them. Do you agree?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e487e553b4655eba3f0747",
+    "part": "PART4",
+    "title": "Gặp gỡ người bạn mới",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục ",
+        "subQuestions": [
+          {
+            "id": "68e487e553b4655eba3f0749",
+            "prompt": "A time you met some new friends.",
+            "suggestion": null
+          },
+          {
+            "id": "68e487e553b4655eba3f074a",
+            "prompt": "Some of the best thing about the experience.",
+            "suggestion": null
+          },
+          {
+            "id": "68e487e553b4655eba3f074b",
+            "prompt": "Benefit from meeting new people.",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4886c53b4655eba3f0752",
+    "part": "PART4",
+    "title": "Sử dụng Internet",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e4886c53b4655eba3f0754",
+            "prompt": "Tell me about some of the different ways you use the internet?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4886c53b4655eba3f0755",
+            "prompt": "How do you feel when you use the internet?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4886c53b4655eba3f0756",
+            "prompt": "Some people think the internet has a bad impact on our lives. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e488d553b4655eba3f075d",
+    "part": "PART4",
+    "title": "Thành quả",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e488d553b4655eba3f075f",
+            "prompt": "Tell me about a time when you achieved your goal.",
+            "suggestion": null
+          },
+          {
+            "id": "68e488d553b4655eba3f0760",
+            "prompt": "How do you feel about it?",
+            "suggestion": null
+          },
+          {
+            "id": "68e488d553b4655eba3f0761",
+            "prompt": "What do people need to do to achieve their goals?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4895053b4655eba3f0768",
+    "part": "PART4",
+    "title": "Thể thao mạo hiểm",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e4895053b4655eba3f076a",
+            "prompt": "Tell me about a time you did an extreme sport.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4895053b4655eba3f076b",
+            "prompt": "How do you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4895053b4655eba3f076c",
+            "prompt": "Only adults do extreme sports. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e489e253b4655eba3f0777",
+    "part": "PART4",
+    "title": "Save money",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục.",
+        "subQuestions": [
+          {
+            "id": "68e489e253b4655eba3f0779",
+            "prompt": "Have you ever saved up to buy something?",
+            "suggestion": null
+          },
+          {
+            "id": "68e489e253b4655eba3f077a",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e489e253b4655eba3f077b",
+            "prompt": "People spend too much money on unnecessary items. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e48fcb53b4655eba3f08ff",
+    "part": "PART4",
+    "title": "Sự sáng tạo",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e48fcb53b4655eba3f0901",
+            "prompt": "A time you saw an impressive work of art",
+            "suggestion": null
+          },
+          {
+            "id": "68e48fcb53b4655eba3f0902",
+            "prompt": "How did it make you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e48fcb53b4655eba3f0903",
+            "prompt": "It is impossible to teach people to be creative. Do you agree with this?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4907453b4655eba3f090a",
+    "part": "PART4",
+    "title": "Hòa mình vào thiên nhiên",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e4907453b4655eba3f090c",
+            "prompt": "Tell me a time you were surrounded by nature.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4907453b4655eba3f090d",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4907453b4655eba3f090e",
+            "prompt": "What are some advantages of getting close to nature?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4914a53b4655eba3f0915",
+    "part": "PART4",
+    "title": "Nhận quà",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e4914a53b4655eba3f0917",
+            "prompt": "Tell me a time you received a gift.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4914a53b4655eba3f0918",
+            "prompt": "How do you feel about this gift?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4914a53b4655eba3f0919",
+            "prompt": "Why do people give gifts?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e491a353b4655eba3f0920",
+    "part": "PART4",
+    "title": "Làm việc nhóm",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e491a353b4655eba3f0922",
+            "prompt": "Tell me about a time when you worked in a team.",
+            "suggestion": null
+          },
+          {
+            "id": "68e491a353b4655eba3f0923",
+            "prompt": "How do you feel when you work in a team?",
+            "suggestion": null
+          },
+          {
+            "id": "68e491a353b4655eba3f0924",
+            "prompt": "What are the advantages of teamwork?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4954c53b4655eba3f092b",
+    "part": "PART4",
+    "title": "Đọc sách",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e4954c53b4655eba3f092d",
+            "prompt": "A time when you read books",
+            "suggestion": null
+          },
+          {
+            "id": "68e4954c53b4655eba3f092e",
+            "prompt": "How do you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4954c53b4655eba3f092f",
+            "prompt": "Some people prefer watching films to books. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4960453b4655eba3f0936",
+    "part": "PART4",
+    "title": "Một thử thách",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e4960453b4655eba3f0938",
+            "prompt": "Tell me about a time when you were successful in a challenging situation.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4960453b4655eba3f0939",
+            "prompt": "How do you feel when you are given a challenge?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4960453b4655eba3f093a",
+            "prompt": "What can help people face the challenges of daily life?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e496a953b4655eba3f0941",
+    "part": "PART4",
+    "title": "Cư xử thô lỗ",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e496a953b4655eba3f0943",
+            "prompt": "Tell me about a time when someone was rude to you.",
+            "suggestion": null
+          },
+          {
+            "id": "68e496a953b4655eba3f0944",
+            "prompt": "What do you think?",
+            "suggestion": null
+          },
+          {
+            "id": "68e496a953b4655eba3f0945",
+            "prompt": "Do you think technology is changing people's thoughts, making them more uncommunicative? ",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4975953b4655eba3f094c",
+    "part": "PART4",
+    "title": "Giải quyết một vấn đề",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e498e853b4655eba3f09da",
+            "prompt": "Tell me about a time you solved a problem.",
+            "suggestion": null
+          },
+          {
+            "id": "68e498e853b4655eba3f09db",
+            "prompt": "How do you feel when you can’t solve a problem?",
+            "suggestion": null
+          },
+          {
+            "id": "68e498e853b4655eba3f09dc",
+            "prompt": "Technology causes more problems than the ones that it can solve. What do you think about it?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e4996953b4655eba3f09f0",
+    "part": "PART4",
+    "title": "Làm một việc mình không thích",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e4996953b4655eba3f09f2",
+            "prompt": "A time you did something you didn’t like.",
+            "suggestion": null
+          },
+          {
+            "id": "68e4996953b4655eba3f09f3",
+            "prompt": "Do you prefer the job you love or the job that helps you make a lot of money?",
+            "suggestion": null
+          },
+          {
+            "id": "68e4996953b4655eba3f09f4",
+            "prompt": "In today's society, we often find ourselves having to do many things we don't enjoy, both in social settings and within our families.",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e499fd53b4655eba3f09fb",
+    "part": "PART4",
+    "title": "Làm việc tốt",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e499fd53b4655eba3f09fd",
+            "prompt": "A time when you gave help?",
+            "suggestion": null
+          },
+          {
+            "id": "68e499fd53b4655eba3f09fe",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e499fd53b4655eba3f09ff",
+            "prompt": "How can people be encouraged to do good things?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e49a7753b4655eba3f0a06",
+    "part": "PART4",
+    "title": "Cười về một điều gì đó",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e49a7753b4655eba3f0a08",
+            "prompt": "Tell me about a time you laughed with your friends.",
+            "suggestion": null
+          },
+          {
+            "id": "68e49a7753b4655eba3f0a09",
+            "prompt": "What do you think of a cheerful person?",
+            "suggestion": null
+          },
+          {
+            "id": "68e49a7753b4655eba3f0a0a",
+            "prompt": "Why do people laugh at different things?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e49add53b4655eba3f0a11",
+    "part": "PART4",
+    "title": "Nhận tin tốt",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e49add53b4655eba3f0a13",
+            "prompt": "Please tell me about a time you received good news.",
+            "suggestion": null
+          },
+          {
+            "id": "68e49add53b4655eba3f0a14",
+            "prompt": "How did you feel when waiting for important news?",
+            "suggestion": null
+          },
+          {
+            "id": "68e49add53b4655eba3f0a15",
+            "prompt": "Why do you think people enjoy celebrating good news?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68e49b4453b4655eba3f0a1c",
+    "part": "PART4",
+    "title": "Nhận giải thưởng",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "2 phút/ 3 câu - trả lời liên tục",
+        "subQuestions": [
+          {
+            "id": "68e49b4453b4655eba3f0a1e",
+            "prompt": "Tell me about a time you received a prize/ an award.",
+            "suggestion": null
+          },
+          {
+            "id": "68e49b4453b4655eba3f0a1f",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68e49b4453b4655eba3f0a20",
+            "prompt": "Should people push themselves to get prizes?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68ea01ce53b4655eba3f1729",
+    "part": "PART4",
+    "title": "Ăn ở nhà hàng",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Ăn ở nhà hàng",
+        "subQuestions": [
+          {
+            "id": "68ea01ce53b4655eba3f172b",
+            "prompt": "A time you ate at a restaurant.",
+            "suggestion": null
+          },
+          {
+            "id": "68ea01ce53b4655eba3f172c",
+            "prompt": "What makes a restaurant good?",
+            "suggestion": null
+          },
+          {
+            "id": "68ea01ce53b4655eba3f172d",
+            "prompt": "Why do people choose to spend money in restaurants?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f34faa53b4655eba3f3971",
+    "part": "PART4",
+    "title": "Âm nhạc",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Âm nhạc",
+        "subQuestions": [
+          {
+            "id": "68f34faa53b4655eba3f3973",
+            "prompt": "Tell me about the music that comes from your country. ",
+            "suggestion": null
+          },
+          {
+            "id": "68f34faa53b4655eba3f3974",
+            "prompt": "How do you feel when you hear or listen to music?",
+            "suggestion": null
+          },
+          {
+            "id": "68f34faa53b4655eba3f3975",
+            "prompt": "Why do some cultures produce so much music and others so little?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f3502053b4655eba3f397c",
+    "part": "PART4",
+    "title": "Du lịch đường dài",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Du lịch đường dài",
+        "subQuestions": [
+          {
+            "id": "68f3502053b4655eba3f397e",
+            "prompt": "Tell me about a time you went on a long journey.",
+            "suggestion": null
+          },
+          {
+            "id": "68f3502053b4655eba3f397f",
+            "prompt": "How did you feel about it?",
+            "suggestion": null
+          },
+          {
+            "id": "68f3502053b4655eba3f3980",
+            "prompt": "How do people travel long distances in your country?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f3506553b4655eba3f3987",
+    "part": "PART4",
+    "title": "Ghé thăm một toà nhà cao",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Ghé thăm một toà nhà cao",
+        "subQuestions": [
+          {
+            "id": "68f3506553b4655eba3f3989",
+            "prompt": "Tell me about a time when you visited a very tall building.",
+            "suggestion": null
+          },
+          {
+            "id": "68f3506553b4655eba3f398a",
+            "prompt": "How did you feel about it?",
+            "suggestion": null
+          },
+          {
+            "id": "68f3506553b4655eba3f398b",
+            "prompt": "Why do you think so many cities have tall buildings?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f350a253b4655eba3f3992",
+    "part": "PART4",
+    "title": "Bị lạc đường",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Bị lạc đường",
+        "subQuestions": [
+          {
+            "id": "68f350a253b4655eba3f3994",
+            "prompt": "Tell me about a time when you got lost.",
+            "suggestion": null
+          },
+          {
+            "id": "68f350a253b4655eba3f3995",
+            "prompt": "How did you feel about it?",
+            "suggestion": null
+          },
+          {
+            "id": "68f350a253b4655eba3f3996",
+            "prompt": "What do people usually do when they get lost?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f350e853b4655eba3f399d",
+    "part": "PART4",
+    "title": "Bộ quần áo yêu thích",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Bộ quần áo yêu thích",
+        "subQuestions": [
+          {
+            "id": "68f350e853b4655eba3f399f",
+            "prompt": "Tell me about your favourite piece of clothing.",
+            "suggestion": null
+          },
+          {
+            "id": "68f350e853b4655eba3f39a0",
+            "prompt": "How do you feel when you wear it?",
+            "suggestion": null
+          },
+          {
+            "id": "68f350e853b4655eba3f39a1",
+            "prompt": "Why do people dress in such different ways?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f3512553b4655eba3f39a8",
+    "part": "PART4",
+    "title": "Ghé thăm một tòa nhà cổ",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Ghé thăm một tòa nhà cổ",
+        "subQuestions": [
+          {
+            "id": "68f3512553b4655eba3f39aa",
+            "prompt": "Tell me about a time when you visited an old building.",
+            "suggestion": null
+          },
+          {
+            "id": "68f3512553b4655eba3f39ab",
+            "prompt": "How did you feel about it?",
+            "suggestion": null
+          },
+          {
+            "id": "68f3512553b4655eba3f39ac",
+            "prompt": "Why do you think it is important to look after an old building?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f3516653b4655eba3f39b3",
+    "part": "PART4",
+    "title": "Ngừng làm gì đó lại",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Ngừng làm gì đó lại",
+        "subQuestions": [
+          {
+            "id": "68f3516653b4655eba3f39b5",
+            "prompt": "Tell me about a time when someone told you to stop doing something.",
+            "suggestion": null
+          },
+          {
+            "id": "68f3516653b4655eba3f39b6",
+            "prompt": "How did you feel about it?",
+            "suggestion": null
+          },
+          {
+            "id": "68f3516653b4655eba3f39b7",
+            "prompt": "Do you think there are too many rules in modern life?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f351a753b4655eba3f39be",
+    "part": "PART4",
+    "title": "Chuyển nhà",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Chuyển nhà",
+        "subQuestions": [
+          {
+            "id": "68f351a753b4655eba3f39c0",
+            "prompt": "Tell me about a time when you moved house.",
+            "suggestion": null
+          },
+          {
+            "id": "68f351a753b4655eba3f39c1",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68f351a753b4655eba3f39c2",
+            "prompt": "What can people do to ease the task of moving house?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f3529053b4655eba3f39c9",
+    "part": "PART4",
+    "title": "Nhận được sự giúp đỡ",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Nhận được sự giúp đỡ",
+        "subQuestions": [
+          {
+            "id": "68f3529053b4655eba3f39cb",
+            "prompt": "Tell about a time when you were supported by others.",
+            "suggestion": null
+          },
+          {
+            "id": "68f3529053b4655eba3f39cc",
+            "prompt": "How did you feel?",
+            "suggestion": null
+          },
+          {
+            "id": "68f3529053b4655eba3f39cd",
+            "prompt": "What are ways to motivate others to cooperate?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "68f352e253b4655eba3f39d4",
+    "part": "PART4",
+    "title": "Nhận quà Version 2",
+    "timeLimitSeconds": null,
+    "image": null,
+    "questions": [
+      {
+        "prompt": "Nhận quà Version 2",
+        "subQuestions": [
+          {
+            "id": "68f352e253b4655eba3f39d6",
+            "prompt": "Tell me a time you received a gift?",
+            "suggestion": null
+          },
+          {
+            "id": "68f352e253b4655eba3f39d7",
+            "prompt": " How do you feel when someone who you don’t know well sends you a gift?",
+            "suggestion": null
+          },
+          {
+            "id": "68f352e253b4655eba3f39d8",
+            "prompt": "Choosing a perfect gift for someone who you don’t know well can be very difficult. What do you think?",
+            "suggestion": null
+          }
+        ]
+      }
+    ]
+  }
+]

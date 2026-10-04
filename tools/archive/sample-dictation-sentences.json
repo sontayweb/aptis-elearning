@@ -1,0 +1,38 @@
+[
+  {
+    "sentence_id": "8db5d4af-5a01-4c85-baee-2c09dd410586",
+    "set_id": "0970b339-5e09-4f58-a40d-f07ccb4fd292",
+    "set_title": "Đề 01 - Part 1 · Bài 02",
+    "part": "Part 1",
+    "sort": 1,
+    "text": "About dinner tonight - I know we first said half past seven, but my meeting now finishes late, so that's impossible for me.",
+    "audio_url": "v3_p1_de01_q02.mp3",
+    "start_sec": 1.9,
+    "end_sec": 8.39,
+    "best_accuracy": 0
+  },
+  {
+    "sentence_id": "fd88d074-dafd-49c2-ae2c-36d1288b6679",
+    "set_id": "0970b339-5e09-4f58-a40d-f07ccb4fd292",
+    "set_title": "Đề 01 - Part 1 · Bài 02",
+    "part": "Part 1",
+    "sort": 2,
+    "text": "I thought about quarter past seven for a moment, but that's even earlier, silly me.",
+    "audio_url": "v3_p1_de01_q02.mp3",
+    "start_sec": 8.44,
+    "end_sec": 12.6,
+    "best_accuracy": 0
+  },
+  {
+    "sentence_id": "b4fbb947-9f04-41b8-bfc6-35eb46edeb5e",
+    "set_id": "0970b339-5e09-4f58-a40d-f07ccb4fd292",
+    "set_title": "Đề 01 - Part 1 · Bài 02",
+    "part": "Part 1",
+    "sort": 4,
+    "text": "The table is already changed to quarter to eight, so see you then!",
+    "audio_url": "v3_p1_de01_q02.mp3",
+    "start_sec": 15.09,
+    "end_sec": 18.02,
+    "best_accuracy": 0
+  }
+]
