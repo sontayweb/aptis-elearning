@@ -212,7 +212,7 @@ export default function ReadingPracticePage() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      <main className="flex-1 pt-16">
+      <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
         <section className="section-container py-6 md:py-8">
           {/* Search Box */}
           <div className="relative mb-6">

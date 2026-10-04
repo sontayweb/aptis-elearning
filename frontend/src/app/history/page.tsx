@@ -97,7 +97,7 @@ export default function HistoryPage() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      <main className="flex-1 pt-16">
+      <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-card border-b border-border">
           <div className="section-container py-10 md:py-14">
