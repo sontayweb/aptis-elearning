@@ -8,9 +8,22 @@ import { gradeObjectiveQuestion } from '../../utils/scoring-engine';
 
 export class SubmissionService {
   async startSubmission(userId: string, examId: string) {
-    const exam = await prisma.exam.findUnique({
-      where: { id: examId },
-    });
+    const trimmed = examId.trim();
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed);
+    let exam = isUuid
+      ? await prisma.exam.findUnique({ where: { id: trimmed } })
+      : null;
+
+    if (!exam) {
+      exam = await prisma.exam.findFirst({
+        where: {
+          OR: [
+            { id: trimmed },
+            { title: { contains: trimmed, mode: 'insensitive' } },
+          ],
+        },
+      });
+    }
 
     if (!exam || !exam.is_published) {
       throw { statusCode: 404, message: 'Đề thi không tồn tại hoặc đã ngừng công khai' };
@@ -27,7 +40,7 @@ export class SubmissionService {
     const submission = await prisma.examSubmission.create({
       data: {
         user_id: userId,
-        exam_id: examId,
+        exam_id: exam.id,
         status: SubmissionStatus.IN_PROGRESS,
         started_at: now,
         deadline_at: deadlineAt,

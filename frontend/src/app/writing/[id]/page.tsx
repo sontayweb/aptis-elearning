@@ -193,6 +193,15 @@ function WritingExamRunnerContent() {
   const [aiQuota, setAiQuota] = useState(2);
   const [showPart2Result, setShowPart2Result] = useState(false);
   const [showAiWaitingScreen, setShowAiWaitingScreen] = useState(false);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [evalError, setEvalError] = useState<string | null>(null);
+  const [aiGradingResult, setAiGradingResult] = useState<{
+    submissionId: string;
+    overallScore: number;
+    cefrLevel: string;
+    evaluatedQuestionsCount: number;
+    aiResults: Array<any>;
+  } | null>(null);
   const [showSampleAnswersModal, setShowSampleAnswersModal] = useState(false);
   const [showPartsDrawer, setShowPartsDrawer] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -307,6 +316,15 @@ function WritingExamRunnerContent() {
             if (Object.keys(loadedAnswers).length > 0) {
               setAnswers(loadedAnswers);
             }
+            if (sub.ai_results && sub.ai_results.length > 0) {
+              setAiGradingResult({
+                submissionId: sub.id,
+                overallScore: sub.total_score || 0,
+                cefrLevel: sub.cefr_level || "B2",
+                evaluatedQuestionsCount: sub.ai_results.length,
+                aiResults: sub.ai_results,
+              });
+            }
             if (modeParam === "review") {
               setReviewMode(true);
             }
@@ -374,39 +392,102 @@ function WritingExamRunnerContent() {
     return text.trim().split(/\s+/).filter(Boolean).length;
   };
 
-  // NỘP BÀI (SUBMIT LOGIC: Part 2 miễn phí trả ngay; Part 1, 3, 4 trừ lượt AI & chờ)
+  // NỘP BÀI THI & CHẤM ĐIỂM BẰNG AI (GEMINI & GPT)
   const handleSubmit = async () => {
-    // Lưu các câu trả lời vào database nếu có submissionId
-    if (submissionId) {
-      try {
-        const answersPayload = currentPart.questions.map((q, qIdx) => ({
-          questionId: q.id || `writing-p${currentPart.partNumber}-q${qIdx + 1}`,
-          textAnswer: answers[`${currentPartIdx}_${qIdx}`] || "",
-        }));
-        await api.submissions.autosave(submissionId, answersPayload);
-      } catch (err) {
-        console.warn("Autosave error:", err);
-      }
-    }
-
-    if (currentPart.partNumber === 2) {
-      // PART 2: KHÔNG CHẤM AI - KHÔNG TRỪ LƯỢT AI - TRẢ KẾT QUẢ NGAY
+    // Nếu chỉ làm riêng Part 2 và không muốn dùng AI
+    if (parts.length === 1 && currentPart.partNumber === 2) {
       setShowPart2Result(true);
       setShowAiWaitingScreen(false);
-    } else {
-      // PART 1, 3, 4: CHẤM AI - TRỪ 1 LƯỢT CHẤM - HIỆN MÀN HÌNH CHỜ 1-3 PHÚT
-      const newQuota = Math.max(0, aiQuota - 1);
-      setAiQuota(newQuota);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("aptis_writing_ai_quota", String(newQuota));
-      }
+      return;
+    }
+
+    setEvalError(null);
+
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken") ||
+          localStorage.getItem("token") ||
+          localStorage.getItem("aptis_token")
+        : null;
+
+    if (!token) {
+      setEvalError("Bạn cần đăng nhập để nộp bài và nhận đánh giá từ mô hình AI (Gemini Premier) theo chuẩn CEFR Aptis.");
       setShowAiWaitingScreen(true);
-      setShowPart2Result(false);
+      return;
+    }
+
+    setIsEvaluating(true);
+    setShowAiWaitingScreen(true);
+    setShowPart2Result(false);
+
+    try {
+      let activeSubId = submissionId;
+      if (!activeSubId && examId) {
+        const startRes = await api.submissions.start(examId);
+        if (startRes.success && startRes.data) {
+          activeSubId = startRes.data.submissionId || startRes.data.id;
+          setSubmissionId(activeSubId);
+        }
+      }
+
+      if (!activeSubId) {
+        throw new Error("Không thể khởi tạo phiên làm bài thi. Vui lòng kiểm tra lại kết nối mạng.");
+      }
+
+      // 1. Thu thập toàn bộ câu trả lời từ tất cả các parts
+      const allAnswersPayload: Array<{ questionId: string; textAnswer: string }> = [];
+      parts.forEach((p, pIdx) => {
+        p.questions.forEach((q, qIdx) => {
+          const text = answers[`${pIdx}_${qIdx}`] || "";
+          if (q.id) {
+            allAnswersPayload.push({
+              questionId: q.id,
+              textAnswer: text,
+            });
+          }
+        });
+      });
+
+      if (allAnswersPayload.length > 0) {
+        await api.submissions.autosave(activeSubId, allAnswersPayload);
+      }
+
+      // 2. Nộp bài chính thức
+      await api.submissions.submit(activeSubId);
+
+      // 3. Kích hoạt mô hình AI chấm điểm thực tế
+      const aiRes = await api.aiGrading.evaluate(activeSubId);
+      if (aiRes.success && aiRes.data) {
+        const resData = aiRes.data;
+        setAiGradingResult({
+          submissionId: resData.submissionId || activeSubId,
+          overallScore: resData.overallScore ?? 0,
+          cefrLevel: resData.cefrLevel || "B2",
+          evaluatedQuestionsCount: resData.evaluatedQuestionsCount || resData.aiResults?.length || 0,
+          aiResults: resData.aiResults || [],
+        });
+
+        // Cập nhật quota hiển thị nếu có trừ
+        if (resData.quotaDeducted) {
+          const newQuota = Math.max(0, aiQuota - 1);
+          setAiQuota(newQuota);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("aptis_writing_ai_quota", String(newQuota));
+          }
+        }
+      } else {
+        throw new Error(aiRes.error?.message || "Mô hình AI chưa phản hồi bài chấm. Vui lòng thử lại.");
+      }
+    } catch (err: any) {
+      console.error("Writing AI grading error:", err);
+      setEvalError(err?.message || "Không thể hoàn tất quá trình chấm AI. Vui lòng thử lại.");
+    } finally {
+      setIsEvaluating(false);
     }
   };
 
   // =========================================================================
-  // MÀN HÌNH CHỜ CHẤM AI (PART 1, 3, 4 - THEO THEME CHUẨN CỦA HỆ THỐNG MÌNH)
+  // MÀN HÌNH CHỜ & KẾT QUẢ CHẤM AI
   // =========================================================================
   if (showAiWaitingScreen) {
     return (
@@ -422,7 +503,7 @@ function WritingExamRunnerContent() {
                 Writing Test
               </span>
               <span className="text-sm font-bold text-foreground">
-                Kết quả đánh giá AI
+                Kết quả đánh giá AI (Gemini Premier)
               </span>
             </div>
           </div>
@@ -437,51 +518,171 @@ function WritingExamRunnerContent() {
 
         {/* Centered Waiting Card theo theme hệ thống */}
         <main className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-xl bg-card border border-border rounded-2xl shadow-sm p-10 text-center space-y-6 animate-in fade-in">
-            {/* Circular Spinner theo màu primary của hệ thống */}
-            <div className="flex justify-center">
-              <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-            </div>
+          <div className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-sm p-8 text-center space-y-6 animate-in fade-in">
+            {evalError ? (
+              /* ERROR STATE */
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mx-auto">
+                  <AlertCircle className="w-6 h-6" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="font-heading font-bold text-base text-foreground">
+                    Không thể chấm điểm AI
+                  </h3>
+                  <p className="text-xs md:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                    {evalError}
+                  </p>
+                </div>
+                <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                  {typeof window !== "undefined" && !localStorage.getItem("accessToken") && (
+                    <Link
+                      href={`/auth?redirect=/writing/${examId}`}
+                      className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:brightness-110 font-bold text-xs shadow-md transition-all"
+                    >
+                      Đăng nhập tài khoản
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleSubmit()}
+                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs transition-all gap-1.5 cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Thử lại</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAiWaitingScreen(false)}
+                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    Quay lại bài làm
+                  </button>
+                </div>
+              </div>
+            ) : isEvaluating ? (
+              /* LOADING STATE (REAL AI EVALUATION IN PROGRESS) */
+              <div className="space-y-6 py-4">
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                    <Sparkles className="w-6 h-6 text-primary absolute inset-0 m-auto animate-pulse" />
+                  </div>
+                </div>
 
-            {/* Waiting Text */}
-            <div className="space-y-2">
-              <h3 className="font-heading font-bold text-base text-foreground">
-                AI PREMIER đang chấm bài viết
-              </h3>
-              <p className="text-xs md:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-                Quá trình phân tích CEFR thường mất từ 1-3 phút. Bạn có thể thoát ra làm đề khác, bài chấm hoàn tất sẽ tự động lưu trong Lịch sử làm bài.
-              </p>
-            </div>
+                <div className="space-y-2">
+                  <h3 className="font-heading font-bold text-lg text-foreground">
+                    AI Examiner đang phân tích &amp; chấm bài viết
+                  </h3>
+                  <p className="text-xs md:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                    Mô hình Gemini đang chấm điểm chi tiết 4 tiêu chí CEFR (Task Completion, Grammar, Vocabulary, Cohesion) và trích xuất gợi ý cải thiện...
+                  </p>
+                </div>
 
-            {/* Actions */}
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAiWaitingScreen(false);
-                  setReviewMode(true);
-                  setReviewPartIdx(0);
-                }}
-                className="tech-btn inline-flex items-center justify-center px-6 py-2.5 rounded-xl border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs transition-all gap-1.5"
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>Xem lại bài làm &amp; Bài mẫu →</span>
-              </button>
+                {/* Progress Checklist */}
+                <div className="max-w-md mx-auto bg-muted/40 rounded-xl p-4 border border-border/60 text-left space-y-2 text-xs">
+                  <div className="flex items-center gap-2 text-foreground font-medium">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
+                    <span>Đang kiểm tra độ hoàn thành đề bài &amp; đếm từ...</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <span className="w-2 h-2 rounded-full bg-primary/50 shrink-0" />
+                    <span>Đang rà soát ngữ pháp và cấu trúc câu phức...</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <span className="w-2 h-2 rounded-full bg-primary/50 shrink-0" />
+                    <span>Đang đánh giá độ phong phú từ vựng theo khung CEFR...</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <span className="w-2 h-2 rounded-full bg-primary/50 shrink-0" />
+                    <span>Đang tổng hợp nhận xét và gợi ý nâng band...</span>
+                  </div>
+                </div>
+              </div>
+            ) : aiGradingResult ? (
+              /* SUCCESS STATE (REAL AI RESULTS READY!) */
+              <div className="space-y-6 text-left">
+                {/* Result Header Card */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary text-primary-foreground">
+                        Hoàn tất chấm điểm AI
+                      </span>
+                      <span className="text-xs font-semibold text-muted-foreground">
+                        {aiGradingResult.evaluatedQuestionsCount} câu hỏi
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-heading font-black text-foreground">
+                      Điểm thi Writing Aptis ESOL
+                    </h3>
+                  </div>
 
-              <Link
-                href="/history"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors"
-              >
-                Lịch sử làm bài
-              </Link>
+                  <div className="flex items-baseline gap-2 bg-card p-3 rounded-xl border border-border shadow-xs self-start sm:self-auto">
+                    <span className="text-3xl font-black text-primary font-mono">
+                      {aiGradingResult.overallScore}
+                    </span>
+                    <span className="text-xs font-bold text-muted-foreground">/ 50</span>
+                    <span className="ml-2 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                      Band {aiGradingResult.cefrLevel}
+                    </span>
+                  </div>
+                </div>
 
-              <Link
-                href="/writing"
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:brightness-110 font-bold text-xs shadow-md transition-all"
-              >
-                Về danh sách đề Writing
-              </Link>
-            </div>
+                {/* Feedback Summary */}
+                {aiGradingResult.aiResults?.[0]?.feedback_summary && (
+                  <div className="p-4 rounded-xl bg-card border border-border space-y-1.5 text-xs md:text-sm">
+                    <strong className="text-foreground block font-bold">
+                      Nhận xét tổng thể từ Giám khảo AI:
+                    </strong>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {aiGradingResult.aiResults[0].feedback_summary}
+                    </p>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-3 border-t border-border">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAiWaitingScreen(false);
+                      setReviewMode(true);
+                      setReviewPartIdx(0);
+                    }}
+                    className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:brightness-110 font-bold text-xs shadow-md transition-all gap-1.5 cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Xem chi tiết nhận xét &amp; sửa lỗi từng câu →</span>
+                  </button>
+
+                  <Link
+                    href="/history"
+                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+                  >
+                    Lịch sử làm bài
+                  </Link>
+
+                  <Link
+                    href="/writing"
+                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+                  >
+                    Về danh sách đề
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              /* Fallback */
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">Chưa có kết quả chấm điểm.</p>
+                <button
+                  type="button"
+                  onClick={() => setShowAiWaitingScreen(false)}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold"
+                >
+                  Quay lại
+                </button>
+              </div>
+            )}
           </div>
         </main>
       </div>
@@ -745,6 +946,7 @@ function WritingExamRunnerContent() {
                 const isWcOk = wc >= curReviewPart.minWords && wc <= curReviewPart.maxWords;
                 const tabKey = `${reviewPartIdx}_${qIdx}`;
                 const activeTab = sampleTabState[tabKey] || "b1";
+                const aiItem = aiGradingResult?.aiResults?.find((r: any) => q.id && r.question_id === q.id);
 
                 return (
                   <div
@@ -845,31 +1047,130 @@ function WritingExamRunnerContent() {
                       </div>
                     </div>
 
-                    {/* Criteria & AI Improvement Tips */}
-                    <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
-                      <span className="text-xs font-bold text-primary flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Tiêu chí đánh giá &amp; Gợi ý nâng band:</span>
-                      </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-xs text-muted-foreground">
-                        <div className="p-2.5 rounded-lg bg-card border border-border/60">
-                          <strong className="text-foreground block mb-0.5">1. Task Fulfillment:</strong>
-                          Bám sát các câu hỏi con, kiểm soát đúng dung lượng {curReviewPart.minWords}–{curReviewPart.maxWords} từ.
+                    {/* Criteria & AI Evaluation Box */}
+                    {aiItem ? (
+                      <div className="p-5 rounded-2xl bg-card border border-primary/30 space-y-4 shadow-sm animate-in fade-in">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-primary" />
+                            <span className="font-heading font-bold text-sm text-foreground">
+                              Đánh giá AI (Gemini Premier)
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                              Band {aiItem.cefr_level || "B2"}
+                            </span>
+                          </div>
+                          <div className="text-sm font-black text-primary font-mono">
+                            Điểm câu này: {aiItem.score}/50
+                          </div>
                         </div>
-                        <div className="p-2.5 rounded-lg bg-card border border-border/60">
-                          <strong className="text-foreground block mb-0.5">2. Cohesion &amp; Linking:</strong>
-                          Dùng liên từ nối như &ldquo;Moreover&rdquo;, &ldquo;In addition&rdquo;, &ldquo;Therefore&rdquo; để câu văn mượt mà.
+
+                        {/* 4 Criteria Scores */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          <div className="p-2.5 rounded-xl bg-muted/30 border border-border text-center">
+                            <span className="text-[10px] text-muted-foreground uppercase font-bold block mb-1">
+                              Task Response
+                            </span>
+                            <span className="text-sm font-black text-foreground">
+                              {aiItem.task_completion ?? "-"}/50
+                            </span>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-muted/30 border border-border text-center">
+                            <span className="text-[10px] text-muted-foreground uppercase font-bold block mb-1">
+                              Grammar
+                            </span>
+                            <span className="text-sm font-black text-foreground">
+                              {aiItem.grammar_score ?? "-"}/50
+                            </span>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-muted/30 border border-border text-center">
+                            <span className="text-[10px] text-muted-foreground uppercase font-bold block mb-1">
+                              Vocabulary
+                            </span>
+                            <span className="text-sm font-black text-foreground">
+                              {aiItem.vocabulary_score ?? "-"}/50
+                            </span>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-muted/30 border border-border text-center">
+                            <span className="text-[10px] text-muted-foreground uppercase font-bold block mb-1">
+                              Cohesion
+                            </span>
+                            <span className="text-sm font-black text-foreground">
+                              {aiItem.fluency_score ?? "-"}/50
+                            </span>
+                          </div>
                         </div>
-                        <div className="p-2.5 rounded-lg bg-card border border-border/60">
-                          <strong className="text-foreground block mb-0.5">3. Vocabulary (Lexical):</strong>
-                          Thay từ thông thường (&ldquo;good&rdquo;, &ldquo;nice&rdquo;) bằng từ học thuật (&ldquo;delightful&rdquo;, &ldquo;essential&rdquo;).
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-card border border-border/60">
-                          <strong className="text-foreground block mb-0.5">4. Grammar Accuracy:</strong>
-                          Đảm bảo thì quá khứ/hiện tại đơn nhất quán, tránh viết hoa/chấm phẩy tùy tiện.
+
+                        {/* AI Feedback Summary */}
+                        {aiItem.feedback_summary && (
+                          <div className="p-3.5 rounded-xl bg-primary/5 border border-primary/20 text-xs md:text-sm text-foreground leading-relaxed">
+                            <strong className="text-primary block mb-1 font-bold">Nhận xét chi tiết:</strong>
+                            {aiItem.feedback_summary}
+                          </div>
+                        )}
+
+                        {/* Detailed corrections if any */}
+                        {Array.isArray(aiItem.detailed_feedback) && aiItem.detailed_feedback.length > 0 && (
+                          <div className="space-y-2 pt-1">
+                            <span className="text-xs font-bold text-foreground block">
+                              Sửa lỗi ngữ pháp &amp; Gợi ý câu văn tự nhiên hơn:
+                            </span>
+                            <div className="space-y-2">
+                              {aiItem.detailed_feedback.map((item: any, fIdx: number) => (
+                                <div
+                                  key={fIdx}
+                                  className="p-3 rounded-xl bg-muted/40 border border-border text-xs space-y-1"
+                                >
+                                  {item.original && (
+                                    <div className="text-red-600 dark:text-red-400">
+                                      <span className="font-semibold">Bản gốc: </span>
+                                      <span className="line-through">{item.original}</span>
+                                    </div>
+                                  )}
+                                  {item.suggested && (
+                                    <div className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                                      <span>Gợi ý chuẩn: </span>
+                                      <span>{item.suggested}</span>
+                                    </div>
+                                  )}
+                                  {item.comment && (
+                                    <div className="text-muted-foreground text-[11px] pt-0.5">
+                                      {item.comment}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      /* Criteria & Guidance Tips */
+                      <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
+                        <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Tiêu chí đánh giá &amp; Gợi ý nâng band:</span>
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-xs text-muted-foreground">
+                          <div className="p-2.5 rounded-lg bg-card border border-border/60">
+                            <strong className="text-foreground block mb-0.5">1. Task Fulfillment:</strong>
+                            Bám sát các câu hỏi con, kiểm soát đúng dung lượng {curReviewPart.minWords}–{curReviewPart.maxWords} từ.
+                          </div>
+                          <div className="p-2.5 rounded-lg bg-card border border-border/60">
+                            <strong className="text-foreground block mb-0.5">2. Cohesion &amp; Linking:</strong>
+                            Dùng liên từ nối như &ldquo;Moreover&rdquo;, &ldquo;In addition&rdquo;, &ldquo;Therefore&rdquo; để câu văn mượt mà.
+                          </div>
+                          <div className="p-2.5 rounded-lg bg-card border border-border/60">
+                            <strong className="text-foreground block mb-0.5">3. Vocabulary (Lexical):</strong>
+                            Thay từ thông thường (&ldquo;good&rdquo;, &ldquo;nice&rdquo;) bằng từ học thuật (&ldquo;delightful&rdquo;, &ldquo;essential&rdquo;).
+                          </div>
+                          <div className="p-2.5 rounded-lg bg-card border border-border/60">
+                            <strong className="text-foreground block mb-0.5">4. Grammar Accuracy:</strong>
+                            Đảm bảo thì quá khứ/hiện tại đơn nhất quán, tránh viết hoa/chấm phẩy tùy tiện.
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 );
               })}

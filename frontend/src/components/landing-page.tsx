@@ -1289,22 +1289,69 @@ export function LandingPage() {
         {/* ====================================================
             12. FINAL CALL TO ACTION BANNER
             ==================================================== */}
+        {/* ====================================================
+            12. FINAL CALL TO ACTION BANNER (Đồng bộ chuẩn CSS Event Sự kiện Hero Banner)
+            ==================================================== */}
         <section className="py-16 md:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-800 text-white p-8 sm:p-14 text-center space-y-6 shadow-2xl">
-            {/* Background Glow */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent"
-            />
+          <div
+            className="relative rounded-3xl overflow-hidden text-white p-8 sm:p-14 text-center space-y-6 shadow-2xl transition-all duration-500"
+            style={{
+              background: config.enabled
+                ? `linear-gradient(135deg, ${config.primaryColor} 0%, ${config.accentColor || config.primaryColor} 100%)`
+                : "linear-gradient(to right, #1d4ed8, #2563eb, #3730a3)",
+            }}
+          >
+            {/* Decorative Grid & Glow Orbs (Đồng bộ chuẩn hero-banner.tsx) */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+              <div className="absolute inset-0 tech-grid-bg animate-grid-drift opacity-30" />
+              <div
+                className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -top-20 -right-20"
+                style={{
+                  width: "360px",
+                  height: "360px",
+                  background: config.enabled && config.accentColor
+                    ? `${config.accentColor}33`
+                    : "rgba(255, 255, 255, 0.2)",
+                }}
+              />
+              <div
+                className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -bottom-20 -left-20"
+                style={{
+                  width: "320px",
+                  height: "320px",
+                  background: config.enabled && config.primaryColor
+                    ? `${config.primaryColor}33`
+                    : "rgba(255, 255, 255, 0.15)",
+                }}
+              />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent" />
+            </div>
 
             <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-              <span className="text-[10.5px] font-bold uppercase tracking-widest text-blue-200 bg-white/10 px-2.5 py-0.5 rounded-full inline-block">
-                CHINH PHỤC CHỨNG CHỈ TIẾNG ANH
-              </span>
+              {config.enabled ? (
+                <div
+                  className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border backdrop-blur-md shadow-xs animate-in fade-in transition-all text-white"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.15)",
+                    borderColor: "rgba(255, 255, 255, 0.3)",
+                  }}
+                >
+                  <span className="text-sm shrink-0 animate-bounce">{config.icon}</span>
+                  <span className="text-[11px] font-bold tracking-wider uppercase">
+                    {config.badge} — {config.name}
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-ping" />
+                </div>
+              ) : (
+                <span className="text-[10.5px] font-bold uppercase tracking-widest text-blue-200 bg-white/10 px-2.5 py-0.5 rounded-full inline-block">
+                  CHINH PHỤC CHỨNG CHỈ TIẾNG ANH
+                </span>
+              )}
+
               <h2 className="font-heading text-lg sm:text-2xl font-extrabold tracking-tight leading-snug">
-                Sẵn sàng đạt B1 & B2 Aptis ESOL ngay hôm nay?
+                Sẵn sàng đạt B1 &amp; B2 Aptis ESOL ngay hôm nay?
               </h2>
-              <p className="text-xs sm:text-[13px] text-blue-100/90 leading-relaxed font-normal">
+              <p className="text-xs sm:text-[13px] text-white/90 leading-relaxed font-normal">
                 Bắt đầu với bài thi thử miễn phí, nhận band điểm AI chuẩn xác và trải nghiệm cảm giác làm bài như trong phòng thi thật.
               </p>
             </div>
@@ -1312,9 +1359,18 @@ export function LandingPage() {
             <div className="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               <Link
                 href="/thi-thu"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3 rounded-xl bg-white text-blue-700 font-bold text-xs sm:text-sm shadow-lg hover:bg-blue-50 active:scale-95 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3 rounded-xl bg-white font-bold text-xs sm:text-sm shadow-lg hover:brightness-105 active:scale-95 transition-all"
+                style={{
+                  color: config.enabled ? config.primaryColor : "#1d4ed8",
+                }}
               >
-                <Zap className="w-4 h-4 fill-blue-700" />
+                <Zap
+                  className="w-4 h-4"
+                  style={{
+                    fill: config.enabled ? config.primaryColor : "#1d4ed8",
+                    color: config.enabled ? config.primaryColor : "#1d4ed8",
+                  }}
+                />
                 <span>Bắt đầu thi thử miễn phí</span>
               </Link>
               <Link

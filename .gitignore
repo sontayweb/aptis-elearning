@@ -45,7 +45,6 @@ frontend/build/
 Thumbs.db
 __pycache__/
 
-<<<<<<< HEAD
 # Dependencies
 node_modules/
 **/node_modules/
@@ -88,7 +87,6 @@ tools/auth_token.json
 # Backups
 backups/
 **/backups/
-=======
 # Scratch & Temporary exploration files in tools
 tools/archive/
 tools/aptis-academy/
@@ -113,4 +111,3 @@ backend/uploads/
 
 # Skill development & miscellaneous
 _dev/
->>>>>>> dev
