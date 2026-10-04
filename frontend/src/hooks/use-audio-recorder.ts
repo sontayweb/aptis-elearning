@@ -321,6 +321,13 @@ export function useAudioRecorder() {
       // 2. Nếu đang ghi âm thật bằng MediaRecorder
       const recorder = mediaRecorderRef.current;
       if (recorder && recorder.state === "recording") {
+        try {
+          if (typeof recorder.requestData === "function") {
+            recorder.requestData();
+          }
+        } catch {
+          // ignore
+        }
         recorder.onstop = () => {
           const finalMime = recorder.mimeType || "audio/webm";
           let blob = new Blob(audioChunksRef.current, { type: finalMime });
@@ -380,16 +387,27 @@ export function useAudioRecorder() {
 
   // Upload file ghi âm lên Backend API
   const uploadRecording = useCallback(
-    async (submissionId: string, questionId: string, token: string): Promise<string | null> => {
-      if (!state.audioBlob) return null;
+    async (
+      submissionId: string,
+      questionId: string,
+      token: string,
+      blobOverride?: Blob,
+      durationOverride?: number
+    ): Promise<string | null> => {
+      const blobToUpload = blobOverride || state.audioBlob;
+      if (!blobToUpload) return null;
 
       setState((prev) => ({ ...prev, isUploading: true }));
 
       try {
         const formData = new FormData();
-        const ext = state.audioBlob.type.includes("mp4") ? "mp4" : "webm";
-        formData.append("audio", state.audioBlob, `speech_q_${questionId}.${ext}`);
-        formData.append("durationSeconds", String(state.recordingDuration || 30));
+        const ext = blobToUpload.type.includes("mp4")
+          ? "mp4"
+          : blobToUpload.type.includes("wav")
+          ? "wav"
+          : "webm";
+        formData.append("audio", blobToUpload, `speech_q_${questionId}.${ext}`);
+        formData.append("durationSeconds", String(durationOverride || state.recordingDuration || 30));
 
         const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
         const res = await fetch(

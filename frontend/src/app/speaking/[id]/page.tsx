@@ -158,6 +158,7 @@ function SpeakingExamRunnerContent() {
       number,
       {
         audioUrl?: string | null;
+        audioBlob?: Blob | null;
         duration?: number;
         aiResult?: any;
         prepNotes?: string;
@@ -165,6 +166,7 @@ function SpeakingExamRunnerContent() {
       }
     >
   >({});
+  const [evalError, setEvalError] = useState<string | null>(null);
   const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(modeParam === "review");
   const [isReviewMode, setIsReviewMode] = useState(modeParam === "review");
@@ -189,6 +191,7 @@ function SpeakingExamRunnerContent() {
     isRecording,
     recordingDuration,
     audioUrl,
+    audioBlob,
     volumeLevel,
     permissionState,
     errorMessage: micError,
@@ -632,104 +635,99 @@ function SpeakingExamRunnerContent() {
     }
   };
 
-  // Chấm điểm AI
+  // Chấm điểm AI thật bằng Backend API (Whisper + Gemini/GPT)
   const handleAIEvaluation = async (targetIndex?: number) => {
     const qIdx = typeof targetIndex === "number" ? targetIndex : currentIndex;
     const targetQ = questions[qIdx];
     if (!targetQ) return;
 
+    setEvalError(null);
+
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken") ||
+          localStorage.getItem("token") ||
+          localStorage.getItem("aptis_token")
+        : null;
+
+    if (!token) {
+      setEvalError("Bạn cần đăng nhập để gửi bản thu âm tới mô hình AI (Whisper & Gemini) chấm phát âm và ngữ pháp thực tế.");
+      return;
+    }
+
+    const currentRecord = recordedData[qIdx];
+    const targetBlob = currentRecord?.audioBlob || audioBlob;
+
+    if (!targetBlob) {
+      setEvalError("Chưa có tệp ghi âm. Vui lòng ghi âm câu trả lời trước khi gửi chấm AI.");
+      return;
+    }
+
     setIsEvaluating(true);
 
     try {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem("accessToken") ||
-            localStorage.getItem("token") ||
-            localStorage.getItem("aptis_token")
-          : null;
-
-      if (token && submissionId) {
-        const remoteUrl = await uploadRecording(submissionId, targetQ.id, token);
-        if (remoteUrl && qIdx === currentIndex) {
-          setUploadedUrl(remoteUrl);
+      let activeSubId = submissionId;
+      if (!activeSubId && examId) {
+        const startRes = await api.submissions.start(examId);
+        if (startRes.success && startRes.data) {
+          activeSubId = startRes.data.submissionId || startRes.data.id;
+          setSubmissionId(activeSubId);
         }
       }
 
-      if (submissionId) {
-        const aiRes = await api.aiGrading.evaluate(submissionId);
-        if (aiRes.success && aiRes.data) {
-          const aiResults = aiRes.data.aiResults || [];
-          const thisResult = aiResults.find((r: any) => r.question_id === targetQ.id);
+      if (!activeSubId) {
+        throw new Error("Không thể khởi tạo phiên làm bài thi. Vui lòng kiểm tra lại kết nối mạng.");
+      }
 
-          if (thisResult) {
-            const evaluatedResult = {
-              band: `CEFR ${thisResult.cefr_level || "B2"} Target`,
-              score: thisResult.score || 38,
-              pronunciation: thisResult.pronunciation || 38,
-              fluency: thisResult.fluency_score || 40,
-              grammar: thisResult.grammar_score || 35,
-              vocabulary: thisResult.vocabulary_score || 37,
-              feedback: [thisResult.feedback_summary || "Phân tích chi tiết bài nói của bạn."],
-              strengths: Array.isArray(thisResult.detailed_feedback)
-                ? thisResult.detailed_feedback.filter((f: any) => f.criterion).map((f: any) => f.comment || "")
-                : ["Độ dài câu trả lời phù hợp với thời lượng tiêu chuẩn."],
-              upgrades: [
-                "Tiếp tục rèn luyện từ vựng chuyên sâu CEFR C1 để nâng band điểm.",
-              ],
-            };
+      // 1. Upload file ghi âm thật lên Backend
+      const remoteUrl = await uploadRecording(
+        activeSubId,
+        targetQ.id,
+        token,
+        targetBlob,
+        currentRecord?.duration || recordingDuration
+      );
 
-            if (qIdx === currentIndex) setAiResult(evaluatedResult);
-            setRecordedData((prev) => ({
-              ...prev,
-              [qIdx]: { ...(prev[qIdx] || {}), aiResult: evaluatedResult },
-            }));
-            setIsEvaluating(false);
-            return;
-          }
+      if (remoteUrl && qIdx === currentIndex) {
+        setUploadedUrl(remoteUrl);
+      }
+
+      // 2. Gọi Backend AI Grading thật
+      const aiRes = await api.aiGrading.evaluate(activeSubId);
+      if (aiRes.success && aiRes.data) {
+        const aiResults = aiRes.data.aiResults || [];
+        const thisResult = aiResults.find((r: any) => r.question_id === targetQ.id);
+
+        if (thisResult) {
+          const evaluatedResult = {
+            band: `CEFR ${thisResult.cefr_level || "B2"}`,
+            score: thisResult.score,
+            pronunciation: thisResult.pronunciation || 0,
+            fluency: thisResult.fluency_score || 0,
+            grammar: thisResult.grammar_score || 0,
+            vocabulary: thisResult.vocabulary_score || 0,
+            feedback: [thisResult.feedback_summary || "Phân tích chi tiết bài nói từ mô hình AI."],
+            strengths: Array.isArray(thisResult.detailed_feedback)
+              ? thisResult.detailed_feedback.filter((f: any) => f.criterion || f.comment).map((f: any) => `${f.criterion ? f.criterion + ': ' : ''}${f.comment || ''}`)
+              : ["Phát âm và cấu trúc câu đã được AI ghi nhận."],
+            upgrades: thisResult.transcript
+              ? [`Nội dung nhận diện: "${thisResult.transcript}"`]
+              : ["Tiếp tục mở rộng vốn từ vựng học thuật."],
+          };
+
+          if (qIdx === currentIndex) setAiResult(evaluatedResult);
+          setRecordedData((prev) => ({
+            ...prev,
+            [qIdx]: { ...(prev[qIdx] || {}), aiResult: evaluatedResult },
+          }));
+          return;
         }
       }
 
-      // Fallback cục bộ
-      const rec = recordedData[qIdx];
-      const dur = rec?.duration || recordingDuration || 25;
-      const targetDur = targetQ.speakTime;
-      const ratio = Math.min(1, dur / (targetDur * 0.7));
-      const baseScore = Math.round(34 + ratio * 14);
-      const bandLabel =
-        baseScore >= 45
-          ? "C1 Target (Xuất sắc)"
-          : baseScore >= 38
-          ? "B2 Target (Vững vàng)"
-          : baseScore >= 30
-          ? "B1 Target (Đạt yêu cầu)"
-          : "A2 Target (Cần rèn thêm)";
-
-      const fallbackResult = {
-        band: bandLabel,
-        score: baseScore,
-        pronunciation: Math.min(94, Math.round(75 + ratio * 15)),
-        fluency: Math.min(92, Math.round(70 + ratio * 20)),
-        grammar: Math.min(90, Math.round(76 + ratio * 14)),
-        vocabulary: Math.min(92, Math.round(78 + ratio * 12)),
-        feedback: [
-          "Tốc độ phát âm đều đặn, phân nhịp (chunking) tự nhiên ở các mệnh đề quan hệ.",
-          "Ý tưởng rõ ràng, bám sát các câu hỏi phụ của đề bài.",
-        ],
-        strengths: [
-          "Độ dài câu trả lời bám sát thời lượng tiêu chuẩn British Council.",
-        ],
-        upgrades: [
-          "Thay vì dùng từ đơn giản, bạn có thể bổ sung các liên từ nối như 'Furthermore', 'Consequently' để câu nói mạch lạc hơn.",
-        ],
-      };
-
-      if (qIdx === currentIndex) setAiResult(fallbackResult);
-      setRecordedData((prev) => ({
-        ...prev,
-        [qIdx]: { ...(prev[qIdx] || {}), aiResult: fallbackResult },
-      }));
-    } catch {
-      // Fallback an toàn
+      throw new Error(aiRes.error?.message || "Mô hình AI chưa hoàn tất phản hồi bài chấm. Vui lòng thử lại.");
+    } catch (err: any) {
+      console.error("AI Evaluation error:", err);
+      setEvalError(err?.message || "Không thể kết nối tới dịch vụ AI chấm điểm.");
     } finally {
       setIsEvaluating(false);
     }
@@ -1131,7 +1129,25 @@ function SpeakingExamRunnerContent() {
                     </div>
 
                     {currentAudioUrl && (
-                      <audio controls src={currentAudioUrl} className="w-full h-8" preload="metadata" />
+                      <div className="w-full">
+                        <audio
+                          key={currentAudioUrl}
+                          controls
+                          src={currentAudioUrl}
+                          className="w-full h-8"
+                          preload="auto"
+                          onLoadedMetadata={(e) => {
+                            const el = e.currentTarget;
+                            if (el.duration === Infinity || isNaN(el.duration)) {
+                              el.currentTime = 1e101;
+                              el.ontimeupdate = () => {
+                                el.ontimeupdate = null;
+                                el.currentTime = 0;
+                              };
+                            }
+                          }}
+                        />
+                      </div>
                     )}
 
                     <div className="w-full space-y-2 pt-1">
@@ -1150,20 +1166,54 @@ function SpeakingExamRunnerContent() {
                         className="tech-btn w-full py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 flex items-center justify-center gap-1.5 disabled:opacity-50"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
-                        <span>{isEvaluating ? "AI đang chấm..." : "Chấm điểm với AI"}</span>
+                        <span>{isEvaluating ? "AI đang phân tích giọng nói..." : "Chấm điểm với AI"}</span>
                       </button>
                     </div>
 
+                    {/* Hiển thị lỗi nếu chưa đăng nhập hoặc lỗi chấm AI */}
+                    {evalError && (
+                      <div className="w-full p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-left space-y-2 text-xs">
+                        <p className="text-destructive font-semibold text-[11px] leading-relaxed">
+                          ⚠️ {evalError}
+                        </p>
+                        {evalError.includes("đăng nhập") && (
+                          <a
+                            href="/auth?redirect=/speaking"
+                            className="inline-block px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-bold hover:bg-primary/90 transition-colors"
+                          >
+                            Đăng nhập ngay
+                          </a>
+                        )}
+                      </div>
+                    )}
+
                     {/* AI Score Badge if evaluated */}
                     {currentAiResult && (
-                      <div className="w-full p-3 rounded-xl bg-primary/5 border border-primary/20 text-left space-y-1.5 text-xs">
+                      <div className="w-full p-3 rounded-xl bg-primary/5 border border-primary/20 text-left space-y-2 text-xs">
                         <div className="flex items-center justify-between font-bold text-foreground">
                           <span>{currentAiResult.band}</span>
-                          <span className="text-primary">{currentAiResult.score}/50</span>
+                          <span className="text-primary text-sm font-black">{currentAiResult.score}/50</span>
                         </div>
-                        <p className="text-[11px] text-muted-foreground">
+
+                        {/* Điểm 4 tiêu chí chuẩn Aptis */}
+                        {(currentAiResult.pronunciation > 0 || currentAiResult.fluency > 0) && (
+                          <div className="grid grid-cols-2 gap-1.5 text-[10px] text-muted-foreground pt-1 border-t border-border/50">
+                            <div>Phát âm: <strong className="text-foreground">{currentAiResult.pronunciation}</strong></div>
+                            <div>Lưu loát: <strong className="text-foreground">{currentAiResult.fluency}</strong></div>
+                            <div>Ngữ pháp: <strong className="text-foreground">{currentAiResult.grammar}</strong></div>
+                            <div>Từ vựng: <strong className="text-foreground">{currentAiResult.vocabulary}</strong></div>
+                          </div>
+                        )}
+
+                        <p className="text-[11px] text-muted-foreground pt-1">
                           {currentAiResult.feedback?.[0]}
                         </p>
+
+                        {currentAiResult.upgrades?.[0] && (
+                          <p className="text-[10px] text-primary/80 italic font-mono">
+                            {currentAiResult.upgrades[0]}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
