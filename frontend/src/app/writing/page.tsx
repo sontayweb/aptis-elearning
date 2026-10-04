@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { api } from "@/lib/api-client";
+import { useAuth } from "@/contexts/auth-context";
 import {
   PenTool,
   Clock,
@@ -23,6 +24,8 @@ interface WritingExam {
   id: string;
   title: string;
   parts: string;
+  totalParts: number;
+  partTitle?: string | null;
   questionsCount: number;
   duration: string;
   isFree: boolean;
@@ -34,6 +37,13 @@ interface WritingExam {
 }
 
 export default function WritingPracticePage() {
+  const { user } = useAuth();
+  const isProOrAdmin =
+    user?.role === "SUPER_ADMIN" ||
+    user?.role === "ADMIN" ||
+    user?.role === "TEACHER" ||
+    Boolean(user?.subscription) ||
+    Boolean(user?.user_subscriptions?.length);
   const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
@@ -48,13 +58,15 @@ export default function WritingPracticePage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.exams.getAll({ skill: "WRITING", limit: 50 });
+      const res = await api.exams.getAll({ skill: "WRITING", limit: 350 });
       if (res.success && Array.isArray(res.data)) {
         setExams(
           res.data.map((exam: any, idx: number) => {
             let status: "not_started" | "in_progress" | "completed" = "not_started";
             if (exam.userStatus === "COMPLETED") status = "completed";
             else if (exam.userStatus === "IN_PROGRESS") status = "in_progress";
+
+            const isFullWriting = exam.totalParts === 4 || exam.title.includes("Full Writing");
 
             // Phân bổ tỷ lệ ưu tiên (Cao, Vừa, Thấp)
             let priority: "HIGH" | "MEDIUM" | "LOW" = "HIGH";
@@ -70,7 +82,9 @@ export default function WritingPracticePage() {
             return {
               id: exam.id,
               title: exam.title,
-              parts: "Full Writing · 4 Parts",
+              parts: isFullWriting ? "Full Writing · 4 Parts" : (exam.partTitle || "Writing Part"),
+              totalParts: exam.totalParts || 1,
+              partTitle: exam.partTitle,
               questionsCount: exam.totalQuestions || 4,
               duration: `${exam.durationMinutes || 50} phút`,
               isFree: !exam.isPro,
@@ -99,8 +113,32 @@ export default function WritingPracticePage() {
     loadExams();
   }, []);
 
-  // Filtered exams according to tab, search and filters
-  const filteredExams = exams.filter((e) => {
+  // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
+  const currentTabExams = exams.filter((e) => {
+    if (activeTab === "full") {
+      return e.title.includes("Full Writing") || e.totalParts === 4;
+    } else if (activeTab === "p1") {
+      // Part 1: Word-level Writing (Form thông tin ngắn)
+      if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
+      return e.partTitle?.includes("Part 1") || e.title.includes("Writing Part 1");
+    } else if (activeTab === "p2") {
+      // Part 2: Short Text Writing (Đoạn văn ngắn 20-30 từ)
+      if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
+      return e.partTitle?.includes("Part 2") || e.title.includes("Writing Part 2");
+    } else if (activeTab === "p3") {
+      // Part 3: Three Responses (Chat CLB)
+      if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
+      return e.partTitle?.includes("Part 3") || e.title.includes("Writing Part 3");
+    } else if (activeTab === "p4") {
+      // Part 4: Formal & Informal Emails
+      if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
+      return e.partTitle?.includes("Part 4") || e.title.includes("Writing Part 4");
+    }
+    return true;
+  });
+
+  // 2. Lọc tiếp theo search, status, priority, source từ currentTabExams
+  const filteredExams = currentTabExams.filter((e) => {
     const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
       filterStatus === "all"
@@ -248,11 +286,11 @@ export default function WritingPracticePage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-muted-foreground font-semibold w-24">Lọc ưu tiên:</span>
               {[
-                { id: "all", label: `Tất cả (${exams.length})` },
-                { id: "high", label: `Ưu tiên cao (${exams.filter((e) => e.priority === "HIGH").length})` },
-                { id: "medium", label: `Ưu tiên vừa (${exams.filter((e) => e.priority === "MEDIUM").length})` },
-                ...(exams.some((e) => e.priority === "LOW")
-                  ? [{ id: "low", label: `Ưu tiên thấp (${exams.filter((e) => e.priority === "LOW").length})` }]
+                { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                { id: "high", label: `Ưu tiên cao (${currentTabExams.filter((e) => e.priority === "HIGH").length})` },
+                { id: "medium", label: `Ưu tiên vừa (${currentTabExams.filter((e) => e.priority === "MEDIUM").length})` },
+                ...(currentTabExams.some((e) => e.priority === "LOW")
+                  ? [{ id: "low", label: `Ưu tiên thấp (${currentTabExams.filter((e) => e.priority === "LOW").length})` }]
                   : []),
               ].map((item) => (
                 <button
@@ -274,9 +312,9 @@ export default function WritingPracticePage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-muted-foreground font-semibold w-24">Trạng thái:</span>
               {[
-                { id: "all", label: `Tất cả (${exams.length})` },
-                { id: "not_started", label: `Chưa làm (${exams.filter((e) => e.status !== "completed").length})` },
-                { id: "completed", label: `Đã làm (${exams.filter((e) => e.status === "completed").length})` },
+                { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                { id: "not_started", label: `Chưa làm (${currentTabExams.filter((e) => e.status !== "completed").length})` },
+                { id: "completed", label: `Đã làm (${currentTabExams.filter((e) => e.status === "completed").length})` },
               ].map((item) => (
                 <button
                   key={item.id}
@@ -298,8 +336,8 @@ export default function WritingPracticePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-muted-foreground font-semibold w-24">Nguồn:</span>
                 {[
-                  { id: "all", label: `Tất cả (${exams.length})` },
-                  { id: "web", label: `Đề web (${exams.length})` },
+                  { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                  { id: "web", label: `Đề web (${currentTabExams.length})` },
                   { id: "my", label: `Bộ đề của tôi (0)` },
                 ].map((item) => (
                   <button
@@ -461,7 +499,7 @@ export default function WritingPracticePage() {
 
                     {/* Bottom Action */}
                     <div className="pt-6 mt-4 border-t border-border/40 flex items-center justify-end">
-                      {exam.isFree ? (
+                      {exam.isFree || isProOrAdmin ? (
                         <Link
                           href={targetUrl}
                           className="inline-flex items-center gap-1.5 text-primary hover:text-brand-brown font-extrabold text-xs transition-colors"

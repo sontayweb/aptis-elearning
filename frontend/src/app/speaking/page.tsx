@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { api } from "@/lib/api-client";
+import { useAuth } from "@/contexts/auth-context";
 import {
   Mic,
   Clock,
@@ -23,6 +24,8 @@ interface SpeakingExam {
   id: string;
   title: string;
   parts: string;
+  totalParts: number;
+  partTitle?: string | null;
   questionsCount: number;
   duration: string;
   isFree: boolean;
@@ -34,6 +37,13 @@ interface SpeakingExam {
 }
 
 export default function SpeakingPracticePage() {
+  const { user } = useAuth();
+  const isProOrAdmin =
+    user?.role === "SUPER_ADMIN" ||
+    user?.role === "ADMIN" ||
+    user?.role === "TEACHER" ||
+    Boolean(user?.subscription) ||
+    Boolean(user?.user_subscriptions?.length);
   const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
@@ -48,13 +58,15 @@ export default function SpeakingPracticePage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.exams.getAll({ skill: "SPEAKING", limit: 50 });
+      const res = await api.exams.getAll({ skill: "SPEAKING", limit: 350 });
       if (res.success && Array.isArray(res.data)) {
         setExams(
           res.data.map((exam: any, idx: number) => {
             let status: "not_started" | "in_progress" | "completed" = "not_started";
             if (exam.userStatus === "COMPLETED") status = "completed";
             else if (exam.userStatus === "IN_PROGRESS") status = "in_progress";
+
+            const isFullSpeaking = exam.totalParts === 4 || exam.title.includes("Full Speaking");
 
             // Phân bổ tỷ lệ ưu tiên trực quan (Cao, Vừa, Thấp)
             let priority: "HIGH" | "MEDIUM" | "LOW" = "HIGH";
@@ -70,7 +82,9 @@ export default function SpeakingPracticePage() {
             return {
               id: exam.id,
               title: exam.title,
-              parts: "Full Speaking · 4 Parts",
+              parts: isFullSpeaking ? "Full Speaking · 4 Parts" : (exam.partTitle || "Speaking Part"),
+              totalParts: exam.totalParts || 1,
+              partTitle: exam.partTitle,
               questionsCount: exam.totalQuestions || 4,
               duration: `${exam.durationMinutes || 12} phút`,
               isFree: !exam.isPro,
@@ -99,8 +113,32 @@ export default function SpeakingPracticePage() {
     loadExams();
   }, []);
 
-  // Filtered exams according to tab, search and filters
-  const filteredExams = exams.filter((e) => {
+  // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
+  const currentTabExams = exams.filter((e) => {
+    if (activeTab === "full") {
+      return e.title.includes("Full Speaking") || e.totalParts === 4;
+    } else if (activeTab === "p1") {
+      // Part 1: Personal Information
+      if (e.totalParts === 4 || e.title.includes("Full Speaking")) return false;
+      return e.partTitle?.includes("Part 1") || e.partTitle?.includes("Personal");
+    } else if (activeTab === "p2") {
+      // Part 2: Describe & Opinion
+      if (e.totalParts === 4 || e.title.includes("Full Speaking")) return false;
+      return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Describe");
+    } else if (activeTab === "p3") {
+      // Part 3: Compare & Explain
+      if (e.totalParts === 4 || e.title.includes("Full Speaking")) return false;
+      return e.partTitle?.includes("Part 3") || e.partTitle?.includes("Compare");
+    } else if (activeTab === "p4") {
+      // Part 4: Abstract Discussion
+      if (e.totalParts === 4 || e.title.includes("Full Speaking")) return false;
+      return e.partTitle?.includes("Part 4") || e.partTitle?.includes("Discussion");
+    }
+    return true;
+  });
+
+  // 2. Lọc tiếp theo search, status, priority, source từ currentTabExams
+  const filteredExams = currentTabExams.filter((e) => {
     const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
       filterStatus === "all"
@@ -248,11 +286,11 @@ export default function SpeakingPracticePage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-muted-foreground font-semibold w-24">Lọc ưu tiên:</span>
               {[
-                { id: "all", label: `Tất cả (${exams.length})` },
-                { id: "high", label: `Ưu tiên cao (${exams.filter((e) => e.priority === "HIGH").length})` },
-                { id: "medium", label: `Ưu tiên vừa (${exams.filter((e) => e.priority === "MEDIUM").length})` },
-                ...(exams.some((e) => e.priority === "LOW")
-                  ? [{ id: "low", label: `Ưu tiên thấp (${exams.filter((e) => e.priority === "LOW").length})` }]
+                { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                { id: "high", label: `Ưu tiên cao (${currentTabExams.filter((e) => e.priority === "HIGH").length})` },
+                { id: "medium", label: `Ưu tiên vừa (${currentTabExams.filter((e) => e.priority === "MEDIUM").length})` },
+                ...(currentTabExams.some((e) => e.priority === "LOW")
+                  ? [{ id: "low", label: `Ưu tiên thấp (${currentTabExams.filter((e) => e.priority === "LOW").length})` }]
                   : []),
               ].map((item) => (
                 <button
@@ -274,9 +312,9 @@ export default function SpeakingPracticePage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-muted-foreground font-semibold w-24">Trạng thái:</span>
               {[
-                { id: "all", label: `Tất cả (${exams.length})` },
-                { id: "not_started", label: `Chưa làm (${exams.filter((e) => e.status !== "completed").length})` },
-                { id: "completed", label: `Đã làm (${exams.filter((e) => e.status === "completed").length})` },
+                { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                { id: "not_started", label: `Chưa làm (${currentTabExams.filter((e) => e.status !== "completed").length})` },
+                { id: "completed", label: `Đã làm (${currentTabExams.filter((e) => e.status === "completed").length})` },
               ].map((item) => (
                 <button
                   key={item.id}
@@ -298,8 +336,8 @@ export default function SpeakingPracticePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-muted-foreground font-semibold w-24">Nguồn:</span>
                 {[
-                  { id: "all", label: `Tất cả (${exams.length})` },
-                  { id: "web", label: `Đề web (${exams.length})` },
+                  { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                  { id: "web", label: `Đề web (${currentTabExams.length})` },
                   { id: "my", label: `Bộ đề của tôi (0)` },
                 ].map((item) => (
                   <button
@@ -461,7 +499,7 @@ export default function SpeakingPracticePage() {
 
                     {/* Bottom Action */}
                     <div className="pt-6 mt-4 border-t border-border/40 flex items-center justify-end">
-                      {exam.isFree ? (
+                      {exam.isFree || isProOrAdmin ? (
                         <Link
                           href={targetUrl}
                           className="inline-flex items-center gap-1.5 text-primary hover:text-brand-brown font-extrabold text-xs transition-colors"

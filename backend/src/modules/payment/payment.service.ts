@@ -3,6 +3,7 @@ import { PlanType, TransactionStatus, AuditAction, NotificationType } from '@pri
 import { SepayWebhookInput, ReportPaymentIssueInput } from './payment.dto';
 import { auditService } from '../audit/audit.service';
 import { notificationService } from '../notifications/notification.service';
+import { grantOrExtendSubscription } from '../../utils/subscription-helper';
 
 export class PaymentService {
   async getPlans() {
@@ -173,47 +174,12 @@ export class PaymentService {
         return { isAlreadyCompleted: true };
       }
 
-      const existingSub = await tx.userSubscription.findFirst({
-        where: {
-          user_id: transaction.user_id,
-          is_active: true,
-          end_date: { gt: now },
-        },
+      const sub = await grantOrExtendSubscription(tx, {
+        userId: transaction.user_id,
+        planId: plan.id,
+        transactionId: transaction.id,
+        now,
       });
-
-      let newEndDate = new Date(now.getTime() + durationMs);
-      let newAiQuota = plan.ai_quota;
-      let newTeacherQuota = plan.teacher_quota;
-
-      if (existingSub) {
-        newEndDate = new Date(existingSub.end_date.getTime() + durationMs);
-        newAiQuota += existingSub.ai_quota_left;
-        newTeacherQuota += existingSub.teacher_quota_left;
-
-        await tx.userSubscription.update({
-          where: { id: existingSub.id },
-          data: {
-            plan_id: plan.id,
-            end_date: newEndDate,
-            ai_quota_left: newAiQuota,
-            teacher_quota_left: newTeacherQuota,
-            transaction_id: transaction.id,
-          },
-        });
-      } else {
-        await tx.userSubscription.create({
-          data: {
-            user_id: transaction.user_id,
-            plan_id: plan.id,
-            start_date: now,
-            end_date: newEndDate,
-            is_active: true,
-            ai_quota_left: newAiQuota,
-            teacher_quota_left: newTeacherQuota,
-            transaction_id: transaction.id,
-          },
-        });
-      }
 
       await tx.transaction.update({
         where: { id: transaction.id },
@@ -226,9 +192,9 @@ export class PaymentService {
 
       return {
         isAlreadyCompleted: false,
-        newEndDate,
-        newAiQuota,
-        newTeacherQuota,
+        newEndDate: sub.end_date,
+        newAiQuota: sub.ai_quota_left,
+        newTeacherQuota: sub.teacher_quota_left,
       };
     });
 

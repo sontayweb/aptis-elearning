@@ -1,4 +1,5 @@
 import { prisma } from '../../config/database';
+import { assertProAccess } from '../../utils/pro-guard';
 
 export class VocabService {
   async getSets() {
@@ -381,7 +382,7 @@ export class VocabService {
     return { count: created.length };
   }
 
-  async getSetWords(setId: string) {
+  async getSetWords(setId: string, userId?: string) {
     const set = await prisma.vocabSet.findUnique({
       where: { id: setId },
       include: {
@@ -393,6 +394,10 @@ export class VocabService {
 
     if (!set) {
       throw { statusCode: 404, message: 'Bộ từ vựng không tồn tại' };
+    }
+
+    if (!set.is_free) {
+      await assertProAccess(userId, 'Bộ từ vựng PRO');
     }
 
     return set;

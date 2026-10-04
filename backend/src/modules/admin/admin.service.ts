@@ -13,6 +13,7 @@ import {
 import { TransactionStatus, SubmissionStatus, AuditAction, TargetBand, UserRole } from '@prisma/client';
 import { auditService } from '../audit/audit.service';
 import { Request } from 'express';
+import { grantOrExtendSubscription } from '../../utils/subscription-helper';
 import * as xlsx from 'xlsx';
 
 export class AdminService {
@@ -698,46 +699,11 @@ export class AdminService {
           }));
 
         if (defaultPlan) {
-          const now = new Date();
-          const durationMs = defaultPlan.duration_days * 24 * 60 * 60 * 1000;
-
-          // Kiểm tra xem học viên đã có subscription active hay chưa để cộng dồn
-          const existingSub = await tx.userSubscription.findFirst({
-            where: {
-              user_id: targetUserId,
-              is_active: true,
-              end_date: { gt: now },
-            },
-            orderBy: { end_date: 'desc' },
+          await grantOrExtendSubscription(tx, {
+            userId: targetUserId,
+            planId: defaultPlan.id,
+            transactionId: txRecord.id,
           });
-
-          if (existingSub) {
-            const newEndDate = new Date(existingSub.end_date.getTime() + durationMs);
-            await tx.userSubscription.update({
-              where: { id: existingSub.id },
-              data: {
-                plan_id: defaultPlan.id,
-                end_date: newEndDate,
-                ai_quota_left: existingSub.ai_quota_left + defaultPlan.ai_quota,
-                teacher_quota_left: existingSub.teacher_quota_left + defaultPlan.teacher_quota,
-                transaction_id: txRecord.id,
-              },
-            });
-          } else {
-            const endDate = new Date(now.getTime() + durationMs);
-            await tx.userSubscription.create({
-              data: {
-                user_id: targetUserId,
-                plan_id: defaultPlan.id,
-                start_date: now,
-                end_date: endDate,
-                is_active: true,
-                ai_quota_left: defaultPlan.ai_quota,
-                teacher_quota_left: defaultPlan.teacher_quota,
-                transaction_id: txRecord.id,
-              },
-            });
-          }
         }
       }
 
@@ -795,45 +761,11 @@ export class AdminService {
       });
 
       if (plan) {
-        const now = new Date();
-        const durationMs = plan.duration_days * 24 * 60 * 60 * 1000;
-
-        const existingSub = await tx.userSubscription.findFirst({
-          where: {
-            user_id: input.userId,
-            is_active: true,
-            end_date: { gt: now },
-          },
-          orderBy: { end_date: 'desc' },
+        await grantOrExtendSubscription(tx, {
+          userId: input.userId,
+          planId: plan.id,
+          transactionId: newTx.id,
         });
-
-        if (existingSub) {
-          const newEndDate = new Date(existingSub.end_date.getTime() + durationMs);
-          await tx.userSubscription.update({
-            where: { id: existingSub.id },
-            data: {
-              plan_id: plan.id,
-              end_date: newEndDate,
-              ai_quota_left: existingSub.ai_quota_left + plan.ai_quota,
-              teacher_quota_left: existingSub.teacher_quota_left + plan.teacher_quota,
-              transaction_id: newTx.id,
-            },
-          });
-        } else {
-          const endDate = new Date(now.getTime() + durationMs);
-          await tx.userSubscription.create({
-            data: {
-              user_id: input.userId,
-              plan_id: plan.id,
-              start_date: now,
-              end_date: endDate,
-              is_active: true,
-              ai_quota_left: plan.ai_quota,
-              teacher_quota_left: plan.teacher_quota,
-              transaction_id: newTx.id,
-            },
-          });
-        }
       }
 
       return newTx;
@@ -877,49 +809,14 @@ export class AdminService {
     }
 
     const days = input.days || plan.duration_days || 30;
-    const now = new Date();
-    const durationMs = days * 24 * 60 * 60 * 1000;
-
-    // Kiểm tra subscription hiện tại còn hạn để cộng dồn
-    const existingSub = await prisma.userSubscription.findFirst({
-      where: {
-        user_id: userId,
-        is_active: true,
-        end_date: { gt: now },
-      },
-      orderBy: { end_date: 'desc' },
+    const subscription = await grantOrExtendSubscription(prisma, {
+      userId,
+      planId: plan.id,
+      customDurationDays: days,
+      customAiQuota: plan.ai_quota || 50,
+      customTeacherQuota: plan.teacher_quota || 5,
     });
-
-    let subscription;
-    let newEndDate: Date;
-
-    if (existingSub) {
-      newEndDate = new Date(existingSub.end_date.getTime() + durationMs);
-      subscription = await prisma.userSubscription.update({
-        where: { id: existingSub.id },
-        data: {
-          plan_id: plan.id,
-          end_date: newEndDate,
-          ai_quota_left: existingSub.ai_quota_left + (plan.ai_quota || 50),
-          teacher_quota_left: existingSub.teacher_quota_left + (plan.teacher_quota || 5),
-        },
-        include: { plan: true },
-      });
-    } else {
-      newEndDate = new Date(now.getTime() + durationMs);
-      subscription = await prisma.userSubscription.create({
-        data: {
-          user_id: userId,
-          plan_id: plan.id,
-          start_date: now,
-          end_date: newEndDate,
-          is_active: true,
-          ai_quota_left: plan.ai_quota || 50,
-          teacher_quota_left: plan.teacher_quota || 5,
-        },
-        include: { plan: true },
-      });
-    }
+    const newEndDate = subscription.end_date;
 
     auditService.record({
       req,

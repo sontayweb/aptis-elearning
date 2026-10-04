@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database';
 import { ExamFilterInput, CustomExamBuilderInput } from './exam.dto';
+import { assertProAccess } from '../../utils/pro-guard';
 
 export class ExamService {
   async listExams(filter: ExamFilterInput, userId?: string) {
@@ -29,7 +30,7 @@ export class ExamService {
       where.creator_id = userId;
     }
 
-    const orderBy: any = skill === 'FULL_TEST' ? { title: 'asc' } : { created_at: 'desc' };
+    const orderBy: any = skill ? { title: 'asc' } : { created_at: 'desc' };
 
     const [exams, total] = await Promise.all([
       prisma.exam.findMany({
@@ -148,6 +149,12 @@ export class ExamService {
           source: exam.source,
           totalParts: exam.parts.length,
           totalQuestions: exam.parts.reduce((sum, p) => sum + p._count.questions, 0),
+          partTitle: exam.parts[0]?.title || null,
+          parts: exam.parts.map((p) => ({
+            id: p.id,
+            partNumber: p.part_number,
+            title: p.title,
+          })),
           attemptCount: exam._count.submissions,
           userStatus,
           bestScore,
@@ -308,7 +315,7 @@ export class ExamService {
     };
   }
 
-  async getExamQuestions(examId: string) {
+  async getExamQuestions(examId: string, userId?: string) {
     const trimmed = examId.trim();
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed);
 
@@ -401,6 +408,11 @@ export class ExamService {
 
     if (!exam) {
       throw { statusCode: 404, message: 'Đề thi không tồn tại' };
+    }
+
+    // Kiểm tra quyền nếu là đề thi PRO
+    if (exam.is_pro) {
+      await assertProAccess(userId, 'Đề thi PRO');
     }
 
     // BẢO MẬT: Tuyệt đối không để lộ explanation cho các kỹ năng trắc nghiệm (LISTENING, READING, GRAMMAR, FULL_TEST) khi chưa nộp bài

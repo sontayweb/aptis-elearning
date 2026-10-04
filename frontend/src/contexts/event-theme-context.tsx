@@ -210,7 +210,7 @@ export function EventThemeProvider({ children }: { children: ReactNode }) {
           } else {
             applyThemeToDOM("light", parsed);
           }
-        } catch {}
+        } catch { }
       }
       if (e.key === THEME_STORAGE_KEY && e.newValue) {
         setCurrentThemeState(e.newValue);

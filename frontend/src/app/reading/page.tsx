@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { api } from "@/lib/api-client";
+import { useAuth } from "@/contexts/auth-context";
 import {
   BookOpen,
   Clock,
@@ -25,6 +26,8 @@ interface ReadingExam {
   id: string;
   title: string;
   parts: string;
+  totalParts: number;
+  partTitle?: string | null;
   questionsCount: number;
   duration: string;
   isFree: boolean;
@@ -36,6 +39,13 @@ interface ReadingExam {
 }
 
 export default function ReadingPracticePage() {
+  const { user } = useAuth();
+  const isProOrAdmin =
+    user?.role === "SUPER_ADMIN" ||
+    user?.role === "ADMIN" ||
+    user?.role === "TEACHER" ||
+    Boolean(user?.subscription) ||
+    Boolean(user?.user_subscriptions?.length);
   const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
@@ -50,7 +60,7 @@ export default function ReadingPracticePage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.exams.getAll({ skill: "READING", limit: 50 });
+      const res = await api.exams.getAll({ skill: "READING", limit: 200 });
       if (res.success && Array.isArray(res.data)) {
         setExams(
           res.data.map((exam: any, idx: number) => {
@@ -58,10 +68,14 @@ export default function ReadingPracticePage() {
             if (exam.userStatus === "COMPLETED") status = "completed";
             else if (exam.userStatus === "IN_PROGRESS") status = "in_progress";
 
+            const isFullReading = exam.totalParts === 4 || exam.title.includes("Full Reading");
+
             return {
               id: exam.id,
               title: exam.title,
-              parts: `Full Reading · 4 Parts`,
+              parts: isFullReading ? `Full Reading · 4 Parts` : (exam.partTitle || `Reading Part`),
+              totalParts: exam.totalParts || 1,
+              partTitle: exam.partTitle,
               questionsCount: exam.totalQuestions || 20,
               duration: `${exam.durationMinutes || 35} phút`,
               isFree: !exam.isPro,
@@ -90,8 +104,32 @@ export default function ReadingPracticePage() {
     loadExams();
   }, []);
 
-  // Filtered exams according to tab, search and filters
-  const filteredExams = exams.filter((e) => {
+  // 1. Danh sách đề thi thuộc Tab hiện tại (Tab Full Part, Part 1, Part 2+3, Part 4, Part 5)
+  const currentTabExams = exams.filter((e) => {
+    if (activeTab === "full") {
+      return e.title.includes("Full Reading") || e.totalParts === 4;
+    } else if (activeTab === "p1") {
+      // Part 1: Sentence comprehension
+      if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
+      return e.title.includes("Reading Part 1") || e.partTitle?.includes("Part 1");
+    } else if (activeTab === "p2") {
+      // Part 2: Text cohesion (sắp xếp câu)
+      if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
+      return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Text Cohesion");
+    } else if (activeTab === "p3") {
+      // Part 4: Opinion matching (nối ý kiến)
+      if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
+      return e.partTitle?.includes("Part 3") || e.partTitle?.includes("Gap Fill") || e.partTitle?.includes("Opinion");
+    } else if (activeTab === "p4") {
+      // Part 5: Long reading (đọc bài dài & nối heading)
+      if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
+      return e.partTitle?.includes("Part 4") || e.partTitle?.includes("Long Text") || e.partTitle?.includes("Long Reading");
+    }
+    return true;
+  });
+
+  // 2. Lọc tiếp theo search, status, priority từ currentTabExams
+  const filteredExams = currentTabExams.filter((e) => {
     const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "all" ? true : e.status === filterStatus;
     const matchesPriority =
@@ -111,7 +149,7 @@ export default function ReadingPracticePage() {
       case "full":
         return {
           title: "Luyện tập full part kỹ năng Reading",
-          desc: "Hoàn thành tất cả các Part của kỹ năng này trong một lượt thi liên tục để đánh giá năng lực chính xác nhất.",
+          desc: "32 bộ đề tổng hợp liên hoàn cả 4 Part của kỹ năng Reading trong 35 phút chuẩn British Council.",
           badge: "Full Part",
           partQuery: "",
           marathonText: "Tạo bộ đề của bạn",
@@ -122,46 +160,46 @@ export default function ReadingPracticePage() {
       case "p1":
         return {
           title: "Part 1 – Sentence comprehension",
-          desc: "22 bộ đề luyện tập hoàn thành câu & chọn từ điền vào chỗ trống ngắn (1-5).",
+          desc: "32 bộ đề luyện tập hoàn thành câu & chọn từ điền vào chỗ trống ngắn.",
           badge: "Part 1",
           partQuery: "?part=1",
           marathonText: "Luyện tất cả đề Part 1",
-          marathonDesc: "Làm liên tục 22 đề — không giới hạn giờ",
+          marathonDesc: "Làm liên tục 32 đề — không giới hạn giờ",
           marathonBtn: "Mở khóa",
           marathonType: "marathon",
         };
       case "p2":
         return {
           title: "Part 2 + 3 – Text cohesion",
-          desc: "36 bộ đề luyện tập sắp xếp trật tự câu văn thành một đoạn văn hoàn chỉnh.",
+          desc: "32 bộ đề luyện tập sắp xếp trật tự câu văn thành một đoạn văn hoàn chỉnh.",
           subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
           badge: "Part 2 + 3",
           partQuery: "?part=2",
           marathonText: "Luyện tất cả đề Part 2 + 3",
-          marathonDesc: "Làm liên tục 36 đề — không giới hạn giờ",
+          marathonDesc: "Làm liên tục 32 đề — không giới hạn giờ",
           marathonBtn: "Mở khóa",
           marathonType: "marathon",
         };
       case "p3":
         return {
           title: "Part 4 – Opinion matching",
-          desc: "22 bộ đề luyện tập nối ý kiến của 4 nhân vật với các câu nhận định.",
+          desc: "32 bộ đề luyện tập nối ý kiến của 4 nhân vật với các câu nhận định.",
           subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
           badge: "Part 4",
           partQuery: "?part=4",
           marathonText: "Luyện tất cả đề Part 4",
-          marathonDesc: "Làm liên tục 22 đề — không giới hạn giờ",
+          marathonDesc: "Làm liên tục 32 đề — không giới hạn giờ",
           marathonBtn: "Mở khóa",
           marathonType: "marathon",
         };
       case "p4":
         return {
           title: "Part 5 – Long reading",
-          desc: "18 bộ đề luyện tập đọc hiểu bài văn dài và chọn tiêu đề Heading cho 7 đoạn văn.",
+          desc: "32 bộ đề luyện tập đọc hiểu bài văn dài và chọn tiêu đề Heading cho 7 đoạn văn.",
           badge: "Part 5",
           partQuery: "?part=5",
           marathonText: "Luyện tất cả đề Part 5",
-          marathonDesc: "Làm liên tục 18 đề — không giới hạn giờ",
+          marathonDesc: "Làm liên tục 32 đề — không giới hạn giờ",
           marathonBtn: "Mở khóa",
           marathonType: "marathon",
         };
@@ -234,11 +272,11 @@ export default function ReadingPracticePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-muted-foreground font-semibold w-24">Lọc ưu tiên:</span>
                 {[
-                  { id: "all", label: `Tất cả (${exams.length})` },
-                  { id: "high", label: `Ưu tiên cao (${exams.filter((e) => e.priority === "HIGH").length})` },
-                  { id: "medium", label: `Ưu tiên vừa (${exams.filter((e) => e.priority === "MEDIUM").length})` },
+                  { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                  { id: "high", label: `Ưu tiên cao (${currentTabExams.filter((e) => e.priority === "HIGH").length})` },
+                  { id: "medium", label: `Ưu tiên vừa (${currentTabExams.filter((e) => e.priority === "MEDIUM").length})` },
                   ...(activeTab === "p2" || activeTab === "p3"
-                    ? [{ id: "low", label: `Ưu tiên thấp (${exams.filter((e) => e.priority === "LOW").length})` }]
+                    ? [{ id: "low", label: `Ưu tiên thấp (${currentTabExams.filter((e) => e.priority === "LOW").length})` }]
                     : []),
                 ].map((item) => (
                   <button
@@ -261,9 +299,9 @@ export default function ReadingPracticePage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-muted-foreground font-semibold w-24">Trạng thái:</span>
               {[
-                { id: "all", label: `Tất cả (${exams.length})` },
-                { id: "not_started", label: `Chưa làm (${exams.filter((e) => e.status !== "completed").length})` },
-                { id: "completed", label: `Đã làm (${exams.filter((e) => e.status === "completed").length})` },
+                { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                { id: "not_started", label: `Chưa làm (${currentTabExams.filter((e) => e.status !== "completed").length})` },
+                { id: "completed", label: `Đã làm (${currentTabExams.filter((e) => e.status === "completed").length})` },
               ].map((item) => (
                 <button
                   key={item.id}
@@ -285,8 +323,8 @@ export default function ReadingPracticePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-muted-foreground font-semibold w-24">Nguồn:</span>
                 {[
-                  { id: "all", label: `Tất cả (${exams.length})` },
-                  { id: "web", label: `Đề web (${exams.length})` },
+                  { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                  { id: "web", label: `Đề web (${currentTabExams.length})` },
                   { id: "my", label: `Bộ đề của tôi (0)` },
                 ].map((item) => (
                   <button
@@ -451,7 +489,7 @@ export default function ReadingPracticePage() {
 
                     {/* Bottom Action */}
                     <div className="pt-6 mt-4 border-t border-border/40 flex items-center justify-end">
-                      {exam.isFree ? (
+                      {exam.isFree || isProOrAdmin ? (
                         <Link
                           href={targetUrl}
                           className="inline-flex items-center gap-1.5 text-primary hover:text-brand-brown font-extrabold text-xs transition-colors"

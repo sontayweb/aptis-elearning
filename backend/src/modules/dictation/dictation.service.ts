@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database';
 import { DictationLevel, DictationMode } from '@prisma/client';
 import { computeWordDiff } from '../../utils/word-diff';
+import { assertProAccess } from '../../utils/pro-guard';
 
 export class DictationService {
   async getLevelsSummary(userId?: string) {
@@ -92,7 +93,7 @@ export class DictationService {
     });
   }
 
-  async getLessonDetail(lessonId: string) {
+  async getLessonDetail(lessonId: string, userId?: string) {
     const lesson = await prisma.dictationLesson.findUnique({
       where: { id: lessonId },
       include: {
@@ -113,6 +114,10 @@ export class DictationService {
 
     if (!lesson) {
       throw { statusCode: 404, message: 'Bài học nghe chép không tồn tại' };
+    }
+
+    if (!lesson.is_free) {
+      await assertProAccess(userId, 'Bài nghe chép PRO');
     }
 
     return lesson;

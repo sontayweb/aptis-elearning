@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
+import { useAuth } from "@/contexts/auth-context";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -23,6 +24,8 @@ interface ListeningExam {
   id: string;
   title: string;
   parts: string;
+  totalParts: number;
+  partTitle?: string | null;
   questionsCount: number;
   duration: string;
   isFree: boolean;
@@ -34,6 +37,13 @@ interface ListeningExam {
 }
 
 export default function ListeningPracticePage() {
+  const { user } = useAuth();
+  const isProOrAdmin =
+    user?.role === "SUPER_ADMIN" ||
+    user?.role === "ADMIN" ||
+    user?.role === "TEACHER" ||
+    Boolean(user?.subscription) ||
+    Boolean(user?.user_subscriptions?.length);
   const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium">("all");
@@ -49,7 +59,7 @@ export default function ListeningPracticePage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.exams.getAll({ skill: "LISTENING", limit: 50 });
+      const res = await api.exams.getAll({ skill: "LISTENING", limit: 250 });
       if (res.success && Array.isArray(res.data)) {
         setExams(
           res.data.map((exam: any) => {
@@ -57,13 +67,17 @@ export default function ListeningPracticePage() {
             if (exam.userStatus === "COMPLETED") status = "completed";
             else if (exam.userStatus === "IN_PROGRESS") status = "in_progress";
 
+            const isFullListening = exam.totalParts === 4 || exam.title.includes("Full Listening");
+
             return {
               id: exam.id,
               title: exam.title,
-              parts: "Full Listening · 4 Parts",
-              questionsCount: 25,
-              duration: "40 phút",
-              isFree: !exam.is_pro,
+              parts: isFullListening ? "Full Listening · 4 Parts" : (exam.partTitle || "Listening Part"),
+              totalParts: exam.totalParts || 1,
+              partTitle: exam.partTitle,
+              questionsCount: exam.totalQuestions || 25,
+              duration: `${exam.durationMinutes || 40} phút`,
+              isFree: !exam.isPro,
               status,
               bestScore: exam.bestScore || (status === "completed" ? "A0" : null),
               bestScoreNumber: exam.bestScoreNumber,
@@ -102,7 +116,32 @@ export default function ListeningPracticePage() {
     }).catch(() => {});
   }, []);
 
-  const filteredExams = exams.filter((e) => {
+  // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
+  const currentTabExams = exams.filter((e) => {
+    if (activeTab === "full") {
+      return e.title.includes("Full Listening") || e.totalParts === 4;
+    } else if (activeTab === "p1") {
+      // Part 1: Word recognition / Information recognition
+      if (e.totalParts === 4 || e.title.includes("Full Listening")) return false;
+      return e.title.includes("Listening Part 1") || e.partTitle?.includes("Part 1");
+    } else if (activeTab === "p2") {
+      // Part 2: Information Matching
+      if (e.totalParts === 4 || e.title.includes("Full Listening")) return false;
+      return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Information Matching");
+    } else if (activeTab === "p3") {
+      // Part 3: Opinion Matching
+      if (e.totalParts === 4 || e.title.includes("Full Listening")) return false;
+      return e.partTitle?.includes("Part 3") || e.partTitle?.includes("Opinion Matching");
+    } else if (activeTab === "p4") {
+      // Part 4: Monologues / Monologue Comprehension
+      if (e.totalParts === 4 || e.title.includes("Full Listening")) return false;
+      return e.partTitle?.includes("Part 4") || e.partTitle?.includes("Monologue");
+    }
+    return true;
+  });
+
+  // 2. Lọc tiếp theo search, status, priority từ currentTabExams
+  const filteredExams = currentTabExams.filter((e) => {
     const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPriority =
       filterPriority === "all"
@@ -276,9 +315,9 @@ export default function ListeningPracticePage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-muted-foreground font-semibold w-24">Lọc ưu tiên:</span>
               {[
-                { id: "all", label: `Tất cả (${exams.length})` },
-                { id: "high", label: `Ưu tiên cao (${exams.filter((e) => e.priority === "HIGH").length})` },
-                { id: "medium", label: `Ưu tiên vừa (${exams.filter((e) => e.priority === "MEDIUM").length})` },
+                { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                { id: "high", label: `Ưu tiên cao (${currentTabExams.filter((e) => e.priority === "HIGH").length})` },
+                { id: "medium", label: `Ưu tiên vừa (${currentTabExams.filter((e) => e.priority === "MEDIUM").length})` },
               ].map((item) => (
                 <button
                   key={item.id}
@@ -299,9 +338,9 @@ export default function ListeningPracticePage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-muted-foreground font-semibold w-24">Trạng thái:</span>
               {[
-                { id: "all", label: `Tất cả (${exams.length})` },
-                { id: "not_started", label: `Chưa làm (${exams.filter((e) => e.status !== "completed").length})` },
-                { id: "completed", label: `Đã làm (${exams.filter((e) => e.status === "completed").length})` },
+                { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                { id: "not_started", label: `Chưa làm (${currentTabExams.filter((e) => e.status !== "completed").length})` },
+                { id: "completed", label: `Đã làm (${currentTabExams.filter((e) => e.status === "completed").length})` },
               ].map((item) => (
                 <button
                   key={item.id}
@@ -323,8 +362,8 @@ export default function ListeningPracticePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-muted-foreground font-semibold w-24">Nguồn:</span>
                 {[
-                  { id: "all", label: `Tất cả (${exams.length})` },
-                  { id: "web", label: `Đề web (${exams.length})` },
+                  { id: "all", label: `Tất cả (${currentTabExams.length})` },
+                  { id: "web", label: `Đề web (${currentTabExams.length})` },
                   { id: "my", label: `Bộ đề của tôi (0)` },
                 ].map((item) => (
                   <button
@@ -457,7 +496,7 @@ export default function ListeningPracticePage() {
                   </div>
 
                   <div className="pt-6 mt-4 border-t border-border/40 flex justify-end">
-                    {exam.isFree ? (
+                    {exam.isFree || isProOrAdmin ? (
                       <Link
                         href={`/listening/${exam.id}${activeTab !== "full" ? `?part=${activeTab}` : ""}`}
                         className="tech-btn inline-flex items-center justify-center whitespace-nowrap text-xs font-bold h-9 rounded-xl px-4 bg-primary text-primary-foreground hover:bg-primary-glow shadow-sm gap-1 group-hover:gap-2 transition-all"

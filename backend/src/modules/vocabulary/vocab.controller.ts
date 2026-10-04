@@ -25,7 +25,8 @@ export class VocabController {
   async getSetWords(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const setId = req.params.id;
-      const set = await vocabService.getSetWords(setId);
+      const userId = (req as AuthenticatedRequest).user?.userId;
+      const set = await vocabService.getSetWords(setId, userId);
       sendSuccess(res, set, 'Lấy danh sách từ vựng thành công', 200);
     } catch (error) {
       next(error);

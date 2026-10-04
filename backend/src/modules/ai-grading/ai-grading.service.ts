@@ -4,6 +4,7 @@ import { prisma } from '../../config/database';
 import { ExamSkill, QuestionType, SubmissionStatus } from '@prisma/client';
 import { audioService } from '../audio/audio.service';
 import { geminiRotator } from './gemini-rotator.service';
+import { scoreToCefr } from '../../utils/cefr-engine';
 
 export class AiGradingService {
   private getOpenAIClient(): OpenAI | null {
@@ -176,7 +177,8 @@ ${transcriptText}
 
     // 3. Quản lý Quota AI: Kiểm tra & Trừ lượt chấm AI của học viên
     let activeSubId: string | null = null;
-    if (userId && userRole !== 'ADMIN') {
+    const isStaff = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN' || userRole === 'TEACHER';
+    if (userId && !isStaff) {
       const activeSub = await prisma.userSubscription.findFirst({
         where: {
           user_id: submission.user_id,
@@ -275,11 +277,7 @@ ${transcriptText}
           cohesionScore = 40;
           averageScore = Math.round((taskScore + grammarScore + vocabScore + cohesionScore) / 4);
 
-          if (averageScore >= 42) cefrLevel = 'C1';
-          else if (averageScore >= 36) cefrLevel = 'B2';
-          else if (averageScore >= 28) cefrLevel = 'B1';
-          else if (averageScore >= 20) cefrLevel = 'A2';
-          else cefrLevel = 'A1';
+          cefrLevel = scoreToCefr(averageScore);
 
           feedbackSummary = `Bài viết hoàn thành tốt nhiệm vụ, độ dài ${wordCount} từ. Đạt chuẩn CEFR ${cefrLevel}.`;
           detailedFeedback = [
@@ -389,10 +387,7 @@ ${transcriptText}
           vocabScore = 37;
           averageScore = Math.round((pronScore + fluencyScore + grammarScore + vocabScore) / 4);
 
-          if (averageScore >= 42) cefrLevel = 'C1';
-          else if (averageScore >= 36) cefrLevel = 'B2';
-          else if (averageScore >= 28) cefrLevel = 'B1';
-          else cefrLevel = 'A2';
+          cefrLevel = scoreToCefr(averageScore);
 
           feedbackSummary = `Phát âm rõ ràng, nhịp điệu tương đối tốt (thời lượng ${audioDuration}s). Đạt chuẩn CEFR ${cefrLevel}.`;
           detailedFeedback = [
@@ -434,11 +429,7 @@ ${transcriptText}
         ? Math.round((writingTotalScore + speakingTotalScore) / subjectiveQuestionCount)
         : submission.total_score || 0;
 
-    let overallCefr = 'B2';
-    if (finalScore >= 42) overallCefr = 'C1';
-    else if (finalScore >= 36) overallCefr = 'B2';
-    else if (finalScore >= 28) overallCefr = 'B1';
-    else overallCefr = 'A2';
+    const overallCefr = scoreToCefr(finalScore);
 
     await prisma.examSubmission.update({
       where: { id: submissionId },

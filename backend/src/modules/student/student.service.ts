@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database';
 import { SubmissionStatus, ExamSkill } from '@prisma/client';
+import { compareCefr, normalizeCefrLevel } from '../../utils/cefr-engine';
 
 export class StudentService {
   async getDashboardStats(userId?: string) {
@@ -111,9 +112,6 @@ export class StudentService {
       },
     });
 
-    // Thứ tự ưu tiên CEFR: A0 < A1 < A2 < B1 < B2 < C
-    const CEFR_ORDER = ['A0', 'A1', 'A2', 'B1', 'B2', 'C'];
-
     const skillMap: Record<string, {
       count: number;
       totalScore: number;
@@ -134,11 +132,10 @@ export class StudentService {
         skillMap[sk].totalScore += sub.total_score || 0;
 
         if (sub.cefr_level) {
-          skillMap[sk].cefrCounts[sub.cefr_level] = (skillMap[sk].cefrCounts[sub.cefr_level] || 0) + 1;
-          const currentHighestIdx = CEFR_ORDER.indexOf(skillMap[sk].highestCefr);
-          const newIdx = CEFR_ORDER.indexOf(sub.cefr_level);
-          if (newIdx > currentHighestIdx) {
-            skillMap[sk].highestCefr = sub.cefr_level;
+          const normCefr = normalizeCefrLevel(sub.cefr_level) || sub.cefr_level;
+          skillMap[sk].cefrCounts[normCefr] = (skillMap[sk].cefrCounts[normCefr] || 0) + 1;
+          if (skillMap[sk].highestCefr === 'Chưa làm' || compareCefr(normCefr, skillMap[sk].highestCefr) > 0) {
+            skillMap[sk].highestCefr = normCefr;
           }
         }
       }
@@ -151,7 +148,7 @@ export class StudentService {
         const [bestBand, bestCount] = best;
         if (count > bestCount) return [band, count] as [string, number];
         if (count === bestCount) {
-          return CEFR_ORDER.indexOf(band) > CEFR_ORDER.indexOf(bestBand)
+          return compareCefr(band, bestBand) > 0
             ? [band, count] as [string, number]
             : best;
         }
@@ -302,7 +299,7 @@ export class StudentService {
       const modeBand = Object.entries(bandFreq).reduce((best, [band, cnt]) => {
         const [bestBand, bestCnt] = best;
         if (cnt > bestCnt) return [band, cnt] as [string, number];
-        if (cnt === bestCnt && CEFR_ORDER.indexOf(band) > CEFR_ORDER.indexOf(bestBand))
+        if (cnt === bestCnt && compareCefr(band, bestBand) > 0)
           return [band, cnt] as [string, number];
         return best;
       }, ['', 0] as [string, number])[0];

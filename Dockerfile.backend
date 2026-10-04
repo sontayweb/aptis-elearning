@@ -3,9 +3,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ENV NODE_ENV=development
+
 # Copy package files
 COPY backend/package*.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
 # Copy source & prisma schema
 COPY backend/prisma ./prisma

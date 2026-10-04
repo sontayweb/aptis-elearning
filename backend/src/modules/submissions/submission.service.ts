@@ -2,6 +2,9 @@ import { prisma } from '../../config/database';
 import { AutosaveAnswerInput, HeartbeatInput, MyHistoryFilterInput } from './submission.dto';
 import { SubmissionStatus, QuestionType, AuditAction } from '@prisma/client';
 import { auditService } from '../audit/audit.service';
+import { assertProAccess } from '../../utils/pro-guard';
+import { scoreToCefr } from '../../utils/cefr-engine';
+import { gradeObjectiveQuestion } from '../../utils/scoring-engine';
 
 export class SubmissionService {
   async startSubmission(userId: string, examId: string) {
@@ -15,21 +18,7 @@ export class SubmissionService {
 
     // Kiểm tra quyền nếu là đề PRO
     if (exam.is_pro) {
-      const activeSub = await prisma.userSubscription.findFirst({
-        where: {
-          user_id: userId,
-          is_active: true,
-          end_date: { gt: new Date() },
-        },
-      });
-
-      if (!activeSub) {
-        throw {
-          statusCode: 403,
-          message: 'Đề thi PRO yêu cầu nâng cấp gói VIP để truy cập',
-          requirePro: true,
-        };
-      }
+      await assertProAccess(userId, 'Đề thi PRO');
     }
 
     const now = new Date();
@@ -271,32 +260,13 @@ export class SubmissionService {
 
       maxTotalScore += q.max_score;
 
-      let score = 0;
-      const userChoice = (ans.selected_option || ans.text_answer || '').trim();
-
-      if (
-        q.question_type === QuestionType.MULTIPLE_CHOICE ||
-        q.question_type === QuestionType.GAP_FILL ||
-        q.question_type === QuestionType.MATCHING
-      ) {
-        if (q.correct_answer && userChoice.toUpperCase() === q.correct_answer.trim().toUpperCase()) {
-          score = q.max_score;
-        }
-      } else if (q.question_type === QuestionType.SENTENCE_ORDER) {
-        try {
-          const userArr = JSON.parse(userChoice);
-          const correctArr = JSON.parse(q.correct_answer || '[]');
-          if (Array.isArray(userArr) && Array.isArray(correctArr)) {
-            let matched = 0;
-            for (let i = 0; i < correctArr.length; i++) {
-              if (userArr[i] === correctArr[i]) matched++;
-            }
-            score = correctArr.length > 0 ? (matched / correctArr.length) * q.max_score : 0;
-          }
-        } catch {
-          if (userChoice === q.correct_answer) score = q.max_score;
-        }
-      }
+      const userChoice = ans.selected_option || ans.text_answer || '';
+      const { score } = gradeObjectiveQuestion(
+        q.question_type,
+        q.correct_answer,
+        userChoice,
+        q.max_score
+      );
 
       totalScore += score;
       answerUpdates.push({ id: ans.id, score });
@@ -309,13 +279,7 @@ export class SubmissionService {
     // Tính thang điểm CEFR (0 - 50 điểm chuẩn British Council Aptis) nếu hoàn toàn là trắc nghiệm
     let calculatedCefr: string | null = null;
     if (!hasSubjective) {
-      const normalizedScore = maxTotalScore > 0 ? (totalScore / maxTotalScore) * 50 : totalScore;
-      if (normalizedScore >= 46) calculatedCefr = 'C';
-      else if (normalizedScore >= 38) calculatedCefr = 'B2';
-      else if (normalizedScore >= 26) calculatedCefr = 'B1';
-      else if (normalizedScore >= 16) calculatedCefr = 'A2';
-      else if (normalizedScore >= 10) calculatedCefr = 'A1';
-      else calculatedCefr = 'A0';
+      calculatedCefr = scoreToCefr(totalScore, maxTotalScore);
     }
 
     const skill = submission.exam.skill;

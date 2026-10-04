@@ -34,7 +34,8 @@ export class ExamController {
   async questions(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const examId = req.params.id;
-      const result = await examService.getExamQuestions(examId);
+      const userId = (req as AuthenticatedRequest).user?.userId;
+      const result = await examService.getExamQuestions(examId, userId);
       sendSuccess(res, result, 'Lấy danh sách câu hỏi phòng thi thành công', 200);
     } catch (error) {
       next(error);

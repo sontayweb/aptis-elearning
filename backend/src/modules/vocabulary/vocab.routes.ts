@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { vocabController } from './vocab.controller';
-import { authGuard } from '../../middlewares/auth.guard';
+import { authGuard, optionalAuthGuard } from '../../middlewares/auth.guard';
 
 const router = Router();
 
 // Public & Learner routes
-router.get('/sets', (req, res, next) => vocabController.getSets(req, res, next));
-router.get('/sets/:id/words', (req, res, next) => vocabController.getSetWords(req, res, next));
+router.get('/sets', optionalAuthGuard, (req, res, next) => vocabController.getSets(req, res, next));
+router.get('/sets/:id/words', optionalAuthGuard, (req, res, next) => vocabController.getSetWords(req, res, next));
 
 // Set & Word Management routes
 router.post('/sets', (req, res, next) => vocabController.createSet(req, res, next));
