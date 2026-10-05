@@ -18,7 +18,8 @@ export function gradeObjectiveQuestion(
   type: QuestionType,
   correctAnswer: string | null | undefined,
   userAnswer: string | null | undefined,
-  maxScore: number = 1
+  maxScore: number = 1,
+  options?: any
 ): ObjectiveGradeResult {
   if (!correctAnswer || !userAnswer) {
     return { score: 0, isCorrect: false };
@@ -63,7 +64,36 @@ export function gradeObjectiveQuestion(
   }
 
   // 2. Dạng Trắc Nghiệm, Điền Từ, Nối Ý (MULTIPLE_CHOICE, GAP_FILL, MATCHING)
-  const isCorrect = cleanUser.toUpperCase() === cleanCorrect.toUpperCase();
+  let isCorrect = cleanUser.toUpperCase() === cleanCorrect.toUpperCase();
+
+  // Hỗ trợ trường hợp 1 bên lưu ký tự A/B/C/D và bên kia dùng chuỗi text phương án
+  if (!isCorrect && options) {
+    let optsArray: string[] = [];
+    if (Array.isArray(options)) {
+      optsArray = options.map(String);
+    } else if (typeof options === 'string') {
+      try {
+        const p = JSON.parse(options);
+        if (Array.isArray(p)) optsArray = p.map(String);
+      } catch {}
+    }
+
+    if (optsArray.length > 0) {
+      if (/^[A-D]$/i.test(cleanUser)) {
+        const uIdx = cleanUser.toUpperCase().charCodeAt(0) - 65;
+        if (optsArray[uIdx] && optsArray[uIdx].trim().toUpperCase() === cleanCorrect.toUpperCase()) {
+          isCorrect = true;
+        }
+      }
+      if (/^[A-D]$/i.test(cleanCorrect)) {
+        const cIdx = cleanCorrect.toUpperCase().charCodeAt(0) - 65;
+        if (optsArray[cIdx] && optsArray[cIdx].trim().toUpperCase() === cleanUser.toUpperCase()) {
+          isCorrect = true;
+        }
+      }
+    }
+  }
+
   return {
     score: isCorrect ? maxScore : 0,
     isCorrect,

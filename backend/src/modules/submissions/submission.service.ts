@@ -278,7 +278,8 @@ export class SubmissionService {
         q.question_type,
         q.correct_answer,
         userChoice,
-        q.max_score
+        q.max_score,
+        q.options
       );
 
       totalScore += score;

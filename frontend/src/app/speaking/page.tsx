@@ -118,21 +118,17 @@ export default function SpeakingPracticePage() {
     if (activeTab === "full") {
       return e.title.includes("Full Speaking") || e.totalParts === 4;
     } else if (activeTab === "p1") {
-      // Part 1: Personal Information
-      if (e.totalParts === 4 || e.title.includes("Full Speaking")) return false;
-      return e.partTitle?.includes("Part 1") || e.partTitle?.includes("Personal");
+      if (e.partTitle?.includes("Part 1") || e.partTitle?.includes("Personal")) return true;
+      return e.totalParts === 4 || e.title.includes("Full Speaking");
     } else if (activeTab === "p2") {
-      // Part 2: Describe & Opinion
-      if (e.totalParts === 4 || e.title.includes("Full Speaking")) return false;
-      return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Describe");
+      if (e.partTitle?.includes("Part 2") || e.partTitle?.includes("Describe")) return true;
+      return e.totalParts === 4 || e.title.includes("Full Speaking");
     } else if (activeTab === "p3") {
-      // Part 3: Compare & Explain
-      if (e.totalParts === 4 || e.title.includes("Full Speaking")) return false;
-      return e.partTitle?.includes("Part 3") || e.partTitle?.includes("Compare");
+      if (e.partTitle?.includes("Part 3") || e.partTitle?.includes("Compare")) return true;
+      return e.totalParts === 4 || e.title.includes("Full Speaking");
     } else if (activeTab === "p4") {
-      // Part 4: Abstract Discussion
-      if (e.totalParts === 4 || e.title.includes("Full Speaking")) return false;
-      return e.partTitle?.includes("Part 4") || e.partTitle?.includes("Discussion");
+      if (e.partTitle?.includes("Part 4") || e.partTitle?.includes("Discussion")) return true;
+      return e.totalParts === 4 || e.title.includes("Full Speaking");
     }
     return true;
   });

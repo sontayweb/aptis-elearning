@@ -121,21 +121,17 @@ export default function ListeningPracticePage() {
     if (activeTab === "full") {
       return e.title.includes("Full Listening") || e.totalParts === 4;
     } else if (activeTab === "p1") {
-      // Part 1: Word recognition / Information recognition
-      if (e.totalParts === 4 || e.title.includes("Full Listening")) return false;
-      return e.title.includes("Listening Part 1") || e.partTitle?.includes("Part 1");
+      if (e.title.includes("Listening Part 1") || e.partTitle?.includes("Part 1")) return true;
+      return e.totalParts === 4 || e.title.includes("Full Listening");
     } else if (activeTab === "p2") {
-      // Part 2: Information Matching
-      if (e.totalParts === 4 || e.title.includes("Full Listening")) return false;
-      return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Information Matching");
+      if (e.partTitle?.includes("Part 2") || e.partTitle?.includes("Information Matching")) return true;
+      return e.totalParts === 4 || e.title.includes("Full Listening");
     } else if (activeTab === "p3") {
-      // Part 3: Opinion Matching
-      if (e.totalParts === 4 || e.title.includes("Full Listening")) return false;
-      return e.partTitle?.includes("Part 3") || e.partTitle?.includes("Opinion Matching");
+      if (e.partTitle?.includes("Part 3") || e.partTitle?.includes("Opinion Matching")) return true;
+      return e.totalParts === 4 || e.title.includes("Full Listening");
     } else if (activeTab === "p4") {
-      // Part 4: Monologues / Monologue Comprehension
-      if (e.totalParts === 4 || e.title.includes("Full Listening")) return false;
-      return e.partTitle?.includes("Part 4") || e.partTitle?.includes("Monologue");
+      if (e.partTitle?.includes("Part 4") || e.partTitle?.includes("Monologue")) return true;
+      return e.totalParts === 4 || e.title.includes("Full Listening");
     }
     return true;
   });

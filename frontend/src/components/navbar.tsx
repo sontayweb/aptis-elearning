@@ -41,6 +41,32 @@ import {
   User,
 } from "lucide-react";
 
+function NavbarUserAvatar({ user }: { user?: { avatar_url?: string; full_name?: string } | null }) {
+  const [imgError, setImgError] = useState(false);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [user?.avatar_url]);
+
+  if (user?.avatar_url && !imgError) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={user.avatar_url}
+        alt={user.full_name || "Avatar"}
+        onError={() => setImgError(true)}
+        className="w-full h-full object-cover"
+      />
+    );
+  }
+
+  return (
+    <span className="w-full h-full rounded-full flex items-center justify-center bg-[#1A3FA4] text-white font-bold text-xs select-none">
+      {user?.full_name ? user.full_name.charAt(0).toUpperCase() : "U"}
+    </span>
+  );
+}
+
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const { config: eventConfig, currentTheme, setTheme: setEventTheme } = useEventTheme();
@@ -414,17 +440,30 @@ export function Navbar() {
                 <button
                   onClick={() => setUserDropdown(!userDropdown)}
                   aria-label="Mở menu tài khoản"
-                  className="relative w-8 h-8 rounded-full bg-[#1A3FA4] text-white text-xs font-bold flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
+                  className="relative w-8 h-8 rounded-full ring-2 ring-primary/30 overflow-hidden bg-[#1A3FA4] text-white flex items-center justify-center hover:opacity-90 hover:ring-primary/60 transition-all shadow-sm shrink-0"
                 >
-                  <span className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-[#1A3FA4] text-white font-bold text-sm">
-                    {user.full_name ? user.full_name.charAt(0).toUpperCase() : "H"}
-                  </span>
+                  <NavbarUserAvatar user={user} />
                 </button>
 
                 {userDropdown && (
                   <div
-                    className="absolute top-full right-0 mt-2.5 w-60 rounded-2xl border border-border bg-card p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 select-none"
+                    className="absolute top-full right-0 mt-2.5 w-64 rounded-2xl border border-border bg-card p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 select-none"
                   >
+                    {/* User Header Profile */}
+                    <div className="px-3 py-2.5 border-b border-border/80 flex items-center gap-2.5 mb-1">
+                      <div className="w-8 h-8 rounded-full ring-1 ring-primary/30 overflow-hidden shrink-0">
+                        <NavbarUserAvatar user={user} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-foreground truncate">
+                          {user.full_name || "Học viên"}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+
                     {/* Giao diện */}
                     <div className="px-3 pt-1.5 pb-1 text-xs font-semibold text-muted-foreground">
                       Giao diện
@@ -600,14 +639,18 @@ export function Navbar() {
               Đăng nhập / Đăng ký tài khoản
             </button>
           )}
-          {isAuthenticated && (
+          {isAuthenticated && user && (
             <Link
               href="/profile"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
             >
-              <User className="w-4 h-4" />
-              <span>Hồ sơ cá nhân & Đổi mật khẩu</span>
+              <div className="w-6 h-6 rounded-full overflow-hidden shrink-0">
+                <NavbarUserAvatar user={user} />
+              </div>
+              <div className="min-w-0 flex-1 truncate">
+                <span>{user.full_name || "Hồ sơ cá nhân & Đổi mật khẩu"}</span>
+              </div>
             </Link>
           )}
           <Link

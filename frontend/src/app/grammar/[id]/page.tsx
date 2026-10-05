@@ -81,13 +81,28 @@ export default function GrammarExamRunner() {
               }
             }
 
+            let corIdx: number | undefined = undefined;
+            if (q.correct_answer !== undefined && q.correct_answer !== null) {
+              const corStr = String(q.correct_answer).trim();
+              const matchIdx = parsedOpts.findIndex(
+                (opt) => opt.trim().toLowerCase() === corStr.toLowerCase()
+              );
+              if (matchIdx >= 0) {
+                corIdx = matchIdx;
+              } else if (/^[A-D]$/i.test(corStr)) {
+                corIdx = corStr.toUpperCase().charCodeAt(0) - 65;
+              } else if (!isNaN(Number(corStr)) && Number(corStr) >= 0 && Number(corStr) < parsedOpts.length) {
+                corIdx = Number(corStr);
+              }
+            }
+
             loadedQuestions.push({
               id: q.id,
               part: p.title || `Phần ${p.part_number}`,
               type: p.title?.toLowerCase().includes("vocab") ? "vocabulary" : "grammar",
               prompt: q.prompt,
               options: parsedOpts,
-              correctAnswer: q.correct_answer !== undefined ? Number(q.correct_answer) : undefined,
+              correctAnswer: corIdx,
               explanation: q.explanation,
             });
           });
@@ -177,9 +192,10 @@ export default function GrammarExamRunner() {
         const formatted = Object.entries(selectedAnswers)
           .map(([qIdx, optIdx]) => {
             const q = questions[Number(qIdx)];
+            const optText = q?.options && q.options[optIdx] ? q.options[optIdx] : String.fromCharCode(65 + optIdx);
             return {
               questionId: String(q?.id || ""),
-              selectedOption: String.fromCharCode(65 + optIdx),
+              selectedOption: optText,
             };
           })
           .filter((a) => a.questionId);

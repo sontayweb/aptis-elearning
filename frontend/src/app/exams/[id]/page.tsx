@@ -36,6 +36,9 @@ export default function ExamDispatcherPage() {
             case "SPEAKING":
               targetUrl = `/speaking/${exam.id}`;
               break;
+            case "GRAMMAR_VOCABULARY":
+              targetUrl = `/grammar/${exam.id}`;
+              break;
             case "FULL_TEST":
             default:
               targetUrl = `/thi-thu/${exam.id}`;

@@ -169,6 +169,7 @@ export class AuthService {
         phone_number: true,
         avatar_url: true,
         role: true,
+        target_band: true,
         created_at: true,
         subscriptions: {
           where: { is_active: true, end_date: { gt: new Date() } },

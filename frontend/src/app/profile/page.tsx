@@ -149,7 +149,7 @@ export default function ProfilePage() {
       const res = await api.auth.updateProfile({
         fullName: fullName.trim(),
         phoneNumber: phoneNumber.trim() || undefined,
-        avatarUrl: avatarUrl.trim() || undefined,
+        avatarUrl: avatarUrl.trim() ? avatarUrl.trim() : null,
         targetBand: targetBand,
       });
 

@@ -223,6 +223,7 @@ model ExamSubmission {
   answers          SubmissionAnswer[]
   ai_results       AiGradingResult[]
 
+  @@index([user_id, exam_id])
   @@index([user_id, status])
   @@index([exam_id, status])
   @@index([status])

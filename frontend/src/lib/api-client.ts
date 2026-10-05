@@ -100,7 +100,7 @@ class ApiClient {
         body: JSON.stringify(body),
       }),
 
-    updateProfile: (body: { fullName?: string; phoneNumber?: string; avatarUrl?: string; targetBand?: string }) =>
+    updateProfile: (body: { fullName?: string; phoneNumber?: string; avatarUrl?: string | null; targetBand?: string }) =>
       this.request('/auth/profile', {
         method: 'PATCH',
         body: JSON.stringify(body),

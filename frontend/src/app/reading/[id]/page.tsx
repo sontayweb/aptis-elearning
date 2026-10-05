@@ -1748,8 +1748,14 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
       }
     }
 
-    // Part 4: Opinion Matching
-    if (pNum === 4 || pTitle.includes("part 4") || pTitle.includes("opinion")) {
+    // Part 3/4: Opinion Matching — title keywords take priority, pNum=4 only if not a heading/long-reading part
+    const isOpinionPart =
+      pTitle.includes("opinion") ||
+      pTitle.includes("matching") ||
+      (pTitle.includes("part 4") && !pTitle.includes("long") && !pTitle.includes("heading")) ||
+      (pTitle.includes("part 3") && !pTitle.includes("long") && !pTitle.includes("heading")) ||
+      ((pNum === 4 || pNum === 3) && !pTitle.includes("long") && !pTitle.includes("heading") && !pTitle.includes("part 5"));
+    if (isOpinionPart) {
       const questions: Part3Question[] = (p.questions || []).map((q: any) => {
         let opts: string[] = ["Person A", "Person B", "Person C", "Person D"];
         if (Array.isArray(q.options)) opts = q.options;
@@ -1763,11 +1769,40 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
       if (questions.length > 0) {
         result.part3.questions = questions;
         if (p.instructions) result.part3.instructions = p.instructions;
+        if (p.title) result.part3.title = p.title;
+      }
+      // Parse passage_text into reviews array
+      if (p.passage_text && typeof p.passage_text === "string") {
+        const reviewBlocks = p.passage_text.split(/\n\n(?=Person [A-Z])/);
+        const parsedReviews: Part3Review[] = reviewBlocks
+          .map((block: string) => {
+            const headerMatch = block.match(/^(Person [A-Z])(?:\s*\([^)]+\))?:/i);
+            if (!headerMatch) return null;
+            const personLabel = headerMatch[1];
+            const reviewText = block
+              .replace(/^Person [A-Z](?:\s*\([^)]+\))?:\s*/i, "")
+              .replace(/^[""]|[""]$/g, "")
+              .trim();
+            return { person: personLabel, name: personLabel, review: reviewText };
+          })
+          .filter(Boolean) as Part3Review[];
+        if (parsedReviews.length > 0) {
+          result.part3.reviews = parsedReviews;
+        }
       }
     }
 
-    // Part 5: Long Reading
-    if (pNum === 5 || pTitle.includes("part 5") || pTitle.includes("long")) {
+
+    // Part 4/5: Long Reading — title keywords take priority, pNum=5 is safe; pNum=4 only if title says long/heading
+    const isLongReadingPart =
+      pTitle.includes("long") ||
+      pTitle.includes("heading") ||
+      pTitle.includes("long text") ||
+      pTitle.includes("long reading") ||
+      pTitle.includes("part 5") ||
+      pNum === 5 ||
+      (pNum === 4 && (pTitle.includes("long") || pTitle.includes("heading")));
+    if (isLongReadingPart) {
       const paragraphs: Part4Paragraph[] = (p.questions || []).map((q: any, idx: number) => {
         return {
           id: String(q.id),
@@ -1779,6 +1814,12 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
       if (paragraphs.length > 0) {
         result.part4.paragraphs = paragraphs;
         if (p.instructions) result.part4.instructions = p.instructions;
+        if (p.title) result.part4.title = p.title;
+        // Extract allHeadings from the options of the first question (same options for all questions)
+        const firstQ = p.questions?.[0];
+        if (firstQ && Array.isArray(firstQ.options) && firstQ.options.length > 0) {
+          result.part4.allHeadings = firstQ.options;
+        }
       }
     }
   });

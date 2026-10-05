@@ -66,8 +66,25 @@ interface Part4Recording {
   questions: Part4Question[];
 }
 
+interface ListeningExamData {
+  title: string;
+  durationMinutes: number;
+  part1: Part1Item[];
+  part2: {
+    instructions: string;
+    options: string[];
+    speakers: Part2Speaker[];
+  };
+  part3: {
+    topic: string;
+    instructions: string;
+    opinions: Part3Opinion[];
+  };
+  part4: Part4Recording[];
+}
+
 // Dữ liệu mẫu chuẩn Đề 01 Listening Aptis Kỳ Tích
-const DEFAULT_LISTENING_TEST = {
+const DEFAULT_LISTENING_TEST: ListeningExamData = {
   title: "Đề 01 — Full Listening · 4 Parts",
   durationMinutes: 40,
   part1: [
@@ -280,6 +297,131 @@ const DEFAULT_LISTENING_TEST = {
   ],
 };
 
+function parseOptions(options: any): string[] {
+  if (Array.isArray(options)) return options.map(String);
+  if (typeof options === "string") {
+    try {
+      const parsed = JSON.parse(options);
+      if (Array.isArray(parsed)) return parsed.map(String);
+    } catch {
+      // not json string
+    }
+    return [options];
+  }
+  return [];
+}
+
+function parseApiToListeningData(apiExam: any) {
+  const result = {
+    title: apiExam.title || DEFAULT_LISTENING_TEST.title,
+    durationMinutes: apiExam.duration_minutes || DEFAULT_LISTENING_TEST.durationMinutes,
+    part1: [...DEFAULT_LISTENING_TEST.part1],
+    part2: { ...DEFAULT_LISTENING_TEST.part2 },
+    part3: { ...DEFAULT_LISTENING_TEST.part3 },
+    part4: [...DEFAULT_LISTENING_TEST.part4],
+  };
+
+  const parts = apiExam.parts || [];
+  if (parts.length === 0) return result;
+
+  for (const p of parts) {
+    const pNum = p.part_number || p.partNumber;
+    const pTitle = (p.title || "").toLowerCase();
+    const questions = p.questions || [];
+
+    // Part 1: Word Recognition
+    if (pNum === 1 || pTitle.includes("part 1") || pTitle.includes("word recognition")) {
+      if (questions.length > 0) {
+        result.part1 = questions.map((q: any, idx: number) => ({
+          id: String(q.id),
+          num: q.question_number || idx + 1,
+          prompt: q.prompt || "",
+          options: parseOptions(q.options),
+          correctAnswer: String(q.correct_answer || ""),
+          explanation: q.explanation || "",
+        }));
+      }
+    }
+    // Part 2: Matching Information (Speakers)
+    else if (pNum === 2 || pTitle.includes("part 2") || pTitle.includes("matching")) {
+      const firstQ = questions[0];
+      const partOptions = firstQ ? parseOptions(firstQ.options) : result.part2.options;
+      result.part2 = {
+        instructions: p.instructions || result.part2.instructions,
+        options: partOptions.length > 0 ? partOptions : result.part2.options,
+        speakers: questions.length > 0
+          ? questions.map((q: any, idx: number) => ({
+              id: String(q.id),
+              speaker: q.prompt || `Speaker ${String.fromCharCode(65 + idx)}`,
+              correctAnswer: String(q.correct_answer || ""),
+              explanation: q.explanation || "",
+            }))
+          : result.part2.speakers,
+      };
+    }
+    // Part 3: Short Conversations (Opinions)
+    else if (pNum === 3 || pTitle.includes("part 3") || pTitle.includes("conversation") || pTitle.includes("opinion")) {
+      result.part3 = {
+        topic: p.passage_text || p.title || result.part3.topic,
+        instructions: p.instructions || result.part3.instructions,
+        opinions: questions.length > 0
+          ? questions.map((q: any) => ({
+              id: String(q.id),
+              statement: q.prompt || "",
+              correctAnswer: (q.correct_answer as "Man" | "Woman" | "Both") || "Both",
+              explanation: q.explanation || "",
+            }))
+          : result.part3.opinions,
+      };
+    }
+    // Part 4: Monologues (2 recordings)
+    else if (pNum === 4 || pTitle.includes("part 4") || pTitle.includes("monologue")) {
+      if (questions.length > 0) {
+        const mid = Math.ceil(questions.length / 2);
+        const rec1Questions = questions.slice(0, mid);
+        const rec2Questions = questions.slice(mid);
+
+        let rec1Text = p.passage_text || "Monologue 1";
+        let rec2Text = "Monologue 2";
+        if (p.passage_text && p.passage_text.includes("Recording 2:")) {
+          const partsSplit = p.passage_text.split(/Recording 2:\s*/i);
+          rec1Text = partsSplit[0].replace(/Recording 1:\s*/i, "").trim();
+          rec2Text = partsSplit[1].trim();
+        }
+
+        result.part4 = [
+          {
+            recNum: 1,
+            title: "Recording 1 of 2",
+            passageText: rec1Text,
+            questions: rec1Questions.map((q: any) => ({
+              id: String(q.id),
+              prompt: q.prompt || "",
+              options: parseOptions(q.options),
+              correctAnswer: String(q.correct_answer || ""),
+              explanation: q.explanation || "",
+            })),
+          },
+          {
+            recNum: 2,
+            title: "Recording 2 of 2",
+            passageText: rec2Text,
+            questions: rec2Questions.map((q: any) => ({
+              id: String(q.id),
+              prompt: q.prompt || "",
+              options: parseOptions(q.options),
+              correctAnswer: String(q.correct_answer || ""),
+              explanation: q.explanation || "",
+            })),
+          },
+        ];
+      }
+    }
+  }
+
+  return result;
+}
+
 function ListeningExamRunnerContent() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -288,9 +430,10 @@ function ListeningExamRunnerContent() {
   const modeParam = searchParams?.get("mode");
   const submissionIdParam = searchParams?.get("submissionId");
 
-  const [examData, setExamData] = useState(DEFAULT_LISTENING_TEST);
+  const [examData, setExamData] = useState<ListeningExamData>(DEFAULT_LISTENING_TEST);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [submissionId, setSubmissionId] = useState<string | null>(submissionIdParam || null);
 
   // Active Stage Index (1 to 17 exercises total):
   // 0..12: Part 1 (13 questions)
@@ -344,6 +487,24 @@ function ListeningExamRunnerContent() {
     else if (partQuery === "p4") setActiveStage(15);
   }, [searchParams]);
 
+  // Khởi tạo Database Submission (chỉ khi làm mới)
+  useEffect(() => {
+    async function initSubmission() {
+      if (modeParam === "review" || submissionIdParam) return;
+      const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+      if (!token || !examId || submissionId) return;
+      try {
+        const res = await api.submissions.start(examId);
+        if (res.success && res.data) {
+          setSubmissionId(res.data.submissionId || res.data.id);
+        }
+      } catch (e) {
+        console.warn("Offline listening session:", e);
+      }
+    }
+    initSubmission();
+  }, [examId, modeParam, submissionIdParam]);
+
   // Load đề thi từ backend & tải submission cũ nếu có mode=review
   useEffect(() => {
     async function load() {
@@ -351,50 +512,70 @@ function ListeningExamRunnerContent() {
         setLoading(true);
         const res = await api.exams.getQuestions(examId);
         if (res.success && res.data) {
-          const dMinutes = res.data.duration_minutes || 40;
-          setExamData((prev) => ({
-            ...prev,
-            title: res.data.title || prev.title,
-            durationMinutes: dMinutes,
-          }));
-          setTimeLeft(dMinutes * 60);
-        }
+          const parsed = parseApiToListeningData(res.data);
+          setExamData(parsed);
+          setTimeLeft((parsed.durationMinutes || 40) * 60);
 
-        // Tải submission nếu ở review mode
-        if (submissionIdParam) {
-          try {
-            const subRes = await api.submissions.getResult(submissionIdParam);
-            if (subRes.success && subRes.data) {
-              const sub = subRes.data;
-              setIsSubmitted(true);
-              setReviewMode(true);
-              const loadedP1: Record<number, string> = {};
-              const loadedP2: Record<number, string> = {};
-              const loadedP3: Record<number, "Man" | "Woman" | "Both"> = {};
-              const loadedP4: Record<string, string> = {};
+          // Tải submission nếu ở review mode
+          if (submissionIdParam) {
+            try {
+              const subRes = await api.submissions.getResult(submissionIdParam);
+              if (subRes.success && subRes.data) {
+                const sub = subRes.data;
+                setIsSubmitted(true);
+                setReviewMode(true);
+                const loadedP1: Record<number, string> = {};
+                const loadedP2: Record<number, string> = {};
+                const loadedP3: Record<number, "Man" | "Woman" | "Both"> = {};
+                const loadedP4: Record<string, string> = {};
 
-              (sub.answers || []).forEach((ans: any, idx: number) => {
-                const opt = ans.selected_option || ans.selectedOption || "";
-                if (idx < 13) {
-                  loadedP1[idx] = opt;
-                } else if (idx < 17) {
-                  loadedP2[idx - 13] = opt;
-                } else if (idx < 21) {
-                  loadedP3[idx - 17] = opt as any;
-                } else {
-                  const recIdx = idx < 23 ? 0 : 1;
-                  const qIdx = idx % 2;
-                  loadedP4[`${recIdx}_${qIdx}`] = opt;
-                }
-              });
+                (sub.answers || []).forEach((ans: any, idx: number) => {
+                  const opt = ans.selected_option || ans.selectedOption || "";
+                  const qId = ans.question_id || ans.questionId;
 
-              if (Object.keys(loadedP1).length > 0) setP1Answers(loadedP1);
-              if (Object.keys(loadedP2).length > 0) setP2Answers(loadedP2);
-              if (Object.keys(loadedP3).length > 0) setP3Answers(loadedP3);
-              if (Object.keys(loadedP4).length > 0) setP4Answers(loadedP4);
+                  let matched = false;
+                  if (qId) {
+                    const p1Idx = parsed.part1.findIndex((q) => q.id === qId);
+                    if (p1Idx >= 0) { loadedP1[p1Idx] = opt; matched = true; }
+                    if (!matched) {
+                      const p2Idx = parsed.part2.speakers.findIndex((s) => s.id === qId);
+                      if (p2Idx >= 0) { loadedP2[p2Idx] = opt; matched = true; }
+                    }
+                    if (!matched) {
+                      const p3Idx = parsed.part3.opinions.findIndex((o) => o.id === qId);
+                      if (p3Idx >= 0) { loadedP3[p3Idx] = opt as any; matched = true; }
+                    }
+                    if (!matched) {
+                      for (let r = 0; r < parsed.part4.length; r++) {
+                        const qIdx = parsed.part4[r].questions.findIndex((q) => q.id === qId);
+                        if (qIdx >= 0) { loadedP4[`${r}_${qIdx}`] = opt; matched = true; break; }
+                      }
+                    }
+                  }
+
+                  if (!matched) {
+                    if (idx < 13) {
+                      loadedP1[idx] = opt;
+                    } else if (idx < 17) {
+                      loadedP2[idx - 13] = opt;
+                    } else if (idx < 21) {
+                      loadedP3[idx - 17] = opt as any;
+                    } else {
+                      const recIdx = idx < 23 ? 0 : 1;
+                      const qIdx = idx % 2;
+                      loadedP4[`${recIdx}_${qIdx}`] = opt;
+                    }
+                  }
+                });
+
+                if (Object.keys(loadedP1).length > 0) setP1Answers(loadedP1);
+                if (Object.keys(loadedP2).length > 0) setP2Answers(loadedP2);
+                if (Object.keys(loadedP3).length > 0) setP3Answers(loadedP3);
+                if (Object.keys(loadedP4).length > 0) setP4Answers(loadedP4);
+              }
+            } catch (e) {
+              console.warn("Could not load listening submission result:", e);
             }
-          } catch (e) {
-            console.warn("Could not load listening submission result:", e);
           }
         }
       } catch (err) {
@@ -518,6 +699,58 @@ function ListeningExamRunnerContent() {
   };
 
   const results = calculateResults();
+
+  const handleSubmitExam = async () => {
+    setIsSubmitModalOpen(false);
+    setIsSubmitted(true);
+
+    if (submissionId) {
+      try {
+        const answersPayload: any[] = [];
+        examData.part1.forEach((q, idx) => {
+          if (q.id && p1Answers[idx]) {
+            answersPayload.push({
+              questionId: q.id,
+              selectedOption: p1Answers[idx],
+            });
+          }
+        });
+        examData.part2.speakers.forEach((s, idx) => {
+          if (s.id && p2Answers[idx]) {
+            answersPayload.push({
+              questionId: s.id,
+              selectedOption: p2Answers[idx],
+            });
+          }
+        });
+        examData.part3.opinions.forEach((o, idx) => {
+          if (o.id && p3Answers[idx]) {
+            answersPayload.push({
+              questionId: o.id,
+              selectedOption: p3Answers[idx],
+            });
+          }
+        });
+        examData.part4.forEach((rec, recIdx) => {
+          rec.questions.forEach((q, qIdx) => {
+            if (q.id && p4Answers[`${recIdx}_${qIdx}`]) {
+              answersPayload.push({
+                questionId: q.id,
+                selectedOption: p4Answers[`${recIdx}_${qIdx}`],
+              });
+            }
+          });
+        });
+
+        if (answersPayload.length > 0) {
+          await api.submissions.autosave(submissionId, answersPayload);
+        }
+        await api.submissions.submit(submissionId);
+      } catch (err) {
+        console.error("Submit listening error:", err);
+      }
+    }
+  };
 
   // Xác định Part hiện tại theo activeStage
   const getStageMeta = () => {
@@ -1486,10 +1719,7 @@ function ListeningExamRunnerContent() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setIsSubmitModalOpen(false);
-                  setIsSubmitted(true);
-                }}
+                onClick={handleSubmitExam}
                 className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown transition-colors shadow-sm cursor-pointer"
               >
                 Xác nhận nộp bài
