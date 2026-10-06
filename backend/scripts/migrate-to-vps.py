@@ -13,7 +13,7 @@ VPS_PORT = 22
 VPS_USER = 'root'
 VPS_PASS = 'Taovipko0!'
 DB_CONTAINER = 'wlafe5vr5fwx6rn3curavktm'
-BACKEND_CONTAINER = 'rujigoulsjkdrha58tgtrvsr-185445880597'
+BACKEND_CONTAINER = 'rujigoulsjkdrha58tgtrvsr-163252449778'
 LOCAL_DUMP_PATH = r'd:\sontayweb\aptis-elearning\backend\local_dump.sql'
 REMOTE_DUMP_PATH = '/root/local_dump.sql'
 

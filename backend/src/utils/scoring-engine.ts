@@ -63,8 +63,15 @@ export function gradeObjectiveQuestion(
     }
   }
 
-  // 2. Dạng Trắc Nghiệm, Điền Từ, Nối Ý (MULTIPLE_CHOICE, GAP_FILL, MATCHING)
   let isCorrect = cleanUser.toUpperCase() === cleanCorrect.toUpperCase();
+
+  // Chuẩn hóa tiền tố Person (VD: "Person A" vs "A")
+  if (!isCorrect) {
+    const normPerson = (s: string) => s.trim().toUpperCase().replace(/^PERSON\s+/, "");
+    if (normPerson(cleanUser) === normPerson(cleanCorrect)) {
+      isCorrect = true;
+    }
+  }
 
   // Hỗ trợ trường hợp 1 bên lưu ký tự A/B/C/D và bên kia dùng chuỗi text phương án
   if (!isCorrect && options) {

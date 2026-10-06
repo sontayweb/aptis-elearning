@@ -365,12 +365,19 @@ function parseApiToListeningData(apiExam: any) {
         topic: p.passage_text || p.title || result.part3.topic,
         instructions: p.instructions || result.part3.instructions,
         opinions: questions.length > 0
-          ? questions.map((q: any) => ({
-              id: String(q.id),
-              statement: q.prompt || "",
-              correctAnswer: (q.correct_answer as "Man" | "Woman" | "Both") || "Both",
-              explanation: q.explanation || "",
-            }))
+          ? questions.map((q: any) => {
+              const rawCor = String(q.correct_answer || "");
+              let cor: "Man" | "Woman" | "Both" = "Both";
+              if (rawCor.toLowerCase() === "man" || rawCor === "0") cor = "Man";
+              else if (rawCor.toLowerCase() === "woman" || rawCor === "1") cor = "Woman";
+              else if (rawCor.toLowerCase() === "both" || rawCor === "2") cor = "Both";
+              return {
+                id: String(q.id),
+                statement: q.prompt || "",
+                correctAnswer: cor,
+                explanation: q.explanation || "",
+              };
+            })
           : result.part3.opinions,
       };
     }

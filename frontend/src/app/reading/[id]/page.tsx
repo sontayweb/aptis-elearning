@@ -789,7 +789,7 @@ function ReadingExamRunner() {
                 if (!gap) return null;
                 const userAns = p1Answers[gap.id] || "";
                 const isCorrect = userAns.toLowerCase() === gap.correctAnswer.toLowerCase();
-                const parts = gap.prompt.split(/\[(?:gap|blank|\.\.\.)\]/i);
+                const parts = gap.prompt.split(/\[(?:gap|blank|\.\.\.)\]|\{\d+\}/i);
 
                 return (
                   <div className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-5">
@@ -1189,7 +1189,7 @@ function ReadingExamRunner() {
                       {/* Gaps List */}
                       <div className="space-y-4">
                         {examData.part1.gaps.map((gap, gIdx) => {
-                          const parts = gap.prompt.split(/\[(?:gap|blank|\.\.\.)\]/i);
+                          const parts = gap.prompt.split(/\[(?:gap|blank|\.\.\.)\]|\{\d+\}/i);
                           const userVal = p1Answers[gap.id] || "";
 
                           return (
@@ -1720,8 +1720,17 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
           } catch {
             optsObj = {};
           }
-        } else if (typeof q.options === "object" && q.options !== null) {
+        } else if (typeof q.options === "object" && q.options !== null && !Array.isArray(q.options)) {
           optsObj = q.options;
+        } else if (Array.isArray(q.options) && q.options.length > 0) {
+          optsObj = {
+            title: q.prompt || `Đoạn văn ${idx + 1}`,
+            fixedSentence: q.options[0],
+            sentences: q.options.slice(1).map((text: string, sIdx: number) => ({
+              id: `s${sIdx + 2}`,
+              text,
+            })),
+          };
         }
 
         let corArr: string[] = [];

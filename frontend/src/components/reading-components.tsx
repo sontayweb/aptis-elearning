@@ -406,7 +406,29 @@ export function ReadingPart4OpinionMatching({
     },
   ];
 
-  const reviewList = reviews && reviews.length > 0 ? reviews : defaultReviews;
+  let reviewList = reviews && reviews.length > 0 ? reviews : null;
+  if (!reviewList && reviewsText) {
+    const chunks = reviewsText
+      .split(/(?=Person\s+[A-D]:)/i)
+      .map((chunk) => {
+        const match = chunk.match(/^Person\s+([A-D]):\s*([\s\S]*)$/i);
+        if (match) {
+          return {
+            id: `Person ${match[1].toUpperCase()}`,
+            text: match[2].trim(),
+          };
+        }
+        return null;
+      })
+      .filter(Boolean) as ReviewPersonItem[];
+
+    if (chunks.length > 0) {
+      reviewList = chunks;
+    }
+  }
+  if (!reviewList || reviewList.length === 0) {
+    reviewList = defaultReviews;
+  }
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto py-2">

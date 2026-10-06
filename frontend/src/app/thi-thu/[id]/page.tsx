@@ -318,6 +318,7 @@ export default function OfficialMockExamRoom() {
                 partTitle: part.title,
                 partAudioUrl: part.audio_url,
                 partPassageText: part.passage_text,
+                partImageUrl: part.image_url,
                 partInstructions: part.instructions,
               });
             }
@@ -582,8 +583,9 @@ export default function OfficialMockExamRoom() {
             earned = qMax;
           }
         } else if (q.question_type === "MATCHING") {
-          const userVal = (matchingAnswers[q.id] || "").trim().toLowerCase();
-          const corVal = String(q.correct_answer || "").trim().toLowerCase();
+          const norm = (s: string) => (s || "").trim().toLowerCase().replace(/^person\s+/i, "");
+          const userVal = norm(matchingAnswers[q.id] || "");
+          const corVal = norm(String(q.correct_answer || ""));
           if (userVal === corVal && userVal.length > 0) {
             isCorrect = true;
             earned = qMax;
@@ -640,33 +642,27 @@ export default function OfficialMockExamRoom() {
     setIsSubmitting(false);
   }, [isSubmitting, isFinished, submissionId, doAutosave, questions, selectedAnswers, textAnswers, matchingAnswers, orderAnswers, examData]);
 
-  // Reading stage calculation: Mỗi Part (hoặc Story) là 1 Stage duy nhất
-  const getReadingStages = useCallback(() => {
-    if (examData?.skill !== "READING") return null;
+  // Stage calculation: Nhóm các task thuộc cùng 1 màn hình chuẩn British Council Aptis ESOL
+  const getExamStages = useCallback(() => {
+    if (!questions || questions.length === 0) return null;
     const stages: number[] = [];
-    let inGapFill = false;
-    let inOpinionMatching = false;
-    let inLongReading = false;
+    const handledPartIds = new Set<string>();
 
     questions.forEach((q, idx) => {
-      if (q.question_type === "GAP_FILL") {
-        if (!inGapFill) {
+      const isGrouped =
+        q.question_type === "GAP_FILL" ||
+        (q.question_type === "MATCHING" && (
+          q.partTitle?.includes("READING") ||
+          q.partTitle?.includes("LISTENING") ||
+          q.partTitle?.includes("GRAMMAR_VOCAB") ||
+          q.partTitle?.includes("Vocab")
+        ));
+
+      if (isGrouped) {
+        const partKey = q.part_id || q.partTitle;
+        if (!handledPartIds.has(partKey)) {
           stages.push(idx);
-          inGapFill = true;
-        }
-      } else if (q.question_type === "SENTENCE_ORDER") {
-        stages.push(idx);
-      } else if (q.question_type === "MATCHING") {
-        if (q.partTitle?.includes("Part 5") || q.partTitle?.includes("Long Reading")) {
-          if (!inLongReading) {
-            stages.push(idx);
-            inLongReading = true;
-          }
-        } else {
-          if (!inOpinionMatching) {
-            stages.push(idx);
-            inOpinionMatching = true;
-          }
+          handledPartIds.add(partKey);
         }
       } else {
         stages.push(idx);
@@ -674,18 +670,15 @@ export default function OfficialMockExamRoom() {
     });
 
     return stages.length > 0 ? stages : null;
-  }, [examData?.skill, questions]);
+  }, [questions]);
 
-  const readingStages = getReadingStages();
-  const currentStageIndex = readingStages
-    ? readingStages.findIndex((sIdx, i) => {
-        const nextSIdx = readingStages[i + 1] ?? questions.length;
-        return questionIdx >= sIdx && questionIdx < nextSIdx;
-      })
+  const examStages = getExamStages();
+  const currentStageIndex = examStages
+    ? examStages.reduce((acc, sIdx, i) => (questionIdx >= sIdx ? i : acc), 0)
     : -1;
 
-  const isLastStage = readingStages
-    ? currentStageIndex === readingStages.length - 1
+  const isLastStage = examStages
+    ? currentStageIndex === examStages.length - 1
     : questionIdx >= questions.length - 1;
 
   const handleNext = () => {
@@ -695,9 +688,9 @@ export default function OfficialMockExamRoom() {
       return;
     }
 
-    if (readingStages) {
-      if (currentStageIndex >= 0 && currentStageIndex < readingStages.length - 1) {
-        setQuestionIdx(readingStages[currentStageIndex + 1]);
+    if (examStages && examStages.length > 0) {
+      if (currentStageIndex >= 0 && currentStageIndex < examStages.length - 1) {
+        setQuestionIdx(examStages[currentStageIndex + 1]);
         return;
       } else {
         setIsSubmitModalOpen(true);
@@ -715,9 +708,9 @@ export default function OfficialMockExamRoom() {
   const handlePrev = () => {
     if (stagePhase === "instruction") return;
 
-    if (readingStages) {
+    if (examStages && examStages.length > 0) {
       if (currentStageIndex > 0) {
-        setQuestionIdx(readingStages[currentStageIndex - 1]);
+        setQuestionIdx(examStages[currentStageIndex - 1]);
       }
       return;
     }
@@ -1016,9 +1009,11 @@ export default function OfficialMockExamRoom() {
         return userVal === String(q.correct_answer || "").trim().toLowerCase() ? "correct" : "wrong";
       }
       if (q.question_type === "MATCHING") {
-        const userVal = (matchingAnswers[q.id] || "").trim().toLowerCase();
+        const norm = (s: string) => (s || "").trim().toLowerCase().replace(/^person\s+/i, "");
+        const userVal = norm(matchingAnswers[q.id] || "");
+        const corVal = norm(String(q.correct_answer || ""));
         if (!userVal) return "unanswered";
-        return userVal === String(q.correct_answer || "").trim().toLowerCase() ? "correct" : "wrong";
+        return userVal === corVal ? "correct" : "wrong";
       }
       if (q.question_type === "SENTENCE_ORDER") {
         const userArr = orderAnswers[q.id];
@@ -1506,70 +1501,102 @@ export default function OfficialMockExamRoom() {
         </div>
       </header>
 
-      {/* Main Content: Split panel cho Listening/Writing; Reading full width */}
-      <main className="flex-1 flex flex-col lg:flex-row items-start justify-center pt-12 pb-20">
-        {/* Left panel: Passage / Audio (Chỉ hiện cho Listening/Writing/IELTS; ẩn hoàn toàn cho Reading vì đề Reading tự chứa nội dung) */}
-        {((currentQ?.partPassageText || currentQ?.partAudioUrl) && examData?.skill !== "READING") && (
-          <aside className="w-full lg:w-1/2 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg:sticky lg:top-12 p-4 md:p-6 border-b lg:border-b-0 lg:border-r border-exam-border bg-exam-bg/30">
-            {currentQ.partAudioUrl && (
-              <div className="mb-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
-                  🔊 Audio: {currentQ.partTitle}
-                </p>
-                <AudioPlayer
-                  src={
-                    currentQ.partAudioUrl.startsWith("http")
-                      ? currentQ.partAudioUrl
-                      : `${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "")}${currentQ.partAudioUrl.startsWith("/") ? "" : "/"}${currentQ.partAudioUrl}`
-                  }
-                  label={currentQ.partTitle}
-                />
-              </div>
-            )}
-            {currentQ.partPassageText && (
-              <div>
-                {currentQ.partTitle && (
-                  <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
-                    📖 {currentQ.partTitle}
-                  </p>
-                )}
-                {currentQ.partInstructions && (
-                  <p className="text-xs text-primary font-semibold mb-3">{currentQ.partInstructions}</p>
-                )}
-                <div className="text-sm text-exam-text leading-7 whitespace-pre-wrap font-serif">
-                  {currentQ.partPassageText}
-                </div>
-              </div>
-            )}
-          </aside>
-        )}
+      {/* Main Content: Split panel cho Listening/Writing/Speaking; Reading full width */}
+      {(() => {
+        const isReadingSkillOrPart =
+          examData?.skill === "READING" || currentQ?.partTitle?.includes("READING");
+        const hasCueImage =
+          currentQ?.question_type === "SPEAKING_AUDIO" &&
+          (currentQ?.image_url || currentQ?.partImageUrl);
+        const hasLeftPanel =
+          !isReadingSkillOrPart &&
+          (currentQ?.partPassageText || currentQ?.partAudioUrl || hasCueImage);
 
-        {/* Right panel: Question */}
-        <div
-          className={`flex-1 w-full ${
-            (currentQ?.partPassageText || currentQ?.partAudioUrl) && examData?.skill !== "READING"
-              ? "lg:w-1/2"
-              : currentQ?.question_type === "SENTENCE_ORDER"
-              ? "max-w-5xl mx-auto"
-              : "max-w-3xl mx-auto"
-          } p-4 md:p-8`}
-        >
-          {currentQ ? (
-            <div className="bg-exam-surface rounded-2xl border border-exam-border shadow-sm p-6 md:p-8 animate-in fade-in">
-              {/* Question header */}
-              <div className="flex items-center justify-between pb-4 border-b border-exam-border mb-6">
-                <span className="text-xs font-bold text-exam-text uppercase tracking-wider">
-                  {currentQ.partTitle || examData?.skill} ·{" "}
-                  {partParam === "1"
-                    ? "Part 1 – Gap Fill"
-                    : partParam === "4"
-                    ? "Part 4 – Opinion matching"
-                    : partParam === "5"
-                    ? "Part 5 – Long reading"
-                    : readingStages && readingStages.length > 1
-                    ? `Question ${currentStageIndex + 1} of ${readingStages.length}`
-                    : `Câu ${questionIdx + 1}/${questions.length}`}
-                </span>
+        return (
+          <main className="flex-1 flex flex-col lg:flex-row items-start justify-center pt-12 pb-20">
+            {/* Left panel: Passage / Audio / Speaking Image */}
+            {hasLeftPanel && (
+              <aside className="w-full lg:w-1/2 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg:sticky lg:top-12 p-4 md:p-6 border-b lg:border-b-0 lg:border-r border-exam-border bg-exam-bg/30">
+                {currentQ.partAudioUrl && (
+                  <div className="mb-4">
+                    <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
+                      🔊 Audio: {currentQ.partTitle}
+                    </p>
+                    <AudioPlayer
+                      src={
+                        currentQ.partAudioUrl.startsWith("http")
+                          ? currentQ.partAudioUrl
+                          : `${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "")}${currentQ.partAudioUrl.startsWith("/") ? "" : "/"}${currentQ.partAudioUrl}`
+                      }
+                      label={currentQ.partTitle}
+                    />
+                  </div>
+                )}
+                {hasCueImage && (
+                  <div className="mb-4">
+                    <p className="text-xs font-bold uppercase tracking-wider text-primary mb-2">
+                      🖼️ Hình ảnh đề bài Speaking
+                    </p>
+                    <div className="rounded-xl border border-exam-border overflow-hidden bg-black/5 dark:bg-white/5 flex items-center justify-center p-2">
+                      <img
+                        src={
+                          (currentQ.image_url || currentQ.partImageUrl).startsWith("http")
+                            ? (currentQ.image_url || currentQ.partImageUrl)
+                            : `https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/images/${(currentQ.image_url || currentQ.partImageUrl).replace(/^\/+/, "")}`
+                        }
+                        alt="Speaking Cue"
+                        className="max-h-72 object-contain rounded-lg shadow-xs"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = "none";
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+                {currentQ.partPassageText && (
+                  <div>
+                    {currentQ.partTitle && (
+                      <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
+                        📖 {currentQ.partTitle}
+                      </p>
+                    )}
+                    {currentQ.partInstructions && (
+                      <p className="text-xs text-primary font-semibold mb-3">{currentQ.partInstructions}</p>
+                    )}
+                    <div className="text-sm text-exam-text leading-7 whitespace-pre-wrap font-serif">
+                      {currentQ.partPassageText}
+                    </div>
+                  </div>
+                )}
+              </aside>
+            )}
+
+            {/* Right panel: Question */}
+            <div
+              className={`flex-1 w-full ${
+                hasLeftPanel
+                  ? "lg:w-1/2"
+                  : currentQ?.question_type === "SENTENCE_ORDER"
+                  ? "max-w-5xl mx-auto"
+                  : "max-w-3xl mx-auto"
+              } p-4 md:p-8`}
+            >
+              {currentQ ? (
+                <div className="bg-exam-surface rounded-2xl border border-exam-border shadow-sm p-6 md:p-8 animate-in fade-in">
+                  {/* Question header */}
+                  <div className="flex items-center justify-between pb-4 border-b border-exam-border mb-6">
+                    <span className="text-xs font-bold text-exam-text uppercase tracking-wider">
+                      {currentQ.partTitle || examData?.skill} ·{" "}
+                      {partParam === "1"
+                        ? "Part 1 – Gap Fill"
+                        : partParam === "4"
+                        ? "Part 4 – Opinion matching"
+                        : partParam === "5"
+                        ? "Part 5 – Long reading"
+                        : examStages && examStages.length > 1
+                        ? `Phần ${currentStageIndex + 1}/${examStages.length}`
+                        : `Câu ${questionIdx + 1}/${questions.length}`}
+                    </span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-exam-bg text-primary">
                   {currentQ.question_type === "SPEAKING_AUDIO"
                     ? "🎙 Speaking"
@@ -1629,47 +1656,260 @@ export default function OfficialMockExamRoom() {
                 />
               )}
 
-              {/* 3. MATCHING COMPONENT (Part 4 Opinion Matching & Part 5 Long Reading) */}
-              {currentQ.question_type === "MATCHING" && (
-                currentQ.partTitle?.includes("Part 5") || currentQ.partTitle?.includes("Long Reading") ? (
-                  <ReadingPart5LongReading
-                    title={currentQ.partPassageText || currentQ.options?.title || "Children and Exercises"}
-                    instructions={currentQ.partInstructions || "Read the passage quickly. Choose a heading for each numbered paragraph from the drop-down box."}
-                    paragraphs={questions
-                      .filter(
-                        (q) =>
-                          q.part_id === currentQ.part_id ||
-                          q.partTitle?.includes("Part 5") ||
-                          q.partTitle?.includes("Long Reading")
-                      )
-                      .map((q, idx) => ({
+              {/* 3. MATCHING COMPONENT - Hỗ trợ toàn bộ các dạng Matching trong Aptis Full Test & từng kỹ năng */}
+              {currentQ.question_type === "MATCHING" && (() => {
+                const isReadingLongText =
+                  isReadingSkillOrPart &&
+                  (currentQ.partTitle?.includes("Long") ||
+                    currentQ.partTitle?.includes("Part 4") ||
+                    currentQ.partTitle?.includes("Part 5") ||
+                    currentQ.partTitle?.includes("Heading"));
+
+                const isReadingOpinion =
+                  isReadingSkillOrPart &&
+                  (currentQ.partTitle?.includes("Opinion") || currentQ.partTitle?.includes("Part 3"));
+
+                const isListeningPart2 =
+                  currentQ.partTitle?.includes("LISTENING") && currentQ.partTitle?.includes("Part 2");
+
+                const isListeningPart3 =
+                  currentQ.partTitle?.includes("LISTENING") && currentQ.partTitle?.includes("Part 3");
+
+                const isVocabMatching =
+                  currentQ.partTitle?.includes("GRAMMAR_VOCAB") || currentQ.partTitle?.includes("Vocab");
+
+                // A. Reading Long Text Comprehension (Headings matching)
+                if (isReadingLongText) {
+                  const partQs = questions.filter((q) => q.part_id === currentQ.part_id);
+                  return (
+                    <ReadingPart5LongReading
+                      title={currentQ.partPassageText || currentQ.options?.title || "Long Reading"}
+                      instructions={
+                        currentQ.partInstructions ||
+                        "Read the passage quickly. Choose a heading for each numbered paragraph from the drop-down box."
+                      }
+                      paragraphs={partQs.map((q, idx) => ({
                         id: q.id,
                         paragraphNumber: idx + 1,
                         text: q.prompt.replace(/^Paragraph\s*\d+\s*:\s*/i, ""),
                         headingOptions: Array.isArray(q.options) ? q.options : [],
                       }))}
-                    answers={matchingAnswers}
-                    onSelect={(qId, val) => {
-                      setMatchingAnswers((prev) => ({ ...prev, [qId]: val }));
-                    }}
-                  />
-                ) : (
-                  <ReadingPart4OpinionMatching
-                    instructions={currentQ.partInstructions}
-                    reviewsText={currentQ.partPassageText}
-                    questions={questions.filter(
-                      (q) =>
-                        q.part_id === currentQ.part_id ||
-                        q.partTitle?.includes("Part 4") ||
-                        q.partTitle?.includes("Opinion")
-                    )}
-                    answers={matchingAnswers}
-                    onSelect={(qId, val) => {
-                      setMatchingAnswers((prev) => ({ ...prev, [qId]: val }));
-                    }}
-                  />
-                )
-              )}
+                      answers={matchingAnswers}
+                      onSelect={(qId, val) => {
+                        setMatchingAnswers((prev) => ({ ...prev, [qId]: val }));
+                      }}
+                    />
+                  );
+                }
+
+                // B. Reading Opinion Matching (4 Reviewers Person A, B, C, D)
+                if (isReadingOpinion) {
+                  const partQs = questions.filter((q) => q.part_id === currentQ.part_id);
+                  return (
+                    <ReadingPart4OpinionMatching
+                      instructions={currentQ.partInstructions}
+                      reviewsText={currentQ.partPassageText}
+                      questions={partQs}
+                      answers={matchingAnswers}
+                      onSelect={(qId, val) => {
+                        setMatchingAnswers((prev) => ({ ...prev, [qId]: val }));
+                      }}
+                    />
+                  );
+                }
+
+                // C. Listening Part 2 - Information Matching (4 Speakers)
+                if (isListeningPart2) {
+                  const partQs = questions.filter((q) => q.part_id === currentQ.part_id);
+                  return (
+                    <div className="space-y-6">
+                      <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-1">
+                        <h3 className="text-sm font-bold text-exam-text">
+                          {currentQ.partTitle}
+                        </h3>
+                        <p className="text-xs text-exam-text-muted">
+                          {currentQ.partInstructions ||
+                            "Four people are talking. Match each person (Speaker A, B, C, D) to the correct information."}
+                        </p>
+                      </div>
+
+                      {currentQ.partAudioUrl && (
+                        <AudioPlayer
+                          src={
+                            currentQ.partAudioUrl.startsWith("http")
+                              ? currentQ.partAudioUrl
+                              : `${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "")}${currentQ.partAudioUrl.startsWith("/") ? "" : "/"}${currentQ.partAudioUrl}`
+                          }
+                          label={currentQ.partTitle}
+                        />
+                      )}
+
+                      <div className="space-y-3 pt-2">
+                        {partQs.map((spk, sIdx) => (
+                          <div
+                            key={spk.id}
+                            className="p-4 rounded-xl border border-exam-border bg-exam-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
+                          >
+                            <span className="font-bold text-sm text-primary w-28 shrink-0">
+                              {spk.prompt || `Speaker ${String.fromCharCode(65 + sIdx)}`}
+                            </span>
+                            <select
+                              value={matchingAnswers[spk.id] || ""}
+                              onChange={(e) =>
+                                setMatchingAnswers((prev) => ({ ...prev, [spk.id]: e.target.value }))
+                              }
+                              className="flex-1 p-2.5 rounded-lg border border-exam-border bg-exam-bg text-exam-text text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer font-sans"
+                            >
+                              <option value="">-- Chọn thông tin phù hợp --</option>
+                              {Array.isArray(spk.options) &&
+                                spk.options.map((opt: string, oIdx: number) => (
+                                  <option key={oIdx} value={opt}>
+                                    {opt}
+                                  </option>
+                                ))}
+                            </select>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                // D. Listening Part 3 - Opinion Matching (Man / Woman / Both)
+                if (isListeningPart3) {
+                  const partQs = questions.filter((q) => q.part_id === currentQ.part_id);
+                  return (
+                    <div className="space-y-6">
+                      <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-1">
+                        <h3 className="text-sm font-bold text-exam-text">
+                          {currentQ.partTitle}
+                        </h3>
+                        <p className="text-xs text-exam-text-muted">
+                          {currentQ.partInstructions ||
+                            "Listen to a conversation between a man and a woman. Decide who expressed each opinion: Man, Woman, or Both."}
+                        </p>
+                      </div>
+
+                      {currentQ.partAudioUrl && (
+                        <AudioPlayer
+                          src={
+                            currentQ.partAudioUrl.startsWith("http")
+                              ? currentQ.partAudioUrl
+                              : `${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "")}${currentQ.partAudioUrl.startsWith("/") ? "" : "/"}${currentQ.partAudioUrl}`
+                          }
+                          label={currentQ.partTitle}
+                        />
+                      )}
+
+                      <div className="space-y-3 pt-2">
+                        {partQs.map((op, idx) => (
+                          <div
+                            key={op.id}
+                            className="p-4 rounded-xl border border-exam-border bg-exam-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
+                          >
+                            <span className="text-xs md:text-sm text-exam-text flex-1 leading-relaxed">
+                              <strong className="text-primary mr-1.5">{idx + 1}.</strong>
+                              {op.prompt}
+                            </span>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {["Man", "Woman", "Both"].map((choice) => {
+                                const isSel = matchingAnswers[op.id] === choice;
+                                return (
+                                  <button
+                                    key={choice}
+                                    type="button"
+                                    onClick={() =>
+                                      setMatchingAnswers((prev) => ({ ...prev, [op.id]: choice }))
+                                    }
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                                      isSel
+                                        ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                                        : "bg-exam-bg border-exam-border text-exam-text hover:border-primary/50"
+                                    }`}
+                                  >
+                                    {choice}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                // E. Vocabulary Matching (Grammar & Vocab Parts 10-14)
+                if (isVocabMatching) {
+                  const partQs = questions.filter((q) => q.part_id === currentQ.part_id);
+                  return (
+                    <div className="space-y-6">
+                      <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-1">
+                        <h3 className="text-sm font-bold text-exam-text">
+                          {currentQ.partTitle}
+                        </h3>
+                        <p className="text-xs text-exam-text-muted">
+                          {currentQ.partInstructions ||
+                            "Choose the word that matches the definition, synonym, or completion from the list."}
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        {partQs.map((vQ, idx) => (
+                          <div
+                            key={vQ.id}
+                            className="p-3.5 rounded-xl border border-exam-border bg-exam-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
+                          >
+                            <div className="flex-1 text-xs md:text-sm font-medium text-exam-text">
+                              <span className="font-bold text-primary mr-2">{idx + 1}.</span>
+                              <span>{vQ.prompt}</span>
+                            </div>
+                            <div className="sm:w-60 shrink-0">
+                              <select
+                                value={matchingAnswers[vQ.id] || ""}
+                                onChange={(e) =>
+                                  setMatchingAnswers((prev) => ({ ...prev, [vQ.id]: e.target.value }))
+                                }
+                                className="w-full p-2 rounded-lg border border-exam-border bg-exam-bg text-exam-text text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer font-sans"
+                              >
+                                <option value="">-- Chọn từ tương ứng --</option>
+                                {Array.isArray(vQ.options) &&
+                                  vQ.options.map((opt: string, oIdx: number) => (
+                                    <option key={oIdx} value={opt}>
+                                      {opt}
+                                    </option>
+                                  ))}
+                              </select>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                // F. Generic Matching Fallback
+                return (
+                  <div className="space-y-4">
+                    <p className="text-sm font-medium text-exam-text">{currentQ.prompt}</p>
+                    <select
+                      value={matchingAnswers[currentQ.id] || ""}
+                      onChange={(e) =>
+                        setMatchingAnswers((prev) => ({ ...prev, [currentQ.id]: e.target.value }))
+                      }
+                      className="w-full p-3 rounded-xl border border-exam-border bg-exam-bg text-exam-text text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer font-sans"
+                    >
+                      <option value="">-- Chọn đáp án --</option>
+                      {Array.isArray(currentQ.options) &&
+                        currentQ.options.map((opt: string, oIdx: number) => (
+                          <option key={oIdx} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                );
+              })()}
 
               {/* 4. MULTIPLE CHOICE STANDARD */}
               {currentQ.question_type === "MULTIPLE_CHOICE" &&
@@ -1757,6 +1997,8 @@ export default function OfficialMockExamRoom() {
           )}
         </div>
       </main>
+    );
+  })()}
 
       {/* Bottom Navigation */}
       <footer className="fixed bottom-0 left-0 right-0 z-40 border-t bg-exam-surface border-exam-border">
