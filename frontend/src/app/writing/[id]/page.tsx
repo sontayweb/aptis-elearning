@@ -951,12 +951,12 @@ function WritingExamRunnerContent() {
               </h3>
 
               <div className="space-y-2 text-xs md:text-sm">
-                <span className="font-bold text-primary">Đề 1</span>
+                <span className="font-bold text-primary">{examTitle || "Writing Test"}</span>
                 <p className="text-muted-foreground leading-relaxed">
-                  You are a new member of the art club. Fill in the form. Write in sentences. Use 20-30 words. Recommended time: 7 minutes.
+                  {parts[1]?.instructions || "You are a new member of the club. Fill in the form. Write in sentences. Use 20-30 words. Recommended time: 7 minutes."}
                 </p>
                 <p className="font-medium text-foreground">
-                  Tell us about a painting or photo you like.
+                  {parts[1]?.questions[0]?.prompt || "Tell us about your interests and why you want to join this club."}
                 </p>
               </div>
 
@@ -979,7 +979,7 @@ function WritingExamRunnerContent() {
                   <span>Bài mẫu tham khảo của đề</span>
                 </span>
                 <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 leading-relaxed font-sans">
-                  I took a photo last weekend in the park when the sun was setting. The light was soft, so the picture looked very nice.
+                  {parts[1]?.questions[0]?.sampleAnswer || "I really enjoy participating in club activities because it helps me learn new things and meet great people."}
                 </div>
               </div>
             </div>
@@ -1091,7 +1091,7 @@ function WritingExamRunnerContent() {
             {/* Part 2 Specific Prompt */}
             {currentPart.partNumber === 2 && (
               <div className="text-xs md:text-sm font-semibold text-foreground pt-1">
-                Tell us about a painting or photo you like.
+                {currentPart.questions[0]?.prompt || "Please tell us about yourself and your reasons for joining this club."}
               </div>
             )}
           </div>
@@ -1141,6 +1141,9 @@ function WritingExamRunnerContent() {
               ========================================================================= */}
           {currentPart.partNumber === 2 && (
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-3">
+              <label className="text-xs md:text-sm font-semibold text-foreground block leading-relaxed">
+                {currentPart.questions[0]?.prompt || "Please complete the club registration form in 20-30 words."}
+              </label>
               <textarea
                 rows={5}
                 value={answers[`${currentPartIdx}_0`] || ""}
