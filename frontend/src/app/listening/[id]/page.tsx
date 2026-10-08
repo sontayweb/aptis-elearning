@@ -24,7 +24,6 @@ import {
   LogOut,
   X,
   Trophy,
-  Sparkles,
 } from "lucide-react";
 
 // Định nghĩa dữ liệu 4 Parts chuẩn Aptis Listening
@@ -66,25 +65,8 @@ interface Part4Recording {
   questions: Part4Question[];
 }
 
-interface ListeningExamData {
-  title: string;
-  durationMinutes: number;
-  part1: Part1Item[];
-  part2: {
-    instructions: string;
-    options: string[];
-    speakers: Part2Speaker[];
-  };
-  part3: {
-    topic: string;
-    instructions: string;
-    opinions: Part3Opinion[];
-  };
-  part4: Part4Recording[];
-}
-
 // Dữ liệu mẫu chuẩn Đề 01 Listening Aptis Kỳ Tích
-const DEFAULT_LISTENING_TEST: ListeningExamData = {
+const DEFAULT_LISTENING_TEST = {
   title: "Đề 01 — Full Listening · 4 Parts",
   durationMinutes: 40,
   part1: [
@@ -297,150 +279,228 @@ const DEFAULT_LISTENING_TEST: ListeningExamData = {
   ],
 };
 
-function parseOptions(options: any): string[] {
-  if (Array.isArray(options)) return options.map(String);
-  if (typeof options === "string") {
-    try {
-      const parsed = JSON.parse(options);
-      if (Array.isArray(parsed)) return parsed.map(String);
-    } catch {
-      // not json string
-    }
-    return [options];
-  }
-  return [];
-}
-
-function parseApiToListeningData(apiExam: any) {
-  const result = {
-    title: apiExam.title || DEFAULT_LISTENING_TEST.title,
-    durationMinutes: apiExam.duration_minutes || DEFAULT_LISTENING_TEST.durationMinutes,
-    part1: [...DEFAULT_LISTENING_TEST.part1],
-    part2: { ...DEFAULT_LISTENING_TEST.part2 },
-    part3: { ...DEFAULT_LISTENING_TEST.part3 },
-    part4: [...DEFAULT_LISTENING_TEST.part4],
-  };
-
-  const parts = apiExam.parts || [];
-  if (parts.length === 0) return result;
-
-  for (const p of parts) {
-    const pNum = p.part_number || p.partNumber;
-    const pTitle = (p.title || "").toLowerCase();
-    const questions = p.questions || [];
-
-    // Part 1: Word Recognition
-    if (pNum === 1 || pTitle.includes("part 1") || pTitle.includes("word recognition")) {
-      if (questions.length > 0) {
-        result.part1 = questions.map((q: any, idx: number) => ({
-          id: String(q.id),
-          num: q.question_number || idx + 1,
-          prompt: q.prompt || "",
-          options: parseOptions(q.options),
-          correctAnswer: String(q.correct_answer || ""),
-          explanation: q.explanation || "",
-        }));
-      }
-    }
-    // Part 2: Matching Information (Speakers)
-    else if (pNum === 2 || pTitle.includes("part 2") || pTitle.includes("matching")) {
-      const firstQ = questions[0];
-      const partOptions = firstQ ? parseOptions(firstQ.options) : result.part2.options;
-      result.part2 = {
-        instructions: p.instructions || result.part2.instructions,
-        options: partOptions.length > 0 ? partOptions : result.part2.options,
-        speakers: questions.length > 0
-          ? questions.map((q: any, idx: number) => ({
-              id: String(q.id),
-              speaker: q.prompt || `Speaker ${String.fromCharCode(65 + idx)}`,
-              correctAnswer: String(q.correct_answer || ""),
-              explanation: q.explanation || "",
-            }))
-          : result.part2.speakers,
-      };
-    }
-    // Part 3: Short Conversations (Opinions)
-    else if (pNum === 3 || pTitle.includes("part 3") || pTitle.includes("conversation") || pTitle.includes("opinion")) {
-      result.part3 = {
-        topic: p.passage_text || p.title || result.part3.topic,
-        instructions: p.instructions || result.part3.instructions,
-        opinions: questions.length > 0
-          ? questions.map((q: any) => {
-              const rawCor = String(q.correct_answer || "");
-              let cor: "Man" | "Woman" | "Both" = "Both";
-              if (rawCor.toLowerCase() === "man" || rawCor === "0") cor = "Man";
-              else if (rawCor.toLowerCase() === "woman" || rawCor === "1") cor = "Woman";
-              else if (rawCor.toLowerCase() === "both" || rawCor === "2") cor = "Both";
-              return {
-                id: String(q.id),
-                statement: q.prompt || "",
-                correctAnswer: cor,
-                explanation: q.explanation || "",
-              };
-            })
-          : result.part3.opinions,
-      };
-    }
-    // Part 4: Monologues (2 recordings)
-    else if (pNum === 4 || pTitle.includes("part 4") || pTitle.includes("monologue")) {
-      if (questions.length > 0) {
-        const mid = Math.ceil(questions.length / 2);
-        const rec1Questions = questions.slice(0, mid);
-        const rec2Questions = questions.slice(mid);
-
-        let rec1Text = p.passage_text || "Monologue 1";
-        let rec2Text = "Monologue 2";
-        if (p.passage_text && p.passage_text.includes("Recording 2:")) {
-          const partsSplit = p.passage_text.split(/Recording 2:\s*/i);
-          rec1Text = partsSplit[0].replace(/Recording 1:\s*/i, "").trim();
-          rec2Text = partsSplit[1].trim();
-        }
-
-        result.part4 = [
-          {
-            recNum: 1,
-            title: "Recording 1 of 2",
-            passageText: rec1Text,
-            questions: rec1Questions.map((q: any) => ({
-              id: String(q.id),
-              prompt: q.prompt || "",
-              options: parseOptions(q.options),
-              correctAnswer: String(q.correct_answer || ""),
-              explanation: q.explanation || "",
-            })),
-          },
-          {
-            recNum: 2,
-            title: "Recording 2 of 2",
-            passageText: rec2Text,
-            questions: rec2Questions.map((q: any) => ({
-              id: String(q.id),
-              prompt: q.prompt || "",
-              options: parseOptions(q.options),
-              correctAnswer: String(q.correct_answer || ""),
-              explanation: q.explanation || "",
-            })),
-          },
-        ];
-      }
-    }
-  }
-
-  return result;
-}
+// Bộ đề mẫu 02 — Thảo luận & Quan điểm nâng cao (Tránh trùng lặp)
+const DEFAULT_LISTENING_TEST_2 = {
+  title: "Đề 02 — Full Listening · 4 Parts",
+  durationMinutes: 40,
+  part1: [
+    {
+      num: 1,
+      prompt: "A woman is calling a customer service center. What is her issue with the package?",
+      options: ["It was delivered to the wrong address", "The contents inside were damaged", "The delivery was delayed by three days"],
+      correctAnswer: "It was delivered to the wrong address",
+      explanation: "She confirms the parcel went to apartment 4B instead of 4A.",
+    },
+    {
+      num: 2,
+      prompt: "Listen to an announcement at a train station. Which platform should passengers take for Oxford?",
+      options: ["Platform 3", "Platform 5B", "Platform 8"],
+      correctAnswer: "Platform 5B",
+      explanation: "The station announcer directs Oxford commuters to platform 5B.",
+    },
+    {
+      num: 3,
+      prompt: "A doctor is speaking to a patient. What lifestyle advice does she emphasize?",
+      options: ["Drink more herbal tea", "Get at least 30 minutes of daily walking", "Avoid carbohydrates entirely"],
+      correctAnswer: "Get at least 30 minutes of daily walking",
+      explanation: "She strongly recommends brisk walking for half an hour daily.",
+    },
+    {
+      num: 4,
+      prompt: "A radio host interviews an architect. What feature of the new library is unique?",
+      options: ["Rooftop solar garden", "Underground cinema", "All-glass reading atrium"],
+      correctAnswer: "All-glass reading atrium",
+      explanation: "The architect highlights the transparent atrium maximizing daylight.",
+    },
+    {
+      num: 5,
+      prompt: "Listen to a voicemail message. What time does the team meeting start on Monday?",
+      options: ["8:30 AM", "9:00 AM", "10:15 AM"],
+      correctAnswer: "10:15 AM",
+      explanation: "The manager postponed the kickoff session to 10:15 AM.",
+    },
+    {
+      num: 6,
+      prompt: "A receptionist is booking a tour. How much is the discount for family groups?",
+      options: ["10 percent", "15 percent", "25 percent"],
+      correctAnswer: "15 percent",
+      explanation: "Family bookings of four or more receive a 15% markdown.",
+    },
+    {
+      num: 7,
+      prompt: "What will the weather in the southern region be like tomorrow?",
+      options: ["Heavy rain and thunderstorms", "Misty and cold", "Sunny and dry"],
+      correctAnswer: "Sunny and dry",
+      explanation: "Warm dry sunshine will prevail across southern districts.",
+    },
+    {
+      num: 8,
+      prompt: "Why was the flight to Frankfurt rescheduled?",
+      options: ["Technical engine check", "Dense morning fog", "Air traffic strike"],
+      correctAnswer: "Dense morning fog",
+      explanation: "Visibility dropped below safe thresholds due to heavy fog.",
+    },
+    {
+      num: 9,
+      prompt: "A student asks a librarian about returning textbooks. Where is the drop box?",
+      options: ["By the main exit door", "Next to the computer lab", "On the third floor"],
+      correctAnswer: "By the main exit door",
+      explanation: "The return slot is conveniently located right beside the exterior exit door.",
+    },
+    {
+      num: 10,
+      prompt: "Which museum exhibit is free for high school students this week?",
+      options: ["Modern Sculptures", "Ancient Egyptian Artifacts", "Digital Art Gallery"],
+      correctAnswer: "Ancient Egyptian Artifacts",
+      explanation: "The historical Egypt exhibition provides free admission for teens.",
+    },
+    {
+      num: 11,
+      prompt: "A customer orders a birthday cake. What flavor does she choose?",
+      options: ["Vanilla strawberry", "Dark chocolate fudge", "Matcha green tea"],
+      correctAnswer: "Dark chocolate fudge",
+      explanation: "She specifies a 2-tier dark chocolate fudge cake with white icing.",
+    },
+    {
+      num: 12,
+      prompt: "Listen to the guide at an art gallery. How long does the guided tour take?",
+      options: ["45 minutes", "60 minutes", "90 minutes"],
+      correctAnswer: "60 minutes",
+      explanation: "The full gallery walk-through lasts exactly one hour.",
+    },
+    {
+      num: 13,
+      prompt: "A caller leaves a message for David. What does she want him to bring to the dinner?",
+      options: ["Fresh dessert fruits", "A bottle of olive oil", "Home-baked bread"],
+      correctAnswer: "Home-baked bread",
+      explanation: "She requests a loaf of his signature sourdough bread.",
+    },
+  ],
+  part2: {
+    topic: "Workplace Productivity & Remote Work",
+    instructions: "Four employees share their views on working from home. Match each speaker to their statement.",
+    speakers: [
+      {
+        speaker: "Speaker A",
+        correctAnswer: "Saves two hours of commute time daily",
+        explanation: "Speaker A loves not having to ride crowded morning trains.",
+      },
+      {
+        speaker: "Speaker B",
+        correctAnswer: "Misses spontaneous brainstorming with teammates",
+        explanation: "Speaker B feels creative ideas emerge better in person.",
+      },
+      {
+        speaker: "Speaker C",
+        correctAnswer: "Struggles to separate office tasks from personal life",
+        explanation: "Speaker C frequently answers emails late into the night.",
+      },
+      {
+        speaker: "Speaker D",
+        correctAnswer: "Enjoys quiet focus without office interruptions",
+        explanation: "Speaker D produces deeper research output at home.",
+      },
+    ],
+  },
+  part3: {
+    topic: "Electric Vehicles and Environmental Future",
+    instructions: "Who expresses which opinion? Select Man, Woman, or Both.",
+    opinions: [
+      {
+        statement: "1. Charging infrastructure in rural areas is still inadequate.",
+        correctAnswer: "Both" as const,
+        explanation: "Both participants acknowledge rural charging deserts.",
+      },
+      {
+        statement: "2. Battery manufacturing has a notable environmental footprint.",
+        correctAnswer: "Man" as const,
+        explanation: "The man quotes lifecycle battery mining assessments.",
+      },
+      {
+        statement: "3. Government subsidies should be expanded for buyers.",
+        correctAnswer: "Woman" as const,
+        explanation: "The woman argues price parity needs fiscal policy support.",
+      },
+      {
+        statement: "4. Electric cars will dominate passenger transit by 2035.",
+        correctAnswer: "Woman" as const,
+        explanation: "The woman is confident in rapid technological adoption.",
+      },
+    ],
+  },
+  part4: [
+    {
+      recNum: 1,
+      title: "Recording 1 of 2",
+      passageText: "An environmental specialist discusses renewable wind energy offshore.",
+      questions: [
+        {
+          prompt: "1. What is the primary benefit of offshore wind farms mentioned by the speaker?",
+          options: [
+            "Stronger and more consistent ocean wind streams",
+            "Lower installation and maintenance costs",
+            "Easier visual acceptance from coastal residents",
+          ],
+          correctAnswer: "Stronger and more consistent ocean wind streams",
+          explanation: "Ocean winds blow faster and smoother without land friction.",
+        },
+        {
+          prompt: "2. What technical obstacle is engineering research aiming to solve?",
+          options: [
+            "Floating anchors in ultra-deep ocean waters",
+            "Saltwater corrosion of steel turbine blades",
+            "Impact on migratory marine mammal communication",
+          ],
+          correctAnswer: "Floating anchors in ultra-deep ocean waters",
+          explanation: "Tethering turbines stably beyond 100 meters depth remains the key challenge.",
+        },
+      ],
+    },
+    {
+      recNum: 2,
+      title: "Recording 2 of 2",
+      passageText: "A university lecturer delivers an introduction to Behavioral Economics.",
+      questions: [
+        {
+          prompt: "1. How does Behavioral Economics diverge from Classical Economics?",
+          options: [
+            "It accounts for psychological and emotional biases in decisions",
+            "It solely analyzes financial stock market algorithms",
+            "It assumes consumers always maximize mathematical utility",
+          ],
+          correctAnswer: "It accounts for psychological and emotional biases in decisions",
+          explanation: "Human decision makers rely on cognitive shortcuts rather than strict logic.",
+        },
+        {
+          prompt: "2. What practical application does the lecturer recommend for policymakers?",
+          options: [
+            "Gentle 'nudges' that guide better retirement saving choices",
+            "Heavy financial fines on unhealthy food consumption",
+            "Complete deregulation of consumer lending markets",
+          ],
+          correctAnswer: "Gentle 'nudges' that guide better retirement saving choices",
+          explanation: "Default opt-in schemes dramatically improve national pension savings.",
+        },
+      ],
+    },
+  ],
+};
 
 function ListeningExamRunnerContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const examId = params.id as string;
-  const modeParam = searchParams?.get("mode");
-  const submissionIdParam = searchParams?.get("submissionId");
+  const examId = (params.id as string) || "";
 
-  const [examData, setExamData] = useState<ListeningExamData>(DEFAULT_LISTENING_TEST);
+  // Chọn bộ đề benchmark phù hợp dựa trên ID đề (để không bị trùng đề)
+  const initialBenchmark =
+    examId.includes("2") || examId.includes("02")
+      ? DEFAULT_LISTENING_TEST_2
+      : DEFAULT_LISTENING_TEST;
+
+  const [examData, setExamData] = useState(initialBenchmark);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [submissionId, setSubmissionId] = useState<string | null>(submissionIdParam || null);
 
   // Active Stage Index (1 to 17 exercises total):
   // 0..12: Part 1 (13 questions)
@@ -450,55 +510,44 @@ function ListeningExamRunnerContent() {
   // 16: Part 4 Recording 2 (2 questions)
   const [activeStage, setActiveStage] = useState(0);
 
-  // Review Mode State
-  const [reviewMode, setReviewMode] = useState(modeParam === "review");
-  const [reviewQuestionIdx, setReviewQuestionIdx] = useState(0); // 0..24 (total 25 questions)
-
   // Answers State:
-  // p1: { [qIdx]: string }
-  // p2: { [speakerIdx]: string }
-  // p3: { [opinionIdx]: "Man" | "Woman" | "Both" }
-  // p4: { [recIdx_qIdx]: string }
   const [p1Answers, setP1Answers] = useState<Record<number, string>>({});
   const [p2Answers, setP2Answers] = useState<Record<number, string>>({});
   const [p3Answers, setP3Answers] = useState<Record<number, "Man" | "Woman" | "Both">>({});
   const [p4Answers, setP4Answers] = useState<Record<string, string>>({});
 
-  // Audio Play Simulation / Controller
+  // Audio Playback Controller
   const [isPlaying, setIsPlaying] = useState(false);
   const [playCounts, setPlayCounts] = useState<Record<number, number>>({});
   const [playbackProgress, setPlaybackProgress] = useState(0);
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
+  const [audioUrlMap, setAudioUrlMap] = useState<Record<number, string>>({});
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Timer & UI states
   const [timeLeft, setTimeLeft] = useState(40 * 60);
   const [isPaused, setIsPaused] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(modeParam === "review");
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [showSampleAnswers, setShowSampleAnswers] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
 
-  const totalAnsweredCount =
-    Object.keys(p1Answers).length +
-    Object.keys(p2Answers).length +
-    Object.keys(p3Answers).length +
-    Object.keys(p4Answers).length;
-  const totalQuestionsCount = 25;
-
-  // Tự động nhảy tới Part nếu URL có ?part=p1 / p2 / p3 / p4
+  // Tự động nhảy tới Part nếu URL có ?part=p1 / p2 / p3 / p4 / 1 / 2 / 3 / 4
   useEffect(() => {
-    const partQuery = searchParams?.get("part");
-    if (partQuery === "p1") setActiveStage(0);
-    else if (partQuery === "p2") setActiveStage(13);
-    else if (partQuery === "p3") setActiveStage(14);
-    else if (partQuery === "p4") setActiveStage(15);
+    const p = searchParams?.get("part")?.toLowerCase();
+    if (p === "p1" || p === "1" || p === "part1") setActiveStage(0);
+    else if (p === "p2" || p === "2" || p === "part2") setActiveStage(13);
+    else if (p === "p3" || p === "3" || p === "part3") setActiveStage(14);
+    else if (p === "p4" || p === "4" || p === "part4") setActiveStage(15);
   }, [searchParams]);
 
-  // Khởi tạo Database Submission (chỉ khi làm mới)
+  // Khởi tạo phiên làm bài trên backend
   useEffect(() => {
     async function initSubmission() {
-      if (modeParam === "review" || submissionIdParam) return;
-      const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("accessToken") || localStorage.getItem("token")
+          : null;
       if (!token || !examId || submissionId) return;
       try {
         const res = await api.submissions.start(examId);
@@ -510,139 +559,260 @@ function ListeningExamRunnerContent() {
       }
     }
     initSubmission();
-  }, [examId, modeParam, submissionIdParam]);
+  }, [examId, submissionId]);
 
-  // Load đề thi từ backend & tải submission cũ nếu có mode=review
+  // Load đề thi từ backend với bộ parser đầy đủ
   useEffect(() => {
     async function load() {
       try {
         setLoading(true);
         const res = await api.exams.getQuestions(examId);
         if (res.success && res.data) {
-          const parsed = parseApiToListeningData(res.data);
-          setExamData(parsed);
-          setTimeLeft((parsed.durationMinutes || 40) * 60);
-
-          // Tải submission nếu ở review mode
-          if (submissionIdParam) {
-            try {
-              const subRes = await api.submissions.getResult(submissionIdParam);
-              if (subRes.success && subRes.data) {
-                const sub = subRes.data;
-                setIsSubmitted(true);
-                setReviewMode(true);
-                const loadedP1: Record<number, string> = {};
-                const loadedP2: Record<number, string> = {};
-                const loadedP3: Record<number, "Man" | "Woman" | "Both"> = {};
-                const loadedP4: Record<string, string> = {};
-
-                (sub.answers || []).forEach((ans: any, idx: number) => {
-                  const opt = ans.selected_option || ans.selectedOption || "";
-                  const qId = ans.question_id || ans.questionId;
-
-                  let matched = false;
-                  if (qId) {
-                    const p1Idx = parsed.part1.findIndex((q) => q.id === qId);
-                    if (p1Idx >= 0) { loadedP1[p1Idx] = opt; matched = true; }
-                    if (!matched) {
-                      const p2Idx = parsed.part2.speakers.findIndex((s) => s.id === qId);
-                      if (p2Idx >= 0) { loadedP2[p2Idx] = opt; matched = true; }
-                    }
-                    if (!matched) {
-                      const p3Idx = parsed.part3.opinions.findIndex((o) => o.id === qId);
-                      if (p3Idx >= 0) { loadedP3[p3Idx] = opt as any; matched = true; }
-                    }
-                    if (!matched) {
-                      for (let r = 0; r < parsed.part4.length; r++) {
-                        const qIdx = parsed.part4[r].questions.findIndex((q) => q.id === qId);
-                        if (qIdx >= 0) { loadedP4[`${r}_${qIdx}`] = opt; matched = true; break; }
-                      }
-                    }
-                  }
-
-                  if (!matched) {
-                    if (idx < 13) {
-                      loadedP1[idx] = opt;
-                    } else if (idx < 17) {
-                      loadedP2[idx - 13] = opt;
-                    } else if (idx < 21) {
-                      loadedP3[idx - 17] = opt as any;
-                    } else {
-                      const recIdx = idx < 23 ? 0 : 1;
-                      const qIdx = idx % 2;
-                      loadedP4[`${recIdx}_${qIdx}`] = opt;
-                    }
-                  }
-                });
-
-                if (Object.keys(loadedP1).length > 0) setP1Answers(loadedP1);
-                if (Object.keys(loadedP2).length > 0) setP2Answers(loadedP2);
-                if (Object.keys(loadedP3).length > 0) setP3Answers(loadedP3);
-                if (Object.keys(loadedP4).length > 0) setP4Answers(loadedP4);
-              }
-            } catch (e) {
-              console.warn("Could not load listening submission result:", e);
-            }
-          }
+          const apiExam = res.data;
+          const parsed = parseApiToListeningData(apiExam);
+          setExamData(parsed.exam);
+          setAudioUrlMap(parsed.audioUrls);
+          setTimeLeft((apiExam.duration_minutes || 40) * 60);
+        } else {
+          // Dùng benchmark tương ứng nếu backend chưa có đủ câu hỏi
+          const fallback =
+            examId.includes("2") || examId.includes("02")
+              ? DEFAULT_LISTENING_TEST_2
+              : DEFAULT_LISTENING_TEST;
+          setExamData(fallback);
         }
       } catch (err) {
-        console.warn("Using default listening exam:", err);
+        console.warn("Using offline benchmark listening exam:", err);
+        const fallback =
+          examId.includes("2") || examId.includes("02")
+            ? DEFAULT_LISTENING_TEST_2
+            : DEFAULT_LISTENING_TEST;
+        setExamData(fallback);
       } finally {
         setLoading(false);
       }
     }
     if (examId) load();
-  }, [examId, submissionIdParam]);
+  }, [examId]);
 
-  // Timer đếm ngược
+  // Parser dữ liệu từ Backend sang format hiển thị của Listening
+  function parseApiToListeningData(apiData: any) {
+    const fallback =
+      examId.includes("2") || examId.includes("02")
+        ? DEFAULT_LISTENING_TEST_2
+        : DEFAULT_LISTENING_TEST;
+
+    const result = {
+      title: apiData.title || fallback.title,
+      durationMinutes: apiData.duration_minutes || 40,
+      part1: [...fallback.part1],
+      part2: { ...fallback.part2 },
+      part3: { ...fallback.part3 },
+      part4: [...fallback.part4],
+    };
+
+    const audioUrls: Record<number, string> = {};
+    const parts = apiData.parts || [];
+
+    parts.forEach((p: any) => {
+      const pNum = p.part_number;
+      const questions = p.questions || [];
+
+      // Part 1: Word Recognition (13 câu)
+      if (pNum === 1 && questions.length > 0) {
+        if (p.audio_url) {
+          for (let i = 0; i <= 12; i++) audioUrls[i] = p.audio_url;
+        }
+        result.part1 = questions.map((q: any, idx: number) => {
+          let opts: string[] = ["A", "B", "C"];
+          if (Array.isArray(q.options)) opts = q.options;
+          else if (typeof q.options === "string") {
+            try { opts = JSON.parse(q.options); } catch { opts = ["A", "B", "C"]; }
+          }
+          return {
+            id: q.id,
+            num: q.question_number || idx + 1,
+            prompt: q.prompt,
+            options: opts,
+            correctAnswer: q.correct_answer || opts[0] || "",
+            explanation: q.explanation || "Đáp án chuẩn theo đoạn ghi âm đối thoại.",
+          };
+        });
+      }
+
+      // Part 2: Speakers matching
+      if (pNum === 2 && questions.length > 0) {
+        if (p.audio_url) audioUrls[13] = p.audio_url;
+        const spkList = questions.map((q: any, idx: number) => ({
+          id: q.id,
+          speaker: q.prompt ? q.prompt.replace(/^Speaker\s*[A-D]\s*[-:]*\s*/i, "") : `Speaker ${String.fromCharCode(65 + idx)}`,
+          correctAnswer: q.correct_answer || "",
+          explanation: q.explanation || "",
+        }));
+        if (spkList.length > 0) {
+          result.part2.speakers = spkList;
+          if (p.instructions) result.part2.instructions = p.instructions;
+        }
+      }
+
+      // Part 3: Opinion discussion
+      if (pNum === 3 && questions.length > 0) {
+        if (p.audio_url) audioUrls[14] = p.audio_url;
+        const opList = questions.map((q: any) => {
+          let cor: "Man" | "Woman" | "Both" = "Both";
+          const corStr = String(q.correct_answer || "").toLowerCase();
+          if (corStr.includes("man") && !corStr.includes("woman")) cor = "Man";
+          else if (corStr.includes("woman")) cor = "Woman";
+          return {
+            id: q.id,
+            statement: q.prompt,
+            correctAnswer: cor,
+            explanation: q.explanation || "",
+          };
+        });
+        if (opList.length > 0) {
+          result.part3.opinions = opList;
+          if (p.instructions) result.part3.instructions = p.instructions;
+        }
+      }
+
+      // Part 4: Monologues
+      if (pNum === 4 && questions.length > 0) {
+        if (p.audio_url) {
+          audioUrls[15] = p.audio_url;
+          audioUrls[16] = p.audio_url;
+        }
+      }
+    });
+
+    return { exam: result, audioUrls };
+  }
+
+  // Timer đếm ngược thời gian phòng thi
   useEffect(() => {
-    if (loading || isPaused || isSubmitted || reviewMode) return;
+    if (loading || isPaused || isSubmitted) return;
     const timer = setInterval(() => {
       setTimeLeft((t) => (t <= 1 ? 0 : t - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, [loading, isPaused, isSubmitted, reviewMode]);
+  }, [loading, isPaused, isSubmitted]);
 
-  // Audio simulation timer
-  useEffect(() => {
-    let interval: any;
-    if (isPlaying) {
-      interval = setInterval(() => {
-        setPlaybackProgress((p) => {
-          if (p >= 100) {
-            setIsPlaying(false);
-            return 0;
-          }
-          return p + 4;
-        });
-      }, 500);
+  // Lấy nội dung văn bản kịch bản cho stage hiện tại (phục vụ SpeechSynthesis khi không có file âm thanh tĩnh)
+  const getCurrentStageScript = () => {
+    if (activeStage <= 12) {
+      const q = examData.part1[activeStage];
+      return q ? `Question ${q.num}. ${q.prompt}` : "";
+    } else if (activeStage === 13) {
+      return `Part 2. Four people are talking. ${examData.part2.speakers.map((s) => s.speaker + ". " + s.correctAnswer).join(". ")}`;
+    } else if (activeStage === 14) {
+      return `Part 3. A man and a woman are discussing: ${examData.part3.topic}. ${examData.part3.opinions.map((o) => o.statement).join(". ")}`;
+    } else if (activeStage === 15) {
+      return examData.part4[0]?.passageText || "First monologue presentation.";
+    } else {
+      return examData.part4[1]?.passageText || "Second monologue presentation.";
     }
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+  };
 
-  // Reset audio state khi đổi câu hỏi
+  // Reset audio state khi chuyển câu hỏi
   useEffect(() => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
     setIsPlaying(false);
     setPlaybackProgress(0);
   }, [activeStage]);
 
+  // Trình phát âm thanh tích hợp: Ưu tiên phát file Audio -> Fallback SpeechSynthesis chuẩn giọng Anh-Mỹ
   const togglePlayAudio = () => {
     const currentCount = playCounts[activeStage] || 0;
     if (currentCount >= 2 && !isPlaying) {
-      alert("Bạn đã nghe tối đa 2 lần cho đoạn ghi âm này!");
+      alert("Bạn đã nghe tối đa 2 lần cho đoạn ghi âm này theo quy chế khảo thí Aptis!");
       return;
     }
 
     if (isPlaying) {
-      setIsPlaying(false);
-    } else {
-      setIsPlaying(true);
-      if (playbackProgress === 0) {
-        setPlayCounts((prev) => ({
-          ...prev,
-          [activeStage]: currentCount + 1,
-        }));
+      // Dừng âm thanh
+      if (audioRef.current && !audioRef.current.paused) {
+        audioRef.current.pause();
       }
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setIsPlaying(false);
+      return;
+    }
+
+    // Bắt đầu phát âm thanh
+    const targetAudioSrc = audioUrlMap[activeStage];
+    let audioPlayed = false;
+
+    if (targetAudioSrc && audioRef.current) {
+      audioRef.current.src = targetAudioSrc;
+      audioRef.current.playbackRate = playbackSpeed;
+      audioRef.current
+        .play()
+        .then(() => {
+          audioPlayed = true;
+          setIsPlaying(true);
+          setPlayCounts((prev) => ({ ...prev, [activeStage]: currentCount + 1 }));
+        })
+        .catch(() => {
+          audioPlayed = false;
+        });
+    }
+
+    // Nếu không có file audio hoặc file audio bị lỗi đường dẫn: Dùng giọng nói tiếng Anh trình duyệt (SpeechSynthesis)
+    if (!audioPlayed) {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const scriptText = getCurrentStageScript();
+        const utterance = new SpeechSynthesisUtterance(scriptText);
+        utterance.lang = "en-GB"; // Chuẩn giọng Anh British Council
+        utterance.rate = playbackSpeed;
+
+        const estDurationSec = Math.max(8, scriptText.split(" ").length / 2.5);
+        let elapsed = 0;
+
+        utterance.onstart = () => {
+          setIsPlaying(true);
+          setPlayCounts((prev) => ({ ...prev, [activeStage]: currentCount + 1 }));
+        };
+
+        const progressTimer = setInterval(() => {
+          elapsed += 0.5;
+          const pct = Math.min(100, Math.round((elapsed / estDurationSec) * 100));
+          setPlaybackProgress(pct);
+          if (pct >= 100) clearInterval(progressTimer);
+        }, 500);
+
+        utterance.onend = () => {
+          setIsPlaying(false);
+          setPlaybackProgress(100);
+          clearInterval(progressTimer);
+        };
+
+        utterance.onerror = () => {
+          setIsPlaying(false);
+          clearInterval(progressTimer);
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } else {
+        // Fallback mô phỏng nếu trình duyệt không có speech API
+        setIsPlaying(true);
+        setPlayCounts((prev) => ({ ...prev, [activeStage]: currentCount + 1 }));
+      }
+    }
+  };
+
+  const handleSpeedChange = (rate: number) => {
+    setPlaybackSpeed(rate);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate;
     }
   };
 
@@ -707,55 +877,74 @@ function ListeningExamRunnerContent() {
 
   const results = calculateResults();
 
-  const handleSubmitExam = async () => {
-    setIsSubmitModalOpen(false);
+  // Nộp bài thi và đồng bộ kết quả lên Database
+  const handleFinalSubmit = async () => {
     setIsSubmitted(true);
+    let subId = submissionId;
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken") || localStorage.getItem("token")
+        : null;
+    if (!token) return;
 
-    if (submissionId) {
-      try {
+    try {
+      if (!subId) {
+        const startRes = await api.submissions.start(examId);
+        if (startRes.success && startRes.data) {
+          subId = startRes.data.submissionId || startRes.data.id;
+          setSubmissionId(subId);
+        }
+      }
+
+      if (subId) {
         const answersPayload: any[] = [];
-        examData.part1.forEach((q, idx) => {
+        // Part 1
+        examData.part1.forEach((q: any, idx: number) => {
           if (q.id && p1Answers[idx]) {
             answersPayload.push({
-              questionId: q.id,
+              questionId: String(q.id),
               selectedOption: p1Answers[idx],
             });
           }
         });
-        examData.part2.speakers.forEach((s, idx) => {
+        // Part 2
+        examData.part2.speakers.forEach((s: any, idx: number) => {
           if (s.id && p2Answers[idx]) {
             answersPayload.push({
-              questionId: s.id,
+              questionId: String(s.id),
               selectedOption: p2Answers[idx],
             });
           }
         });
-        examData.part3.opinions.forEach((o, idx) => {
+        // Part 3
+        examData.part3.opinions.forEach((o: any, idx: number) => {
           if (o.id && p3Answers[idx]) {
             answersPayload.push({
-              questionId: o.id,
+              questionId: String(o.id),
               selectedOption: p3Answers[idx],
             });
           }
         });
-        examData.part4.forEach((rec, recIdx) => {
-          rec.questions.forEach((q, qIdx) => {
-            if (q.id && p4Answers[`${recIdx}_${qIdx}`]) {
+        // Part 4
+        examData.part4.forEach((rec: any, recIdx: number) => {
+          rec.questions.forEach((q: any, qIdx: number) => {
+            const ansKey = `${recIdx}_${qIdx}`;
+            if (q.id && p4Answers[ansKey]) {
               answersPayload.push({
-                questionId: q.id,
-                selectedOption: p4Answers[`${recIdx}_${qIdx}`],
+                questionId: String(q.id),
+                selectedOption: p4Answers[ansKey],
               });
             }
           });
         });
 
         if (answersPayload.length > 0) {
-          await api.submissions.autosave(submissionId, answersPayload);
+          await api.submissions.autosave(subId, answersPayload);
         }
-        await api.submissions.submit(submissionId);
-      } catch (err) {
-        console.error("Submit listening error:", err);
+        await api.submissions.submit(subId);
       }
+    } catch (err) {
+      console.warn("Submit listening error:", err);
     }
   };
 
@@ -797,9 +986,9 @@ function ListeningExamRunnerContent() {
   const currentMeta = getStageMeta();
 
   // =========================================================================
-  // MÀN HÌNH KẾT QUẢ & REVIEW LISTENING (THEO THEME CHUẨN CỦA HỆ THỐNG)
+  // MÀN HÌNH KẾT QUẢ LISTENING (CHUẨN ẢNH 5 THEO DESIGN SYSTEM CỦA MÌNH)
   // =========================================================================
-  if (isSubmitted && !reviewMode) {
+  if (isSubmitted) {
     return (
       <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
         {/* Header Bar */}
@@ -869,22 +1058,12 @@ function ListeningExamRunnerContent() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setReviewMode(true);
-                    setReviewQuestionIdx(0);
-                  }}
-                  className="px-4 py-2 rounded-xl border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold transition-all flex items-center gap-1.5"
+                  onClick={() => setIsSubmitted(false)}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
                 >
-                  <Eye className="w-3.5 h-3.5" />
+                  <span>👁️</span>
                   <span>Xem lại từng câu →</span>
                 </button>
-
-                <Link
-                  href="/history"
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors"
-                >
-                  Lịch sử làm bài
-                </Link>
 
                 <button
                   type="button"
@@ -897,7 +1076,6 @@ function ListeningExamRunnerContent() {
                     setActiveStage(0);
                     setTimeLeft(40 * 60);
                     setIsSubmitted(false);
-                    setReviewMode(false);
                   }}
                   className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
                 >
@@ -982,371 +1160,42 @@ function ListeningExamRunnerContent() {
   }
 
   // =========================================================================
-  // REVIEW MODE CHI TIẾT (XEM LẠI ĐÁP ÁN ĐÚNG/SAI, TRANSCRIPT, GIẢI THÍCH)
-  // =========================================================================
-  if (isSubmitted && reviewMode) {
-    // 25 câu hỏi tổng hợp
-    const reviewList = [
-      // 0..12: Part 1
-      ...examData.part1.map((q, idx) => ({
-        globalIdx: idx,
-        partNumber: 1,
-        partName: "Part 1 – Word Recognition",
-        prompt: q.prompt,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        userAnswer: p1Answers[idx] || "",
-        isCorrect: p1Answers[idx] === q.correctAnswer,
-        explanation: q.explanation,
-        transcript: q.explanation || "Nội dung hội thoại ngắn kiểm tra khả năng bắt từ và nhận diện thông tin chi tiết.",
-      })),
-      // 13..16: Part 2
-      ...examData.part2.speakers.map((s, idx) => ({
-        globalIdx: 13 + idx,
-        partNumber: 2,
-        partName: "Part 2 – Matching Information",
-        prompt: `Speaker ${s.speaker}: Người nói đề cập đến chủ đề gì?`,
-        options: [
-          "A bad holiday",
-          "A sports event",
-          "A business trip",
-          "A family party",
-          "A musical concert",
-          "A school excursion",
-        ],
-        correctAnswer: s.correctAnswer,
-        userAnswer: p2Answers[idx] || "",
-        isCorrect: p2Answers[idx] === s.correctAnswer,
-        explanation: s.explanation,
-        transcript: `Lời thoại của ${s.speaker}: ${s.explanation}`,
-      })),
-      // 17..20: Part 3
-      ...examData.part3.opinions.map((o, idx) => ({
-        globalIdx: 17 + idx,
-        partNumber: 3,
-        partName: "Part 3 – Short Conversations",
-        prompt: `Ý kiến: "${o.statement}" — Ai đồng ý với nhận định này?`,
-        options: ["Man", "Woman", "Both"],
-        correctAnswer: o.correctAnswer,
-        userAnswer: p3Answers[idx] || "",
-        isCorrect: p3Answers[idx] === o.correctAnswer,
-        explanation: o.explanation,
-        transcript: `Đoạn đối thoại giữa hai người (Man & Woman) thể hiện quan điểm. Chi tiết: ${o.explanation}`,
-      })),
-      // 21..24: Part 4
-      ...(examData.part4[0]?.questions || []).map((q, idx) => ({
-        globalIdx: 21 + idx,
-        partNumber: 4,
-        partName: "Part 4 – Monologues (Bài 1)",
-        prompt: q.prompt,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        userAnswer: p4Answers[`0_${idx}`] || "",
-        isCorrect: p4Answers[`0_${idx}`] === q.correctAnswer,
-        explanation: q.explanation,
-        transcript: examData.part4[0]?.passageText || "",
-      })),
-      ...(examData.part4[1]?.questions || []).map((q, idx) => ({
-        globalIdx: 23 + idx,
-        partNumber: 4,
-        partName: "Part 4 – Monologues (Bài 2)",
-        prompt: q.prompt,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        userAnswer: p4Answers[`1_${idx}`] || "",
-        isCorrect: p4Answers[`1_${idx}`] === q.correctAnswer,
-        explanation: q.explanation,
-        transcript: examData.part4[1]?.passageText || "",
-      })),
-    ];
-
-    const currentRev = reviewList[reviewQuestionIdx] || reviewList[0];
-
-    return (
-      <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
-        {/* Header Review Bar */}
-        <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-3 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setReviewMode(false)}
-              className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-              title="Quay lại bảng kết quả"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-                  Xem lại bài làm
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
-                  {results.totalScore}/50 · Band {results.cefr}
-                </span>
-              </div>
-              <span className="text-xs md:text-sm font-bold text-foreground">
-                {examData.title}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setReviewMode(false)}
-              className="px-3 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-muted transition-colors"
-            >
-              Xem bảng điểm
-            </button>
-            <Link
-              href="/listening"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 transition-all"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Thoát</span>
-            </Link>
-          </div>
-        </header>
-
-        {/* Content Container */}
-        <main className="flex-1 py-6 px-4 md:px-8 max-w-4xl mx-auto w-full space-y-6">
-          {/* Quick Heatmap Navigator (25 câu) */}
-          <div className="bg-card rounded-2xl border border-border p-4 shadow-sm space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                <span>Danh sách câu hỏi (25 câu):</span>
-              </span>
-              <div className="flex items-center gap-3 text-[11px]">
-                <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Đúng ({results.totalCorrect})
-                </span>
-                <span className="flex items-center gap-1 text-rose-600 font-semibold">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500" /> Sai ({25 - results.totalCorrect})
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-1.5">
-              {reviewList.map((item, idx) => {
-                const isCurrent = idx === reviewQuestionIdx;
-                const isCor = item.isCorrect;
-                const hasAnswer = !!item.userAnswer;
-
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setReviewQuestionIdx(idx)}
-                    className={`w-8 h-8 rounded-lg text-xs font-bold transition-all flex items-center justify-center border ${
-                      isCurrent
-                        ? "ring-2 ring-primary ring-offset-2 scale-110 z-10"
-                        : ""
-                    } ${
-                      isCor
-                        ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25"
-                        : hasAnswer
-                        ? "bg-rose-500/15 border-rose-500/40 text-rose-700 dark:text-rose-300 hover:bg-rose-500/25"
-                        : "bg-muted/50 border-border text-muted-foreground hover:bg-muted"
-                    }`}
-                    title={`Câu ${idx + 1}: ${isCor ? "Đúng" : hasAnswer ? "Sai" : "Chưa làm"}`}
-                  >
-                    {idx + 1}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Active Question Review Card */}
-          <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-6 animate-in fade-in duration-200">
-            {/* Question Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-                    {currentRev.partName}
-                  </span>
-                  <span className="text-xs text-muted-foreground font-mono">
-                    Câu {currentRev.globalIdx + 1}/25
-                  </span>
-                </div>
-                <h3 className="font-heading font-bold text-base text-foreground mt-1">
-                  {currentRev.prompt}
-                </h3>
-              </div>
-
-              {/* Status Badge */}
-              <div className="shrink-0">
-                {currentRev.isCorrect ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                    <span>Chính xác (+2đ)</span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30">
-                    <AlertCircle className="w-4 h-4 text-rose-500" />
-                    <span>{currentRev.userAnswer ? "Chưa đúng (0đ)" : "Chưa trả lời (0đ)"}</span>
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Options Comparison */}
-            <div className="space-y-2.5">
-              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
-                So sánh lựa chọn &amp; Đáp án đúng:
-              </span>
-
-              <div className="space-y-2">
-                {currentRev.options.map((opt, oIdx) => {
-                  const isUserPick = opt === currentRev.userAnswer;
-                  const isRight = opt === currentRev.correctAnswer;
-
-                  return (
-                    <div
-                      key={oIdx}
-                      className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs md:text-sm font-medium transition-all ${
-                        isRight
-                          ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-800 dark:text-emerald-200"
-                          : isUserPick && !isRight
-                          ? "bg-rose-500/10 border-rose-500/40 text-rose-800 dark:text-rose-200"
-                          : "bg-muted/20 border-border text-muted-foreground"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                            isRight
-                              ? "bg-emerald-500 text-white"
-                              : isUserPick && !isRight
-                              ? "bg-rose-500 text-white"
-                              : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          {isRight ? "✓" : isUserPick ? "✕" : String.fromCharCode(65 + oIdx)}
-                        </span>
-                        <span className="truncate">{opt}</span>
-                      </div>
-
-                      <div className="shrink-0 text-right">
-                        {isRight && (
-                          <span className="inline-block px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
-                            {isUserPick ? "✓ Bạn chọn đúng" : "Đáp án đúng"}
-                          </span>
-                        )}
-                        {isUserPick && !isRight && (
-                          <span className="inline-block px-2.5 py-0.5 rounded-md bg-rose-500/20 text-rose-700 dark:text-rose-300 font-bold text-[11px]">
-                            ✕ Lựa chọn của bạn
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Audio Script / Transcript Box */}
-            <div className="p-4 rounded-xl bg-muted/30 border border-border space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-primary">
-                <Volume2 className="w-4 h-4" />
-                <span>Audio Script / Lời thoại bóc băng:</span>
-              </div>
-              <p className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans italic bg-background/50 p-3 rounded-lg border border-border/50">
-                &ldquo;{currentRev.transcript}&rdquo;
-              </p>
-            </div>
-
-            {/* Explanation Box */}
-            <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-primary">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <span>Giải thích chi tiết &amp; Từ khóa phân tích:</span>
-              </div>
-              <p className="text-xs md:text-sm text-foreground leading-relaxed">
-                {currentRev.explanation}
-              </p>
-            </div>
-
-            {/* Navigation Buttons */}
-            <div className="flex items-center justify-between pt-4 border-t border-border">
-              <button
-                type="button"
-                disabled={reviewQuestionIdx === 0}
-                onClick={() => setReviewQuestionIdx((p) => p - 1)}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Câu trước</span>
-              </button>
-
-              <span className="text-xs text-muted-foreground font-mono font-bold">
-                {reviewQuestionIdx + 1} / {reviewList.length}
-              </span>
-
-              <button
-                type="button"
-                disabled={reviewQuestionIdx === reviewList.length - 1}
-                onClick={() => setReviewQuestionIdx((p) => p + 1)}
-                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
-              >
-                <span>Câu tiếp</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // =========================================================================
   // MÀN HÌNH LÀM BÀI PHÒNG THI LISTENING (THEO DESIGN SYSTEM CỦA MÌNH)
   // =========================================================================
   return (
-    <div className="notranslate exam-active exam-mode min-h-screen bg-exam-bg text-exam-text flex flex-col font-sans select-none">
-      {/* 0. Top thin progress bar */}
-      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-[3px]">
-        <div
-          className="h-full bg-gradient-to-r from-primary via-accent to-primary transition-all duration-500"
-          style={{ width: `${((activeStage + 1) / 17) * 100}%` }}
-        />
-      </div>
-
-      {/* 1. TOP HEADER (EXAM MODE) */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-exam-surface/95 backdrop-blur border-b border-exam-border">
-        <div className="max-w-6xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="text-xs font-bold text-exam-text truncate hidden sm:block">
-              {examData.title}
-            </span>
-            <span className="text-[10px] text-exam-text-muted hidden md:inline">
-              Listening Aptis ESOL
-            </span>
-          </div>
-
-          {/* Countdown Timer */}
-          <div
-            className={`font-mono text-base font-black px-3 py-1 rounded-lg border flex items-center gap-1.5 ${
-              timeLeft < 300
-                ? "bg-red-500/20 border-red-500 text-red-500 animate-pulse"
-                : "bg-exam-bg border-exam-border text-exam-text"
-            }`}
+    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none">
+      {/* 1. TOP HEADER */}
+      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/listening"
+            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground"
           >
-            <Clock className="w-4 h-4 text-primary" />
-            <span>{formatTime(timeLeft)}</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-xs font-bold text-exam-text-muted">
-              {totalAnsweredCount}/{totalQuestionsCount} câu
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
+              Listening Practice
+            </span>
+            <span className="text-sm md:text-base font-bold text-foreground">
+              {currentMeta.partName}
             </span>
           </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href="/listening"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Thoát</span>
+          </Link>
         </div>
       </header>
 
       {/* 2. MAIN WORKSPACE */}
-      <main className="flex-1 pt-16 pb-24 px-3 md:px-6 overflow-y-auto">
+      <main className="flex-1 py-6 px-3 md:px-6 pb-24">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Card Context & Header Banner */}
           <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
@@ -1373,35 +1222,71 @@ function ListeningExamRunnerContent() {
                 </p>
               </div>
 
-              {/* Pause & Playback control */}
-              <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
+              {/* Bookmark, Pause, Timer */}
+              <div className="flex items-center gap-3 self-end md:self-auto shrink-0">
+                <button
+                  type="button"
+                  className="flex items-center gap-1 px-3 py-1 rounded-xl border border-border text-xs text-muted-foreground hover:bg-muted font-medium transition-colors"
+                >
+                  <Bookmark className="w-3.5 h-3.5" />
+                  <span>Bookmark</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setIsPaused(!isPaused)}
-                  className="px-3 py-1.5 rounded-xl border border-border text-xs text-muted-foreground hover:bg-muted font-medium transition-colors flex items-center gap-1.5"
+                  className="p-1.5 rounded-xl border border-border text-muted-foreground hover:bg-muted transition-colors"
                   title={isPaused ? "Tiếp tục" : "Tạm dừng"}
                 >
                   {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
-                  <span>{isPaused ? "Tiếp tục" : "Tạm dừng"}</span>
                 </button>
+
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+                  <Clock className="w-4 h-4" />
+                  <span>{formatTime(timeLeft)}</span>
+                </div>
               </div>
             </div>
 
-            {/* Trình phát Audio thanh lịch theo theme hệ thống */}
+            {/* Trình phát Audio chuẩn có hỗ trợ âm thanh thật, chỉnh tốc độ & Speech fallback */}
             <div className="p-4 rounded-xl bg-muted/40 border border-border flex flex-col sm:flex-row items-center gap-4">
+              <audio
+                ref={audioRef}
+                preload="metadata"
+                onEnded={() => {
+                  setIsPlaying(false);
+                  setPlaybackProgress(100);
+                }}
+                onTimeUpdate={() => {
+                  if (audioRef.current && audioRef.current.duration > 0) {
+                    const pct = Math.round((audioRef.current.currentTime / audioRef.current.duration) * 100);
+                    setPlaybackProgress(pct);
+                  }
+                }}
+              />
+
               <button
                 type="button"
                 onClick={togglePlayAudio}
                 className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary-glow shadow-md transition-all shrink-0"
+                title={isPlaying ? "Dừng audio" : "Phát audio"}
               >
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
               </button>
 
-              <div className="flex-1 w-full space-y-1">
-                <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                  <span>{isPlaying ? "Đang phát audio..." : "Sẵn sàng nghe"}</span>
-                  <span>Đã nghe: {playCounts[activeStage] || 0}/2 lần</span>
+              <div className="flex-1 w-full space-y-1.5">
+                <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-foreground">
+                      {isPlaying ? "🔊 Đang phát âm thanh..." : "🎧 Sẵn sàng nghe"}
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">
+                      {audioUrlMap[activeStage] ? "Audio HD" : "Audio British AI"}
+                    </span>
+                  </div>
+                  <span>Đã nghe: <strong>{playCounts[activeStage] || 0}/2</strong> lần</span>
                 </div>
+
                 <div className="h-2 rounded-full bg-muted overflow-hidden">
                   <div
                     className={`h-full bg-primary rounded-full transition-all duration-300 ${
@@ -1410,6 +1295,25 @@ function ListeningExamRunnerContent() {
                     style={{ width: `${playbackProgress}%` }}
                   />
                 </div>
+              </div>
+
+              {/* Bộ chọn tốc độ phát âm thanh */}
+              <div className="flex items-center gap-1 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/50 w-full sm:w-auto justify-end">
+                <span className="text-[10px] text-muted-foreground mr-1 hidden sm:inline">Tốc độ:</span>
+                {[0.75, 1, 1.25].map((spd) => (
+                  <button
+                    key={spd}
+                    type="button"
+                    onClick={() => handleSpeedChange(spd)}
+                    className={`px-2 py-1 rounded text-[11px] font-bold transition-all ${
+                      playbackSpeed === spd
+                        ? "bg-primary text-primary-foreground shadow-xs"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {spd}x
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -1596,145 +1500,90 @@ function ListeningExamRunnerContent() {
         </div>
       </main>
 
-      {/* 4. FIXED BOTTOM BAR CHUẨN EXAM MODE */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-exam-surface/95 backdrop-blur border-t border-exam-border h-14">
-        <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
-          {/* Left: Question Drawer & Info */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowDrawer(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
-              title="Danh sách câu hỏi"
-            >
-              <Menu className="w-4 h-4 text-primary" />
-              <span className="hidden sm:inline">Danh sách ({totalAnsweredCount}/{totalQuestionsCount})</span>
-            </button>
+      {/* 4. BOTTOM BAR CHUẨN */}
+      <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
+        {/* Left: Hiện đáp án & Báo lỗi */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowSampleAnswers(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Hiện đáp án</span>
+          </button>
 
-            <button
-              type="button"
-              onClick={() => setIsInfoOpen(true)}
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 transition-colors cursor-pointer"
-              title="Thông tin bài thi"
-            >
-              <Info className="w-4 h-4 text-exam-text-muted" />
-            </button>
+          <button
+            type="button"
+            onClick={() => alert("Đã gửi phản hồi báo lỗi đề thi.")}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors"
+          >
+            <Flag className="w-3.5 h-3.5" />
+            <span>Báo lỗi</span>
+          </button>
+        </div>
 
-            <button
-              type="button"
-              onClick={() => setShowSampleAnswers(true)}
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
-            >
-              <span>💡 Đáp án mẫu</span>
-            </button>
-          </div>
+        {/* Center: Navigation Controls */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowDrawer(true)}
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
+            title="Danh sách câu hỏi"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
 
-          {/* Right: Exit, Previous, Next / Submit */}
-          <div className="flex items-center gap-2">
-            <Link
-              href="/listening"
-              title="Thoát"
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-            </Link>
+          <button
+            type="button"
+            onClick={() => alert(`Đang làm bài: ${currentMeta.partName} - ${currentMeta.subTitle}`)}
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
+            title="Thông tin bài thi"
+          >
+            <Info className="w-4 h-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
+            title="Cuộn lên đầu trang"
+          >
+            <ArrowUp className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Right: Previous & Next / Submit */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={activeStage === 0}
+            onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
+            className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors"
+          >
+            ← Previous
+          </button>
+
+          {activeStage < 16 ? (
             <button
               type="button"
-              onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
-              disabled={activeStage === 0}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-sm font-medium hover:bg-exam-border/40 transition-colors disabled:opacity-40 cursor-pointer"
+              onClick={() => setActiveStage((p) => Math.min(16, p + 1))}
+              className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Previous</span>
+              <span>Next</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
+          ) : (
             <button
               type="button"
-              onClick={() => {
-                if (activeStage === 16) {
-                  setIsSubmitModalOpen(true);
-                } else {
-                  setActiveStage((p) => Math.min(16, p + 1));
-                }
-              }}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-brand-brown text-sm font-bold shadow-sm transition-all cursor-pointer"
+              onClick={handleFinalSubmit}
+              className="tech-btn px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all"
             >
-              <span>{activeStage === 16 ? "Nộp bài" : "Next"}</span>
-              <ArrowRight className="w-4 h-4" />
+              Nộp bài
             </button>
-          </div>
+          )}
         </div>
       </footer>
-
-      {/* MODAL THÔNG TIN BÀI THI */}
-      {isInfoOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in"
-          onClick={() => setIsInfoOpen(false)}
-        >
-          <div
-            className="bg-exam-surface border border-exam-border rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-3"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-exam-border">
-              <h4 className="font-bold text-sm text-exam-text">Thông tin bài thi Listening</h4>
-              <button
-                type="button"
-                onClick={() => setIsInfoOpen(false)}
-                className="w-6 h-6 flex items-center justify-center rounded text-exam-text-muted hover:text-exam-text"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="space-y-2 text-xs text-exam-text">
-              {[
-                { l: "Tên bài thi", v: examData.title },
-                { l: "Kỹ năng", v: "Listening Aptis ESOL (4 Parts · 25 câu)" },
-                { l: "Thời lượng", v: `${examData.durationMinutes} phút` },
-                { l: "Đã hoàn thành", v: `${totalAnsweredCount}/${totalQuestionsCount} câu` },
-                { l: "Thời gian còn lại", v: formatTime(timeLeft) },
-              ].map((x) => (
-                <div key={x.l} className="flex justify-between">
-                  <span className="text-exam-text-muted">{x.l}:</span>
-                  <span className="font-bold">{x.v}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL XÁC NHẬN NỘP BÀI */}
-      {isSubmitModalOpen && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-exam-surface rounded-2xl border border-exam-border p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 className="text-lg font-black text-exam-text">Xác nhận nộp bài thi Listening?</h3>
-            <p className="text-sm text-exam-text-muted leading-relaxed">
-              Bạn đã hoàn thành <strong className="text-primary font-black">{totalAnsweredCount}/{totalQuestionsCount}</strong> câu hỏi. Hệ thống sẽ tiến hành chấm điểm và lập báo cáo kết quả.
-            </p>
-            {totalAnsweredCount < totalQuestionsCount && (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold">
-                ⚠️ Lưu ý: Bạn vẫn còn {totalQuestionsCount - totalAnsweredCount} câu chưa làm xong!
-              </div>
-            )}
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsSubmitModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
-              >
-                Tiếp tục làm bài
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmitExam}
-                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown transition-colors shadow-sm cursor-pointer"
-              >
-                Xác nhận nộp bài
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* MODAL HIỆN ĐÁP ÁN */}
       {showSampleAnswers && (

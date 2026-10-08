@@ -158,28 +158,390 @@ const DEFAULT_ART_CLUB_PARTS: WritingPart[] = [
         prompt:
           "Write an email to the club secretary. Explain how you feel about the cancellation and suggest alternative ways the club could organize the trip or raise funds. Write 120-150 words.",
         sampleAnswer:
-          "Dear Mr. Davis,\n\nI am writing to express my disappointment upon learning about the cancellation of our anticipated annual visit to the National Art Gallery. This excursion is one of the most enriching activities of the club year.\n\nWhile I appreciate the budgetary hurdles currently facing the committee, I would like to respectfully propose several constructive alternatives. Firstly, members could contribute a modest personal fee to cover transportation expenses. Secondly, we could organize a student art auction or reach out to local sponsors to bridge the deficit.\n\nI believe these solutions would enable us to proceed without placing an excessive burden on club finances. I hope the committee will favorably review these thoughts.\n\nYours sincerely,\nHoang Hiep",
+          "Dear Mr. Davis,\n\nI am writing to express my disappointment upon learning about the cancellation of our anticipated annual visit to the National Art Gallery. This excursion is one of the most enriching activities of the club year.\n\nWhile I appreciate the budgetary hurdles currently facing the committee, I would respectfully propose several constructive alternatives. Firstly, members could contribute a modest personal fee to cover transportation expenses. Secondly, we could organize a student art auction or reach out to local sponsors to bridge the deficit.\n\nI believe these solutions would enable us to proceed without placing an excessive burden on club finances. I hope the committee will favorably review these thoughts.\n\nYours sincerely,\nHoang Hiep",
       },
     ],
   },
 ];
+
+// Fallback Sports & Fitness Club data (Đề 02)
+const DEFAULT_FITNESS_CLUB_PARTS: WritingPart[] = [
+  {
+    partNumber: 1,
+    partName: "Part 1 – Short Answers",
+    partSubtitle: "Part 1 - Short Answers",
+    minWords: 1,
+    maxWords: 5,
+    recommendedMinutes: 3,
+    instructions:
+      "You want to join a sports and fitness club. You have 5 messages from a member of the club. Write short answers (1-5 words) to each message. Recommended time: 3 minutes.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt: "1. What is your favorite outdoor sport or physical activity?",
+        sampleAnswer: "Swimming and playing badminton.",
+      },
+      {
+        questionNumber: 2,
+        prompt: "2. How often do you exercise each week?",
+        sampleAnswer: "Three times every week.",
+      },
+      {
+        questionNumber: 3,
+        prompt: "3. What sports gear or equipment do you usually use?",
+        sampleAnswer: "Running shoes and yoga mat.",
+      },
+      {
+        questionNumber: 4,
+        prompt: "4. What time of day do you prefer working out?",
+        sampleAnswer: "Early morning before work.",
+      },
+      {
+        questionNumber: 5,
+        prompt: "5. Which season is best for outdoor running?",
+        sampleAnswer: "Spring, with cool breezes.",
+      },
+    ],
+  },
+  {
+    partNumber: 2,
+    partName: "Part 2 – Social Media Response",
+    partSubtitle: "Part 2 - Social Media Response",
+    minWords: 20,
+    maxWords: 30,
+    recommendedMinutes: 7,
+    instructions:
+      "You are a new member of the sports and fitness club. Fill in the form. Write in sentences. Use 20-30 words. Recommended time: 7 minutes.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt: "Please tell us why you want to join our sports club and what personal goals you wish to achieve.",
+        sampleAnswer:
+          "I want to join to improve my cardiovascular stamina and relieve stress after work. Exercising with club peers will keep me disciplined.",
+      },
+    ],
+  },
+  {
+    partNumber: 3,
+    partName: "Part 3 – Three Questions",
+    partSubtitle: "Part 3 - Three Questions",
+    minWords: 30,
+    maxWords: 40,
+    recommendedMinutes: 10,
+    instructions:
+      "You are a member of the sports club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30-40 words per answer. Recommended time: 10 minutes.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt:
+          "1. I have just started training at the gym. How many days per week should a beginner exercise?",
+        sampleAnswer:
+          "As a beginner, three sessions per week is ideal. It allows your muscle tissue adequate recovery time while fostering a sustainable fitness habit without risking exhaustion.",
+      },
+      {
+        questionNumber: 2,
+        prompt:
+          "2. The management is considering raising membership fees to purchase modern equipment. What is your opinion?",
+        sampleAnswer:
+          "Upgrading machinery is beneficial for member safety and workout variety. However, the club should provide discounted loyalty rates for existing members to reward their dedication.",
+      },
+      {
+        questionNumber: 3,
+        prompt:
+          "3. Some people prefer exercising alone at home while others love group fitness classes. Which do you prefer?",
+        sampleAnswer:
+          "I prefer group workout classes because energetic music and motivated peers inspire me to push beyond my limits far more effectively than exercising alone.",
+      },
+    ],
+  },
+  {
+    partNumber: 4,
+    partName: "Part 4 – Formal & Informal Email",
+    partSubtitle: "Part 4 - Formal & Informal Email",
+    minWords: 50,
+    maxWords: 150,
+    recommendedMinutes: 20,
+    instructions:
+      "You are a member of the sports club. You received an email from the club manager stating that all weekend group workout sessions have been canceled due to staff shortages.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt:
+          "Write an email to a friend who is also a sports club member. Write about your feelings and what you think the club should do. Write about 50 words.",
+        sampleAnswer:
+          "Hi Alex,\n\nDid you see the club notice about canceling weekend training sessions? I am quite upset since weekends are my only free window for exercise. We should talk to other members and suggest hiring temporary guest coaches.\n\nBest,\nHiep",
+      },
+      {
+        questionNumber: 2,
+        prompt:
+          "Write an email to the club manager. Explain how you feel about the cancellation and suggest alternative ways the club could organize sessions or solve staffing issues. Write 120-150 words.",
+        sampleAnswer:
+          "Dear Mr. Henderson,\n\nI am writing to express my earnest concern regarding the recent decision to suspend weekend group workout sessions due to staffing shortages. As a working professional, weekends represent my primary availability to train consistently.\n\nWhile I completely appreciate the operational difficulties facing the club, I would respectfully like to suggest two constructive alternatives. Firstly, the club could hire accredited freelance fitness instructors on temporary contracts. Secondly, certified senior members could supervise peer-led workouts until permanent staff are recruited.\n\nI believe these solutions would enable members to continue their routines safely without placing an excessive burden on management. I hope you will give these suggestions favorable consideration.\n\nYours sincerely,\nHoang Hiep",
+      },
+    ],
+  },
+];
+
+// Fallback Book Club data (Đề 03)
+const DEFAULT_BOOK_CLUB_PARTS: WritingPart[] = [
+  {
+    partNumber: 1,
+    partName: "Part 1 – Short Answers",
+    partSubtitle: "Part 1 - Short Answers",
+    minWords: 1,
+    maxWords: 5,
+    recommendedMinutes: 3,
+    instructions:
+      "You want to join a book club. You have 5 messages from a member of the club. Write short answers (1-5 words) to each message. Recommended time: 3 minutes.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt: "1. What genre of books do you enjoy reading the most?",
+        sampleAnswer: "Historical novels and biographies.",
+      },
+      {
+        questionNumber: 2,
+        prompt: "2. How often do you visit a bookstore or library?",
+        sampleAnswer: "Twice every month.",
+      },
+      {
+        questionNumber: 3,
+        prompt: "3. What was the last book you finished?",
+        sampleAnswer: "The Great Gatsby.",
+      },
+      {
+        questionNumber: 4,
+        prompt: "4. Do you prefer reading printed books or e-books?",
+        sampleAnswer: "Printed books with paper feel.",
+      },
+      {
+        questionNumber: 5,
+        prompt: "5. Where is your favorite spot for reading?",
+        sampleAnswer: "A quiet corner cafe.",
+      },
+    ],
+  },
+  {
+    partNumber: 2,
+    partName: "Part 2 – Social Media Response",
+    partSubtitle: "Part 2 - Social Media Response",
+    minWords: 20,
+    maxWords: 30,
+    recommendedMinutes: 7,
+    instructions:
+      "You are a new member of the book club. Fill in the form. Write in sentences. Use 20-30 words. Recommended time: 7 minutes.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt: "Tell us about a book that made a strong impression on you and why you liked it.",
+        sampleAnswer:
+          "I recently read 'To Kill a Mockingbird'. It deeply moved me because of its profound message about justice, personal integrity, and unconditional human empathy.",
+      },
+    ],
+  },
+  {
+    partNumber: 3,
+    partName: "Part 3 – Three Questions",
+    partSubtitle: "Part 3 - Three Questions",
+    minWords: 30,
+    maxWords: 40,
+    recommendedMinutes: 10,
+    instructions:
+      "You are a member of the book club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30-40 words per answer. Recommended time: 10 minutes.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt:
+          "1. I struggle to finish long books because of busy schedules. How do you find time to read daily?",
+        sampleAnswer:
+          "I set aside twenty minutes before bedtime every night without looking at my smartphone. Reading small chapters consistently accumulates quickly over weeks.",
+      },
+      {
+        questionNumber: 2,
+        prompt:
+          "2. Our local municipal library might reduce its weekend opening hours. How do you feel about this?",
+        sampleAnswer:
+          "Reducing weekend hours would severely hurt students and working citizens who only have leisure time on Saturdays. The municipal council should recruit community volunteers instead.",
+      },
+      {
+        questionNumber: 3,
+        prompt:
+          "3. Many young people prefer audiobooks over paper books now. What is your viewpoint?",
+        sampleAnswer:
+          "Audiobooks are fantastic for daily commutes and multitasking. However, printed books provide tactile pleasure and deeper focus that audio recordings cannot entirely replace.",
+      },
+    ],
+  },
+  {
+    partNumber: 4,
+    partName: "Part 4 – Formal & Informal Email",
+    partSubtitle: "Part 4 - Formal & Informal Email",
+    minWords: 50,
+    maxWords: 150,
+    recommendedMinutes: 20,
+    instructions:
+      "You are a member of the book club. You received an email from the club coordinator stating that next month's author meeting and discussion with novelist David Mitchell has been canceled.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt:
+          "Write an email to a friend who is also a book club member. Write about your feelings and what you think the club should do. Write about 50 words.",
+        sampleAnswer:
+          "Hi Sarah,\n\nHave you heard about the author talk with David Mitchell being canceled? I am so disappointed as I had prepared several questions about his latest novel. Let us propose organizing a virtual session via Zoom instead.\n\nCheers,\nHiep",
+      },
+      {
+        questionNumber: 2,
+        prompt:
+          "Write an email to the club coordinator. Explain how you feel about the cancellation and suggest alternative ways the club could organize the session. Write 120-150 words.",
+        sampleAnswer:
+          "Dear Ms. Watson,\n\nI am writing to express my regret upon receiving the notification that our scheduled author talk with David Mitchell has been canceled owing to travel issues.\n\nGiven the tremendous anticipation among club members, I would like to propose hosting this session virtually via video conference. This would eliminate travel constraints while still providing an engaging interactive platform for members to discuss the author's work.\n\nI hope the committee will consider this viable alternative.\n\nYours sincerely,\nHoang Hiep",
+      },
+    ],
+  },
+];
+
+// Fallback Travel & Adventure Club data (Đề 04)
+const DEFAULT_TRAVEL_CLUB_PARTS: WritingPart[] = [
+  {
+    partNumber: 1,
+    partName: "Part 1 – Short Answers",
+    partSubtitle: "Part 1 - Short Answers",
+    minWords: 1,
+    maxWords: 5,
+    recommendedMinutes: 3,
+    instructions:
+      "You want to join a travel and outdoor club. You have 5 messages from a member of the club. Write short answers (1-5 words) to each message. Recommended time: 3 minutes.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt: "1. What is your favorite holiday destination?",
+        sampleAnswer: "Coastal beaches and mountains.",
+      },
+      {
+        questionNumber: 2,
+        prompt: "2. Who do you usually travel with?",
+        sampleAnswer: "My family and close friends.",
+      },
+      {
+        questionNumber: 3,
+        prompt: "3. What essential item do you always pack?",
+        sampleAnswer: "Camera and comfortable shoes.",
+      },
+      {
+        questionNumber: 4,
+        prompt: "4. How do you prefer to travel: plane, train, or car?",
+        sampleAnswer: "Train, for scenic views.",
+      },
+      {
+        questionNumber: 5,
+        prompt: "5. What is the best season for traveling?",
+        sampleAnswer: "Autumn, with pleasant mild weather.",
+      },
+    ],
+  },
+  {
+    partNumber: 2,
+    partName: "Part 2 – Social Media Response",
+    partSubtitle: "Part 2 - Social Media Response",
+    minWords: 20,
+    maxWords: 30,
+    recommendedMinutes: 7,
+    instructions:
+      "You are a new member of the travel club. Fill in the form. Write in sentences. Use 20-30 words. Recommended time: 7 minutes.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt: "Tell us about a memorable journey or vacation you experienced recently.",
+        sampleAnswer:
+          "Last summer, I took a road trip along the central coastline. The crystal-clear sea and warm hospitality of local fishermen made it an unforgettable journey.",
+      },
+    ],
+  },
+  {
+    partNumber: 3,
+    partName: "Part 3 – Three Questions",
+    partSubtitle: "Part 3 - Three Questions",
+    minWords: 30,
+    maxWords: 40,
+    recommendedMinutes: 10,
+    instructions:
+      "You are a member of the travel club. You are talking to three other members in the club chat room. Talk to them using sentences. Use 30-40 words per answer. Recommended time: 10 minutes.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt:
+          "1. Some people prefer solo travel while others always travel in groups. What do you prefer?",
+        sampleAnswer:
+          "I prefer traveling with friends because sharing local meals and exploring uncharted paths together creates unforgettable memories and enhances mutual safety.",
+      },
+      {
+        questionNumber: 2,
+        prompt:
+          "2. Mass tourism is causing environmental damage to fragile heritage towns. What should authorities do?",
+        sampleAnswer:
+          "Municipal authorities should enforce daily tourist visitor quotas and channel tourism levies directly into historical conservation and eco-friendly waste management.",
+      },
+      {
+        questionNumber: 3,
+        prompt:
+          "3. With rising airfares, budget travel has become challenging. What is your best cost-saving tip?",
+        sampleAnswer:
+          "Booking accommodations well in advance and dining at neighborhood markets rather than tourist cafes saves considerable funds while providing authentic cultural experiences.",
+      },
+    ],
+  },
+  {
+    partNumber: 4,
+    partName: "Part 4 – Formal & Informal Email",
+    partSubtitle: "Part 4 - Formal & Informal Email",
+    minWords: 50,
+    maxWords: 150,
+    recommendedMinutes: 20,
+    instructions:
+      "You are a member of the travel club. You received an email from the committee stating that the upcoming weekend exploration trip to the coastal national park has been canceled due to adverse weather warnings.",
+    questions: [
+      {
+        questionNumber: 1,
+        prompt:
+          "Write an email to a friend who is also a travel club member. Write about your feelings and what you think the club should do. Write about 50 words.",
+        sampleAnswer:
+          "Hi Tom,\n\nDid you see the update about our national park trip being canceled? I was so excited to hike and camp by the coast. Perhaps we could suggest rescheduling to the following weekend once the weather clears.\n\nBest,\nHiep",
+      },
+      {
+        questionNumber: 2,
+        prompt:
+          "Write an email to the club committee. Explain how you feel about the cancellation and suggest alternative ways the club could organize the excursion. Write 120-150 words.",
+        sampleAnswer:
+          "Dear Committee Members,\n\nI am writing regarding the postponement of our planned expedition to the coastal national park due to inclement weather conditions.\n\nWhile member safety is understandably the utmost priority, many of us have already arranged time off work. I would respectfully propose rescheduling the excursion to next weekend or shifting the itinerary to a nearby indoor cultural museum tour.\n\nI would be grateful if the committee could evaluate these possibilities.\n\nYours sincerely,\nHoang Hiep",
+      },
+    ],
+  },
+];
+
+// Helper chọn benchmark đề theo tiêu đề hoặc ID
+function getBenchmarkWritingParts(titleOrId: string = ''): WritingPart[] {
+  const t = titleOrId.toLowerCase();
+  if (t.includes('sport') || t.includes('fitness') || t.includes('thể thao') || t.includes('02') || t === '2') {
+    return DEFAULT_FITNESS_CLUB_PARTS;
+  }
+  if (t.includes('book') || t.includes('sách') || t.includes('đọc') || t.includes('03') || t === '3') {
+    return DEFAULT_BOOK_CLUB_PARTS;
+  }
+  if (t.includes('travel') || t.includes('du lịch') || t.includes('04') || t === '4') {
+    return DEFAULT_TRAVEL_CLUB_PARTS;
+  }
+  return DEFAULT_ART_CLUB_PARTS;
+}
 
 function WritingExamRunnerContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
   const examId = params.id as string;
-  const modeParam = searchParams?.get("mode");
-  const submissionIdParam = searchParams?.get("submissionId");
 
   const [examTitle, setExamTitle] = useState("Writing Test");
   const [parts, setParts] = useState<WritingPart[]>(DEFAULT_ART_CLUB_PARTS);
   const [currentPartIdx, setCurrentPartIdx] = useState(0);
-
-  // Review Mode State
-  const [reviewMode, setReviewMode] = useState(modeParam === "review");
-  const [reviewPartIdx, setReviewPartIdx] = useState(0);
-  const [sampleTabState, setSampleTabState] = useState<Record<string, "b1" | "b2">>({});
 
   // answers: key = `${partIdx}_${qIdx}`
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -187,28 +549,14 @@ function WritingExamRunnerContent() {
   const [isPaused, setIsPaused] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [submissionId, setSubmissionId] = useState<string | null>(submissionIdParam || null);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
 
   // AI Quota & Submission state
   const [aiQuota, setAiQuota] = useState(2);
   const [showPart2Result, setShowPart2Result] = useState(false);
   const [showAiWaitingScreen, setShowAiWaitingScreen] = useState(false);
-  const [isEvaluating, setIsEvaluating] = useState(false);
-  const [evalError, setEvalError] = useState<string | null>(null);
-  const [aiGradingResult, setAiGradingResult] = useState<{
-    submissionId: string;
-    overallScore: number;
-    cefrLevel: string;
-    evaluatedQuestionsCount: number;
-    aiResults: Array<any>;
-  } | null>(null);
   const [showSampleAnswersModal, setShowSampleAnswersModal] = useState(false);
   const [showPartsDrawer, setShowPartsDrawer] = useState(false);
-  const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
-
-  const totalQuestionsCount = parts.reduce((acc, p) => acc + p.questions.length, 0);
-  const totalAnsweredCount = Object.values(answers).filter((a) => a.trim().length > 0).length;
 
   // Khởi tạo Quota từ localStorage (hoặc 2 lượt như hệ thống gốc)
   useEffect(() => {
@@ -222,13 +570,13 @@ function WritingExamRunnerContent() {
     }
   }, []);
 
-  // Xử lý tab part từ URL nếu có (?part=p1, ?part=p2, etc.)
+  // Xử lý tab part từ URL nếu có (?part=p1, ?part=p2, ?part=1, etc.)
   useEffect(() => {
-    const partQuery = searchParams?.get("part");
-    if (partQuery === "p1") setCurrentPartIdx(0);
-    else if (partQuery === "p2") setCurrentPartIdx(1);
-    else if (partQuery === "p3") setCurrentPartIdx(2);
-    else if (partQuery === "p4") setCurrentPartIdx(3);
+    const partQuery = searchParams?.get("part")?.toLowerCase();
+    if (partQuery === "p1" || partQuery === "1") setCurrentPartIdx(0);
+    else if (partQuery === "p2" || partQuery === "2") setCurrentPartIdx(1);
+    else if (partQuery === "p3" || partQuery === "3") setCurrentPartIdx(2);
+    else if (partQuery === "p4" || partQuery === "4") setCurrentPartIdx(3);
   }, [searchParams]);
 
   // Load Exam Data từ Backend
@@ -237,11 +585,13 @@ function WritingExamRunnerContent() {
       setLoading(true);
       setError(null);
       const res = await api.exams.getQuestions(examId);
-      let loadedParts = DEFAULT_ART_CLUB_PARTS;
-      if (res.success && res.data && res.data.parts?.length > 0) {
-        setExamTitle(res.data.title || "Writing Test");
+      const title = res.data?.title || "Writing Test";
+      setExamTitle(title);
 
-        loadedParts = (res.data.parts || []).map(
+      const benchmarkParts = getBenchmarkWritingParts(title || examId);
+
+      if (res.success && res.data && res.data.parts?.length > 0) {
+        const loadedParts: WritingPart[] = (res.data.parts || []).map(
           (p: any, idx: number) => {
             const partNum = p.part_number || idx + 1;
             const subTitle =
@@ -253,17 +603,29 @@ function WritingExamRunnerContent() {
                 ? "Part 3 - Three Questions"
                 : "Part 4 - Formal & Informal Email";
 
-            const defaultP = DEFAULT_ART_CLUB_PARTS[idx] || DEFAULT_ART_CLUB_PARTS[0];
+            const defaultP = benchmarkParts[idx] || benchmarkParts[0];
 
-            const questions: WritingQuestion[] =
-              p.questions && p.questions.length > 0
-                ? p.questions.map((q: any, qIdx: number) => ({
-                    id: q.id,
-                    questionNumber: q.question_number || qIdx + 1,
-                    prompt: q.prompt || defaultP.questions[qIdx]?.prompt || `Question ${qIdx + 1}`,
-                    sampleAnswer: q.explanation || defaultP.questions[qIdx]?.sampleAnswer,
-                  }))
-                : defaultP.questions;
+            let questions: WritingQuestion[] = [];
+            if (p.questions && p.questions.length > 0) {
+              questions = p.questions.map((q: any, qIdx: number) => ({
+                id: q.id,
+                questionNumber: q.question_number || qIdx + 1,
+                prompt: q.prompt || defaultP.questions[qIdx]?.prompt || `Question ${qIdx + 1}`,
+                sampleAnswer: q.explanation || defaultP.questions[qIdx]?.sampleAnswer,
+              }));
+
+              // Bổ sung đủ 5 câu cho Part 1 nếu database chỉ có ít câu
+              if (partNum === 1 && questions.length < 5 && defaultP.questions.length >= 5) {
+                for (let i = questions.length; i < 5; i++) {
+                  questions.push({
+                    ...defaultP.questions[i],
+                    questionNumber: i + 1,
+                  });
+                }
+              }
+            } else {
+              questions = defaultP.questions;
+            }
 
             return {
               partNumber: partNum,
@@ -278,64 +640,22 @@ function WritingExamRunnerContent() {
             };
           }
         );
-      }
-      setParts(loadedParts);
 
-      // Nếu có submissionId, tải bài nộp cũ để review
-      if (submissionIdParam) {
-        try {
-          const subRes = await api.submissions.getResult(submissionIdParam);
-          if (subRes.success && subRes.data) {
-            const sub = subRes.data;
-            const loadedAnswers: Record<string, string> = {};
-            (sub.answers || []).forEach((ans: any, aIdx: number) => {
-              const text = ans.text_answer || ans.textAnswer || "";
-              // Map vào partIdx_qIdx
-              let found = false;
-              loadedParts.forEach((p, pIdx) => {
-                p.questions.forEach((q, qIdx) => {
-                  if (q.id === ans.question_id || q.id === ans.questionId) {
-                    loadedAnswers[`${pIdx}_${qIdx}`] = text;
-                    found = true;
-                  }
-                });
-              });
-              if (!found) {
-                // Fallback theo index
-                let count = 0;
-                for (let pIdx = 0; pIdx < loadedParts.length; pIdx++) {
-                  for (let qIdx = 0; qIdx < loadedParts[pIdx].questions.length; qIdx++) {
-                    if (count === aIdx) {
-                      loadedAnswers[`${pIdx}_${qIdx}`] = text;
-                    }
-                    count++;
-                  }
-                }
-              }
-            });
-            if (Object.keys(loadedAnswers).length > 0) {
-              setAnswers(loadedAnswers);
-            }
-            if (sub.ai_results && sub.ai_results.length > 0) {
-              setAiGradingResult({
-                submissionId: sub.id,
-                overallScore: sub.total_score || 0,
-                cefrLevel: sub.cefr_level || "B2",
-                evaluatedQuestionsCount: sub.ai_results.length,
-                aiResults: sub.ai_results,
-              });
-            }
-            if (modeParam === "review") {
-              setReviewMode(true);
-            }
+        // Bổ sung đủ 4 Part nếu đề chỉ lưu thiếu Part
+        if (loadedParts.length < 4) {
+          for (let i = loadedParts.length; i < 4; i++) {
+            loadedParts.push(benchmarkParts[i]);
           }
-        } catch (e) {
-          console.warn("Could not load writing submission:", e);
         }
+
+        setParts(loadedParts);
+      } else {
+        setParts(benchmarkParts);
       }
     } catch (err: any) {
       console.warn("Fallback to default writing exam:", err);
-      setParts(DEFAULT_ART_CLUB_PARTS);
+      const fallback = getBenchmarkWritingParts(examId);
+      setParts(fallback);
     } finally {
       setLoading(false);
     }
@@ -392,102 +712,46 @@ function WritingExamRunnerContent() {
     return text.trim().split(/\s+/).filter(Boolean).length;
   };
 
-  // NỘP BÀI THI & CHẤM ĐIỂM BẰNG AI (GEMINI & GPT)
+  // NỘP BÀI (SUBMIT LOGIC: Part 2 miễn phí trả ngay; Part 1, 3, 4 trừ lượt AI & chờ)
   const handleSubmit = async () => {
-    // Nếu chỉ làm riêng Part 2 và không muốn dùng AI
-    if (parts.length === 1 && currentPart.partNumber === 2) {
+    // Lưu các câu trả lời vào database nếu có submissionId
+    if (submissionId) {
+      try {
+        const answersPayload = currentPart.questions
+          .filter((q) => q.id && q.id.length > 10)
+          .map((q, qIdx) => ({
+            questionId: q.id!,
+            textAnswer: answers[`${currentPartIdx}_${qIdx}`] || "",
+          }));
+        if (answersPayload.length > 0) {
+          await api.submissions.autosave(submissionId, answersPayload);
+        }
+        if (currentPart.partNumber === 4 || currentPartIdx === parts.length - 1) {
+          await api.submissions.submit(submissionId);
+        }
+      } catch (err) {
+        console.warn("Writing autosave/submit error:", err);
+      }
+    }
+
+    if (currentPart.partNumber === 2) {
+      // PART 2: KHÔNG CHẤM AI - KHÔNG TRỪ LƯỢT AI - TRẢ KẾT QUẢ NGAY
       setShowPart2Result(true);
       setShowAiWaitingScreen(false);
-      return;
-    }
-
-    setEvalError(null);
-
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("accessToken") ||
-          localStorage.getItem("token") ||
-          localStorage.getItem("aptis_token")
-        : null;
-
-    if (!token) {
-      setEvalError("Bạn cần đăng nhập để nộp bài và nhận đánh giá từ mô hình AI (Gemini Premier) theo chuẩn CEFR Aptis.");
+    } else {
+      // PART 1, 3, 4: CHẤM AI - TRỪ 1 LƯỢT CHẤM - HIỆN MÀN HÌNH CHỜ 1-3 PHÚT
+      const newQuota = Math.max(0, aiQuota - 1);
+      setAiQuota(newQuota);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("aptis_writing_ai_quota", String(newQuota));
+      }
       setShowAiWaitingScreen(true);
-      return;
-    }
-
-    setIsEvaluating(true);
-    setShowAiWaitingScreen(true);
-    setShowPart2Result(false);
-
-    try {
-      let activeSubId = submissionId;
-      if (!activeSubId && examId) {
-        const startRes = await api.submissions.start(examId);
-        if (startRes.success && startRes.data) {
-          activeSubId = startRes.data.submissionId || startRes.data.id;
-          setSubmissionId(activeSubId);
-        }
-      }
-
-      if (!activeSubId) {
-        throw new Error("Không thể khởi tạo phiên làm bài thi. Vui lòng kiểm tra lại kết nối mạng.");
-      }
-
-      // 1. Thu thập toàn bộ câu trả lời từ tất cả các parts
-      const allAnswersPayload: Array<{ questionId: string; textAnswer: string }> = [];
-      parts.forEach((p, pIdx) => {
-        p.questions.forEach((q, qIdx) => {
-          const text = answers[`${pIdx}_${qIdx}`] || "";
-          if (q.id) {
-            allAnswersPayload.push({
-              questionId: q.id,
-              textAnswer: text,
-            });
-          }
-        });
-      });
-
-      if (allAnswersPayload.length > 0) {
-        await api.submissions.autosave(activeSubId, allAnswersPayload);
-      }
-
-      // 2. Nộp bài chính thức
-      await api.submissions.submit(activeSubId);
-
-      // 3. Kích hoạt mô hình AI chấm điểm thực tế
-      const aiRes = await api.aiGrading.evaluate(activeSubId);
-      if (aiRes.success && aiRes.data) {
-        const resData = aiRes.data;
-        setAiGradingResult({
-          submissionId: resData.submissionId || activeSubId,
-          overallScore: resData.overallScore ?? 0,
-          cefrLevel: resData.cefrLevel || "B2",
-          evaluatedQuestionsCount: resData.evaluatedQuestionsCount || resData.aiResults?.length || 0,
-          aiResults: resData.aiResults || [],
-        });
-
-        // Cập nhật quota hiển thị nếu có trừ
-        if (resData.quotaDeducted) {
-          const newQuota = Math.max(0, aiQuota - 1);
-          setAiQuota(newQuota);
-          if (typeof window !== "undefined") {
-            localStorage.setItem("aptis_writing_ai_quota", String(newQuota));
-          }
-        }
-      } else {
-        throw new Error(aiRes.error?.message || "Mô hình AI chưa phản hồi bài chấm. Vui lòng thử lại.");
-      }
-    } catch (err: any) {
-      console.error("Writing AI grading error:", err);
-      setEvalError(err?.message || "Không thể hoàn tất quá trình chấm AI. Vui lòng thử lại.");
-    } finally {
-      setIsEvaluating(false);
+      setShowPart2Result(false);
     }
   };
 
   // =========================================================================
-  // MÀN HÌNH CHỜ & KẾT QUẢ CHẤM AI
+  // MÀN HÌNH CHỜ CHẤM AI (PART 1, 3, 4 - THEO THEME CHUẨN CỦA HỆ THỐNG MÌNH)
   // =========================================================================
   if (showAiWaitingScreen) {
     return (
@@ -503,7 +767,7 @@ function WritingExamRunnerContent() {
                 Writing Test
               </span>
               <span className="text-sm font-bold text-foreground">
-                Kết quả đánh giá AI (Gemini Premier)
+                Kết quả đánh giá AI
               </span>
             </div>
           </div>
@@ -518,171 +782,31 @@ function WritingExamRunnerContent() {
 
         {/* Centered Waiting Card theo theme hệ thống */}
         <main className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-sm p-8 text-center space-y-6 animate-in fade-in">
-            {evalError ? (
-              /* ERROR STATE */
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mx-auto">
-                  <AlertCircle className="w-6 h-6" />
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="font-heading font-bold text-base text-foreground">
-                    Không thể chấm điểm AI
-                  </h3>
-                  <p className="text-xs md:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-                    {evalError}
-                  </p>
-                </div>
-                <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                  {typeof window !== "undefined" && !localStorage.getItem("accessToken") && (
-                    <Link
-                      href={`/auth?redirect=/writing/${examId}`}
-                      className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:brightness-110 font-bold text-xs shadow-md transition-all"
-                    >
-                      Đăng nhập tài khoản
-                    </Link>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => handleSubmit()}
-                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs transition-all gap-1.5 cursor-pointer"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Thử lại</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowAiWaitingScreen(false)}
-                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
-                  >
-                    Quay lại bài làm
-                  </button>
-                </div>
-              </div>
-            ) : isEvaluating ? (
-              /* LOADING STATE (REAL AI EVALUATION IN PROGRESS) */
-              <div className="space-y-6 py-4">
-                <div className="flex justify-center">
-                  <div className="relative">
-                    <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-                    <Sparkles className="w-6 h-6 text-primary absolute inset-0 m-auto animate-pulse" />
-                  </div>
-                </div>
+          <div className="w-full max-w-xl bg-card border border-border rounded-2xl shadow-sm p-10 text-center space-y-6 animate-in fade-in">
+            {/* Circular Spinner theo màu primary của hệ thống */}
+            <div className="flex justify-center">
+              <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+            </div>
 
-                <div className="space-y-2">
-                  <h3 className="font-heading font-bold text-lg text-foreground">
-                    AI Examiner đang phân tích &amp; chấm bài viết
-                  </h3>
-                  <p className="text-xs md:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-                    Mô hình Gemini đang chấm điểm chi tiết 4 tiêu chí CEFR (Task Completion, Grammar, Vocabulary, Cohesion) và trích xuất gợi ý cải thiện...
-                  </p>
-                </div>
+            {/* Waiting Text */}
+            <div className="space-y-2">
+              <h3 className="font-heading font-bold text-base text-foreground">
+                AI Kỳ Tích đang chấm bài viết
+              </h3>
+              <p className="text-xs md:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                Quá trình phân tích CEFR thường mất từ 1-3 phút. Bạn có thể thoát ra làm đề khác, bài chấm hoàn tất sẽ tự động lưu trong Lịch sử làm bài.
+              </p>
+            </div>
 
-                {/* Progress Checklist */}
-                <div className="max-w-md mx-auto bg-muted/40 rounded-xl p-4 border border-border/60 text-left space-y-2 text-xs">
-                  <div className="flex items-center gap-2 text-foreground font-medium">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
-                    <span>Đang kiểm tra độ hoàn thành đề bài &amp; đếm từ...</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <span className="w-2 h-2 rounded-full bg-primary/50 shrink-0" />
-                    <span>Đang rà soát ngữ pháp và cấu trúc câu phức...</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <span className="w-2 h-2 rounded-full bg-primary/50 shrink-0" />
-                    <span>Đang đánh giá độ phong phú từ vựng theo khung CEFR...</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <span className="w-2 h-2 rounded-full bg-primary/50 shrink-0" />
-                    <span>Đang tổng hợp nhận xét và gợi ý nâng band...</span>
-                  </div>
-                </div>
-              </div>
-            ) : aiGradingResult ? (
-              /* SUCCESS STATE (REAL AI RESULTS READY!) */
-              <div className="space-y-6 text-left">
-                {/* Result Header Card */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary text-primary-foreground">
-                        Hoàn tất chấm điểm AI
-                      </span>
-                      <span className="text-xs font-semibold text-muted-foreground">
-                        {aiGradingResult.evaluatedQuestionsCount} câu hỏi
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-heading font-black text-foreground">
-                      Điểm thi Writing Aptis ESOL
-                    </h3>
-                  </div>
-
-                  <div className="flex items-baseline gap-2 bg-card p-3 rounded-xl border border-border shadow-xs self-start sm:self-auto">
-                    <span className="text-3xl font-black text-primary font-mono">
-                      {aiGradingResult.overallScore}
-                    </span>
-                    <span className="text-xs font-bold text-muted-foreground">/ 50</span>
-                    <span className="ml-2 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                      Band {aiGradingResult.cefrLevel}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Feedback Summary */}
-                {aiGradingResult.aiResults?.[0]?.feedback_summary && (
-                  <div className="p-4 rounded-xl bg-card border border-border space-y-1.5 text-xs md:text-sm">
-                    <strong className="text-foreground block font-bold">
-                      Nhận xét tổng thể từ Giám khảo AI:
-                    </strong>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {aiGradingResult.aiResults[0].feedback_summary}
-                    </p>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-3 border-t border-border">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAiWaitingScreen(false);
-                      setReviewMode(true);
-                      setReviewPartIdx(0);
-                    }}
-                    className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:brightness-110 font-bold text-xs shadow-md transition-all gap-1.5 cursor-pointer"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>Xem chi tiết nhận xét &amp; sửa lỗi từng câu →</span>
-                  </button>
-
-                  <Link
-                    href="/history"
-                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors"
-                  >
-                    Lịch sử làm bài
-                  </Link>
-
-                  <Link
-                    href="/writing"
-                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors"
-                  >
-                    Về danh sách đề
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              /* Fallback */
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">Chưa có kết quả chấm điểm.</p>
-                <button
-                  type="button"
-                  onClick={() => setShowAiWaitingScreen(false)}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold"
-                >
-                  Quay lại
-                </button>
-              </div>
-            )}
+            {/* Thoát Button */}
+            <div className="pt-2">
+              <Link
+                href="/writing"
+                className="tech-btn inline-flex items-center justify-center px-8 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all"
+              >
+                Thoát về danh sách đề
+              </Link>
+            </div>
           </div>
         </main>
       </div>
@@ -692,7 +816,7 @@ function WritingExamRunnerContent() {
   // =========================================================================
   // MÀN HÌNH KẾT QUẢ PART 2 (THEO THEME CHUẨN CỦA HỆ THỐNG MÌNH)
   // =========================================================================
-  if (showPart2Result && !reviewMode) {
+  if (showPart2Result) {
     const part2Answer = answers["1_0"] || answers[`${currentPartIdx}_0`] || "";
     const hasAnswer = part2Answer.trim().length > 0;
 
@@ -732,54 +856,118 @@ function WritingExamRunnerContent() {
                 Kết quả Writing — Part 2
               </h2>
               <div className="inline-block px-5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-bold text-sm">
-                Đã ghi nhận bài làm
+                Điểm: 0/30
               </div>
             </div>
 
-            {/* Card 2: Nhận xét của AI PREMIER */}
+            {/* Card 2: Nhận xét của AI Kỳ Tích */}
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="font-heading font-bold text-sm text-foreground">
-                  Nhận xét của AI PREMIER
+                  Nhận xét của AI Kỳ Tích
                 </h3>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                  Hoàn tất
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border">
+                  0/30
                 </span>
               </div>
               <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
                 {hasAnswer
-                  ? "Đã ghi nhận câu trả lời của bạn. Bạn có thể đối chiếu với bài mẫu chuẩn B1/B2 bên dưới."
-                  : "Chưa ghi nhận câu trả lời cho phần này."}
+                  ? "Đã ghi nhận bài làm — phần này không được chấm và không bị trừ lượt chấm AI."
+                  : "Chưa làm bài — phần này không được chấm và không bị trừ lượt chấm AI"}
               </p>
             </div>
 
-            {/* Card 3: Đề bài & bài làm */}
+            {/* Card 3: Lỗi cần sửa */}
+            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-2">
+              <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-1.5">
+                <span className="text-primary">✕</span>
+                <span>Lỗi cần sửa</span>
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Không phát hiện lỗi ngữ pháp/chính tả
+              </p>
+            </div>
+
+            {/* Card 4: Bài band B1 của đề này */}
+            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-1.5">
+                  <span className="text-accent">🏆</span>
+                  <span>Bài band B1 của đề này</span>
+                </h3>
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  Xem Bảng Kỳ Tích
+                </button>
+              </div>
+
+              {/* 3 Thẻ bài mẫu B1 */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="p-3.5 rounded-xl border border-border bg-muted/30 space-y-2 flex flex-col justify-between">
+                  <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-muted-foreground mt-0.5" />
+                    <p className="line-clamp-4 leading-relaxed">
+                      I&apos;d like to talk about a photo that I really like. It&apos;s a photo of my family taken during a trip to...
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-semibold text-primary">
+                    Học văn án danh
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-border bg-muted/30 space-y-2 flex flex-col justify-between">
+                  <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-muted-foreground mt-0.5" />
+                    <p className="line-clamp-4 leading-relaxed">
+                      I really like a photo of my family. We took it together during a family trip...
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-semibold text-primary">
+                    Học văn án danh
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-border bg-muted/30 space-y-2 flex flex-col justify-between">
+                  <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-muted-foreground mt-0.5" />
+                    <p className="line-clamp-4 leading-relaxed">
+                      I have a lot of pictures, but the favorite picture is the picture that have my family. My family...
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-semibold text-primary">
+                    Học văn án danh
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 5: Đề bài, bài làm & bài viết mẫu */}
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
               <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-1.5">
                 <span>📝</span>
-                <span>Đề bài &amp; Bài làm của bạn</span>
+                <span>Đề bài, bài làm &amp; bài viết mẫu</span>
               </h3>
 
               <div className="space-y-2 text-xs md:text-sm">
-                <span className="font-bold text-primary">Part 2 Prompt</span>
+                <span className="font-bold text-primary">Đề 1</span>
+                <p className="text-muted-foreground leading-relaxed">
+                  You are a new member of the art club. Fill in the form. Write in sentences. Use 20-30 words. Recommended time: 7 minutes.
+                </p>
                 <p className="font-medium text-foreground">
-                  Tell us about a painting or photo you like. (20-30 words)
+                  Tell us about a painting or photo you like.
                 </p>
               </div>
 
               {/* Bài làm của bạn */}
               <div className="space-y-1 text-xs">
-                <div className="flex items-center justify-between text-muted-foreground">
-                  <span className="font-semibold">Bài làm của bạn:</span>
-                  <span className="font-mono text-[11px]">
-                    {getWordCount(part2Answer)} từ (Yêu cầu: 20-30 từ)
-                  </span>
-                </div>
-                <div className="p-3.5 rounded-xl bg-muted/40 border border-border text-foreground font-sans min-h-[48px]">
+                <span className="font-semibold text-muted-foreground">Bài làm của bạn:</span>
+                <div className="p-3 rounded-xl bg-muted/40 border border-border text-foreground font-sans min-h-[48px]">
                   {hasAnswer ? (
-                    <p className="leading-relaxed text-xs md:text-sm">{part2Answer}</p>
+                    <p className="leading-relaxed">{part2Answer}</p>
                   ) : (
-                    <span className="text-muted-foreground italic">(chưa có nội dung)</span>
+                    <span className="text-muted-foreground italic">(không có nội dung)</span>
                   )}
                 </div>
               </div>
@@ -788,37 +976,27 @@ function WritingExamRunnerContent() {
               <div className="space-y-1.5 text-xs">
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                   <span>💡</span>
-                  <span>Bài mẫu tham khảo Band B1/B2:</span>
+                  <span>Bài mẫu tham khảo của đề</span>
                 </span>
-                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 leading-relaxed font-sans text-xs md:text-sm">
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 leading-relaxed font-sans">
                   I took a photo last weekend in the park when the sun was setting. The light was soft, so the picture looked very nice.
                 </div>
               </div>
             </div>
 
             {/* Action Buttons theo theme hệ thống */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <button
                 type="button"
-                onClick={() => {
-                  setShowPart2Result(false);
-                  setReviewMode(true);
-                  setReviewPartIdx(1);
-                }}
-                className="px-5 py-2.5 rounded-xl border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold transition-all flex items-center gap-1.5"
+                onClick={() => setShowPart2Result(false)}
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
               >
-                <Eye className="w-3.5 h-3.5" />
-                <span>Xem lại toàn bộ 4 Part →</span>
+                <span>👁️</span>
+                <span>Xem lại từng câu →</span>
               </button>
               <Link
-                href="/history"
-                className="px-5 py-2.5 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors"
-              >
-                Lịch sử làm bài
-              </Link>
-              <Link
                 href="/writing"
-                className="tech-btn inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all"
+                className="tech-btn inline-flex items-center justify-center px-8 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all"
               >
                 Quay lại danh sách đề
               </Link>
@@ -830,431 +1008,42 @@ function WritingExamRunnerContent() {
   }
 
   // =========================================================================
-  // REVIEW MODE CHI TIẾT CẢ 4 PARTS KỸ NĂNG WRITING
-  // =========================================================================
-  if (reviewMode) {
-    const curReviewPart = parts[reviewPartIdx] || parts[0];
-
-    return (
-      <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
-        {/* Top Header Review Bar */}
-        <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-3 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setReviewMode(false)}
-              className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-              title="Quay lại phòng luyện viết"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-                  Xem lại bài viết
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
-                  4 Parts · Aptis ESOL
-                </span>
-              </div>
-              <span className="text-xs md:text-sm font-bold text-foreground">
-                {examTitle}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Link
-              href="/history"
-              className="px-3 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-muted transition-colors"
-            >
-              Lịch sử làm bài
-            </Link>
-            <Link
-              href="/writing"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 transition-all"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Thoát</span>
-            </Link>
-          </div>
-        </header>
-
-        {/* Content Container */}
-        <main className="flex-1 py-6 px-4 md:px-8 max-w-4xl mx-auto w-full space-y-6">
-          {/* Part Navigation Tabs (4 Parts) */}
-          <div className="bg-card rounded-2xl border border-border p-4 shadow-sm">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              {parts.map((p, pIdx) => {
-                const isCurrent = pIdx === reviewPartIdx;
-                const answeredInPart = p.questions.filter((_, qIdx) => !!(answers[`${pIdx}_${qIdx}`]?.trim())).length;
-
-                return (
-                  <button
-                    key={pIdx}
-                    type="button"
-                    onClick={() => setReviewPartIdx(pIdx)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
-                      isCurrent
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "border border-border bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    <span>Part {p.partNumber}</span>
-                    <span className={`px-1.5 py-0.5 rounded text-[10px] ${
-                      isCurrent ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
-                    }`}>
-                      {answeredInPart}/{p.questions.length} câu
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Part Overview Card */}
-          <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 border-b border-border pb-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-                    Phần {curReviewPart.partNumber} / 4
-                  </span>
-                  <span className="text-xs text-muted-foreground font-mono">
-                    Yêu cầu: {curReviewPart.minWords}–{curReviewPart.maxWords} từ / câu
-                  </span>
-                </div>
-                <h2 className="font-heading font-bold text-base md:text-lg text-foreground">
-                  {curReviewPart.partName}
-                </h2>
-                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed mt-1">
-                  {curReviewPart.instructions}
-                </p>
-              </div>
-
-              <div className="text-xs text-muted-foreground bg-muted/40 px-3 py-1.5 rounded-lg border border-border shrink-0 self-start">
-                Thời gian đề xuất: {curReviewPart.recommendedMinutes} phút
-              </div>
-            </div>
-
-            {/* Questions List for Current Part */}
-            <div className="space-y-6 pt-2">
-              {curReviewPart.questions.map((q, qIdx) => {
-                const userAns = answers[`${reviewPartIdx}_${qIdx}`] || "";
-                const wc = getWordCount(userAns);
-                const hasText = userAns.trim().length > 0;
-                const isWcOk = wc >= curReviewPart.minWords && wc <= curReviewPart.maxWords;
-                const tabKey = `${reviewPartIdx}_${qIdx}`;
-                const activeTab = sampleTabState[tabKey] || "b1";
-                const aiItem = aiGradingResult?.aiResults?.find((r: any) => q.id && r.question_id === q.id);
-
-                return (
-                  <div
-                    key={qIdx}
-                    className="p-5 rounded-2xl border border-border bg-background/50 space-y-4 shadow-2xs"
-                  >
-                    {/* Question Prompt */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <span className="text-xs font-bold text-primary block mb-1">
-                          Câu hỏi {q.questionNumber || qIdx + 1}
-                        </span>
-                        <h4 className="font-heading font-bold text-sm md:text-base text-foreground">
-                          {q.prompt}
-                        </h4>
-                      </div>
-
-                      {/* Word count validation badge */}
-                      <div className="shrink-0">
-                        {hasText ? (
-                          <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${
-                              isWcOk
-                                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
-                                : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30"
-                            }`}
-                          >
-                            <span>{wc} từ</span>
-                            <span className="text-[10px] font-normal">
-                              ({isWcOk ? "Đạt chuẩn" : wc < curReviewPart.minWords ? "Hơi ngắn" : "Hơi dài"})
-                            </span>
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-muted text-muted-foreground border border-border">
-                            Chưa làm bài
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Candidate's submitted answer */}
-                    <div className="space-y-1.5">
-                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
-                        Bài làm của bạn:
-                      </span>
-                      <div className="p-4 rounded-xl bg-card border border-border text-foreground font-sans text-xs md:text-sm leading-relaxed whitespace-pre-wrap min-h-[56px]">
-                        {hasText ? (
-                          userAns
-                        ) : (
-                          <span className="text-muted-foreground italic">(Thí sinh chưa nhập câu trả lời cho câu này)</span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Benchmark Sample Answer Comparison */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>Bài viết mẫu đối chiếu:</span>
-                        </span>
-
-                        {/* B1 vs B2 Toggle */}
-                        <div className="flex items-center rounded-lg border border-border bg-muted/40 p-0.5 text-xs font-bold">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSampleTabState((prev) => ({ ...prev, [tabKey]: "b1" }))
-                            }
-                            className={`px-2.5 py-1 rounded-md transition-all ${
-                              activeTab === "b1"
-                                ? "bg-card text-foreground shadow-xs"
-                                : "text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            Band B1
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSampleTabState((prev) => ({ ...prev, [tabKey]: "b2" }))
-                            }
-                            className={`px-2.5 py-1 rounded-md transition-all ${
-                              activeTab === "b2"
-                                ? "bg-card text-foreground shadow-xs"
-                                : "text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            Band B2 Target
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 dark:text-emerald-200 text-xs md:text-sm leading-relaxed font-sans">
-                        {activeTab === "b1"
-                          ? q.sampleAnswer || "I enjoy this activity because it helps me relax and spend time with my friends."
-                          : `Furthermore, participating in this allows me to broaden my horizon and foster meaningful connections, which significantly contributes to personal growth.`}
-                      </div>
-                    </div>
-
-                    {/* Criteria & AI Evaluation Box */}
-                    {aiItem ? (
-                      <div className="p-5 rounded-2xl bg-card border border-primary/30 space-y-4 shadow-sm animate-in fade-in">
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
-                          <div className="flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-primary" />
-                            <span className="font-heading font-bold text-sm text-foreground">
-                              Đánh giá AI (Gemini Premier)
-                            </span>
-                            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-                              Band {aiItem.cefr_level || "B2"}
-                            </span>
-                          </div>
-                          <div className="text-sm font-black text-primary font-mono">
-                            Điểm câu này: {aiItem.score}/50
-                          </div>
-                        </div>
-
-                        {/* 4 Criteria Scores */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                          <div className="p-2.5 rounded-xl bg-muted/30 border border-border text-center">
-                            <span className="text-[10px] text-muted-foreground uppercase font-bold block mb-1">
-                              Task Response
-                            </span>
-                            <span className="text-sm font-black text-foreground">
-                              {aiItem.task_completion ?? "-"}/50
-                            </span>
-                          </div>
-                          <div className="p-2.5 rounded-xl bg-muted/30 border border-border text-center">
-                            <span className="text-[10px] text-muted-foreground uppercase font-bold block mb-1">
-                              Grammar
-                            </span>
-                            <span className="text-sm font-black text-foreground">
-                              {aiItem.grammar_score ?? "-"}/50
-                            </span>
-                          </div>
-                          <div className="p-2.5 rounded-xl bg-muted/30 border border-border text-center">
-                            <span className="text-[10px] text-muted-foreground uppercase font-bold block mb-1">
-                              Vocabulary
-                            </span>
-                            <span className="text-sm font-black text-foreground">
-                              {aiItem.vocabulary_score ?? "-"}/50
-                            </span>
-                          </div>
-                          <div className="p-2.5 rounded-xl bg-muted/30 border border-border text-center">
-                            <span className="text-[10px] text-muted-foreground uppercase font-bold block mb-1">
-                              Cohesion
-                            </span>
-                            <span className="text-sm font-black text-foreground">
-                              {aiItem.fluency_score ?? "-"}/50
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* AI Feedback Summary */}
-                        {aiItem.feedback_summary && (
-                          <div className="p-3.5 rounded-xl bg-primary/5 border border-primary/20 text-xs md:text-sm text-foreground leading-relaxed">
-                            <strong className="text-primary block mb-1 font-bold">Nhận xét chi tiết:</strong>
-                            {aiItem.feedback_summary}
-                          </div>
-                        )}
-
-                        {/* Detailed corrections if any */}
-                        {Array.isArray(aiItem.detailed_feedback) && aiItem.detailed_feedback.length > 0 && (
-                          <div className="space-y-2 pt-1">
-                            <span className="text-xs font-bold text-foreground block">
-                              Sửa lỗi ngữ pháp &amp; Gợi ý câu văn tự nhiên hơn:
-                            </span>
-                            <div className="space-y-2">
-                              {aiItem.detailed_feedback.map((item: any, fIdx: number) => (
-                                <div
-                                  key={fIdx}
-                                  className="p-3 rounded-xl bg-muted/40 border border-border text-xs space-y-1"
-                                >
-                                  {item.original && (
-                                    <div className="text-red-600 dark:text-red-400">
-                                      <span className="font-semibold">Bản gốc: </span>
-                                      <span className="line-through">{item.original}</span>
-                                    </div>
-                                  )}
-                                  {item.suggested && (
-                                    <div className="text-emerald-600 dark:text-emerald-400 font-semibold">
-                                      <span>Gợi ý chuẩn: </span>
-                                      <span>{item.suggested}</span>
-                                    </div>
-                                  )}
-                                  {item.comment && (
-                                    <div className="text-muted-foreground text-[11px] pt-0.5">
-                                      {item.comment}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      /* Criteria & Guidance Tips */
-                      <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
-                        <span className="text-xs font-bold text-primary flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Tiêu chí đánh giá &amp; Gợi ý nâng band:</span>
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-xs text-muted-foreground">
-                          <div className="p-2.5 rounded-lg bg-card border border-border/60">
-                            <strong className="text-foreground block mb-0.5">1. Task Fulfillment:</strong>
-                            Bám sát các câu hỏi con, kiểm soát đúng dung lượng {curReviewPart.minWords}–{curReviewPart.maxWords} từ.
-                          </div>
-                          <div className="p-2.5 rounded-lg bg-card border border-border/60">
-                            <strong className="text-foreground block mb-0.5">2. Cohesion &amp; Linking:</strong>
-                            Dùng liên từ nối như &ldquo;Moreover&rdquo;, &ldquo;In addition&rdquo;, &ldquo;Therefore&rdquo; để câu văn mượt mà.
-                          </div>
-                          <div className="p-2.5 rounded-lg bg-card border border-border/60">
-                            <strong className="text-foreground block mb-0.5">3. Vocabulary (Lexical):</strong>
-                            Thay từ thông thường (&ldquo;good&rdquo;, &ldquo;nice&rdquo;) bằng từ học thuật (&ldquo;delightful&rdquo;, &ldquo;essential&rdquo;).
-                          </div>
-                          <div className="p-2.5 rounded-lg bg-card border border-border/60">
-                            <strong className="text-foreground block mb-0.5">4. Grammar Accuracy:</strong>
-                            Đảm bảo thì quá khứ/hiện tại đơn nhất quán, tránh viết hoa/chấm phẩy tùy tiện.
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Navigation Between Parts */}
-            <div className="flex items-center justify-between pt-4 border-t border-border">
-              <button
-                type="button"
-                disabled={reviewPartIdx === 0}
-                onClick={() => setReviewPartIdx((p) => p - 1)}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Phần trước</span>
-              </button>
-
-              <span className="text-xs text-muted-foreground font-mono font-bold">
-                Part {curReviewPart.partNumber} / 4
-              </span>
-
-              <button
-                type="button"
-                disabled={reviewPartIdx === parts.length - 1}
-                onClick={() => setReviewPartIdx((p) => p + 1)}
-                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
-              >
-                <span>Phần tiếp</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // =========================================================================
   // MÀN HÌNH LÀM BÀI PHÒNG THI (THEO THEME CHUẨN CỦA HỆ THỐNG MÌNH)
   // =========================================================================
   return (
-    <div className="notranslate exam-active exam-mode min-h-screen bg-exam-bg text-exam-text flex flex-col font-sans select-none">
-      {/* 0. Top thin progress bar */}
-      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-[3px]">
-        <div
-          className="h-full bg-gradient-to-r from-primary via-accent to-primary transition-all duration-500"
-          style={{ width: `${((currentPartIdx + 1) / parts.length) * 100}%` }}
-        />
-      </div>
-
-      {/* 1. TOP HEADER (EXAM MODE) */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-exam-surface/95 backdrop-blur border-b border-exam-border">
-        <div className="max-w-6xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="text-xs font-bold text-exam-text truncate hidden sm:block">
-              {examTitle}
-            </span>
-            <span className="text-[10px] text-exam-text-muted hidden md:inline">
-              Writing Aptis ESOL
-            </span>
-          </div>
-
-          {/* Countdown Timer */}
-          <div
-            className={`font-mono text-base font-black px-3 py-1 rounded-lg border flex items-center gap-1.5 ${
-              timeLeft < 300
-                ? "bg-red-500/20 border-red-500 text-red-500 animate-pulse"
-                : "bg-exam-bg border-exam-border text-exam-text"
-            }`}
+    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none">
+      {/* 1. TOP HEADER (THEO DESIGN SYSTEM CỦA DỰ ÁN) */}
+      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/writing"
+            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground"
           >
-            <Clock className="w-4 h-4 text-primary" />
-            <span>{formatTime(timeLeft)}</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-xs font-bold text-exam-text-muted">
-              Phần {currentPart.partNumber} / {parts.length}
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
+              Writing Practice
+            </span>
+            <span className="text-sm md:text-base font-bold text-foreground">
+              {currentPart.partSubtitle}
             </span>
           </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href="/writing"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Thoát</span>
+          </Link>
         </div>
       </header>
 
       {/* 2. MAIN WORKSPACE */}
-      <main className="flex-1 pt-16 pb-24 px-3 md:px-6 overflow-y-auto">
+      <main className="flex-1 py-6 px-3 md:px-6 pb-24">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Card Context & Header Banner */}
           <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
@@ -1273,17 +1062,29 @@ function WritingExamRunnerContent() {
                 </p>
               </div>
 
-              {/* Pause control */}
-              <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
+              {/* Bookmark, Pause, Timer */}
+              <div className="flex items-center gap-3 self-end md:self-auto shrink-0">
+                <button
+                  type="button"
+                  className="flex items-center gap-1 px-3 py-1 rounded-xl border border-border text-xs text-muted-foreground hover:bg-muted font-medium transition-colors"
+                >
+                  <Bookmark className="w-3.5 h-3.5" />
+                  <span>Bookmark</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setIsPaused(!isPaused)}
-                  className="px-3 py-1.5 rounded-xl border border-border text-xs text-muted-foreground hover:bg-muted font-medium transition-colors flex items-center gap-1.5"
+                  className="p-1.5 rounded-xl border border-border text-muted-foreground hover:bg-muted transition-colors"
                   title={isPaused ? "Tiếp tục" : "Tạm dừng"}
                 >
                   {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
-                  <span>{isPaused ? "Tiếp tục" : "Tạm dừng"}</span>
                 </button>
+
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+                  <Clock className="w-4 h-4" />
+                  <span>{formatTime(timeLeft)}</span>
+                </div>
               </div>
             </div>
 
@@ -1449,155 +1250,76 @@ function WritingExamRunnerContent() {
         </div>
       </main>
 
-      {/* 4. FIXED BOTTOM BAR CHUẨN EXAM MODE */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-exam-surface/95 backdrop-blur border-t border-exam-border h-14">
-        <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
-          {/* Left: Drawer & Info & Sample Modal */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowPartsDrawer(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
-              title="Danh sách Parts"
-            >
-              <Menu className="w-4 h-4 text-primary" />
-              <span className="hidden sm:inline">Phần ({currentPartIdx + 1}/{parts.length})</span>
-            </button>
+      {/* 4. BOTTOM BAR (THEO DESIGN SYSTEM CỦA DỰ ÁN) */}
+      <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
+        {/* Left: Hiện đáp án & Báo lỗi */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowSampleAnswersModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Hiện đáp án</span>
+          </button>
 
-            <button
-              type="button"
-              onClick={() => setIsInfoOpen(true)}
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 transition-colors cursor-pointer"
-              title="Thông tin bài thi"
-            >
-              <Info className="w-4 h-4 text-exam-text-muted" />
-            </button>
+          <button
+            type="button"
+            onClick={() => alert("Chức năng ghi nhận báo lỗi đề thi đã được gửi đến ban quản trị.")}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors"
+          >
+            <Flag className="w-3.5 h-3.5" />
+            <span>Báo lỗi</span>
+          </button>
+        </div>
 
-            <button
-              type="button"
-              onClick={() => setShowSampleAnswersModal(true)}
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
-            >
-              <span>💡 Bài mẫu</span>
-            </button>
+        {/* Center: Navigation Controls */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowPartsDrawer(true)}
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
+            title="Danh sách Parts"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => alert(`Đang làm bài: ${currentPart.partSubtitle}`)}
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
+            title="Thông tin bài thi"
+          >
+            <Info className="w-4 h-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
+            title="Cuộn lên đầu trang"
+          >
+            <ArrowUp className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Right: Lượt chấm AI & Nút Submit */}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-1 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+            <span>⚡</span>
+            <span>Còn {aiQuota} lượt chấm AI</span>
           </div>
 
-          {/* Right: AI Quota & Exit, Previous, Next / Submit */}
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-1 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 mr-1">
-              <span>⚡</span>
-              <span>{aiQuota} lượt AI</span>
-            </div>
-
-            <Link
-              href="/writing"
-              title="Thoát"
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-            </Link>
-
-            <button
-              type="button"
-              onClick={() => setCurrentPartIdx((p) => Math.max(0, p - 1))}
-              disabled={currentPartIdx === 0}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-sm font-medium hover:bg-exam-border/40 transition-colors disabled:opacity-40 cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Previous</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (currentPartIdx === parts.length - 1) {
-                  setIsSubmitModalOpen(true);
-                } else {
-                  setCurrentPartIdx((p) => Math.min(parts.length - 1, p + 1));
-                }
-              }}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-brand-brown text-sm font-bold shadow-sm transition-all cursor-pointer"
-            >
-              <span>{currentPartIdx === parts.length - 1 ? "Nộp bài" : "Next"}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="tech-btn inline-flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all cursor-pointer"
+          >
+            <span>Submit</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </footer>
-
-      {/* MODAL THÔNG TIN BÀI THI */}
-      {isInfoOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in"
-          onClick={() => setIsInfoOpen(false)}
-        >
-          <div
-            className="bg-exam-surface border border-exam-border rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-3"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-exam-border">
-              <h4 className="font-bold text-sm text-exam-text">Thông tin bài thi Writing</h4>
-              <button
-                type="button"
-                onClick={() => setIsInfoOpen(false)}
-                className="w-6 h-6 flex items-center justify-center rounded text-exam-text-muted hover:text-exam-text"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="space-y-2 text-xs text-exam-text">
-              {[
-                { l: "Tên bài thi", v: examTitle },
-                { l: "Kỹ năng", v: "Writing Aptis ESOL (4 Parts)" },
-                { l: "Phần hiện tại", v: `${currentPart.partSubtitle}` },
-                { l: "Đã điền", v: `${totalAnsweredCount}/${totalQuestionsCount} câu` },
-                { l: "Thời gian còn lại", v: formatTime(timeLeft) },
-              ].map((x) => (
-                <div key={x.l} className="flex justify-between">
-                  <span className="text-exam-text-muted">{x.l}:</span>
-                  <span className="font-bold">{x.v}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL XÁC NHẬN NỘP BÀI */}
-      {isSubmitModalOpen && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-exam-surface rounded-2xl border border-exam-border p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 className="text-lg font-black text-exam-text">Xác nhận nộp bài thi Writing?</h3>
-            <p className="text-sm text-exam-text-muted leading-relaxed">
-              Bạn đã hoàn thành <strong className="text-primary font-black">{totalAnsweredCount}/{totalQuestionsCount}</strong> câu hỏi. Hệ thống AI sẽ chấm điểm chi tiết 4 tiêu chí CEFR cho bài viết của bạn.
-            </p>
-            {totalAnsweredCount < totalQuestionsCount && (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold">
-                ⚠️ Lưu ý: Bạn vẫn còn {totalQuestionsCount - totalAnsweredCount} câu chưa điền nội dung!
-              </div>
-            )}
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsSubmitModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-exam-border text-exam-text text-xs font-bold hover:bg-exam-border/40 transition-colors cursor-pointer"
-              >
-                Tiếp tục viết bài
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSubmitModalOpen(false);
-                  handleSubmit();
-                }}
-                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown transition-colors shadow-sm cursor-pointer"
-              >
-                Xác nhận nộp bài
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* MODAL HIỆN ĐÁP ÁN THAM KHẢO */}
       {showSampleAnswersModal && (

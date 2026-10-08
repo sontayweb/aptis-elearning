@@ -366,16 +366,51 @@ async function main() {
       is_pro: true,
       parts: [
         {
+          part_number: 1,
+          title: 'Part 1 - Daily Dialogue Information',
+          instructions: 'Listen and answer each question.',
+          questions: [
+            {
+              question_number: 1,
+              prompt: 'A customer calls to book a table. What time is the dinner reservation made for?',
+              options: ['6:30 PM', '7:15 PM', '8:00 PM', '8:30 PM'],
+              correct_answer: '7:15 PM',
+              explanation: 'Receptionist confirms: "Your table for four is confirmed for 7:15 PM."',
+            },
+          ],
+        },
+        {
           part_number: 3,
           title: 'Part 3 - Discussion Opinion',
           instructions: 'Listen to the debate and identify who expresses which opinion.',
           questions: [
             {
-              question_number: 1,
+              question_number: 2,
               prompt: 'Who believes that remote work increases employee satisfaction?',
               options: ['The man only', 'The woman only', 'Both speakers', 'Neither speaker'],
               correct_answer: 'The woman only',
               explanation: 'The woman clearly highlights flexibility and work-life balance benefits.',
+            },
+            {
+              question_number: 3,
+              prompt: 'Who thinks companies should maintain weekly in-office collaborative meetings?',
+              options: ['The man only', 'The woman only', 'Both speakers', 'Neither speaker'],
+              correct_answer: 'Both speakers',
+              explanation: 'Both speakers agree in-person meetings foster creative team synergy.',
+            },
+          ],
+        },
+        {
+          part_number: 4,
+          title: 'Part 4 - Academic Monologue',
+          instructions: 'Listen to the lecture on sustainable architecture.',
+          questions: [
+            {
+              question_number: 4,
+              prompt: 'What primary material reduces carbon emissions in modern green towers?',
+              options: ['Mass timber and engineered wood', 'Traditional reinforced concrete', 'Pure aluminum sheets', 'Heavy granite stone'],
+              correct_answer: 'Mass timber and engineered wood',
+              explanation: 'The architect explains engineered timber sequesters carbon during building lifecycle.',
             },
           ],
         },
@@ -399,6 +434,27 @@ async function main() {
               correct_answer: '5:00 PM',
               explanation: 'Announcer: "Please note our weekend hours end at 5:00 PM sharp."',
             },
+            {
+              question_number: 2,
+              prompt: 'Where will the student art exhibition take place tomorrow?',
+              options: ['Main auditorium', 'Campus gallery hall', 'Library basement', 'Outdoor quad'],
+              correct_answer: 'Campus gallery hall',
+              explanation: 'Notice states the exhibition is hosted in the campus gallery hall.',
+            },
+          ],
+        },
+        {
+          part_number: 2,
+          title: 'Part 2 - Speaker Identification',
+          instructions: 'Listen to four speakers talking about their daily habits.',
+          questions: [
+            {
+              question_number: 3,
+              prompt: 'Which speaker prioritizes morning mindfulness meditation?',
+              options: ['Speaker A', 'Speaker B', 'Speaker C', 'Speaker D'],
+              correct_answer: 'Speaker A',
+              explanation: 'Speaker A describes starting every day with fifteen minutes of quiet meditation.',
+            },
           ],
         },
       ],
@@ -407,38 +463,39 @@ async function main() {
 
   for (const item of listeningExams) {
     const existing = await prisma.exam.findFirst({ where: { title: item.title } });
-    if (!existing) {
-      await prisma.exam.create({
-        data: {
-          title: item.title,
-          description: item.description,
-          skill: ExamSkill.LISTENING,
-          duration_minutes: item.duration_minutes,
-          is_pro: item.is_pro,
-          is_published: true,
-          source: 'WEB',
-          parts: {
-            create: item.parts.map((p) => ({
-              part_number: p.part_number,
-              title: p.title,
-              instructions: p.instructions,
-              passage_text: p.passage_text,
-              questions: {
-                create: p.questions.map((q) => ({
-                  question_number: q.question_number,
-                  question_type: QuestionType.MULTIPLE_CHOICE,
-                  prompt: q.prompt,
-                  options: q.options,
-                  correct_answer: q.correct_answer,
-                  explanation: q.explanation,
-                  max_score: 1.0,
-                })),
-              },
-            })),
-          },
-        },
-      });
+    if (existing) {
+      await prisma.exam.delete({ where: { id: existing.id } });
     }
+    await prisma.exam.create({
+      data: {
+        title: item.title,
+        description: item.description,
+        skill: ExamSkill.LISTENING,
+        duration_minutes: item.duration_minutes,
+        is_pro: item.is_pro,
+        is_published: true,
+        source: 'WEB',
+        parts: {
+          create: item.parts.map((p) => ({
+            part_number: p.part_number,
+            title: p.title,
+            instructions: p.instructions,
+            passage_text: p.passage_text,
+            questions: {
+              create: p.questions.map((q) => ({
+                question_number: q.question_number,
+                question_type: QuestionType.MULTIPLE_CHOICE,
+                prompt: q.prompt,
+                options: q.options,
+                correct_answer: q.correct_answer,
+                explanation: q.explanation,
+                max_score: 1.0,
+              })),
+            },
+          })),
+        },
+      },
+    });
   }
 
   // ========================================================
@@ -504,17 +561,45 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
       is_pro: true,
       parts: [
         {
+          part_number: 1,
+          title: 'Part 1 - Academic Sentence Completion',
+          instructions: 'Choose the correct word to complete each sentence.',
+          questions: [
+            {
+              question_number: 1,
+              prompt: 'The research team conducted extensive trials to _____ the new medical algorithm.',
+              options: ['validate', 'forgive', 'ignore', 'cancel'],
+              correct_answer: 'validate',
+              explanation: 'Collocation học thuật: "validate an algorithm" (kiểm chứng tính chính xác của thuật toán).',
+            },
+            {
+              question_number: 2,
+              prompt: 'Recent clinical studies indicate a noticeable _____ in patient recovery durations.',
+              options: ['reduction', 'refusal', 'danger', 'complaint'],
+              correct_answer: 'reduction',
+              explanation: 'Nghĩa ngữ cảnh: "reduction in recovery duration" (sự rút ngắn thời gian hồi phục).',
+            },
+          ],
+        },
+        {
           part_number: 4,
           title: 'Part 4 - Academic Long Passage',
           instructions: 'Match headings with each corresponding paragraph.',
           passage_text: 'Artificial Intelligence has radically altered diagnostic procedures in clinical medicine...',
           questions: [
             {
-              question_number: 1,
+              question_number: 3,
               prompt: 'What is the primary breakthrough of AI in radiological imaging?',
               options: ['Lower equipment cost', 'Higher anomaly detection accuracy', 'Reduced scan time', 'Zero human supervision'],
               correct_answer: 'Higher anomaly detection accuracy',
               explanation: 'Algorithms can detect micro-calcifications earlier than conventional inspection.',
+            },
+            {
+              question_number: 4,
+              prompt: 'How do automated algorithms assist clinical radiologists in hospitals?',
+              options: ['Replacing physician decisions completely', 'Flagging urgent anomalies for immediate human review', 'Eliminating surgical biopsies', 'Reducing hospital electricity usage'],
+              correct_answer: 'Flagging urgent anomalies for immediate human review',
+              explanation: 'Algorithms act as decision-support triaging tools prioritizing critical emergency scans.',
             },
           ],
         },
@@ -538,6 +623,28 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
               correct_answer: 'sending',
               explanation: 'Sau giới từ "for" sử dụng V-ing.',
             },
+            {
+              question_number: 2,
+              prompt: 'The directors were thoroughly impressed by the team _____ performance this quarter.',
+              options: ['exceptional', 'lazy', 'doubtful', 'frequent'],
+              correct_answer: 'exceptional',
+              explanation: '"Exceptional performance" mang ý nghĩa thành tích xuất sắc, vượt trội.',
+            },
+          ],
+        },
+        {
+          part_number: 3,
+          title: 'Part 3 - Business Operations Notice',
+          instructions: 'Read the workplace update and answer the questions.',
+          passage_text: 'Corporate policy regarding hybrid scheduling mandates that departments coordinate in-person attendance on Tuesdays and Thursdays to foster collaborative synergy while maintaining personal flexibility.',
+          questions: [
+            {
+              question_number: 3,
+              prompt: 'Which days require mandatory in-office presence?',
+              options: ['Mondays and Fridays', 'Tuesdays and Thursdays', 'Wednesdays only', 'Any two days of employee choice'],
+              correct_answer: 'Tuesdays and Thursdays',
+              explanation: 'Notice specifies Tuesdays and Thursdays are designated core collaboration days.',
+            },
           ],
         },
       ],
@@ -546,38 +653,39 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
 
   for (const item of readingExams) {
     const existing = await prisma.exam.findFirst({ where: { title: item.title } });
-    if (!existing) {
-      await prisma.exam.create({
-        data: {
-          title: item.title,
-          description: item.description,
-          skill: ExamSkill.READING,
-          duration_minutes: item.duration_minutes,
-          is_pro: item.is_pro,
-          is_published: true,
-          source: 'WEB',
-          parts: {
-            create: item.parts.map((p) => ({
-              part_number: p.part_number,
-              title: p.title,
-              instructions: p.instructions,
-              passage_text: p.passage_text,
-              questions: {
-                create: p.questions.map((q) => ({
-                  question_number: q.question_number,
-                  question_type: QuestionType.MULTIPLE_CHOICE,
-                  prompt: q.prompt,
-                  options: q.options,
-                  correct_answer: q.correct_answer,
-                  explanation: q.explanation,
-                  max_score: 1.0,
-                })),
-              },
-            })),
-          },
-        },
-      });
+    if (existing) {
+      await prisma.exam.delete({ where: { id: existing.id } });
     }
+    await prisma.exam.create({
+      data: {
+        title: item.title,
+        description: item.description,
+        skill: ExamSkill.READING,
+        duration_minutes: item.duration_minutes,
+        is_pro: item.is_pro,
+        is_published: true,
+        source: 'WEB',
+        parts: {
+          create: item.parts.map((p) => ({
+            part_number: p.part_number,
+            title: p.title,
+            instructions: p.instructions,
+            passage_text: p.passage_text,
+            questions: {
+              create: p.questions.map((q) => ({
+                question_number: q.question_number,
+                question_type: QuestionType.MULTIPLE_CHOICE,
+                prompt: q.prompt,
+                options: q.options,
+                correct_answer: q.correct_answer,
+                explanation: q.explanation,
+                max_score: 1.0,
+              })),
+            },
+          })),
+        },
+      },
+    });
   }
 
   // ========================================================
@@ -1105,7 +1213,7 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
   const writingExams = [
     {
       title: 'Đề thi Writing 01 — Viết tương tác & Thư trang trọng',
-      description: 'Luyện tập đủ 4 phần chuẩn: Trả lời ngắn, Điền biểu mẫu, Tin nhắn mạng xã hội và Thư kiến nghị trang trọng.',
+      description: 'Chủ đề Câu lạc bộ Thể thao (Sports Club): 5 câu trả lời ngắn, biểu mẫu câu lạc bộ, trò chuyện 3 người và 2 bức thư.',
       duration_minutes: 50,
       is_pro: false,
       parts: [
@@ -1114,11 +1222,11 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
           title: 'Part 1 - Short Answers (1-5 words)',
           instructions: 'You joined a local Sports & Fitness Club. Fill in the required registration fields (1-5 words each).',
           questions: [
-            {
-              question_number: 1,
-              prompt: 'What is your favorite outdoor sport, and how often do you practice it?',
-              explanation: 'Swimming, three times weekly.',
-            },
+            { question_number: 1, prompt: '1. What is your favorite outdoor sport?', explanation: 'Swimming and badminton.' },
+            { question_number: 2, prompt: '2. How often do you exercise each week?', explanation: 'Three times weekly.' },
+            { question_number: 3, prompt: '3. What sports gear do you usually use?', explanation: 'Running shoes and yoga mat.' },
+            { question_number: 4, prompt: '4. What time of day do you prefer working out?', explanation: 'Early morning before work.' },
+            { question_number: 5, prompt: '5. Which season is best for outdoor running?', explanation: 'Spring, with cool breezes.' },
           ],
         },
         {
@@ -1127,33 +1235,48 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
           instructions: 'Please tell us why you are interested in joining our sports club and what personal goals you wish to achieve (20 - 30 words).',
           questions: [
             {
-              question_number: 2,
+              question_number: 1,
               prompt: 'Write in full sentences (20 - 30 words).',
-              explanation: 'I want to improve my cardiovascular endurance and maintain physical wellness after long office hours. Group workouts will also motivate me.',
+              explanation: 'I want to improve my cardiovascular stamina and relieve stress after work. Exercising with club peers will keep me disciplined.',
             },
           ],
         },
         {
           part_number: 3,
           title: 'Part 3 - Social Network Chat (30-40 words)',
-          instructions: "Sam: 'Hi! I heard the club might raise membership fees next month to upgrade gym machinery. What do you think about this?'",
+          instructions: 'You are talking to 3 members in the sports club chat room (30-40 words per answer).',
           questions: [
             {
+              question_number: 1,
+              prompt: '1. I have just started training at the gym. How many days per week should a beginner exercise?',
+              explanation: 'As a beginner, three sessions per week is ideal. It allows your muscle tissue adequate recovery time while fostering a sustainable fitness habit without risking exhaustion.',
+            },
+            {
+              question_number: 2,
+              prompt: '2. The management is considering raising membership fees to purchase modern equipment. What is your opinion?',
+              explanation: 'Upgrading machinery is beneficial for member safety and workout variety. However, the club should provide discounted loyalty rates for existing members to reward their dedication.',
+            },
+            {
               question_number: 3,
-              prompt: 'Respond to Sam expressing your personal opinion (30 - 40 words).',
-              explanation: 'Personally, I believe modernizing gym equipment is beneficial for our training quality. However, the management should offer discounted grandfather rates for existing loyal members.',
+              prompt: '3. Some people prefer exercising alone at home while others love group fitness classes. Which do you prefer?',
+              explanation: 'I prefer group workout classes because energetic music and motivated peers inspire me to push beyond my limits far more effectively than exercising alone.',
             },
           ],
         },
         {
           part_number: 4,
-          title: 'Part 4 - Formal Email to Club President (120-150 words)',
-          instructions: 'You received an email stating that all weekend workout sessions are cancelled due to staff shortages. Write an email to the President expressing disappointment and proposing solutions.',
+          title: 'Part 4 - Formal & Informal Email',
+          instructions: 'You received an email stating that all weekend workout sessions are cancelled due to staff shortages.',
           questions: [
             {
-              question_number: 4,
-              prompt: 'Write an email to the Club President expressing disappointment and proposing constructive solutions (120 - 150 words).',
-              explanation: 'Dear Mr. President,\n\nI am writing to express my earnest concern regarding the recent announcement to cancel all weekend workout sessions due to staff shortages. As a working professional, weekends are the only window of time when I can attend classes regularly.\n\nWhile I completely understand the staffing challenges currently facing the club, I would respectfully like to propose hiring qualified temporary guest instructors or organizing peer-led exercise groups under certified supervision. This approach would allow members to continue their routines uninterrupted without compromising safety.\n\nI genuinely hope the committee will consider these options favorably.\n\nYours sincerely,\nHoang Hiep',
+              question_number: 1,
+              prompt: 'Write an email to a friend who is also a sports club member. Write about your feelings and what you think the club should do. Write about 50 words.',
+              explanation: 'Hi Alex,\n\nDid you see the club notice about canceling weekend training sessions? I am quite upset since weekends are my only free window for exercise. We should talk to other members and suggest hiring temporary guest coaches.\n\nBest,\nHiep',
+            },
+            {
+              question_number: 2,
+              prompt: 'Write an email to the club manager. Explain how you feel about the cancellation and suggest alternative ways the club could organize sessions or solve staffing issues. Write 120-150 words.',
+              explanation: 'Dear Mr. Henderson,\n\nI am writing to express my earnest concern regarding the recent decision to suspend weekend group workout sessions due to staffing shortages. As a working professional, weekends represent my primary availability to train consistently.\n\nWhile I completely appreciate the operational difficulties facing the club, I would respectfully like to suggest two constructive alternatives. Firstly, the club could hire accredited freelance fitness instructors on temporary contracts. Secondly, certified senior members could supervise peer-led workouts until permanent staff are recruited.\n\nI believe these solutions would enable members to continue their routines safely without placing an excessive burden on management. I hope you will give these suggestions favorable consideration.\n\nYours sincerely,\nHoang Hiep',
             },
           ],
         },
@@ -1161,7 +1284,7 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
     },
     {
       title: 'Đề thi Writing 02 — Đề thi chuẩn British Council 2026',
-      description: 'Chủ đề Câu lạc bộ Sách và Văn hóa đọc trong kỷ nguyên số.',
+      description: 'Chủ đề Câu lạc bộ Sách (Book Club): Điền biểu mẫu độc giả, trao đổi sách và kiến nghị bảo tồn không gian đọc.',
       duration_minutes: 50,
       is_pro: true,
       parts: [
@@ -1170,10 +1293,61 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
           title: 'Part 1 - Book Club Registration',
           instructions: 'Answer with 1-5 words.',
           questions: [
+            { question_number: 1, prompt: '1. What genre of books do you prefer reading?', explanation: 'Historical fiction and biographies.' },
+            { question_number: 2, prompt: '2. How often do you visit a bookstore?', explanation: 'Twice every month.' },
+            { question_number: 3, prompt: '3. What was the last book you finished?', explanation: 'The Great Gatsby.' },
+            { question_number: 4, prompt: '4. Do you prefer reading printed books or e-books?', explanation: 'Printed books with paper feel.' },
+            { question_number: 5, prompt: '5. Where is your favorite spot for reading?', explanation: 'A quiet corner cafe.' },
+          ],
+        },
+        {
+          part_number: 2,
+          title: 'Part 2 - Book Club Profile (20-30 words)',
+          instructions: 'Tell us about a book that made a strong impression on you and why you liked it (20-30 words).',
+          questions: [
             {
               question_number: 1,
-              prompt: 'What genre of books do you prefer reading?',
-              explanation: 'Historical fiction and biographies.',
+              prompt: 'Tell us about a book that made a strong impression on you (20-30 words).',
+              explanation: 'I recently read "To Kill a Mockingbird". It deeply moved me because of its profound message about justice, personal integrity, and unconditional human empathy.',
+            },
+          ],
+        },
+        {
+          part_number: 3,
+          title: 'Part 3 - Book Club Chat Room (30-40 words)',
+          instructions: 'Talk to 3 members in the book club chat room using complete sentences (30-40 words each).',
+          questions: [
+            {
+              question_number: 1,
+              prompt: '1. I struggle to finish long books because of busy schedules. How do you find time to read daily?',
+              explanation: 'I set aside twenty minutes before bedtime every night without looking at my smartphone. Reading small chapters consistently accumulates quickly over weeks.',
+            },
+            {
+              question_number: 2,
+              prompt: '2. Our local municipal library might reduce its weekend opening hours. How do you feel about this?',
+              explanation: 'Reducing weekend hours would severely hurt students and working citizens who only have leisure time on Saturdays. The municipal council should recruit community volunteers instead.',
+            },
+            {
+              question_number: 3,
+              prompt: '3. Many young people prefer audiobooks over paper books now. What is your viewpoint?',
+              explanation: 'Audiobooks are fantastic for daily commutes and multitasking. However, printed books provide tactile pleasure and deeper focus that audio recordings cannot entirely replace.',
+            },
+          ],
+        },
+        {
+          part_number: 4,
+          title: 'Part 4 - Formal & Informal Email',
+          instructions: 'The book club coordinator announced that next month\'s author meeting and discussion has been canceled.',
+          questions: [
+            {
+              question_number: 1,
+              prompt: 'Write an email to a friend who is also a book club member. Write about 50 words.',
+              explanation: 'Hi Sarah,\n\nHave you heard about the author talk with David Mitchell being canceled? I am so disappointed as I had prepared several questions about his latest novel. Let us propose organizing a virtual session via Zoom instead.\n\nCheers,\nHiep',
+            },
+            {
+              question_number: 2,
+              prompt: 'Write an email to the club coordinator proposing constructive alternatives. Write 120-150 words.',
+              explanation: 'Dear Ms. Watson,\n\nI am writing to express my regret upon receiving the notification that our scheduled author talk with David Mitchell has been canceled owing to travel issues.\n\nGiven the tremendous anticipation among club members, I would like to propose hosting this session virtually via video conference. This would eliminate travel constraints while still providing an engaging interactive platform for members to discuss the author\'s work.\n\nI hope the committee will consider this viable alternative.\n\nYours sincerely,\nHoang Hiep',
             },
           ],
         },
@@ -1181,19 +1355,70 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
     },
     {
       title: 'Đề thi Writing 03 — Luyện viết luận nâng cao',
-      description: 'Rèn luyện kỹ năng kết nối ý tưởng, sử dụng từ nối học thuật và cấu trúc câu phức ghép.',
+      description: 'Chủ đề Câu lạc bộ Du lịch (Travel Club): 5 câu trả lời ngắn, trải nghiệm cá nhân, thảo luận du lịch bền vững và xử lý dời lịch.',
       duration_minutes: 50,
       is_pro: false,
       parts: [
         {
           part_number: 1,
-          title: 'Part 1 - Music Club Form',
+          title: 'Part 1 - Travel Club Registration',
           instructions: 'Fill in each line with 1-5 words.',
+          questions: [
+            { question_number: 1, prompt: '1. What is your favorite holiday destination?', explanation: 'Coastal beaches and mountains.' },
+            { question_number: 2, prompt: '2. Who do you usually travel with?', explanation: 'My family and close friends.' },
+            { question_number: 3, prompt: '3. What essential item do you always pack?', explanation: 'Camera and comfortable shoes.' },
+            { question_number: 4, prompt: '4. How do you prefer to travel: plane, train, or car?', explanation: 'Train, for scenic views.' },
+            { question_number: 5, prompt: '5. What is the best season for traveling?', explanation: 'Autumn, with pleasant mild weather.' },
+          ],
+        },
+        {
+          part_number: 2,
+          title: 'Part 2 - Travel Survey (20-30 words)',
+          instructions: 'Tell us about a memorable journey or vacation you experienced recently (20-30 words).',
           questions: [
             {
               question_number: 1,
-              prompt: 'Can you play any musical instrument?',
-              explanation: 'Yes, acoustic guitar.',
+              prompt: 'Tell us about a memorable journey or vacation you experienced recently.',
+              explanation: 'Last summer, I took a road trip along the central coastline. The crystal-clear sea and warm hospitality of local fishermen made it an unforgettable journey.',
+            },
+          ],
+        },
+        {
+          part_number: 3,
+          title: 'Part 3 - Travel Chat Room (30-40 words)',
+          instructions: 'Talk to 3 members in the travel chat room (30-40 words per answer).',
+          questions: [
+            {
+              question_number: 1,
+              prompt: '1. Some people prefer solo travel while others always travel in groups. What do you prefer?',
+              explanation: 'I prefer traveling with friends because sharing local meals and exploring uncharted paths together creates unforgettable memories and enhances mutual safety.',
+            },
+            {
+              question_number: 2,
+              prompt: '2. Mass tourism is causing environmental damage to fragile heritage towns. What should authorities do?',
+              explanation: 'Municipal authorities should enforce daily tourist visitor quotas and channel tourism levies directly into historical conservation and eco-friendly waste management.',
+            },
+            {
+              question_number: 3,
+              prompt: '3. With rising airfares, budget travel has become challenging. What is your best cost-saving tip?',
+              explanation: 'Booking accommodations well in advance and dining at neighborhood markets rather than tourist cafes saves considerable funds while providing authentic cultural experiences.',
+            },
+          ],
+        },
+        {
+          part_number: 4,
+          title: 'Part 4 - Formal & Informal Email',
+          instructions: 'The upcoming weekend exploration trip to the coastal national park has been canceled due to adverse weather warnings.',
+          questions: [
+            {
+              question_number: 1,
+              prompt: 'Write an email to a friend who is also a travel club member (50 words).',
+              explanation: 'Hi Tom,\n\nDid you see the update about our national park trip being canceled? I was so excited to hike and camp by the coast. Perhaps we could suggest rescheduling to the following weekend once the weather clears.\n\nBest,\nHiep',
+            },
+            {
+              question_number: 2,
+              prompt: 'Write an email to the club committee proposing alternatives (120-150 words).',
+              explanation: 'Dear Committee Members,\n\nI am writing regarding the postponement of our planned expedition to the coastal national park due to inclement weather conditions.\n\nWhile member safety is understandably the utmost priority, many of us have already arranged time off work. I would respectfully propose rescheduling the excursion to next weekend or shifting the itinerary to a nearby indoor cultural museum tour.\n\nI would be grateful if the committee could evaluate these possibilities.\n\nYours sincerely,\nHoang Hiep',
             },
           ],
         },
@@ -1203,35 +1428,36 @@ Furthermore, community gardens and rooftop botanical installations foster sponta
 
   for (const item of writingExams) {
     const existing = await prisma.exam.findFirst({ where: { title: item.title } });
-    if (!existing) {
-      await prisma.exam.create({
-        data: {
-          title: item.title,
-          description: item.description,
-          skill: ExamSkill.WRITING,
-          duration_minutes: item.duration_minutes,
-          is_pro: item.is_pro,
-          is_published: true,
-          source: 'WEB',
-          parts: {
-            create: item.parts.map((p) => ({
-              part_number: p.part_number,
-              title: p.title,
-              instructions: p.instructions,
-              questions: {
-                create: p.questions.map((q) => ({
-                  question_number: q.question_number,
-                  question_type: QuestionType.ESSAY,
-                  prompt: q.prompt,
-                  explanation: q.explanation,
-                  max_score: 12.5,
-                })),
-              },
-            })),
-          },
-        },
-      });
+    if (existing) {
+      await prisma.exam.delete({ where: { id: existing.id } });
     }
+    await prisma.exam.create({
+      data: {
+        title: item.title,
+        description: item.description,
+        skill: ExamSkill.WRITING,
+        duration_minutes: item.duration_minutes,
+        is_pro: item.is_pro,
+        is_published: true,
+        source: 'WEB',
+        parts: {
+          create: item.parts.map((p) => ({
+            part_number: p.part_number,
+            title: p.title,
+            instructions: p.instructions,
+            questions: {
+              create: p.questions.map((q) => ({
+                question_number: q.question_number,
+                question_type: QuestionType.ESSAY,
+                prompt: q.prompt,
+                explanation: q.explanation,
+                max_score: 12.5,
+              })),
+            },
+          })),
+        },
+      },
+    });
   }
 
   // ========================================================
