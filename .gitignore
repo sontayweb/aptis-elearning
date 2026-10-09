@@ -67,6 +67,8 @@ out/
 
 # Logs & temp files
 *.log
+*.gemini-models-cache.json
+.gemini-models-cache.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
