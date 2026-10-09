@@ -29,6 +29,14 @@ import {
   Layers,
   HelpCircle,
   FolderPlus,
+  CheckCircle2,
+  ArrowRight,
+  ChevronRight,
+  Headphones,
+  Mic,
+  PenTool,
+  BarChart3,
+  Filter,
 } from "lucide-react";
 
 interface VocabTopic {
@@ -41,6 +49,9 @@ interface VocabTopic {
 
 export default function VocabularyPage() {
   const [activeTab, setActiveTab] = useState<"aptis" | "my">("aptis");
+  const [selectedSkillFilter, setSelectedSkillFilter] = useState<
+    "all" | "reading" | "listening" | "speaking" | "writing"
+  >("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [topics, setTopics] = useState<VocabTopic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<VocabTopic | null>(null);
@@ -244,95 +255,344 @@ export default function VocabularyPage() {
     }
   };
 
-  const filteredTopics = topics.filter((t) =>
-    t.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredTopics = topics.filter((t) => {
+    const matchSearch =
+      t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.category.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!matchSearch) return false;
+    if (selectedSkillFilter === "all") return true;
+
+    const cat = t.category.toLowerCase();
+    const name = t.name.toLowerCase();
+    if (selectedSkillFilter === "reading")
+      return cat.includes("reading") || name.includes("đọc") || cat.includes("academic") || cat.includes("cốt lõi") || cat.includes("general");
+    if (selectedSkillFilter === "listening")
+      return cat.includes("listening") || name.includes("nghe") || cat.includes("audio");
+    if (selectedSkillFilter === "speaking")
+      return cat.includes("speaking") || name.includes("nói") || cat.includes("collocation");
+    if (selectedSkillFilter === "writing")
+      return cat.includes("writing") || name.includes("viết") || cat.includes("email") || cat.includes("linking");
+    return true;
+  });
+
+  const skillCards = [
+    {
+      key: "reading" as const,
+      name: "READING",
+      subName: "Từ vựng đọc hiểu",
+      icon: BookOpen,
+      color: "rose",
+      badgeClass: "bg-rose-500 text-white",
+      borderClass: "border-rose-500/30 hover:border-rose-500/60",
+      bgSoft: "bg-rose-500/5",
+      btnClass: "bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400",
+      bullets: [
+        "Từ đồng nghĩa (Synonym)",
+        "Từ/ cụm từ Paraphrase",
+        "Từ vựng theo chủ đề thường gặp",
+        "Từ vựng học thuật và ngữ cảnh",
+      ],
+      countLabel: "8 bộ từ theo chủ đề",
+      actionText: "Xem các bộ từ",
+    },
+    {
+      key: "listening" as const,
+      name: "LISTENING",
+      subName: "Từ vựng nghe",
+      icon: Headphones,
+      color: "blue",
+      badgeClass: "bg-blue-500 text-white",
+      borderClass: "border-blue-500/30 hover:border-blue-500/60",
+      bgSoft: "bg-blue-500/5",
+      btnClass: "bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400",
+      bullets: [
+        "Từ đồng nghĩa / paraphrase",
+        "Từ dễ nghe nhầm",
+        "Cụm từ thường gặp trong audio",
+        "Từ vựng theo chủ đề và tình huống",
+      ],
+      countLabel: "8 bộ từ theo chủ đề",
+      actionText: "Xem các bộ từ",
+    },
+    {
+      key: "speaking" as const,
+      name: "SPEAKING",
+      subName: "Từ vựng nói",
+      icon: Mic,
+      color: "emerald",
+      badgeClass: "bg-emerald-500 text-white",
+      borderClass: "border-emerald-500/30 hover:border-emerald-500/60",
+      bgSoft: "bg-emerald-500/5",
+      btnClass: "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400",
+      bullets: [
+        "Từ vựng theo chủ đề thường gặp",
+        "Collocations và cụm diễn đạt tự nhiên",
+        "Cụm diễn đạt ý kiến, quan điểm",
+        "Từ vựng mô tả, so sánh, đưa ra giải pháp",
+      ],
+      countLabel: "10 chủ đề từ vựng",
+      actionText: "Xem các chủ đề",
+    },
+    {
+      key: "writing" as const,
+      name: "WRITING",
+      subName: "Từ vựng viết",
+      icon: PenTool,
+      color: "purple",
+      badgeClass: "bg-purple-500 text-white",
+      borderClass: "border-purple-500/30 hover:border-purple-500/60",
+      bgSoft: "bg-purple-500/5",
+      btnClass: "bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400",
+      bullets: [
+        "Collocations thường dùng",
+        "Từ vựng trang trọng và thân mật",
+        "Linking phrases (từ nối)",
+        "Từ vựng áp dụng cho Part 3 & 4",
+        "Từ vựng theo chủ đề email và bài viết",
+      ],
+      countLabel: "10 chủ đề từ vựng",
+      actionText: "Xem các chủ đề",
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5 border-b border-border">
+        {/* Hero Section theo giao diện mới */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 via-primary/5 to-card border-b border-border">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -top-32 -right-24"
-            style={{ width: "420px", height: "420px", background: "hsl(var(--accent) / 0.32)" }}
+            className="pointer-events-none absolute rounded-full blur-3xl -top-24 -right-16 w-96 h-96 bg-primary/10"
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -bottom-40 -left-20 opacity-70"
-            style={{ width: "320px", height: "320px", background: "hsl(var(--primary) / 0.35)" }}
+            className="pointer-events-none absolute rounded-full blur-3xl -bottom-24 -left-16 w-80 h-80 bg-emerald-500/10"
           />
 
-          <div className="section-container py-10 md:py-14 flex flex-col md:flex-row items-center gap-6 relative z-10">
-            <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground shrink-0 shadow-lg">
-              <BookOpen className="w-8 h-8" />
+          <div className="section-container py-8 md:py-12 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+            <div className="flex items-center gap-4 sm:gap-5 text-left">
+              <div className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shrink-0 shadow-sm border border-emerald-500/20">
+                <BookOpen className="w-7 h-7 sm:w-8 sm:h-8" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-black text-foreground tracking-tight">
+                  Học từ vựng Aptis
+                </h1>
+                <p className="text-muted-foreground mt-1 text-xs sm:text-sm md:text-base font-medium">
+                  Ôn luyện từ vựng theo từng kỹ năng trong bài thi Aptis ESOL.
+                </p>
+              </div>
             </div>
-            <div className="text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground">
-                Học từ vựng Aptis
-              </h1>
-              <p className="text-muted-foreground mt-1 text-base md:text-lg">
-                Ôn luyện từ vựng theo các chủ đề trong bộ đề thi &amp; quản lý kho từ cá nhân
-              </p>
+
+            {/* Artwork phối cảnh góc phải */}
+            <div className="hidden lg:flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-card/80 border border-border/80 shadow-xs backdrop-blur-sm shrink-0">
+              <div className="flex -space-x-2 overflow-hidden">
+                <div className="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
+                  R
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
+                  L
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
+                  S
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
+                  W
+                </div>
+              </div>
+              <div className="text-xs">
+                <span className="font-bold text-foreground block">Aptis ESOL Vocabulary</span>
+                <span className="text-muted-foreground text-[11px]">Skills for Success</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Tab switcher */}
-        <div className="section-container py-8">
-          <div className="inline-flex items-center justify-center text-muted-foreground w-full max-w-md mx-auto md:mx-0 h-12 p-1 bg-muted rounded-xl mb-8">
+        {/* Khu vực nội dung chính */}
+        <div className="section-container py-6 md:py-8 space-y-6 md:space-y-8">
+          {/* Hàng điều khiển kết hợp (Control Bar theo mockup ảnh dưới) */}
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5">
+            {/* 1. Tab Switcher */}
+            <div className="inline-flex items-center p-1 bg-muted rounded-xl text-xs font-bold shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("aptis");
+                  setSelectedSkillFilter("all");
+                }}
+                className={`px-3.5 py-2 rounded-lg transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                  activeTab === "aptis"
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Library className="w-3.5 h-3.5" />
+                <span>Từ vựng theo kỹ năng</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("my")}
+                className={`px-3.5 py-2 rounded-lg transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                  activeTab === "my"
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Brain className="w-3.5 h-3.5" />
+                <span>Kho từ vựng của tôi</span>
+              </button>
+            </div>
+
+            {/* 2. Search Input */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full h-10 pl-10 pr-3.5 rounded-xl border border-input bg-card text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all shadow-xs"
+                placeholder="Tìm bộ từ vựng, chủ đề..."
+              />
+            </div>
+
+            {/* 3. Nút Test Mode 15 phút */}
             <button
               type="button"
-              onClick={() => setActiveTab("aptis")}
-              className={`inline-flex items-center justify-center flex-1 h-full rounded-lg text-sm font-semibold transition-all ${
-                activeTab === "aptis"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "hover:text-foreground"
-              }`}
+              onClick={startTestMode}
+              className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer shrink-0"
             >
-              <Library className="w-4 h-4 mr-2" />
-              <span>Từ vựng bài thi Aptis</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("my")}
-              className={`inline-flex items-center justify-center flex-1 h-full rounded-lg text-sm font-semibold transition-all ${
-                activeTab === "my"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "hover:text-foreground"
-              }`}
-            >
-              <Brain className="w-4 h-4 mr-2" />
-              <span>Kho từ vựng của tôi</span>
+              <Clock className="w-4 h-4" />
+              <span>Kiểm tra 15 phút (Test Mode)</span>
             </button>
           </div>
 
           {activeTab === "aptis" ? (
             <>
-              {/* Search Bar & Test Mode Button */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="flex h-10 w-full rounded-md border border-input bg-card px-3 py-2 text-base md:text-sm pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    placeholder="Tìm bộ từ vựng…"
-                  />
+              {/* KHỐI 4 THẺ KỸ NĂNG: Chọn kỹ năng để học từ vựng (Chuẩn theo ảnh mockup) */}
+              <section className="space-y-3.5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <h2 className="font-heading font-black text-foreground text-base sm:text-lg">
+                      Chọn kỹ năng để học từ vựng
+                    </h2>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Các bộ từ vựng được biên soạn bám sát dạng bài và chủ đề thường gặp trong Aptis ESOL.
+                  </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={startTestMode}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow hover:bg-primary-glow transition-all shrink-0"
-                >
-                  <Clock className="w-4 h-4" />
-                  <span>Kiểm tra 15 phút (Test Mode)</span>
-                </button>
-              </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {skillCards.map((sc) => {
+                    const isSelected = selectedSkillFilter === sc.key;
+                    const IconElem = sc.icon;
+                    return (
+                      <div
+                        key={sc.key}
+                        onClick={() =>
+                          setSelectedSkillFilter((prev) => (prev === sc.key ? "all" : sc.key))
+                        }
+                        className={`rounded-2xl border bg-card p-4 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md ${
+                          sc.borderClass
+                        } ${sc.bgSoft} ${
+                          isSelected
+                            ? "ring-2 ring-primary border-primary shadow-glow-soft"
+                            : ""
+                        }`}
+                      >
+                        <div>
+                          {/* Card Header */}
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2.5">
+                              <div
+                                className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-xs ${sc.badgeClass}`}
+                              >
+                                <IconElem className="w-4 h-4 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="font-heading font-black text-xs sm:text-sm text-foreground tracking-wide leading-tight">
+                                  {sc.name}
+                                </h3>
+                                <p className="text-[11px] text-muted-foreground">
+                                  {sc.subName}
+                                </p>
+                              </div>
+                            </div>
+                            <ChevronRight
+                              className={`w-4 h-4 transition-transform ${
+                                isSelected ? "text-primary translate-x-0.5" : "text-muted-foreground"
+                              }`}
+                            />
+                          </div>
+
+                          {/* Bullet points checklist */}
+                          <ul className="space-y-1.5 text-xs text-foreground/85 my-3">
+                            {sc.bullets.map((b, bIdx) => (
+                              <li key={bIdx} className="flex items-start gap-1.5">
+                                <CheckCircle2
+                                  className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${
+                                    sc.color === "rose"
+                                      ? "text-rose-500"
+                                      : sc.color === "blue"
+                                      ? "text-blue-500"
+                                      : sc.color === "emerald"
+                                      ? "text-emerald-500"
+                                      : "text-purple-500"
+                                  }`}
+                                />
+                                <span className="leading-tight">{b}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Card Footer */}
+                        <div className="pt-2 border-t border-border/60 mt-2 space-y-2">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
+                            <Layers className="w-3.5 h-3.5" />
+                            <span>{sc.countLabel}</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            className={`w-full py-1.5 px-3 rounded-xl font-bold text-xs inline-flex items-center justify-center gap-1 transition-colors cursor-pointer ${sc.btnClass}`}
+                          >
+                            <span>{sc.actionText}</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* Danh sách các bộ từ vựng thực tế (Bảo tồn toàn bộ chức năng cũ) */}
+              <div className="pt-2 space-y-3">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-foreground">
+                      Danh sách bộ từ vựng:
+                    </span>
+                    {selectedSkillFilter !== "all" && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase">
+                        Đang lọc: {selectedSkillFilter}
+                      </span>
+                    )}
+                  </div>
+
+                  {selectedSkillFilter !== "all" && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSkillFilter("all")}
+                      className="text-xs font-bold text-muted-foreground hover:text-foreground underline cursor-pointer"
+                    >
+                      Xem tất cả các bộ từ
+                    </button>
+                  )}
+                </div>
 
               {/* Topic Grid */}
               {loading ? (
@@ -403,6 +663,7 @@ export default function VocabularyPage() {
                   ))}
                 </div>
               )}
+              </div>
             </>
           ) : (
             /* My Saved Vocabulary Notebook (Screenshot 2) */

@@ -163,6 +163,7 @@ const DEFAULT_LISTENING_TEST = {
     },
   ],
   part2: {
+    topic: "Exercise Preferences",
     instructions:
       "Four people are talking about their exercise preferences. Match each person to the correct information.",
     options: [
@@ -379,6 +380,13 @@ const DEFAULT_LISTENING_TEST_2 = {
   part2: {
     topic: "Workplace Productivity & Remote Work",
     instructions: "Four employees share their views on working from home. Match each speaker to their statement.",
+    options: [
+      "Saves two hours of commute time daily",
+      "Misses spontaneous brainstorming with teammates",
+      "Struggles to separate office tasks from personal life",
+      "Enjoys quiet focus without office interruptions",
+      "Finds remote setup too expensive for home utilities",
+    ],
     speakers: [
       {
         speaker: "Speaker A",

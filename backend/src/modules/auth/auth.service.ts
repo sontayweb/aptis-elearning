@@ -7,6 +7,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { auditService } from '../audit/audit.service';
 import { AuditAction, TargetBand } from '@prisma/client';
 import { Request } from 'express';
+import { emailService } from '../email/email.service';
 
 const googleClient = process.env.GOOGLE_CLIENT_ID
   ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
@@ -310,9 +311,14 @@ export class AuthService {
       { expiresIn: '1h' }
     );
 
+    // Gửi email đặt lại mật khẩu bất đồng bộ (Non-blocking)
+    emailService.sendPasswordResetEmail(user.email, resetToken, user.full_name).catch((err) => {
+      console.error('[AuthService] Lỗi khi gửi mail reset password:', err);
+    });
+
     return {
-      message: 'Đường dẫn đặt lại mật khẩu đã được tạo',
-      resetToken, // Dùng để gửi mail hoặc kiểm thử
+      message: 'Nếu email tồn tại, đường link đặt lại mật khẩu đã được gửi về hòm thư của bạn',
+      ...(process.env.NODE_ENV !== 'production' ? { resetToken } : {}),
     };
   }
 

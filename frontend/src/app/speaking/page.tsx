@@ -18,6 +18,8 @@ import {
   Search,
   AlertCircle,
   Trophy,
+  Flame,
+  Star,
 } from "lucide-react";
 
 interface SpeakingExam {
@@ -34,6 +36,7 @@ interface SpeakingExam {
   bestScoreNumber?: number | null;
   userAttempts: number;
   priority?: "HIGH" | "MEDIUM" | "LOW";
+  hotLevel?: number;
 }
 
 export default function SpeakingPracticePage() {
@@ -79,21 +82,24 @@ export default function SpeakingPracticePage() {
               else priority = "LOW";
             }
 
-            return {
-              id: exam.id,
-              title: exam.title,
-              parts: isFullSpeaking ? "Full Speaking · 4 Parts" : (exam.partTitle || "Speaking Part"),
-              totalParts: exam.totalParts || 1,
-              partTitle: exam.partTitle,
-              questionsCount: exam.totalQuestions || 4,
-              duration: `${exam.durationMinutes || 12} phút`,
-              isFree: !exam.isPro,
-              status,
-              bestScore: exam.bestScore,
-              bestScoreNumber: exam.bestScoreNumber,
-              userAttempts: exam.userAttempts || 0,
-              priority,
-            };
+              const hotLevel = Number(exam.hotLevel ?? exam.hot_level ?? 0);
+
+              return {
+                id: exam.id,
+                title: exam.title,
+                parts: isFullSpeaking ? "Full Speaking · 4 Parts" : (exam.partTitle || "Speaking Part"),
+                totalParts: exam.totalParts || 1,
+                partTitle: exam.partTitle,
+                questionsCount: exam.totalQuestions || 4,
+                duration: `${exam.durationMinutes || 12} phút`,
+                isFree: !exam.isPro,
+                status,
+                bestScore: exam.bestScore,
+                bestScoreNumber: exam.bestScoreNumber,
+                userAttempts: exam.userAttempts || 0,
+                priority,
+                hotLevel,
+              };
           })
         );
       } else {
@@ -152,7 +158,7 @@ export default function SpeakingPracticePage() {
         : e.priority === "LOW";
     const matchesSource = filterSource === "all" || filterSource === "web" ? true : false;
     return matchesSearch && matchesStatus && matchesPriority && matchesSource;
-  });
+  }).sort((a, b) => (b.hotLevel || 0) - (a.hotLevel || 0));
 
   // Dynamic naming based on activeTab
   const getTabInfo = () => {
@@ -434,12 +440,18 @@ export default function SpeakingPracticePage() {
                 return (
                   <div
                     key={exam.id}
-                    className="relative rounded-2xl border border-border bg-card hover:border-primary/50 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group"
+                    className={`relative rounded-2xl border bg-card hover:border-primary/50 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group ${
+                      exam.hotLevel === 3
+                        ? "border-rose-500/40 shadow-rose-500/5 ring-1 ring-rose-500/20"
+                        : exam.hotLevel === 2
+                        ? "border-amber-500/30"
+                        : "border-border"
+                    }`}
                   >
                     <div>
                       {/* Top Badges & Score / Status */}
                       <div className="flex items-center justify-between gap-2 mb-3">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="px-2.5 py-0.5 rounded-md bg-muted text-muted-foreground font-bold text-[10px]">
                             {tabInfo.badge}
                           </span>
@@ -452,16 +464,30 @@ export default function SpeakingPracticePage() {
                               PRO
                             </span>
                           )}
-                          {exam.priority === "HIGH" && (
+                          {exam.hotLevel === 3 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-600 dark:text-rose-400 font-extrabold text-[10px] animate-pulse border border-rose-500/30">
+                              <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
+                              ĐỀ TỦ KỲ NÀY
+                            </span>
+                          ) : exam.hotLevel === 2 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] border border-amber-500/30">
+                              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                              ĐỀ HOT
+                            </span>
+                          ) : exam.hotLevel === 1 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 font-semibold text-[10px]">
+                              <Star className="w-3 h-3 text-orange-500" />
+                              Trọng tâm
+                            </span>
+                          ) : exam.priority === "HIGH" ? (
                             <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px]">
                               Ưu tiên cao
                             </span>
-                          )}
-                          {exam.priority === "MEDIUM" && (
+                          ) : exam.priority === "MEDIUM" ? (
                             <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 font-bold text-[10px]">
                               Ưu tiên vừa
                             </span>
-                          )}
+                          ) : null}
                         </div>
 
                         {/* Top Right Trophy / Status */}

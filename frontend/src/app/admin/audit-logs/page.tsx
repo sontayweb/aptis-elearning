@@ -23,6 +23,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronUp,
+  Mail,
 } from "lucide-react";
 
 interface AuditLogItem {
@@ -191,6 +192,13 @@ export default function AdminAuditLogsPage() {
             Cập nhật Gói / Quota
           </span>
         );
+      case "EMAIL_NOTIFICATION_SENT":
+        return (
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-300 font-heading font-semibold text-[10px] border border-cyan-200 dark:border-cyan-800/60">
+            <Mail className="w-3 h-3" />
+            Gửi Email
+          </span>
+        );
       default:
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-heading font-medium text-[10px] border border-slate-200 dark:border-slate-700">
@@ -355,6 +363,7 @@ export default function AdminAuditLogsPage() {
             { id: "AUTH_PASSWORD_RESET", label: "Đổi MK" },
             { id: "EXAM_CREATE", label: "Tạo đề" },
             { id: "PLAN_UPDATE", label: "Gói cước" },
+            { id: "EMAIL_NOTIFICATION_SENT", label: "Gửi Email" },
           ].map((tab) => (
             <button
               key={tab.id}

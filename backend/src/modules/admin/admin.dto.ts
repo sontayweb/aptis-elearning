@@ -28,6 +28,8 @@ export const adminCreateExamSchema = z.object({
   skill: z.nativeEnum(ExamSkill),
   durationMinutes: z.number().min(5).max(300),
   isPro: z.boolean().default(false),
+  hotLevel: z.number().min(0).max(5).default(0).optional(),
+  forecastTag: z.string().optional(),
   parts: z
     .array(
       z.object({

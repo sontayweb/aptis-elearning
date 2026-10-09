@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Flame, ArrowRight } from "lucide-react";
+import { Flame, ArrowRight, Target, Crown } from "lucide-react";
 
 interface WeeklyStreakCardProps {
   currentStreak?: number;
@@ -13,131 +13,105 @@ interface WeeklyStreakCardProps {
 
 export function WeeklyStreakCard({
   currentStreak = 0,
-  completedThisWeek = 0,
-  totalDays = 7,
   activeDays,
-  practiceRoute = "/grammar",
+  practiceRoute = "/thi-thu",
 }: WeeklyStreakCardProps) {
-  // Radius 55 -> Circumference = 2 * Math.PI * 55 ≈ 345.575
-  const circumference = 2 * Math.PI * 55;
-  const progressRatio = completedThisWeek / totalDays;
-  const dashOffset = circumference * (1 - progressRatio);
-
   const todayIdx = (new Date().getDay() + 6) % 7; // 0 = T2 ... 6 = CN
-  const days = [
-    { label: "T2", isToday: todayIdx === 0, completed: activeDays ? !!activeDays[0] : false },
-    { label: "T3", isToday: todayIdx === 1, completed: activeDays ? !!activeDays[1] : false },
-    { label: "T4", isToday: todayIdx === 2, completed: activeDays ? !!activeDays[2] : false },
-    { label: "T5", isToday: todayIdx === 3, completed: activeDays ? !!activeDays[3] : false },
-    { label: "T6", isToday: todayIdx === 4, completed: activeDays ? !!activeDays[4] : false },
-    { label: "T7", isToday: todayIdx === 5, completed: activeDays ? !!activeDays[5] : false },
-    { label: "CN", isToday: todayIdx === 6, completed: activeDays ? !!activeDays[6] : false },
-  ];
+  const dayLabels = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
-  const isTodayDone = activeDays ? !!activeDays[todayIdx] : false;
-  const streakHeading = !isTodayDone && currentStreak > 0
-    ? `Sắp mất chuỗi ${currentStreak} ngày!`
-    : `Chuỗi ${currentStreak} ngày`;
-  const streakSubtitle = !isTodayDone
-    ? "Luyện 1 bài hôm nay là đủ để giữ streak."
-    : "Tuyệt vời! Bạn đã duy trì streak hôm nay.";
+  const days = dayLabels.map((label, idx) => ({
+    label,
+    isToday: idx === todayIdx,
+    completed: activeDays ? !!activeDays[idx] : false,
+  }));
 
   return (
-    <div className="relative rounded-2xl border border-border bg-card/80 backdrop-blur-sm shadow-md tech-card hover:border-primary/50 hover:shadow-glow-soft p-4 sm:p-6">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-2xl opacity-60"
-        style={{ background: "var(--gradient-radial-red)" }}
-      />
-      <div className="relative">
-        <div className="flex flex-col sm:flex-row gap-6 items-center">
-          {/* Circular Meter */}
-          <div className="shrink-0">
-            <div
-              className="relative flex items-center justify-center"
-              style={{ width: "120px", height: "120px" }}
-            >
-              <svg width="120" height="120" className="-rotate-90">
-                <defs>
-                  <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" />
-                    <stop offset="100%" stopColor="hsl(var(--accent))" />
-                  </linearGradient>
-                </defs>
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="55"
-                  stroke="hsl(var(--border))"
-                  strokeWidth="10"
-                  fill="none"
-                />
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="55"
-                  stroke="url(#ring-grad)"
-                  strokeWidth="10"
-                  strokeLinecap="round"
-                  fill="none"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={dashOffset}
-                  style={{
-                    transition: "stroke-dashoffset 1s ease-out",
-                    filter: "drop-shadow(0 0 6px hsl(var(--primary) / 0.5))",
-                  }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="text-2xl font-heading font-extrabold text-foreground leading-none">
-                  {completedThisWeek}/{totalDays}
+    <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-4 sm:p-5 md:p-6 shadow-sm flex flex-col justify-between">
+      <div>
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center">
+              <Flame className="w-4 h-4 fill-rose-500/30" />
+            </div>
+            <h3 className="font-heading font-black text-sm sm:text-base text-foreground tracking-tight">
+              Chuỗi học tập
+            </h3>
+          </div>
+
+          <Link
+            href="/progress"
+            className="text-xs font-bold text-primary hover:text-primary-glow inline-flex items-center gap-1"
+          >
+            <span>Xem chi tiết</span>
+            <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
+
+        {/* Big Streak Number & 7 Day Bubbles */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-1">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-3xl sm:text-4xl font-heading font-black text-rose-600 dark:text-rose-400 leading-none">
+              {currentStreak}
+            </span>
+            <div className="flex flex-col leading-tight">
+              <span className="text-xs font-black text-foreground uppercase tracking-tight">
+                ngày
+              </span>
+              <span className="text-[10px] text-muted-foreground font-semibold">
+                liên tiếp
+              </span>
+            </div>
+          </div>
+
+          {/* 7 Days Bubbles + Crown */}
+          <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar">
+            {days.map((day) => (
+              <div key={day.label} className="flex flex-col items-center gap-1">
+                <span className="text-[9px] font-bold text-muted-foreground">
+                  {day.label}
+                </span>
+                <div
+                  className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
+                    day.completed
+                      ? "bg-rose-500 text-white shadow-2xs"
+                      : day.isToday
+                      ? "border-2 border-rose-500 bg-rose-500/10 text-rose-600 animate-pulse"
+                      : "border border-border/80 bg-muted/30 text-muted-foreground/40"
+                  }`}
+                  title={`${day.label}: ${
+                    day.completed ? "Đã học" : day.isToday ? "Hôm nay" : "Chưa học"
+                  }`}
+                >
+                  {day.completed ? "✓" : ""}
                 </div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
-                  Tuần này
-                </div>
+              </div>
+            ))}
+
+            {/* Sunday Crown */}
+            <div className="flex flex-col items-center gap-1 pl-1">
+              <span className="text-[9px] font-bold text-amber-500">Mục tiêu</span>
+              <div
+                className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center ${
+                  currentStreak >= 7
+                    ? "bg-amber-500 text-white shadow-glow-soft"
+                    : "border border-amber-500/30 bg-amber-500/10 text-amber-500"
+                }`}
+                title="Chuỗi 7 ngày đạt danh hiệu"
+              >
+                <Crown className="w-3.5 h-3.5 fill-current" />
               </div>
             </div>
           </div>
-
-          {/* Streak Details & Days */}
-          <div className="flex-1 min-w-0 w-full">
-            <div className="flex items-center gap-2 mb-1">
-              <Flame className="w-6 h-6 text-primary fill-primary/20 animate-pulse" />
-              <h2 className="font-heading font-extrabold text-lg text-foreground">
-                {streakHeading}
-              </h2>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              {streakSubtitle}
-            </p>
-            <div className="flex gap-1.5">
-              {days.map((day) => (
-                <div key={day.label} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="text-[10px] text-muted-foreground">{day.label}</div>
-                  <div
-                    className={`w-full h-9 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
-                      day.completed
-                        ? "btn-brand-gradient text-white shadow-glow-soft"
-                        : day.isToday
-                        ? "bg-primary/15 border border-primary/50 text-primary animate-glow-pulse"
-                        : "bg-muted/40 text-muted-foreground/60"
-                    }`}
-                  >
-                    {day.completed ? "✓" : day.isToday ? "•" : "·"}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <Link
-              className="tech-btn inline-flex items-center justify-center gap-1.5 whitespace-nowrap text-sm font-semibold ring-offset-background btn-brand-gradient text-white shadow-glow-soft hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 h-9 rounded-xl px-4 mt-4 w-full sm:w-auto"
-              href={practiceRoute}
-            >
-              <span>Luyện ngay</span>
-              <ArrowRight className="w-3.5 h-3.5 ml-1" />
-            </Link>
-          </div>
         </div>
+      </div>
+
+      {/* Subtext Motivation */}
+      <div className="mt-3 pt-3 border-t border-border/60 flex items-start gap-2">
+        <Target className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+        <p className="text-xs text-muted-foreground italic leading-relaxed">
+          &ldquo;Hãy luyện ít nhất 1 bài mỗi ngày để giữ chuỗi và tạo thói quen học tập nhé!&rdquo;
+        </p>
       </div>
     </div>
   );

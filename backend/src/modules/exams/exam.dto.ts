@@ -7,6 +7,14 @@ export const examFilterSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val === 'true' ? true : val === 'false' ? false : undefined)),
+  isHot: z
+    .string()
+    .optional()
+    .transform((val) => (val === 'true' ? true : val === 'false' ? false : undefined)),
+  hotLevel: z
+    .string()
+    .optional()
+    .transform((val) => (val !== undefined && val !== '' ? Number(val) : undefined)),
   source: z.string().optional(),
   page: z.string().optional().default('1').transform(Number),
   limit: z.string().optional().default('20').transform(Number),

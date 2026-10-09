@@ -18,6 +18,8 @@ import {
   AlertCircle,
   Lock,
   Sparkles,
+  Flame,
+  Star,
 } from "lucide-react";
 
 interface ListeningExam {
@@ -34,6 +36,7 @@ interface ListeningExam {
   bestScoreNumber?: number | null;
   userAttempts?: number;
   priority?: "HIGH" | "MEDIUM" | "LOW";
+  hotLevel?: number;
 }
 
 export default function ListeningPracticePage() {
@@ -69,6 +72,8 @@ export default function ListeningPracticePage() {
 
             const isFullListening = exam.totalParts === 4 || exam.title.includes("Full Listening");
 
+            const hotLevel = Number(exam.hotLevel ?? exam.hot_level ?? 0);
+
             return {
               id: exam.id,
               title: exam.title,
@@ -83,6 +88,7 @@ export default function ListeningPracticePage() {
               bestScoreNumber: exam.bestScoreNumber,
               userAttempts: exam.userAttempts || 0,
               priority: "HIGH",
+              hotLevel,
             };
           })
         );
@@ -152,7 +158,7 @@ export default function ListeningPracticePage() {
         ? e.status === "completed"
         : e.status !== "completed";
     return matchesSearch && matchesPriority && matchesStatus;
-  });
+  }).sort((a, b) => (b.hotLevel || 0) - (a.hotLevel || 0));
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -442,7 +448,13 @@ export default function ListeningPracticePage() {
               {filteredExams.map((exam, idx) => (
                 <div
                   key={exam.id}
-                  className="relative rounded-2xl border border-border bg-card hover:border-primary/50 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group"
+                  className={`relative rounded-2xl border bg-card hover:border-primary/50 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group ${
+                    exam.hotLevel === 3
+                      ? "border-rose-500/40 shadow-rose-500/5 ring-1 ring-rose-500/20"
+                      : exam.hotLevel === 2
+                      ? "border-amber-500/30"
+                      : "border-border"
+                  }`}
                 >
                   <div>
                     {/* Badges & Score */}
@@ -460,9 +472,26 @@ export default function ListeningPracticePage() {
                             PRO
                           </span>
                         )}
-                        <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px]">
-                          Ưu tiên cao
-                        </span>
+                        {exam.hotLevel === 3 ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-600 dark:text-rose-400 font-extrabold text-[10px] animate-pulse border border-rose-500/30">
+                            <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
+                            ĐỀ TỦ KỲ NÀY
+                          </span>
+                        ) : exam.hotLevel === 2 ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] border border-amber-500/30">
+                            <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                            ĐỀ HOT
+                          </span>
+                        ) : exam.hotLevel === 1 ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 font-semibold text-[10px]">
+                            <Star className="w-3 h-3 text-orange-500" />
+                            Trọng tâm
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px]">
+                            Ưu tiên cao
+                          </span>
+                        )}
                       </div>
 
                       {exam.bestScore && (

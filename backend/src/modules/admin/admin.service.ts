@@ -15,6 +15,7 @@ import { auditService } from '../audit/audit.service';
 import { Request } from 'express';
 import { grantOrExtendSubscription } from '../../utils/subscription-helper';
 import * as xlsx from 'xlsx';
+import { emailService } from '../email/email.service';
 
 export class AdminService {
   async listUsers(filter: AdminUserFilterInput) {
@@ -115,6 +116,11 @@ export class AdminService {
       newValue: { email: user.email, role: user.role, fullName: user.full_name },
     });
 
+    // Gửi email chào mừng và cấp thông tin đăng nhập cho người dùng
+    emailService.sendAccountCreatedEmail(user.email, input.password, user.full_name, user.role).catch((err) => {
+      console.error(`[AdminService] Lỗi gửi email tạo tài khoản cho ${user.email}:`, err);
+    });
+
     return user;
   }
 
@@ -213,6 +219,11 @@ export class AdminService {
 
         results.successCount++;
         results.createdUsers.push(newUser);
+
+        // Gửi email chào mừng và cấp thông tin đăng nhập tự động
+        emailService.sendAccountCreatedEmail(email, rawPassword, fullName, roleStr).catch((err) => {
+          console.error(`[AdminService] Lỗi gửi email tạo tài khoản cho ${email}:`, err);
+        });
       } catch (err: any) {
         results.errorCount++;
         results.errors.push({ row: i + 1, email, reason: err.message || 'Lỗi lưu trữ cơ sở dữ liệu' });
@@ -274,6 +285,8 @@ export class AdminService {
         skill: input.skill,
         duration_minutes: input.durationMinutes,
         is_pro: input.isPro,
+        hot_level: input.hotLevel ?? 0,
+        forecast_tag: input.forecastTag ?? null,
         source: 'WEB',
         parts: {
           create: input.parts.map((p) => ({
@@ -310,7 +323,7 @@ export class AdminService {
       entityType: 'EXAM',
       entityId: exam.id,
       description: `Tạo đề thi mới: "${exam.title}" (Kỹ năng: ${exam.skill}, Thời lượng: ${exam.duration_minutes}p)`,
-      newValue: { title: exam.title, skill: exam.skill, durationMinutes: exam.duration_minutes, isPro: exam.is_pro },
+      newValue: { title: exam.title, skill: exam.skill, durationMinutes: exam.duration_minutes, isPro: exam.is_pro, hotLevel: exam.hot_level },
     });
 
     return exam;
@@ -349,6 +362,8 @@ export class AdminService {
         ...(input.isPro !== undefined && { is_pro: input.isPro }),
         ...(input.isPublished !== undefined && { is_published: input.isPublished }),
         ...(input.skill !== undefined && { skill: input.skill }),
+        ...(input.hotLevel !== undefined && { hot_level: Number(input.hotLevel) }),
+        ...(input.forecastTag !== undefined && { forecast_tag: input.forecastTag }),
       },
     });
 
@@ -949,7 +964,7 @@ export class AdminService {
         where,
         skip,
         take: limit,
-        orderBy: { created_at: 'desc' },
+        orderBy: [{ hot_level: 'desc' }, { created_at: 'desc' }],
         include: {
           parts: {
             include: {
@@ -974,6 +989,8 @@ export class AdminService {
         durationMinutes: exam.duration_minutes,
         isPro: exam.is_pro,
         isPublished: exam.is_published,
+        hotLevel: exam.hot_level ?? 0,
+        forecastTag: exam.forecast_tag ?? null,
         source: exam.source,
         createdAt: exam.created_at,
         partsCount: exam.parts.length,

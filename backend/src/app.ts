@@ -15,6 +15,8 @@ import adminRoutes from './modules/admin/admin.routes';
 import auditRoutes from './modules/audit/audit.routes';
 import studentRoutes from './modules/student/student.routes';
 import notificationRoutes from './modules/notifications/notification.routes';
+import courseRoutes from './modules/courses/course.routes';
+import settingsRoutes from './modules/settings/settings.routes';
 import { errorHandler } from './middlewares/error.handler';
 
 const app = express();
@@ -53,6 +55,8 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/ai-grading', aiGradingRoutes);
 app.use('/api/cms', cmsRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/notifications', notificationRoutes);

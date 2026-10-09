@@ -42,6 +42,8 @@ import {
   ChevronDown,
   ChevronUp,
   MoreHorizontal,
+  Flame,
+  Star,
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
 
@@ -53,6 +55,8 @@ interface ExamItem {
   durationMinutes: number;
   isPro: boolean;
   isPublished: boolean;
+  hotLevel?: number;
+  forecastTag?: string | null;
   partsCount: number;
   questionsCount: number;
   attemptsCount: number;
@@ -78,6 +82,7 @@ export default function AdminExamsPage() {
   }, [openMenuExamId]);
 
   const [skillFilter, setSkillFilter] = useState("ALL");
+  const [hotFilter, setHotFilter] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
@@ -87,6 +92,7 @@ export default function AdminExamsPage() {
   type ExamSortKey =
     | "title"
     | "skill"
+    | "hotLevel"
     | "durationMinutes"
     | "questionsCount"
     | "isPublished"
@@ -134,6 +140,7 @@ export default function AdminExamsPage() {
     durationMinutes: 162,
     isPro: false,
     isPublished: true,
+    hotLevel: 0,
   });
   const [editLoading, setEditLoading] = useState(false);
 
@@ -172,6 +179,7 @@ export default function AdminExamsPage() {
     skill: "FULL_TEST",
     durationMinutes: 162,
     isPro: false,
+    hotLevel: 0,
     parts: [
       {
         partNumber: 1,
@@ -186,7 +194,7 @@ export default function AdminExamsPage() {
             options: ["A. Main Hall", "B. Library", "C. Online Room"],
             correctAnswer: "A",
             explanation: "The text specifies Main Hall as the location.",
-            maxScore: 1.0,
+            maxScore: 1,
           },
         ],
       },
@@ -307,6 +315,30 @@ export default function AdminExamsPage() {
     }
   };
 
+  const handleCycleHotLevel = async (exam: ExamItem) => {
+    const nextLevel = ((exam.hotLevel || 0) + 1) % 4; // 0 -> 1 -> 2 -> 3 -> 0
+    // Optimistic update
+    setExams((prev) =>
+      prev.map((e) => (e.id === exam.id ? { ...e, hotLevel: nextLevel } : e))
+    );
+    try {
+      const res = await api.admin.updateExam(exam.id, { hotLevel: nextLevel });
+      if (res.success) {
+        const labels = [
+          "Mặc định (Không gán sao)",
+          "1 Sao ⭐ (Ôn tập bổ trợ)",
+          "2 Sao ⭐⭐ (Đề Hot)",
+          "3 Sao ⭐⭐⭐ 🔥 (Đề Tủ - Xác suất vào cao)",
+        ];
+        showToast(`Đã đổi mức độ hot "${exam.title}" -> ${labels[nextLevel]}`);
+      } else {
+        fetchExams();
+      }
+    } catch {
+      fetchExams();
+    }
+  };
+
   const handleDuplicateExam = async (exam: ExamItem) => {
     try {
       const res = await api.admin.duplicateExam(exam.id);
@@ -330,6 +362,7 @@ export default function AdminExamsPage() {
       durationMinutes: exam.durationMinutes,
       isPro: exam.isPro,
       isPublished: exam.isPublished,
+      hotLevel: exam.hotLevel || 0,
     });
   };
 
@@ -344,6 +377,7 @@ export default function AdminExamsPage() {
         durationMinutes: Number(editForm.durationMinutes),
         isPro: editForm.isPro,
         isPublished: editForm.isPublished,
+        hotLevel: Number(editForm.hotLevel || 0),
       });
       if (res.success) {
         showToast(`Đã cập nhật thông tin đề "${editForm.title}" thành công!`);
@@ -368,6 +402,7 @@ export default function AdminExamsPage() {
         skill: newExam.skill,
         durationMinutes: Number(newExam.durationMinutes),
         isPro: newExam.isPro,
+        hotLevel: Number(newExam.hotLevel || 0),
         parts: newExam.parts,
       });
 
@@ -406,9 +441,20 @@ export default function AdminExamsPage() {
     }
   };
 
-  const filteredExams = exams.filter((e) =>
-    e.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredExams = exams.filter((e) => {
+    const matchesSearch =
+      e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (e.description && e.description.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    let matchesHot = true;
+    if (hotFilter === "HOT_ALL") matchesHot = (e.hotLevel || 0) > 0;
+    else if (hotFilter === "HOT_3") matchesHot = (e.hotLevel || 0) === 3;
+    else if (hotFilter === "HOT_2") matchesHot = (e.hotLevel || 0) === 2;
+    else if (hotFilter === "HOT_1") matchesHot = (e.hotLevel || 0) === 1;
+    else if (hotFilter === "HOT_0") matchesHot = (e.hotLevel || 0) === 0;
+
+    return matchesSearch && matchesHot;
+  });
 
   const handleSort = (field: ExamSortKey) => {
     setSortState((prev) => {
@@ -689,6 +735,23 @@ export default function AdminExamsPage() {
             })}
           </div>
 
+          {/* Hot Level Filter */}
+          <div className="shrink-0">
+            <select
+              value={hotFilter}
+              onChange={(e) => setHotFilter(e.target.value)}
+              className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+              title="Lọc đề thi theo mức độ hot / dự đoán đề tủ"
+            >
+              <option value="ALL">🔥 Tất cả độ hot</option>
+              <option value="HOT_ALL">⭐ Chỉ đề Hot (≥1⭐)</option>
+              <option value="HOT_3">🔥🔥🔥 Đề tủ (3⭐)</option>
+              <option value="HOT_2">⭐⭐ Đề Hot (2⭐)</option>
+              <option value="HOT_1">⭐ Ôn tập (1⭐)</option>
+              <option value="HOT_0">⚪ Mặc định (0⭐)</option>
+            </select>
+          </div>
+
           <button
             onClick={fetchExams}
             title="Làm mới danh sách đề thi"
@@ -717,6 +780,13 @@ export default function AdminExamsPage() {
                   title="Kỹ năng"
                   currentSort={sortState}
                   onSort={handleSort}
+                />
+                <SortableHeader
+                  field="hotLevel"
+                  title="Mức độ Hot"
+                  currentSort={sortState}
+                  onSort={handleSort}
+                  align="center"
                 />
                 <SortableHeader
                   field="durationMinutes"
@@ -759,14 +829,14 @@ export default function AdminExamsPage() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium text-slate-900 dark:text-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-slate-400 dark:text-slate-500">
+                  <td colSpan={9} className="py-16 text-center text-slate-400 dark:text-slate-500">
                     <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-slate-600 dark:text-slate-400" />
                     Đang tải danh sách đề thi...
                   </td>
                 </tr>
               ) : sortedExams.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-slate-400 dark:text-slate-500 font-normal">
+                  <td colSpan={9} className="py-16 text-center text-slate-400 dark:text-slate-500 font-normal">
                     Không tìm thấy đề thi nào phù hợp.
                   </td>
                 </tr>
@@ -800,6 +870,37 @@ export default function AdminExamsPage() {
                           <SkillIcon className="w-3 h-3" />
                           <span>{badge.label}</span>
                         </span>
+                      </td>
+
+                      {/* Hot Level (Gắn sao & Đề tủ) */}
+                      <td className="py-3.5 px-4 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleCycleHotLevel(exam)}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-heading font-bold border transition-all hover:scale-105 active:scale-95"
+                          title="Bấm để đổi nhanh mức độ hot (0⭐ -> 1⭐ -> 2⭐ -> 3⭐)"
+                        >
+                          {exam.hotLevel === 3 ? (
+                            <span className="inline-flex items-center gap-1 text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 px-2 py-0.5 rounded-full">
+                              <Flame className="w-3 h-3 text-rose-500 fill-rose-500" />
+                              <span>3⭐ Đề tủ</span>
+                            </span>
+                          ) : exam.hotLevel === 2 ? (
+                            <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-2 py-0.5 rounded-full">
+                              <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                              <span>2⭐ Hot</span>
+                            </span>
+                          ) : exam.hotLevel === 1 ? (
+                            <span className="inline-flex items-center gap-1 text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 px-2 py-0.5 rounded-full">
+                              <Star className="w-3 h-3 text-blue-500 fill-blue-500" />
+                              <span>1⭐ Ôn tập</span>
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-normal">
+                              + Gán sao
+                            </span>
+                          )}
+                        </button>
                       </td>
 
                       {/* Duration (Right aligned per UX Guideline 5) */}
@@ -1190,6 +1291,22 @@ export default function AdminExamsPage() {
                 </div>
               </div>
 
+              <div>
+                <label className="block font-heading font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Mức độ Hot / Dự đoán đề thi (Gắn sao &amp; Đề tủ)
+                </label>
+                <select
+                  value={editForm.hotLevel}
+                  onChange={(e) => setEditForm({ ...editForm, hotLevel: Number(e.target.value) })}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-rose-500 font-sans"
+                >
+                  <option value={0}>⚪ Mặc định (0⭐ - Đề bình thường, không gán sao)</option>
+                  <option value={1}>⭐ 1 Sao (Đề ôn tập bổ trợ)</option>
+                  <option value={2}>⭐⭐ 2 Sao (Đề Hot - Xuất hiện thường xuyên)</option>
+                  <option value={3}>⭐⭐⭐ 🔥 3 Sao (Đề Tủ - Khả năng vào rất cao kỳ này!)</option>
+                </select>
+              </div>
+
               <div className="space-y-2 pt-1">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -1432,6 +1549,22 @@ export default function AdminExamsPage() {
                       className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block font-heading font-bold text-slate-800 dark:text-slate-200 mb-1.5">
+                    Mức độ Hot / Dự đoán đề thi (Gắn sao &amp; Đề tủ)
+                  </label>
+                  <select
+                    value={newExam.hotLevel}
+                    onChange={(e) => setNewExam({ ...newExam, hotLevel: Number(e.target.value) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-rose-500 focus:outline-none font-sans"
+                  >
+                    <option value={0}>⚪ Mặc định (0⭐ - Đề bình thường, không gán sao)</option>
+                    <option value={1}>⭐ 1 Sao (Đề ôn tập bổ trợ)</option>
+                    <option value={2}>⭐⭐ 2 Sao (Đề Hot - Xuất hiện thường xuyên)</option>
+                    <option value={3}>⭐⭐⭐ 🔥 3 Sao (Đề Tủ - Khả năng vào rất cao kỳ này!)</option>
+                  </select>
                 </div>
 
                 <div className="flex items-center gap-2.5 pt-2">

@@ -91,6 +91,31 @@ enum DictationMode {
   HYBRID
 }
 
+enum CourseFormat {
+  ONLINE_LIVE
+  OFFLINE
+  HYBRID
+  RECORDED
+}
+
+enum BatchStatus {
+  UPCOMING
+  OPEN
+  ALMOST_FULL
+  FULL
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum LeadConsultationStatus {
+  PENDING
+  CONTACTED
+  CONSULTING
+  ENROLLED
+  CANCELLED
+}
+
 // ==========================================
 // 2. USER & AUTH MODELS
 // ==========================================
@@ -121,6 +146,7 @@ model User {
   audit_logs      AuditLog[]
   reviews         ExamReview[]
   notifications   Notification[]
+  course_leads    CourseLeadRegistration[]
 
   @@index([email])
   @@index([role])
@@ -138,6 +164,8 @@ model Exam {
   duration_minutes Int            // Full test: 162p; Listening: 40p; etc.
   is_pro           Boolean        @default(false)
   is_published     Boolean        @default(true)
+  hot_level        Int            @default(0) // Mức độ hot: 0 = Thường, 1 = 1 sao (Ôn tập), 2 = 2 sao (Hot), 3 = 3 sao (Đề tủ cực hot)
+  forecast_tag     String?        // Nhãn dự đoán (ví dụ: "Đề tủ tháng này", "Tần suất thi cao")
   source           String         @default("WEB") // "WEB" hoặc "CUSTOM"
   creator_id       String?
   created_at       DateTime       @default(now())
@@ -149,6 +177,7 @@ model Exam {
   reviews          ExamReview[]
 
   @@index([skill, is_published])
+  @@index([hot_level])
   @@index([source, creator_id])
 }
 
@@ -494,6 +523,8 @@ enum AuditAction {
   EXAM_DELETE
   SUBMISSION_GRADE_TEACHER
   PLAN_UPDATE
+  SYSTEM_SETTING_UPDATE
+  EMAIL_NOTIFICATION_SENT
 }
 
 model AuditLog {
@@ -529,26 +560,32 @@ model AuditLog {
 // ==========================================
 
 model ExamReview {
-  id              String        @id @default(uuid())
-  user_id         String
-  exam_id         String?
-  rating          Int           @default(5)
-  score_achieved  String?
-  comment         String
-  exam_location   String?
-  exam_date       DateTime?
-  status          ReviewStatus  @default(PENDING)
-  teacher_note    String?
-  reward_claimed  Boolean       @default(false)
-  reward_quota    Int           @default(0)
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
+  id                     String        @id @default(uuid())
+  user_id                String
+  exam_id                String?
+  rating                 Int           @default(5)
+  score_achieved         String?
+  comment                String
+  exam_location          String?
+  exam_date              DateTime?
+  status                 ReviewStatus  @default(PENDING)
+  teacher_note           String?
+  reward_claimed         Boolean       @default(false)
+  reward_quota           Int           @default(0)
+  class_name             String?
+  certificate_image_url  String?
+  is_featured            Boolean       @default(false)
+  display_order          Int           @default(0)
+  verified_by_admin      Boolean       @default(true)
+  created_at             DateTime      @default(now())
+  updated_at             DateTime      @updatedAt
 
-  user            User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  exam            Exam?         @relation(fields: [exam_id], references: [id], onDelete: SetNull)
+  user                   User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  exam                   Exam?         @relation(fields: [exam_id], references: [id], onDelete: SetNull)
 
   @@index([user_id])
-  @@index([status])
+  @@index([status, is_featured])
+  @@index([display_order(sort: Asc)])
   @@index([created_at(sort: Desc)])
 }
 
@@ -572,4 +609,99 @@ model Notification {
   @@index([created_at(sort: Desc)])
   @@map("notifications")
 }
+
+// ==========================================
+// 13. COURSE & BATCH MANAGEMENT (TUYỂN SINH)
+// ==========================================
+
+model Course {
+  id               String         @id @default(uuid())
+  code             String         @unique
+  title            String
+  subtitle         String?
+  target_band      TargetBand     @default(B2_TARGET)
+  format           CourseFormat   @default(ONLINE_LIVE)
+  original_price   Int
+  sale_price       Int
+  discount_percent Int            @default(35)
+  max_students     Int            @default(15)
+  features         Json
+  is_active        Boolean        @default(true)
+  display_order    Int            @default(0)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  batches          CourseBatch[]
+  leads            CourseLeadRegistration[]
+
+  @@index([is_active, display_order])
+}
+
+model CourseBatch {
+  id               String         @id @default(uuid())
+  course_id        String
+  batch_code       String
+  display_date     String
+  opening_date     DateTime
+  schedule_time    String?
+  max_seats        Int            @default(15)
+  enrolled_seats   Int            @default(0)
+  status           BatchStatus    @default(OPEN)
+  is_hot           Boolean        @default(false)
+  order_num        Int            @default(0)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  course           Course         @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  leads            CourseLeadRegistration[]
+
+  @@index([course_id, status])
+  @@index([opening_date(sort: Asc)])
+}
+
+model CourseLeadRegistration {
+  id               String                 @id @default(uuid())
+  course_id        String
+  batch_id         String?
+  user_id          String?
+  full_name        String
+  phone_number     String
+  email            String?
+  target_band      String?
+  current_level    String?
+  note             String?
+  status           LeadConsultationStatus @default(PENDING)
+  assigned_admin   String?
+  created_at       DateTime               @default(now())
+  updated_at       DateTime               @updatedAt
+
+  course           Course                 @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  batch            CourseBatch?           @relation(fields: [batch_id], references: [id], onDelete: SetNull)
+  user             User?                  @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([course_id, status])
+  @@index([phone_number])
+  @@index([created_at(sort: Desc)])
+}
+
+// ==========================================
+// 14. CENTRALIZED SYSTEM SETTINGS
+// ==========================================
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  category    String   @default("CONTACT")
+  description String?
+  is_public   Boolean  @default(true)
+  updated_by  String?
+  updated_at  DateTime @updatedAt
+  created_at  DateTime @default(now())
+
+  @@index([category, is_public])
+  @@map("system_settings")
+}
+
+
 

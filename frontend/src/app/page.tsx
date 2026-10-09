@@ -22,9 +22,9 @@ export default function HomePage() {
   }
 
   // If visitor is not logged in: render the comprehensive marketing landing page
-  if (!isAuthenticated) {
-    return <LandingPage />;
-  }
+  // if (!isAuthenticated) {
+  //   return <LandingPage />;
+  // }
 
   // If student is logged in: render the personal learning dashboard
   return <DashboardView user={user} />;

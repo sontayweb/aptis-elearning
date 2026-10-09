@@ -22,6 +22,15 @@ export class CmsController {
     }
   }
 
+  async getFeaturedFeedbacks(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const data = await cmsService.getFeaturedFeedbacks();
+      sendSuccess(res, data, 'Lấy danh sách feedback nổi bật thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getHallOfFame(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const hof = await cmsService.getHallOfFame();

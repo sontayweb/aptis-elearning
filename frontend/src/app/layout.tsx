@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 
 import { AuthProvider } from "@/contexts/auth-context";
 import { EventThemeProvider } from "@/contexts/event-theme-context";
+import { SiteSettingsProvider } from "@/contexts/site-settings-context";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EventDecorations } from "@/components/event-decorations";
 
@@ -27,11 +28,13 @@ export default function RootLayout({
     <html lang="vi" className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         <EventThemeProvider>
-          <AuthProvider>
-            {children}
-            <EventDecorations />
-            <MobileBottomNav />
-          </AuthProvider>
+          <SiteSettingsProvider>
+            <AuthProvider>
+              {children}
+              <EventDecorations />
+              <MobileBottomNav />
+            </AuthProvider>
+          </SiteSettingsProvider>
         </EventThemeProvider>
       </body>
     </html>

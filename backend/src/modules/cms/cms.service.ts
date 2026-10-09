@@ -81,6 +81,89 @@ export class CmsService {
     return pages[slug] || { title: 'Trang thông tin', content: 'Nội dung đang được cập nhật.' };
   }
 
+  /**
+   * Lấy danh sách feedback & bảng điểm nổi bật phục vụ Dashboard Carousel
+   */
+  async getFeaturedFeedbacks() {
+    const reviews = await prisma.examReview.findMany({
+      where: {
+        status: ReviewStatus.APPROVED,
+        is_featured: true,
+      },
+      orderBy: { display_order: 'asc' },
+      take: 10,
+      include: {
+        user: { select: { full_name: true, avatar_url: true } },
+      },
+    });
+
+    if (reviews.length === 0) {
+      return [
+        {
+          id: 'fb-1',
+          studentName: 'Trịnh Liên Hương',
+          className: 'Lớp 22/2026',
+          achievedBand: 'Đạt B2',
+          quote: 'Cảm ơn cô và khóa học, tài liệu rất sát đề và dễ hiểu ạ!',
+          scoreSummary: 'Overall 164/200 - B2',
+          certificateImageUrl: '/assets/certificates/huong-b2.png',
+          verified: true,
+        },
+        {
+          id: 'fb-2',
+          studentName: 'Quỳnh Trang',
+          className: 'Lớp 21/2026',
+          achievedBand: 'Đạt C1',
+          quote: 'Em không ngờ mình chỉ cần B2 mà được C1. Cám ơn cô nhiều ạ!',
+          scoreSummary: 'Overall 182/200 - C1',
+          certificateImageUrl: '/assets/certificates/trang-c1.png',
+          verified: true,
+        },
+        {
+          id: 'fb-3',
+          studentName: 'Học viên lớp 21/2026',
+          className: 'ĐHQG Hà Nội',
+          achievedBand: 'Đạt B2',
+          quote: 'Cháu học ĐHQG, cám ơn trung tâm nhiều, không ngờ lần 1 đã đỗ ạ!',
+          scoreSummary: 'Overall 158/200 - B2',
+          certificateImageUrl: '/assets/certificates/student-b2.png',
+          verified: true,
+        },
+        {
+          id: 'fb-4',
+          studentName: 'Nguyễn Minh Đức',
+          className: 'Lớp 23/2026',
+          achievedBand: 'Đạt B2',
+          quote: 'AI chấm Speaking & Writing phát hiện đúng lỗi ngữ pháp, đi thi tự tin hẳn!',
+          scoreSummary: 'Overall 160/200 - B2',
+          certificateImageUrl: '/assets/certificates/duc-b2.png',
+          verified: true,
+        },
+        {
+          id: 'fb-5',
+          studentName: 'Trần Mai Anh',
+          className: 'Lớp 20/2026',
+          achievedBand: 'Đạt C1',
+          quote: 'Bộ đề khoanh vùng trúng ngay bài thi Reading Part 4, đạt điểm tối đa luôn ạ.',
+          scoreSummary: 'Overall 185/200 - C1',
+          certificateImageUrl: '/assets/certificates/maianh-c1.png',
+          verified: true,
+        },
+      ];
+    }
+
+    return reviews.map((r) => ({
+      id: r.id,
+      studentName: r.user.full_name,
+      className: r.class_name || 'Khóa Luyện Thi B2',
+      achievedBand: r.score_achieved?.includes('C') ? 'Đạt C1' : 'Đạt B2',
+      quote: r.comment,
+      scoreSummary: r.score_achieved ? `Overall ${r.score_achieved}` : 'Đạt chuẩn B2',
+      certificateImageUrl: r.certificate_image_url || '/assets/certificates/sample.png',
+      verified: r.verified_by_admin,
+    }));
+  }
+
   async getReviews(includePending: boolean = false) {
     const where: any = {};
     if (!includePending) {

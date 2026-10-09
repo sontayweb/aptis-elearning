@@ -8,6 +8,7 @@ const router = Router();
 // Public routes
 router.get('/pages/:slug', (req, res, next) => cmsController.getPage(req, res, next));
 router.get('/reviews', (req, res, next) => cmsController.getReviews(req, res, next));
+router.get('/featured-feedbacks', (req, res, next) => cmsController.getFeaturedFeedbacks(req, res, next));
 router.get('/hall-of-fame', (req, res, next) => cmsController.getHallOfFame(req, res, next));
 
 // Student route: Nộp review đề thi thật

@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Mail, Phone, MessageCircle } from "lucide-react";
+import { useSiteSettings } from "@/contexts/site-settings-context";
 
 export function Footer() {
+  const settings = useSiteSettings();
   return (
     <footer className="relative bg-sidebar text-sidebar-foreground/80 overflow-hidden mt-12">
       {/* Top Border Gradient Line */}
@@ -134,21 +138,26 @@ export function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-primary" />
-                <span>aptisesolpremier@gmail.com</span>
+                <span>{settings.supportEmail}</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-primary" />
-                <span>0379 866 596</span>
+                <a
+                  href={`tel:${settings.supportHotline.replace(/\s+/g, "")}`}
+                  className="hover:text-primary transition-colors"
+                >
+                  {settings.supportHotline}
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 text-primary" />
                 <a
-                  href="https://zalo.me/0867833227"
+                  href={settings.zaloContactUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-primary transition-colors"
                 >
-                  Zalo: 0379 866 596
+                  Zalo: {settings.supportHotline}
                 </a>
               </li>
               <li className="flex items-center gap-2">

@@ -16,6 +16,8 @@ import {
   CheckCircle2,
   Key,
   AlertCircle,
+  Flame,
+  Star,
 } from "lucide-react";
 
 interface MockTest {
@@ -27,6 +29,8 @@ interface MockTest {
   difficulty: string;
   isFree: boolean;
   attempts: number;
+  hotLevel: number;
+  forecastTag?: string | null;
 }
 
 export default function MockExamListPage() {
@@ -35,12 +39,13 @@ export default function MockExamListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<string>("ALL");
+  const [hotOnly, setHotOnly] = useState(false);
 
   const loadExams = async () => {
     try {
       setLoading(true);
       setError(null);
-      const queryParam: any = { limit: 20 };
+      const queryParam: any = { limit: 50 };
       if (selectedSkill !== "ALL") {
         queryParam.skill = selectedSkill;
       }
@@ -55,6 +60,8 @@ export default function MockExamListPage() {
           difficulty: "B1 - B2 Target",
           isFree: !exam.isPro,
           attempts: exam.attemptCount || 0,
+          hotLevel: exam.hotLevel ?? exam.hot_level ?? 0,
+          forecastTag: exam.forecastTag ?? exam.forecast_tag ?? null,
         }));
         setTests(mapped);
       } else {
@@ -159,29 +166,46 @@ export default function MockExamListPage() {
               </p>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-muted/60 border border-border">
-              {[
-                { id: "ALL", label: "Tất cả" },
-                { id: "FULL_TEST", label: "Full Test (4 kỹ năng)" },
-                { id: "READING", label: "📖 Reading" },
-                { id: "LISTENING", label: "🔊 Listening" },
-                { id: "WRITING", label: "✏️ Writing" },
-                { id: "SPEAKING", label: "🎙️ Speaking" },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setSelectedSkill(tab.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    selectedSkill === tab.id
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+            {/* Filter Tabs & Hot Toggle */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-muted/60 border border-border">
+                {[
+                  { id: "ALL", label: "Tất cả" },
+                  { id: "FULL_TEST", label: "Full Test (4 kỹ năng)" },
+                  { id: "READING", label: "📖 Reading" },
+                  { id: "LISTENING", label: "🔊 Listening" },
+                  { id: "WRITING", label: "✏️ Writing" },
+                  { id: "SPEAKING", label: "🎙️ Speaking" },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setSelectedSkill(tab.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      selectedSkill === tab.id
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Nút lọc Đề Hot / Đề Tủ */}
+              <button
+                type="button"
+                onClick={() => setHotOnly(!hotOnly)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 border cursor-pointer ${
+                  hotOnly
+                    ? "bg-gradient-to-r from-rose-500 to-amber-500 text-white border-transparent shadow-glow-soft scale-102"
+                    : "bg-card border-border text-foreground hover:border-rose-500/50 hover:text-rose-500"
+                }`}
+                title="Lọc nhanh các đề có mức độ hot cao nhất"
+              >
+                <Flame className={`w-3.5 h-3.5 ${hotOnly ? "fill-white text-white" : "text-rose-500 fill-rose-500"}`} />
+                <span>Đề tủ &amp; Đề Hot ({tests.filter((t) => t.hotLevel > 0).length})</span>
+              </button>
             </div>
           </div>
 
@@ -215,14 +239,23 @@ export default function MockExamListPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {tests.map((test) => (
+            {(hotOnly ? tests.filter((t) => t.hotLevel > 0) : tests)
+              .slice()
+              .sort((a, b) => (b.hotLevel || 0) - (a.hotLevel || 0))
+              .map((test) => (
               <div
                 key={test.id}
-                className="group relative rounded-2xl border border-border bg-card p-6 shadow-sm hover:border-primary/50 hover:shadow-glow-soft transition-all flex flex-col justify-between"
+                className={`group relative rounded-2xl border bg-card p-6 shadow-sm transition-all flex flex-col justify-between hover:shadow-glow-soft ${
+                  test.hotLevel === 3
+                    ? "border-rose-500/50 bg-gradient-to-b from-rose-500/5 via-card to-card hover:border-rose-500"
+                    : test.hotLevel === 2
+                    ? "border-amber-500/40 hover:border-amber-500"
+                    : "border-border hover:border-primary/50"
+                }`}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between mb-3 gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-xs font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded">
                         {test.code}
                       </span>
@@ -235,8 +268,28 @@ export default function MockExamListPage() {
                           VIP PRO
                         </span>
                       )}
+
+                      {/* Hot Level Badges */}
+                      {test.hotLevel === 3 && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-2xs">
+                          <Flame className="w-3 h-3 fill-white" />
+                          <span>ĐỀ TỦ KỲ NÀY (3⭐)</span>
+                        </span>
+                      )}
+                      {test.hotLevel === 2 && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                          <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                          <span>ĐỀ HOT (2⭐)</span>
+                        </span>
+                      )}
+                      {test.hotLevel === 1 && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30">
+                          <Star className="w-3 h-3 text-blue-500 fill-blue-500" />
+                          <span>ÔN TRỌNG TÂM</span>
+                        </span>
+                      )}
                     </div>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground shrink-0">
                       {test.attempts} lượt thi
                     </span>
                   </div>

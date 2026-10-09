@@ -4,7 +4,7 @@ import { assertProAccess } from '../../utils/pro-guard';
 
 export class ExamService {
   async listExams(filter: ExamFilterInput, userId?: string) {
-    const { skill, isPro, source, page, limit } = filter;
+    const { skill, isPro, isHot, hotLevel, source, page, limit } = filter;
     const skip = (page - 1) * limit;
 
     const where: any = {
@@ -23,6 +23,12 @@ export class ExamService {
       where.is_pro = isPro;
     }
 
+    if (hotLevel !== undefined) {
+      where.hot_level = hotLevel;
+    } else if (isHot) {
+      where.hot_level = { gt: 0 };
+    }
+
     if (source === 'CUSTOM') {
       if (!userId) {
         return { exams: [], total: 0, page, totalPages: 0 };
@@ -30,7 +36,10 @@ export class ExamService {
       where.creator_id = userId;
     }
 
-    const orderBy: any = skill ? { title: 'asc' } : { created_at: 'desc' };
+    const orderBy: any = [
+      { hot_level: 'desc' },
+      ...(skill ? [{ title: 'asc' }] : [{ created_at: 'desc' }]),
+    ];
 
     const [exams, total] = await Promise.all([
       prisma.exam.findMany({
@@ -146,6 +155,8 @@ export class ExamService {
           skill: exam.skill,
           durationMinutes: exam.duration_minutes,
           isPro: exam.is_pro,
+          hotLevel: exam.hot_level ?? 0,
+          forecastTag: exam.forecast_tag ?? null,
           source: exam.source,
           totalParts: exam.parts.length,
           totalQuestions: exam.parts.reduce((sum, p) => sum + p._count.questions, 0),
@@ -301,6 +312,8 @@ export class ExamService {
       skill: exam.skill,
       durationMinutes: exam.duration_minutes,
       isPro: exam.is_pro,
+      hotLevel: exam.hot_level ?? 0,
+      forecastTag: exam.forecast_tag ?? null,
       source: exam.source,
       parts: exam.parts.map((p) => ({
         id: p.id,

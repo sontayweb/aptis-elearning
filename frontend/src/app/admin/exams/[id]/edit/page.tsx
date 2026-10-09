@@ -70,6 +70,7 @@ export default function ExamEditorPage() {
     durationMinutes: 40,
     isPro: false,
     isPublished: true,
+    hotLevel: 0,
   });
 
   const getExamTakeUrl = (ex: ExamFull) => {
@@ -97,6 +98,7 @@ export default function ExamEditorPage() {
       durationMinutes: exam.duration_minutes,
       isPro: exam.is_pro,
       isPublished: exam.is_published,
+      hotLevel: (exam as any).hot_level ?? (exam as any).hotLevel ?? 0,
     });
     setEditingExamMeta(true);
   };
@@ -112,6 +114,7 @@ export default function ExamEditorPage() {
         durationMinutes: Number(examMetaForm.durationMinutes),
         isPro: examMetaForm.isPro,
         isPublished: examMetaForm.isPublished,
+        hotLevel: Number(examMetaForm.hotLevel || 0),
       });
       if (res.success) {
         showToast("Đã cập nhật thông tin chung đề thi!");
@@ -367,6 +370,19 @@ export default function ExamEditorPage() {
                 onChange={(e) => setExamMetaForm({ ...examMetaForm, durationMinutes: Number(e.target.value) })}
               />
             </div>
+            <div className="sm:col-span-2">
+              <label className={lc}>Mức độ Hot / Dự đoán đề tủ (Gắn sao kỳ thi)</label>
+              <select
+                className={ic}
+                value={examMetaForm.hotLevel}
+                onChange={(e) => setExamMetaForm({ ...examMetaForm, hotLevel: Number(e.target.value) })}
+              >
+                <option value={0}>⚪ Mặc định (0⭐ - Đề bình thường, không gán sao)</option>
+                <option value={1}>⭐ 1 Sao (Đề ôn tập bổ trợ)</option>
+                <option value={2}>⭐⭐ 2 Sao (Đề Hot - Xuất hiện thường xuyên)</option>
+                <option value={3}>⭐⭐⭐ 🔥 3 Sao (Đề Tủ - Khả năng vào rất cao kỳ này!)</option>
+              </select>
+            </div>
             <div className="sm:col-span-2 flex items-center gap-6 pt-1">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -408,10 +424,21 @@ export default function ExamEditorPage() {
       )}
 
       {/* Summary bar */}
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs grid grid-cols-2 sm:grid-cols-5 gap-4">
         {[
           { label: "Kỹ năng", value: exam.skill },
           { label: "Thời lượng", value: `${exam.duration_minutes} phút` },
+          {
+            label: "Mức độ Hot",
+            value:
+              ((exam as any).hot_level === 3 || (exam as any).hotLevel === 3)
+                ? "🔥🔥🔥 3⭐ Đề tủ"
+                : ((exam as any).hot_level === 2 || (exam as any).hotLevel === 2)
+                ? "⭐⭐ 2⭐ Đề Hot"
+                : ((exam as any).hot_level === 1 || (exam as any).hotLevel === 1)
+                ? "⭐ 1⭐ Ôn tập"
+                : "⚪ Bình thường",
+          },
           { label: "Số phần", value: String(exam.parts.length) },
           { label: "Tổng câu hỏi", value: String(totalQ) },
         ].map(({ label, value }) => (

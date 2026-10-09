@@ -20,6 +20,8 @@ import {
   Trophy,
   PlusCircle,
   Zap,
+  Flame,
+  Star,
 } from "lucide-react";
 
 interface ReadingExam {
@@ -36,6 +38,7 @@ interface ReadingExam {
   bestScoreNumber?: number | null;
   userAttempts: number;
   priority?: "HIGH" | "MEDIUM" | "LOW";
+  hotLevel?: number;
 }
 
 export default function ReadingPracticePage() {
@@ -83,7 +86,8 @@ export default function ReadingPracticePage() {
               bestScore: exam.bestScore,
               bestScoreNumber: exam.bestScoreNumber,
               userAttempts: exam.userAttempts,
-              priority: idx % 3 === 0 ? "HIGH" : idx % 3 === 1 ? "MEDIUM" : "LOW",
+              hotLevel: exam.hotLevel ?? exam.hot_level ?? 0,
+              priority: (exam.hotLevel ?? exam.hot_level) === 3 ? "HIGH" : (exam.hotLevel ?? exam.hot_level) === 2 ? "MEDIUM" : (idx % 3 === 0 ? "HIGH" : idx % 3 === 1 ? "MEDIUM" : "LOW"),
             };
           })
         );
@@ -141,7 +145,7 @@ export default function ReadingPracticePage() {
         ? e.priority === "MEDIUM"
         : e.priority === "LOW";
     return matchesSearch && matchesStatus && matchesPriority;
-  });
+  }).sort((a, b) => (b.hotLevel || 0) - (a.hotLevel || 0));
 
   // Dynamic naming based on activeTab
   const getTabInfo = () => {
@@ -451,11 +455,26 @@ export default function ReadingPracticePage() {
                               PRO
                             </span>
                           )}
-                          {exam.priority === "HIGH" && (
+                          {exam.hotLevel === 3 ? (
+                            <span className="px-2 py-0.5 rounded-md bg-gradient-to-r from-rose-500 to-amber-500 text-white font-black text-[10px] inline-flex items-center gap-1 shadow-2xs">
+                              <Flame className="w-3 h-3 fill-white" />
+                              <span>ĐỀ TỦ (3⭐)</span>
+                            </span>
+                          ) : exam.hotLevel === 2 ? (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] inline-flex items-center gap-1 border border-amber-500/30">
+                              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                              <span>ĐỀ HOT (2⭐)</span>
+                            </span>
+                          ) : exam.hotLevel === 1 ? (
+                            <span className="px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-700 dark:text-blue-300 font-bold text-[10px] inline-flex items-center gap-1 border border-blue-500/30">
+                              <Star className="w-3 h-3 text-blue-500 fill-blue-500" />
+                              <span>ÔN TRỌNG TÂM</span>
+                            </span>
+                          ) : exam.priority === "HIGH" ? (
                             <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px]">
                               Ưu tiên cao
                             </span>
-                          )}
+                          ) : null}
                         </div>
 
                         {/* Top Right Trophy / Status */}

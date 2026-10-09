@@ -4,6 +4,7 @@ import { SepayWebhookInput, ReportPaymentIssueInput } from './payment.dto';
 import { auditService } from '../audit/audit.service';
 import { notificationService } from '../notifications/notification.service';
 import { grantOrExtendSubscription } from '../../utils/subscription-helper';
+import { emailService } from '../email/email.service';
 
 export class PaymentService {
   async getPlans() {
@@ -236,6 +237,24 @@ export class PaymentService {
       link: '/pricing',
     }).catch(() => {});
 
+    // Gửi email xác nhận quyền lợi VIP cho học viên
+    prisma.user.findUnique({
+      where: { id: transaction.user_id },
+      select: { email: true, full_name: true },
+    }).then((user) => {
+      if (user?.email) {
+        emailService.sendVipActivatedEmail(user.email, {
+          fullName: user.full_name || 'Học viên',
+          planName: plan.name,
+          endDate: result.newEndDate || new Date(),
+          aiQuota: result.newAiQuota || plan.ai_quota || 0,
+          teacherQuota: result.newTeacherQuota || plan.teacher_quota || 0,
+        }).catch((err) => {
+          console.error(`[PaymentService] Lỗi gửi email kích hoạt VIP cho ${user.email}:`, err);
+        });
+      }
+    }).catch(() => {});
+
     return {
       success: true,
       message: 'Kích hoạt gói cước VIP thành công',
@@ -414,6 +433,14 @@ export class PaymentService {
       type: NotificationType.SYSTEM,
       link: '/profile',
     }).catch(() => {});
+
+    // 4. Gửi email cảnh báo khẩn cấp tới hộp thư Quản trị viên
+    emailService.sendAdminAlertEmail(
+      `Khiếu nại chuyển khoản đơn ${orderCode} - ${transaction.user.full_name}`,
+      `Học viên: ${transaction.user.full_name} (${transaction.user.email})\nĐơn hàng: ${orderCode}\nSố tiền báo cáo: ${input.transferAmount.toLocaleString('vi-VN')}đ\nMã GD Ngân hàng: ${input.bankTransId}\nSĐT: ${input.contactPhone || 'N/A'}\nNgân hàng: ${input.senderBank || 'N/A'} - ${input.senderAccount || 'N/A'}\nGhi chú: ${input.note || 'Không'}\n\nVui lòng tra soát sao kê MB Bank và kích hoạt bù qua trang Admin.`
+    ).catch((err) => {
+      console.error('[PaymentService] Lỗi gửi email cảnh báo khiếu nại cho Admin:', err);
+    });
 
     return {
       success: true,

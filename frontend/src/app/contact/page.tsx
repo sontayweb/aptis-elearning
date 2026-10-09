@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { useSiteSettings } from "@/contexts/site-settings-context";
 import {
   Phone,
   Mail,
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 
 export default function ContactPage() {
+  const settings = useSiteSettings();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -69,7 +71,12 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-foreground text-base mb-1">Hotline tư vấn tuyển sinh</h3>
-                  <p className="text-sm text-primary font-semibold">0379 866 596</p>
+                  <a
+                    href={`tel:${settings.supportHotline.replace(/\s+/g, "")}`}
+                    className="text-sm text-primary font-semibold hover:underline"
+                  >
+                    {settings.supportHotline}
+                  </a>
                   <p className="text-xs text-muted-foreground mt-1">Hỗ trợ từ 8:00 - 22:30 hàng ngày</p>
                 </div>
               </div>
@@ -81,7 +88,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-bold text-foreground text-base mb-1">Zalo Hỗ trợ VIP 1:1</h3>
                   <a
-                    href="https://zalo.me/0867833227"
+                    href={settings.zaloContactUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-500 font-semibold hover:underline inline-flex items-center gap-1"
@@ -99,7 +106,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-foreground text-base mb-1">Email học vụ</h3>
-                  <p className="text-sm text-foreground font-semibold">aptiskytich.admin@gmail.com</p>
+                  <p className="text-sm text-foreground font-semibold">{settings.supportEmail}</p>
                   <p className="text-xs text-muted-foreground mt-1">Tiếp nhận khiếu nại, đối soát tài chính</p>
                 </div>
               </div>

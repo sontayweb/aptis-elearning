@@ -117,12 +117,14 @@ class ApiClient {
   // 2. EXAMS & QUESTIONS
   // ==========================================
   exams = {
-    getAll: (params?: { page?: number; limit?: number; skill?: string; isPro?: boolean; source?: string }) => {
+    getAll: (params?: { page?: number; limit?: number; skill?: string; isPro?: boolean; isHot?: boolean; hotLevel?: number; source?: string }) => {
       const query = new URLSearchParams();
       if (params?.page) query.append('page', params.page.toString());
       if (params?.limit) query.append('limit', params.limit.toString());
       if (params?.skill) query.append('skill', params.skill);
       if (params?.isPro !== undefined) query.append('isPro', String(params.isPro));
+      if (params?.isHot !== undefined) query.append('isHot', String(params.isHot));
+      if (params?.hotLevel !== undefined) query.append('hotLevel', String(params.hotLevel));
       if (params?.source) query.append('source', params.source);
       const qs = query.toString();
       return this.request(`/exams${qs ? `?${qs}` : ''}`);
@@ -212,6 +214,41 @@ class ApiClient {
       this.request('/student/goal', {
         method: 'PUT',
         body: JSON.stringify(data),
+      }),
+  };
+
+  // ==========================================
+  // 3.2. COURSES, BATCHES & SOCIAL FEEDBACK
+  // ==========================================
+  courses = {
+    getFeaturedFasttrack: () => this.request('/courses/featured-fasttrack'),
+    registerLead: (body: {
+      courseId?: string;
+      courseCode?: string;
+      batchId?: string;
+      batchDateStr?: string;
+      fullName: string;
+      phoneNumber: string;
+      email?: string;
+      targetBand?: string;
+      note?: string;
+    }) =>
+      this.request('/courses/leads/register', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+  };
+
+  feedbacks = {
+    getFeatured: () => this.request('/cms/featured-feedbacks'),
+  };
+
+  settings = {
+    getPublic: () => this.request('/settings/public'),
+    update: (body: { settings: Array<{ key: string; value: string; description?: string }> }) =>
+      this.request('/settings', {
+        method: 'PUT',
+        body: JSON.stringify(body),
       }),
   };
 
@@ -550,11 +587,12 @@ class ApiClient {
         body: JSON.stringify(body),
       }),
 
-    getExams: (params?: { page?: number; limit?: number; skill?: string }) => {
+    getExams: (params?: { page?: number; limit?: number; skill?: string; hotLevel?: number }) => {
       const query = new URLSearchParams();
       if (params?.page) query.append('page', params.page.toString());
       if (params?.limit) query.append('limit', params.limit.toString());
       if (params?.skill && params.skill !== 'ALL') query.append('skill', params.skill);
+      if (params?.hotLevel !== undefined) query.append('hotLevel', params.hotLevel.toString());
       const qs = query.toString();
       return this.request(`/admin/exams${qs ? `?${qs}` : ''}`);
     },

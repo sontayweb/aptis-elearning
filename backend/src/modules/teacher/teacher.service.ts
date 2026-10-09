@@ -3,6 +3,7 @@ import { SubmissionStatus, UserRole, AuditAction, NotificationType } from '@pris
 import { GradeSubmissionInput, CreateClassroomInput } from './teacher.dto';
 import { auditService } from '../audit/audit.service';
 import { notificationService } from '../notifications/notification.service';
+import { emailService } from '../email/email.service';
 
 export class TeacherService {
   async getGradingQueue(teacherId: string) {
@@ -131,7 +132,7 @@ export class TeacherService {
       },
     });
 
-    // Gửi thông báo cho học viên
+    // Gửi thông báo in-app cho học viên
     notificationService.createNotification({
       userId: submission.user_id,
       title: 'Bài thi đã có nhận xét từ giảng viên 📝',
@@ -139,6 +140,21 @@ export class TeacherService {
       type: NotificationType.EXAM_GRADED,
       link: '/history',
     }).catch(() => {});
+
+    // Gửi email chi tiết kết quả cho học viên
+    if (updated.user?.email) {
+      emailService.sendExamGradedEmail(updated.user.email, {
+        fullName: updated.user.full_name || 'Học viên',
+        examTitle: updated.exam?.title || 'Bài thi Aptis',
+        totalScore: data.totalScore,
+        cefrLevel: data.cefrLevel,
+        teacherName: teacher?.full_name || 'Giảng viên',
+        teacherNotes: data.teacherFeedback || undefined,
+        submissionId,
+      }).catch((err) => {
+        console.error(`[TeacherService] Lỗi gửi email kết quả chấm thi cho ${updated.user.email}:`, err);
+      });
+    }
 
     return updated;
   }
