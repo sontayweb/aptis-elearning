@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Sparkles,
   PanelLeftClose,
@@ -36,6 +36,7 @@ interface TourStep {
 export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [spotlightRect, setSpotlightRect] = useState<{
     top: number;
     left: number;
@@ -47,10 +48,12 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
     x: number;
     y: number;
     arrowSide: "left" | "top" | "bottom" | "none";
+    arrowOffset: number;
   }>({
     x: 0,
     y: 0,
     arrowSide: "none",
+    arrowOffset: 32,
   });
 
   const steps: TourStep[] = [
@@ -164,11 +167,13 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
       setSpotlightRect(null);
       // Center in viewport
       const cardW = Math.min(420, window.innerWidth - 32);
-      const cardH = 340;
+      const measuredCardH = cardRef.current?.offsetHeight || 440;
+      const cardH = Math.min(measuredCardH, window.innerHeight - 32);
       setPopoverPos({
         x: Math.max(16, (window.innerWidth - cardW) / 2),
         y: Math.max(16, (window.innerHeight - cardH) / 2),
         arrowSide: "none",
+        arrowOffset: 32,
       });
       return;
     }
@@ -185,7 +190,9 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
     });
 
     const cardW = Math.min(420, window.innerWidth - 32);
-    const cardH = 340;
+    // Đo chiều cao thực tế chính xác của thẻ Card thay vì giá trị hardcode nhỏ hơn thực tế
+    const measuredCardH = cardRef.current?.offsetHeight || 440;
+    const cardH = Math.min(measuredCardH, window.innerHeight - 32);
     const padding = 16;
     const placement = current.preferredPlacement || "right";
 
@@ -193,38 +200,61 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
     let y = 0;
     let arrowSide: "left" | "top" | "bottom" | "none" = "none";
 
+    const targetCenterY = rect.top + rect.height / 2;
+    const targetCenterX = rect.left + rect.width / 2;
+
     if (placement === "right") {
       x = rect.right + 18;
-      y = rect.top + rect.height / 2 - 120;
+
+      // Nếu target nằm ở nửa dưới màn hình (đặc biệt là nút cuối sidebar tour-profile-footer):
+      // Neo đáy của card khớp với đáy target để KHÔNG BAO GIỜ bị tràn xuống đáy màn hình
+      if (rect.bottom > window.innerHeight * 0.6) {
+        y = rect.bottom - cardH;
+      } else {
+        y = targetCenterY - 100;
+      }
       arrowSide = "left";
 
-      // If overflowing right edge, flip to bottom
+      // Nếu tràn mép phải màn hình, lật sang bottom hoặc top
       if (x + cardW > window.innerWidth - padding) {
-        x = rect.left + rect.width / 2 - cardW / 2;
-        y = rect.bottom + 18;
-        arrowSide = "top";
+        x = targetCenterX - cardW / 2;
+        if (rect.bottom + cardH + 18 <= window.innerHeight - padding) {
+          y = rect.bottom + 18;
+          arrowSide = "top";
+        } else {
+          y = rect.top - cardH - 18;
+          arrowSide = "bottom";
+        }
       }
     } else if (placement === "bottom") {
-      x = rect.left + rect.width / 2 - cardW / 2;
+      x = targetCenterX - cardW / 2;
       y = rect.bottom + 18;
       arrowSide = "top";
 
-      // If overflowing bottom edge, flip to top
+      // Nếu tràn mép dưới màn hình, lật lên trên
       if (y + cardH > window.innerHeight - padding) {
         y = rect.top - cardH - 18;
         arrowSide = "bottom";
       }
     } else if (placement === "top") {
-      x = rect.left + rect.width / 2 - cardW / 2;
+      x = targetCenterX - cardW / 2;
       y = rect.top - cardH - 18;
       arrowSide = "bottom";
     }
 
-    // Clamp coordinates inside safe screen area
+    // Clamp tọa độ an toàn 100% trong khung nhìn viewport (Bảo vệ tuyệt đối)
     x = Math.max(padding, Math.min(x, window.innerWidth - cardW - padding));
     y = Math.max(padding, Math.min(y, window.innerHeight - cardH - padding));
 
-    setPopoverPos({ x, y, arrowSide });
+    // Tính vị trí mũi tên động trỏ chính xác vào tâm của target
+    let arrowOffset = 32;
+    if (arrowSide === "left") {
+      arrowOffset = Math.max(20, Math.min(targetCenterY - y, cardH - 24));
+    } else if (arrowSide === "top" || arrowSide === "bottom") {
+      arrowOffset = Math.max(20, Math.min(targetCenterX - x, cardW - 24));
+    }
+
+    setPopoverPos({ x, y, arrowSide, arrowOffset });
   }, [isOpen, current]);
 
   useEffect(() => {
@@ -320,19 +350,31 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
       >
         {/* Pointer Arrow */}
         {popoverPos.arrowSide === "left" && (
-          <div className="hidden sm:block absolute -left-2 top-8 w-4 h-4 bg-slate-900 rotate-45 rounded-xs shadow-sm" />
+          <div
+            style={{ top: `${popoverPos.arrowOffset}px` }}
+            className="hidden sm:block absolute -left-2 w-4 h-4 bg-slate-900 rotate-45 rounded-xs shadow-sm"
+          />
         )}
         {popoverPos.arrowSide === "top" && (
-          <div className="hidden sm:block absolute -top-2 left-10 w-4 h-4 bg-slate-900 rotate-45 rounded-xs shadow-sm" />
+          <div
+            style={{ left: `${popoverPos.arrowOffset}px` }}
+            className="hidden sm:block absolute -top-2 w-4 h-4 bg-slate-900 rotate-45 rounded-xs shadow-sm"
+          />
         )}
         {popoverPos.arrowSide === "bottom" && (
-          <div className="hidden sm:block absolute -bottom-2 left-10 w-4 h-4 bg-white rotate-45 rounded-xs border-r border-b border-slate-200" />
+          <div
+            style={{ left: `${popoverPos.arrowOffset}px` }}
+            className="hidden sm:block absolute -bottom-2 w-4 h-4 bg-white dark:bg-slate-900 rotate-45 rounded-xs border-r border-b border-slate-200 dark:border-slate-800"
+          />
         )}
 
         {/* Card Body */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden flex flex-col">
+        <div
+          ref={cardRef}
+          className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-32px)]"
+        >
           {/* Header */}
-          <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-white relative">
+          <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-white relative shrink-0">
             <button
               onClick={handleClose}
               title="Đóng hướng dẫn (Esc)"
@@ -361,8 +403,8 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
             </div>
           </div>
 
-          {/* Content */}
-          <div className="p-5 space-y-4 text-xs">
+          {/* Content (Scrollable nếu màn hình nhỏ) */}
+          <div className="p-5 space-y-4 text-xs overflow-y-auto scrollbar-thin min-h-0 flex-1">
             <p className="text-slate-700 dark:text-slate-200 leading-relaxed font-normal text-xs sm:text-[13px]">
               {current.description}
             </p>
@@ -384,7 +426,7 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
           </div>
 
           {/* Footer Controls */}
-          <div className="p-4 bg-slate-50/70 dark:bg-slate-900/90 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3">
+          <div className="p-4 bg-slate-50/70 dark:bg-slate-900/90 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3 shrink-0">
             {/* Top row: progress dots & checkbox */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
