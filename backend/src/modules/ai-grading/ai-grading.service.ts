@@ -204,6 +204,8 @@ ${transcriptText}
     let writingTotalScore = 0;
     let speakingTotalScore = 0;
     let subjectiveQuestionCount = 0;
+    let writingQuestionCount = 0;
+    let speakingQuestionCount = 0;
 
     for (const ans of submission.answers) {
       // Tìm câu hỏi tương ứng
@@ -223,6 +225,7 @@ ${transcriptText}
       if (question.question_type === QuestionType.ESSAY || question.question_type === QuestionType.SHORT_TEXT) {
         // Chấm bài viết (Writing)
         subjectiveQuestionCount++;
+        writingQuestionCount++;
         const text = ans.text_answer || '';
         const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
 
@@ -313,6 +316,7 @@ ${transcriptText}
       } else if (question.question_type === QuestionType.SPEAKING_AUDIO) {
         // Chấm bài nói (Speaking)
         subjectiveQuestionCount++;
+        speakingQuestionCount++;
         const audioDuration = ans.audio_duration || 30;
 
         let evalResult: any = null;
@@ -423,20 +427,66 @@ ${transcriptText}
       }
     }
 
-    // Cập nhật trạng thái bài thi sang GRADED nếu chấm xong toàn bộ
-    const finalScore =
-      subjectiveQuestionCount > 0
-        ? Math.round((writingTotalScore + speakingTotalScore) / subjectiveQuestionCount)
-        : submission.total_score || 0;
+    // Cập nhật trạng thái bài thi sang GRADED với thang điểm chuẩn British Council
+    const finalWritingScore =
+      writingQuestionCount > 0 ? Math.round(writingTotalScore / writingQuestionCount) : null;
+    const finalSpeakingScore =
+      speakingQuestionCount > 0 ? Math.round(speakingTotalScore / speakingQuestionCount) : null;
 
-    const overallCefr = scoreToCefr(finalScore);
+    let finalTotalScore = 0;
+    let overallCefr = 'B1';
+
+    if (submission.exam.skill === ExamSkill.FULL_TEST) {
+      const rScore = submission.reading_score ?? 0;
+      const lScore = submission.listening_score ?? 0;
+      const wScore = finalWritingScore ?? 0;
+      const sScore = finalSpeakingScore ?? 0;
+      const gScore = submission.grammar_score ?? 0;
+
+      // Chuẩn Thang 200 điểm Aptis ESOL British Council (4 kỹ năng x 50)
+      finalTotalScore = rScore + lScore + wScore + sScore;
+
+      // Quy tắc CEFR Profile chuẩn
+      if (finalTotalScore >= 160) {
+        overallCefr = 'C';
+      } else if (finalTotalScore >= 120) {
+        overallCefr = 'B2';
+      } else if (finalTotalScore >= 80) {
+        overallCefr = 'B1';
+      } else if (finalTotalScore >= 50) {
+        overallCefr = 'A2';
+      } else {
+        overallCefr = 'A1';
+      }
+
+      // Borderline adjustment: Nếu điểm giáp ranh mà Grammar & Vocab >= 38 thì nâng bậc CEFR
+      if (finalTotalScore >= 115 && finalTotalScore < 120 && gScore >= 38) {
+        overallCefr = 'B2';
+      } else if (finalTotalScore >= 155 && finalTotalScore < 160 && gScore >= 42) {
+        overallCefr = 'C';
+      }
+    } else if (submission.exam.skill === ExamSkill.WRITING) {
+      finalTotalScore = finalWritingScore ?? 0;
+      overallCefr = scoreToCefr(finalTotalScore);
+    } else if (submission.exam.skill === ExamSkill.SPEAKING) {
+      finalTotalScore = finalSpeakingScore ?? 0;
+      overallCefr = scoreToCefr(finalTotalScore);
+    } else {
+      finalTotalScore =
+        subjectiveQuestionCount > 0
+          ? Math.round((writingTotalScore + speakingTotalScore) / subjectiveQuestionCount)
+          : submission.total_score || 0;
+      overallCefr = scoreToCefr(finalTotalScore);
+    }
 
     await prisma.examSubmission.update({
       where: { id: submissionId },
       data: {
         status: SubmissionStatus.GRADED,
-        total_score: finalScore,
+        total_score: finalTotalScore,
         cefr_level: overallCefr,
+        ...(finalWritingScore !== null && { writing_score: finalWritingScore }),
+        ...(finalSpeakingScore !== null && { speaking_score: finalSpeakingScore }),
       },
     });
 
@@ -452,7 +502,7 @@ ${transcriptText}
 
     return {
       submissionId,
-      overallScore: finalScore,
+      overallScore: finalTotalScore,
       cefrLevel: overallCefr,
       evaluatedQuestionsCount: aiResults.length,
       aiResults,

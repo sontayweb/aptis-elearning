@@ -24,6 +24,7 @@ import {
   LogOut,
   X,
   Trophy,
+  Sparkles,
 } from "lucide-react";
 
 // Định nghĩa dữ liệu 4 Parts chuẩn Aptis Listening
@@ -1067,9 +1068,9 @@ function ListeningExamRunnerContent() {
                 <button
                   type="button"
                   onClick={() => setIsSubmitted(false)}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
                 >
-                  <span>👁️</span>
+                  <Eye className="w-3.5 h-3.5" />
                   <span>Xem lại từng câu →</span>
                 </button>
 
@@ -1191,6 +1192,12 @@ function ListeningExamRunnerContent() {
           </div>
         </div>
 
+        {/* Căn giữa: Đồng hồ đếm ngược */}
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+          <Clock className="w-4 h-4" />
+          <span>{formatTime(timeLeft)}</span>
+        </div>
+
         <div className="flex items-center gap-3">
           <Link
             href="/listening"
@@ -1285,8 +1292,18 @@ function ListeningExamRunnerContent() {
               <div className="flex-1 w-full space-y-1.5">
                 <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-foreground">
-                      {isPlaying ? "🔊 Đang phát âm thanh..." : "🎧 Sẵn sàng nghe"}
+                    <span className="font-semibold text-foreground flex items-center gap-1.5">
+                      {isPlaying ? (
+                        <>
+                          <Volume2 className="w-3.5 h-3.5 text-primary animate-pulse" />
+                          <span>Đang phát âm thanh...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Headphones className="w-3.5 h-3.5 text-muted-foreground" />
+                          <span>Sẵn sàng nghe</span>
+                        </>
+                      )}
                     </span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">
                       {audioUrlMap[activeStage] ? "Audio HD" : "Audio British AI"}
@@ -1599,7 +1616,7 @@ function ListeningExamRunnerContent() {
           <div className="relative w-full max-w-lg p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
-                <span>💡</span>
+                <Sparkles className="w-4 h-4 text-primary" />
                 <span>Đáp án &amp; Giải thích</span>
               </h3>
               <button

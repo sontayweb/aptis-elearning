@@ -563,6 +563,93 @@ export class PaymentService {
     };
   }
 
+  async redeemPromoCode(userId: string, inputCode: string) {
+    const codeNormalized = inputCode.trim().toUpperCase();
+    const now = new Date();
+
+    // 1. Kiểm tra mã tồn tại & hiệu lực
+    const promo = await prisma.promotionCode.findUnique({
+      where: { code: codeNormalized },
+      include: { plan: true },
+    });
+
+    if (!promo || !promo.is_active) {
+      throw { statusCode: 400, message: 'Mã kích hoạt không hợp lệ hoặc đã kết thúc chương trình' };
+    }
+
+    if (promo.expires_at && now > promo.expires_at) {
+      throw { statusCode: 400, message: 'Mã kích hoạt đã hết hạn sử dụng' };
+    }
+
+    if (promo.max_uses !== null && promo.current_uses >= promo.max_uses) {
+      throw { statusCode: 400, message: 'Mã kích hoạt đã hết lượt sử dụng' };
+    }
+
+    // 2. Chống kích hoạt lặp lại (1 User chỉ được nhập mã này 1 lần duy nhất)
+    const alreadyRedeemed = await prisma.promotionRedemption.findUnique({
+      where: {
+        code_id_user_id: {
+          code_id: promo.id,
+          user_id: userId,
+        },
+      },
+    });
+
+    if (alreadyRedeemed) {
+      throw { statusCode: 400, message: 'Bạn đã từng kích hoạt mã trải nghiệm này rồi' };
+    }
+
+    // 3. Thực thi transaction đảm bảo tính toàn vẹn (Atomic Execution)
+    const subscription = await prisma.$transaction(async (tx) => {
+      // 3.1 Cấp VIP qua helper hiện hữu
+      const sub = await grantOrExtendSubscription(tx, {
+        userId,
+        planId: promo.plan_id,
+        customDurationDays: promo.duration_days,
+        customAiQuota: promo.ai_quota,
+        customTeacherQuota: promo.teacher_quota,
+        now,
+      });
+
+      // 3.2 Ghi nhận vết kích hoạt
+      await tx.promotionRedemption.create({
+        data: {
+          code_id: promo.id,
+          user_id: userId,
+          subscription_id: sub.id,
+          redeemed_at: now,
+        },
+      });
+
+      // 3.3 Tăng biến đếm số lượt đã dùng
+      await tx.promotionCode.update({
+        where: { id: promo.id },
+        data: { current_uses: { increment: 1 } },
+      });
+
+      return sub;
+    });
+
+    // 4. Bắn thông báo chuông cho học viên
+    notificationService.createNotification({
+      userId,
+      type: NotificationType.VIP_ACTIVATED,
+      title: '🎉 Kích hoạt VIP Trải Nghiệm thành công!',
+      message: `Bạn đã nhận được ${promo.duration_days} ngày trải nghiệm VIP kèm ${promo.ai_quota} lượt chấm AI.`,
+      link: '/pricing',
+    }).catch(() => {});
+
+    return {
+      success: true,
+      message: `Chúc mừng bạn! Đã kích hoạt thành công ${promo.duration_days} ngày VIP trải nghiệm miễn phí!`,
+      planName: promo.plan.name,
+      durationDays: promo.duration_days,
+      aiQuotaGranted: promo.ai_quota,
+      aiQuotaLeft: subscription.ai_quota_left,
+      endDate: subscription.end_date,
+    };
+  }
+
   async getTransactions(userId: string) {
     return prisma.transaction.findMany({
       where: { user_id: userId },

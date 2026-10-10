@@ -627,8 +627,9 @@ export default function GrammarExamRunner() {
               Bạn đã hoàn thành <strong className="text-primary font-black">{answeredCount}/{questions.length}</strong> câu hỏi. Hệ thống sẽ tiến hành chấm điểm và lập báo cáo kết quả.
             </p>
             {answeredCount < questions.length && (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold">
-                ⚠️ Lưu ý: Bạn vẫn còn {questions.length - answeredCount} câu chưa trả lời!
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                <span>Lưu ý: Bạn vẫn còn {questions.length - answeredCount} câu chưa trả lời!</span>
               </div>
             )}
             <div className="flex items-center justify-end gap-3 pt-2">

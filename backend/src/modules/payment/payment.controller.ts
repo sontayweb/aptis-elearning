@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { paymentService } from './payment.service';
-import { initiatePaymentSchema, sepayWebhookSchema, reportPaymentIssueSchema } from './payment.dto';
+import { initiatePaymentSchema, sepayWebhookSchema, reportPaymentIssueSchema, redeemPromoCodeSchema } from './payment.dto';
 import { sendSuccess, sendError } from '../../utils/api-response';
 import { AuthenticatedRequest } from '../../middlewares/auth.guard';
 
@@ -96,6 +96,17 @@ export class PaymentController {
       const userId = req.user!.userId;
       const transactions = await paymentService.getTransactions(userId);
       sendSuccess(res, transactions, 'Lấy lịch sử giao dịch thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async redeemCode(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user!.userId;
+      const { code } = redeemPromoCodeSchema.parse(req.body);
+      const result = await paymentService.redeemPromoCode(userId, code);
+      sendSuccess(res, result, result.message, 200);
     } catch (error) {
       next(error);
     }

@@ -11,6 +11,16 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "APTIS ESOL PREMIER — Luyện thi Aptis ESOL chuẩn British Council",
   description: "Nền tảng luyện thi Aptis ESOL chuẩn CEFR — Thi thử miễn phí, AI chấm Speaking & Writing, lộ trình đạt B2 nhanh nhất.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 import { AuthProvider } from "@/contexts/auth-context";

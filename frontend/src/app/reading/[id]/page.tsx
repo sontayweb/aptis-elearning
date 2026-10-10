@@ -3,9 +3,6 @@
 import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
-import { FloatingActions } from "@/components/floating-actions";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import {
@@ -27,6 +24,8 @@ import {
   X,
   RefreshCw,
   Check,
+  LogOut,
+  Pin,
 } from "lucide-react";
 
 /* ====================================================
@@ -574,50 +573,57 @@ function ReadingExamRunner() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <Navbar />
-
-      <main className="flex-1 pt-16 pb-12">
-        <div className="section-container pt-4 md:pt-6">
-          {/* Header Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-card border border-border shadow-sm mb-6">
-            <div className="flex items-center gap-3">
-              <Link
-                href="/reading"
-                className="w-9 h-9 rounded-lg border border-border hover:bg-muted flex items-center justify-center transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Link>
-              <div>
-                <h1 className="font-heading font-bold text-base md:text-lg">
-                  {examData.title}
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  Reading Aptis ESOL · Thời gian làm bài {examData.durationMinutes} phút
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* Timer */}
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary font-mono font-bold text-sm">
-                <Clock className="w-4 h-4" />
-                <span>{formatTime(timeLeft)}</span>
-              </div>
-
-              {/* Submit Button */}
-              {!isSubmitted && (
-                <button
-                  type="button"
-                  onClick={() => setIsSubmitModalOpen(true)}
-                  className="tech-btn inline-flex items-center gap-2 px-4 py-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow text-xs font-bold shadow-md transition-all"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Nộp bài</span>
-                </button>
-              )}
-            </div>
+    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none">
+      {/* 1. TOP HEADER PHÒNG THI CHUẨN */}
+      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/reading"
+            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground"
+            title="Quay lại danh sách đề"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
+              Reading Practice
+            </span>
+            <span className="text-sm md:text-base font-bold text-foreground">
+              {examData.title}
+            </span>
           </div>
+        </div>
+
+        {/* Căn giữa: Đồng hồ đếm ngược */}
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+          <Clock className="w-4 h-4" />
+          <span>{formatTime(timeLeft)}</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {!isSubmitted && (
+            <button
+              type="button"
+              onClick={() => setIsSubmitModalOpen(true)}
+              className="tech-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow text-xs font-bold shadow-xs transition-all"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Nộp bài</span>
+            </button>
+          )}
+          <Link
+            href="/reading"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Thoát</span>
+          </Link>
+        </div>
+      </header>
+
+      {/* 2. MAIN WORKSPACE */}
+      <main className="flex-1 py-6 px-3 md:px-6 pb-24">
+        <div className="max-w-7xl mx-auto space-y-6">
 
           {/* Loading State */}
           {loading && (
@@ -766,8 +772,9 @@ function ReadingExamRunner() {
                   {activeStage === 0 && (
                     <div className="space-y-6">
                       <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80">
-                        <p className="text-xs md:text-sm text-foreground font-semibold">
-                          📌 {examData.part1.instructions}
+                        <p className="text-xs md:text-sm text-foreground font-semibold flex items-center gap-1.5">
+                          <Pin className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span>{examData.part1.instructions}</span>
                         </p>
                       </div>
 
@@ -858,8 +865,9 @@ function ReadingExamRunner() {
 
                         {/* Fixed Starter Sentence */}
                         <div className="p-4 rounded-xl border border-primary/30 bg-primary/5 space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-                            📌 Câu mở đầu cố định (Vị trí 1):
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary flex items-center gap-1">
+                            <Pin className="w-3 h-3 text-primary shrink-0" />
+                            <span>Câu mở đầu cố định (Vị trí 1):</span>
                           </span>
                           <p className="text-sm md:text-base font-semibold text-foreground">
                             {story.fixedSentence}
@@ -948,8 +956,9 @@ function ReadingExamRunner() {
 
                         {/* Fixed Starter Sentence */}
                         <div className="p-4 rounded-xl border border-primary/30 bg-primary/5 space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-                            📌 Câu mở đầu cố định (Vị trí 1):
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary flex items-center gap-1">
+                            <Pin className="w-3 h-3 text-primary shrink-0" />
+                            <span>Câu mở đầu cố định (Vị trí 1):</span>
                           </span>
                           <p className="text-sm md:text-base font-semibold text-foreground">
                             {story.fixedSentence}
@@ -1098,8 +1107,9 @@ function ReadingExamRunner() {
                   {activeStage === 4 && (
                     <div className="space-y-6">
                       <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 space-y-1">
-                        <span className="text-xs font-bold text-primary block">
-                          📖 {examData.part4.title}
+                        <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                          <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span>{examData.part4.title}</span>
                         </span>
                         <p className="text-xs md:text-sm text-foreground">
                           {examData.part4.instructions}
@@ -1323,9 +1333,6 @@ function ReadingExamRunner() {
           )}
         </div>
       </main>
-
-      <Footer />
-      <FloatingActions />
     </div>
   );
 }

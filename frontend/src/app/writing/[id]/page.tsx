@@ -25,6 +25,10 @@ import {
   LogOut,
   X,
   PenTool,
+  Trophy,
+  FileText,
+  Zap,
+  Award,
 } from "lucide-react";
 
 interface WritingQuestion {
@@ -851,7 +855,9 @@ function WritingExamRunnerContent() {
           <div className="max-w-2xl mx-auto space-y-4">
             {/* Card 1: Điểm */}
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm text-center space-y-3">
-              <div className="text-3xl">🍰</div>
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20">
+                <Award className="w-6 h-6" />
+              </div>
               <h2 className="font-heading font-bold text-base md:text-lg text-foreground">
                 Kết quả Writing — Part 2
               </h2>
@@ -880,7 +886,7 @@ function WritingExamRunnerContent() {
             {/* Card 3: Lỗi cần sửa */}
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-2">
               <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-1.5">
-                <span className="text-primary">✕</span>
+                <AlertCircle className="w-4 h-4 text-primary" />
                 <span>Lỗi cần sửa</span>
               </h3>
               <p className="text-xs text-muted-foreground">
@@ -892,7 +898,7 @@ function WritingExamRunnerContent() {
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-1.5">
-                  <span className="text-accent">🏆</span>
+                  <Trophy className="w-4 h-4 text-amber-500" />
                   <span>Bài band B1 của đề này</span>
                 </h3>
                 <button
@@ -946,7 +952,7 @@ function WritingExamRunnerContent() {
             {/* Card 5: Đề bài, bài làm & bài viết mẫu */}
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
               <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-1.5">
-                <span>📝</span>
+                <FileText className="w-4 h-4 text-primary" />
                 <span>Đề bài, bài làm &amp; bài viết mẫu</span>
               </h3>
 
@@ -974,8 +980,8 @@ function WritingExamRunnerContent() {
 
               {/* Bài mẫu tham khảo của đề */}
               <div className="space-y-1.5 text-xs">
-                <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <span>💡</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
                   <span>Bài mẫu tham khảo của đề</span>
                 </span>
                 <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 leading-relaxed font-sans">
@@ -989,9 +995,9 @@ function WritingExamRunnerContent() {
               <button
                 type="button"
                 onClick={() => setShowPart2Result(false)}
-                className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
               >
-                <span>👁️</span>
+                <Eye className="w-3.5 h-3.5" />
                 <span>Xem lại từng câu →</span>
               </button>
               <Link
@@ -1029,6 +1035,12 @@ function WritingExamRunnerContent() {
               {currentPart.partSubtitle}
             </span>
           </div>
+        </div>
+
+        {/* Căn giữa: Đồng hồ đếm ngược */}
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+          <Clock className="w-4 h-4" />
+          <span>{formatTime(timeLeft)}</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -1308,8 +1320,8 @@ function WritingExamRunnerContent() {
 
         {/* Right: Lượt chấm AI & Nút Submit */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-            <span>⚡</span>
+          <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+            <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
             <span>Còn {aiQuota} lượt chấm AI</span>
           </div>
 
@@ -1330,7 +1342,7 @@ function WritingExamRunnerContent() {
           <div className="relative w-full max-w-lg p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
-                <span>💡</span>
+                <Sparkles className="w-4 h-4 text-primary" />
                 <span>Bài mẫu tham khảo — {currentPart.partSubtitle}</span>
               </h3>
               <button

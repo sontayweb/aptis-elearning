@@ -36,3 +36,13 @@ export const reportPaymentIssueSchema = z.object({
 
 export type ReportPaymentIssueInput = z.infer<typeof reportPaymentIssueSchema>;
 
+export const redeemPromoCodeSchema = z.object({
+  code: z
+    .string()
+    .min(3, 'Mã kích hoạt phải có ít nhất 3 ký tự')
+    .max(30, 'Mã kích hoạt không vượt quá 30 ký tự')
+    .transform((val) => val.trim().toUpperCase()),
+});
+
+export type RedeemPromoCodeInput = z.infer<typeof redeemPromoCodeSchema>;
+

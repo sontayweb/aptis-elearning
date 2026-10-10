@@ -122,6 +122,45 @@ export default function PricingPage() {
   const [disputeSuccess, setDisputeSuccess] = useState<string | null>(null);
   const [disputeError, setDisputeError] = useState<string | null>(null);
 
+  // States for Go-Live Promo Code
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [redeemingPromo, setRedeemingPromo] = useState(false);
+  const [promoNotice, setPromoNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const handleRedeemPromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoCodeInput.trim()) return;
+    if (!isAuthenticated) {
+      setAuthModalOpen(true);
+      return;
+    }
+    setRedeemingPromo(true);
+    setPromoNotice(null);
+    try {
+      const res: any = await api.payment.redeemPromoCode(promoCodeInput.trim());
+      if (res.success) {
+        setPromoNotice({
+          type: "success",
+          text: res.message || "Chúc mừng bạn đã kích hoạt thành công 14 ngày VIP trải nghiệm!",
+        });
+        setPromoCodeInput("");
+        await refreshUser();
+      } else {
+        setPromoNotice({
+          type: "error",
+          text: res.message || "Mã kích hoạt không hợp lệ hoặc đã kết thúc chương trình.",
+        });
+      }
+    } catch (err: any) {
+      setPromoNotice({
+        type: "error",
+        text: err.message || "Không thể kích hoạt mã. Vui lòng kiểm tra lại.",
+      });
+    } finally {
+      setRedeemingPromo(false);
+    }
+  };
+
   useEffect(() => {
     async function loadPlans() {
       try {
@@ -327,6 +366,70 @@ export default function PricingPage() {
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Tự động hóa kích hoạt tài khoản ngay lập tức 24/7 qua cổng thanh toán SePay VietQR. Chọn gói phù hợp với mục tiêu B1, B2 hay C Target của bạn.
             </p>
+          </div>
+        </section>
+
+        {/* Go-Live Promo Code Section */}
+        <section className="section-container pt-8 pb-4">
+          <div className="max-w-4xl mx-auto rounded-3xl bg-gradient-to-r from-amber-500/10 via-primary/10 to-amber-500/10 border border-amber-500/30 p-6 md:p-8 shadow-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="space-y-1.5 text-center md:text-left flex-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Chương Trình Chào Mừng Go-Live</span>
+                </div>
+                <h2 className="text-xl md:text-2xl font-heading font-extrabold text-foreground">
+                  Bạn có Mã Kích Hoạt Trải Nghiệm VIP?
+                </h2>
+                <p className="text-xs md:text-sm text-muted-foreground">
+                  Nhập mã <span className="font-mono font-bold text-primary">APTISGOLIVE</span> để nhận ngay 14 ngày VIP đầy đủ tính năng &amp; 20 lượt chấm AI miễn phí!
+                </p>
+              </div>
+
+              <form onSubmit={handleRedeemPromo} className="flex flex-col sm:flex-row gap-2.5 w-full md:w-auto shrink-0">
+                <input
+                  type="text"
+                  value={promoCodeInput}
+                  onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                  placeholder="Mã CODE: APTISGOLIVE"
+                  className="px-4 py-2.5 rounded-xl border border-border bg-background text-sm font-mono font-bold uppercase tracking-wider focus:outline-hidden focus:ring-2 focus:ring-primary w-full sm:w-64"
+                />
+                <button
+                  type="submit"
+                  disabled={redeemingPromo || !promoCodeInput.trim()}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-primary text-white text-sm font-bold shadow-md hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+                >
+                  {redeemingPromo ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Đang kích hoạt...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4" />
+                      <span>Kích Hoạt Ngay</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+
+            {promoNotice && (
+              <div
+                className={`mt-4 p-3 rounded-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
+                  promoNotice.type === "success"
+                    ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                    : "bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300"
+                }`}
+              >
+                {promoNotice.type === "success" ? (
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                ) : (
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
+                )}
+                <span>{promoNotice.text}</span>
+              </div>
+            )}
           </div>
         </section>
 

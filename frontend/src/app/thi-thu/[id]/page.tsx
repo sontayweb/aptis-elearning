@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
@@ -19,7 +19,8 @@ import { ReadingResultCard } from "@/components/reading-result-card";
 import {
   Clock, ArrowLeft, ArrowRight, List, Info, LogOut,
   Mic, Volume2, CheckCircle2, Award, Sparkles, X, Loader2,
-  StopCircle, Play, AlertTriangle, Upload, Pause, Check, Eye,
+  StopCircle, Play, AlertTriangle, Upload, Pause, Check, Eye, EyeOff,
+  Headphones, BookOpen, FileText, PenTool, RefreshCw, Flag, RotateCcw, RotateCw, ArrowUp,
 } from "lucide-react";
 
 /* ====================================================
@@ -47,10 +48,17 @@ function AudioPlayer({ src, label }: { src: string; label?: string }) {
     }
   };
 
+  const seekRelative = (seconds: number) => {
+    if (!audioRef.current) return;
+    const target = Math.max(0, Math.min(duration || 0, audioRef.current.currentTime + seconds));
+    audioRef.current.currentTime = target;
+  };
+
   const pct = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const fmt = (t: number) => `${Math.floor(t / 60).toString().padStart(2, "0")}:${Math.floor(t % 60).toString().padStart(2, "0")}`;
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl border border-exam-border bg-exam-bg/50">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3.5 rounded-xl border border-exam-border bg-exam-bg/60 shadow-xs">
       <audio
         ref={audioRef}
         src={src}
@@ -60,44 +68,88 @@ function AudioPlayer({ src, label }: { src: string; label?: string }) {
         onError={() => setHasError(true)}
         preload="metadata"
       />
-      <button
-        type="button"
-        onClick={toggle}
-        disabled={hasError}
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0"
-      >
-        {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-      </button>
-      <div className="flex-1 min-w-0">
-        {label && <p className="text-xs font-semibold text-exam-text mb-1 truncate">{label}</p>}
-        <div className="relative h-1.5 bg-exam-border rounded-full overflow-hidden">
+      
+      {/* Controls: Play/Pause, Rewind 5s, Forward 5s */}
+      <div className="flex items-center gap-1.5 shrink-0">
+        <button
+          type="button"
+          onClick={() => seekRelative(-5)}
+          disabled={hasError || currentTime <= 0}
+          title="Tua lùi 5 giây"
+          className="w-7 h-7 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 disabled:opacity-40 transition-colors"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+        </button>
+
+        <button
+          type="button"
+          onClick={toggle}
+          disabled={hasError}
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:brightness-110 shadow-sm transition-all shrink-0"
+        >
+          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => seekRelative(5)}
+          disabled={hasError || currentTime >= duration}
+          title="Tua tới 5 giây"
+          className="w-7 h-7 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 disabled:opacity-40 transition-colors"
+        >
+          <RotateCw className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* Seekbar */}
+      <div className="flex-1 min-w-0 space-y-1">
+        {label && <p className="text-xs font-semibold text-exam-text truncate">{label}</p>}
+        <div
+          role="slider"
+          tabIndex={0}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(pct)}
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickPos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            if (audioRef.current && duration > 0) {
+              audioRef.current.currentTime = clickPos * duration;
+            }
+          }}
+          className="relative h-2 bg-exam-border rounded-full overflow-hidden cursor-pointer group hover:h-2.5 transition-all py-0.5"
+          title="Nhấn để tua audio"
+        >
           <div
-            className="absolute left-0 top-0 h-full bg-primary rounded-full transition-all"
+            className="absolute left-0 top-0 h-full bg-primary rounded-full transition-all group-hover:brightness-110"
             style={{ width: `${pct}%` }}
           />
         </div>
-        {hasError && <p className="text-xs text-red-500 mt-1">Không thể tải audio</p>}
+        {hasError && <p className="text-xs text-red-500">Không thể tải tệp âm thanh</p>}
       </div>
-      <div className="flex items-center gap-1 shrink-0">
-        {[0.75, 1, 1.25].map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => handleSpeedChange(s)}
-            className={`px-1.5 py-0.5 text-[10px] font-bold rounded transition-colors ${
-              playbackSpeed === s
-                ? "bg-primary text-white shadow-xs"
-                : "bg-exam-border/40 text-exam-text-muted hover:text-exam-text"
-            }`}
-          >
-            {s}x
-          </button>
-        ))}
+
+      {/* Speed & Time Display */}
+      <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+        <div className="flex items-center gap-1">
+          {[0.75, 1, 1.25].map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => handleSpeedChange(s)}
+              className={`px-1.5 py-0.5 text-[10px] font-bold rounded transition-colors ${
+                playbackSpeed === s
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "bg-exam-border/40 text-exam-text-muted hover:text-exam-text"
+              }`}
+            >
+              {s}x
+            </button>
+          ))}
+        </div>
+        <span className="text-[10px] font-mono shrink-0 text-exam-text-muted font-bold min-w-[75px] text-right">
+          {fmt(currentTime)} / {fmt(duration)}
+        </span>
       </div>
-      <span className="text-[10px] font-mono shrink-0 text-exam-text-muted">
-        {Math.floor(currentTime / 60).toString().padStart(2, "0")}:
-        {Math.floor(currentTime % 60).toString().padStart(2, "0")}
-      </span>
     </div>
   );
 }
@@ -126,7 +178,20 @@ function SpeakingRecorder({
   };
 
   const handleStop = async () => {
-    await rec.stopRecording();
+    const res = await rec.stopRecording();
+    if (res?.url) {
+      onRecorded(res.url, res.duration);
+    }
+    if (res?.blob && submissionId && token) {
+      rec.uploadRecording(submissionId, questionId, token, res.blob, res.duration).then((remoteUrl) => {
+        if (remoteUrl) {
+          setUploaded(true);
+          onRecorded(remoteUrl, res.duration);
+        }
+      }).catch((err) => {
+        console.warn("Auto upload error:", err);
+      });
+    }
   };
 
   const handleUpload = async () => {
@@ -135,8 +200,10 @@ function SpeakingRecorder({
       return;
     }
     const url = await rec.uploadRecording(submissionId, questionId, token);
-    setUploaded(true);
-    onRecorded(url, rec.recordingDuration);
+    if (url) {
+      setUploaded(true);
+      onRecorded(url, rec.recordingDuration);
+    }
   };
 
   return (
@@ -263,6 +330,8 @@ export default function OfficialMockExamRoom() {
   const [orderAnswers, setOrderAnswers] = useState<Record<string, string[]>>({});
   const [matchingAnswers, setMatchingAnswers] = useState<Record<string, string>>({});
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [flaggedQuestions, setFlaggedQuestions] = useState<Record<number, boolean>>({});
+  const [paletteSkillFilter, setPaletteSkillFilter] = useState<string>("ALL");
 
   // UI
   const [isQuestionListOpen, setIsQuestionListOpen] = useState(false);
@@ -271,6 +340,35 @@ export default function OfficialMockExamRoom() {
   const [soundTested, setSoundTested] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [showListeningScript, setShowListeningScript] = useState<boolean>(false);
+  const [hideAnswersReview, setHideAnswersReview] = useState<boolean>(false);
+  const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
+  const [reportReason, setReportReason] = useState<string>("Đáp án chưa chính xác");
+  const [reportNote, setReportNote] = useState<string>("");
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled =
+        (typeof window !== "undefined" && window.scrollY > 40) ||
+        (typeof document !== "undefined" &&
+          (document.documentElement?.scrollTop > 40 || document.body?.scrollTop > 40));
+      setHasScrolled(Boolean(isScrolled));
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleScrollToTop = () => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.documentElement?.scrollTo({ top: 0, behavior: "smooth" });
+      document.body?.scrollTo({ top: 0, behavior: "smooth" });
+      const mainEl = document.querySelector("main");
+      if (mainEl) mainEl.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const heartbeatRef = useRef<NodeJS.Timeout | null>(null);
   const tabSwitchRef = useRef(0);
@@ -315,6 +413,7 @@ export default function OfficialMockExamRoom() {
               flat.push({
                 ...q,
                 options: opts,
+                partNumber: part.part_number,
                 partTitle: part.title,
                 partAudioUrl: part.audio_url,
                 partPassageText: part.passage_text,
@@ -456,6 +555,18 @@ export default function OfficialMockExamRoom() {
     return () => document.removeEventListener("visibilitychange", fn);
   }, []);
 
+  // ---- Chống vô tình reload hoặc đóng tab khi đang thi ----
+  useEffect(() => {
+    if (stagePhase !== "exam" || isFinished) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Bạn đang làm bài thi Aptis. Rời khỏi trang có thể làm gián đoạn bài làm!";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [stagePhase, isFinished]);
+
   // ---- Autosave ----
   const doAutosave = useCallback(async () => {
     if (!submissionId) return;
@@ -516,6 +627,46 @@ export default function OfficialMockExamRoom() {
     }
     prevIdxRef.current = questionIdx;
   }, [questionIdx, doAutosave, submissionId]);
+
+  // Polling kết quả chấm AI tự động
+  const pollLatestResult = useCallback(async () => {
+    if (!submissionId) return false;
+    try {
+      const res: any = await api.submissions.getResult(submissionId);
+      if (res.success && res.data) {
+        const sub = res.data;
+        const isAiDone = sub.status === "GRADED" || (sub.writing_score !== null && sub.speaking_score !== null);
+        if (isAiDone) {
+          setResultData({
+            totalScore: sub.total_score,
+            cefrLevel: sub.cefr_level || "B2",
+            hasSubjectiveEvaluation: false,
+            listeningScore: sub.listening_score,
+            readingScore: sub.reading_score,
+            writingScore: sub.writing_score,
+            speakingScore: sub.speaking_score,
+            grammarScore: sub.grammar_vocab_score ?? sub.grammar_score,
+            totalQuestions: questions.length,
+            correctCount: sub.answers?.filter((a: any) => (a.score || 0) > 0)?.length || 0,
+          });
+          return true;
+        }
+      }
+    } catch (e) {
+      console.warn("Poll result error:", e);
+    }
+    return false;
+  }, [submissionId, questions.length]);
+
+  // Tự động poll theo interval khi đang chờ chấm AI
+  useEffect(() => {
+    if (!isFinished || !submissionId || !resultData?.hasSubjectiveEvaluation) return;
+    const interval = setInterval(async () => {
+      const finished = await pollLatestResult();
+      if (finished) clearInterval(interval);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isFinished, submissionId, resultData?.hasSubjectiveEvaluation, pollLatestResult]);
 
   // ---- Submit ----
   const handleSubmitExam = useCallback(async () => {
@@ -621,12 +772,20 @@ export default function OfficialMockExamRoom() {
       const normalizedScore = maxPts > 0 ? Math.round((totalPts / maxPts) * scale) : Math.round(totalPts);
 
       let cefr = "A1";
-      if (normalizedScore >= 46) cefr = "C";
-      else if (normalizedScore >= 38) cefr = "B2";
-      else if (normalizedScore >= 26) cefr = "B1";
-      else if (normalizedScore >= 16) cefr = "A2";
-      else if (normalizedScore > 5) cefr = "A1";
-      else cefr = "A0";
+      if (examData?.skill === "FULL_TEST") {
+        if (normalizedScore >= 160) cefr = "C";
+        else if (normalizedScore >= 120) cefr = "B2";
+        else if (normalizedScore >= 80) cefr = "B1";
+        else if (normalizedScore >= 50) cefr = "A2";
+        else cefr = "A1";
+      } else {
+        if (normalizedScore >= 46) cefr = "C";
+        else if (normalizedScore >= 38) cefr = "B2";
+        else if (normalizedScore >= 26) cefr = "B1";
+        else if (normalizedScore >= 16) cefr = "A2";
+        else if (normalizedScore > 5) cefr = "A1";
+        else cefr = "A0";
+      }
 
       finalResult = {
         totalScore: normalizedScore,
@@ -640,7 +799,14 @@ export default function OfficialMockExamRoom() {
     setResultData(finalResult);
     setIsFinished(true);
     setIsSubmitting(false);
-  }, [isSubmitting, isFinished, submissionId, doAutosave, questions, selectedAnswers, textAnswers, matchingAnswers, orderAnswers, examData]);
+
+    // Kích hoạt tự động lấy kết quả AI chấm ngầm (sau 4s, 8s, 13s)
+    if (finalResult?.hasSubjectiveEvaluation && submissionId) {
+      setTimeout(pollLatestResult, 4000);
+      setTimeout(pollLatestResult, 8000);
+      setTimeout(pollLatestResult, 13000);
+    }
+  }, [isSubmitting, isFinished, submissionId, doAutosave, questions, selectedAnswers, textAnswers, matchingAnswers, orderAnswers, examData, pollLatestResult]);
 
   // Stage calculation: Nhóm các task thuộc cùng 1 màn hình chuẩn British Council Aptis ESOL
   const getExamStages = useCallback(() => {
@@ -733,7 +899,63 @@ export default function OfficialMockExamRoom() {
     return false;
   };
   const answeredCount = questions.filter((_, i) => isAnswered(i)).length;
+  const toggleFlag = (idx: number) => {
+    setFlaggedQuestions((prev) => ({ ...prev, [idx]: !prev[idx] }));
+  };
+  const flaggedCount = Object.values(flaggedQuestions).filter(Boolean).length;
   const currentQ = questions[questionIdx];
+
+  const getSkillFromQuestion = useCallback((q: any) => {
+    const pTitle = (q?.partTitle || "").toUpperCase();
+    const qType = q?.question_type || "";
+    const pNum = Number(q?.partNumber || 0);
+
+    if (qType === "SPEAKING_AUDIO" || pTitle.includes("SPEAKING") || pTitle.includes("NÓI") || pTitle.includes("NOI") || (pNum >= 1 && pNum <= 4)) {
+      return { key: "SPEAKING", name: "Speaking", label: "Nói" };
+    }
+    if (pTitle.includes("LISTENING") || pTitle.includes("NGHE") || (pNum >= 5 && pNum <= 8)) {
+      return { key: "LISTENING", name: "Listening", label: "Nghe" };
+    }
+    if (pTitle.includes("GRAMMAR") || pTitle.includes("VOCAB") || pTitle.includes("NGỮ PHÁP") || pTitle.includes("TỪ VỰNG") || (pNum >= 9 && pNum <= 14)) {
+      return { key: "GRAMMAR_VOCABULARY", name: "Grammar & Vocab", label: "Ngữ pháp & Từ vựng" };
+    }
+    if (pTitle.includes("READING") || pTitle.includes("ĐỌC") || pTitle.includes("DOC") || (pNum >= 15 && pNum <= 18)) {
+      return { key: "READING", name: "Reading", label: "Đọc" };
+    }
+    if (qType === "WRITING_ESSAY" || pTitle.includes("WRITING") || pTitle.includes("VIẾT") || pTitle.includes("VIET") || (pNum >= 19 && pNum <= 22)) {
+      return { key: "WRITING", name: "Writing", label: "Viết" };
+    }
+    return { key: "GENERAL", name: "General", label: "Tổng hợp" };
+  }, []);
+
+  const fullTestSkills = useMemo(() => {
+    if (examData?.skill !== "FULL_TEST" || questions.length === 0) return [];
+    const skillsOrder = [
+      { key: "SPEAKING", name: "Speaking", label: "Nói" },
+      { key: "LISTENING", name: "Listening", label: "Nghe" },
+      { key: "GRAMMAR_VOCABULARY", name: "Grammar & Vocab", label: "Ngữ pháp & Từ vựng" },
+      { key: "READING", name: "Reading", label: "Đọc" },
+      { key: "WRITING", name: "Writing", label: "Viết" },
+    ];
+
+    return skillsOrder.map((s) => {
+      const indices: number[] = [];
+      questions.forEach((q, idx) => {
+        if (getSkillFromQuestion(q).key === s.key) {
+          indices.push(idx);
+        }
+      });
+      const answeredInSkill = indices.filter((idx) => isAnswered(idx)).length;
+      return {
+        ...s,
+        startIndex: indices[0] ?? -1,
+        totalCount: indices.length,
+        answeredCount: answeredInSkill,
+      };
+    }).filter((s) => s.totalCount > 0);
+  }, [examData?.skill, questions, getSkillFromQuestion, selectedAnswers, textAnswers, audioUrls, orderAnswers, matchingAnswers]);
+
+  const currentSkill = getSkillFromQuestion(currentQ);
 
   // ========================================================
   //  RENDER: Loading
@@ -915,43 +1137,177 @@ export default function OfficialMockExamRoom() {
               </p>
             </div>
 
-            {hasSub ? (
-              <div className="p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 max-w-sm mx-auto">
-                <span className="text-xs font-bold text-amber-700 dark:text-amber-300 uppercase">
-                  Đang chờ chấm điểm
-                </span>
-                <div className="text-xl font-black text-exam-text my-2">Chờ giáo viên đánh giá</div>
-                <p className="text-xs text-exam-text-muted">
-                  Bài thi có phần Speaking/Writing cần chấm thủ công. Kết quả sẽ có trong 24-48h.
-                </p>
+            {examData?.skill === "FULL_TEST" ? (
+              <div className="space-y-6">
+                {/* Overall Score & CEFR */}
+                <div className="p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-transparent border border-primary/30 max-w-md mx-auto">
+                  <span className="text-xs font-bold text-exam-text-muted uppercase tracking-wider">Aptis ESOL Overall CEFR</span>
+                  <div className="text-6xl font-black text-primary my-2">{cefr}</div>
+                  <div className="text-sm font-semibold text-exam-text">
+                    Điểm tổng hợp:{" "}
+                    <span className="text-primary font-bold">
+                      {score !== undefined && score !== null ? Math.round(score) : 0}
+                    </span>{" "}
+                    / 200
+                  </div>
+                  <p className="text-[11px] text-exam-text-muted mt-1">
+                    {cefr === "C" && "Năng lực Anh ngữ thành thạo cao cấp (C1/C2)"}
+                    {cefr === "B2" && "Đạt chuẩn B2 Quốc tế – Tự tin giao tiếp công việc và học tập"}
+                    {cefr === "B1" && "Đạt chuẩn B1 Quốc tế – Giao tiếp độc lập trong môi trường quen thuộc"}
+                    {cefr === "A2" && "Đạt chuẩn A2 Quốc tế – Giao tiếp cơ bản"}
+                    {cefr === "A1" && "Khởi đầu A1 – Cần rèn luyện thêm vốn từ vựng"}
+                  </p>
+                </div>
+
+                {/* AI Grading Status Banner */}
+                {hasSub ? (
+                  <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-700 dark:text-purple-300 flex items-center justify-center gap-3">
+                    <RefreshCw className="w-5 h-5 animate-spin text-purple-500 shrink-0" />
+                    <div className="text-left text-xs">
+                      <div className="font-bold uppercase tracking-wide">Hệ thống AI đang chấm Speaking & Writing...</div>
+                      <div className="text-exam-text-muted text-[11px] mt-0.5">
+                        Điểm số 2 kỹ năng tự luận sẽ tự động cập nhật ngay trên màn hình trong giây lát (không cần tải lại trang).
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-2 text-xs font-bold">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Toàn bộ 5 kỹ năng đã được chấm điểm hoàn tất (AI Certified)</span>
+                  </div>
+                )}
+
+                {/* 5 Skills Breakdown Grid */}
+                <div className="text-left">
+                  <div className="text-xs font-bold text-exam-text-muted uppercase tracking-wider mb-2">
+                    Điểm chi tiết từng kỹ năng (Thang điểm 0 - 50)
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-exam-text-muted">
+                        <Headphones className="w-3.5 h-3.5 text-blue-500" /> Listening
+                      </div>
+                      <div className="text-2xl font-black text-exam-text mt-1">
+                        {resultData?.listeningScore !== null && resultData?.listeningScore !== undefined ? resultData.listeningScore : 0}
+                        <span className="text-xs font-medium text-exam-text-muted"> / 50</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-exam-text-muted">
+                        <FileText className="w-3.5 h-3.5 text-emerald-500" /> Reading
+                      </div>
+                      <div className="text-2xl font-black text-exam-text mt-1">
+                        {resultData?.readingScore !== null && resultData?.readingScore !== undefined ? resultData.readingScore : 0}
+                        <span className="text-xs font-medium text-exam-text-muted"> / 50</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-exam-text-muted">
+                        <PenTool className="w-3.5 h-3.5 text-rose-500" /> Writing
+                      </div>
+                      <div className="text-2xl font-black text-exam-text mt-1">
+                        {resultData?.writingScore !== null && resultData?.writingScore !== undefined ? (
+                          <>
+                            {resultData.writingScore}
+                            <span className="text-xs font-medium text-exam-text-muted"> / 50</span>
+                          </>
+                        ) : (
+                          <span className="text-xs font-bold text-amber-500 flex items-center gap-1">
+                            <Loader2 className="w-3 h-3 animate-spin" /> Đang chấm AI
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-exam-text-muted">
+                        <Mic className="w-3.5 h-3.5 text-amber-500" /> Speaking
+                      </div>
+                      <div className="text-2xl font-black text-exam-text mt-1">
+                        {resultData?.speakingScore !== null && resultData?.speakingScore !== undefined ? (
+                          <>
+                            {resultData.speakingScore}
+                            <span className="text-xs font-medium text-exam-text-muted"> / 50</span>
+                          </>
+                        ) : (
+                          <span className="text-xs font-bold text-amber-500 flex items-center gap-1">
+                            <Loader2 className="w-3 h-3 animate-spin" /> Đang chấm AI
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40 sm:col-span-2 md:col-span-1">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-exam-text-muted">
+                        <BookOpen className="w-3.5 h-3.5 text-purple-500" /> Grammar & Vocab
+                      </div>
+                      <div className="text-2xl font-black text-exam-text mt-1">
+                        {resultData?.grammarScore !== null && resultData?.grammarScore !== undefined ? resultData.grammarScore : 0}
+                        <span className="text-xs font-medium text-exam-text-muted"> / 50</span>
+                      </div>
+                      <span className="text-[10px] text-exam-text-muted block mt-0.5">* Điểm điều kiện xếp hạng</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
+                  <div className="p-3 rounded-xl border border-exam-border bg-exam-bg/40 text-center">
+                    <div className="text-[10px] text-exam-text-muted font-medium">Đã trả lời</div>
+                    <div className="text-xl font-bold text-exam-text mt-0.5">
+                      {answeredCount}/{questions.length}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl border border-exam-border bg-exam-bg/40 text-center">
+                    <div className="text-[10px] text-exam-text-muted font-medium">Trạng thái</div>
+                    <div className={`text-sm font-bold mt-0.5 ${hasSub ? "text-purple-500" : "text-emerald-500"}`}>
+                      {hasSub ? "AI đang chấm" : "Hoàn thành"}
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-transparent border border-primary/30 max-w-sm mx-auto">
-                <span className="text-xs font-bold text-exam-text-muted uppercase">Overall CEFR Result</span>
-                <div className="text-5xl font-black text-primary my-1">{cefr}</div>
-                <p className="text-xs text-exam-text-muted">
-                  Điểm:{" "}
-                  {score !== undefined && score !== null
-                    ? `${Math.round(score)} / ${examData?.skill === "FULL_TEST" ? 200 : 50}`
-                    : "Đang tính"}
-                </p>
-              </div>
-            )}
+              <>
+                {hasSub ? (
+                  <div className="p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 max-w-sm mx-auto">
+                    <span className="text-xs font-bold text-amber-700 dark:text-amber-300 uppercase">
+                      Đang chờ chấm điểm
+                    </span>
+                    <div className="text-xl font-black text-exam-text my-2">Chờ giáo viên đánh giá</div>
+                    <p className="text-xs text-exam-text-muted">
+                      Bài thi có phần Speaking/Writing cần chấm thủ công. Kết quả sẽ có trong 24-48h.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-transparent border border-primary/30 max-w-sm mx-auto">
+                    <span className="text-xs font-bold text-exam-text-muted uppercase">Overall CEFR Result</span>
+                    <div className="text-5xl font-black text-primary my-1">{cefr}</div>
+                    <p className="text-xs text-exam-text-muted">
+                      Điểm:{" "}
+                      {score !== undefined && score !== null
+                        ? `${Math.round(score)} / 50`
+                        : "Đang tính"}
+                    </p>
+                  </div>
+                )}
 
-            <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
-              <div className="p-3 rounded-xl border border-exam-border bg-exam-bg/40 text-center">
-                <div className="text-[10px] text-exam-text-muted font-medium">Đã trả lời</div>
-                <div className="text-xl font-bold text-exam-text mt-0.5">
-                  {answeredCount}/{questions.length}
+                <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
+                  <div className="p-3 rounded-xl border border-exam-border bg-exam-bg/40 text-center">
+                    <div className="text-[10px] text-exam-text-muted font-medium">Đã trả lời</div>
+                    <div className="text-xl font-bold text-exam-text mt-0.5">
+                      {answeredCount}/{questions.length}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl border border-exam-border bg-exam-bg/40 text-center">
+                    <div className="text-[10px] text-exam-text-muted font-medium">Trạng thái</div>
+                    <div className={`text-sm font-bold mt-0.5 ${hasSub ? "text-amber-500" : "text-emerald-500"}`}>
+                      {hasSub ? "Chờ chấm" : "Hoàn thành"}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="p-3 rounded-xl border border-exam-border bg-exam-bg/40 text-center">
-                <div className="text-[10px] text-exam-text-muted font-medium">Trạng thái</div>
-                <div className={`text-sm font-bold mt-0.5 ${hasSub ? "text-amber-500" : "text-emerald-500"}`}>
-                  {hasSub ? "Chờ chấm" : "Hoàn thành"}
-                </div>
-              </div>
-            </div>
+              </>
+            )}
 
             <div className="pt-4 border-t border-exam-border flex flex-wrap justify-center gap-3">
               <button
@@ -995,6 +1351,91 @@ export default function OfficialMockExamRoom() {
   //  RENDER: REVIEW MODE CHO BÀI THI THỬ (FULL TEST / KỸ NĂNG)
   // ========================================================
   if (isFinished && reviewMode) {
+    // Helper: Bôi vàng câu manh mối (<mark>...</mark> hoặc ==...==)
+    const renderClueText = (text: string) => {
+      if (!text) return null;
+      const parts = text.split(/(<mark>[\s\S]*?<\/mark>|==[\s\S]*?==)/gi);
+      return (
+        <>
+          {parts.map((part, i) => {
+            if (/^<mark>([\s\S]*?)<\/mark>$/i.test(part)) {
+              const match = part.match(/^<mark>([\s\S]*?)<\/mark>$/i);
+              return (
+                <mark key={i} className="bg-amber-300 dark:bg-amber-400/90 text-amber-950 font-bold px-1.5 py-0.5 rounded mx-0.5 select-text">
+                  {match ? match[1] : part}
+                </mark>
+              );
+            }
+            if (/^==([\s\S]*?)==$/i.test(part)) {
+              const match = part.match(/^==([\s\S]*?)==$/i);
+              return (
+                <mark key={i} className="bg-amber-300 dark:bg-amber-400/90 text-amber-950 font-bold px-1.5 py-0.5 rounded mx-0.5 select-text">
+                  {match ? match[1] : part}
+                </mark>
+              );
+            }
+            return <span key={i}>{part}</span>;
+          })}
+        </>
+      );
+    };
+
+    // Helper: Định dạng khối Giải Thích 3 phần chuẩn UI (Vì sao đúng / sai / Mẹo)
+    const renderStructuredExplanation = (text: string) => {
+      if (!text) return null;
+      const lines = text.split("\n");
+      return (
+        <div className="space-y-2.5 text-xs md:text-sm leading-relaxed text-exam-text">
+          {lines.map((line, idx) => {
+            const trimmed = line.trim();
+            if (!trimmed) return <div key={idx} className="h-0.5" />;
+
+            // Dòng tiêu đề như: "--- GIẢI THÍCH: Đáp án B – Plays football."
+            if (trimmed.startsWith("---") || trimmed.toLowerCase().startsWith("giải thích:") || trimmed.toLowerCase().startsWith("đáp án:")) {
+              return (
+                <div key={idx} className="font-bold text-primary border-b border-primary/20 pb-1.5 mb-2 flex items-center gap-2">
+                  <span className="text-sm">📌</span>
+                  <span>{trimmed.replace(/^---\s*/, "")}</span>
+                </div>
+              );
+            }
+
+            // Dòng Vì sao đúng: "• Vì sao đúng:"
+            if (trimmed.startsWith("• Vì sao đúng:") || trimmed.startsWith("· Vì sao đúng:") || trimmed.startsWith("- Vì sao đúng:")) {
+              return (
+                <div key={idx} className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-900 dark:text-emerald-200">
+                  <span className="font-bold">✓ Vì sao đúng: </span>
+                  {renderClueText(trimmed.replace(/^([•·-]\s*Vì sao đúng:\s*)/, ""))}
+                </div>
+              );
+            }
+
+            // Dòng Mẹo: "👉 Mẹo:"
+            if (trimmed.includes("Mẹo:") || trimmed.includes("👉")) {
+              return (
+                <div key={idx} className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 font-medium">
+                  <span className="font-bold text-amber-600 dark:text-amber-400">👉 Mẹo phòng thi: </span>
+                  {renderClueText(trimmed.replace(/^[•·-]?\s*(👉\s*)?Mẹo:\s*/, ""))}
+                </div>
+              );
+            }
+
+            // Dòng phân tích các phương án khác sai: "• Swimming sai:"
+            if (trimmed.startsWith("•") || trimmed.startsWith("·") || trimmed.startsWith("-")) {
+              return (
+                <div key={idx} className="flex items-start gap-2 pl-1 text-exam-text leading-relaxed">
+                  <span className="text-rose-500 font-bold shrink-0 mt-0.5">•</span>
+                  <div>{renderClueText(trimmed.replace(/^[•·-]\s*/, ""))}</div>
+                </div>
+              );
+            }
+
+            return <p key={idx}>{renderClueText(line)}</p>;
+          })}
+        </div>
+      );
+    };
+
     const getStatus = (q: any, idx: number) => {
       if (q.question_type === "MULTIPLE_CHOICE") {
         const sel = selectedAnswers[idx];
@@ -1222,8 +1663,38 @@ export default function OfficialMockExamRoom() {
 
               {/* Passage text if any */}
               {activeRevQ.partPassageText && (
-                <div className="p-4 rounded-xl bg-exam-bg/50 border border-exam-border text-xs md:text-sm leading-relaxed text-exam-text whitespace-pre-wrap font-sans">
-                  {activeRevQ.partPassageText}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-exam-text-muted flex items-center gap-1.5">
+                      <span>📜</span>
+                      <span>
+                        {(activeRevQ.partTitle || "").toUpperCase().includes("LISTENING") ||
+                        (activeRevQ.partTitle || "").toUpperCase().includes("NGHE") ||
+                        Boolean(activeRevQ.partAudioUrl)
+                          ? "Lời thoại bài nghe (Transcript):"
+                          : "Đoạn văn ngữ cảnh:"}
+                      </span>
+                    </span>
+                    {(Boolean(activeRevQ.partAudioUrl) ||
+                      (activeRevQ.partTitle || "").toUpperCase().includes("LISTENING") ||
+                      (activeRevQ.partTitle || "").toUpperCase().includes("NGHE")) && (
+                      <button
+                        type="button"
+                        onClick={() => setShowListeningScript(!showListeningScript)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border border-exam-border bg-exam-surface hover:bg-exam-border/40 text-primary transition-all"
+                      >
+                        {showListeningScript ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        <span>{showListeningScript ? "Thu gọn Transcript" : "Xem Transcript"}</span>
+                      </button>
+                    )}
+                  </div>
+                  {(!Boolean(activeRevQ.partAudioUrl) || showListeningScript) && (
+                    <div className="p-4 rounded-xl bg-exam-bg/50 border border-exam-border text-xs md:text-sm leading-relaxed text-exam-text whitespace-pre-wrap font-sans transition-all">
+                      {hideAnswersReview
+                        ? (activeRevQ.partPassageText || "").replace(/<mark>([\s\S]*?)<\/mark>/gi, "$1").replace(/==([\s\S]*?)==/gi, "$1")
+                        : renderClueText(activeRevQ.partPassageText)}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1239,7 +1710,7 @@ export default function OfficialMockExamRoom() {
               {activeRevQ.question_type === "MULTIPLE_CHOICE" && Array.isArray(activeRevQ.options) && (
                 <div className="space-y-2.5">
                   <span className="text-xs font-bold text-exam-text-muted uppercase tracking-wider block">
-                    So sánh lựa chọn của bạn &amp; Đáp án đúng:
+                    {hideAnswersReview ? "Các phương án lựa chọn:" : "So sánh lựa chọn của bạn & Đáp án đúng:"}
                   </span>
                   <div className="space-y-2">
                     {activeRevQ.options.map((opt: any, oIdx: number) => {
@@ -1248,6 +1719,37 @@ export default function OfficialMockExamRoom() {
                       const optStr = String(opt).trim().toUpperCase();
                       const corStr = String(activeRevQ.correct_answer || "").trim().toUpperCase();
                       const isRight = optStr === corStr || String.fromCharCode(65 + oIdx) === corStr;
+
+                      if (hideAnswersReview) {
+                        return (
+                          <div
+                            key={oIdx}
+                            className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs md:text-sm font-medium transition-all ${
+                              isUserPick
+                                ? "bg-primary/10 border-primary/40 text-primary"
+                                : "bg-exam-bg/30 border-exam-border text-exam-text"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span
+                                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                                  isUserPick
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-exam-border/50 text-exam-text-muted"
+                                }`}
+                              >
+                                {String.fromCharCode(65 + oIdx)}
+                              </span>
+                              <span className="truncate">{String(opt)}</span>
+                            </div>
+                            {isUserPick && (
+                              <span className="inline-block px-2.5 py-0.5 rounded-md bg-primary/20 text-primary font-bold text-[11px]">
+                                Lựa chọn của bạn
+                              </span>
+                            )}
+                          </div>
+                        );
+                      }
 
                       return (
                         <div
@@ -1294,34 +1796,120 @@ export default function OfficialMockExamRoom() {
                 </div>
               )}
 
-              {/* 2. Gap Fill */}
-              {activeRevQ.question_type === "GAP_FILL" && (
-                <div className="space-y-3">
-                  <span className="text-xs font-bold text-exam-text-muted uppercase tracking-wider block">
-                    Chi tiết điền từ:
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40 space-y-1">
-                      <span className="text-[11px] text-exam-text-muted font-bold block">
-                        Câu trả lời của bạn:
+              {/* 2. Gap Fill - Chuẩn layout Screenshot 2 (Đáp án & dịch nghĩa) */}
+              {activeRevQ.question_type === "GAP_FILL" && (() => {
+                const siblingGapQs = questions.filter(
+                  (q) => q.partNumber === activeRevQ.partNumber && q.question_type === "GAP_FILL"
+                );
+                const listToRender = siblingGapQs.length > 0 ? siblingGapQs : [activeRevQ];
+
+                return (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-exam-border pb-2">
+                      <h4 className="font-bold text-sm md:text-base text-exam-text">
+                        Đáp án &amp; dịch nghĩa
+                      </h4>
+                      <span className="text-xs text-exam-text-muted">
+                        {listToRender.length} câu điền từ trong phần này
                       </span>
-                      <p className={`font-mono text-sm font-bold ${
-                        activeStatus === "correct" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
-                      }`}>
-                        {textAnswers[activeRevQ.id] || (selectedAnswers[questionIdx] !== undefined && activeRevQ.options ? activeRevQ.options[selectedAnswers[questionIdx]] : "") || "(Trống)"}
-                      </p>
                     </div>
-                    <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 space-y-1">
-                      <span className="text-[11px] text-emerald-700 dark:text-emerald-300 font-bold block">
-                        Đáp án chính xác:
-                      </span>
-                      <p className="font-mono text-sm font-bold text-emerald-700 dark:text-emerald-300">
-                        {activeRevQ.correct_answer || "N/A"}
-                      </p>
+
+                    <div className="space-y-3.5">
+                      {listToRender.map((gq: any, gIdx: number) => {
+                        const targetIdx = questions.findIndex((q) => q.id === gq.id);
+                        const isCurrentActive = targetIdx === questionIdx;
+                        const userVal = (
+                          textAnswers[gq.id] ||
+                          (targetIdx !== -1 && selectedAnswers[targetIdx] !== undefined && gq.options
+                            ? gq.options[selectedAnswers[targetIdx]]
+                            : "") ||
+                          ""
+                        ).trim();
+
+                        const corVal = String(gq.correct_answer || "").trim();
+                        const isCorrect = userVal.toLowerCase() === corVal.toLowerCase();
+
+                        // Hoàn thiện câu văn in nghiêng chuẩn Screenshot 2
+                        let completedSentence = gq.prompt || "";
+                        if (!hideAnswersReview) {
+                          if (/\[gap\]|_{2,}|\(\.\.\.\)|\(\d+\)|\[blank\]/i.test(completedSentence)) {
+                            completedSentence = completedSentence.replace(
+                              /\[gap\]|_{2,}|\(\.\.\.\)|\(\d+\)|\[blank\]/gi,
+                              corVal || "___"
+                            );
+                          } else if (!completedSentence.includes(corVal) && corVal) {
+                            completedSentence = `${completedSentence} → [${corVal}]`;
+                          }
+                        }
+
+                        // Lời dịch tiếng Việt
+                        let translation = "";
+                        if (gq.explanation) {
+                          translation = gq.explanation.replace(/^[•·-]?\s*dịch\s*(nghĩa)?:\s*/i, "").trim();
+                        }
+
+                        return (
+                          <div
+                            key={gq.id || gIdx}
+                            onClick={() => {
+                              if (targetIdx !== -1) setQuestionIdx(targetIdx);
+                            }}
+                            className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                              isCurrentActive
+                                ? "bg-card border-primary/40 shadow-sm ring-1 ring-primary/20"
+                                : "bg-card/60 hover:bg-card border-exam-border hover:border-exam-border/80"
+                            }`}
+                          >
+                            <div className="flex items-start gap-2.5">
+                              <span className="font-semibold text-xs md:text-sm text-exam-text-muted shrink-0 mt-0.5">
+                                {gIdx + 1}.
+                              </span>
+                              <div className="space-y-2 flex-1 min-w-0">
+                                {/* Câu văn in nghiêng chuẩn Screenshot 2 */}
+                                <p className="italic text-xs md:text-sm text-exam-text font-serif leading-relaxed">
+                                  {completedSentence}
+                                </p>
+
+                                {/* Badges: Đỏ (Lựa chọn của bạn) & Xanh (Đáp án đúng) */}
+                                <div className="flex items-center flex-wrap gap-2 pt-0.5">
+                                  {/* Badge 1: User answer */}
+                                  {isCorrect ? (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border border-emerald-400/60 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
+                                      <Check className="w-3 h-3 text-emerald-500" />
+                                      <span>{userVal}</span>
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border border-rose-400/60 bg-rose-500/10 text-rose-700 dark:text-rose-300 text-xs font-semibold">
+                                      <X className="w-3 h-3 text-rose-500" />
+                                      <span>{userVal || "—"}</span>
+                                    </span>
+                                  )}
+
+                                  {/* Badge 2: Correct answer (ẩn nếu bật ẩn đáp án) */}
+                                  {!hideAnswersReview && !isCorrect && (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border border-emerald-400/60 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
+                                      <Check className="w-3 h-3 text-emerald-500" />
+                                      <span>{corVal}</span>
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Lời dịch tiếng Việt */}
+                                {!hideAnswersReview && translation && (
+                                  <p className="text-xs text-exam-text-muted pt-0.5 font-sans leading-relaxed">
+                                    <span className="font-semibold text-exam-text">Dịch: </span>
+                                    {renderClueText(translation)}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* 3. Matching */}
               {activeRevQ.question_type === "MATCHING" && (
@@ -1345,16 +1933,27 @@ export default function OfficialMockExamRoom() {
                         Đáp án đúng:
                       </span>
                       <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
-                        {activeRevQ.correct_answer || "N/A"}
+                        {hideAnswersReview ? "••••••" : (activeRevQ.correct_answer || "N/A")}
                       </p>
                     </div>
                   </div>
+                  {!hideAnswersReview && (
+                    <div className="p-3.5 rounded-xl bg-card border border-exam-border text-xs text-exam-text space-y-1">
+                      <span className="font-bold text-primary flex items-center gap-1.5">
+                        <span>🎯</span>
+                        <span>Mẹo tìm bằng chứng (Paraphrase Clue):</span>
+                      </span>
+                      <p className="text-exam-text-muted leading-relaxed">
+                        Đối chiếu từ khóa trong nhận định với phát biểu của {activeRevQ.correct_answer || "nhân vật"}. Chú ý các từ đồng nghĩa (synonyms) thay vì tìm từ nguyên bản.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* 4. Sentence Order */}
               {activeRevQ.question_type === "SENTENCE_ORDER" && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <span className="text-xs font-bold text-exam-text-muted uppercase tracking-wider block">
                     Chi tiết sắp xếp câu:
                   </span>
@@ -1363,7 +1962,7 @@ export default function OfficialMockExamRoom() {
                       <span className="text-[11px] text-exam-text-muted font-bold block">
                         Thứ tự bạn đã chọn:
                       </span>
-                      <p className="text-xs font-mono text-exam-text">
+                      <p className="text-xs font-mono text-exam-text font-bold">
                         {Array.isArray(orderAnswers[activeRevQ.id]) ? orderAnswers[activeRevQ.id].join(" → ") : "(Chưa xếp)"}
                       </p>
                     </div>
@@ -1372,49 +1971,202 @@ export default function OfficialMockExamRoom() {
                         Thứ tự chính xác:
                       </span>
                       <p className="text-xs font-mono text-emerald-700 dark:text-emerald-300 font-bold">
-                        {activeRevQ.correct_answer || "N/A"}
+                        {hideAnswersReview ? "••••••" : (activeRevQ.correct_answer || "N/A")}
                       </p>
                     </div>
                   </div>
+
+                  {/* Đoạn văn ghép hoàn chỉnh theo đúng logic */}
+                  {!hideAnswersReview && Array.isArray(activeRevQ.options) && (
+                    <div className="space-y-2.5 pt-1">
+                      <div className="flex items-center justify-between border-b border-exam-border pb-1.5">
+                        <span className="text-xs font-bold text-exam-text flex items-center gap-1.5">
+                          <span>📖</span>
+                          <span>Đoạn văn hoàn chỉnh sau khi sắp xếp đúng logic:</span>
+                        </span>
+                        <span className="text-[11px] text-exam-text-muted">
+                          Bôi đậm các từ nối liên kết logic
+                        </span>
+                      </div>
+                      <div className="space-y-2 p-3.5 rounded-xl bg-card border border-exam-border">
+                        {(() => {
+                          const corStr = String(activeRevQ.correct_answer || "");
+                          let orderedIndices: number[] = [];
+                          if (corStr.includes(",")) {
+                            orderedIndices = corStr
+                              .split(",")
+                              .map((s) => parseInt(s.trim(), 10) - 1)
+                              .filter((n) => !isNaN(n) && n >= 0 && n < activeRevQ.options.length);
+                          }
+                          if (orderedIndices.length === 0) {
+                            orderedIndices = activeRevQ.options.map((_: any, i: number) => i);
+                          }
+
+                          const highlightCohesion = (sentence: string) => {
+                            if (!sentence) return null;
+                            const regex = /\b(First|Firstly|Second|Secondly|Third|Next|Then|After that|Following this|Subsequently|Finally|Lastly|However|Nevertheless|On the other hand|In addition|Furthermore|Moreover|Therefore|As a result|Because|Since|Although|Even though)\b/gi;
+                            const parts = sentence.split(regex);
+                            return parts.map((part, pIdx) => {
+                              if (regex.test(part)) {
+                                return (
+                                  <span key={pIdx} className="font-bold text-primary bg-primary/10 px-1 py-0.5 rounded border border-primary/20">
+                                    {part}
+                                  </span>
+                                );
+                              }
+                              return <span key={pIdx}>{part}</span>;
+                            });
+                          };
+
+                          return orderedIndices.map((origIdx, pos) => (
+                            <div key={pos} className="flex items-start gap-2.5 text-xs md:text-sm text-exam-text leading-relaxed">
+                              <span className="w-5 h-5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold flex items-center justify-center text-[11px] shrink-0 mt-0.5">
+                                {pos + 1}
+                              </span>
+                              <div className="flex-1">
+                                {highlightCohesion(activeRevQ.options[origIdx])}
+                              </div>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* 5. Speaking Audio */}
               {activeRevQ.question_type === "SPEAKING_AUDIO" && (
-                <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-2">
-                  <span className="text-xs font-bold text-primary block">
-                    Bản ghi âm bài nói của bạn:
-                  </span>
-                  {audioUrls[activeRevQ.id] ? (
-                    <audio controls src={audioUrls[activeRevQ.id]!} className="w-full h-8" />
-                  ) : (
-                    <p className="text-xs text-exam-text-muted italic">(Không có file ghi âm)</p>
+                <div className="space-y-4">
+                  {/* Tranh thi thật nếu có */}
+                  {activeRevQ.partImageUrl && (
+                    <div className="p-3 rounded-2xl border border-exam-border bg-card/60 space-y-2 text-center">
+                      <span className="text-xs font-bold text-exam-text-muted block text-left">
+                        🖼️ Hình ảnh đề thi:
+                      </span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={activeRevQ.partImageUrl}
+                        alt="Đề thi Speaking"
+                        className="rounded-xl border border-exam-border max-h-72 object-contain mx-auto shadow-sm"
+                      />
+                    </div>
+                  )}
+
+                  {/* Bản ghi âm của bạn */}
+                  <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-2">
+                    <span className="text-xs font-bold text-primary block">
+                      🎙️ Bản ghi âm bài nói của bạn:
+                    </span>
+                    {audioUrls[activeRevQ.id] ? (
+                      <audio controls src={audioUrls[activeRevQ.id]!} className="w-full h-8" />
+                    ) : (
+                      <p className="text-xs text-exam-text-muted italic">(Không có file ghi âm)</p>
+                    )}
+                  </div>
+
+                  {/* Dàn ý phát triển ý tưởng & Cụm từ ăn điểm */}
+                  {!hideAnswersReview && (
+                    <div className="p-4 rounded-xl border border-exam-border bg-card space-y-2 text-xs md:text-sm leading-relaxed">
+                      <div className="font-bold text-primary flex items-center gap-2 border-b border-exam-border pb-2">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        <span>Dàn ý phát triển ý tưởng &amp; Mẫu câu Band B2/C1:</span>
+                      </div>
+                      <div className="space-y-2 text-exam-text">
+                        <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/15">
+                          <span className="font-bold text-primary">👉 Công thức mở rộng ý: </span>
+                          <span>Trả lời trực diện $\rightarrow$ Nêu nguyên nhân (Because...) $\rightarrow$ Trải nghiệm thực tế (For instance...).</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-muted/40 border border-exam-border">
+                          <span className="font-bold text-exam-text">💡 Bộ câu đệm mượt mà (Fillers / Openers): </span>
+                          <span className="italic text-exam-text-muted">
+                            &ldquo;Well, to be honest...&rdquo;, &ldquo;As far as I remember...&rdquo;, &ldquo;Judging from what I can see...&rdquo;
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
 
-              {/* 6. Essay / Writing */}
-              {activeRevQ.question_type === "ESSAY" && (
-                <div className="space-y-3">
-                  <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-1.5">
-                    <span className="text-xs font-bold text-exam-text-muted uppercase">Bài làm của bạn:</span>
-                    <p className="text-xs md:text-sm text-exam-text leading-relaxed whitespace-pre-wrap">
-                      {textAnswers[activeRevQ.id] || "(Chưa có nội dung)"}
-                    </p>
+              {/* 6. Essay / Writing / Short Text */}
+              {(activeRevQ.question_type === "ESSAY" || activeRevQ.question_type === "SHORT_TEXT") && (() => {
+                const userContent = textAnswers[activeRevQ.id] || "";
+                const words = userContent.trim() ? userContent.trim().split(/\s+/).length : 0;
+                const isPart1 = (activeRevQ.partTitle || "").includes("Part 1") || activeRevQ.partNumber === 1;
+                const isPart2 = (activeRevQ.partTitle || "").includes("Part 2") || activeRevQ.partNumber === 2;
+                const isPart3 = (activeRevQ.partTitle || "").includes("Part 3") || activeRevQ.partNumber === 3;
+                const isPart4 = (activeRevQ.partTitle || "").includes("Part 4") || activeRevQ.partNumber === 4;
+
+                let wordTarget = "Dung lượng tự do";
+                if (isPart1) wordTarget = "1 – 5 từ / câu";
+                else if (isPart2) wordTarget = "20 – 30 từ";
+                else if (isPart3) wordTarget = "30 – 40 từ";
+                else if (isPart4) wordTarget = (activeRevQ.prompt || "").toLowerCase().includes("friend") ? "Khoảng 50 từ (Thân mật)" : "120 – 150 từ (Trang trọng)";
+
+                return (
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-exam-text-muted uppercase">Bài làm của bạn:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-exam-text-muted">Yêu cầu: {wordTarget}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold border ${
+                            words > 0 ? "bg-primary/10 text-primary border-primary/20" : "bg-muted text-exam-text-muted border-exam-border"
+                          }`}>
+                            {words} từ
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs md:text-sm text-exam-text leading-relaxed whitespace-pre-wrap font-sans">
+                        {userContent || "(Chưa có nội dung trả lời)"}
+                      </p>
+                    </div>
+
+                    {!hideAnswersReview && (
+                      <div className="p-4 rounded-xl border border-exam-border bg-card space-y-2.5 text-xs md:text-sm leading-relaxed">
+                        <div className="font-bold text-primary flex items-center gap-2 border-b border-exam-border pb-2">
+                          <Sparkles className="w-4 h-4 text-primary" />
+                          <span>Khung tiêu chí &amp; Mẫu câu ghi điểm Band C1:</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 dark:text-emerald-200">
+                            <span className="font-bold">✓ Tiêu chí chấm: </span>
+                            <span>Đủ số từ quy định, dùng đúng văn phong ({isPart4 && (activeRevQ.prompt || "").toLowerCase().includes("friend") ? "Informal (thân mật)" : "Formal (trang trọng)"}), không viết tắt bừa bãi và dùng liên từ mạch lạc.</span>
+                          </div>
+                          {isPart4 && (
+                            <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/15 text-exam-text">
+                              <span className="font-bold text-primary">📌 Mẫu câu Formal đắt giá: </span>
+                              <span className="italic">
+                                &ldquo;I am writing to express my dissatisfaction regarding...&rdquo;, &ldquo;I would appreciate it if you could look into this matter...&rdquo;
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
+                );
+              })()}
+
+              {/* Explanation Card - Chuẩn layout Screenshot 1 */}
+              {hideAnswersReview ? (
+                <div className="p-4 rounded-xl bg-muted/40 border border-exam-border text-center py-5 text-exam-text-muted space-y-1">
+                  <EyeOff className="w-5 h-5 mx-auto mb-1 text-primary" />
+                  <p className="text-xs font-bold text-exam-text">Đáp án và giải thích đang được ẩn để bạn tự ôn luyện</p>
+                  <p className="text-[11px]">Bấm nút &ldquo;Hiện đáp án&rdquo; ở góc dưới bên trái màn hình khi bạn muốn xem chi tiết.</p>
+                </div>
+              ) : (
+                <div className="p-4 md:p-5 rounded-2xl bg-exam-surface border border-exam-border shadow-sm space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-bold text-primary border-b border-exam-border pb-2.5">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span>Giải thích chi tiết &amp; Phân tích đáp án:</span>
+                  </div>
+                  {renderStructuredExplanation(
+                    activeRevQ.explanation || "Câu hỏi kiểm tra kiến thức ngôn ngữ chuẩn theo khung đánh giá Aptis ESOL."
+                  )}
                 </div>
               )}
-
-              {/* Explanation Card */}
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-bold text-primary">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <span>Giải thích chi tiết &amp; Phân tích đáp án:</span>
-                </div>
-                <p className="text-xs md:text-sm text-exam-text leading-relaxed">
-                  {activeRevQ.explanation || "Câu hỏi kiểm tra kiến thức ngôn ngữ chuẩn theo khung đánh giá Aptis ESOL."}
-                </p>
-              </div>
 
               {/* Navigation Buttons */}
               <div className="flex items-center justify-between pt-4 border-t border-exam-border">
@@ -1441,6 +2193,129 @@ export default function OfficialMockExamRoom() {
                   <span>Câu tiếp</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Floating action pills: Góc dưới bên trái chuẩn Screenshot */}
+          <div className="fixed bottom-6 left-6 z-50 flex flex-col gap-2 items-start pointer-events-auto">
+            <button
+              type="button"
+              onClick={() => setHideAnswersReview((prev) => !prev)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border-2 border-exam-border bg-white dark:bg-card text-exam-text hover:bg-exam-border/30 shadow-lg text-xs font-bold transition-all hover:scale-105 active:scale-95"
+              title="Ẩn / Hiện đáp án câu hỏi để tự luyện thi"
+            >
+              {hideAnswersReview ? (
+                <>
+                  <Eye className="w-3.5 h-3.5 text-primary" />
+                  <span>Hiện đáp án</span>
+                </>
+              ) : (
+                <>
+                  <EyeOff className="w-3.5 h-3.5 text-exam-text-muted" />
+                  <span>Ẩn đáp án</span>
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setReportModalOpen(true)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border-2 border-exam-border bg-white dark:bg-card text-exam-text hover:bg-exam-border/30 shadow-lg text-xs font-bold transition-all hover:scale-105 active:scale-95"
+              title="Báo cáo lỗi câu hỏi cho đội ngũ học thuật"
+            >
+              <Flag className="w-3.5 h-3.5 text-rose-500" />
+              <span>Báo lỗi</span>
+            </button>
+          </div>
+
+          {/* Modal Báo lỗi câu hỏi thi */}
+          {reportModalOpen && (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-exam-surface rounded-2xl border border-exam-border max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between border-b border-exam-border pb-3">
+                  <div className="flex items-center gap-2 text-rose-500">
+                    <Flag className="w-4 h-4" />
+                    <h3 className="font-bold text-sm text-exam-text">Báo lỗi câu hỏi</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setReportModalOpen(false)}
+                    className="p-1 rounded-lg text-exam-text-muted hover:text-exam-text hover:bg-exam-border/40 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-1 text-xs text-exam-text-muted">
+                  <p className="font-semibold text-exam-text">
+                    Câu {questionIdx + 1}: {activeRevQ?.partTitle || "Aptis ESOL"}
+                  </p>
+                  <p className="line-clamp-2 italic">{activeRevQ?.prompt}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-exam-text block">Lý do báo lỗi:</label>
+                  <div className="space-y-1.5">
+                    {[
+                      "Đáp án chưa chính xác",
+                      "Dịch nghĩa / Giải thích sai",
+                      "Lỗi âm thanh / Audio",
+                      "Lỗi hiển thị / Lời thoại transcript",
+                      "Khác",
+                    ].map((reason) => (
+                      <label
+                        key={reason}
+                        className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
+                          reportReason === reason
+                            ? "border-primary bg-primary/10 text-primary font-bold"
+                            : "border-exam-border hover:bg-exam-border/30 text-exam-text"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="reportReason"
+                          checked={reportReason === reason}
+                          onChange={() => setReportReason(reason)}
+                          className="w-3.5 h-3.5 accent-primary"
+                        />
+                        <span>{reason}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-exam-text block">Chi tiết góp ý (tùy chọn):</label>
+                  <textarea
+                    rows={3}
+                    value={reportNote}
+                    onChange={(e) => setReportNote(e.target.value)}
+                    placeholder="Mô tả cụ thể lỗi bạn phát hiện để ban chuyên môn hỗ trợ sửa chữa..."
+                    className="w-full p-2.5 rounded-xl border border-exam-border bg-exam-bg text-exam-text text-xs focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-exam-border">
+                  <button
+                    type="button"
+                    onClick={() => setReportModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-exam-border text-xs font-bold hover:bg-exam-border/30 transition-colors"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      alert("Cảm ơn bạn! Báo cáo lỗi của bạn đã được tiếp nhận và gửi đến ban chuyên môn Aptis.");
+                      setReportModalOpen(false);
+                      setReportNote("");
+                    }}
+                    className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 shadow-sm transition-all"
+                  >
+                    Gửi báo cáo
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -1499,6 +2374,45 @@ export default function OfficialMockExamRoom() {
             {answeredCount}/{questions.length} câu
           </div>
         </div>
+
+        {/* 5-Skill Navigation Tabs cho Full Test */}
+        {examData?.skill === "FULL_TEST" && fullTestSkills.length > 0 && (
+          <div className="bg-exam-surface/90 border-t border-exam-border/60">
+            <div className="max-w-6xl mx-auto px-4 h-11 flex items-center gap-2 overflow-x-auto">
+              {fullTestSkills.map((s) => {
+                const isActive = currentSkill.key === s.key;
+                return (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => {
+                      if (s.startIndex >= 0) setQuestionIdx(s.startIndex);
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
+                      isActive
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-exam-bg/60 text-exam-text-muted hover:text-exam-text hover:bg-exam-border/40"
+                    }`}
+                  >
+                    {s.key === "SPEAKING" && <Mic className="w-3.5 h-3.5" />}
+                    {s.key === "LISTENING" && <Headphones className="w-3.5 h-3.5" />}
+                    {s.key === "GRAMMAR_VOCABULARY" && <BookOpen className="w-3.5 h-3.5" />}
+                    {s.key === "READING" && <FileText className="w-3.5 h-3.5" />}
+                    {s.key === "WRITING" && <PenTool className="w-3.5 h-3.5" />}
+                    <span>{s.name}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                        isActive ? "bg-white/20 text-white" : "bg-exam-border/60 text-exam-text-muted"
+                      }`}
+                    >
+                      {s.answeredCount}/{s.totalCount}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content: Split panel cho Listening/Writing/Speaking; Reading full width */}
@@ -1511,12 +2425,13 @@ export default function OfficialMockExamRoom() {
         const hasLeftPanel =
           !isReadingSkillOrPart &&
           (currentQ?.partPassageText || currentQ?.partAudioUrl || hasCueImage);
+        const isFullTest = examData?.skill === "FULL_TEST";
 
         return (
-          <main className="flex-1 flex flex-col lg:flex-row items-start justify-center pt-12 pb-20">
+          <main className={`flex-1 flex flex-col lg:flex-row items-start justify-center pb-20 ${isFullTest ? "pt-[92px]" : "pt-12"}`}>
             {/* Left panel: Passage / Audio / Speaking Image */}
             {hasLeftPanel && (
-              <aside className="w-full lg:w-1/2 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg:sticky lg:top-12 p-4 md:p-6 border-b lg:border-b-0 lg:border-r border-exam-border bg-exam-bg/30">
+              <aside className={`w-full lg:w-1/2 lg:overflow-y-auto lg:sticky p-4 md:p-6 border-b lg:border-b-0 lg:border-r border-exam-border bg-exam-bg/30 ${isFullTest ? "lg:h-[calc(100vh-9.5rem)] lg:top-[92px]" : "lg:h-[calc(100vh-7rem)] lg:top-12"}`}>
                 {currentQ.partAudioUrl && (
                   <div className="mb-4">
                     <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
@@ -1540,9 +2455,15 @@ export default function OfficialMockExamRoom() {
                     <div className="rounded-xl border border-exam-border overflow-hidden bg-black/5 dark:bg-white/5 flex items-center justify-center p-2">
                       <img
                         src={
-                          (currentQ.image_url || currentQ.partImageUrl).startsWith("http")
-                            ? (currentQ.image_url || currentQ.partImageUrl)
-                            : `https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/images/${(currentQ.image_url || currentQ.partImageUrl).replace(/^\/+/, "")}`
+                          (() => {
+                            const rawUrl = currentQ.image_url || currentQ.partImageUrl || "";
+                            if (rawUrl.startsWith("http")) return rawUrl;
+                            const apiOrigin = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
+                            if (rawUrl.startsWith("/uploads") || rawUrl.startsWith("uploads") || rawUrl.startsWith("/api/uploads")) {
+                              return `${apiOrigin}/${rawUrl.replace(/^\/+/, "")}`;
+                            }
+                            return `https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/images/${rawUrl.replace(/^\/+/, "")}`;
+                          })()
                         }
                         alt="Speaking Cue"
                         className="max-h-72 object-contain rounded-lg shadow-xs"
@@ -1554,18 +2475,70 @@ export default function OfficialMockExamRoom() {
                   </div>
                 )}
                 {currentQ.partPassageText && (
-                  <div>
-                    {currentQ.partTitle && (
-                      <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
-                        📖 {currentQ.partTitle}
-                      </p>
-                    )}
-                    {currentQ.partInstructions && (
-                      <p className="text-xs text-primary font-semibold mb-3">{currentQ.partInstructions}</p>
-                    )}
-                    <div className="text-sm text-exam-text leading-7 whitespace-pre-wrap font-serif">
-                      {currentQ.partPassageText}
-                    </div>
+                  <div className="mt-3">
+                    {(() => {
+                      const isListeningQ =
+                        examData?.skill === "LISTENING" ||
+                        (currentQ?.partTitle || "").toUpperCase().includes("LISTENING") ||
+                        (currentQ?.partTitle || "").toUpperCase().includes("NGHE") ||
+                        Boolean(currentQ?.partAudioUrl);
+
+                      if (isListeningQ) {
+                        return (
+                          <div className="space-y-2.5">
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-exam-surface/80 border border-exam-border">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm">📜</span>
+                                <div>
+                                  <p className="text-xs font-bold text-exam-text">Lời thoại bài nghe (Transcript)</p>
+                                  <p className="text-[11px] text-exam-text-muted">
+                                    {showListeningScript ? "Đang mở transcript đối chiếu" : "Mặc định ẩn để rèn luyện kỹ năng nghe"}
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setShowListeningScript(!showListeningScript)}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
+                                  showListeningScript
+                                    ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                                    : "bg-exam-surface text-exam-text border-exam-border hover:border-primary/50 hover:bg-exam-border/20"
+                                }`}
+                              >
+                                {showListeningScript ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                <span>{showListeningScript ? "Ẩn Transcript" : "Hiện Transcript"}</span>
+                              </button>
+                            </div>
+
+                            {showListeningScript && (
+                              <div className="p-4 rounded-xl border border-primary/25 bg-primary/5 dark:bg-primary/10 text-xs md:text-sm text-exam-text leading-relaxed whitespace-pre-wrap font-sans transition-all">
+                                <p className="text-[11px] font-semibold text-primary mb-2 flex items-center gap-1.5">
+                                  <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
+                                  <span>Gợi ý: Hãy tập trung nghe trước để tối ưu phản xạ thi thật!</span>
+                                </p>
+                                {currentQ.partPassageText}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div>
+                          {currentQ.partTitle && (
+                            <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
+                              📖 {currentQ.partTitle}
+                            </p>
+                          )}
+                          {currentQ.partInstructions && (
+                            <p className="text-xs text-primary font-semibold mb-3">{currentQ.partInstructions}</p>
+                          )}
+                          <div className="text-sm text-exam-text leading-7 whitespace-pre-wrap font-serif">
+                            {currentQ.partPassageText}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </aside>
@@ -1584,33 +2557,51 @@ export default function OfficialMockExamRoom() {
               {currentQ ? (
                 <div className="bg-exam-surface rounded-2xl border border-exam-border shadow-sm p-6 md:p-8 animate-in fade-in">
                   {/* Question header */}
-                  <div className="flex items-center justify-between pb-4 border-b border-exam-border mb-6">
-                    <span className="text-xs font-bold text-exam-text uppercase tracking-wider">
-                      {currentQ.partTitle || examData?.skill} ·{" "}
-                      {partParam === "1"
-                        ? "Part 1 – Gap Fill"
-                        : partParam === "4"
-                        ? "Part 4 – Opinion matching"
-                        : partParam === "5"
-                        ? "Part 5 – Long reading"
-                        : examStages && examStages.length > 1
-                        ? `Phần ${currentStageIndex + 1}/${examStages.length}`
-                        : `Câu ${questionIdx + 1}/${questions.length}`}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-exam-border mb-6">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-exam-text uppercase tracking-wider">
+                        {currentQ.partTitle || examData?.skill} ·{" "}
+                        {partParam === "1"
+                          ? "Part 1 – Gap Fill"
+                          : partParam === "4"
+                          ? "Part 4 – Opinion matching"
+                          : partParam === "5"
+                          ? "Part 5 – Long reading"
+                          : examStages && examStages.length > 1
+                          ? `Phần ${currentStageIndex + 1}/${examStages.length}`
+                          : `Câu ${questionIdx + 1}/${questions.length}`}
+                      </span>
+
+                      {/* Flag button */}
+                      <button
+                        type="button"
+                        onClick={() => toggleFlag(questionIdx)}
+                        title={flaggedQuestions[questionIdx] ? "Bỏ cắm cờ xem lại" : "Cắm cờ đánh dấu câu hỏi này cần xem lại"}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold border transition-all ${
+                          flaggedQuestions[questionIdx]
+                            ? "bg-amber-500/15 border-amber-500 text-amber-600 dark:text-amber-400"
+                            : "bg-exam-bg/60 border-exam-border text-exam-text-muted hover:text-exam-text hover:border-exam-border/80"
+                        }`}
+                      >
+                        <Flag className={`w-3 h-3 ${flaggedQuestions[questionIdx] ? "fill-current text-amber-500" : ""}`} />
+                        <span>{flaggedQuestions[questionIdx] ? "Đã cắm cờ" : "Cắm cờ"}</span>
+                      </button>
+                    </div>
+
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-exam-bg text-primary">
+                      {currentQ.question_type === "SPEAKING_AUDIO"
+                        ? "🎙 Speaking"
+                        : currentQ.question_type === "ESSAY"
+                        ? "✏️ Writing"
+                        : currentQ.question_type === "GAP_FILL"
+                        ? "🔤 Gap Fill"
+                        : currentQ.question_type === "SENTENCE_ORDER"
+                        ? "📑 Text Cohesion"
+                        : currentQ.question_type === "MATCHING"
+                        ? "🔗 Matching"
+                        : "📝 Multiple Choice"}
                     </span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-exam-bg text-primary">
-                  {currentQ.question_type === "SPEAKING_AUDIO"
-                    ? "🎙 Speaking"
-                    : currentQ.question_type === "ESSAY"
-                    ? "✏️ Writing"
-                    : currentQ.question_type === "GAP_FILL"
-                    ? "🔤 Gap Fill"
-                    : currentQ.question_type === "SENTENCE_ORDER"
-                    ? "📑 Text Cohesion"
-                    : currentQ.question_type === "MATCHING"
-                    ? "🔗 Matching"
-                    : "📝 Multiple Choice"}
-                </span>
-              </div>
+                  </div>
 
               {/* Prompt (Ẩn cho GAP_FILL, MATCHING, SENTENCE_ORDER vì đã tích hợp sẵn trong UI) */}
               {currentQ.question_type !== "GAP_FILL" && currentQ.question_type !== "MATCHING" && (
@@ -2020,18 +3011,30 @@ export default function OfficialMockExamRoom() {
             >
               <Info className="w-4 h-4" />
             </button>
-          </div>
-
-          {questionIdx >= questions.length - 3 && questions.length > 0 && (
             <button
               type="button"
-              onClick={() => setIsSubmitModalOpen(true)}
-              disabled={isSubmitting}
-              className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors disabled:opacity-60"
+              onClick={handleScrollToTop}
+              title={hasScrolled ? "Cuộn nhanh lên đầu trang" : "Bạn đang ở đầu trang rồi"}
+              className={`w-9 h-9 flex items-center justify-center rounded-lg border text-xs font-bold transition-all ${
+                hasScrolled
+                  ? "border-primary bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground shadow-sm scale-105 active:scale-95 cursor-pointer ring-2 ring-primary/20"
+                  : "border-exam-border/60 text-exam-text-muted/40 hover:bg-exam-border/20 cursor-default"
+              }`}
             >
-              Nộp bài ({answeredCount}/{questions.length})
+              <ArrowUp className="w-4 h-4" />
             </button>
-          )}
+          </div>
+
+          {/* Nút nộp bài thường trực */}
+          <button
+            type="button"
+            onClick={() => setIsSubmitModalOpen(true)}
+            disabled={isSubmitting}
+            className="px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-1.5 disabled:opacity-60"
+          >
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>Nộp bài ({answeredCount}/{questions.length})</span>
+          </button>
 
           <div className="flex items-center gap-2">
             <Link
@@ -2065,58 +3068,135 @@ export default function OfficialMockExamRoom() {
       {/* Question List Modal */}
       {isQuestionListOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in"
           onClick={() => setIsQuestionListOpen(false)}
         >
           <div
-            className="bg-exam-surface border border-exam-border rounded-2xl max-w-sm w-full p-5 shadow-2xl"
+            className="bg-exam-surface border border-exam-border rounded-2xl max-w-2xl w-full p-5 md:p-6 shadow-2xl space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-exam-border mb-4">
-              <h4 className="font-bold text-sm text-exam-text">
-                Danh sách câu hỏi ({answeredCount}/{questions.length})
-              </h4>
+            <div className="flex items-center justify-between pb-3 border-b border-exam-border">
+              <div>
+                <h4 className="font-bold text-base text-exam-text flex items-center gap-2">
+                  <List className="w-4 h-4 text-primary" />
+                  <span>Bảng điều hướng câu hỏi</span>
+                  <span className="text-xs font-normal text-exam-text-muted">
+                    ({answeredCount}/{questions.length} đã làm · {flaggedCount} cắm cờ)
+                  </span>
+                </h4>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsQuestionListOpen(false)}
-                className="w-6 h-6 flex items-center justify-center rounded text-exam-text-muted"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-exam-text-muted hover:text-exam-text hover:bg-exam-border/40 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="grid grid-cols-5 gap-2 max-h-72 overflow-y-auto pr-1">
+
+            {/* Chú thích màu sắc */}
+            <div className="flex flex-wrap items-center gap-3 text-[11px] text-exam-text-muted pb-1">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-md bg-emerald-500/20 border border-emerald-500 inline-block" />
+                Đã trả lời
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-md bg-exam-bg border border-exam-border inline-block" />
+                Chưa làm
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-md bg-amber-500/20 border border-amber-500 inline-block relative">
+                  <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-amber-500" />
+                </span>
+                Cần xem lại
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-md bg-primary inline-block" />
+                Đang làm
+              </span>
+            </div>
+
+            {/* Filter by skill nếu là Full Test */}
+            {examData?.skill === "FULL_TEST" && fullTestSkills.length > 0 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setPaletteSkillFilter("ALL")}
+                  className={`px-2.5 py-1 rounded-lg font-bold shrink-0 transition-colors ${
+                    paletteSkillFilter === "ALL"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-exam-bg border border-exam-border text-exam-text-muted hover:text-exam-text"
+                  }`}
+                >
+                  Tất cả ({questions.length})
+                </button>
+                {fullTestSkills.map((s) => (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => setPaletteSkillFilter(s.key)}
+                    className={`px-2.5 py-1 rounded-lg font-bold shrink-0 transition-colors ${
+                      paletteSkillFilter === s.key
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-exam-bg border border-exam-border text-exam-text-muted hover:text-exam-text"
+                    }`}
+                  >
+                    {s.name} ({s.answeredCount}/{s.totalCount})
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Lưới câu hỏi */}
+            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-72 overflow-y-auto pr-1">
               {questions.map((q, idx) => {
+                if (paletteSkillFilter !== "ALL" && getSkillFromQuestion(q).key !== paletteSkillFilter) {
+                  return null;
+                }
                 const ans = isAnswered(idx);
                 const cur = idx === questionIdx;
+                const isFlagged = !!flaggedQuestions[idx];
+
                 return (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => { setQuestionIdx(idx); setIsQuestionListOpen(false); }}
-                    className={`h-10 rounded-lg border text-xs font-bold transition-colors relative ${
+                    className={`h-9 rounded-lg border text-xs font-bold transition-all relative flex items-center justify-center ${
                       cur
-                        ? "border-primary bg-primary text-primary-foreground"
+                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                        : isFlagged
+                        ? "border-amber-500 bg-amber-500/15 text-amber-700 dark:text-amber-300 font-extrabold"
                         : ans
-                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-                        : "border-exam-border bg-exam-surface text-exam-text hover:border-primary/50"
+                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                        : "border-exam-border bg-exam-bg text-exam-text hover:border-primary/50"
                     }`}
                   >
                     {idx + 1}
-                    {ans && !cur && (
-                      <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 border border-exam-surface" />
+                    {isFlagged && (
+                      <span className="absolute -top-1 -right-1 text-amber-500">
+                        <Flag className="w-2.5 h-2.5 fill-current" />
+                      </span>
+                    )}
+                    {ans && !isFlagged && !cur && (
+                      <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     )}
                   </button>
                 );
               })}
             </div>
-            <div className="mt-4 pt-3 border-t border-exam-border">
+
+            <div className="pt-3 border-t border-exam-border flex items-center justify-between gap-3">
+              <span className="text-xs text-exam-text-muted">
+                Đã trả lời {answeredCount}/{questions.length} câu
+              </span>
               <button
                 type="button"
                 onClick={() => { setIsQuestionListOpen(false); setIsSubmitModalOpen(true); }}
                 disabled={isSubmitting}
-                className="w-full py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-brand-brown transition-colors"
+                className="px-5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm"
               >
-                Nộp bài ngay ({answeredCount}/{questions.length} câu)
+                Nộp bài thi ngay
               </button>
             </div>
           </div>
@@ -2149,6 +3229,7 @@ export default function OfficialMockExamRoom() {
                 { l: "Kỹ năng", v: examData?.skill || "Aptis" },
                 { l: "Tổng câu hỏi", v: `${questions.length} câu` },
                 { l: "Đã trả lời", v: `${answeredCount} câu` },
+                { l: "Cắm cờ xem lại", v: `${flaggedCount} câu` },
                 { l: "Thời gian còn", v: timerFormatted },
               ].map((x) => (
                 <div key={x.l} className="flex justify-between">
@@ -2175,8 +3256,15 @@ export default function OfficialMockExamRoom() {
               Bạn đã hoàn thành <strong className="text-primary font-black">{answeredCount}/{questions.length}</strong> câu hỏi. Hệ thống sẽ tiến hành chấm điểm và lập bảng chi tiết kết quả.
             </p>
             {answeredCount < questions.length && (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold">
-                ⚠️ Lưu ý: Bạn vẫn còn {questions.length - answeredCount} câu chưa hoàn thành!
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" />
+                <span>Lưu ý: Bạn vẫn còn {questions.length - answeredCount} câu chưa hoàn thành!</span>
+              </div>
+            )}
+            {flaggedCount > 0 && (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold flex items-center gap-2">
+                <Flag className="w-4 h-4 fill-current shrink-0 text-amber-500" />
+                <span>Bạn đang có {flaggedCount} câu được cắm cờ xem lại.</span>
               </div>
             )}
             <div className="flex items-center justify-end gap-3 pt-2">

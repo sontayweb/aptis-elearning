@@ -21,5 +21,8 @@ router.get('/my-subscription', authGuard, (req, res, next) =>
 router.get('/transactions', authGuard, (req, res, next) =>
   paymentController.getTransactions(req, res, next)
 );
+router.post('/redeem-code', authGuard, (req, res, next) =>
+  paymentController.redeemCode(req, res, next)
+);
 
 export default router;

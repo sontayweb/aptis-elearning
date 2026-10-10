@@ -147,6 +147,7 @@ model User {
   reviews         ExamReview[]
   notifications   Notification[]
   course_leads    CourseLeadRegistration[]
+  promotion_redemptions PromotionRedemption[]
 
   @@index([email])
   @@index([role])
@@ -327,6 +328,7 @@ model SubscriptionPlan {
   created_at       DateTime       @default(now())
 
   subscriptions    UserSubscription[]
+  promotion_codes  PromotionCode[]
 }
 
 model UserSubscription {
@@ -342,6 +344,7 @@ model UserSubscription {
 
   user             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
   plan             SubscriptionPlan @relation(fields: [plan_id], references: [id])
+  redemptions      PromotionRedemption[]
 
   @@index([user_id, is_active])
 }
@@ -363,6 +366,49 @@ model Transaction {
 
   @@index([user_id, status])
   @@index([order_code])
+}
+
+// ==========================================
+// 6.1. PROMOTION & REDEEM CODES (GO-LIVE)
+// ==========================================
+
+model PromotionCode {
+  id               String               @id @default(uuid())
+  code             String               @unique // Lưu UPPERCASE (ví dụ: "APTISGOLIVE")
+  title            String               // "Mã trải nghiệm Go-Live 14 ngày VIP"
+  description      String?              // "Tặng 14 ngày VIP và 20 lượt chấm AI chuẩn British Council"
+  plan_id          String               // Trỏ tới Gói VIP trong bảng SubscriptionPlan
+  duration_days    Int                  @default(14) // Thời hạn ngày trải nghiệm
+  ai_quota         Int                  @default(20) // Số lượt chấm AI tặng kèm
+  teacher_quota    Int                  @default(0)  // Số lượt giáo viên chấm (mặc định 0)
+  max_uses         Int?                 // Giới hạn số lượt toàn hệ thống (null = không giới hạn)
+  current_uses     Int                  @default(0)  // Đếm số lượt đã kích hoạt
+  is_active        Boolean              @default(true)
+  starts_at        DateTime             @default(now())
+  expires_at       DateTime?            // Hạn chót sử dụng mã
+  created_at       DateTime             @default(now())
+  updated_at       DateTime             @updatedAt
+
+  plan             SubscriptionPlan     @relation(fields: [plan_id], references: [id])
+  redemptions      PromotionRedemption[]
+
+  @@index([code, is_active])
+}
+
+model PromotionRedemption {
+  id               String           @id @default(uuid())
+  code_id          String
+  user_id          String
+  subscription_id  String
+  redeemed_at      DateTime         @default(now())
+
+  code             PromotionCode    @relation(fields: [code_id], references: [id], onDelete: Cascade)
+  user             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  subscription     UserSubscription @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
+
+  // Khóa chống 1 user nhập 1 mã nhiều lần
+  @@unique([code_id, user_id])
+  @@index([user_id])
 }
 
 // ==========================================

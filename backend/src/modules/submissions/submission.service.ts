@@ -5,6 +5,7 @@ import { auditService } from '../audit/audit.service';
 import { assertProAccess } from '../../utils/pro-guard';
 import { scoreToCefr } from '../../utils/cefr-engine';
 import { gradeObjectiveQuestion } from '../../utils/scoring-engine';
+import { aiGradingService } from '../ai-grading/ai-grading.service';
 
 export class SubmissionService {
   async startSubmission(userId: string, examId: string) {
@@ -301,10 +302,20 @@ export class SubmissionService {
     let listeningScore: number | undefined = skill === 'LISTENING' ? totalScore : undefined;
     let grammarScore: number | undefined = skill === 'GRAMMAR_VOCABULARY' ? totalScore : undefined;
 
-    // Nếu là FULL_TEST, bóc tách điểm từng kỹ năng dựa theo part title
+    // Nếu là FULL_TEST, bóc tách điểm từng kỹ năng và chuẩn hóa về thang 50 điểm chuẩn British Council
     if (skill === 'FULL_TEST') {
-      let rScore = 0, lScore = 0, gScore = 0;
-      let hasReading = false, hasListening = false, hasGrammar = false;
+      let rScore = 0, maxRScore = 0;
+      let lScore = 0, maxLScore = 0;
+      let gScore = 0, maxGScore = 0;
+
+      for (const part of submission.exam.parts) {
+        const partTitle = (part?.title || '').toLowerCase();
+        for (const q of part.questions) {
+          if (partTitle.includes('reading')) maxRScore += q.max_score;
+          else if (partTitle.includes('listening')) maxLScore += q.max_score;
+          else if (partTitle.includes('grammar') || partTitle.includes('vocab')) maxGScore += q.max_score;
+        }
+      }
 
       for (const ans of submission.answers) {
         const q = questionsMap.get(ans.question_id);
@@ -315,19 +326,17 @@ export class SubmissionService {
 
         if (partTitle.includes('reading')) {
           rScore += qScore;
-          hasReading = true;
         } else if (partTitle.includes('listening')) {
           lScore += qScore;
-          hasListening = true;
         } else if (partTitle.includes('grammar') || partTitle.includes('vocab')) {
           gScore += qScore;
-          hasGrammar = true;
         }
       }
 
-      if (hasReading) readingScore = rScore;
-      if (hasListening) listeningScore = lScore;
-      if (hasGrammar) grammarScore = gScore;
+      // Chuẩn hóa sang thang điểm 0 - 50 cho từng kỹ năng
+      if (maxRScore > 0) readingScore = Math.round((rScore / maxRScore) * 50);
+      if (maxLScore > 0) listeningScore = Math.round((lScore / maxLScore) * 50);
+      if (maxGScore > 0) grammarScore = Math.round((gScore / maxGScore) * 50);
     }
 
     // Atomic transaction cập nhật điểm từng câu và trạng thái bài nộp
@@ -355,6 +364,18 @@ export class SubmissionService {
         },
       });
     });
+
+    // Tự động kích hoạt chấm AI ngầm cho bài thi có Writing/Speaking (không bắt học viên chờ 24-48h)
+    if (nextStatus === SubmissionStatus.PENDING_EVALUATION) {
+      setImmediate(async () => {
+        try {
+          await aiGradingService.evaluateSubmission(submissionId);
+          console.log(`✅ [Auto AI Grading] Đã chấm tự động xong bài thi ${submissionId}`);
+        } catch (err: any) {
+          console.warn(`⚠️ [Auto AI Grading] Chấm ngầm bài ${submissionId} gặp sự cố:`, err?.message || err);
+        }
+      });
+    }
 
     // Ghi nhận Audit Log tiến độ hoàn thành bài thi
     auditService.record({

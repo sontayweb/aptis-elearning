@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 import { useAudioRecorder } from "@/hooks/use-audio-recorder";
 import { api } from "@/lib/api-client";
 import {
@@ -29,6 +27,8 @@ import {
   Trophy,
   LogOut,
   Send,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 export interface SpeakingQuestion {
@@ -695,66 +695,75 @@ function SpeakingExamRunnerContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground pb-20">
-      <Navbar />
-
-      <main className="flex-1 pt-16">
-        <div className="section-container pt-4 md:pt-6">
-          {/* Top Bar Navigation: Title Part X of 4 & Thoát */}
-          <div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-card border border-border shadow-xs mb-6">
-            <div>
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
-                Speaking
-              </span>
-              <h1 className="font-heading font-bold text-base md:text-lg text-foreground">
-                Part {currentQ ? currentQ.partNumber : targetPart || 1} of 4
-              </h1>
-            </div>
-
-            <div className="flex items-center gap-2.5">
-              {/* Part selector if in full test or viewing */}
-              {allQuestions.length > 0 && (
-                <div className="hidden sm:flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border">
-                  {[1, 2, 3, 4].map((pNum) => {
-                    const isSelected = (currentQ?.partNumber || targetPart) === pNum;
-                    return (
-                      <Link
-                        key={pNum}
-                        href={`/speaking/${examId}?part=p${pNum}`}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                          isSelected
-                            ? "bg-primary text-primary-foreground shadow-xs"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                        }`}
-                      >
-                        Part {pNum}
-                      </Link>
-                    );
-                  })}
-                  <Link
-                    href={`/speaking/${examId}`}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                      !targetPart
-                        ? "bg-primary text-primary-foreground shadow-xs"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    Full Test
-                  </Link>
-                </div>
-              )}
-
-              {/* Exit button */}
-              <Link
-                href="/speaking"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-card hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
-                title="Thoát về danh sách đề"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Thoát</span>
-              </Link>
-            </div>
+    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none pb-20">
+      {/* 1. TOP HEADER PHÒNG THI CHUẨN */}
+      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/speaking"
+            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground"
+            title="Quay lại danh sách đề"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
+              Speaking Practice
+            </span>
+            <span className="text-sm md:text-base font-bold text-foreground">
+              Part {currentQ ? currentQ.partNumber : targetPart || 1} of 4
+            </span>
           </div>
+        </div>
+
+        {/* Căn giữa: Bộ chọn Part (1, 2, 3, 4, Full Test) */}
+        {allQuestions.length > 0 && (
+          <div className="hidden sm:flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border">
+            {[1, 2, 3, 4].map((pNum) => {
+              const isSelected = (currentQ?.partNumber || targetPart) === pNum;
+              return (
+                <Link
+                  key={pNum}
+                  href={`/speaking/${examId}?part=p${pNum}`}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                    isSelected
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  Part {pNum}
+                </Link>
+              );
+            })}
+            <Link
+              href={`/speaking/${examId}`}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                !targetPart
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
+            >
+              Full Test
+            </Link>
+          </div>
+        )}
+
+        {/* Bên phải: Nút Thoát */}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/speaking"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            title="Thoát về danh sách đề"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Thoát</span>
+          </Link>
+        </div>
+      </header>
+
+      {/* 2. MAIN WORKSPACE */}
+      <main className="flex-1 py-6 px-3 md:px-6">
+        <div className="max-w-7xl mx-auto space-y-6">
 
           {/* Micro Permission Notice */}
           {permissionState !== "granted" && showMicPrompt && (
@@ -937,7 +946,7 @@ function SpeakingExamRunnerContent() {
                 {showSampleAnswer && (
                   <div className="rounded-2xl border border-border bg-card p-5 md:p-6 shadow-xs space-y-4 animate-in fade-in">
                     <div className="flex items-center gap-2">
-                      <span className="text-amber-500 text-sm">💡</span>
+                      <Sparkles className="w-4 h-4 text-amber-500" />
                       <h3 className="font-heading font-bold text-xs uppercase tracking-wider text-foreground">
                         BÀI NÓI MẪU
                       </h3>
@@ -1153,7 +1162,7 @@ function SpeakingExamRunnerContent() {
             <button
               type="button"
               onClick={() => setIsScratchpadOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition-colors"
             >
               <FileEdit className="w-3.5 h-3.5 text-primary" />
               <span>Nháp</span>
@@ -1162,19 +1171,29 @@ function SpeakingExamRunnerContent() {
             <button
               type="button"
               onClick={() => setShowSampleAnswer(!showSampleAnswer)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
                 showSampleAnswer
-                  ? "border-primary/40 bg-primary/10 text-primary"
-                  : "border-border bg-card hover:bg-muted text-foreground"
+                  ? "border-primary bg-primary text-primary-foreground shadow-xs"
+                  : "border-primary/20 text-primary bg-primary/5 hover:bg-primary/10"
               }`}
             >
-              <span>{showSampleAnswer ? "👁️ Ẩn đáp án" : "👁️ Hiện đáp án"}</span>
+              {showSampleAnswer ? (
+                <>
+                  <EyeOff className="w-3.5 h-3.5" />
+                  <span>Ẩn đáp án</span>
+                </>
+              ) : (
+                <>
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Hiện đáp án</span>
+                </>
+              )}
             </button>
 
             <button
               type="button"
               onClick={() => setIsReportOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors"
             >
               <AlertCircle className="w-3.5 h-3.5" />
               <span>Báo lỗi</span>

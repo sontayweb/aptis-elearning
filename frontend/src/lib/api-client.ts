@@ -409,6 +409,12 @@ class ApiClient {
 
     getOrderStatus: (orderCode: string) =>
       this.request(`/payment/order-status/${orderCode}`),
+
+    redeemPromoCode: (code: string) =>
+      this.request('/payment/redeem-code', {
+        method: 'POST',
+        body: JSON.stringify({ code }),
+      }),
   };
 
   // ==========================================

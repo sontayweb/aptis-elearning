@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import path from 'path';
+import fs from 'fs';
 import authRoutes from './modules/auth/auth.routes';
 import examRoutes from './modules/exams/exam.routes';
 import submissionRoutes from './modules/submissions/submission.routes';
@@ -17,6 +19,7 @@ import studentRoutes from './modules/student/student.routes';
 import notificationRoutes from './modules/notifications/notification.routes';
 import courseRoutes from './modules/courses/course.routes';
 import settingsRoutes from './modules/settings/settings.routes';
+import ingestionRoutes from './modules/ingestion/ingestion.routes';
 import { errorHandler } from './middlewares/error.handler';
 
 const app = express();
@@ -39,6 +42,14 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
+// Static Uploads Serving
+const UPLOAD_ROOT = path.resolve(process.env.UPLOAD_DIR || './uploads');
+if (!fs.existsSync(UPLOAD_ROOT)) {
+  fs.mkdirSync(UPLOAD_ROOT, { recursive: true });
+}
+app.use('/uploads', express.static(UPLOAD_ROOT));
+app.use('/api/uploads', express.static(UPLOAD_ROOT));
+
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -58,6 +69,7 @@ app.use('/api/cms', cmsRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/ingest', ingestionRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/notifications', notificationRoutes);
 
