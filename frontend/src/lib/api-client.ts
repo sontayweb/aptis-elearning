@@ -3,7 +3,15 @@
  * Connects Next.js Frontend with Node.js/Express Backend (Port 5000)
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+export function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${window.location.hostname}:5000/api`;
+  }
+  return 'http://localhost:5000/api';
+}
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -20,7 +28,10 @@ export interface ApiResponse<T = any> {
 class ApiClient {
   private getAuthHeader(): Record<string, string> {
     if (typeof window === 'undefined') return {};
-    const token = localStorage.getItem('accessToken');
+    const token =
+      localStorage.getItem('accessToken') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('aptis_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
@@ -28,7 +39,7 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+    const url = `${getApiBaseUrl()}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
     const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
     const headers: Record<string, string> = {
       ...this.getAuthHeader(),

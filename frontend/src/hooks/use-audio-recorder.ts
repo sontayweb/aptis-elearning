@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { getApiBaseUrl } from "@/lib/api-client";
 
 export type MicPermissionState = "idle" | "requesting" | "granted" | "denied";
 
@@ -409,7 +410,7 @@ export function useAudioRecorder() {
         formData.append("audio", blobToUpload, `speech_q_${questionId}.${ext}`);
         formData.append("durationSeconds", String(durationOverride || state.recordingDuration || 30));
 
-        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+        const apiBaseUrl = getApiBaseUrl();
         const res = await fetch(
           `${apiBaseUrl}/submissions/${submissionId}/answers/${questionId}/audio`,
           {

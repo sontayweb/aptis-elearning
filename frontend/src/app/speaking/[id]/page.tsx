@@ -668,6 +668,7 @@ function SpeakingExamRunnerContent() {
       number,
       {
         audioUrl?: string | null;
+        audioBlob?: Blob | null;
         duration?: number;
         aiResult?: any;
         prepNotes?: string;
@@ -701,6 +702,7 @@ function SpeakingExamRunnerContent() {
     isRecording,
     recordingDuration,
     audioUrl,
+    audioBlob,
     volumeLevel,
     permissionState,
     errorMessage: micError,
@@ -1253,70 +1255,113 @@ function SpeakingExamRunnerContent() {
             localStorage.getItem("aptis_token")
           : null;
 
-      if (token && submissionId) {
-        const remoteUrl = await uploadRecording(submissionId, targetQ.id, token);
-        if (remoteUrl && qIdx === currentIndex) {
-          setUploadedUrl(remoteUrl);
-        }
+      if (!token) {
+        alert("Vui lòng đăng nhập tài khoản để sử dụng tính năng Chấm điểm với AI.");
+        setIsEvaluating(false);
+        return;
       }
 
-      if (submissionId) {
-        const aiRes = await api.aiGrading.evaluate(submissionId);
-        if (aiRes.success && aiRes.data) {
-          const aiResults = aiRes.data.aiResults || [];
-          const thisResult = aiResults.find((r: any) => r.question_id === targetQ.id);
-
-          if (thisResult) {
-            const evaluatedResult = {
-              band: `CEFR ${thisResult.cefr_level || "B2"} Target`,
-              score: thisResult.score || 38,
-              pronunciation: thisResult.pronunciation ?? thisResult.pronunciation_score ?? 38,
-              fluency: thisResult.fluency_score ?? 38,
-              grammar: thisResult.grammar_score ?? 35,
-              vocabulary: thisResult.vocabulary_score ?? 38,
-              transcript: thisResult.transcript || thisResult.raw_ai_response?.transcribed_speech || "",
-              feedback: [thisResult.feedback_summary || "Phân tích chi tiết bài nói của bạn."],
-              detailedFeedback: Array.isArray(thisResult.detailed_feedback) ? thisResult.detailed_feedback : [],
-              strengths: Array.isArray(thisResult.detailed_feedback)
-                ? thisResult.detailed_feedback.filter((f: any) => f.criterion).map((f: any) => f.comment || "")
-                : ["Độ dài câu trả lời phù hợp với thời lượng tiêu chuẩn."],
-              upgrades: thisResult.raw_ai_response?.improvement_suggestions || [
-                "Tiếp tục rèn luyện từ vựng chuyên sâu CEFR C1 để nâng band điểm.",
-              ],
-            };
-
-            if (qIdx === currentIndex) setAiResult(evaluatedResult);
-            setRecordedData((prev) => ({
-              ...prev,
-              [qIdx]: { ...(prev[qIdx] || {}), aiResult: evaluatedResult },
-            }));
-
-            if (typeof window !== "undefined" && examId) {
-              try {
-                const targetCefr = thisResult.cefr_level || "B2";
-                const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
-                const oldData = oldStr ? JSON.parse(oldStr) : {};
-                localStorage.setItem(
-                  `aptis_exam_progress_${examId}`,
-                  JSON.stringify({
-                    ...oldData,
-                    examId,
-                    bestCefr: targetCefr,
-                    bestScore: `${thisResult.score || 38}/50`,
-                    updatedAt: new Date().toISOString(),
-                  })
-                );
-              } catch {}
-            }
-
-            setIsEvaluating(false);
-            return;
+      // 1. Đảm bảo luôn có phiên thi (submissionId) hợp lệ
+      let activeSubId = submissionId;
+      if (!activeSubId && examId) {
+        try {
+          console.log(`[AI Evaluation] Tạo phiên thi mới cho examId: ${examId}...`);
+          const startRes = await api.submissions.start(examId);
+          if (startRes.success && startRes.data) {
+            activeSubId = startRes.data.submissionId || startRes.data.id;
+            setSubmissionId(activeSubId);
+            console.log(`[AI Evaluation] Đã tạo submissionId thành công: ${activeSubId}`);
           }
+        } catch (subErr: any) {
+          console.warn("[AI Evaluation] Không thể tạo phiên thi:", subErr);
         }
       }
 
-      // Fallback cục bộ
+      if (!activeSubId) {
+        alert("Không thể khởi tạo phiên thi. Vui lòng kiểm tra lại kết nối mạng hoặc thử đăng nhập lại.");
+        setIsEvaluating(false);
+        return;
+      }
+
+      // 2. Upload file ghi âm giọng nói lên server
       const rec = recordedData[qIdx];
+      const currentBlob = rec?.audioBlob || audioBlob;
+      const currentDur = rec?.duration || recordingDuration || 30;
+
+      if (activeSubId && currentBlob) {
+        console.log(`[AI Evaluation] Đang upload bản thu âm câu hỏi ${targetQ.id} (${currentDur}s)...`);
+        const remoteUrl = await uploadRecording(activeSubId, targetQ.id, token, currentBlob, currentDur);
+        if (remoteUrl) {
+          console.log(`[AI Evaluation] Upload thành công, audioUrl: ${remoteUrl}`);
+          if (qIdx === currentIndex) setUploadedUrl(remoteUrl);
+        }
+      } else {
+        console.warn("[AI Evaluation] Chưa có dữ liệu âm thanh Blob để upload.");
+      }
+
+      // 3. Gọi API chấm điểm bằng AI
+      console.log(`[AI Evaluation] Gửi yêu cầu chấm điểm AI cho submissionId: ${activeSubId}...`);
+      const aiRes = await api.aiGrading.evaluate(activeSubId);
+      console.log("[AI Evaluation] Kết quả trả về từ API chấm điểm:", aiRes);
+
+      if (aiRes.success && aiRes.data) {
+        const aiResults = aiRes.data.aiResults || [];
+        const thisResult =
+          aiResults.find((r: any) => r.question_id === targetQ.id) ||
+          aiResults[aiResults.length - 1];
+
+        if (thisResult) {
+          const evaluatedResult = {
+            band: `CEFR ${thisResult.cefr_level || "B2"} Target`,
+            score: thisResult.score || 38,
+            pronunciation: thisResult.pronunciation ?? thisResult.pronunciation_score ?? 38,
+            fluency: thisResult.fluency_score ?? 38,
+            grammar: thisResult.grammar_score ?? 35,
+            vocabulary: thisResult.vocabulary_score ?? 38,
+            transcript: thisResult.transcript || thisResult.raw_ai_response?.transcribed_speech || "",
+            feedback: [thisResult.feedback_summary || "Phân tích chi tiết bài nói của bạn."],
+            detailedFeedback: Array.isArray(thisResult.detailed_feedback) ? thisResult.detailed_feedback : [],
+            strengths: Array.isArray(thisResult.detailed_feedback)
+              ? thisResult.detailed_feedback.filter((f: any) => f.criterion).map((f: any) => f.comment || "")
+              : ["Độ dài câu trả lời phù hợp với thời lượng tiêu chuẩn."],
+            upgrades: thisResult.raw_ai_response?.improvement_suggestions || [
+              "Tiếp tục rèn luyện từ vựng chuyên sâu CEFR C1 để nâng band điểm.",
+            ],
+          };
+
+          if (qIdx === currentIndex) setAiResult(evaluatedResult);
+          setRecordedData((prev) => ({
+            ...prev,
+            [qIdx]: { ...(prev[qIdx] || {}), aiResult: evaluatedResult },
+          }));
+
+          if (typeof window !== "undefined" && examId) {
+            try {
+              const targetCefr = thisResult.cefr_level || "B2";
+              const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
+              const oldData = oldStr ? JSON.parse(oldStr) : {};
+              localStorage.setItem(
+                `aptis_exam_progress_${examId}`,
+                JSON.stringify({
+                  ...oldData,
+                  examId,
+                  bestCefr: targetCefr,
+                  bestScore: `${thisResult.score || 38}/50`,
+                  updatedAt: new Date().toISOString(),
+                })
+              );
+            } catch {}
+          }
+
+          setIsEvaluating(false);
+          return;
+        }
+      } else {
+        const errorMsg = aiRes.error?.message || aiRes.message || "Chấm điểm thất bại.";
+        console.warn("[AI Evaluation] API trả về thông báo:", errorMsg);
+      }
+
+      // 4. Fallback cục bộ chỉ khi server hoàn toàn không phản hồi hoặc mất mạng
       const dur = rec?.duration || recordingDuration || 25;
       const targetDur = targetQ.speakTime;
       const ratio = Math.min(1, dur / (targetDur * 0.7));
@@ -1354,8 +1399,8 @@ function SpeakingExamRunnerContent() {
         ...prev,
         [qIdx]: { ...(prev[qIdx] || {}), aiResult: fallbackResult },
       }));
-    } catch {
-      // Fallback an toàn
+    } catch (err: any) {
+      console.error("[AI Evaluation Exception]:", err);
     } finally {
       setIsEvaluating(false);
     }
