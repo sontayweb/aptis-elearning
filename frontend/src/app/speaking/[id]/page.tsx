@@ -32,6 +32,7 @@ import {
   Crown,
   ExternalLink,
   Lock,
+  ChevronDown,
 } from "lucide-react";
 
 export interface SpeakingQuestion {
@@ -533,10 +534,14 @@ function SpeakingExamRunnerContent() {
     fluency: number;
     grammar: number;
     vocabulary: number;
+    transcript?: string;
     feedback: string[];
+    detailedFeedback?: Array<{ criterion: string; score?: number; comment?: string }>;
     strengths: string[];
     upgrades: string[];
   } | null>(null);
+
+  const [showDetailedFeedback, setShowDetailedFeedback] = useState(false);
 
   const {
     isRecording,
@@ -1023,15 +1028,17 @@ function SpeakingExamRunnerContent() {
             const evaluatedResult = {
               band: `CEFR ${thisResult.cefr_level || "B2"} Target`,
               score: thisResult.score || 38,
-              pronunciation: thisResult.pronunciation || 38,
-              fluency: thisResult.fluency_score || 40,
-              grammar: thisResult.grammar_score || 35,
-              vocabulary: thisResult.vocabulary_score || 37,
+              pronunciation: thisResult.pronunciation ?? thisResult.pronunciation_score ?? 38,
+              fluency: thisResult.fluency_score ?? 38,
+              grammar: thisResult.grammar_score ?? 35,
+              vocabulary: thisResult.vocabulary_score ?? 38,
+              transcript: thisResult.transcript || thisResult.raw_ai_response?.transcribed_speech || "",
               feedback: [thisResult.feedback_summary || "Phân tích chi tiết bài nói của bạn."],
+              detailedFeedback: Array.isArray(thisResult.detailed_feedback) ? thisResult.detailed_feedback : [],
               strengths: Array.isArray(thisResult.detailed_feedback)
                 ? thisResult.detailed_feedback.filter((f: any) => f.criterion).map((f: any) => f.comment || "")
                 : ["Độ dài câu trả lời phù hợp với thời lượng tiêu chuẩn."],
-              upgrades: [
+              upgrades: thisResult.raw_ai_response?.improvement_suggestions || [
                 "Tiếp tục rèn luyện từ vựng chuyên sâu CEFR C1 để nâng band điểm.",
               ],
             };
@@ -1791,14 +1798,165 @@ function SpeakingExamRunnerContent() {
 
                     {/* AI Score Badge if evaluated */}
                     {currentAiResult && (
-                      <div className="w-full p-3 rounded-xl bg-primary/5 border border-primary/20 text-left space-y-1.5 text-xs">
-                        <div className="flex items-center justify-between font-bold text-foreground">
-                          <span>{currentAiResult.band}</span>
-                          <span className="text-primary">{currentAiResult.score}/50</span>
+                      <div className="w-full rounded-2xl bg-gradient-to-b from-primary/10 via-primary/5 to-card border border-primary/25 text-left p-4 space-y-3.5 text-xs shadow-sm">
+                        {/* Header: Huy hiệu Band & Thang điểm BC 50 */}
+                        <div className="flex items-center justify-between border-b border-primary/15 pb-2.5">
+                          <div className="flex items-center gap-1.5 font-bold text-foreground">
+                            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                            <span className="text-primary font-heading tracking-wide">
+                              {currentAiResult.band}
+                            </span>
+                          </div>
+                          <div className="px-2 py-0.5 rounded-full bg-primary/15 text-primary font-mono font-bold text-xs border border-primary/20">
+                            {currentAiResult.score}/50 điểm
+                          </div>
                         </div>
-                        <p className="text-[11px] text-muted-foreground">
-                          {currentAiResult.feedback?.[0]}
-                        </p>
+
+                        {/* Speech-to-Text Transcript */}
+                        {currentAiResult.transcript && (
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                              <Volume2 className="w-3 h-3 text-primary" />
+                              Lời thoại nhận diện (STT):
+                            </span>
+                            <div className="p-2.5 rounded-xl bg-card border border-border/80 text-[11px] leading-relaxed text-foreground/90 italic font-sans max-h-24 overflow-y-auto">
+                              &ldquo;{currentAiResult.transcript}&rdquo;
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 4 Tiêu chí cốt lõi chuẩn British Council */}
+                        <div className="space-y-2 pt-0.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                            Điểm 4 tiêu chí chuẩn Aptis:
+                          </span>
+                          <div className="grid grid-cols-2 gap-2 text-[11px]">
+                            {/* Phát âm */}
+                            <div className="p-2 rounded-xl bg-card border border-border/60 flex flex-col justify-between">
+                              <span className="text-muted-foreground text-[10px]">Phát âm (Pron.)</span>
+                              <div className="flex items-center justify-between font-bold text-foreground mt-1">
+                                <span>{currentAiResult.pronunciation ?? 38}</span>
+                                <span className="text-[10px] text-muted-foreground font-normal">/50</span>
+                              </div>
+                              <div className="w-full bg-muted h-1 rounded-full overflow-hidden mt-1.5">
+                                <div
+                                  className="bg-primary h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${Math.min(100, ((currentAiResult.pronunciation ?? 38) / 50) * 100)}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Lưu loát */}
+                            <div className="p-2 rounded-xl bg-card border border-border/60 flex flex-col justify-between">
+                              <span className="text-muted-foreground text-[10px]">Lưu loát (Fluency)</span>
+                              <div className="flex items-center justify-between font-bold text-foreground mt-1">
+                                <span>{currentAiResult.fluency ?? 38}</span>
+                                <span className="text-[10px] text-muted-foreground font-normal">/50</span>
+                              </div>
+                              <div className="w-full bg-muted h-1 rounded-full overflow-hidden mt-1.5">
+                                <div
+                                  className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${Math.min(100, ((currentAiResult.fluency ?? 38) / 50) * 100)}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Ngữ pháp */}
+                            <div className="p-2 rounded-xl bg-card border border-border/60 flex flex-col justify-between">
+                              <span className="text-muted-foreground text-[10px]">Ngữ pháp (Grammar)</span>
+                              <div className="flex items-center justify-between font-bold text-foreground mt-1">
+                                <span>{currentAiResult.grammar ?? 35}</span>
+                                <span className="text-[10px] text-muted-foreground font-normal">/50</span>
+                              </div>
+                              <div className="w-full bg-muted h-1 rounded-full overflow-hidden mt-1.5">
+                                <div
+                                  className="bg-blue-500 h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${Math.min(100, ((currentAiResult.grammar ?? 35) / 50) * 100)}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Từ vựng */}
+                            <div className="p-2 rounded-xl bg-card border border-border/60 flex flex-col justify-between">
+                              <span className="text-muted-foreground text-[10px]">Từ vựng (Vocab.)</span>
+                              <div className="flex items-center justify-between font-bold text-foreground mt-1">
+                                <span>{currentAiResult.vocabulary ?? 38}</span>
+                                <span className="text-[10px] text-muted-foreground font-normal">/50</span>
+                              </div>
+                              <div className="w-full bg-muted h-1 rounded-full overflow-hidden mt-1.5">
+                                <div
+                                  className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${Math.min(100, ((currentAiResult.vocabulary ?? 38) / 50) * 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Nhận xét tổng quan của Giám khảo AI */}
+                        {currentAiResult.feedback?.[0] && (
+                          <div className="p-2.5 rounded-xl bg-card/80 border border-border/70 space-y-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              Nhận xét giám khảo AI:
+                            </span>
+                            <p className="text-[11px] text-foreground/90 leading-relaxed">
+                              {currentAiResult.feedback[0]}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Accordion Chi tiết góp ý từng tiêu chí */}
+                        {currentAiResult.detailedFeedback && currentAiResult.detailedFeedback.length > 0 && (
+                          <div className="pt-1 border-t border-primary/15">
+                            <button
+                              type="button"
+                              onClick={() => setShowDetailedFeedback((prev) => !prev)}
+                              className="w-full py-1 text-[11px] font-semibold text-primary hover:text-primary/80 flex items-center justify-between transition-colors"
+                            >
+                              <span>
+                                {showDetailedFeedback ? "Thu gọn nhận xét chi tiết" : "Xem góp ý chi tiết từng tiêu chí"}
+                              </span>
+                              <ChevronDown
+                                className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                                  showDetailedFeedback ? "rotate-180" : ""
+                                }`}
+                              />
+                            </button>
+
+                            {showDetailedFeedback && (
+                              <div className="mt-2 space-y-2 pt-1 border-t border-border/50 max-h-48 overflow-y-auto pr-1">
+                                {currentAiResult.detailedFeedback.map((df: any, idx: number) => {
+                                  const criterionTitle =
+                                    df.criterion === "pronunciation"
+                                      ? "Phát âm (Pronunciation)"
+                                      : df.criterion === "fluency"
+                                      ? "Lưu loát (Fluency)"
+                                      : df.criterion === "grammar"
+                                      ? "Ngữ pháp (Grammar)"
+                                      : df.criterion === "vocabulary"
+                                      ? "Từ vựng (Vocabulary)"
+                                      : df.criterion;
+                                  return (
+                                    <div
+                                      key={idx}
+                                      className="p-2 rounded-lg bg-card border border-border/50 text-[11px] space-y-0.5"
+                                    >
+                                      <div className="flex items-center justify-between font-semibold text-foreground text-[10px]">
+                                        <span>{criterionTitle}</span>
+                                        {df.score !== undefined && df.score !== null && (
+                                          <span className="text-primary font-mono">{df.score}/50</span>
+                                        )}
+                                      </div>
+                                      <p className="text-muted-foreground text-[11px] leading-relaxed">
+                                        {df.comment}
+                                      </p>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
