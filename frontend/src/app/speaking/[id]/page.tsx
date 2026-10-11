@@ -575,62 +575,96 @@ function SpeakingExamRunnerContent() {
         parts.forEach((p: any) => {
           const pNum = (p.part_number || p.partNumber || 1) as 1 | 2 | 3 | 4;
           const pTitle = p.title || `Part ${pNum}`;
+          const qList = p.questions || [];
 
-          (p.questions || []).forEach((q: any) => {
-            const qNum = q.question_number || q.questionNumber || 1;
-            // Thời gian chuẩn bị mô phỏng chuẩn: Part 4 là 60s, Part 2 & 3 là 12s, Part 1 là 5s
-            const defaultPrep =
-              pNum === 4
-                ? 60
-                : pNum === 2 || pNum === 3
-                ? 12
-                : 5;
-            const defaultSpeak = pNum === 4 ? 120 : pNum === 1 ? 30 : 45;
-
-            let subQuestions: string[] | undefined;
-            let secondImageUrl: string | undefined;
-
-            if (pNum === 4) {
-              subQuestions = parseSubQuestions(q.options);
-            } else if (pNum === 3) {
-              if (Array.isArray(q.options) && typeof q.options[0] === "string" && q.options[0].startsWith("http")) {
-                secondImageUrl = q.options[0];
-              } else if (typeof q.options === "string" && q.options.startsWith("http")) {
-                secondImageUrl = q.options;
+          if (pNum === 4) {
+            // Chuẩn web gốc Aptis Kỳ Tích & British Council:
+            // Part 4 là 1 bài thuyết trình dài (Long Turn: 60s chuẩn bị, 120s nói liên tục)
+            // Hiển thị 3 câu hỏi phụ trên cùng 1 màn hình duy nhất
+            if (qList.length > 0) {
+              const firstQ = qList[0];
+              let subQuestions: string[] = parseSubQuestions(firstQ.options);
+              if (!subQuestions || subQuestions.length === 0) {
+                if (qList.length > 1) {
+                  // CSDL lưu 3 questions riêng biệt -> Lấy prompt của từng câu làm subQuestions
+                  subQuestions = qList.map((q: any) => q.prompt?.trim()).filter(Boolean);
+                } else if (firstQ.prompt) {
+                  const lines = firstQ.prompt
+                    .split(/\n+/)
+                    .map((l: string) => l.trim().replace(/^[-•*]\s*/, ""))
+                    .filter(Boolean);
+                  if (lines.length > 1) subQuestions = lines;
+                }
               }
+
+              const rawExp =
+                qList
+                  .map((q: any) => (q.explanation || "").trim())
+                  .filter(Boolean)
+                  .join("\n\n") || (firstQ.explanation || "").trim();
+              const hasVn = isVietnameseText(rawExp);
+
+              loaded.push({
+                id: firstQ.id,
+                partNumber: 4,
+                part: pTitle,
+                title: firstQ.prompt && firstQ.prompt.length > 50 ? firstQ.prompt.substring(0, 50) + "..." : firstQ.prompt,
+                prompt: firstQ.prompt,
+                prepTime: 60,
+                speakTime: 120,
+                imageUrl:
+                  p.image_url ||
+                  "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80",
+                sampleAnswer: hasVn ? "" : rawExp,
+                guidanceNote: hasVn ? rawExp : undefined,
+                subQuestions: subQuestions.length > 0 ? subQuestions : undefined,
+                topic: p.title ? p.title.replace(/^Part\s*\d+\s*[-:]*\s*/i, "").trim() : undefined,
+              });
             }
+          } else {
+            // Part 1, Part 2, Part 3: Mỗi câu hỏi là 1 lượt nói riêng biệt (30s hoặc 45s)
+            qList.forEach((q: any) => {
+              const defaultPrep = pNum === 2 || pNum === 3 ? 12 : 5;
+              const defaultSpeak = pNum === 1 ? 30 : 45;
 
-            const rawExp = (q.explanation || "").trim();
-            const hasVn = isVietnameseText(rawExp);
+              let secondImageUrl: string | undefined;
+              if (pNum === 3) {
+                if (Array.isArray(q.options) && typeof q.options[0] === "string" && q.options[0].startsWith("http")) {
+                  secondImageUrl = q.options[0];
+                } else if (typeof q.options === "string" && q.options.startsWith("http")) {
+                  secondImageUrl = q.options;
+                }
+              }
 
-            loaded.push({
-              id: q.id,
-              partNumber: pNum,
-              part: pTitle,
-              title: q.prompt && q.prompt.length > 50 ? q.prompt.substring(0, 50) + "..." : q.prompt,
-              prompt: q.prompt,
-              prepTime: defaultPrep,
-              speakTime: defaultSpeak,
-              imageUrl:
-                p.image_url ||
-                (pNum === 2
-                  ? "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80"
-                  : pNum === 3
-                  ? "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=800&q=80"
-                  : pNum === 4
-                  ? "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80"
-                  : undefined),
-              secondImageUrl:
-                secondImageUrl ||
-                (pNum === 3
-                  ? "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80"
-                  : undefined),
-              sampleAnswer: hasVn ? "" : rawExp,
-              guidanceNote: hasVn ? rawExp : undefined,
-              subQuestions,
-              topic: p.title ? p.title.replace(/^Part\s*\d+\s*[-:]*\s*/i, "") : undefined,
+              const rawExp = (q.explanation || "").trim();
+              const hasVn = isVietnameseText(rawExp);
+
+              loaded.push({
+                id: q.id,
+                partNumber: pNum,
+                part: pTitle,
+                title: q.prompt && q.prompt.length > 50 ? q.prompt.substring(0, 50) + "..." : q.prompt,
+                prompt: q.prompt,
+                prepTime: defaultPrep,
+                speakTime: defaultSpeak,
+                imageUrl:
+                  p.image_url ||
+                  (pNum === 2
+                    ? "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80"
+                    : pNum === 3
+                    ? "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=800&q=80"
+                    : undefined),
+                secondImageUrl:
+                  secondImageUrl ||
+                  (pNum === 3
+                    ? "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80"
+                    : undefined),
+                sampleAnswer: hasVn ? "" : rawExp,
+                guidanceNote: hasVn ? rawExp : undefined,
+                topic: p.title ? p.title.replace(/^Part\s*\d+\s*[-:]*\s*/i, "").trim() : undefined,
+              });
             });
-          });
+          }
         });
 
         if (loaded.length === 0) {
@@ -1519,7 +1553,7 @@ function SpeakingExamRunnerContent() {
                         </div>
                       )}
 
-                      {/* 3 bullet questions */}
+                      {/* 3 bullet questions lấy trực tiếp từ dữ liệu bài thi */}
                       <div className="space-y-2 pt-1">
                         {currentQ.subQuestions && currentQ.subQuestions.length > 0 ? (
                           currentQ.subQuestions.map((sub, sIdx) => (
@@ -1528,17 +1562,9 @@ function SpeakingExamRunnerContent() {
                             </p>
                           ))
                         ) : (
-                          <>
-                            <p className="text-xs md:text-sm text-foreground/90 font-medium">
-                              • Tell me about a time when you achieved a goal.
-                            </p>
-                            <p className="text-xs md:text-sm text-foreground/90 font-medium">
-                              • How did you feel when you achieved your goal?
-                            </p>
-                            <p className="text-xs md:text-sm text-foreground/90 font-medium">
-                              • Why is it important for people to set goals?
-                            </p>
-                          </>
+                          <p className="text-xs md:text-sm text-foreground/90 font-medium">
+                            • {currentQ.prompt}
+                          </p>
                         )}
                       </div>
 
