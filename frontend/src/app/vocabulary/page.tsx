@@ -37,6 +37,9 @@ import {
   PenTool,
   BarChart3,
   Filter,
+  FileSpreadsheet,
+  Download,
+  Loader2,
 } from "lucide-react";
 
 interface VocabTopic {
@@ -117,6 +120,151 @@ export default function VocabularyPage() {
     try {
       localStorage.setItem("aptis_user_notebook", JSON.stringify(updated));
     } catch {}
+  };
+
+  // Trạng thái & Xử lý Import từ Google Sheet
+  const [isGoogleSheetModalOpen, setIsGoogleSheetModalOpen] = useState(false);
+  const [sheetUrl, setSheetUrl] = useState("");
+  const [isFetchingSheet, setIsFetchingSheet] = useState(false);
+  const [sheetError, setSheetError] = useState<string | null>(null);
+  const [sheetSuccessMessage, setSheetSuccessMessage] = useState<string | null>(null);
+  const [parsedSheetWords, setParsedSheetWords] = useState<
+    Array<{ word: string; meaning: string; phonetic?: string; example?: string }>
+  >([]);
+
+  function parseCsvLine(line: string): string[] {
+    const result: string[] = [];
+    let cur = "";
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (c === ',' && !inQuotes) {
+        result.push(cur.trim());
+        cur = "";
+      } else {
+        cur += c;
+      }
+    }
+    result.push(cur.trim());
+    return result;
+  }
+
+  function parseGoogleSheetCsvText(csvText: string) {
+    const rawLines = csvText.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    if (rawLines.length === 0) return [];
+    const firstCols = parseCsvLine(rawLines[0]);
+    const hasHeader = firstCols.some((col) => /stt|word|từ|meaning|nghĩa|cột|no\./i.test(col));
+    const dataLines = hasHeader ? rawLines.slice(1) : rawLines;
+
+    const words: Array<{ word: string; meaning: string; phonetic?: string; example?: string }> = [];
+
+    for (const line of dataLines) {
+      const cols = parseCsvLine(line);
+      let word = "";
+      let meaning = "";
+      let phonetic = "";
+      let example = "";
+
+      if (cols.length >= 3 && /^\d+$/.test(cols[0])) {
+        word = cols[1] || "";
+        meaning = cols[2] || "";
+        if (cols[3]) phonetic = cols[3];
+        if (cols[4]) example = cols[4];
+      } else if (cols.length >= 2) {
+        word = cols[0] || "";
+        meaning = cols[1] || "";
+        if (cols[2]) phonetic = cols[2];
+        if (cols[3]) example = cols[3];
+      }
+
+      if (word && meaning) {
+        words.push({
+          word: word.trim(),
+          meaning: meaning.trim(),
+          phonetic: phonetic.trim() || undefined,
+          example: example.trim() || undefined,
+        });
+      }
+    }
+    return words;
+  }
+
+  const handleFetchSheetData = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!sheetUrl.trim()) {
+      setSheetError("Vui lòng dán đường link Google Sheet.");
+      return;
+    }
+
+    try {
+      setIsFetchingSheet(true);
+      setSheetError(null);
+      setSheetSuccessMessage(null);
+      setParsedSheetWords([]);
+
+      const res = await fetch("/api/import-sheet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: sheetUrl.trim() }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Không thể tải dữ liệu từ Google Sheet.");
+      }
+
+      const parsed = parseGoogleSheetCsvText(data.csvText);
+      if (parsed.length === 0) {
+        throw new Error("Không tìm thấy dòng từ vựng hợp lệ nào trong bảng tính. Vui lòng kiểm tra lại cấu trúc cột.");
+      }
+
+      setParsedSheetWords(parsed);
+    } catch (err: any) {
+      setSheetError(err.message || "Lỗi kết nối tải Google Sheet.");
+    } finally {
+      setIsFetchingSheet(false);
+    }
+  };
+
+  const handleApplySheetWordsToNotebook = () => {
+    if (parsedSheetWords.length === 0) return;
+
+    const existingWordSet = new Set(notebookWords.map((w) => w.word.toLowerCase()));
+    const newItems = parsedSheetWords
+      .filter((w) => !existingWordSet.has(w.word.toLowerCase()))
+      .map((w, idx) => ({
+        id: `sheet_${Date.now()}_${idx}`,
+        word: w.word,
+        meaning: w.meaning,
+        phonetic: w.phonetic,
+        example: w.example,
+      }));
+
+    const duplicateCount = parsedSheetWords.length - newItems.length;
+    const updated = [...newItems, ...notebookWords];
+    setNotebookWords(updated);
+
+    try {
+      localStorage.setItem("aptis_user_notebook", JSON.stringify(updated));
+    } catch {}
+
+    setSheetSuccessMessage(
+      `Đã thêm thành công ${newItems.length} từ vựng vào Sổ tay của bạn${
+        duplicateCount > 0 ? ` (bỏ qua ${duplicateCount} từ đã có)` : ""
+      }!`
+    );
+    setParsedSheetWords([]);
+    setTimeout(() => {
+      setIsGoogleSheetModalOpen(false);
+      setSheetSuccessMessage(null);
+    }, 1500);
   };
 
   // Chế độ kiểm tra (Test Mode): 10 từ vựng ngẫu nhiên / 15 phút (Mục 3.5 Đặc tả)
@@ -713,14 +861,24 @@ export default function VocabularyPage() {
                   <h3 className="font-heading font-bold text-base md:text-lg text-foreground">
                     Danh sách từ vựng của tôi
                   </h3>
-                  <button
-                    type="button"
-                    onClick={() => setIsAddWordModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white hover:brightness-110 font-bold text-xs shadow-sm shadow-blue-500/20 transition-all"
-                  >
-                    <FolderPlus className="w-4 h-4" />
-                    <span>Tạo danh sách mới</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsGoogleSheetModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm shadow-emerald-500/20 transition-all cursor-pointer"
+                    >
+                      <FileSpreadsheet className="w-4 h-4" />
+                      <span>Nhập từ Google Sheet</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddWordModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white hover:brightness-110 font-bold text-xs shadow-sm shadow-blue-500/20 transition-all cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Thêm từ thủ công</span>
+                    </button>
+                  </div>
                 </div>
 
                 {notebookWords.length === 0 ? (
@@ -957,6 +1115,178 @@ export default function VocabularyPage() {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          )}
+
+          {/* Google Sheet Import Modal */}
+          {isGoogleSheetModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
+              <div className="bg-card border border-border rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between pb-3 border-b border-border mb-4 shrink-0">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                      <FileSpreadsheet className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-bold text-base text-foreground">
+                        Nhập từ vựng từ Google Sheet
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground">
+                        Đồng bộ nhanh danh sách từ vựng từ bảng tính công khai
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsGoogleSheetModalOpen(false);
+                      setSheetError(null);
+                      setParsedSheetWords([]);
+                    }}
+                    className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="overflow-y-auto flex-1 space-y-4 pr-1">
+                  {/* Hướng dẫn định dạng */}
+                  <div className="p-3.5 rounded-xl bg-muted/40 border border-border text-xs space-y-2">
+                    <div className="font-bold text-foreground flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Cấu trúc bảng tính được hỗ trợ:</span>
+                    </div>
+                    <ul className="list-disc pl-4 space-y-1 text-muted-foreground text-[11.5px]">
+                      <li>
+                        <strong>Cột A:</strong> STT (hoặc Từ vựng) · <strong>Cột B:</strong> Từ vựng (Word) · <strong>Cột C:</strong> Nghĩa tiếng Việt (Meaning)
+                      </li>
+                      <li>
+                        Cột D & E (tùy chọn): Phiên âm IPA & Câu ví dụ minh họa.
+                      </li>
+                      <li>
+                        Bảng tính cần được bật quyền: <em>&quot;Bất kỳ ai có đường liên kết đều có thể xem&quot;</em>.
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Form nhập link */}
+                  <form onSubmit={handleFetchSheetData} className="space-y-3">
+                    <div>
+                      <label className="text-xs font-semibold text-foreground block mb-1">
+                        Đường link Google Sheet <span className="text-destructive">*</span>
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="url"
+                          required
+                          placeholder="https://docs.google.com/spreadsheets/d/..."
+                          value={sheetUrl}
+                          onChange={(e) => setSheetUrl(e.target.value)}
+                          className="flex-1 px-3.5 py-2 rounded-xl bg-background border border-border text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                        <button
+                          type="submit"
+                          disabled={isFetchingSheet}
+                          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shrink-0 transition-colors disabled:opacity-60 cursor-pointer"
+                        >
+                          {isFetchingSheet ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Đang tải...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Download className="w-3.5 h-3.5" />
+                              <span>Tải dữ liệu</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+
+                  {/* Thông báo lỗi */}
+                  {sheetError && (
+                    <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                      <span>{sheetError}</span>
+                    </div>
+                  )}
+
+                  {/* Thông báo thành công */}
+                  {sheetSuccessMessage && (
+                    <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs flex items-center gap-2 font-medium">
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      <span>{sheetSuccessMessage}</span>
+                    </div>
+                  )}
+
+                  {/* Danh sách xem trước */}
+                  {parsedSheetWords.length > 0 && (
+                    <div className="space-y-2.5 pt-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-foreground">
+                          Tìm thấy {parsedSheetWords.length} từ vựng
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          Xem trước dữ liệu
+                        </span>
+                      </div>
+
+                      <div className="max-h-56 overflow-y-auto rounded-xl border border-border bg-background divide-y divide-border">
+                        {parsedSheetWords.map((item, idx) => (
+                          <div key={idx} className="p-2.5 text-xs flex items-start justify-between gap-3">
+                            <div>
+                              <div className="font-bold text-primary flex items-center gap-2">
+                                <span>{item.word}</span>
+                                {item.phonetic && (
+                                  <span className="text-[10px] text-muted-foreground font-mono font-normal">
+                                    {item.phonetic}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-foreground text-[11.5px] mt-0.5">{item.meaning}</div>
+                              {item.example && (
+                                <div className="text-[10.5px] text-muted-foreground italic mt-0.5">
+                                  Ví dụ: {item.example}
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                              #{idx + 1}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer Modal */}
+                <div className="pt-3 border-t border-border flex items-center justify-between gap-2 mt-4 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsGoogleSheetModalOpen(false);
+                      setSheetError(null);
+                      setParsedSheetWords([]);
+                    }}
+                    className="px-4 py-2 rounded-xl border border-border hover:bg-muted text-xs font-semibold cursor-pointer"
+                  >
+                    Đóng
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={parsedSheetWords.length === 0}
+                    onClick={handleApplySheetWordsToNotebook}
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Thêm {parsedSheetWords.length} từ vào Sổ tay</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}

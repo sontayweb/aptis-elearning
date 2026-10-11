@@ -1214,7 +1214,7 @@ function WritingExamRunnerContent() {
           )}
 
           {/* =========================================================================
-              PART 4: 2 EMAILS (INFORMAL & FORMAL)
+              PART 4: 2 EMAILS (INFORMAL & FORMAL DUAL-FORM WORKSPACE)
               ========================================================================= */}
           {currentPart.partNumber === 4 && (
             <div className="space-y-6">
@@ -1224,22 +1224,79 @@ function WritingExamRunnerContent() {
                 const words = getWordCount(val);
                 const isFormal = qIdx === 1;
 
+                // Chuẩn độ dài theo British Council
+                const targetMin = isFormal ? 120 : 40;
+                const targetMax = isFormal ? 150 : 60;
+                const recommendedWords = isFormal ? "120 – 150 từ" : "40 – 60 từ (khuyến nghị 50 từ)";
+                const recommendedTime = isFormal ? "20 phút" : "10 phút";
+
+                // Đánh giá trạng thái số lượng từ
+                let wordStatusText = "Chưa nhập bài";
+                let wordStatusColor = "text-muted-foreground bg-muted border-border";
+                if (words > 0) {
+                  if (words < targetMin) {
+                    wordStatusText = `Chưa đủ dung lượng (${words}/${isFormal ? 150 : 50} từ)`;
+                    wordStatusColor = "text-amber-700 bg-amber-500/10 border-amber-300 dark:text-amber-400";
+                  } else if (words <= targetMax) {
+                    wordStatusText = `Đạt chuẩn dung lượng (${words}/${isFormal ? 150 : 50} từ)`;
+                    wordStatusColor = "text-emerald-700 bg-emerald-500/10 border-emerald-300 dark:text-emerald-400";
+                  } else {
+                    wordStatusText = `Vượt số từ khuyến nghị (${words}/${isFormal ? 150 : 50} từ)`;
+                    wordStatusColor = "text-blue-700 bg-blue-500/10 border-blue-300 dark:text-blue-400";
+                  }
+                }
+
                 return (
                   <div
                     key={q.questionNumber}
-                    className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-3"
+                    className={`bg-card rounded-2xl border transition-all shadow-sm ${
+                      isFormal
+                        ? "border-primary/30 ring-1 ring-primary/10"
+                        : "border-sky-300/40 ring-1 ring-sky-400/10"
+                    } p-5 md:p-6 space-y-4`}
                   >
-                    <div className="space-y-1">
-                      <span className="text-[11px] font-bold text-primary uppercase">
-                        {isFormal ? "Task 2 — Formal Email" : "Task 1 — Informal Email"}
+                    {/* Header thông tin từng email */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-border pb-3">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${
+                            isFormal
+                              ? "bg-primary text-primary-foreground shadow-sm"
+                              : "bg-sky-600 text-white shadow-sm"
+                          }`}
+                        >
+                          {isFormal ? "Task 2 — Formal Email (Trang trọng)" : "Task 1 — Informal Email (Thân mật)"}
+                        </span>
+                        <span className="text-xs text-muted-foreground font-medium hidden sm:inline">
+                          Thời gian gợi ý: ~{recommendedTime}
+                        </span>
+                      </div>
+
+                      {/* Word Status Badge */}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${wordStatusColor}`}>
+                        {wordStatusText}
                       </span>
+                    </div>
+
+                    {/* Đề bài */}
+                    <div className="space-y-1.5">
                       <label className="text-xs md:text-sm font-semibold text-foreground block leading-relaxed">
                         {q.prompt}
                       </label>
+                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+                        <span className="font-semibold text-foreground">Yêu cầu chuẩn:</span>
+                        <span className="px-2 py-0.5 rounded-md bg-muted font-medium">Mục tiêu: {recommendedWords}</span>
+                        <span className="px-2 py-0.5 rounded-md bg-muted font-medium">
+                          {isFormal
+                            ? "Văn phong: Lịch sự, dùng Dear Mr/Ms..., không viết tắt, kết Yours sincerely"
+                            : "Văn phong: Tự nhiên, thân thiện, dùng Hi/Hey, được viết tắt, kết Best/Cheers"}
+                        </span>
+                      </div>
                     </div>
 
+                    {/* Vùng nhập bài viết */}
                     <textarea
-                      rows={isFormal ? 8 : 4}
+                      rows={isFormal ? 9 : 5}
                       value={val}
                       onChange={(e) =>
                         setAnswers((prev) => ({
@@ -1249,13 +1306,37 @@ function WritingExamRunnerContent() {
                       }
                       placeholder={
                         isFormal
-                          ? "Write your formal letter to the secretary (120-150 words)..."
-                          : "Write your informal note to your friend (~50 words)..."
+                          ? "Dear Mr./Ms. [Tên quản lý],\n\nI am writing to express my view regarding the recent notice...\n\n[Giải thích cảm nghĩ và đề xuất 2-3 giải pháp cụ thể (120 - 150 từ)]\n\nI look forward to hearing from you soon.\n\nYours sincerely,\n[Tên của bạn]"
+                          : "Hi [Tên bạn],\n\nDid you see the recent announcement about our club? I feel really...\n\n[Viết về cảm xúc và gợi ý câu lạc bộ nên làm gì (~50 từ)]\n\nTalk to you soon,\n[Tên của bạn]"
                       }
-                      className="w-full p-3.5 rounded-xl border border-input bg-background text-foreground text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans resize-y leading-relaxed transition-all"
+                      className="w-full p-4 rounded-xl border border-input bg-background text-foreground text-sm md:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans resize-y leading-relaxed transition-all shadow-inner"
                     />
-                    <div className="flex justify-end text-xs text-muted-foreground font-mono">
-                      Words {words} / {isFormal ? 220 : 75}
+
+                    {/* Thống kê số từ & độ tiến độ */}
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 sm:w-36 h-2 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className={`h-full transition-all duration-300 ${
+                              words >= targetMin && words <= targetMax
+                                ? "bg-emerald-500"
+                                : words > targetMax
+                                ? "bg-blue-500"
+                                : "bg-primary"
+                            }`}
+                            style={{
+                              width: `${Math.min(100, (words / (isFormal ? 150 : 50)) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                        <span className="font-mono font-medium">
+                          {words} / {isFormal ? "150" : "50"} từ
+                        </span>
+                      </div>
+
+                      <span className="text-[11px] italic">
+                        {isFormal ? "Thang điểm chiếm 60% Part 4" : "Thang điểm chiếm 40% Part 4"}
+                      </span>
                     </div>
                   </div>
                 );

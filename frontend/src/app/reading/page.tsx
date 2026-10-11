@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { UniversalSkillGuideModal } from "@/components/skill-format-guide-modal";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import {
@@ -58,6 +59,7 @@ export default function ReadingPracticePage() {
   const [exams, setExams] = useState<ReadingExam[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
 
   const loadExams = async () => {
     try {
@@ -404,7 +406,7 @@ export default function ReadingPracticePage() {
                 <div className="pt-6 mt-4 border-t border-border/40">
                   <button
                     type="button"
-                    onClick={() => alert("Tính năng dành riêng cho gói Pro. Bạn có thể làm ngay các đề Free miễn phí bên cạnh!")}
+                    onClick={() => setIsGuideModalOpen(true)}
                     className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center"
                   >
                     {tabInfo.marathonBtn}
@@ -537,6 +539,11 @@ export default function ReadingPracticePage() {
 
       <Footer />
       <FloatingActions />
+      <UniversalSkillGuideModal
+        isOpen={isGuideModalOpen}
+        onClose={() => setIsGuideModalOpen(false)}
+        initialSkill="reading"
+      />
     </div>
   );
 }

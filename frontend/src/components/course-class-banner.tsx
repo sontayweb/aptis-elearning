@@ -21,9 +21,14 @@ import {
   Target,
   FileText,
   TrendingUp,
+  Copy,
+  Check,
+  CreditCard,
+  QrCode,
 } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { useSiteSettings } from "@/contexts/site-settings-context";
+import { SITE_CONFIG } from "@/config/site-config";
 
 interface BatchItem {
   id: string;
@@ -33,11 +38,16 @@ interface BatchItem {
 }
 
 const defaultBatches: BatchItem[] = [
-  { id: "1", dateStr: "15/10", isHot: true, seatsLeft: 3 },
-  { id: "2", dateStr: "25/10", seatsLeft: 8 },
-  { id: "3", dateStr: "05/11", seatsLeft: 12 },
-  { id: "4", dateStr: "15/11", seatsLeft: 15 },
-  { id: "5", dateStr: "25/11", seatsLeft: 15 },
+  {
+    id: "1",
+    dateStr: SITE_CONFIG.courseClass.fixedOpeningDate || "14/10",
+    isHot: true,
+    seatsLeft: 3,
+  },
+  { id: "2", dateStr: "04/11", seatsLeft: 8 },
+  { id: "3", dateStr: "18/11", seatsLeft: 12 },
+  { id: "4", dateStr: "02/12", seatsLeft: 15 },
+  { id: "5", dateStr: "16/12", seatsLeft: 15 },
 ];
 
 export interface SyllabusSession {
@@ -198,6 +208,7 @@ export function CourseClassBanner() {
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [copiedAccount, setCopiedAccount] = useState(false);
 
   useEffect(() => {
     async function loadBatches() {
@@ -302,11 +313,23 @@ export function CourseClassBanner() {
               ÔN CẤP TỐC ĐẠT MỤC TIÊU B2
             </p>
 
+            {/* Lịch học cố định */}
+            <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] sm:text-xs font-bold text-rose-600/90 dark:text-rose-400/90">
+              <span className="inline-flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5" />
+                Thứ 3 – Thứ 5 – Thứ 7
+              </span>
+              <span className="text-muted-foreground/50">|</span>
+              <span>20:00 – 21:30</span>
+              <span className="text-muted-foreground/50">|</span>
+              <span>Online Zoom</span>
+            </div>
+
             {/* Checklist 5 cam kết (tích xanh) */}
-            <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-foreground/90 font-medium">
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-foreground/90 font-medium">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Học trực tuyến tương tác</span>
+                <span>Học trực tuyến tương tác qua Zoom</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -329,16 +352,16 @@ export function CourseClassBanner() {
 
           {/* Cụm 2: Khối Ưu đãi + Các đợt khai giảng sắp tới */}
           <div className="w-full xl:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 shrink-0 pt-3 xl:pt-0 border-t xl:border-t-0 border-border/60">
-            {/* Box Ưu đãi giảm 35% */}
-            <div className="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-500 to-rose-600 text-white p-3.5 sm:px-4 sm:py-3.5 text-center shadow-md flex flex-col items-center justify-center min-w-[130px]">
+            {/* Box Học phí ưu đãi */}
+            <div className="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-500 to-rose-600 text-white p-3.5 sm:px-4 sm:py-3.5 text-center shadow-md flex flex-col items-center justify-center min-w-[140px]">
               <span className="text-[11px] font-bold uppercase tracking-wider text-white/90">
-                Ưu đãi
+                Học phí ưu đãi
               </span>
-              <span className="text-lg sm:text-xl font-heading font-black tracking-tight leading-tight mt-0.5">
-                GIẢM 35%
+              <span className="text-xl sm:text-2xl font-heading font-black tracking-tight leading-tight mt-0.5">
+                1.400.000đ
               </span>
-              <span className="text-[11px] font-bold text-white/95 mt-1 bg-white/20 px-2 py-0.5 rounded-full">
-                Chỉ từ 1TRX/KHÓA
+              <span className="text-[10px] font-bold text-white/95 mt-1 bg-white/20 px-2 py-0.5 rounded-full">
+                /khóa 11 buổi
               </span>
             </div>
 
@@ -481,7 +504,7 @@ export function CourseClassBanner() {
                 }`}
               >
                 <Send className="w-4 h-4" />
-                <span>Đăng ký giữ chỗ &amp; Ưu đãi 35%</span>
+                <span>Đăng ký — Học phí 1.400.000đ</span>
               </button>
             </div>
 
@@ -610,7 +633,7 @@ export function CourseClassBanner() {
                   </div>
                 </div>
               ) : (
-                /* Tab Form Đăng ký giữ chỗ */
+                /* Tab Đăng ký — 2 Option rõ ràng */
                 <div className="max-w-lg mx-auto py-2 space-y-4">
                   {submitSuccess ? (
                     <div className="py-8 text-center space-y-3 animate-in zoom-in-95">
@@ -618,14 +641,14 @@ export function CourseClassBanner() {
                         <CheckCircle2 className="w-8 h-8" />
                       </div>
                       <h4 className="font-heading font-black text-foreground text-lg">
-                        Đăng ký giữ chỗ thành công!
+                        Đã ghi nhận thông tin!
                       </h4>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        Cố vấn học tập đã ghi nhận thông tin lớp{" "}
+                        Cố vấn học tập sẽ liên hệ xác nhận lớp{" "}
                         <strong className="text-foreground">
                           Aptis B2 (Đợt {selectedBatch?.dateStr})
                         </strong>{" "}
-                        và sẽ liên hệ xếp lớp ngay trong vòng 15 phút.
+                        trong vòng 15 phút.
                       </p>
                       <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
                         <a
@@ -650,93 +673,177 @@ export function CourseClassBanner() {
                       </div>
                     </div>
                   ) : (
-                    <form onSubmit={handleSubmitLead} className="space-y-4">
-                      {/* Box ưu đãi nhắc lại */}
+                    <div className="space-y-5">
+                      {/* Thông tin đợt đăng ký */}
                       <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-between gap-3">
                         <div>
                           <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 uppercase">
-                            Đợt đăng ký giữ chỗ
+                            Khai giảng đợt
                           </span>
                           <h4 className="font-heading font-black text-foreground text-base">
-                            Khai giảng: {selectedBatch?.dateStr || "Sắp tới"}
+                            {selectedBatch?.dateStr || "Sắp tới"} · Thứ 3–5–7 · 20:00–21:30
                           </h4>
                         </div>
-                        <span className="px-2.5 py-1 rounded-lg bg-rose-600 text-white text-xs font-black">
-                          ƯU ĐÃI GIẢM 35%
-                        </span>
+                        <div className="text-right shrink-0">
+                          <span className="block text-[10px] font-bold text-muted-foreground uppercase">Học phí</span>
+                          <span className="font-heading font-black text-rose-600 dark:text-rose-400 text-lg">1.400.000đ</span>
+                        </div>
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-bold text-foreground mb-1.5">
-                          Họ và tên của bạn <span className="text-rose-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                          placeholder="Ví dụ: Nguyễn Văn An"
-                          className="w-full h-11 px-3.5 rounded-xl border border-border bg-background text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/40"
-                        />
+                      {/* Option A: Chuyển khoản */}
+                      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-rose-600 text-white text-[11px] font-black flex items-center justify-center shrink-0">A</div>
+                          <span className="font-bold text-sm text-foreground">Chuyển khoản học phí giữ chỗ</span>
+                          <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">Nhanh nhất</span>
+                        </div>
+
+                        <div className="pl-0 sm:pl-8 space-y-3">
+                          {/* Box VietQR + Thông tin tài khoản */}
+                          <div className="flex flex-col sm:flex-row items-center gap-3.5 p-3 rounded-xl bg-muted/40 border border-border/80">
+                            <div className="w-28 h-28 bg-white p-1.5 rounded-xl border border-border/80 shrink-0 shadow-xs flex items-center justify-center">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={
+                                  SITE_CONFIG.bankAccount.qrImageUrl ||
+                                  `https://img.vietqr.io/image/MB-${SITE_CONFIG.bankAccount.accountNumber}-compact2.png?amount=${SITE_CONFIG.courseClass.tuitionVnd}&addInfo=Aptis%20B2`
+                                }
+                                alt="Mã VietQR chuyển khoản học phí"
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5 text-xs flex-1 w-full">
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground text-[11px]">Ngân hàng:</span>
+                                <span className="font-bold text-foreground text-[11px]">{SITE_CONFIG.bankAccount.bankName}</span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground text-[11px]">Số tài khoản:</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(SITE_CONFIG.bankAccount.accountNumber);
+                                    setCopiedAccount(true);
+                                    setTimeout(() => setCopiedAccount(false), 2000);
+                                  }}
+                                  className="inline-flex items-center gap-1 font-mono font-bold text-primary hover:underline cursor-pointer"
+                                  title="Bấm để copy STK"
+                                >
+                                  <span>{SITE_CONFIG.bankAccount.accountNumber}</span>
+                                  {copiedAccount ? (
+                                    <Check className="w-3.5 h-3.5 text-emerald-500" />
+                                  ) : (
+                                    <Copy className="w-3.5 h-3.5 opacity-70" />
+                                  )}
+                                </button>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground text-[11px]">Chủ tài khoản:</span>
+                                <span className="font-bold text-foreground text-[11px]">{SITE_CONFIG.bankAccount.accountHolder}</span>
+                              </div>
+                              <div className="flex items-center justify-between border-t border-border/60 pt-1">
+                                <span className="text-muted-foreground text-[11px]">Nội dung CK:</span>
+                                <span className="font-mono font-bold text-rose-600 dark:text-rose-400 text-[11px]">
+                                  Tên + SĐT + B2
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="text-[11px] text-muted-foreground">
+                            Sau khi chuyển khoản, bạn chỉ cần nhắn Zalo gửi biên lai để trợ giảng kích hoạt phòng học ngay lập tức.
+                          </p>
+                        </div>
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-bold text-foreground mb-1.5">
-                          Số điện thoại (hoặc Zalo) <span className="text-rose-500">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          placeholder="Ví dụ: 0987654321"
-                          className="w-full h-11 px-3.5 rounded-xl border border-border bg-background text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/40"
-                        />
+                      {/* Divider */}
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <div className="flex-1 h-px bg-border" />
+                        <span className="font-bold">HOẶC</span>
+                        <div className="flex-1 h-px bg-border" />
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-bold text-foreground mb-1.5">
-                          Ghi chú mục tiêu hoặc ngày dự kiến thi (tùy chọn)
-                        </label>
-                        <textarea
-                          rows={2}
-                          value={note}
-                          onChange={(e) => setNote(e.target.value)}
-                          placeholder="Ví dụ: Cần B2 để ra trường vào tháng sau, yếu Speaking..."
-                          className="w-full p-3 rounded-xl border border-border bg-background text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/40 resize-none"
-                        />
+                      {/* Option B: Zalo/Gọi tư vấn */}
+                      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-[11px] font-black flex items-center justify-center shrink-0">B</div>
+                          <span className="font-bold text-sm text-foreground">Liên hệ tư vấn trực tiếp</span>
+                        </div>
+                        <div className="pl-8 flex flex-col sm:flex-row gap-2">
+                          <a
+                            href={zaloContactUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            <span>Nhắn Zalo ngay</span>
+                          </a>
+                          <a
+                            href={`tel:${supportHotline?.replace(/[^0-9]/g, "")}`}
+                            className="flex-1 h-10 rounded-xl border border-rose-500/40 bg-rose-500/5 hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-colors"
+                          >
+                            <PhoneCall className="w-4 h-4" />
+                            <span>Gọi: {supportHotline || "0387.905.990"}</span>
+                          </a>
+                        </div>
                       </div>
 
-                      <div className="pt-2 space-y-2">
+                      {/* Divider */}
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <div className="flex-1 h-px bg-border" />
+                        <span className="font-bold">HOẶC để lại thông tin</span>
+                        <div className="flex-1 h-px bg-border" />
+                      </div>
+
+                      {/* Form gửi thông tin */}
+                      <form onSubmit={handleSubmitLead} className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-bold text-foreground mb-1.5">
+                            Họ và tên <span className="text-rose-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            placeholder="Ví dụ: Nguyễn Văn An"
+                            className="w-full h-10 px-3.5 rounded-xl border border-border bg-background text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/40"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-foreground mb-1.5">
+                            Số điện thoại / Zalo <span className="text-rose-500">*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            required
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            placeholder="Ví dụ: 0987654321"
+                            className="w-full h-10 px-3.5 rounded-xl border border-border bg-background text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/40"
+                          />
+                        </div>
                         <button
                           type="submit"
                           disabled={isSubmitting}
-                          className="w-full h-11 rounded-xl btn-brand-gradient text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-glow-soft hover:shadow-md transition-all disabled:opacity-50 cursor-pointer"
+                          className="w-full h-10 rounded-xl btn-brand-gradient text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all disabled:opacity-50 cursor-pointer"
                         >
                           {isSubmitting ? (
                             <>
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              <span>Đang gửi thông tin...</span>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Đang gửi...</span>
                             </>
                           ) : (
                             <>
-                              <Send className="w-4 h-4" />
-                              <span>Xác nhận đăng ký giữ chỗ ({selectedBatch?.dateStr})</span>
+                              <Send className="w-3.5 h-3.5" />
+                              <span>Để lại thông tin — Được gọi lại trong 15 phút</span>
                             </>
                           )}
                         </button>
-
-                        <a
-                          href={zaloContactUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="w-full h-9 rounded-xl border border-border hover:bg-muted text-xs font-semibold text-muted-foreground inline-flex items-center justify-center gap-1.5 transition-colors"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5 text-blue-500" />
-                          <span>Hoặc chat trực tiếp qua Zalo với Admin</span>
-                        </a>
-                      </div>
-                    </form>
+                      </form>
+                    </div>
                   )}
                 </div>
               )}

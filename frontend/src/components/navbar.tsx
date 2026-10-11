@@ -9,6 +9,7 @@ import { useEventTheme } from "@/contexts/event-theme-context";
 import { AuthModal } from "@/components/auth-modal";
 import { NotificationDropdown } from "@/components/notification-dropdown";
 import { EventAnnouncementBar } from "@/components/event-decorations";
+import { GoLivePromoBanner } from "@/components/golive-promo-banner";
 import {
   ClipboardCheck,
   BookOpen,
@@ -155,6 +156,7 @@ export function Navbar() {
     <>
       <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
         <EventAnnouncementBar />
+        <GoLivePromoBanner onOpenAuth={() => setAuthModalOpen(true)} />
         <nav className="xl:h-16 transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-primary/30 shadow-[0_4px_20px_-8px_hsl(var(--primary)/0.18)]">
         <div className="h-16 xl:h-full max-w-[1440px] mx-auto px-4 lg:px-6 flex items-center gap-3">
         {/* Brand Logo */}

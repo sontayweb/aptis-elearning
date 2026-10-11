@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, Suspense } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useAudioRecorder } from "@/hooks/use-audio-recorder";
@@ -29,6 +29,9 @@ import {
   Send,
   Eye,
   EyeOff,
+  Crown,
+  ExternalLink,
+  Lock,
 } from "lucide-react";
 
 export interface SpeakingQuestion {
@@ -42,6 +45,7 @@ export interface SpeakingQuestion {
   imageUrl?: string;
   secondImageUrl?: string;
   sampleAnswer: string;
+  guidanceNote?: string;
   subQuestions?: string[];
   topic?: string;
 }
@@ -67,37 +71,387 @@ function playStartBeep() {
   }
 }
 
-// Hàm chuẩn hóa B1 sample answer theo ngữ cảnh
-function generateB1SampleAnswer(b2Text: string, prompt: string): string {
-  const pLower = prompt.toLowerCase();
-  if (pLower.includes("family")) {
-    return "There are four people in my family: my father, my mother, my younger sister and me. My father is an engineer and my mother is an accountant. We live together in Hanoi. We are very close and we always eat dinner together every evening and share about our day.";
-  }
-  if (pLower.includes("yourself") || pLower.includes("introduce")) {
-    return "My name is Nguyen Van A, and I am from Vietnam. I am a friendly and hardworking person. At the moment, I am studying English because I want to improve my communication skills. In my free time, I enjoy listening to music, watching movies, and spending time with my family.";
-  }
-  if (pLower.includes("daily routine") || pLower.includes("routine")) {
-    return "On weekdays, I usually wake up at 6:30 AM. After having breakfast, I go to school or work. In the afternoon, I come home, relax and do some light exercise. In the evening, I spend time with my family, study English, and go to bed at around 11 PM.";
-  }
-  if (pLower.includes("describe the picture") || pLower.includes("picture")) {
-    return "In this picture, I can see a group of people smiling and enjoying their time together outdoors. The weather looks bright and pleasant. Everyone seems happy and relaxed as they chat and share this nice moment.";
-  }
-  if (pLower.includes("prefer") || pLower.includes("compare")) {
-    return "Comparing both options, I personally prefer the first one because it is more convenient and relaxing for me. It helps me reduce stress after busy working hours and gives me more positive energy.";
-  }
-  if (pLower.includes("achieve") || pLower.includes("goal")) {
-    return "I would like to talk about when I passed my university entrance exam. I felt very happy and proud because I worked hard for it. In my opinion, setting goals is very important because it gives people motivation and clear direction in life.";
-  }
-  if (pLower.includes("journey") || pLower.includes("travel")) {
-    return "I would like to tell you about a memorable trip to Da Nang with my close friends last summer. We visited beautiful beaches and tried delicious local foods. It was a wonderful experience that helped me relax and become closer to my friends.";
+// Kiểm tra chuỗi có chứa ký tự tiếng Việt có dấu
+function isVietnameseText(text?: string): boolean {
+  if (!text) return false;
+  return /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(text);
+}
+
+// Chuẩn hóa bài nói mẫu B1 (Bản dễ học) và B2 (Bản nâng cao) chuẩn Aptis ESOL
+function resolveSpeakingSampleAnswers(
+  prompt: string,
+  rawSampleAnswer?: string,
+  partNumber?: number,
+  guidanceNote?: string
+): { b1: string; b2: string; guidance?: string } {
+  const pLower = (prompt || "").toLowerCase();
+  const rawClean = (rawSampleAnswer || "").trim();
+
+  // Xác định dàn ý gợi ý tiếng Việt nếu có
+  let resolvedGuidance = guidanceNote?.trim();
+  if (!resolvedGuidance && isVietnameseText(rawClean)) {
+    resolvedGuidance = rawClean;
   }
 
-  // Fallback: cắt ngắn b2Text thành các câu đơn giản
-  const sentences = b2Text.split(/(?<=[.!?])\s+/);
-  if (sentences.length > 0) {
-    return sentences.slice(0, 3).join(" ");
+  // Nếu trong database đã có bài nói mẫu tiếng Anh hoàn chỉnh (> 25 từ và không có dấu tiếng Việt)
+  const isRawEnglish = rawClean.length > 25 && !isVietnameseText(rawClean);
+  if (isRawEnglish) {
+    const sentences = rawClean.split(/(?<=[.!?])\s+/);
+    const b1 = sentences.length > 2 ? sentences.slice(0, 3).join(" ") : rawClean;
+    return {
+      b1,
+      b2: rawClean,
+      guidance: resolvedGuidance,
+    };
   }
-  return b2Text;
+
+  // 1. Trải nghiệm tương tự (Part 2 Question 2: "Tell me about a similar experience you have had in your life")
+  if (
+    pLower.includes("similar experience") ||
+    pLower.includes("similar") ||
+    pLower.includes("experience you have had") ||
+    (pLower.includes("experience") && pLower.includes("life"))
+  ) {
+    return {
+      b1: "I had a very similar experience last semester when I worked on a group assignment with my close classmates at university. We met at a cozy coffee shop near our campus to discuss our topic, prepare the slides, and divide the tasks. We had a great time sharing creative ideas, helping each other, and laughing together. In the end, our team got a high score, and that memorable experience really brought us much closer together.",
+      b2: "Looking at this picture truly reminds me of a memorable collaborative project I participated in during my final year at university. My teammates and I gathered regularly at a local cafe with our laptops to conduct research, brainstorm creative solutions, and assemble our final presentation. Although we encountered several challenges coordinating our perspectives, we managed to foster excellent teamwork and constructive discussions. Ultimately, our combined efforts paid off with an outstanding grade, and that valuable experience taught me crucial lessons about effective communication and teamwork under pressure.",
+      guidance: resolvedGuidance || "Nói về trải nghiệm cá nhân liên quan đến bối cảnh bức tranh.",
+    };
+  }
+
+  // 2. Miêu tả tranh Part 2 (Question 1: "Describe what you see in the picture")
+  if (
+    pLower.includes("describe what you see") ||
+    pLower.includes("describe the picture") ||
+    pLower.includes("describe this picture")
+  ) {
+    return {
+      b1: "In this picture, I can see a group of young people sitting together around a wooden table in a cafe. They are looking at their laptops and working on a project together. A woman in the center is smiling and laughing happily while communicating with her friends. The atmosphere looks very pleasant, friendly, and energetic.",
+      b2: "This picture captures a lively and collaborative moment among three young adults, presumably university students or young professionals working together in a cozy cafe. In the foreground, a woman is typing on her laptop while engaging in an upbeat discussion with her peers. The person in the denim jacket is smiling warmly and actively listening. The modern interior and warm natural lighting create a productive yet relaxed ambiance, reflecting modern teamwork.",
+      guidance: resolvedGuidance || "Miêu tả tổng quan: Ai? Ở đâu? Đang làm gì? Cảm xúc và không gian xung quanh.",
+    };
+  }
+
+  // 3. Tầm quan trọng / Lợi ích hoạt động (Part 2 Question 3: "Why do you think this activity is important to many people?")
+  if (
+    pLower.includes("important to many people") ||
+    pLower.includes("why is this activity important") ||
+    pLower.includes("why do you think this activity") ||
+    (pLower.includes("important") && pLower.includes("activity"))
+  ) {
+    return {
+      b1: "In my opinion, studying or working in groups is very important because it allows people to learn from one another and solve difficult problems together. When people share their knowledge, they can finish tasks faster and achieve better results. In addition, meeting in a relaxing environment like a cafe helps reduce stress, boosts creativity, and strengthens friendships among colleagues or classmates.",
+      b2: "From my perspective, collaborative activities like group study or brainstorming sessions play an indispensable role in both academic and professional success. Firstly, they foster diverse viewpoints, allowing individuals to approach complex challenges from multiple angles and arrive at innovative solutions. Secondly, working alongside peers in dynamic settings promotes essential interpersonal soft skills, such as active listening, constructive debate, and emotional intelligence, which are vital for career advancement in today's interconnected world.",
+      guidance: resolvedGuidance || "Đánh giá quan điểm và lợi ích xã hội / cá nhân.",
+    };
+  }
+
+  // 4. So sánh đối chiếu 2 tranh (Part 3 Question 1: "Tell me what you see in the two pictures and contrast them")
+  if (
+    pLower.includes("contrast") ||
+    pLower.includes("two pictures") ||
+    pLower.includes("compare the two") ||
+    (pLower.includes("compare") && pLower.includes("picture"))
+  ) {
+    return {
+      b1: "Both pictures illustrate different ways people spend their time. In the first picture, I can see people engaging in outdoor activities surrounded by nature, looking energetic and refreshed. In contrast, the second picture depicts individuals staying indoors, focusing on digital screens. The primary difference is the environment and the level of physical activity involved.",
+      b2: "Both photographs portray contrasting lifestyles and recreational pursuits. The first image depicts an energetic outdoor scene where individuals are immersed in nature, highlighting vitality, fresh air, and physical wellness. Conversely, the second image showcases an indoor setting where individuals are engaged with modern technological devices. The stark contrast between natural tranquility and contemporary digital convenience is clearly evident here.",
+      guidance: resolvedGuidance || "Cấu trúc: Both pictures show... In the first picture... Whereas in the second picture...",
+    };
+  }
+
+  // 5. Sở thích / Lựa chọn nào hơn (Part 3 Question 2: "Which of the two options would you prefer and why?")
+  if (
+    pLower.includes("prefer") ||
+    pLower.includes("which of the two") ||
+    pLower.includes("which option")
+  ) {
+    return {
+      b1: "If I had to choose between the two options, I would definitely prefer the first one. Spending time outdoors helps me recharge my energy and disconnect from digital screens after stressful working hours. It also gives me a wonderful opportunity to stay healthy and appreciate nature.",
+      b2: "Personally speaking, I would undeniably gravitate towards the first option. After spending extended hours immersed in screen time and academic demands, being close to nature provides profound psychological relaxation and rejuvenates my mental clarity. Furthermore, participating in physical outdoor activities enhances both cardiovascular health and overall vitality far more effectively than remaining sedentary indoors.",
+      guidance: resolvedGuidance || "Lựa chọn cá nhân: I would definitely prefer... First of all... Secondly...",
+    };
+  }
+
+  // 6. Xu hướng tương lai (Part 3 Question 3: "how might this situation change in the future?")
+  if (
+    pLower.includes("future") ||
+    pLower.includes("change in the future")
+  ) {
+    return {
+      b1: "In my opinion, more people in the future will seek a balance between technology and outdoor life. As life becomes faster and more stressful, people will recognize the value of mental health and make time to relax outdoors with their family and friends.",
+      b2: "Looking ahead, I anticipate that advancing technology and urban lifestyles will further accelerate digital integration into daily routines. However, this may trigger a counter-trend where individuals consciously embrace digital detoxes and prioritize outdoor wellness to combat screen fatigue and mental burnout.",
+      guidance: resolvedGuidance || "Bình luận xu hướng xã hội trong tương lai.",
+    };
+  }
+
+  // 7. Giới thiệu bản thân (Part 1: "introduce yourself", "where you come from")
+  if (
+    pLower.includes("introduce") ||
+    pLower.includes("yourself") ||
+    pLower.includes("where you come from") ||
+    pLower.includes("where are you from")
+  ) {
+    return {
+      b1: "My name is Nguyen Van A, and I am from Hanoi, Vietnam. I am currently a student preparing for my future career. In my free time, I enjoy listening to music, reading books, and spending time with my family and friends.",
+      b2: "My name is Nguyen Van A, and I was born and raised in Hanoi, the vibrant capital city of Vietnam. Currently, I am pursuing my academic and professional goals in finance. Aside from my work, I have a deep passion for exploring foreign languages, photography, and participating in community service.",
+      guidance: resolvedGuidance || "Trả lời trực tiếp 2-3 câu rõ ràng, tự nhiên.",
+    };
+  }
+
+  // 8. Thời gian rảnh / Sở thích (Part 1)
+  if (pLower.includes("free time") || pLower.includes("hobby") || pLower.includes("hobbies") || pLower.includes("spare time")) {
+    return {
+      b1: "In my free time, I really enjoy playing sports, especially badminton and football with my friends. It helps me stay healthy, relieve stress after long working days, and maintain strong relationships with the people around me.",
+      b2: "Whenever I have leisure time, I dedicate it to reading non-fiction literature and playing badminton. Engaging in physical sports allows me to stay agile and decompress effectively, while reading broadens my perspective and provides valuable intellectual stimulation.",
+      guidance: resolvedGuidance || "Nêu sở thích kèm lý do giúp thư giãn hoặc học hỏi.",
+    };
+  }
+
+  // 9. Sách / Phim yêu thích (Part 1)
+  if (pLower.includes("movie") || pLower.includes("book") || pLower.includes("film")) {
+    return {
+      b1: "My favorite movie is 'The Pursuit of Happyness'. It tells an inspiring story about a father who overcomes great difficulties to achieve success and take care of his son. It taught me the importance of perseverance and never giving up on my dreams.",
+      b2: "One of the most impactful books I have ever read is 'Atomic Habits' by James Clear. The book brilliantly illustrates how minor, incremental behavioral adjustments can compound into remarkable personal transformation over time. It has fundamentally reshaped how I structure my daily discipline and approach long-term goals.",
+      guidance: resolvedGuidance || "Nêu tên tác phẩm, nội dung chính và bài học rút ra.",
+    };
+  }
+
+  // 10. Gia đình (Part 1)
+  if (pLower.includes("family")) {
+    return {
+      b1: "There are four people in my family: my father, my mother, my younger sister and me. My father is an engineer and my mother is an accountant. We live together in Hanoi. We are very close and we always eat dinner together every evening and share about our day.",
+      b2: "My immediate family consists of four members: my parents, my sibling, and myself. Although each of us has a demanding schedule, we consistently prioritize having evening meals together and sharing our experiences. This close-knit bond provides me with an immense sense of emotional stability and encouragement.",
+      guidance: resolvedGuidance,
+    };
+  }
+
+  // 11. Thói quen hàng ngày (Part 1)
+  if (pLower.includes("routine") || pLower.includes("daily")) {
+    return {
+      b1: "On weekdays, I usually wake up at 6:30 AM. After having breakfast, I go to school or work. In the afternoon, I come home, relax and do some light exercise. In the evening, I spend time with my family, study English, and go to bed at around 11 PM.",
+      b2: "My typical daily schedule begins promptly at 6:30 AM with a nutritious breakfast and a brief review of my daily priorities. The bulk of my daytime is dedicated to work commitments. Evenings are reserved for physical workouts, home-cooked dinners, and language practice, which helps maintain a healthy work-life balance.",
+      guidance: resolvedGuidance,
+    };
+  }
+
+  // 12. Part 4 (120s): Đề thuyết trình 3 câu hỏi
+  if (partNumber === 4 || pLower.includes("achieve") || pLower.includes("goal") || pLower.includes("journey") || pLower.includes("event")) {
+    return {
+      b1: "I would like to share an experience regarding this topic. A few years ago, I had a very memorable opportunity when I took part in an important project at my university. At first, I felt nervous and anxious because the challenge was quite demanding. However, my friends and teachers gave me great encouragement and guidance. When I finally accomplished my objective, I felt immensely proud and joyful. In my view, experiences like this are essential for everyone. They teach us resilience, self-confidence, and the value of hard work. Setting clear goals gives people motivation and direction in life. Without goals, it is difficult to measure progress and achieve meaningful success. That is why I believe embracing challenges is crucial for personal development.",
+      b2: "I would like to address this topic by sharing a defining experience from my academic journey. A few years ago, I undertook a comprehensive research project that required extensive fieldwork and data analysis. Initially, I felt overwhelmed by the sheer scope of the assignment and the tight deadlines. Nevertheless, with persistent effort, structured planning, and mentorship from my professors, I managed to present our findings successfully. That moment brought me a tremendous sense of fulfillment and reinforced my confidence in overcoming complex obstacles. Looking at the broader picture, I firmly believe that setting and pursuing meaningful goals is indispensable for personal and professional growth. Goals provide us with a tangible sense of purpose and direction, preventing stagnation in an increasingly competitive world. Furthermore, overcoming challenges during this process cultivates perseverance, problem-solving skills, and emotional maturity. Ultimately, it is through these demanding experiences that individuals discover their true potential and develop the resilience required to thrive.",
+      guidance: resolvedGuidance || "Kể lại trải nghiệm, cảm xúc cá nhân và bình luận quan điểm mở rộng.",
+    };
+  }
+
+  // Fallback tổng quát cho các câu hỏi Speaking khác
+  return {
+    b1: "Regarding this question, I believe that having clear preparation and positive motivation is essential. From my personal perspective, this allows people to build practical skills, communicate more effectively, and achieve better outcomes in their daily lives.",
+    b2: "Addressing this matter, I strongly contend that structured preparation and intrinsic motivation are fundamental prerequisites. From an analytical perspective, engaging proactively in such circumstances enables individuals to cultivate robust communicative competencies, foster critical thinking, and attain sustainable long-term success.",
+    guidance: resolvedGuidance,
+  };
+}
+
+export interface VocabularyHintData {
+  keywords: string[];
+  startingPhrases: string[];
+  linkingPhrases: string[];
+}
+
+export function resolveSpeakingVocabularyHints(
+  prompt: string,
+  topic?: string,
+  partNumber?: number
+): VocabularyHintData {
+  const p = ((prompt || "") + " " + (topic || "")).toLowerCase();
+
+  if (p.includes("outdoor") || p.includes("park") || p.includes("nature") || p.includes("street")) {
+    return {
+      keywords: ["lush greenery", "picturesque scenery", "leisure stroll", "vibrant atmosphere", "outdoor activities", "fresh breeze"],
+      startingPhrases: [
+        "Looking at the picture, the prominent feature is...",
+        "The scene appears to be set in an open outdoor area where...",
+      ],
+      linkingPhrases: [
+        "In the background, the weather seems quite pleasant and sunny...",
+        "This clearly illustrates how people enjoy reconnecting with nature...",
+      ],
+    };
+  }
+
+  if (p.includes("cafe") || p.includes("coffee") || p.includes("restaurant") || p.includes("food") || p.includes("eat") || p.includes("meal")) {
+    return {
+      keywords: ["cozy ambiance", "casual dining", "savory delicacies", "sip a warm beverage", "social gathering", "mouthwatering dishes"],
+      startingPhrases: [
+        "The image captures a lively scene inside a cafe/restaurant where...",
+        "At first glance, what stands out to me is the warm, inviting atmosphere...",
+      ],
+      linkingPhrases: [
+        "The individuals seem deeply engaged in their conversation...",
+        "It reminds me of relaxing weekend get-togethers with close companions...",
+      ],
+    };
+  }
+
+  if (p.includes("work") || p.includes("office") || p.includes("meeting") || p.includes("laptop") || p.includes("study") || p.includes("library")) {
+    return {
+      keywords: ["collaborative workspace", "digital devices", "brainstorm solutions", "intense concentration", "team synergy", "meet tight deadlines"],
+      startingPhrases: [
+        "In this photograph, I can observe a modern working environment where...",
+        "The central focus is a group of colleagues collaborating on a task...",
+      ],
+      linkingPhrases: [
+        "Judging by their focused expressions, they appear to be tackling a deadline...",
+        "This reflects the collaborative nature of contemporary professional life...",
+      ],
+    };
+  }
+
+  if (p.includes("sport") || p.includes("exercise") || p.includes("gym") || p.includes("fitness") || p.includes("run") || p.includes("workout")) {
+    return {
+      keywords: ["physical endurance", "cardio workout", "healthy lifestyle", "burn calories", "strenuous exercise", "boost stamina"],
+      startingPhrases: [
+        "This image depicts individuals actively engaging in physical workout...",
+        "The primary focus is on staying fit and maintaining good health through...",
+      ],
+      linkingPhrases: [
+        "Regular physical exertion like this helps reduce chronic stress...",
+        "It emphasizes the growing awareness of health and personal wellness...",
+      ],
+    };
+  }
+
+  if (p.includes("shop") || p.includes("market") || p.includes("store") || p.includes("supermarket") || p.includes("mall") || p.includes("buy")) {
+    return {
+      keywords: ["bustling marketplace", "browsing products", "retail therapy", "consumer behavior", "fresh produce", "convenient checkout"],
+      startingPhrases: [
+        "The picture illustrates a busy commercial setting where customers are...",
+        "What immediately catches my attention is the wide variety of goods on display...",
+      ],
+      linkingPhrases: [
+        "Shopping in physical stores allows people to inspect items firsthand...",
+        "This scene reflects everyday urban lifestyle and consumer habits...",
+      ],
+    };
+  }
+
+  if (p.includes("travel") || p.includes("vacation") || p.includes("trip") || p.includes("airport") || p.includes("flight") || p.includes("journey")) {
+    return {
+      keywords: ["breathtaking destination", "broaden horizons", "cultural exploration", "travel itinerary", "scenic landmark", "unforgettable getaway"],
+      startingPhrases: [
+        "The picture portrays tourists visiting a captivating travel destination...",
+        "The overall mood of the scene conveys wanderlust and excitement...",
+      ],
+      linkingPhrases: [
+        "Traveling allows individuals to step outside their comfort zone...",
+        "Experiences like this enrich our understanding of different cultures...",
+      ],
+    };
+  }
+
+  if (p.includes("family") || p.includes("child") || p.includes("kid") || p.includes("home") || p.includes("parent")) {
+    return {
+      keywords: ["close-knit bond", "quality family time", "warm household", "nurturing environment", "generational connection", "domestic harmony"],
+      startingPhrases: [
+        "The photograph presents an intimate domestic setting where family members...",
+        "A strong sense of warmth and togetherness is evident as...",
+      ],
+      linkingPhrases: [
+        "Spending meaningful moments together reinforces emotional security...",
+        "This reflects how important strong family bonds are in daily life...",
+      ],
+    };
+  }
+
+  if (p.includes("compare") || p.includes("contrast") || partNumber === 3) {
+    return {
+      keywords: ["striking contrast", "traditional versus modern", "pace of life", "convenience and flexibility", "lifestyle preference"],
+      startingPhrases: [
+        "While the first picture portrays a dynamic setting, the second depicts...",
+        "Comparing the two scenarios, there is a stark difference in...",
+      ],
+      linkingPhrases: [
+        "On the one hand, the former offers great convenience, whereas...",
+        "Personally, I find the latter much more appealing because...",
+      ],
+    };
+  }
+
+  // Fallback tổng quát cho miêu tả tranh Part 2 & Part 3
+  return {
+    keywords: ["focal point", "lively interaction", "peaceful setting", "facial expressions", "daily routine"],
+    startingPhrases: [
+      "The first detail that catches my attention is...",
+      "In the foreground, there are people engaged in...",
+    ],
+    linkingPhrases: [
+      "Overall, the photo conveys a very positive and harmonious vibe...",
+      "From my perspective, this situation is quite relatable because...",
+    ],
+  };
+}
+
+export interface HallOfFameCardItem {
+  id: string;
+  band: "B1" | "B2" | "C";
+  score: string;
+  author: string;
+  text: string;
+  partNumber: number;
+}
+
+// Danh sách bài mẫu học viên Bảng Kỳ Tích đạt điểm cao thực chiến
+function getSpeakingHallOfFameSubmissions(topic?: string, partNumber?: number): HallOfFameCardItem[] {
+  return [
+    {
+      id: "hof-1",
+      band: "B1",
+      score: "22/30",
+      author: "Học viên ẩn danh",
+      text: "Well, receiving a gift is a very special moment for me. Uh, I think it's not about the value of the gift, but it's about the thought and the effort that the person put into it. For example, my best friend made me a small handcrafted card on my birthday...",
+      partNumber: 4,
+    },
+    {
+      id: "hof-2",
+      band: "B1",
+      score: "22/30",
+      author: "Học viên ẩn danh",
+      text: "The last gift I received was a handmade photo album from my best friend on my birthday. We've been friends since high school, so we share countless memories. Flipping through each page brought back so much laughter and joy...",
+      partNumber: 4,
+    },
+    {
+      id: "hof-3",
+      band: "B1",
+      score: "21/30",
+      author: "Học viên ẩn danh",
+      text: "First of all, I would like to tell you about the last gift I received. So, uh last year when I turned 18, I passed the national entrance test to attend my dream university, and my parents surprised me with a wristwatch...",
+      partNumber: 4,
+    },
+    {
+      id: "hof-4",
+      band: "B1",
+      score: "23/30",
+      author: "Học viên ẩn danh",
+      text: "First question, the last gift I received was a watch from my family on my birthday. It was about two months ago. We had a small party at home and after that my father gave me a nicely wrapped box...",
+      partNumber: 4,
+    },
+    {
+      id: "hof-5",
+      band: "B1",
+      score: "22/30",
+      author: "Học viên ẩn danh",
+      text: "I would like to tell you about the last gift I received was a brand new laptop which my parents gave to me to celebrate my admission to university. It was extremely helpful for my studies...",
+      partNumber: 4,
+    },
+    {
+      id: "hof-6",
+      band: "B2",
+      score: "27/30",
+      author: "Học viên ẩn danh",
+      text: "Well, to kick off with the first question about is the last present I received. It was an elegant mechanical wristwatch given to me by my parents on my most recent birthday. Not only was it aesthetically pleasing, but it also held immense sentimental value...",
+      partNumber: 4,
+    },
+  ];
 }
 
 // Hàm phân tích 3 câu hỏi phụ của Part 4
@@ -142,6 +496,11 @@ function SpeakingExamRunnerContent() {
   // Toggle & Tabs cho Bài Nói Mẫu (Screenshot 2)
   const [showSampleAnswer, setShowSampleAnswer] = useState(false);
   const [sampleTab, setSampleTab] = useState<"b1" | "b2">("b1");
+
+  // Bảng Kỳ Tích & Modal Pro (Screenshots 1 & 2)
+  const [hofBandTab, setHofBandTab] = useState<"B1" | "B2" | "C">("B1");
+  const [hofOffset, setHofOffset] = useState(0);
+  const [isProModalOpen, setIsProModalOpen] = useState(false);
 
   // Modal nháp & Modal báo lỗi
   const [isScratchpadOpen, setIsScratchpadOpen] = useState(false);
@@ -236,6 +595,9 @@ function SpeakingExamRunnerContent() {
               }
             }
 
+            const rawExp = (q.explanation || "").trim();
+            const hasVn = isVietnameseText(rawExp);
+
             loaded.push({
               id: q.id,
               partNumber: pNum,
@@ -258,9 +620,8 @@ function SpeakingExamRunnerContent() {
                 (pNum === 3
                   ? "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80"
                   : undefined),
-              sampleAnswer:
-                q.explanation ||
-                "In my perspective, this response demonstrates clear pronunciation, accurate grammar control, and natural intonation aligned with British Council Band C standards.",
+              sampleAnswer: hasVn ? "" : rawExp,
+              guidanceNote: hasVn ? rawExp : undefined,
               subQuestions,
               topic: p.title ? p.title.replace(/^Part\s*\d+\s*[-:]*\s*/i, "") : undefined,
             });
@@ -330,15 +691,53 @@ function SpeakingExamRunnerContent() {
     : 0;
   const totalInPart = questionsInCurrentPart.length || 3;
 
-  // Sample answers B1 & B2
-  const sampleAnswerB2 = currentQ?.sampleAnswer || "";
-  const sampleAnswerB1 = currentQ
-    ? generateB1SampleAnswer(sampleAnswerB2, currentQ.prompt)
-    : "";
-  const currentSampleText = sampleTab === "b1" ? sampleAnswerB1 : sampleAnswerB2;
+  // Sample answers B1 & B2 kèm gợi ý dàn ý tiếng Việt (nếu có)
+  const sampleData = useMemo(() => {
+    if (!currentQ) return { b1: "", b2: "", guidance: undefined };
+    return resolveSpeakingSampleAnswers(
+      currentQ.prompt,
+      currentQ.sampleAnswer,
+      currentQ.partNumber,
+      currentQ.guidanceNote
+    );
+  }, [currentQ]);
+
+  const currentSampleText = sampleTab === "b1" ? sampleData.b1 : sampleData.b2;
+  const currentGuidance = sampleData.guidance;
   const sampleWordCount = currentSampleText.trim()
     ? currentSampleText.trim().split(/\s+/).length
     : 0;
+
+  // Gợi ý từ vựng & Collocations bên cạnh tranh (Part 2 & Part 3)
+  const vocabHints = useMemo(() => {
+    if (!currentQ) return { keywords: [], startingPhrases: [], linkingPhrases: [] };
+    return resolveSpeakingVocabularyHints(currentQ.prompt, currentQ.topic, currentQ.partNumber);
+  }, [currentQ]);
+
+  // Dữ liệu Bảng Kỳ Tích cho câu hỏi hiện tại
+  const hofSubmissions = useMemo(() => {
+    return getSpeakingHallOfFameSubmissions(currentQ?.topic, currentQ?.partNumber);
+  }, [currentQ]);
+
+  const b1Hof = hofSubmissions.filter((s) => s.band === "B1");
+  const b2Hof = hofSubmissions.filter((s) => s.band === "B2");
+  const cHof = hofSubmissions.filter((s) => s.band === "C");
+
+  const currentHofList =
+    hofBandTab === "B1" ? b1Hof : hofBandTab === "B2" ? b2Hof : cHof;
+
+  const totalHofCount = hofSubmissions.length;
+
+  const displayedHofCards = useMemo(() => {
+    if (currentHofList.length === 0) return [];
+    if (currentHofList.length <= 3) return currentHofList;
+    const start = (hofOffset * 3) % currentHofList.length;
+    const items: HallOfFameCardItem[] = [];
+    for (let i = 0; i < 3; i++) {
+      items.push(currentHofList[(start + i) % currentHofList.length]);
+    }
+    return items;
+  }, [currentHofList, hofOffset]);
 
   // Khởi tạo hoặc khôi phục trạng thái cho câu hỏi
   const initQuestionState = useCallback(
@@ -845,48 +1244,176 @@ function SpeakingExamRunnerContent() {
                     </h2>
                   </div>
 
-                  {/* PART 1, 2, 3: Direct prompt or image */}
-                  {currentQ.partNumber !== 4 && (
+                  {/* PART 1: Direct prompt */}
+                  {currentQ.partNumber === 1 && (
                     <div className="space-y-4">
-                      {/* Image for Part 2 & Part 3 */}
-                      {currentQ.imageUrl && (
-                        <div
-                          className={`grid gap-4 ${
-                            currentQ.secondImageUrl ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"
-                          }`}
-                        >
-                          <div className="relative overflow-hidden rounded-xl border border-border bg-muted/20 aspect-[16/10]">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={currentQ.imageUrl}
-                              alt="Speaking Aptis Prompt 1"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
-                              }}
-                            />
-                          </div>
-                          {currentQ.secondImageUrl && (
-                            <div className="relative overflow-hidden rounded-xl border border-border bg-muted/20 aspect-[16/10]">
+                      <p className="text-base md:text-lg text-foreground font-semibold leading-relaxed">
+                        {currentQ.prompt}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* PART 2: Single Picture + Side Vocabulary Box */}
+                  {currentQ.partNumber === 2 && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                        {/* Cột trái (7 cols): Hình ảnh đề thi */}
+                        <div className="lg:col-span-7 space-y-3">
+                          {currentQ.imageUrl && (
+                            <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
-                                src={currentQ.secondImageUrl}
-                                alt="Speaking Aptis Prompt 2"
-                                className="w-full h-full object-cover"
+                                src={currentQ.imageUrl}
+                                alt="Speaking Aptis Prompt 1"
+                                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                                 onError={(e) => {
                                   (e.target as HTMLImageElement).src =
-                                    "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80";
+                                    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
                                 }}
                               />
                             </div>
                           )}
+                          <p className="text-base md:text-lg text-foreground font-semibold leading-relaxed pt-1">
+                            {currentQ.prompt}
+                          </p>
                         </div>
-                      )}
 
-                      <p className="text-base md:text-lg text-foreground font-medium leading-relaxed">
+                        {/* Cột phải (5 cols): Bảng Từ Vựng & Collocations Ăn Điểm */}
+                        <div className="lg:col-span-5 rounded-2xl border border-primary/20 bg-primary/5 p-4 md:p-5 space-y-4 shadow-xs">
+                          <div className="flex items-center justify-between border-b border-primary/15 pb-2.5">
+                            <div className="flex items-center gap-2">
+                              <Sparkles className="w-4 h-4 text-primary" />
+                              <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-primary">
+                                Gợi Ý Từ Vựng & Collocations
+                              </h4>
+                            </div>
+                            <span className="text-[10px] font-semibold text-primary/80 uppercase">Aim B1 - B2</span>
+                          </div>
+
+                          {/* Keywords & Collocations Pills */}
+                          <div className="space-y-2">
+                            <span className="text-xs font-semibold text-foreground/80 block">Từ khóa ăn điểm (Collocations):</span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {vocabHints.keywords.map((kw, kwIdx) => (
+                                <span
+                                  key={kwIdx}
+                                  className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-background border border-primary/20 text-foreground shadow-2xs hover:border-primary/50 transition-colors"
+                                >
+                                  {kw}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Mẫu câu mở đầu */}
+                          <div className="space-y-1.5 pt-1">
+                            <span className="text-xs font-semibold text-foreground/80 block">Mẫu câu mở đầu phản xạ:</span>
+                            <div className="space-y-1.5">
+                              {vocabHints.startingPhrases.map((phrase, pIdx) => (
+                                <p key={pIdx} className="text-xs text-foreground/90 bg-background/80 p-2 rounded-lg border border-border/60 leading-relaxed font-sans">
+                                  &ldquo;{phrase}&rdquo;
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Mẫu câu phát triển ý */}
+                          <div className="space-y-1.5 pt-1">
+                            <span className="text-xs font-semibold text-foreground/80 block">Mẫu câu mở rộng ý:</span>
+                            <div className="space-y-1.5">
+                              {vocabHints.linkingPhrases.map((phrase, pIdx) => (
+                                <p key={pIdx} className="text-xs text-foreground/90 bg-background/80 p-2 rounded-lg border border-border/60 leading-relaxed font-sans">
+                                  &ldquo;{phrase}&rdquo;
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* PART 3: Two Contrasting Pictures + Vocabulary & Comparison Box */}
+                  {currentQ.partNumber === 3 && (
+                    <div className="space-y-4">
+                      {/* 2 Contrasting Pictures */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={currentQ.imageUrl}
+                            alt="Speaking Aptis Prompt 1"
+                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
+                            }}
+                          />
+                          <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-black/60 text-white font-bold text-xs backdrop-blur-xs">
+                            Picture 1
+                          </span>
+                        </div>
+
+                        <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={currentQ.secondImageUrl || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80"}
+                            alt="Speaking Aptis Prompt 2"
+                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80";
+                            }}
+                          />
+                          <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-black/60 text-white font-bold text-xs backdrop-blur-xs">
+                            Picture 2
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className="text-base md:text-lg text-foreground font-semibold leading-relaxed">
                         {currentQ.prompt}
                       </p>
+
+                      {/* Bảng Gợi Ý So Sánh & Đối Lập (Part 3) */}
+                      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 md:p-5 space-y-4 shadow-xs">
+                        <div className="flex items-center justify-between border-b border-primary/15 pb-2.5">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-primary" />
+                            <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-primary">
+                              Gợi Ý So Sánh Đối Lập & Cấu Trúc Ăn Điểm Part 3
+                            </h4>
+                          </div>
+                          <span className="text-[10px] font-semibold text-primary/80 uppercase">Aim B1 - B2</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div className="space-y-1.5">
+                            <span className="text-xs font-semibold text-foreground/80 block">Collocations đối lập:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {vocabHints.keywords.map((kw, kwIdx) => (
+                                <span
+                                  key={kwIdx}
+                                  className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-background border border-primary/20 text-foreground"
+                                >
+                                  {kw}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5 md:col-span-2">
+                            <span className="text-xs font-semibold text-foreground/80 block">Mẫu câu so sánh & đối chiếu (Compare & Contrast):</span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {vocabHints.startingPhrases.concat(vocabHints.linkingPhrases).slice(0, 4).map((phrase, pIdx) => (
+                                <p key={pIdx} className="text-xs text-foreground/90 bg-background/80 p-2 rounded-lg border border-border/60 leading-relaxed font-sans">
+                                  &ldquo;{phrase}&rdquo;
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -945,12 +1472,28 @@ function SpeakingExamRunnerContent() {
                 {/* BÀI NÓI MẪU (Sample Answer Box - Screenshot 2) */}
                 {showSampleAnswer && (
                   <div className="rounded-2xl border border-border bg-card p-5 md:p-6 shadow-xs space-y-4 animate-in fade-in">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-amber-500" />
-                      <h3 className="font-heading font-bold text-xs uppercase tracking-wider text-foreground">
-                        BÀI NÓI MẪU
-                      </h3>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-amber-500" />
+                        <h3 className="font-heading font-bold text-xs uppercase tracking-wider text-foreground">
+                          BÀI NÓI MẪU
+                        </h3>
+                      </div>
+                      <span className="text-[11px] text-muted-foreground font-medium">
+                        Chuẩn chấm điểm Aptis ESOL
+                      </span>
                     </div>
+
+                    {/* Gợi ý dàn ý tiếng Việt (nếu có từ ngân hàng đề) */}
+                    {currentGuidance && (
+                      <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+                        <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                        <div className="space-y-0.5 leading-relaxed">
+                          <span className="font-bold">Gợi ý dàn ý: </span>
+                          <span>{currentGuidance}</span>
+                        </div>
+                      </div>
+                    )}
 
                     {/* 2 tabs: Bản dễ học (B1) & Bản nâng cao (B2+) */}
                     <div className="grid grid-cols-2 p-1 rounded-xl bg-muted/60 border border-border text-xs gap-1">
@@ -992,6 +1535,118 @@ function SpeakingExamRunnerContent() {
                         {sampleWordCount} từ · nói vừa đủ {currentQ.speakTime || 30} giây
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* BẢNG KỲ TÍCH · 6 bài (Screenshot 1) */}
+                {showSampleAnswer && (
+                  <div className="rounded-2xl border border-amber-500/25 bg-card p-5 md:p-6 shadow-xs space-y-4 animate-in fade-in">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Trophy className="w-4 h-4 text-amber-500" />
+                        <h3 className="font-heading font-bold text-xs uppercase tracking-wider text-foreground">
+                          BẢNG KỲ TÍCH · {totalHofCount} bài
+                        </h3>
+                      </div>
+                      <Link
+                        href="/bang-ky-tich"
+                        target="_blank"
+                        className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                      >
+                        <span>Xem Bảng Kỳ Tích</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+
+                    {/* Filter tabs: B1 (5), B2 (1), C (0) */}
+                    <div className="flex items-center gap-2 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHofBandTab("B1");
+                          setHofOffset(0);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                          hofBandTab === "B1"
+                            ? "bg-foreground text-background shadow-xs"
+                            : "bg-muted/60 border border-border text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        B1 ({b1Hof.length})
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHofBandTab("B2");
+                          setHofOffset(0);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                          hofBandTab === "B2"
+                            ? "bg-foreground text-background shadow-xs"
+                            : "bg-muted/60 border border-border text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        B2 ({b2Hof.length})
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHofBandTab("C");
+                          setHofOffset(0);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                          hofBandTab === "C"
+                            ? "bg-foreground text-background shadow-xs"
+                            : "bg-muted/60 border border-border text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        C ({cHof.length})
+                      </button>
+                    </div>
+
+                    {/* 3 cards grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {displayedHofCards.map((card) => (
+                        <div
+                          key={card.id}
+                          onClick={() => setIsProModalOpen(true)}
+                          className="rounded-xl border border-border bg-muted/30 hover:border-primary/50 hover:bg-muted/60 p-4 transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
+                        >
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-foreground">
+                              {card.band}
+                            </span>
+                            <span className="font-mono text-muted-foreground text-[11px]">
+                              {card.score}
+                            </span>
+                          </div>
+
+                          <p className="text-xs text-foreground/80 leading-relaxed line-clamp-4">
+                            {card.text}
+                          </p>
+
+                          <div className="text-[11px] text-muted-foreground font-medium pt-1 border-t border-border/40">
+                            {card.author}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Footer: Đổi 3 bài khác */}
+                    {currentHofList.length > 3 && (
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setHofOffset((prev) => prev + 1)}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline transition-colors"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Đổi 3 bài khác</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1450,6 +2105,42 @@ function SpeakingExamRunnerContent() {
                 </Link>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL TÍNH NĂNG DÀNH CHO PRO (Screenshot 2) */}
+      {isProModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-card border border-border rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl relative space-y-4">
+            <button
+              type="button"
+              onClick={() => setIsProModalOpen(false)}
+              className="absolute top-4 right-4 w-7 h-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-14 h-14 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mx-auto border border-red-500/20">
+              <Crown className="w-7 h-7" />
+            </div>
+
+            <div className="space-y-1.5">
+              <h3 className="font-heading font-bold text-base text-foreground">
+                Tính năng dành cho Pro
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Bảng Kỳ Tích dành cho thành viên Pro. Nâng cấp để mở khóa.
+              </p>
+            </div>
+
+            <Link
+              href="/pricing"
+              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition-all"
+            >
+              <Crown className="w-4 h-4" />
+              <span>Nâng cấp Pro</span>
+            </Link>
           </div>
         </div>
       )}

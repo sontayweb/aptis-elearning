@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Clock,
   FileText,
@@ -675,6 +675,13 @@ export function UniversalSkillGuideModal({
 }: UniversalSkillGuideModalProps) {
   const [currentSkill, setCurrentSkill] = useState<SkillType>(initialSkill);
   const [activePartIndex, setActivePartIndex] = useState(0);
+
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentSkill(initialSkill);
+      setActivePartIndex(0);
+    }
+  }, [isOpen, initialSkill]);
 
   if (!isOpen) return null;
 

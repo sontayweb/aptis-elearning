@@ -13,10 +13,12 @@ export interface TtsOptions {
 
 export class TtsAudioService {
   private audioDir: string;
+  private subDir: string;
 
-  constructor(customUploadDir?: string) {
+  constructor(customUploadDir?: string, subDir: string = 'listening') {
     const baseUpload = customUploadDir || path.resolve(process.env.UPLOAD_DIR || './uploads');
-    this.audioDir = path.join(baseUpload, 'audio', 'listening');
+    this.subDir = subDir;
+    this.audioDir = path.join(baseUpload, 'audio', subDir);
     if (!fs.existsSync(this.audioDir)) {
       fs.mkdirSync(this.audioDir, { recursive: true });
     }
@@ -61,7 +63,7 @@ export class TtsAudioService {
 
     return {
       localPath: outputPath,
-      publicUrl: `/uploads/audio/listening/${filename}`,
+      publicUrl: `/uploads/audio/${this.subDir}/${filename}`,
     };
   }
 

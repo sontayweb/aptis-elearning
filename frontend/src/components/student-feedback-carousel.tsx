@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Trophy,
   ChevronLeft,
@@ -11,6 +12,7 @@ import {
   CheckCircle2,
   X,
   FileCheck,
+  ExternalLink,
 } from "lucide-react";
 import { api } from "@/lib/api-client";
 
@@ -165,26 +167,45 @@ export function StudentFeedbackCarousel() {
                 className="w-16 sm:w-20 shrink-0 rounded-lg border border-border/80 bg-muted/40 hover:border-primary/50 overflow-hidden flex flex-col items-center justify-center p-1.5 transition-transform group-hover:scale-105 cursor-pointer relative"
                 title="Nhấn để xem bảng điểm"
               >
-                {/* Simulated Certificate Graphic */}
-                <div className="w-full h-full rounded border border-border/60 bg-card flex flex-col justify-between p-1 shadow-xs">
-                  <div className="flex items-center justify-between border-b border-border/40 pb-0.5">
-                    <span className="text-[7px] font-black text-rose-500 uppercase">
-                      APTIS
+                {item.certificateImageUrl ? (
+                  /* Ảnh bảng điểm thật */
+                  <div className="w-full h-full rounded overflow-hidden relative" style={{ minHeight: 56 }}>
+                    <Image
+                      src={item.certificateImageUrl}
+                      alt={`Bảng điểm ${item.studentName}`}
+                      fill
+                      className="object-cover object-top"
+                      sizes="80px"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <span className="absolute bottom-0.5 left-0 right-0 text-center text-[8px] font-bold text-white">
+                      {item.achievedBand}
                     </span>
-                    <FileCheck className="w-2.5 h-2.5 text-emerald-500" />
                   </div>
-                  <div className="space-y-0.5 py-1">
-                    <div className="w-full h-1 bg-muted rounded-full" />
-                    <div className="w-4/5 h-1 bg-amber-500/60 rounded-full" />
-                    <div className="w-full h-1 bg-primary/60 rounded-full" />
-                  </div>
-                  <span className="text-[7.5px] font-bold text-center text-foreground/80 block">
-                    {item.achievedBand}
-                  </span>
-                </div>
-                <span className="text-[9px] font-semibold text-primary mt-1">
-                  Xem bảng điểm
-                </span>
+                ) : (
+                  /* Simulated Certificate Graphic (fallback) */
+                  <>
+                    <div className="w-full h-full rounded border border-border/60 bg-card flex flex-col justify-between p-1 shadow-xs">
+                      <div className="flex items-center justify-between border-b border-border/40 pb-0.5">
+                        <span className="text-[7px] font-black text-rose-500 uppercase">
+                          APTIS
+                        </span>
+                        <FileCheck className="w-2.5 h-2.5 text-emerald-500" />
+                      </div>
+                      <div className="space-y-0.5 py-1">
+                        <div className="w-full h-1 bg-muted rounded-full" />
+                        <div className="w-4/5 h-1 bg-amber-500/60 rounded-full" />
+                        <div className="w-full h-1 bg-primary/60 rounded-full" />
+                      </div>
+                      <span className="text-[7.5px] font-bold text-center text-foreground/80 block">
+                        {item.achievedBand}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-semibold text-primary mt-1">
+                      Xem bảng điểm
+                    </span>
+                  </>
+                )}
               </button>
 
               {/* Feedback Content */}
@@ -237,48 +258,56 @@ export function StudentFeedbackCarousel() {
               </h3>
             </div>
 
-            {/* Simulated High-Res Certificate Card */}
-            <div className="rounded-xl border border-border bg-gradient-to-b from-card to-muted/20 p-4 space-y-3 shadow-inner">
-              <div className="flex items-center justify-between border-b border-border/80 pb-2">
-                <div>
-                  <span className="text-xs font-black text-rose-500 uppercase tracking-wider block">
-                    British Council Aptis ESOL
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    Báo cáo kết quả kiểm tra năng lực
-                  </span>
+            {/* Simulated High-Res Certificate Card hoặc Ảnh Thật */}
+            <div className="rounded-xl border border-border bg-gradient-to-b from-card to-muted/20 overflow-hidden shadow-inner">
+              {activeCertificate.certificateImageUrl ? (
+                /* Ảnh bảng điểm thật — full size */
+                <div className="relative w-full" style={{ minHeight: 220 }}>
+                  <Image
+                    src={activeCertificate.certificateImageUrl}
+                    alt={`Bảng điểm thật: ${activeCertificate.studentName}`}
+                    fill
+                    className="object-contain object-top"
+                    sizes="(max-width: 640px) 100vw, 480px"
+                  />
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-rose-600 text-white font-extrabold text-xs">
-                  {activeCertificate.achievedBand}
-                </span>
-              </div>
+              ) : (
+                /* Simulated certificate card (fallback) */
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center justify-between border-b border-border/80 pb-2">
+                    <div>
+                      <span className="text-xs font-black text-rose-500 uppercase tracking-wider block">
+                        British Council Aptis ESOL
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        Báo cáo kết quả kiểm tra năng lực
+                      </span>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full bg-rose-600 text-white font-extrabold text-xs">
+                      {activeCertificate.achievedBand}
+                    </span>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs py-1">
-                <div>
-                  <span className="text-[10px] text-muted-foreground block">
-                    Thí sinh
-                  </span>
-                  <strong className="text-foreground">
-                    {activeCertificate.studentName}
-                  </strong>
+                  <div className="grid grid-cols-2 gap-2 text-xs py-1">
+                    <div>
+                      <span className="text-[10px] text-muted-foreground block">Thí sinh</span>
+                      <strong className="text-foreground">{activeCertificate.studentName}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-muted-foreground block">Khóa đào tạo</span>
+                      <strong className="text-foreground">{activeCertificate.className}</strong>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                    {activeCertificate.scoreSummary} · Đạt yêu cầu chuẩn đầu ra B2/C1
+                  </div>
+
+                  <blockquote className="text-xs italic text-muted-foreground border-l-2 border-primary/50 pl-2.5">
+                    &ldquo;{activeCertificate.quote}&rdquo;
+                  </blockquote>
                 </div>
-                <div>
-                  <span className="text-[10px] text-muted-foreground block">
-                    Khóa đào tạo
-                  </span>
-                  <strong className="text-foreground">
-                    {activeCertificate.className}
-                  </strong>
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-700 dark:text-emerald-400 font-medium">
-                {activeCertificate.scoreSummary} · Đạt yêu cầu chuẩn đầu ra B2/C1
-              </div>
-
-              <blockquote className="text-xs italic text-muted-foreground border-l-2 border-primary/50 pl-2.5">
-                &ldquo;{activeCertificate.quote}&rdquo;
-              </blockquote>
+              )}
             </div>
 
             <button

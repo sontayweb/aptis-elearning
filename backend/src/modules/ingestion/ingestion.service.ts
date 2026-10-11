@@ -52,7 +52,7 @@ export class IngestionService {
               question_number: q.questionNumber,
               question_type: q.questionType,
               prompt: q.prompt,
-              options: q.options ? JSON.stringify(q.options) : null,
+              options: q.options ? (q.options as any) : undefined,
               correct_answer: q.correctAnswer || null,
               explanation: q.explanation || null,
               max_score: q.maxScore ?? 1.0,

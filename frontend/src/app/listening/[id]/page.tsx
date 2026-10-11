@@ -25,6 +25,8 @@ import {
   X,
   Trophy,
   Sparkles,
+  FileText,
+  Languages,
 } from "lucide-react";
 
 // Định nghĩa dữ liệu 4 Parts chuẩn Aptis Listening
@@ -196,10 +198,14 @@ const DEFAULT_LISTENING_TEST = {
         explanation: "Speaker D prefers quiet mindfulness, stretching, and breathing exercises at home.",
       },
     ],
+    passageText: `Speaker A: "I wake up at 6 every morning to run in the park nearby. The fresh air and quiet streets give me energy for the whole day."\n\nSpeaker B: "Every Saturday afternoon, I meet up with my colleagues for amateur basketball tournaments. I love the teamwork and friendly competition."\n\nSpeaker C: "I work with a personal trainer at a modern gym three times a week. Having a structured routine and expert guidance keeps me motivated."\n\nSpeaker D: "I prefer gentle yoga and meditation in my living room. It helps calm my mind, relieves back stiffness, and requires no special gear."`,
+    translationText: `Người nói A: "Tôi thức dậy lúc 6 giờ sáng mỗi ngày để chạy bộ trong công viên gần nhà. Không khí trong lành và đường phố yên tĩnh tiếp thêm năng lượng cho cả ngày dài."\n\nNgười nói B: "Chiều thứ Bảy hàng tuần, tôi gặp đồng nghiệp tham gia giải bóng rổ phong trào. Tôi rất thích tinh thần đồng đội và sự thi đấu giao lưu vui vẻ."\n\nNgười nói C: "Tôi tập cùng huấn luyện viên cá nhân tại phòng gym hiện đại 3 buổi mỗi tuần. Lộ trình bài bản và sự chỉ dẫn chuyên môn giúp tôi luôn giữ vững động lực."\n\nNgười nói D: "Tôi thích tập yoga nhẹ nhàng và thiền định tại phòng khách. Nó giúp làm dịu tâm trí, giải tỏa đau mỏi lưng mà không cần dụng cụ phức tạp."`,
   },
   part3: {
     topic: "There is too much information on the Internet",
     instructions: "Who expresses which opinion?",
+    passageText: `Man: "It feels like we are constantly bombarded with endless articles and social feeds. There is simply too much information on the Internet these days."\n\nWoman: "I completely agree, but the real challenge is that finding reliable information now requires critical skills and filtering techniques."\n\nMan: "Recent studies also show that navigating all this digital noise actually rewires our brains and alters how we think and process facts."\n\nWoman: "Not to mention patience—teenagers expect instantaneous answers and struggle with deep, focused tasks because of the web."`,
+    translationText: `Nam: "Cảm giác như chúng ta liên tục bị bủa vây bởi vô số bài báo và nguồn cấp dữ liệu mạng xã hội. Thật sự có quá nhiều thông tin trên Internet ngày nay."\n\nNữ: "Tôi hoàn toàn đồng ý, nhưng thách thức thực sự là việc tìm kiếm thông tin đáng tin cậy đòi hỏi kỹ năng chọn lọc và tư duy phản biện sắc bén."\n\nNam: "Các nghiên cứu gần đây cũng chỉ ra rằng việc tiếp nhận quá nhiều tạp âm số đang làm thay đổi cách não bộ chúng ta tư duy và xử lý các sự kiện."\n\nNữ: "Chưa kể đến tính kiên nhẫn—thanh thiếu niên ngày nay mong đợi câu trả lời tức thì và rất khó tập trung lâu dài vào các việc đòi hỏi sự sâu sắc vì mạng internet."`,
     opinions: [
       {
         statement: "1. There is too much information on the Internet",
@@ -410,10 +416,14 @@ const DEFAULT_LISTENING_TEST_2 = {
         explanation: "Speaker D produces deeper research output at home.",
       },
     ],
+    passageText: `Speaker A: "Working remotely saves me over two hours of commuting in crowded subway trains each day, giving me more time with family."\n\nSpeaker B: "I really miss the spontaneous hallway brainstorming and casual coffee talks with teammates that only happen in person."\n\nSpeaker C: "My biggest struggle is boundary setting. With work laptops at home, I often end up responding to emails until late at night."\n\nSpeaker D: "I get so much more deep analytical work done without constant open-plan office disruptions and impromptu meetings."`,
+    translationText: `Người nói A: "Làm việc từ xa giúp tôi tiết kiệm hơn 2 giờ đi lại trên các chuyến tàu điện ngầm đông đúc mỗi ngày, dành được nhiều thời gian hơn cho gia đình."\n\nNgười nói B: "Tôi thực sự nhớ những buổi trao đổi ý tưởng ngẫu hứng ở hành lang và lúc trò chuyện cà phê trực tiếp cùng đồng nghiệp."\n\nNgười nói C: "Khó khăn lớn nhất của tôi là thiết lập ranh giới làm việc. Để máy tính ở nhà khiến tôi thường xuyên phải trả lời email đến tận đêm muộn."\n\nNgười nói D: "Tôi hoàn thành được nhiều nghiên cứu phân tích chuyên sâu hơn hẳn khi không bị phân tâm bởi môi trường văn phòng mở và các cuộc họp đột xuất."`,
   },
   part3: {
     topic: "Electric Vehicles and Environmental Future",
     instructions: "Who expresses which opinion? Select Man, Woman, or Both.",
+    passageText: `Man: "Electric vehicles are gaining popularity, but rural charging networks remain painfully sparse across the countryside."\n\nWoman: "I agree, charging deserts outside major metropolitan highways are still a major roadblock for everyday drivers."\n\nMan: "We also cannot overlook the significant carbon and environmental footprint tied to rare metal battery mining."\n\nWoman: "True, but as technology scales and subsidies expand, EVs will definitely dominate passenger transit by 2035."`,
+    translationText: `Nam: "Xe điện đang ngày càng phổ biến hơn, nhưng mạng lưới trạm sạc ở khu vực nông thôn vẫn còn quá thưa thớt."\n\nNữ: "Tôi đồng ý, các khoảng trống thiếu trạm sạc ngoài trục đô thị lớn vẫn là trở ngại đáng kể với tài xế đi lại hàng ngày."\n\nNam: "Chúng ta cũng không thể xem nhẹ dấu chân carbon và tác động môi trường không nhỏ từ hoạt động khai thác kim loại hiếm làm pin."\n\nNữ: "Đúng vậy, nhưng khi công nghệ được tối ưu và chính sách trợ cấp mở rộng, xe điện chắc chắn sẽ giữ thế áp đảo trong phương tiện giao thông trước năm 2035."`,
     opinions: [
       {
         statement: "1. Charging infrastructure in rural areas is still inadequate.",
@@ -540,6 +550,46 @@ function ListeningExamRunnerContent() {
   const [showSampleAnswers, setShowSampleAnswers] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [showScript, setShowScript] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<"all" | "p1" | "p2" | "p3" | "p4">("all");
+
+  // Lấy Script và Bản dịch song song cho stage hiện tại
+  const getCurrentBilingualData = () => {
+    if (activeStage === 13) {
+      return {
+        title: "Part 2 — Đoạn ghi âm 4 người nói",
+        script: (examData.part2 as any).passageText || examData.part2.speakers.map((s) => `${s.speaker}: "${s.correctAnswer}"`).join("\n\n"),
+        translation: (examData.part2 as any).translationText || "",
+      };
+    } else if (activeStage === 14) {
+      return {
+        title: "Part 3 — Hội thoại thảo luận quan điểm",
+        script: (examData.part3 as any).passageText || examData.part3.opinions.map((o) => `• ${o.statement} (${o.correctAnswer})`).join("\n\n"),
+        translation: (examData.part3 as any).translationText || "",
+      };
+    } else if (activeStage === 15) {
+      return {
+        title: "Part 4 — Bài thuyết trình 1 (Recording 1)",
+        script: examData.part4[0]?.passageText || "",
+        translation: (examData.part4[0] as any)?.translationText || "",
+      };
+    } else if (activeStage === 16) {
+      return {
+        title: "Part 4 — Bài thuyết trình 2 (Recording 2)",
+        script: examData.part4[1]?.passageText || "",
+        translation: (examData.part4[1] as any)?.translationText || "",
+      };
+    } else if (activeStage <= 12) {
+      const q = examData.part1[activeStage];
+      return {
+        title: `Part 1 — Câu hỏi ${activeStage + 1}`,
+        script: q?.prompt || "",
+        translation: "",
+      };
+    }
+    return null;
+  };
 
   // Tự động nhảy tới Part nếu URL có ?part=p1 / p2 / p3 / p4 / 1 / 2 / 3 / 4
   useEffect(() => {
@@ -650,44 +700,55 @@ function ListeningExamRunnerContent() {
       }
 
       // Part 2: Speakers matching
-      if (pNum === 2 && questions.length > 0) {
-        if (p.audio_url) audioUrls[13] = p.audio_url;
-        const spkList = questions.map((q: any, idx: number) => ({
-          id: q.id,
-          speaker: q.prompt ? q.prompt.replace(/^Speaker\s*[A-D]\s*[-:]*\s*/i, "") : `Speaker ${String.fromCharCode(65 + idx)}`,
-          correctAnswer: q.correct_answer || "",
-          explanation: q.explanation || "",
-        }));
-        if (spkList.length > 0) {
-          result.part2.speakers = spkList;
-          if (p.instructions) result.part2.instructions = p.instructions;
+      if (pNum === 2) {
+        if (p.passage_text) (result.part2 as any).passageText = p.passage_text;
+        if (p.translation_text || p.passage_translation) (result.part2 as any).translationText = p.translation_text || p.passage_translation;
+        if (questions.length > 0) {
+          if (p.audio_url) audioUrls[13] = p.audio_url;
+          const spkList = questions.map((q: any, idx: number) => ({
+            id: q.id,
+            speaker: q.prompt ? q.prompt.replace(/^Speaker\s*[A-D]\s*[-:]*\s*/i, "") : `Speaker ${String.fromCharCode(65 + idx)}`,
+            correctAnswer: q.correct_answer || "",
+            explanation: q.explanation || "",
+          }));
+          if (spkList.length > 0) {
+            result.part2.speakers = spkList;
+            if (p.instructions) result.part2.instructions = p.instructions;
+          }
         }
       }
 
       // Part 3: Opinion discussion
-      if (pNum === 3 && questions.length > 0) {
-        if (p.audio_url) audioUrls[14] = p.audio_url;
-        const opList = questions.map((q: any) => {
-          let cor: "Man" | "Woman" | "Both" = "Both";
-          const corStr = String(q.correct_answer || "").toLowerCase();
-          if (corStr.includes("man") && !corStr.includes("woman")) cor = "Man";
-          else if (corStr.includes("woman")) cor = "Woman";
-          return {
-            id: q.id,
-            statement: q.prompt,
-            correctAnswer: cor,
-            explanation: q.explanation || "",
-          };
-        });
-        if (opList.length > 0) {
-          result.part3.opinions = opList;
-          if (p.instructions) result.part3.instructions = p.instructions;
+      if (pNum === 3) {
+        if (p.passage_text) (result.part3 as any).passageText = p.passage_text;
+        if (p.translation_text || p.passage_translation) (result.part3 as any).translationText = p.translation_text || p.passage_translation;
+        if (questions.length > 0) {
+          if (p.audio_url) audioUrls[14] = p.audio_url;
+          const opList = questions.map((q: any) => {
+            let cor: "Man" | "Woman" | "Both" = "Both";
+            const corStr = String(q.correct_answer || "").toLowerCase();
+            if (corStr.includes("man") && !corStr.includes("woman")) cor = "Man";
+            else if (corStr.includes("woman")) cor = "Woman";
+            return {
+              id: q.id,
+              statement: q.prompt,
+              correctAnswer: cor,
+              explanation: q.explanation || "",
+            };
+          });
+          if (opList.length > 0) {
+            result.part3.opinions = opList;
+            if (p.instructions) result.part3.instructions = p.instructions;
+          }
         }
       }
 
       // Part 4: Monologues
-      if (pNum === 4 && questions.length > 0) {
-        if (p.audio_url) {
+      if (pNum === 4) {
+        if (p.translation_text || p.passage_translation) {
+          if (result.part4[0]) (result.part4[0] as any).translationText = p.translation_text || p.passage_translation;
+        }
+        if (questions.length > 0 && p.audio_url) {
           audioUrls[15] = p.audio_url;
           audioUrls[16] = p.audio_url;
         }
@@ -1341,6 +1402,83 @@ function ListeningExamRunnerContent() {
                 ))}
               </div>
             </div>
+
+            {/* Script & Bản dịch song song (ẩn mặc định, bật tắt tùy chọn) */}
+            <div className="pt-3 border-t border-border/50">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowScript((v) => !v)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                      showScript
+                        ? "bg-primary text-primary-foreground shadow-xs"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border"
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>{showScript ? "Ẩn Audio Script" : "Xem Audio Script"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowTranslation((v) => !v)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                      showTranslation
+                        ? "bg-amber-600 text-white shadow-xs"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border"
+                    }`}
+                  >
+                    <Languages className="w-3.5 h-3.5" />
+                    <span>{showTranslation ? "Ẩn Bản Dịch TV" : "Xem Bản Dịch TV"}</span>
+                  </button>
+                </div>
+
+                <span className="text-[11px] text-muted-foreground italic hidden sm:inline">
+                  💡 Nên nghe và làm bài trước khi mở script để rèn phản xạ thi thật
+                </span>
+              </div>
+
+              {/* Bảng hiển thị Song Song (2 cột desktop, cột đơn mobile) */}
+              {(showScript || showTranslation) && (() => {
+                const bilingual = getCurrentBilingualData();
+                if (!bilingual) return null;
+                return (
+                  <div className="mt-3 p-4 rounded-xl border border-primary/20 bg-muted/20 space-y-3">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground border-b border-border/60 pb-1.5">
+                      <span className="font-bold text-foreground">{bilingual.title}</span>
+                      <span className="text-[10px]">Hiển thị song song hỗ trợ ôn luyện</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      {showScript && (
+                        <div className={!showTranslation ? "md:col-span-2" : ""}>
+                          <div className="flex items-center gap-1.5 font-bold text-primary mb-1.5 text-[11px] uppercase tracking-wide">
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>Script Ghi Âm (Tiếng Anh)</span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-background border border-border text-foreground leading-relaxed whitespace-pre-line font-mono text-[11.5px] max-h-64 overflow-y-auto">
+                            {bilingual.script || "Đang cập nhật script cho phần này."}
+                          </div>
+                        </div>
+                      )}
+
+                      {showTranslation && (
+                        <div className={!showScript ? "md:col-span-2" : ""}>
+                          <div className="flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400 mb-1.5 text-[11px] uppercase tracking-wide">
+                            <Languages className="w-3.5 h-3.5" />
+                            <span>Bản Dịch Nghĩa (Tiếng Việt)</span>
+                          </div>
+                          <div className="p-3 rounded-lg bg-background border border-border text-foreground leading-relaxed whitespace-pre-line text-[11.5px] max-h-64 overflow-y-auto">
+                            {bilingual.translation || "Bản dịch nghĩa đang được hoàn thiện."}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
           </div>
 
           {/* 3. PART CONTENT CHUẨN */}
@@ -1548,30 +1686,97 @@ function ListeningExamRunnerContent() {
           </button>
         </div>
 
-        {/* Center: Navigation Controls */}
+        {/* Center: Quick Part Question Pills & Navigation Controls */}
         <div className="flex items-center gap-2">
+          {/* Pills câu hỏi của Part đang mở */}
+          <div className="flex items-center gap-1 overflow-x-auto max-w-[42vw] sm:max-w-[36vw] py-1 px-1">
+            {activeStage <= 12 && (
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 13 }).map((_, idx) => {
+                  const isCurrent = activeStage === idx;
+                  const isAnswered = !!p1Answers[idx];
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setActiveStage(idx)}
+                      className={`w-7 h-7 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                        isCurrent
+                          ? "bg-primary text-primary-foreground shadow-xs scale-105"
+                          : isAnswered
+                          ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                          : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                      }`}
+                      title={`Câu ${idx + 1}`}
+                    >
+                      {idx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {activeStage === 13 && (
+              <button
+                type="button"
+                className="px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-xs shrink-0"
+              >
+                Part 2: Câu 14 (4 Speakers)
+              </button>
+            )}
+
+            {activeStage === 14 && (
+              <button
+                type="button"
+                className="px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-xs shrink-0"
+              >
+                Part 3: Câu 15 (4 Quan điểm)
+              </button>
+            )}
+
+            {activeStage >= 15 && (
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setActiveStage(15)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeStage === 15
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Câu 16 (Bài 1)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveStage(16)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeStage === 16
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Câu 17 (Bài 2)
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="h-5 w-px bg-border/60 shrink-0 hidden sm:block" />
+
           <button
             type="button"
             onClick={() => setShowDrawer(true)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
-            title="Danh sách câu hỏi"
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer"
+            title="Danh sách tất cả câu hỏi"
           >
             <Menu className="w-4 h-4" />
           </button>
 
           <button
             type="button"
-            onClick={() => alert(`Đang làm bài: ${currentMeta.partName} - ${currentMeta.subTitle}`)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
-            title="Thông tin bài thi"
-          >
-            <Info className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer hidden sm:flex"
             title="Cuộn lên đầu trang"
           >
             <ArrowUp className="w-4 h-4" />
@@ -1695,115 +1900,164 @@ function ListeningExamRunnerContent() {
               <button
                 type="button"
                 onClick={() => setShowDrawer(false)}
-                className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-2">
+            {/* Bộ lọc Tab theo Part */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 text-xs border-b border-border/50">
+              {[
+                { id: "all", label: "Tất cả (17)" },
+                { id: "p1", label: "Part 1 (13)" },
+                { id: "p2", label: "Part 2 (1)" },
+                { id: "p3", label: "Part 3 (1)" },
+                { id: "p4", label: "Part 4 (2)" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setDrawerTab(tab.id as any)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0 transition-colors cursor-pointer ${
+                    drawerTab === tab.id
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-3">
               {/* Part 1 */}
-              <div className="text-[11px] font-bold text-primary uppercase pt-1">
-                Part 1 – Word Recognition (13 câu)
-              </div>
-              <div className="grid grid-cols-5 gap-1.5">
-                {Array.from({ length: 13 }).map((_, idx) => (
+              {(drawerTab === "all" || drawerTab === "p1") && (
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-bold text-primary uppercase pt-1 flex items-center justify-between">
+                    <span>Part 1 – Word Recognition (13 câu)</span>
+                    <span className="text-[10px] text-muted-foreground font-normal">
+                      {Object.keys(p1Answers).length}/13 đã làm
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {Array.from({ length: 13 }).map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setActiveStage(idx);
+                          setShowDrawer(false);
+                        }}
+                        className={`p-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                          activeStage === idx
+                            ? "bg-primary text-primary-foreground"
+                            : p1Answers[idx]
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                            : "bg-muted/40 hover:bg-muted text-foreground"
+                        }`}
+                      >
+                        Câu {idx + 1}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Part 2 */}
+              {(drawerTab === "all" || drawerTab === "p2") && (
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-bold text-primary uppercase pt-2 flex items-center justify-between">
+                    <span>Part 2 – Matching Info</span>
+                    <span className="text-[10px] text-muted-foreground font-normal">
+                      {Object.keys(p2Answers).length}/4 người nói
+                    </span>
+                  </div>
                   <button
-                    key={idx}
                     type="button"
                     onClick={() => {
-                      setActiveStage(idx);
+                      setActiveStage(13);
                       setShowDrawer(false);
                     }}
-                    className={`p-2 rounded-lg text-xs font-bold transition-colors ${
-                      activeStage === idx
+                    className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors cursor-pointer ${
+                      activeStage === 13
                         ? "bg-primary text-primary-foreground"
-                        : p1Answers[idx]
+                        : Object.keys(p2Answers).length === 4
                         ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
                         : "bg-muted/40 hover:bg-muted text-foreground"
                     }`}
                   >
-                    Câu {idx + 1}
+                    Câu 14: Matching 4 Speakers (Speaker A - D)
                   </button>
-                ))}
-              </div>
-
-              {/* Part 2 */}
-              <div className="text-[11px] font-bold text-primary uppercase pt-2">
-                Part 2 – Matching Info
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveStage(13);
-                  setShowDrawer(false);
-                }}
-                className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors ${
-                  activeStage === 13
-                    ? "bg-primary text-primary-foreground"
-                    : Object.keys(p2Answers).length === 4
-                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                    : "bg-muted/40 hover:bg-muted text-foreground"
-                }`}
-              >
-                Câu 14: Matching 4 Speakers (Speaker A - D)
-              </button>
+                </div>
+              )}
 
               {/* Part 3 */}
-              <div className="text-[11px] font-bold text-primary uppercase pt-2">
-                Part 3 – Short Conversations
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveStage(14);
-                  setShowDrawer(false);
-                }}
-                className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors ${
-                  activeStage === 14
-                    ? "bg-primary text-primary-foreground"
-                    : Object.keys(p3Answers).length === 4
-                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                    : "bg-muted/40 hover:bg-muted text-foreground"
-                }`}
-              >
-                Câu 15: Opinion Matching (Man / Woman / Both)
-              </button>
+              {(drawerTab === "all" || drawerTab === "p3") && (
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-bold text-primary uppercase pt-2 flex items-center justify-between">
+                    <span>Part 3 – Short Conversations</span>
+                    <span className="text-[10px] text-muted-foreground font-normal">
+                      {Object.keys(p3Answers).length}/4 quan điểm
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveStage(14);
+                      setShowDrawer(false);
+                    }}
+                    className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors cursor-pointer ${
+                      activeStage === 14
+                        ? "bg-primary text-primary-foreground"
+                        : Object.keys(p3Answers).length === 4
+                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                        : "bg-muted/40 hover:bg-muted text-foreground"
+                    }`}
+                  >
+                    Câu 15: Opinion Matching (Man / Woman / Both)
+                  </button>
+                </div>
+              )}
 
               {/* Part 4 */}
-              <div className="text-[11px] font-bold text-primary uppercase pt-2">
-                Part 4 – Monologues
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveStage(15);
-                    setShowDrawer(false);
-                  }}
-                  className={`p-2.5 rounded-lg text-xs font-bold transition-colors ${
-                    activeStage === 15
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted/40 hover:bg-muted text-foreground"
-                  }`}
-                >
-                  Câu 16: Recording 1
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveStage(16);
-                    setShowDrawer(false);
-                  }}
-                  className={`p-2.5 rounded-lg text-xs font-bold transition-colors ${
-                    activeStage === 16
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted/40 hover:bg-muted text-foreground"
-                  }`}
-                >
-                  Câu 17: Recording 2
-                </button>
-              </div>
+              {(drawerTab === "all" || drawerTab === "p4") && (
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-bold text-primary uppercase pt-2">
+                    Part 4 – Monologues (2 bài thuyết trình)
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveStage(15);
+                        setShowDrawer(false);
+                      }}
+                      className={`p-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                        activeStage === 15
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted/40 hover:bg-muted text-foreground"
+                      }`}
+                    >
+                      Câu 16: Recording 1
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveStage(16);
+                        setShowDrawer(false);
+                      }}
+                      className={`p-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                        activeStage === 16
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted/40 hover:bg-muted text-foreground"
+                      }`}
+                    >
+                      Câu 17: Recording 2
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

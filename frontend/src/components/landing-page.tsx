@@ -33,6 +33,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { AuthModal } from "@/components/auth-modal";
+import { GoLivePromoBanner } from "@/components/golive-promo-banner";
 import { useEventTheme } from "@/contexts/event-theme-context";
 
 function hexToRgb(hex?: string): { r: number; g: number; b: number } {
@@ -512,6 +513,9 @@ export function LandingPage() {
                     <span>Xem kho đề luyện</span>
                   </Link>
                 </div>
+
+                {/* Banner Quà tặng Go-Live */}
+                <GoLivePromoBanner className="max-w-xl mx-auto lg:mx-0 text-left" />
 
                 {/* 3 Core Trust Badges */}
                 <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-[11px] text-muted-foreground">

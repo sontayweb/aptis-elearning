@@ -162,6 +162,15 @@ export default function PricingPage() {
   };
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const codeFromUrl = new URLSearchParams(window.location.search).get("code");
+      if (codeFromUrl) {
+        setPromoCodeInput(codeFromUrl.toUpperCase());
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     async function loadPlans() {
       try {
         const res = await api.payment.getPlans();
@@ -382,7 +391,7 @@ export default function PricingPage() {
                   Bạn có Mã Kích Hoạt Trải Nghiệm VIP?
                 </h2>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  Nhập mã <span className="font-mono font-bold text-primary">APTISGOLIVE</span> để nhận ngay 14 ngày VIP đầy đủ tính năng &amp; 20 lượt chấm AI miễn phí!
+                  Nhập mã <span className="font-mono font-bold text-primary">GOLIVE14</span> (hoặc <span className="font-mono font-semibold">APTISGOLIVE</span>) để nhận ngay 14 ngày VIP đầy đủ tính năng &amp; 20 lượt chấm AI miễn phí!
                 </p>
               </div>
 
@@ -391,7 +400,7 @@ export default function PricingPage() {
                   type="text"
                   value={promoCodeInput}
                   onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
-                  placeholder="Mã CODE: APTISGOLIVE"
+                  placeholder="Mã CODE: GOLIVE14"
                   className="px-4 py-2.5 rounded-xl border border-border bg-background text-sm font-mono font-bold uppercase tracking-wider focus:outline-hidden focus:ring-2 focus:ring-primary w-full sm:w-64"
                 />
                 <button

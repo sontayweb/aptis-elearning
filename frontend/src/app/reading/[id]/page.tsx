@@ -26,6 +26,8 @@ import {
   Check,
   LogOut,
   Pin,
+  Highlighter,
+  Trash2,
 } from "lucide-react";
 
 /* ====================================================
@@ -312,6 +314,101 @@ function ReadingExamRunner() {
   const [partScores, setPartScores] = useState<
     { name: string; score: number; maxScore: number; correct: number; total: number }[]
   >([]);
+
+  // Bộ quản lý Highlight cho bài đọc
+  const [highlights, setHighlights] = useState<
+    Record<string, Array<{ text: string; color: "yellow" | "green" }>>
+  >({});
+  const [selectionMenu, setSelectionMenu] = useState<{
+    targetId: string;
+    selectedText: string;
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const handleTextSelection = (targetId: string) => {
+    if (typeof window === "undefined") return;
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) {
+      setSelectionMenu(null);
+      return;
+    }
+    const text = sel.toString().trim();
+    if (text.length < 2) {
+      setSelectionMenu(null);
+      return;
+    }
+
+    try {
+      const range = sel.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      setSelectionMenu({
+        targetId,
+        selectedText: text,
+        x: rect.left + rect.width / 2,
+        y: Math.max(10, rect.top - 44),
+      });
+    } catch {
+      setSelectionMenu(null);
+    }
+  };
+
+  const addHighlight = (color: "yellow" | "green") => {
+    if (!selectionMenu) return;
+    const { targetId, selectedText } = selectionMenu;
+    setHighlights((prev) => {
+      const current = prev[targetId] || [];
+      if (current.some((h) => h.text === selectedText && h.color === color)) {
+        return prev;
+      }
+      return {
+        ...prev,
+        [targetId]: [...current, { text: selectedText, color }],
+      };
+    });
+    setSelectionMenu(null);
+    if (typeof window !== "undefined") {
+      window.getSelection()?.removeAllRanges();
+    }
+  };
+
+  const clearHighlightsForStage = (targetIds: string[]) => {
+    setHighlights((prev) => {
+      const copy = { ...prev };
+      targetIds.forEach((id) => delete copy[id]);
+      return copy;
+    });
+  };
+
+  const renderHighlightedContent = (rawText: string, targetId: string) => {
+    const list = highlights[targetId];
+    if (!list || list.length === 0) return rawText;
+
+    const sorted = [...list].sort((a, b) => b.text.length - a.text.length);
+    const escaped = sorted.map((h) => h.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const regex = new RegExp(`(${escaped.join("|")})`, "gi");
+
+    const parts = rawText.split(regex);
+    return parts.map((part, i) => {
+      const match = sorted.find((h) => h.text.toLowerCase() === part.toLowerCase());
+      if (match) {
+        return (
+          <mark
+            key={i}
+            className={`px-0.5 rounded cursor-pointer transition-colors ${
+              match.color === "yellow"
+                ? "bg-amber-300/40 text-amber-950 dark:text-amber-200 border-b border-amber-400"
+                : "bg-emerald-300/40 text-emerald-950 dark:text-emerald-200 border-b border-emerald-400"
+            }`}
+            title="Đoạn văn đã được đánh dấu"
+          >
+            {part}
+          </mark>
+        );
+      }
+      return part;
+    });
+  };
 
   // 1. Initial Load: Fetch questions from API or use Benchmark
   useEffect(() => {
@@ -1021,13 +1118,29 @@ function ReadingExamRunner() {
                   {/* ============================================================== */}
                   {activeStage === 3 && (
                     <div className="space-y-6">
-                      <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80">
-                        <span className="text-xs font-bold text-primary block">
-                          {examData.part3.title}
-                        </span>
-                        <p className="text-xs md:text-sm text-foreground">
-                          {examData.part3.instructions}
-                        </p>
+                      <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                          <span className="text-xs font-bold text-primary block">
+                            {examData.part3.title}
+                          </span>
+                          <p className="text-xs text-foreground">
+                            {examData.part3.instructions}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                            <Highlighter className="w-3.5 h-3.5 text-amber-500" />
+                            <span className="hidden sm:inline">Bôi đen chữ để highlight</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => clearHighlightsForStage(examData.part3.reviews.map((r) => r.person))}
+                            className="px-2 py-1 rounded-lg border border-border hover:bg-muted text-[11px] font-semibold text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3 h-3 text-destructive" />
+                            <span>Xóa highlight</span>
+                          </button>
+                        </div>
                       </div>
 
                       {/* 4 Review Cards in 2 columns */}
@@ -1035,13 +1148,15 @@ function ReadingExamRunner() {
                         {examData.part3.reviews.map((rev) => (
                           <div
                             key={rev.person}
-                            className="p-4 rounded-xl border border-border bg-card space-y-2 shadow-2xs"
+                            className="p-4 rounded-xl border border-border bg-card space-y-2 shadow-2xs select-text"
+                            onMouseUp={() => handleTextSelection(rev.person)}
+                            onTouchEnd={() => handleTextSelection(rev.person)}
                           >
                             <span className="px-2.5 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-xs inline-block">
                               {rev.person}
                             </span>
                             <p className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans">
-                              {rev.review}
+                              {renderHighlightedContent(rev.review, rev.person)}
                             </p>
                           </div>
                         ))}
@@ -1106,14 +1221,30 @@ function ReadingExamRunner() {
                   {/* ============================================================== */}
                   {activeStage === 4 && (
                     <div className="space-y-6">
-                      <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 space-y-1">
-                        <span className="text-xs font-bold text-primary flex items-center gap-1.5">
-                          <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
-                          <span>{examData.part4.title}</span>
-                        </span>
-                        <p className="text-xs md:text-sm text-foreground">
-                          {examData.part4.instructions}
-                        </p>
+                      <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="space-y-1">
+                          <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                            <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                            <span>{examData.part4.title}</span>
+                          </span>
+                          <p className="text-xs text-foreground">
+                            {examData.part4.instructions}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                            <Highlighter className="w-3.5 h-3.5 text-amber-500" />
+                            <span className="hidden sm:inline">Bôi đen chữ để highlight</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => clearHighlightsForStage(examData.part4.paragraphs.map((p) => p.id))}
+                            className="px-2 py-1 rounded-lg border border-border hover:bg-muted text-[11px] font-semibold text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3 h-3 text-destructive" />
+                            <span>Xóa highlight</span>
+                          </button>
+                        </div>
                       </div>
 
                       {/* Reference Headings List */}
@@ -1169,8 +1300,12 @@ function ReadingExamRunner() {
                                 </select>
                               </div>
 
-                              <p className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans">
-                                {p.text}
+                              <p
+                                className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans select-text"
+                                onMouseUp={() => handleTextSelection(p.id)}
+                                onTouchEnd={() => handleTextSelection(p.id)}
+                              >
+                                {renderHighlightedContent(p.text, p.id)}
                               </p>
                             </div>
                           );
@@ -1329,6 +1464,42 @@ function ReadingExamRunner() {
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Floating Highlight Menu khi bôi đen chữ trên bài đọc */}
+          {selectionMenu && (
+            <div
+              className="fixed z-50 -translate-x-1/2 flex items-center gap-1.5 p-1 rounded-xl bg-card border border-border shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 select-none"
+              style={{ top: selectionMenu.y, left: selectionMenu.x }}
+            >
+              <button
+                type="button"
+                onClick={() => addHighlight("yellow")}
+                className="px-2.5 py-1 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 text-amber-900 dark:text-amber-200 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Đánh dấu đoạn văn dẫn chứng (Màu vàng)"
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0 shadow-xs" />
+                <span>Dẫn chứng</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => addHighlight("green")}
+                className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-900 dark:text-emerald-200 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Đánh dấu từ khóa đối chiếu (Màu xanh)"
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-xs" />
+                <span>Từ khóa</span>
+              </button>
+              <div className="w-px h-4 bg-border/60 mx-0.5" />
+              <button
+                type="button"
+                onClick={() => setSelectionMenu(null)}
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title="Đóng menu"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
         </div>

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { UniversalSkillGuideModal } from "@/components/skill-format-guide-modal";
 import {
   Headphones,
   Clock,
@@ -57,6 +58,7 @@ export default function ListeningPracticePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [progressText, setProgressText] = useState("Chưa có bài nào — hãy bắt đầu luyện tập!");
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
 
   const loadExams = async () => {
     try {
@@ -436,7 +438,7 @@ export default function ListeningPracticePage() {
                 <div className="pt-6 mt-4 border-t border-border/40">
                   <button
                     type="button"
-                    onClick={() => alert("Tính năng ghép đề Pro. Bạn có thể luyện tập các đề Free bên cạnh!")}
+                    onClick={() => setIsGuideModalOpen(true)}
                     className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-colors text-center"
                   >
                     Nâng cấp để tạo →
@@ -549,6 +551,11 @@ export default function ListeningPracticePage() {
 
       <Footer />
       <FloatingActions />
+      <UniversalSkillGuideModal
+        isOpen={isGuideModalOpen}
+        onClose={() => setIsGuideModalOpen(false)}
+        initialSkill="listening"
+      />
     </div>
   );
 }
