@@ -28,6 +28,7 @@ interface SpeakingExam {
   title: string;
   parts: string;
   totalParts: number;
+  completedParts?: number;
   partTitle?: string | null;
   questionsCount: number;
   duration: string;
@@ -35,6 +36,7 @@ interface SpeakingExam {
   status: "not_started" | "in_progress" | "completed";
   bestScore?: string | null;
   bestScoreNumber?: number | null;
+  bestCefr?: string | null;
   userAttempts: number;
   priority?: "HIGH" | "MEDIUM" | "LOW";
   hotLevel?: number;
@@ -71,6 +73,35 @@ export default function SpeakingPracticePage() {
             if (exam.userStatus === "COMPLETED") status = "completed";
             else if (exam.userStatus === "IN_PROGRESS") status = "in_progress";
 
+            let completedParts = Number(exam.completedParts || 0);
+            let bestCefr = exam.bestCefr || null;
+            let bestScore = exam.bestScore || null;
+
+            // Đồng bộ trực tiếp từ localStorage để phản ánh tức thì tiến độ làm bài
+            if (typeof window !== "undefined") {
+              try {
+                const localProgStr = localStorage.getItem(`aptis_exam_progress_${exam.id}`);
+                if (localProgStr) {
+                  const localProg = JSON.parse(localProgStr);
+                  if (localProg.status === "completed") {
+                    status = "completed";
+                    completedParts = exam.totalParts || 4;
+                  } else if (localProg.status === "in_progress" && status === "not_started") {
+                    status = "in_progress";
+                    completedParts = localProg.completedParts || 1;
+                  }
+                  if (localProg.bestCefr && !bestCefr) {
+                    bestCefr = localProg.bestCefr;
+                  }
+                  if (localProg.bestScore && !bestScore) {
+                    bestScore = localProg.bestScore;
+                  }
+                }
+              } catch {
+                // ignore
+              }
+            }
+
             const isFullSpeaking = exam.totalParts === 4 || exam.title.includes("Full Speaking");
 
             // Phân bổ tỷ lệ ưu tiên trực quan (Cao, Vừa, Thấp)
@@ -84,24 +115,26 @@ export default function SpeakingPracticePage() {
               else priority = "LOW";
             }
 
-              const hotLevel = Number(exam.hotLevel ?? exam.hot_level ?? 0);
+            const hotLevel = Number(exam.hotLevel ?? exam.hot_level ?? 0);
 
-              return {
-                id: exam.id,
-                title: exam.title,
-                parts: isFullSpeaking ? "Full Speaking · 4 Parts" : (exam.partTitle || "Speaking Part"),
-                totalParts: exam.totalParts || 1,
-                partTitle: exam.partTitle,
-                questionsCount: exam.totalQuestions || 4,
-                duration: `${exam.durationMinutes || 12} phút`,
-                isFree: !exam.isPro,
-                status,
-                bestScore: exam.bestScore,
-                bestScoreNumber: exam.bestScoreNumber,
-                userAttempts: exam.userAttempts || 0,
-                priority,
-                hotLevel,
-              };
+            return {
+              id: exam.id,
+              title: exam.title,
+              parts: isFullSpeaking ? "Full Speaking · 4 Parts" : (exam.partTitle || "Speaking Part"),
+              totalParts: exam.totalParts || 4,
+              completedParts,
+              partTitle: exam.partTitle,
+              questionsCount: exam.totalQuestions || 4,
+              duration: `${exam.durationMinutes || 12} phút`,
+              isFree: !exam.isPro,
+              status,
+              bestCefr,
+              bestScore,
+              bestScoreNumber: exam.bestScoreNumber,
+              userAttempts: exam.userAttempts || 0,
+              priority,
+              hotLevel,
+            };
           })
         );
       } else {
@@ -492,21 +525,13 @@ export default function SpeakingPracticePage() {
                           ) : null}
                         </div>
 
-                        {/* Top Right Trophy / Status */}
+                        {/* Top Right Trophy / CEFR Badge (chuẩn web gốc Aptis) */}
                         <div>
-                          {exam.bestScore ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-black text-xs">
-                              🏆 {exam.bestScore}
+                          {exam.bestCefr || (exam.status === "completed" && (exam.bestScore || exam.bestScoreNumber)) ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 font-bold text-xs border border-amber-500/25 shadow-2xs">
+                              🏆 {exam.bestCefr || "A0"}
                             </span>
-                          ) : exam.status === "completed" ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600">
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Đã làm
-                            </span>
-                          ) : (
-                            <span className="text-[11px] font-semibold text-muted-foreground">
-                              Chưa bắt đầu
-                            </span>
-                          )}
+                          ) : null}
                         </div>
                       </div>
 
@@ -516,9 +541,27 @@ export default function SpeakingPracticePage() {
                       </h3>
 
                       {/* Subtitle */}
-                      <p className="text-xs text-muted-foreground">
-                        {activeTab === "full" ? "Full Speaking · 4 Parts (12 phút)" : "🎙️ Đề luyện tập AI chấm Speaking"}
+                      <p className="text-xs text-muted-foreground mb-2.5">
+                        {activeTab === "full" ? "Full Speaking · 4 Parts" : (exam.parts || "Full Speaking · 4 Parts")}
                       </p>
+
+                      {/* Progress Badge chuẩn web gốc Aptis: Đã hoàn thành / Đã làm X/4 Part / Chưa bắt đầu */}
+                      <div className="pt-0.5">
+                        {exam.status === "completed" || (exam.completedParts && exam.completedParts >= (exam.totalParts || 4)) ? (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold shadow-2xs">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <span>Đã hoàn thành tất cả {exam.totalParts || 4} Part</span>
+                          </div>
+                        ) : exam.status === "in_progress" || (exam.completedParts && exam.completedParts > 0) ? (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/20 text-xs font-semibold shadow-2xs">
+                            <span>Đã làm {exam.completedParts || 1}/{exam.totalParts || 4} Part</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground font-medium block">
+                            Chưa bắt đầu
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Bottom Action */}
@@ -528,7 +571,11 @@ export default function SpeakingPracticePage() {
                           href={targetUrl}
                           className="inline-flex items-center gap-1.5 text-primary hover:text-brand-brown font-extrabold text-xs transition-colors"
                         >
-                          <span>Luyện tập</span>
+                          <span>
+                            {exam.status === "in_progress" || (exam.completedParts && exam.completedParts > 0 && exam.completedParts < (exam.totalParts || 4))
+                              ? "Tiếp tục luyện tập"
+                              : "Bắt đầu luyện tập"}
+                          </span>
                           <ArrowRight className="w-4 h-4" />
                         </Link>
                       ) : (

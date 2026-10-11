@@ -84,6 +84,15 @@ export class ExamService {
           cefr_level: true,
           submitted_at: true,
           started_at: true,
+          answers: {
+            select: {
+              question: {
+                select: {
+                  part_id: true,
+                },
+              },
+            },
+          },
         },
         orderBy: { started_at: 'desc' },
       });
@@ -102,6 +111,9 @@ export class ExamService {
         let userStatus: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' = 'NOT_STARTED';
         let bestScore: string | null = null;
         let bestScoreNumber: number | null = null;
+        let bestCefr: string | null = null;
+        const totalPartsCount = exam.parts.length || 1;
+        let completedParts = 0;
         const userAttempts = userSubs.length;
         let lastAttemptedAt: Date | null = null;
 
@@ -116,6 +128,7 @@ export class ExamService {
 
           if (completedSubs.length > 0) {
             userStatus = 'COMPLETED';
+            completedParts = totalPartsCount;
 
             // Điểm cao nhất của thí sinh
             let maxScore = -1;
@@ -135,6 +148,9 @@ export class ExamService {
 
               if (scoreVal != null && scoreVal > maxScore) {
                 maxScore = scoreVal;
+                bestCefr = s.cefr_level || null;
+              } else if (!bestCefr && s.cefr_level) {
+                bestCefr = s.cefr_level;
               }
             }
 
@@ -142,9 +158,32 @@ export class ExamService {
               bestScoreNumber = Math.round(maxScore * 10) / 10;
               const maxScale = exam.skill === 'FULL_TEST' ? 200 : 50;
               bestScore = `${bestScoreNumber}/${maxScale}`;
+
+              if (!bestCefr) {
+                const norm = exam.skill === 'FULL_TEST' ? maxScore / 4 : maxScore;
+                if (norm >= 45) bestCefr = 'C';
+                else if (norm >= 38) bestCefr = 'B2';
+                else if (norm >= 30) bestCefr = 'B1';
+                else if (norm >= 20) bestCefr = 'A2';
+                else if (norm > 0) bestCefr = 'A1';
+                else bestCefr = 'A0';
+              }
+            } else if (!bestCefr) {
+              bestCefr = 'A0';
             }
           } else if (userSubs.some((s) => s.status === 'IN_PROGRESS')) {
             userStatus = 'IN_PROGRESS';
+            const inProgressSub = userSubs.find((s) => s.status === 'IN_PROGRESS');
+            if (inProgressSub && inProgressSub.answers && inProgressSub.answers.length > 0) {
+              const uniquePartIds = new Set(
+                inProgressSub.answers
+                  .map((a: any) => a.question?.part_id)
+                  .filter(Boolean)
+              );
+              completedParts = Math.min(totalPartsCount, Math.max(1, uniquePartIds.size));
+            } else {
+              completedParts = 1;
+            }
           }
         }
 
@@ -158,7 +197,7 @@ export class ExamService {
           hotLevel: exam.hot_level ?? 0,
           forecastTag: exam.forecast_tag ?? null,
           source: exam.source,
-          totalParts: exam.parts.length,
+          totalParts: totalPartsCount,
           totalQuestions: exam.parts.reduce((sum, p) => sum + p._count.questions, 0),
           partTitle: exam.parts[0]?.title || null,
           parts: exam.parts.map((p) => ({
@@ -168,6 +207,8 @@ export class ExamService {
           })),
           attemptCount: exam._count.submissions,
           userStatus,
+          completedParts,
+          bestCefr,
           bestScore,
           bestScoreNumber,
           userAttempts,

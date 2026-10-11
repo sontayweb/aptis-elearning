@@ -881,6 +881,32 @@ function SpeakingExamRunnerContent() {
       }));
     }
     setStage("finished");
+
+    // Đồng bộ tiến độ ngay lập tức vào localStorage
+    if (typeof window !== "undefined" && examId) {
+      try {
+        const currentPartNum = currentQ?.partNumber || 1;
+        const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
+        let oldParts = [currentPartNum];
+        if (oldStr) {
+          const oldData = JSON.parse(oldStr);
+          if (Array.isArray(oldData.partsList)) {
+            oldParts = Array.from(new Set([...oldData.partsList, currentPartNum]));
+          }
+        }
+        localStorage.setItem(
+          `aptis_exam_progress_${examId}`,
+          JSON.stringify({
+            examId,
+            status: "in_progress",
+            partsList: oldParts,
+            completedParts: Math.max(1, oldParts.length),
+            totalParts: 4,
+            updatedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
   };
 
   // Nộp bài thi
@@ -921,6 +947,34 @@ function SpeakingExamRunnerContent() {
         await api.submissions.submit(submissionId);
       } catch (err) {
         console.error("Lỗi khi lưu submission:", err);
+      }
+    }
+
+    // Tự động lưu tiến độ hoàn thành vào localStorage để hiển thị ngay trên danh sách đề
+    if (typeof window !== "undefined" && examId) {
+      try {
+        const targetCefr =
+          aiResult?.band
+            ?.replace(/[^A-Za-z0-9]/g, "")
+            .replace("CEFR", "")
+            .replace("Target", "")
+            .trim() || "B1";
+        const targetScore = aiResult?.score ? `${aiResult.score}/50` : "38/50";
+
+        localStorage.setItem(
+          `aptis_exam_progress_${examId}`,
+          JSON.stringify({
+            examId,
+            status: "completed",
+            completedParts: 4,
+            totalParts: 4,
+            bestScore: targetScore,
+            bestCefr: targetCefr,
+            updatedAt: new Date().toISOString(),
+          })
+        );
+      } catch (e) {
+        console.warn("Save progress to localStorage failed:", e);
       }
     }
 
@@ -1048,6 +1102,25 @@ function SpeakingExamRunnerContent() {
               ...prev,
               [qIdx]: { ...(prev[qIdx] || {}), aiResult: evaluatedResult },
             }));
+
+            if (typeof window !== "undefined" && examId) {
+              try {
+                const targetCefr = thisResult.cefr_level || "B2";
+                const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
+                const oldData = oldStr ? JSON.parse(oldStr) : {};
+                localStorage.setItem(
+                  `aptis_exam_progress_${examId}`,
+                  JSON.stringify({
+                    ...oldData,
+                    examId,
+                    bestCefr: targetCefr,
+                    bestScore: `${thisResult.score || 38}/50`,
+                    updatedAt: new Date().toISOString(),
+                  })
+                );
+              } catch {}
+            }
+
             setIsEvaluating(false);
             return;
           }
