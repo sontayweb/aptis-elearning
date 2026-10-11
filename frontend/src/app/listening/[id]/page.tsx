@@ -37,6 +37,7 @@ interface Part1Item {
   options: string[];
   correctAnswer: string;
   explanation: string;
+  audioUrl?: string;
 }
 
 interface Part2Speaker {
@@ -66,6 +67,33 @@ interface Part4Recording {
   title: string;
   passageText: string;
   questions: Part4Question[];
+  audioUrl?: string;
+  translationText?: string;
+}
+
+export interface ListeningExamData {
+  title: string;
+  durationMinutes: number;
+  part1: Part1Item[];
+  part2: {
+    prompt?: string;
+    instructions?: string;
+    options?: string[];
+    speakers: Part2Speaker[];
+    audioUrl?: string;
+    passageText?: string;
+    translationText?: string;
+  };
+  part3: {
+    prompt?: string;
+    topic?: string;
+    instructions?: string;
+    opinions: Part3Opinion[];
+    audioUrl?: string;
+    passageText?: string;
+    translationText?: string;
+  };
+  part4: Part4Recording[];
 }
 
 // Dữ liệu mẫu chuẩn Đề 01 Listening Aptis Kỳ Tích
@@ -517,7 +545,7 @@ function ListeningExamRunnerContent() {
       ? DEFAULT_LISTENING_TEST_2
       : DEFAULT_LISTENING_TEST;
 
-  const [examData, setExamData] = useState(initialBenchmark);
+  const [examData, setExamData] = useState<ListeningExamData>(initialBenchmark);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -554,36 +582,106 @@ function ListeningExamRunnerContent() {
   const [showTranslation, setShowTranslation] = useState(false);
   const [drawerTab, setDrawerTab] = useState<"all" | "p1" | "p2" | "p3" | "p4">("all");
 
+  // Dynamic Stage definitions based on actually loaded questions in examData
+  const listeningStages: Array<{
+    id: string;
+    partNum: 1 | 2 | 3 | 4;
+    subIndex: number;
+    title: string;
+    label: string;
+    audioUrl?: string;
+  }> = [];
+
+  // Part 1 questions
+  examData.part1.forEach((q, idx) => {
+    listeningStages.push({
+      id: `p1_${idx}`,
+      partNum: 1,
+      subIndex: idx,
+      title: `Part 1 — Câu ${idx + 1}`,
+      label: `Câu ${idx + 1}`,
+      audioUrl: q.audioUrl || audioUrlMap[idx],
+    });
+  });
+
+  // Part 2
+  if (examData.part2.speakers && examData.part2.speakers.length > 0) {
+    listeningStages.push({
+      id: "p2",
+      partNum: 2,
+      subIndex: 0,
+      title: "Part 2 — Matching Info (4 Speakers)",
+      label: "Part 2: 4 Speakers",
+      audioUrl: (examData.part2 as any).audioUrl || audioUrlMap[13],
+    });
+  }
+
+  // Part 3
+  if (examData.part3.opinions && examData.part3.opinions.length > 0) {
+    listeningStages.push({
+      id: "p3",
+      partNum: 3,
+      subIndex: 0,
+      title: "Part 3 — Short Conversations (Opinions)",
+      label: "Part 3: Opinions",
+      audioUrl: (examData.part3 as any).audioUrl || audioUrlMap[14],
+    });
+  }
+
+  // Part 4
+  examData.part4.forEach((rec, idx) => {
+    listeningStages.push({
+      id: `p4_${idx}`,
+      partNum: 4,
+      subIndex: idx,
+      title: `Part 4 — Bài thuyết trình ${idx + 1}`,
+      label: `Part 4: Rec ${idx + 1}`,
+      audioUrl: rec.audioUrl || audioUrlMap[15 + idx],
+    });
+  });
+
+  if (listeningStages.length === 0) {
+    listeningStages.push({
+      id: "p1_0",
+      partNum: 1,
+      subIndex: 0,
+      title: "Part 1 — Câu 1",
+      label: "Câu 1",
+    });
+  }
+
+  const currentStage = listeningStages[activeStage] || listeningStages[0];
+
   // Lấy Script và Bản dịch song song cho stage hiện tại
   const getCurrentBilingualData = () => {
-    if (activeStage === 13) {
+    if (!currentStage) return null;
+    if (currentStage.partNum === 2) {
       return {
         title: "Part 2 — Đoạn ghi âm 4 người nói",
-        script: (examData.part2 as any).passageText || examData.part2.speakers.map((s) => `${s.speaker}: "${s.correctAnswer}"`).join("\n\n"),
+        script:
+          (examData.part2 as any).passageText ||
+          examData.part2.speakers.map((s) => `${s.speaker}: "${s.correctAnswer}"`).join("\n\n"),
         translation: (examData.part2 as any).translationText || "",
       };
-    } else if (activeStage === 14) {
+    } else if (currentStage.partNum === 3) {
       return {
         title: "Part 3 — Hội thoại thảo luận quan điểm",
-        script: (examData.part3 as any).passageText || examData.part3.opinions.map((o) => `• ${o.statement} (${o.correctAnswer})`).join("\n\n"),
+        script:
+          (examData.part3 as any).passageText ||
+          examData.part3.opinions.map((o) => `• ${o.statement} (${o.correctAnswer})`).join("\n\n"),
         translation: (examData.part3 as any).translationText || "",
       };
-    } else if (activeStage === 15) {
+    } else if (currentStage.partNum === 4) {
+      const rec = examData.part4[currentStage.subIndex];
       return {
-        title: "Part 4 — Bài thuyết trình 1 (Recording 1)",
-        script: examData.part4[0]?.passageText || "",
-        translation: (examData.part4[0] as any)?.translationText || "",
+        title: `Part 4 — Bài thuyết trình ${currentStage.subIndex + 1}`,
+        script: rec?.passageText || "",
+        translation: rec?.translationText || "",
       };
-    } else if (activeStage === 16) {
+    } else if (currentStage.partNum === 1) {
+      const q = examData.part1[currentStage.subIndex];
       return {
-        title: "Part 4 — Bài thuyết trình 2 (Recording 2)",
-        script: examData.part4[1]?.passageText || "",
-        translation: (examData.part4[1] as any)?.translationText || "",
-      };
-    } else if (activeStage <= 12) {
-      const q = examData.part1[activeStage];
-      return {
-        title: `Part 1 — Câu hỏi ${activeStage + 1}`,
+        title: `Part 1 — Câu hỏi ${currentStage.subIndex + 1}`,
         script: q?.prompt || "",
         translation: "",
       };
@@ -593,12 +691,20 @@ function ListeningExamRunnerContent() {
 
   // Tự động nhảy tới Part nếu URL có ?part=p1 / p2 / p3 / p4 / 1 / 2 / 3 / 4
   useEffect(() => {
-    const p = searchParams?.get("part")?.toLowerCase();
-    if (p === "p1" || p === "1" || p === "part1") setActiveStage(0);
-    else if (p === "p2" || p === "2" || p === "part2") setActiveStage(13);
-    else if (p === "p3" || p === "3" || p === "part3") setActiveStage(14);
-    else if (p === "p4" || p === "4" || p === "part4") setActiveStage(15);
-  }, [searchParams]);
+    if (!searchParams || listeningStages.length === 0) return;
+    const p = searchParams.get("part")?.toLowerCase();
+    if (!p) return;
+    let targetPart: 1 | 2 | 3 | 4 | null = null;
+    if (p === "p1" || p === "1" || p === "part1") targetPart = 1;
+    else if (p === "p2" || p === "2" || p === "part2") targetPart = 2;
+    else if (p === "p3" || p === "3" || p === "part3") targetPart = 3;
+    else if (p === "p4" || p === "4" || p === "part4") targetPart = 4;
+
+    if (targetPart !== null) {
+      const idx = listeningStages.findIndex((s) => s.partNum === targetPart);
+      if (idx !== -1) setActiveStage(idx);
+    }
+  }, [searchParams, listeningStages]);
 
   // Khởi tạo phiên làm bài trên backend
   useEffect(() => {
@@ -656,74 +762,107 @@ function ListeningExamRunnerContent() {
 
   // Parser dữ liệu từ Backend sang format hiển thị của Listening
   function parseApiToListeningData(apiData: any) {
-    const fallback =
-      examId.includes("2") || examId.includes("02")
-        ? DEFAULT_LISTENING_TEST_2
-        : DEFAULT_LISTENING_TEST;
+    const parts = apiData.parts || [];
+    const isSinglePart = parts.length === 1;
 
     const result = {
-      title: apiData.title || fallback.title,
-      durationMinutes: apiData.duration_minutes || 40,
-      part1: [...fallback.part1],
-      part2: { ...fallback.part2 },
-      part3: { ...fallback.part3 },
-      part4: [...fallback.part4],
+      title: apiData.title || "Bài thi Listening",
+      durationMinutes: apiData.duration_minutes || (isSinglePart ? 15 : 40),
+      part1: [] as any[],
+      part2: {
+        topic: "Workplace & Daily Life",
+        instructions: "Four employees share their views. Match each speaker to their statement.",
+        options: [] as string[],
+        speakers: [] as any[],
+        passageText: "",
+        translationText: "",
+        audioUrl: "",
+      },
+      part3: {
+        topic: "Discussion & Opinions",
+        instructions: "Who expresses which opinion? Select Man, Woman, or Both.",
+        passageText: "",
+        translationText: "",
+        opinions: [] as any[],
+        audioUrl: "",
+      },
+      part4: [] as any[],
     };
 
     const audioUrls: Record<number, string> = {};
-    const parts = apiData.parts || [];
 
     parts.forEach((p: any) => {
+      const pTitle = (p.title || "").toLowerCase();
       const pNum = p.part_number;
       const questions = p.questions || [];
 
-      // Part 1: Word Recognition (13 câu)
-      if (pNum === 1 && questions.length > 0) {
-        if (p.audio_url) {
-          for (let i = 0; i <= 12; i++) audioUrls[i] = p.audio_url;
+      // Part 1: Word Recognition
+      if (pNum === 1 || pTitle.includes("part 1")) {
+        if (questions.length > 0) {
+          result.part1 = questions.map((q: any, idx: number) => {
+            let opts: string[] = ["A", "B", "C"];
+            if (Array.isArray(q.options)) opts = q.options;
+            else if (typeof q.options === "string") {
+              try {
+                opts = JSON.parse(q.options);
+              } catch {
+                opts = ["A", "B", "C"];
+              }
+            }
+            if (p.audio_url) audioUrls[idx] = p.audio_url;
+            return {
+              id: q.id,
+              num: q.question_number || idx + 1,
+              prompt: q.prompt,
+              options: opts,
+              correctAnswer: q.correct_answer || opts[0] || "",
+              explanation: q.explanation || "Đáp án chuẩn theo đoạn ghi âm đối thoại.",
+              audioUrl: p.audio_url || "",
+            };
+          });
         }
-        result.part1 = questions.map((q: any, idx: number) => {
-          let opts: string[] = ["A", "B", "C"];
-          if (Array.isArray(q.options)) opts = q.options;
-          else if (typeof q.options === "string") {
-            try { opts = JSON.parse(q.options); } catch { opts = ["A", "B", "C"]; }
-          }
-          return {
-            id: q.id,
-            num: q.question_number || idx + 1,
-            prompt: q.prompt,
-            options: opts,
-            correctAnswer: q.correct_answer || opts[0] || "",
-            explanation: q.explanation || "Đáp án chuẩn theo đoạn ghi âm đối thoại.",
-          };
-        });
       }
 
       // Part 2: Speakers matching
-      if (pNum === 2) {
+      if (pNum === 2 || pTitle.includes("part 2") || pTitle.includes("speaker")) {
         if (p.passage_text) (result.part2 as any).passageText = p.passage_text;
         if (p.translation_text || p.passage_translation) (result.part2 as any).translationText = p.translation_text || p.passage_translation;
+        if (p.audio_url) {
+          (result.part2 as any).audioUrl = p.audio_url;
+          audioUrls[13] = p.audio_url;
+        }
         if (questions.length > 0) {
-          if (p.audio_url) audioUrls[13] = p.audio_url;
+          let extractedOptions: string[] = [];
+          if (Array.isArray(questions[0]?.options)) extractedOptions = questions[0].options;
+          else if (typeof questions[0]?.options === "string") {
+            try {
+              extractedOptions = JSON.parse(questions[0].options);
+            } catch {
+              extractedOptions = [];
+            }
+          }
+          if (extractedOptions.length > 0) result.part2.options = extractedOptions;
+
           const spkList = questions.map((q: any, idx: number) => ({
             id: q.id,
-            speaker: q.prompt ? q.prompt.replace(/^Speaker\s*[A-D]\s*[-:]*\s*/i, "") : `Speaker ${String.fromCharCode(65 + idx)}`,
+            speaker: q.prompt && isNaN(Number(q.prompt)) ? q.prompt : `Speaker ${String.fromCharCode(65 + idx)}`,
             correctAnswer: q.correct_answer || "",
             explanation: q.explanation || "",
           }));
-          if (spkList.length > 0) {
-            result.part2.speakers = spkList;
-            if (p.instructions) result.part2.instructions = p.instructions;
-          }
+          result.part2.speakers = spkList;
+          if (p.instructions) result.part2.instructions = p.instructions;
         }
       }
 
       // Part 3: Opinion discussion
-      if (pNum === 3) {
+      if (pNum === 3 || pTitle.includes("part 3") || pTitle.includes("opinion")) {
         if (p.passage_text) (result.part3 as any).passageText = p.passage_text;
         if (p.translation_text || p.passage_translation) (result.part3 as any).translationText = p.translation_text || p.passage_translation;
+        if (p.audio_url) {
+          (result.part3 as any).audioUrl = p.audio_url;
+          audioUrls[14] = p.audio_url;
+        }
         if (questions.length > 0) {
-          if (p.audio_url) audioUrls[14] = p.audio_url;
           const opList = questions.map((q: any) => {
             let cor: "Man" | "Woman" | "Both" = "Both";
             const corStr = String(q.correct_answer || "").toLowerCase();
@@ -736,21 +875,67 @@ function ListeningExamRunnerContent() {
               explanation: q.explanation || "",
             };
           });
-          if (opList.length > 0) {
-            result.part3.opinions = opList;
-            if (p.instructions) result.part3.instructions = p.instructions;
-          }
+          result.part3.opinions = opList;
+          if (p.instructions) result.part3.instructions = p.instructions;
         }
       }
 
       // Part 4: Monologues
-      if (pNum === 4) {
-        if (p.translation_text || p.passage_translation) {
-          if (result.part4[0]) (result.part4[0] as any).translationText = p.translation_text || p.passage_translation;
-        }
-        if (questions.length > 0 && p.audio_url) {
-          audioUrls[15] = p.audio_url;
-          audioUrls[16] = p.audio_url;
+      if (pNum === 4 || pTitle.includes("part 4") || pTitle.includes("monologue") || pTitle.includes("recording")) {
+        if (questions.length > 0) {
+          const qList = questions.map((q: any) => {
+            let opts: string[] = [];
+            if (Array.isArray(q.options)) opts = q.options;
+            else if (typeof q.options === "string") {
+              try {
+                opts = JSON.parse(q.options);
+              } catch {
+                opts = ["A", "B", "C"];
+              }
+            }
+            return {
+              id: q.id,
+              prompt: q.prompt,
+              options: opts,
+              correctAnswer: q.correct_answer || opts[0] || "",
+              explanation: q.explanation || "",
+            };
+          });
+
+          const recordings: any[] = [];
+          if (qList.length > 2) {
+            recordings.push({
+              recNum: 1,
+              title: "Recording 1 of 2",
+              passageText: p.passage_text || "",
+              translationText: p.translation_text || p.passage_translation || "",
+              audioUrl: p.audio_url || "",
+              questions: qList.slice(0, 2),
+            });
+            recordings.push({
+              recNum: 2,
+              title: "Recording 2 of 2",
+              passageText: p.passage_text || "",
+              translationText: p.translation_text || p.passage_translation || "",
+              audioUrl: p.audio_url || "",
+              questions: qList.slice(2, 4),
+            });
+            if (p.audio_url) {
+              audioUrls[15] = p.audio_url;
+              audioUrls[16] = p.audio_url;
+            }
+          } else {
+            recordings.push({
+              recNum: 1,
+              title: "Recording 1",
+              passageText: p.passage_text || "",
+              translationText: p.translation_text || p.passage_translation || "",
+              audioUrl: p.audio_url || "",
+              questions: qList,
+            });
+            if (p.audio_url) audioUrls[15] = p.audio_url;
+          }
+          result.part4 = recordings;
         }
       }
     });
@@ -769,18 +954,19 @@ function ListeningExamRunnerContent() {
 
   // Lấy nội dung văn bản kịch bản cho stage hiện tại (phục vụ SpeechSynthesis khi không có file âm thanh tĩnh)
   const getCurrentStageScript = () => {
-    if (activeStage <= 12) {
-      const q = examData.part1[activeStage];
+    if (!currentStage) return "";
+    if (currentStage.partNum === 1) {
+      const q = examData.part1[currentStage.subIndex];
       return q ? `Question ${q.num}. ${q.prompt}` : "";
-    } else if (activeStage === 13) {
+    } else if (currentStage.partNum === 2) {
       return `Part 2. Four people are talking. ${examData.part2.speakers.map((s) => s.speaker + ". " + s.correctAnswer).join(". ")}`;
-    } else if (activeStage === 14) {
+    } else if (currentStage.partNum === 3) {
       return `Part 3. A man and a woman are discussing: ${examData.part3.topic}. ${examData.part3.opinions.map((o) => o.statement).join(". ")}`;
-    } else if (activeStage === 15) {
-      return examData.part4[0]?.passageText || "First monologue presentation.";
-    } else {
-      return examData.part4[1]?.passageText || "Second monologue presentation.";
+    } else if (currentStage.partNum === 4) {
+      const rec = examData.part4[currentStage.subIndex];
+      return rec?.passageText || "Monologue presentation.";
     }
+    return "";
   };
 
   // Reset audio state khi chuyển câu hỏi
@@ -892,36 +1078,46 @@ function ListeningExamRunnerContent() {
     return `00:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // TÍNH ĐIỂM CHUẨN 25 CÂU (50 ĐIỂM)
+  // TÍNH ĐIỂM CHUẨN DỰA TRÊN SỐ CÂU HỎI THỰC TẾ
   const calculateResults = () => {
     let p1Correct = 0;
     examData.part1.forEach((q, idx) => {
-      if (p1Answers[idx] === q.correctAnswer) p1Correct++;
+      if (p1Answers[idx] && p1Answers[idx].toLowerCase() === q.correctAnswer.toLowerCase()) p1Correct++;
     });
 
     let p2Correct = 0;
     examData.part2.speakers.forEach((s, idx) => {
-      if (p2Answers[idx] === s.correctAnswer) p2Correct++;
+      if (p2Answers[idx] && p2Answers[idx].toLowerCase() === s.correctAnswer.toLowerCase()) p2Correct++;
     });
 
     let p3Correct = 0;
     examData.part3.opinions.forEach((o, idx) => {
-      if (p3Answers[idx] === o.correctAnswer) p3Correct++;
+      if (p3Answers[idx] && p3Answers[idx].toLowerCase() === o.correctAnswer.toLowerCase()) p3Correct++;
     });
 
     let p4Correct = 0;
     examData.part4.forEach((rec, recIdx) => {
       rec.questions.forEach((q, qIdx) => {
-        if (p4Answers[`${recIdx}_${qIdx}`] === q.correctAnswer) p4Correct++;
+        if (p4Answers[`${recIdx}_${qIdx}`] && p4Answers[`${recIdx}_${qIdx}`].toLowerCase() === q.correctAnswer.toLowerCase()) {
+          p4Correct++;
+        }
       });
     });
 
+    const totalQuestionsInExam =
+      examData.part1.length +
+      examData.part2.speakers.length +
+      examData.part3.opinions.length +
+      examData.part4.reduce((sum, r) => sum + r.questions.length, 0);
+
     const totalCorrect = p1Correct + p2Correct + p3Correct + p4Correct;
-    const p1Score = p1Correct * 2;
-    const p2Score = p2Correct * 2;
-    const p3Score = p3Correct * 2;
-    const p4Score = p4Correct * 2;
-    const totalScore = p1Score + p2Score + p3Score + p4Score;
+    const isFullListeningTest = totalQuestionsInExam >= 20;
+
+    const totalScore = isFullListeningTest
+      ? totalCorrect * 2
+      : totalQuestionsInExam > 0
+      ? Math.round((totalCorrect / totalQuestionsInExam) * 50)
+      : 0;
 
     let cefr = "A0";
     if (totalScore >= 46) cefr = "C";
@@ -932,15 +1128,16 @@ function ListeningExamRunnerContent() {
 
     return {
       p1Correct,
-      p1Score,
+      p1Score: isFullListeningTest ? p1Correct * 2 : examData.part1.length > 0 ? Math.round((p1Correct / examData.part1.length) * 50) : 0,
       p2Correct,
-      p2Score,
+      p2Score: isFullListeningTest ? p2Correct * 2 : examData.part2.speakers.length > 0 ? Math.round((p2Correct / examData.part2.speakers.length) * 50) : 0,
       p3Correct,
-      p3Score,
+      p3Score: isFullListeningTest ? p3Correct * 2 : examData.part3.opinions.length > 0 ? Math.round((p3Correct / examData.part3.opinions.length) * 50) : 0,
       p4Correct,
-      p4Score,
+      p4Score: isFullListeningTest ? p4Correct * 2 : Math.round((p4Correct / Math.max(1, examData.part4.reduce((s, r) => s + r.questions.length, 0))) * 50),
       totalCorrect,
       totalScore,
+      totalQuestionsInExam,
       cefr,
     };
   };
@@ -1018,37 +1215,35 @@ function ListeningExamRunnerContent() {
     }
   };
 
-  // Xác định Part hiện tại theo activeStage
+  // Xác định Part hiện tại theo currentStage
   const getStageMeta = () => {
-    if (activeStage <= 12) {
+    if (!currentStage) {
+      return { partName: "Listening Practice", subTitle: "Question 1", isLast: true };
+    }
+    const isLast = activeStage === listeningStages.length - 1;
+    if (currentStage.partNum === 1) {
       return {
         partName: "Part 1 – Word Recognition",
-        subTitle: `Question ${activeStage + 1} of 13`,
-        isLast: false,
+        subTitle: `Question ${currentStage.subIndex + 1} of ${examData.part1.length}`,
+        isLast,
       };
-    } else if (activeStage === 13) {
+    } else if (currentStage.partNum === 2) {
       return {
         partName: "Part 2 – Matching Information",
-        subTitle: "Question 1 of 1",
-        isLast: false,
+        subTitle: "Matching 4 Speakers",
+        isLast,
       };
-    } else if (activeStage === 14) {
+    } else if (currentStage.partNum === 3) {
       return {
         partName: "Part 3 – Short Conversations",
-        subTitle: "Question 1 of 1",
-        isLast: false,
-      };
-    } else if (activeStage === 15) {
-      return {
-        partName: "Part 4 – Monologues",
-        subTitle: "Recording 1 of 2",
-        isLast: false,
+        subTitle: "Opinion Discussion (4 Questions)",
+        isLast,
       };
     } else {
       return {
         partName: "Part 4 – Monologues",
-        subTitle: "Recording 2 of 2",
-        isLast: true,
+        subTitle: `Recording ${currentStage.subIndex + 1} of ${Math.max(1, examData.part4.length)}`,
+        isLast,
       };
     }
   };
@@ -1483,54 +1678,58 @@ function ListeningExamRunnerContent() {
 
           {/* 3. PART CONTENT CHUẨN */}
           {/* =========================================================================
-              PART 1: 13 CÂU HỎI TRẮC NGHIỆM A, B, C
+              PART 1: CÂU HỎI TRẮC NGHIỆM A, B, C
               ========================================================================= */}
-          {activeStage <= 12 && (
-            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
-              <h3 className="text-sm md:text-base font-medium text-foreground leading-relaxed">
-                {examData.part1[activeStage].prompt}
-              </h3>
+          {currentStage.partNum === 1 && (() => {
+            const q = examData.part1[currentStage.subIndex];
+            if (!q) return null;
+            return (
+              <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
+                <h3 className="text-sm md:text-base font-medium text-foreground leading-relaxed">
+                  {q.prompt}
+                </h3>
 
-              <div className="space-y-3">
-                {examData.part1[activeStage].options.map((opt, optIdx) => {
-                  const isSelected = p1Answers[activeStage] === opt;
-                  return (
-                    <button
-                      key={optIdx}
-                      type="button"
-                      onClick={() =>
-                        setP1Answers((prev) => ({
-                          ...prev,
-                          [activeStage]: opt,
-                        }))
-                      }
-                      className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between ${
-                        isSelected
-                          ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                          : "border-border bg-background hover:border-primary/40 text-foreground"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-lg border border-border flex items-center justify-center font-bold text-xs bg-muted/40">
-                          {String.fromCharCode(65 + optIdx)}
-                        </span>
-                        <span className="text-sm md:text-base font-normal">{opt}</span>
-                      </div>
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
-                    </button>
-                  );
-                })}
+                <div className="space-y-3">
+                  {q.options.map((opt, optIdx) => {
+                    const isSelected = p1Answers[currentStage.subIndex] === opt;
+                    return (
+                      <button
+                        key={optIdx}
+                        type="button"
+                        onClick={() =>
+                          setP1Answers((prev) => ({
+                            ...prev,
+                            [currentStage.subIndex]: opt,
+                          }))
+                        }
+                        className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between ${
+                          isSelected
+                            ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
+                            : "border-border bg-background hover:border-primary/40 text-foreground"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="w-7 h-7 rounded-lg border border-border flex items-center justify-center font-bold text-xs bg-muted/40">
+                            {String.fromCharCode(65 + optIdx)}
+                          </span>
+                          <span className="text-sm md:text-base font-normal">{opt}</span>
+                        </div>
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* =========================================================================
-              PART 2: 4 SPEAKERS NỐI THÔNG TIN BẰNG DROPDOWN
+              PART 2: SPEAKERS NỐI THÔNG TIN BẰNG DROPDOWN
               ========================================================================= */}
-          {activeStage === 13 && (
+          {currentStage.partNum === 2 && examData.part2.speakers && examData.part2.speakers.length > 0 && (
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
               <h3 className="text-sm font-semibold text-foreground">
-                Ghép thông tin tương ứng cho 4 người nói:
+                Ghép thông tin tương ứng cho các người nói:
               </h3>
 
               <div className="space-y-4">
@@ -1554,7 +1753,7 @@ function ListeningExamRunnerContent() {
                       className="flex-1 p-2.5 rounded-lg border border-input bg-card text-foreground text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans cursor-pointer"
                     >
                       <option value="">-- Chọn thông tin phù hợp --</option>
-                      {examData.part2.options.map((opt, oIdx) => (
+                      {(examData.part2.options || []).map((opt, oIdx) => (
                         <option key={oIdx} value={opt}>
                           {opt}
                         </option>
@@ -1567,9 +1766,9 @@ function ListeningExamRunnerContent() {
           )}
 
           {/* =========================================================================
-              PART 3: 4 NHẬN ĐỊNH CHỌN MAN / WOMAN / BOTH
+              PART 3: NHẬN ĐỊNH CHỌN MAN / WOMAN / BOTH
               ========================================================================= */}
-          {activeStage === 14 && (
+          {currentStage.partNum === 3 && examData.part3.opinions && examData.part3.opinions.length > 0 && (
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
               <h3 className="text-sm font-semibold text-foreground">
                 Xác định ai là người đưa ra từng quan điểm dưới đây:
@@ -1607,59 +1806,63 @@ function ListeningExamRunnerContent() {
           )}
 
           {/* =========================================================================
-              PART 4: 2 RECORDINGS MONOLOGUES (MỖI BÀI 2 CÂU HỎI TRẮC NGHIỆM)
+              PART 4: RECORDINGS MONOLOGUES (CÂU HỎI TRẮC NGHIỆM)
               ========================================================================= */}
-          {(activeStage === 15 || activeStage === 16) && (
-            <div className="space-y-6">
-              {examData.part4[activeStage === 15 ? 0 : 1].questions.map((q, qIdx) => {
-                const recIdx = activeStage === 15 ? 0 : 1;
-                const answerKey = `${recIdx}_${qIdx}`;
-                const selected = p4Answers[answerKey];
+          {currentStage.partNum === 4 && (() => {
+            const rec = examData.part4[currentStage.subIndex];
+            if (!rec || !rec.questions) return null;
+            const recIdx = currentStage.subIndex;
+            return (
+              <div className="space-y-6">
+                {rec.questions.map((q, qIdx) => {
+                  const answerKey = `${recIdx}_${qIdx}`;
+                  const selected = p4Answers[answerKey];
 
-                return (
-                  <div
-                    key={qIdx}
-                    className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4"
-                  >
-                    <h3 className="text-sm md:text-base font-semibold text-foreground leading-relaxed">
-                      {q.prompt}
-                    </h3>
+                  return (
+                    <div
+                      key={qIdx}
+                      className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4"
+                    >
+                      <h3 className="text-sm md:text-base font-semibold text-foreground leading-relaxed">
+                        {q.prompt}
+                      </h3>
 
-                    <div className="space-y-3">
-                      {q.options.map((opt, optIdx) => {
-                        const isSelected = selected === opt;
-                        return (
-                          <button
-                            key={optIdx}
-                            type="button"
-                            onClick={() =>
-                              setP4Answers((prev) => ({
-                                ...prev,
-                                [answerKey]: opt,
-                              }))
-                            }
-                            className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between ${
-                              isSelected
-                                ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                                : "border-border bg-background hover:border-primary/40 text-foreground"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="w-7 h-7 rounded-lg border border-border flex items-center justify-center font-bold text-xs bg-muted/40">
-                                {String.fromCharCode(65 + optIdx)}
-                              </span>
-                              <span className="text-xs md:text-sm font-normal">{opt}</span>
-                            </div>
-                            {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
-                          </button>
-                        );
-                      })}
+                      <div className="space-y-3">
+                        {q.options.map((opt, optIdx) => {
+                          const isSelected = selected === opt;
+                          return (
+                            <button
+                              key={optIdx}
+                              type="button"
+                              onClick={() =>
+                                setP4Answers((prev) => ({
+                                  ...prev,
+                                  [answerKey]: opt,
+                                }))
+                              }
+                              className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between ${
+                                isSelected
+                                  ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
+                                  : "border-border bg-background hover:border-primary/40 text-foreground"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="w-7 h-7 rounded-lg border border-border flex items-center justify-center font-bold text-xs bg-muted/40">
+                                  {String.fromCharCode(65 + optIdx)}
+                                </span>
+                                <span className="text-xs md:text-sm font-normal">{opt}</span>
+                              </div>
+                              {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       </main>
 
@@ -1690,76 +1893,41 @@ function ListeningExamRunnerContent() {
         <div className="flex items-center gap-2">
           {/* Pills câu hỏi của Part đang mở */}
           <div className="flex items-center gap-1 overflow-x-auto max-w-[42vw] sm:max-w-[36vw] py-1 px-1">
-            {activeStage <= 12 && (
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 13 }).map((_, idx) => {
-                  const isCurrent = activeStage === idx;
-                  const isAnswered = !!p1Answers[idx];
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setActiveStage(idx)}
-                      className={`w-7 h-7 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
-                        isCurrent
-                          ? "bg-primary text-primary-foreground shadow-xs scale-105"
-                          : isAnswered
-                          ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                          : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                      }`}
-                      title={`Câu ${idx + 1}`}
-                    >
-                      {idx + 1}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+            {listeningStages
+              .map((stage, idx) => ({ stage, idx }))
+              .filter(({ stage }) => stage.partNum === currentStage.partNum)
+              .map(({ stage, idx }) => {
+                const isCurrent = activeStage === idx;
+                let isAnswered = false;
+                if (stage.partNum === 1) {
+                  isAnswered = !!p1Answers[stage.subIndex];
+                } else if (stage.partNum === 2) {
+                  isAnswered = Object.keys(p2Answers).length > 0;
+                } else if (stage.partNum === 3) {
+                  isAnswered = Object.keys(p3Answers).length > 0;
+                } else if (stage.partNum === 4) {
+                  const part4KeyPrefix = `p4-${stage.subIndex}-`;
+                  isAnswered = Object.keys(p4Answers).some((k) => k.startsWith(part4KeyPrefix));
+                }
 
-            {activeStage === 13 && (
-              <button
-                type="button"
-                className="px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-xs shrink-0"
-              >
-                Part 2: Câu 14 (4 Speakers)
-              </button>
-            )}
-
-            {activeStage === 14 && (
-              <button
-                type="button"
-                className="px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-xs shrink-0"
-              >
-                Part 3: Câu 15 (4 Quan điểm)
-              </button>
-            )}
-
-            {activeStage >= 15 && (
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setActiveStage(15)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    activeStage === 15
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Câu 16 (Bài 1)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveStage(16)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    activeStage === 16
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Câu 17 (Bài 2)
-                </button>
-              </div>
-            )}
+                return (
+                  <button
+                    key={stage.id}
+                    type="button"
+                    onClick={() => setActiveStage(idx)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                      isCurrent
+                        ? "bg-primary text-primary-foreground shadow-xs scale-105"
+                        : isAnswered
+                        ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                    }`}
+                    title={stage.label}
+                  >
+                    {stage.label}
+                  </button>
+                );
+              })}
           </div>
 
           <div className="h-5 w-px bg-border/60 shrink-0 hidden sm:block" />
@@ -1794,10 +1962,10 @@ function ListeningExamRunnerContent() {
             ← Previous
           </button>
 
-          {activeStage < 16 ? (
+          {activeStage < listeningStages.length - 1 ? (
             <button
               type="button"
-              onClick={() => setActiveStage((p) => Math.min(16, p + 1))}
+              onClick={() => setActiveStage((p) => Math.min(listeningStages.length - 1, p + 1))}
               className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1"
             >
               <span>Next</span>
@@ -1834,21 +2002,21 @@ function ListeningExamRunnerContent() {
             </div>
 
             <div className="space-y-3 text-xs leading-relaxed">
-              {activeStage <= 12 && (
+              {currentStage.partNum === 1 && examData.part1[currentStage.subIndex] && (
                 <div className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-2">
                   <div className="font-semibold text-foreground">
-                    {examData.part1[activeStage].prompt}
+                    {examData.part1[currentStage.subIndex].prompt}
                   </div>
                   <div className="text-primary font-bold">
-                    Đáp án đúng: {examData.part1[activeStage].correctAnswer}
+                    Đáp án đúng: {examData.part1[currentStage.subIndex].correctAnswer}
                   </div>
                   <div className="text-muted-foreground italic">
-                    {examData.part1[activeStage].explanation}
+                    {examData.part1[currentStage.subIndex].explanation}
                   </div>
                 </div>
               )}
 
-              {activeStage === 13 &&
+              {currentStage.partNum === 2 &&
                 examData.part2.speakers.map((s, idx) => (
                   <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-1">
                     <div className="font-bold text-primary">{s.speaker}</div>
@@ -1857,7 +2025,7 @@ function ListeningExamRunnerContent() {
                   </div>
                 ))}
 
-              {activeStage === 14 &&
+              {currentStage.partNum === 3 &&
                 examData.part3.opinions.map((op, idx) => (
                   <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-1">
                     <div className="font-medium text-foreground">{op.statement}</div>
@@ -1866,8 +2034,8 @@ function ListeningExamRunnerContent() {
                   </div>
                 ))}
 
-              {(activeStage === 15 || activeStage === 16) &&
-                examData.part4[activeStage === 15 ? 0 : 1].questions.map((q, idx) => (
+              {currentStage.partNum === 4 &&
+                examData.part4[currentStage.subIndex]?.questions.map((q, idx) => (
                   <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-1">
                     <div className="font-medium text-foreground">{q.prompt}</div>
                     <div className="text-primary font-bold">Đáp án: {q.correctAnswer}</div>
@@ -1895,7 +2063,7 @@ function ListeningExamRunnerContent() {
           <div className="relative w-full max-w-md p-5 rounded-2xl bg-card border border-border shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-border pb-2">
               <h3 className="font-heading font-bold text-xs uppercase text-muted-foreground tracking-wider">
-                Danh sách bài tập Listening (17 bài)
+                Danh sách bài tập Listening ({listeningStages.length} bài)
               </h3>
               <button
                 type="button"
@@ -1909,11 +2077,19 @@ function ListeningExamRunnerContent() {
             {/* Bộ lọc Tab theo Part */}
             <div className="flex items-center gap-1 overflow-x-auto pb-1 text-xs border-b border-border/50">
               {[
-                { id: "all", label: "Tất cả (17)" },
-                { id: "p1", label: "Part 1 (13)" },
-                { id: "p2", label: "Part 2 (1)" },
-                { id: "p3", label: "Part 3 (1)" },
-                { id: "p4", label: "Part 4 (2)" },
+                { id: "all", label: `Tất cả (${listeningStages.length})` },
+                ...(listeningStages.some((s) => s.partNum === 1)
+                  ? [{ id: "p1", label: `Part 1 (${listeningStages.filter((s) => s.partNum === 1).length})` }]
+                  : []),
+                ...(listeningStages.some((s) => s.partNum === 2)
+                  ? [{ id: "p2", label: `Part 2 (${listeningStages.filter((s) => s.partNum === 2).length})` }]
+                  : []),
+                ...(listeningStages.some((s) => s.partNum === 3)
+                  ? [{ id: "p3", label: `Part 3 (${listeningStages.filter((s) => s.partNum === 3).length})` }]
+                  : []),
+                ...(listeningStages.some((s) => s.partNum === 4)
+                  ? [{ id: "p4", label: `Part 4 (${listeningStages.filter((s) => s.partNum === 4).length})` }]
+                  : []),
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1932,129 +2108,136 @@ function ListeningExamRunnerContent() {
 
             <div className="space-y-3">
               {/* Part 1 */}
-              {(drawerTab === "all" || drawerTab === "p1") && (
+              {(drawerTab === "all" || drawerTab === "p1") && listeningStages.some((s) => s.partNum === 1) && (
                 <div className="space-y-1.5">
                   <div className="text-[11px] font-bold text-primary uppercase pt-1 flex items-center justify-between">
-                    <span>Part 1 – Word Recognition (13 câu)</span>
+                    <span>Part 1 – Word Recognition ({listeningStages.filter((s) => s.partNum === 1).length} câu)</span>
                     <span className="text-[10px] text-muted-foreground font-normal">
-                      {Object.keys(p1Answers).length}/13 đã làm
+                      {Object.keys(p1Answers).length}/{listeningStages.filter((s) => s.partNum === 1).length} đã làm
                     </span>
                   </div>
                   <div className="grid grid-cols-5 gap-1.5">
-                    {Array.from({ length: 13 }).map((_, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => {
-                          setActiveStage(idx);
-                          setShowDrawer(false);
-                        }}
-                        className={`p-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                          activeStage === idx
-                            ? "bg-primary text-primary-foreground"
-                            : p1Answers[idx]
-                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                            : "bg-muted/40 hover:bg-muted text-foreground"
-                        }`}
-                      >
-                        Câu {idx + 1}
-                      </button>
-                    ))}
+                    {listeningStages
+                      .map((stage, idx) => ({ stage, idx }))
+                      .filter(({ stage }) => stage.partNum === 1)
+                      .map(({ stage, idx }) => (
+                        <button
+                          key={stage.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveStage(idx);
+                            setShowDrawer(false);
+                          }}
+                          className={`p-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                            activeStage === idx
+                              ? "bg-primary text-primary-foreground"
+                              : p1Answers[stage.subIndex]
+                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                              : "bg-muted/40 hover:bg-muted text-foreground"
+                          }`}
+                        >
+                          Câu {stage.subIndex + 1}
+                        </button>
+                      ))}
                   </div>
                 </div>
               )}
 
               {/* Part 2 */}
-              {(drawerTab === "all" || drawerTab === "p2") && (
+              {(drawerTab === "all" || drawerTab === "p2") && listeningStages.some((s) => s.partNum === 2) && (
                 <div className="space-y-1.5">
                   <div className="text-[11px] font-bold text-primary uppercase pt-2 flex items-center justify-between">
                     <span>Part 2 – Matching Info</span>
                     <span className="text-[10px] text-muted-foreground font-normal">
-                      {Object.keys(p2Answers).length}/4 người nói
+                      {Object.keys(p2Answers).length}/{examData.part2.speakers.length || 4} người nói
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveStage(13);
-                      setShowDrawer(false);
-                    }}
-                    className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors cursor-pointer ${
-                      activeStage === 13
-                        ? "bg-primary text-primary-foreground"
-                        : Object.keys(p2Answers).length === 4
-                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                        : "bg-muted/40 hover:bg-muted text-foreground"
-                    }`}
-                  >
-                    Câu 14: Matching 4 Speakers (Speaker A - D)
-                  </button>
+                  {listeningStages
+                    .map((stage, idx) => ({ stage, idx }))
+                    .filter(({ stage }) => stage.partNum === 2)
+                    .map(({ stage, idx }) => (
+                      <button
+                        key={stage.id}
+                        type="button"
+                        onClick={() => {
+                          setActiveStage(idx);
+                          setShowDrawer(false);
+                        }}
+                        className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors cursor-pointer ${
+                          activeStage === idx
+                            ? "bg-primary text-primary-foreground"
+                            : Object.keys(p2Answers).length === (examData.part2.speakers.length || 4)
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                            : "bg-muted/40 hover:bg-muted text-foreground"
+                        }`}
+                      >
+                        {stage.label}: Matching Speakers
+                      </button>
+                    ))}
                 </div>
               )}
 
               {/* Part 3 */}
-              {(drawerTab === "all" || drawerTab === "p3") && (
+              {(drawerTab === "all" || drawerTab === "p3") && listeningStages.some((s) => s.partNum === 3) && (
                 <div className="space-y-1.5">
                   <div className="text-[11px] font-bold text-primary uppercase pt-2 flex items-center justify-between">
                     <span>Part 3 – Short Conversations</span>
                     <span className="text-[10px] text-muted-foreground font-normal">
-                      {Object.keys(p3Answers).length}/4 quan điểm
+                      {Object.keys(p3Answers).length}/{examData.part3.opinions.length || 4} quan điểm
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveStage(14);
-                      setShowDrawer(false);
-                    }}
-                    className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors cursor-pointer ${
-                      activeStage === 14
-                        ? "bg-primary text-primary-foreground"
-                        : Object.keys(p3Answers).length === 4
-                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                        : "bg-muted/40 hover:bg-muted text-foreground"
-                    }`}
-                  >
-                    Câu 15: Opinion Matching (Man / Woman / Both)
-                  </button>
+                  {listeningStages
+                    .map((stage, idx) => ({ stage, idx }))
+                    .filter(({ stage }) => stage.partNum === 3)
+                    .map(({ stage, idx }) => (
+                      <button
+                        key={stage.id}
+                        type="button"
+                        onClick={() => {
+                          setActiveStage(idx);
+                          setShowDrawer(false);
+                        }}
+                        className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors cursor-pointer ${
+                          activeStage === idx
+                            ? "bg-primary text-primary-foreground"
+                            : Object.keys(p3Answers).length === (examData.part3.opinions.length || 4)
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                            : "bg-muted/40 hover:bg-muted text-foreground"
+                        }`}
+                      >
+                        {stage.label}: Opinion Matching (Man / Woman / Both)
+                      </button>
+                    ))}
                 </div>
               )}
 
               {/* Part 4 */}
-              {(drawerTab === "all" || drawerTab === "p4") && (
+              {(drawerTab === "all" || drawerTab === "p4") && listeningStages.some((s) => s.partNum === 4) && (
                 <div className="space-y-1.5">
                   <div className="text-[11px] font-bold text-primary uppercase pt-2">
-                    Part 4 – Monologues (2 bài thuyết trình)
+                    Part 4 – Monologues ({listeningStages.filter((s) => s.partNum === 4).length} bài thuyết trình)
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveStage(15);
-                        setShowDrawer(false);
-                      }}
-                      className={`p-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                        activeStage === 15
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted/40 hover:bg-muted text-foreground"
-                      }`}
-                    >
-                      Câu 16: Recording 1
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveStage(16);
-                        setShowDrawer(false);
-                      }}
-                      className={`p-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                        activeStage === 16
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted/40 hover:bg-muted text-foreground"
-                      }`}
-                    >
-                      Câu 17: Recording 2
-                    </button>
+                    {listeningStages
+                      .map((stage, idx) => ({ stage, idx }))
+                      .filter(({ stage }) => stage.partNum === 4)
+                      .map(({ stage, idx }) => (
+                        <button
+                          key={stage.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveStage(idx);
+                            setShowDrawer(false);
+                          }}
+                          className={`p-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                            activeStage === idx
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted/40 hover:bg-muted text-foreground"
+                          }`}
+                        >
+                          {stage.label}
+                        </button>
+                      ))}
                   </div>
                 </div>
               )}
@@ -2062,21 +2245,6 @@ function ListeningExamRunnerContent() {
           </div>
         </div>
       )}
-
-      {/* =========================================================================
-          BACKUP CODE UI CŨ (GENERIC LISTENING VIEW)
-          Được comment lại theo yêu cầu của user để có thể phục hồi/backup bất cứ lúc nào:
-          =========================================================================
-      {false && (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 p-6">
-          <div className="lg:col-span-3 space-y-6">
-            <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm">
-              <div>Legacy Audio Station with flat multiple choice options</div>
-            </div>
-          </div>
-        </div>
-      )}
-      ========================================================================= */}
     </div>
   );
 }

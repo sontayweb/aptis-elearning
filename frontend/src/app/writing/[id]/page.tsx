@@ -597,7 +597,14 @@ function WritingExamRunnerContent() {
       if (res.success && res.data && res.data.parts?.length > 0) {
         const loadedParts: WritingPart[] = (res.data.parts || []).map(
           (p: any, idx: number) => {
-            const partNum = p.part_number || idx + 1;
+            const rawPartNum = p.part_number || idx + 1;
+            const pTitleLower = (p.title || "").toLowerCase();
+            let partNum = rawPartNum;
+            if (pTitleLower.includes("part 4") || pTitleLower.includes("email")) partNum = 4;
+            else if (pTitleLower.includes("part 3") || pTitleLower.includes("three response") || pTitleLower.includes("chat")) partNum = 3;
+            else if (pTitleLower.includes("part 2") || pTitleLower.includes("short text") || pTitleLower.includes("social")) partNum = 2;
+            else if (pTitleLower.includes("part 1") || pTitleLower.includes("word-level")) partNum = 1;
+
             const subTitle =
               partNum === 1
                 ? "Part 1 - Short Answers"
@@ -607,7 +614,7 @@ function WritingExamRunnerContent() {
                 ? "Part 3 - Three Questions"
                 : "Part 4 - Formal & Informal Email";
 
-            const defaultP = benchmarkParts[idx] || benchmarkParts[0];
+            const defaultP = benchmarkParts[partNum - 1] || benchmarkParts[0];
 
             let questions: WritingQuestion[] = [];
             if (p.questions && p.questions.length > 0) {
@@ -617,16 +624,6 @@ function WritingExamRunnerContent() {
                 prompt: q.prompt || defaultP.questions[qIdx]?.prompt || `Question ${qIdx + 1}`,
                 sampleAnswer: q.explanation || defaultP.questions[qIdx]?.sampleAnswer,
               }));
-
-              // Bổ sung đủ 5 câu cho Part 1 nếu database chỉ có ít câu
-              if (partNum === 1 && questions.length < 5 && defaultP.questions.length >= 5) {
-                for (let i = questions.length; i < 5; i++) {
-                  questions.push({
-                    ...defaultP.questions[i],
-                    questionNumber: i + 1,
-                  });
-                }
-              }
             } else {
               questions = defaultP.questions;
             }
@@ -645,13 +642,7 @@ function WritingExamRunnerContent() {
           }
         );
 
-        // Bổ sung đủ 4 Part nếu đề chỉ lưu thiếu Part
-        if (loadedParts.length < 4) {
-          for (let i = loadedParts.length; i < 4; i++) {
-            loadedParts.push(benchmarkParts[i]);
-          }
-        }
-
+        // Hiển thị chính xác các Part có trong đề thi, KHÔNG tự ý chèn Part của CLB khác
         setParts(loadedParts);
       } else {
         setParts(benchmarkParts);

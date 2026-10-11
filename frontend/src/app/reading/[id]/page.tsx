@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
@@ -455,14 +455,86 @@ function ReadingExamRunner() {
     loadReadingExam();
   }, [examId]);
 
+  // Dynamic Stage list for navigation based on actually loaded questions
+  const stages = useMemo(() => {
+    const list: Array<{
+      stageKey: "p1" | "p2-1" | "p2-2" | "p3" | "p4";
+      title: string;
+      label: string;
+      count: number;
+    }> = [];
+
+    if (examData.part1.gaps.length > 0) {
+      list.push({
+        stageKey: "p1",
+        title: "Part 1",
+        label: "Part 1 – Gap Fill",
+        count: examData.part1.gaps.length,
+      });
+    }
+    if (examData.part2.stories.length > 0) {
+      list.push({
+        stageKey: "p2-1",
+        title: "Part 2 (Bài 1)",
+        label: "Part 2 – " + (examData.part2.stories[0]?.title || "Story 1"),
+        count: examData.part2.stories[0]?.sentences.length || 4,
+      });
+      if (examData.part2.stories.length > 1) {
+        list.push({
+          stageKey: "p2-2",
+          title: "Part 2 (Bài 2)",
+          label: "Part 2 – " + (examData.part2.stories[1]?.title || "Story 2"),
+          count: examData.part2.stories[1]?.sentences.length || 4,
+        });
+      }
+    }
+    if (examData.part3.questions.length > 0) {
+      list.push({
+        stageKey: "p3",
+        title: "Part 3",
+        label: "Part 3 – Opinion Matching",
+        count: examData.part3.questions.length,
+      });
+    }
+    if (examData.part4.paragraphs.length > 0) {
+      list.push({
+        stageKey: "p4",
+        title: "Part 4",
+        label: "Part 4 – Long Reading",
+        count: examData.part4.paragraphs.length,
+      });
+    }
+
+    if (list.length === 0) {
+      list.push({
+        stageKey: "p1",
+        title: "Part 1",
+        label: "Part 1 – Gap Fill",
+        count: 0,
+      });
+    }
+    return list;
+  }, [examData]);
+
   // Adjust activeStage if URL contains ?part=
   useEffect(() => {
-    const p = partParam?.toLowerCase();
-    if (p === "1" || p === "p1" || p === "part1") setActiveStage(0);
-    else if (p === "2" || p === "p2" || p === "part2") setActiveStage(1);
-    else if (p === "3" || p === "p3" || p === "part3" || p === "4" || p === "p4" || p === "part4") setActiveStage(3);
-    else if (p === "5" || p === "p5" || p === "part5") setActiveStage(4);
-  }, [partParam]);
+    if (!partParam || stages.length === 0) return;
+    const p = partParam.toLowerCase();
+    const targetKey =
+      p === "1" || p === "p1" || p === "part1"
+        ? "p1"
+        : p === "2" || p === "p2" || p === "part2"
+        ? "p2-1"
+        : p === "3" || p === "p3" || p === "part3"
+        ? "p3"
+        : p === "4" || p === "p4" || p === "part4" || p === "5" || p === "p5" || p === "part5"
+        ? "p4"
+        : null;
+    if (targetKey) {
+      const idx = stages.findIndex((s) => s.stageKey === targetKey);
+      if (idx !== -1) setActiveStage(idx);
+    }
+  }, [partParam, stages]);
 
   // 2. Countdown Timer
   useEffect(() => {
@@ -548,47 +620,95 @@ function ReadingExamRunner() {
   const handleSubmitExam = useCallback(async () => {
     setIsSubmitModalOpen(false);
 
-    // 1. Part 1 Score (Max: 7 pts)
-    let p1Correct = 0;
-    examData.part1.gaps.forEach((g) => {
-      if (p1Answers[g.id] && p1Answers[g.id].toLowerCase() === g.correctAnswer.toLowerCase()) {
-        p1Correct++;
-      }
-    });
-    const p1Score = examData.part1.gaps.length > 0 ? (p1Correct / examData.part1.gaps.length) * 7 : 7;
+    const activePartsCount =
+      (examData.part1.gaps.length > 0 ? 1 : 0) +
+      (examData.part2.stories.length > 0 ? 1 : 0) +
+      (examData.part3.questions.length > 0 ? 1 : 0) +
+      (examData.part4.paragraphs.length > 0 ? 1 : 0);
 
-    // 2. Part 2 Score (Max: 17 pts)
+    const calculatedPartScores: { name: string; score: number; maxScore: number; correct: number; total: number }[] = [];
+
+    // 1. Part 1 Score
+    let p1Correct = 0;
+    if (examData.part1.gaps.length > 0) {
+      examData.part1.gaps.forEach((g) => {
+        if (p1Answers[g.id] && p1Answers[g.id].toLowerCase() === g.correctAnswer.toLowerCase()) {
+          p1Correct++;
+        }
+      });
+      const p1Max = activePartsCount === 1 ? 50 : 7;
+      const p1Score = (p1Correct / examData.part1.gaps.length) * p1Max;
+      calculatedPartScores.push({
+        name: "Part 1 – Sentence comprehension",
+        score: Math.round(p1Score * 10) / 10,
+        maxScore: p1Max,
+        correct: p1Correct,
+        total: examData.part1.gaps.length,
+      });
+    }
+
+    // 2. Part 2 Score
     let p2CorrectMatches = 0;
     let p2TotalMatches = 0;
-    examData.part2.stories.forEach((st) => {
-      const userOrder = p2Orders[st.id] || [];
-      const corOrder = st.correctOrder || [];
-      p2TotalMatches += corOrder.length;
-      userOrder.forEach((item, idx) => {
-        if (corOrder[idx] === item) p2CorrectMatches++;
+    if (examData.part2.stories.length > 0) {
+      examData.part2.stories.forEach((st) => {
+        const userOrder = p2Orders[st.id] || [];
+        const corOrder = st.correctOrder || [];
+        p2TotalMatches += corOrder.length;
+        userOrder.forEach((item, idx) => {
+          if (corOrder[idx] === item) p2CorrectMatches++;
+        });
       });
-    });
-    const p2Score = p2TotalMatches > 0 ? (p2CorrectMatches / p2TotalMatches) * 17 : 17;
+      const p2Max = activePartsCount === 1 ? 50 : 17;
+      const p2Score = p2TotalMatches > 0 ? (p2CorrectMatches / p2TotalMatches) * p2Max : 0;
+      calculatedPartScores.push({
+        name: "Part 2 – Text cohesion",
+        score: Math.round(p2Score * 10) / 10,
+        maxScore: p2Max,
+        correct: p2CorrectMatches,
+        total: p2TotalMatches,
+      });
+    }
 
-    // 3. Part 3 Score (Max: 13 pts)
+    // 3. Part 3 Score
     let p3Correct = 0;
-    examData.part3.questions.forEach((q) => {
-      if (p3Answers[q.id] && p3Answers[q.id].toLowerCase() === q.correctAnswer.toLowerCase()) {
-        p3Correct++;
-      }
-    });
-    const p3Score = examData.part3.questions.length > 0 ? (p3Correct / examData.part3.questions.length) * 13 : 13;
+    if (examData.part3.questions.length > 0) {
+      examData.part3.questions.forEach((q) => {
+        if (p3Answers[q.id] && p3Answers[q.id].toLowerCase() === q.correctAnswer.toLowerCase()) {
+          p3Correct++;
+        }
+      });
+      const p3Max = activePartsCount === 1 ? 50 : 13;
+      const p3Score = (p3Correct / examData.part3.questions.length) * p3Max;
+      calculatedPartScores.push({
+        name: "Part 3 – Opinion matching",
+        score: Math.round(p3Score * 10) / 10,
+        maxScore: p3Max,
+        correct: p3Correct,
+        total: examData.part3.questions.length,
+      });
+    }
 
-    // 4. Part 4 Score (Max: 13 pts)
+    // 4. Part 4 Score
     let p4Correct = 0;
-    examData.part4.paragraphs.forEach((p) => {
-      if (p4Answers[p.id] && p4Answers[p.id].toLowerCase() === p.correctHeading.toLowerCase()) {
-        p4Correct++;
-      }
-    });
-    const p4Score = examData.part4.paragraphs.length > 0 ? (p4Correct / examData.part4.paragraphs.length) * 13 : 13;
+    if (examData.part4.paragraphs.length > 0) {
+      examData.part4.paragraphs.forEach((p) => {
+        if (p4Answers[p.id] && p4Answers[p.id].toLowerCase() === p.correctHeading.toLowerCase()) {
+          p4Correct++;
+        }
+      });
+      const p4Max = activePartsCount === 1 ? 50 : 13;
+      const p4Score = (p4Correct / examData.part4.paragraphs.length) * p4Max;
+      calculatedPartScores.push({
+        name: "Part 4 – Long reading",
+        score: Math.round(p4Score * 10) / 10,
+        maxScore: p4Max,
+        correct: p4Correct,
+        total: examData.part4.paragraphs.length,
+      });
+    }
 
-    const totalCalculated = Math.round(p1Score + p2Score + p3Score + p4Score);
+    const totalCalculated = Math.min(50, Math.round(calculatedPartScores.reduce((sum, item) => sum + item.score, 0)));
 
     let cefr = "A1";
     if (totalCalculated >= 46) cefr = "C";
@@ -600,12 +720,7 @@ function ReadingExamRunner() {
 
     setResultScore(totalCalculated);
     setCefrBand(cefr);
-    setPartScores([
-      { name: "Part 1 – Sentence comprehension", score: Math.round(p1Score * 10) / 10, maxScore: 7, correct: p1Correct, total: examData.part1.gaps.length },
-      { name: "Part 2 + 3 – Text cohesion", score: Math.round(p2Score * 10) / 10, maxScore: 17, correct: p2CorrectMatches, total: p2TotalMatches },
-      { name: "Part 4 – Opinion matching", score: Math.round(p3Score * 10) / 10, maxScore: 13, correct: p3Correct, total: examData.part3.questions.length },
-      { name: "Part 5 – Long reading", score: Math.round(p4Score * 10) / 10, maxScore: 13, correct: p4Correct, total: examData.part4.paragraphs.length },
-    ]);
+    setPartScores(calculatedPartScores);
 
     // Save to backend submission
     if (submissionId) {
@@ -660,14 +775,7 @@ function ReadingExamRunner() {
     setIsSubmitted(true);
   }, [examData, p1Answers, p2Orders, p3Answers, p4Answers, submissionId]);
 
-  // Stage list for navigation
-  const stages = [
-    { id: 0, title: "Part 1", label: "Part 1 – Gap Fill", count: examData.part1.gaps.length },
-    { id: 1, title: "Part 2 (Bài 1)", label: "Part 2 – " + (examData.part2.stories[0]?.title || "Story 1"), count: 4 },
-    { id: 2, title: "Part 2 (Bài 2)", label: "Part 2 – " + (examData.part2.stories[1]?.title || "Story 2"), count: 4 },
-    { id: 3, title: "Part 4", label: "Part 4 – Opinion Matching", count: examData.part3.questions.length },
-    { id: 4, title: "Part 5", label: "Part 5 – Long Reading", count: examData.part4.paragraphs.length },
-  ];
+  const currentStage = stages[activeStage] || stages[0];
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none">
@@ -866,7 +974,7 @@ function ReadingExamRunner() {
                   {/* ============================================================== */}
                   {/* PART 1: GAP FILL (Sentence Comprehension)                       */}
                   {/* ============================================================== */}
-                  {activeStage === 0 && (
+                  {currentStage.stageKey === "p1" && (
                     <div className="space-y-6">
                       <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80">
                         <p className="text-xs md:text-sm text-foreground font-semibold flex items-center gap-1.5">
@@ -934,7 +1042,7 @@ function ReadingExamRunner() {
                   {/* ============================================================== */}
                   {/* PART 2: TEXT COHESION (Sentence Ordering - Story 1)             */}
                   {/* ============================================================== */}
-                  {activeStage === 1 && (() => {
+                  {currentStage.stageKey === "p2-1" && (() => {
                     const story = examData.part2.stories[0];
                     if (!story) return null;
                     const currentOrder = p2Orders[story.id] || story.sentences.map((s) => s.id);
@@ -1025,7 +1133,7 @@ function ReadingExamRunner() {
                   {/* ============================================================== */}
                   {/* PART 2: TEXT COHESION (Sentence Ordering - Story 2)             */}
                   {/* ============================================================== */}
-                  {activeStage === 2 && (() => {
+                  {currentStage.stageKey === "p2-2" && (() => {
                     const story = examData.part2.stories[1];
                     if (!story) return null;
                     const currentOrder = p2Orders[story.id] || story.sentences.map((s) => s.id);
@@ -1116,7 +1224,7 @@ function ReadingExamRunner() {
                   {/* ============================================================== */}
                   {/* PART 3: OPINION MATCHING (4 Reviews, 7 Questions)              */}
                   {/* ============================================================== */}
-                  {activeStage === 3 && (
+                  {currentStage.stageKey === "p3" && (
                     <div className="space-y-6">
                       <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
@@ -1219,7 +1327,7 @@ function ReadingExamRunner() {
                   {/* ============================================================== */}
                   {/* PART 4: LONG READING (Paragraphs & Headings Dropdowns)          */}
                   {/* ============================================================== */}
-                  {activeStage === 4 && (
+                  {currentStage.stageKey === "p4" && (
                     <div className="space-y-6">
                       <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="space-y-1">
@@ -1356,23 +1464,23 @@ function ReadingExamRunner() {
                   </div>
 
                   <div className="space-y-2">
-                    {stages.map((stg) => {
-                      const isActive = activeStage === stg.id;
-                      const isFlg = flagged[stg.id];
+                    {stages.map((stg, stgIdx) => {
+                      const isActive = activeStage === stgIdx;
+                      const isFlg = flagged[stgIdx];
 
                       // Compute if this stage is completed
                       let isComplete = false;
-                      if (stg.id === 0) {
+                      if (stg.stageKey === "p1") {
                         isComplete =
                           Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length ===
                           examData.part1.gaps.length;
-                      } else if (stg.id === 1 || stg.id === 2) {
+                      } else if (stg.stageKey === "p2-1" || stg.stageKey === "p2-2") {
                         isComplete = true; // has an order
-                      } else if (stg.id === 3) {
+                      } else if (stg.stageKey === "p3") {
                         isComplete =
                           Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length ===
                           examData.part3.questions.length;
-                      } else if (stg.id === 4) {
+                      } else if (stg.stageKey === "p4") {
                         isComplete =
                           Object.keys(p4Answers).filter((k) => !!p4Answers[k]).length ===
                           examData.part4.paragraphs.length;
@@ -1380,9 +1488,9 @@ function ReadingExamRunner() {
 
                       return (
                         <button
-                          key={stg.id}
+                          key={stg.stageKey}
                           type="button"
-                          onClick={() => setActiveStage(stg.id)}
+                          onClick={() => setActiveStage(stgIdx)}
                           className={`w-full text-left p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${
                             isActive
                               ? "border-primary bg-primary/10 text-primary shadow-2xs ring-1 ring-primary"
@@ -1393,7 +1501,7 @@ function ReadingExamRunner() {
                         >
                           <div className="flex items-center gap-2 truncate">
                             <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] shrink-0">
-                              {stg.id + 1}
+                              {stgIdx + 1}
                             </span>
                             <span className="truncate">{stg.label}</span>
                           </div>
@@ -1510,14 +1618,34 @@ function ReadingExamRunner() {
 
 // Parser: Turns backend API getQuestions payload into structured ReadingExamData
 function parseApiToReadingData(apiData: any): ReadingExamData {
-  const result: ReadingExamData = {
-    ...DEFAULT_READING_TEST,
-    id: apiData.id || "reading-01",
-    title: apiData.title || "Full Reading · 4 Parts",
-    durationMinutes: apiData.duration_minutes || 35,
-  };
-
   const parts = apiData.parts || [];
+
+  const result: ReadingExamData = {
+    id: apiData.id || "reading-01",
+    title: apiData.title || "Bài thi Reading",
+    durationMinutes: apiData.duration_minutes || (parts.length <= 1 ? 15 : 35),
+    part1: {
+      instructions: "Choose the word that fits in the gap. The first one is done for you.",
+      exampleText: { prefix: "", word: "", suffix: "" },
+      gaps: [],
+    },
+    part2: {
+      instructions: "The sentences below make a complete text. Put them in the correct order.",
+      stories: [],
+    },
+    part3: {
+      title: "Opinion matching",
+      instructions: "Read the texts and answer the questions.",
+      reviews: [],
+      questions: [],
+    },
+    part4: {
+      title: "Long reading",
+      instructions: "Read the passage quickly. Choose a heading for each numbered paragraph from the drop-down box.",
+      allHeadings: [],
+      paragraphs: [],
+    },
+  };
 
   parts.forEach((p: any) => {
     const pTitle = (p.title || "").toLowerCase();
@@ -1595,14 +1723,25 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
 
     if (isOpinionMatching) {
       if (p.passage_text) {
+        const cleanText = p.passage_text.replace(/<[^>]+>/g, "\n");
         // Tách 4 đoạn review A, B, C, D nếu có trong passage_text
-        const matches = Array.from(p.passage_text.matchAll(/(?:^|\n)([A-D])\n([\s\S]*?)(?=\n[A-D]\n|$)/g));
+        const matches = Array.from(
+          cleanText.matchAll(/(?:^|\n)\s*(?:Person\s*)?([A-D])\s*[:.-]?\s*([\s\S]*?)(?=(?:\n\s*(?:Person\s*)?[A-D]\s*[:.-]?)|$)/gi)
+        );
         if (matches && matches.length >= 4) {
-          result.part3.reviews = matches.map((m: any) => ({
-            person: `Person ${m[1]}`,
-            name: `Person ${m[1]}`,
+          result.part3.reviews = matches.slice(0, 4).map((m: any) => ({
+            person: `Person ${m[1].toUpperCase()}`,
+            name: `Person ${m[1].toUpperCase()}`,
             review: m[2]?.trim() || "",
           }));
+        } else {
+          result.part3.reviews = [
+            {
+              person: "Passage",
+              name: "Nội dung bài đọc",
+              review: cleanText.trim(),
+            },
+          ];
         }
       }
 
