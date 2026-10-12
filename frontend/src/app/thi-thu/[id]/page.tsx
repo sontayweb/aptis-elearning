@@ -2341,6 +2341,13 @@ export default function OfficialMockExamRoom() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-exam-surface/95 backdrop-blur border-b border-exam-border">
         <div className="max-w-6xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
+            <Link
+              href="/thi-thu"
+              className="p-1.5 rounded-lg hover:bg-exam-border/40 text-exam-text-muted hover:text-exam-text transition-colors shrink-0"
+              title="Quay lại danh sách"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
             <span className="text-xs font-bold text-exam-text truncate hidden sm:block">
               {examData?.title || "Bài thi Aptis"}
             </span>
@@ -2370,8 +2377,18 @@ export default function OfficialMockExamRoom() {
             {timerFormatted}
           </div>
 
-          <div className="text-xs text-exam-text-muted hidden sm:block shrink-0">
-            {answeredCount}/{questions.length} câu
+          <div className="flex items-center gap-3">
+            <div className="text-xs text-exam-text-muted hidden sm:block shrink-0">
+              {answeredCount}/{questions.length} câu
+            </div>
+            <Link
+              href="/thi-thu"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-exam-border text-xs font-semibold text-exam-text-muted hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
+              title="Thoát bài thi"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Thoát</span>
+            </Link>
           </div>
         </div>
 
@@ -3037,13 +3054,6 @@ export default function OfficialMockExamRoom() {
           </button>
 
           <div className="flex items-center gap-2">
-            <Link
-              href="/thi-thu"
-              title="Thoát"
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-            </Link>
             <button
               type="button"
               onClick={handlePrev}

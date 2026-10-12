@@ -17,8 +17,6 @@ import {
   Sparkles,
   BookOpen,
   Trophy,
-  ChevronUp,
-  ChevronDown,
   Award,
   HelpCircle,
   X,
@@ -28,7 +26,12 @@ import {
   Pin,
   Highlighter,
   Trash2,
+  Eye,
+  Menu,
+  Info,
+  ArrowUp,
 } from "lucide-react";
+import { ReadingSentenceOrder } from "@/components/reading-components";
 
 /* ====================================================
    DATA TYPES & INTERFACES
@@ -297,6 +300,8 @@ function ReadingExamRunner() {
   const [timeLeft, setTimeLeft] = useState(35 * 60);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [showSampleAnswers, setShowSampleAnswers] = useState(false);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
 
   // Answers State
@@ -424,10 +429,10 @@ function ReadingExamRunner() {
           setExamData(parsed);
           setTimeLeft((apiData.duration_minutes || 35) * 60);
 
-          // Initialize Part 2 sentences default order
+          // Initialize Part 2 sentences default order (empty slots, ready for drag & drop)
           const initialP2Orders: Record<string, string[]> = {};
           parsed.part2.stories.forEach((st) => {
-            initialP2Orders[st.id] = st.sentences.map((s) => s.id);
+            initialP2Orders[st.id] = [];
           });
           setP2Orders(initialP2Orders);
         } else {
@@ -435,7 +440,7 @@ function ReadingExamRunner() {
           setExamData(DEFAULT_READING_TEST);
           const initialP2Orders: Record<string, string[]> = {};
           DEFAULT_READING_TEST.part2.stories.forEach((st) => {
-            initialP2Orders[st.id] = st.sentences.map((s) => s.id);
+            initialP2Orders[st.id] = [];
           });
           setP2Orders(initialP2Orders);
         }
@@ -444,7 +449,7 @@ function ReadingExamRunner() {
         setExamData(DEFAULT_READING_TEST);
         const initialP2Orders: Record<string, string[]> = {};
         DEFAULT_READING_TEST.part2.stories.forEach((st) => {
-          initialP2Orders[st.id] = st.sentences.map((s) => s.id);
+          initialP2Orders[st.id] = [];
         });
         setP2Orders(initialP2Orders);
       } finally {
@@ -806,16 +811,6 @@ function ReadingExamRunner() {
         </div>
 
         <div className="flex items-center gap-2">
-          {!isSubmitted && (
-            <button
-              type="button"
-              onClick={() => setIsSubmitModalOpen(true)}
-              className="tech-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow text-xs font-bold shadow-xs transition-all"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Nộp bài</span>
-            </button>
-          )}
           <Link
             href="/reading"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -827,8 +822,8 @@ function ReadingExamRunner() {
       </header>
 
       {/* 2. MAIN WORKSPACE */}
-      <main className="flex-1 py-6 px-3 md:px-6 pb-24">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <main className="flex-1 py-6 px-3 md:px-6 pb-28">
+        <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Loading State */}
           {loading && (
@@ -935,23 +930,22 @@ function ReadingExamRunner() {
             </div>
           )}
 
-          {/* Exam Questions Workspace (Grid: Left 3 cols, Right 1 col) */}
+          {/* Exam Questions Workspace */}
           {!loading && !isSubmitted && (
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Left 3 cols: Questions Main Workspace */}
-              <div className="lg:col-span-3 space-y-6">
-                <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm space-y-6">
-                  {/* Top Bar inside Card */}
-                  <div className="flex items-center justify-between pb-4 border-b border-border/70">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-md">
-                        {stages[activeStage]?.title}
-                      </span>
-                      <span className="text-xs font-medium text-foreground">
-                        {stages[activeStage]?.label}
-                      </span>
-                    </div>
+            <div className="space-y-6">
+              {/* Card Context & Header Banner */}
+              <div className="bg-card rounded-2xl border border-border p-5 md:p-6 shadow-sm space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/70 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                      Phần {activeStage + 1} / {stages.length}
+                    </span>
+                    <h2 className="font-heading font-bold text-base md:text-lg text-foreground">
+                      {stages[activeStage]?.label}
+                    </h2>
+                  </div>
 
+                  <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
                     <button
                       type="button"
                       onClick={() =>
@@ -960,16 +954,29 @@ function ReadingExamRunner() {
                           [activeStage]: !prev[activeStage],
                         }))
                       }
-                      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md transition-colors ${
+                      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-colors cursor-pointer ${
                         flagged[activeStage]
-                          ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30"
-                          : "text-muted-foreground hover:bg-muted"
+                          ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                          : "border-border text-muted-foreground hover:bg-muted"
                       }`}
                     >
                       <Flag className="w-3.5 h-3.5" />
                       <span>{flagged[activeStage] ? "Đã gắn cờ" : "Gắn cờ"}</span>
                     </button>
                   </div>
+                </div>
+
+                <p className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans">
+                  {currentStage.stageKey === "p1" && examData.part1.instructions}
+                  {currentStage.stageKey === "p2-1" && examData.part2.instructions}
+                  {currentStage.stageKey === "p2-2" && examData.part2.instructions}
+                  {currentStage.stageKey === "p3" && examData.part3.instructions}
+                  {currentStage.stageKey === "p4" && examData.part4.instructions}
+                </p>
+              </div>
+
+              {/* Main Questions Content Card */}
+              <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm space-y-6">
 
                   {/* ============================================================== */}
                   {/* PART 1: GAP FILL (Sentence Comprehension)                       */}
@@ -1040,93 +1047,28 @@ function ReadingExamRunner() {
                   )}
 
                   {/* ============================================================== */}
+                  {/* ============================================================== */}
                   {/* PART 2: TEXT COHESION (Sentence Ordering - Story 1)             */}
                   {/* ============================================================== */}
                   {currentStage.stageKey === "p2-1" && (() => {
                     const story = examData.part2.stories[0];
                     if (!story) return null;
-                    const currentOrder = p2Orders[story.id] || story.sentences.map((s) => s.id);
+                    const currentOrder = p2Orders[story.id] || [];
 
                     return (
-                      <div className="space-y-5">
-                        <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 flex items-center justify-between gap-3">
-                          <div>
-                            <span className="text-xs font-bold text-primary block">
-                              {story.title}
-                            </span>
-                            <p className="text-xs md:text-sm text-foreground">
-                              {examData.part2.instructions}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleResetStoryOrder(story.id)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
-                          >
-                            <RotateCcw className="w-3.5 h-3.5" />
-                            <span>Khôi phục</span>
-                          </button>
-                        </div>
-
-                        {/* Fixed Starter Sentence */}
-                        <div className="p-4 rounded-xl border border-primary/30 bg-primary/5 space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary flex items-center gap-1">
-                            <Pin className="w-3 h-3 text-primary shrink-0" />
-                            <span>Câu mở đầu cố định (Vị trí 1):</span>
-                          </span>
-                          <p className="text-sm md:text-base font-semibold text-foreground">
-                            {story.fixedSentence}
-                          </p>
-                        </div>
-
-                        {/* Re-orderable sentences */}
-                        <div className="space-y-2.5">
-                          <span className="text-xs font-bold text-muted-foreground block">
-                            Sắp xếp 4 câu tiếp theo (Dùng nút ↑ và ↓ để đổi thứ tự):
-                          </span>
-                          {currentOrder.map((sId, sIdx) => {
-                            const sentenceObj = story.sentences.find((s) => s.id === sId);
-                            if (!sentenceObj) return null;
-
-                            return (
-                              <div
-                                key={sId}
-                                className="p-3.5 rounded-xl border border-border bg-card hover:border-primary/50 flex items-center justify-between gap-3 transition-all shadow-2xs"
-                              >
-                                <div className="flex items-center gap-3 flex-1 min-w-0">
-                                  <span className="w-6 h-6 rounded-md bg-muted text-muted-foreground font-bold text-xs flex items-center justify-center shrink-0">
-                                    {sIdx + 2}
-                                  </span>
-                                  <p className="text-xs md:text-sm font-medium text-foreground leading-relaxed">
-                                    {sentenceObj.text}
-                                  </p>
-                                </div>
-
-                                <div className="flex items-center gap-1 shrink-0">
-                                  <button
-                                    type="button"
-                                    disabled={sIdx === 0}
-                                    onClick={() => handleMoveSentence(story.id, sIdx, "up")}
-                                    className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                                    title="Di chuyển lên"
-                                  >
-                                    <ChevronUp className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={sIdx === currentOrder.length - 1}
-                                    onClick={() => handleMoveSentence(story.id, sIdx, "down")}
-                                    className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                                    title="Di chuyển xuống"
-                                  >
-                                    <ChevronDown className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
+                      <ReadingSentenceOrder
+                        key={story.id}
+                        title={story.title}
+                        fixedSentence={story.fixedSentence}
+                        sentences={story.sentences}
+                        currentOrder={currentOrder}
+                        onChangeOrder={(newOrder) =>
+                          setP2Orders((prev) => ({
+                            ...prev,
+                            [story.id]: newOrder,
+                          }))
+                        }
+                      />
                     );
                   })()}
 
@@ -1136,88 +1078,22 @@ function ReadingExamRunner() {
                   {currentStage.stageKey === "p2-2" && (() => {
                     const story = examData.part2.stories[1];
                     if (!story) return null;
-                    const currentOrder = p2Orders[story.id] || story.sentences.map((s) => s.id);
+                    const currentOrder = p2Orders[story.id] || [];
 
                     return (
-                      <div className="space-y-5">
-                        <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 flex items-center justify-between gap-3">
-                          <div>
-                            <span className="text-xs font-bold text-primary block">
-                              {story.title}
-                            </span>
-                            <p className="text-xs md:text-sm text-foreground">
-                              {examData.part2.instructions}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleResetStoryOrder(story.id)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
-                          >
-                            <RotateCcw className="w-3.5 h-3.5" />
-                            <span>Khôi phục</span>
-                          </button>
-                        </div>
-
-                        {/* Fixed Starter Sentence */}
-                        <div className="p-4 rounded-xl border border-primary/30 bg-primary/5 space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary flex items-center gap-1">
-                            <Pin className="w-3 h-3 text-primary shrink-0" />
-                            <span>Câu mở đầu cố định (Vị trí 1):</span>
-                          </span>
-                          <p className="text-sm md:text-base font-semibold text-foreground">
-                            {story.fixedSentence}
-                          </p>
-                        </div>
-
-                        {/* Re-orderable sentences */}
-                        <div className="space-y-2.5">
-                          <span className="text-xs font-bold text-muted-foreground block">
-                            Sắp xếp 4 câu tiếp theo (Dùng nút ↑ và ↓ để đổi thứ tự):
-                          </span>
-                          {currentOrder.map((sId, sIdx) => {
-                            const sentenceObj = story.sentences.find((s) => s.id === sId);
-                            if (!sentenceObj) return null;
-
-                            return (
-                              <div
-                                key={sId}
-                                className="p-3.5 rounded-xl border border-border bg-card hover:border-primary/50 flex items-center justify-between gap-3 transition-all shadow-2xs"
-                              >
-                                <div className="flex items-center gap-3 flex-1 min-w-0">
-                                  <span className="w-6 h-6 rounded-md bg-muted text-muted-foreground font-bold text-xs flex items-center justify-center shrink-0">
-                                    {sIdx + 2}
-                                  </span>
-                                  <p className="text-xs md:text-sm font-medium text-foreground leading-relaxed">
-                                    {sentenceObj.text}
-                                  </p>
-                                </div>
-
-                                <div className="flex items-center gap-1 shrink-0">
-                                  <button
-                                    type="button"
-                                    disabled={sIdx === 0}
-                                    onClick={() => handleMoveSentence(story.id, sIdx, "up")}
-                                    className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                                    title="Di chuyển lên"
-                                  >
-                                    <ChevronUp className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={sIdx === currentOrder.length - 1}
-                                    onClick={() => handleMoveSentence(story.id, sIdx, "down")}
-                                    className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                                    title="Di chuyển xuống"
-                                  >
-                                    <ChevronDown className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
+                      <ReadingSentenceOrder
+                        key={story.id}
+                        title={story.title}
+                        fixedSentence={story.fixedSentence}
+                        sentences={story.sentences}
+                        currentOrder={currentOrder}
+                        onChangeOrder={(newOrder) =>
+                          setP2Orders((prev) => ({
+                            ...prev,
+                            [story.id]: newOrder,
+                          }))
+                        }
+                      />
                     );
                   })()}
 
@@ -1422,110 +1298,6 @@ function ReadingExamRunner() {
                     </div>
                   )}
 
-                  {/* Navigation Buttons inside Workspace */}
-                  <div className="flex items-center justify-between pt-6 border-t border-border/70">
-                    <button
-                      type="button"
-                      disabled={activeStage === 0}
-                      onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl border border-border hover:bg-muted disabled:opacity-30 transition-colors"
-                    >
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                      <span>Phần trước</span>
-                    </button>
-
-                    <div className="text-xs text-muted-foreground">
-                      Phần {activeStage + 1} / {stages.length}
-                    </div>
-
-                    <button
-                      type="button"
-                      disabled={activeStage === stages.length - 1}
-                      onClick={() => setActiveStage((p) => Math.min(stages.length - 1, p + 1))}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow disabled:opacity-30 transition-colors"
-                    >
-                      <span>Phần tiếp theo</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right 1 col: Question Palette (Danh sách câu hỏi) */}
-              <div className="space-y-4">
-                <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between border-b border-border/70 pb-3">
-                    <h3 className="font-heading font-bold text-sm text-foreground">
-                      Danh sách bài thi
-                    </h3>
-                    <span className="text-xs font-mono font-bold text-primary">
-                      {totalAnsweredCount}/{totalQuestionsCount}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {stages.map((stg, stgIdx) => {
-                      const isActive = activeStage === stgIdx;
-                      const isFlg = flagged[stgIdx];
-
-                      // Compute if this stage is completed
-                      let isComplete = false;
-                      if (stg.stageKey === "p1") {
-                        isComplete =
-                          Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length ===
-                          examData.part1.gaps.length;
-                      } else if (stg.stageKey === "p2-1" || stg.stageKey === "p2-2") {
-                        isComplete = true; // has an order
-                      } else if (stg.stageKey === "p3") {
-                        isComplete =
-                          Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length ===
-                          examData.part3.questions.length;
-                      } else if (stg.stageKey === "p4") {
-                        isComplete =
-                          Object.keys(p4Answers).filter((k) => !!p4Answers[k]).length ===
-                          examData.part4.paragraphs.length;
-                      }
-
-                      return (
-                        <button
-                          key={stg.stageKey}
-                          type="button"
-                          onClick={() => setActiveStage(stgIdx)}
-                          className={`w-full text-left p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${
-                            isActive
-                              ? "border-primary bg-primary/10 text-primary shadow-2xs ring-1 ring-primary"
-                              : isComplete
-                              ? "border-border/60 bg-muted/20 text-foreground hover:bg-muted/40"
-                              : "border-border bg-card text-muted-foreground hover:bg-muted"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 truncate">
-                            <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] shrink-0">
-                              {stgIdx + 1}
-                            </span>
-                            <span className="truncate">{stg.label}</span>
-                          </div>
-
-                          <div className="flex items-center gap-1 shrink-0">
-                            {isFlg && <Flag className="w-3 h-3 text-amber-500 fill-amber-500" />}
-                            {isComplete && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="pt-2 border-t border-border/70">
-                    <button
-                      type="button"
-                      onClick={() => setIsSubmitModalOpen(true)}
-                      className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Nộp bài ngay</span>
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
           )}
@@ -1612,6 +1384,330 @@ function ReadingExamRunner() {
           )}
         </div>
       </main>
+
+      {/* 3. STICKY BOTTOM RUNNER BAR CHUẨN */}
+      {!loading && !isSubmitted && (
+        <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
+          {/* Left: Hiện đáp án & Báo lỗi */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowSampleAnswers(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors cursor-pointer"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Hiện đáp án</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => alert("Đã gửi phản hồi báo lỗi đề thi Reading.")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer"
+            >
+              <AlertCircle className="w-3.5 h-3.5" />
+              <span>Báo lỗi</span>
+            </button>
+          </div>
+
+          {/* Center: Quick Stage Pills & Navigation Controls */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 overflow-x-auto max-w-[42vw] sm:max-w-[36vw] py-1 px-1">
+              {stages.map((stg, idx) => {
+                const isCurrent = activeStage === idx;
+                let isComplete = false;
+                if (stg.stageKey === "p1") {
+                  isComplete =
+                    Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length ===
+                    examData.part1.gaps.length;
+                } else if (stg.stageKey === "p2-1") {
+                  const stId = examData.part2.stories[0]?.id;
+                  isComplete = !!(stId && p2Orders[stId] && p2Orders[stId].filter(Boolean).length === 4);
+                } else if (stg.stageKey === "p2-2") {
+                  const stId = examData.part2.stories[1]?.id;
+                  isComplete = !!(stId && p2Orders[stId] && p2Orders[stId].filter(Boolean).length === 4);
+                } else if (stg.stageKey === "p3") {
+                  isComplete =
+                    Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length ===
+                    examData.part3.questions.length;
+                } else if (stg.stageKey === "p4") {
+                  isComplete =
+                    Object.keys(p4Answers).filter((k) => !!p4Answers[k]).length ===
+                    examData.part4.paragraphs.length;
+                }
+
+                return (
+                  <button
+                    key={stg.stageKey}
+                    type="button"
+                    onClick={() => setActiveStage(idx)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                      isCurrent
+                        ? "bg-primary text-primary-foreground shadow-xs scale-105"
+                        : isComplete
+                        ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                    }`}
+                    title={stg.label}
+                  >
+                    {stg.title}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="h-5 w-px bg-border/60 shrink-0 hidden sm:block" />
+
+            <button
+              type="button"
+              onClick={() => setShowDrawer(true)}
+              className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer"
+              title="Danh sách tất cả phần thi Reading"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer hidden sm:flex"
+              title="Cuộn lên đầu trang"
+            >
+              <ArrowUp className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Right: Previous & Next / Submit */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={activeStage === 0}
+              onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
+              className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors cursor-pointer"
+            >
+              ← Previous
+            </button>
+
+            {activeStage < stages.length - 1 ? (
+              <button
+                type="button"
+                onClick={() => setActiveStage((p) => Math.min(stages.length - 1, p + 1))}
+                className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1 cursor-pointer"
+              >
+                <span>Next</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsSubmitModalOpen(true)}
+                className="tech-btn px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all cursor-pointer"
+              >
+                Nộp bài
+              </button>
+            )}
+          </div>
+        </footer>
+      )}
+
+      {/* DRAWER DANH SÁCH BÀI THI READING */}
+      {showDrawer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md p-5 rounded-2xl bg-card border border-border shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-border pb-2">
+              <h3 className="font-heading font-bold text-xs uppercase text-muted-foreground tracking-wider">
+                Danh sách bài thi Reading ({stages.length} phần)
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowDrawer(false)}
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {stages.map((stg, stgIdx) => {
+                const isActive = activeStage === stgIdx;
+                const isFlg = flagged[stgIdx];
+
+                let isComplete = false;
+                let progressText = "";
+                if (stg.stageKey === "p1") {
+                  const count = Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length;
+                  isComplete = count === examData.part1.gaps.length;
+                  progressText = `${count}/${examData.part1.gaps.length}`;
+                } else if (stg.stageKey === "p2-1") {
+                  const stId = examData.part2.stories[0]?.id;
+                  const placed = (stId && p2Orders[stId]?.filter(Boolean).length) || 0;
+                  isComplete = placed === 4;
+                  progressText = placed === 4 ? "Đã xếp đủ 4 câu" : `${placed}/4 câu`;
+                } else if (stg.stageKey === "p2-2") {
+                  const stId = examData.part2.stories[1]?.id;
+                  const placed = (stId && p2Orders[stId]?.filter(Boolean).length) || 0;
+                  isComplete = placed === 4;
+                  progressText = placed === 4 ? "Đã xếp đủ 4 câu" : `${placed}/4 câu`;
+                } else if (stg.stageKey === "p3") {
+                  const count = Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length;
+                  isComplete = count === examData.part3.questions.length;
+                  progressText = `${count}/${examData.part3.questions.length}`;
+                } else if (stg.stageKey === "p4") {
+                  const count = Object.keys(p4Answers).filter((k) => !!p4Answers[k]).length;
+                  isComplete = count === examData.part4.paragraphs.length;
+                  progressText = `${count}/${examData.part4.paragraphs.length}`;
+                }
+
+                return (
+                  <button
+                    key={stg.stageKey}
+                    type="button"
+                    onClick={() => {
+                      setActiveStage(stgIdx);
+                      setShowDrawer(false);
+                    }}
+                    className={`w-full text-left p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                      isActive
+                        ? "border-primary bg-primary/10 text-primary shadow-xs ring-1 ring-primary"
+                        : isComplete
+                        ? "border-border/60 bg-muted/20 text-foreground hover:bg-muted/40"
+                        : "border-border bg-card text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] shrink-0">
+                        {stgIdx + 1}
+                      </span>
+                      <span className="truncate">{stg.label}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[11px] font-normal text-muted-foreground font-mono">
+                        {progressText}
+                      </span>
+                      {isFlg && <Flag className="w-3 h-3 text-amber-500 fill-amber-500" />}
+                      {isComplete && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDrawer(false);
+                  setIsSubmitModalOpen(true);
+                }}
+                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Nộp bài ngay</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL HIỆN ĐÁP ÁN THAM KHẢO & GIẢI THÍCH */}
+      {showSampleAnswers && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-lg p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span>Đáp án &amp; Hướng dẫn giải ({stages[activeStage]?.label})</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowSampleAnswers(false)}
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs leading-relaxed">
+              {currentStage.stageKey === "p1" && (
+                <div className="space-y-2">
+                  {examData.part1.gaps.map((g, idx) => (
+                    <div key={g.id} className="p-3 rounded-xl bg-muted/40 border border-border space-y-1">
+                      <div className="font-semibold text-foreground">
+                        Câu {idx + 1}: {g.prompt.replace(/\[(?:gap|blank|\.\.\.)\]/i, "___")}
+                      </div>
+                      <div className="text-primary font-bold">
+                        Đáp án đúng: <span className="underline">{g.correctAnswer}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {(currentStage.stageKey === "p2-1" || currentStage.stageKey === "p2-2") && (() => {
+                const storyIdx = currentStage.stageKey === "p2-1" ? 0 : 1;
+                const story = examData.part2.stories[storyIdx];
+                if (!story) return null;
+                return (
+                  <div className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-2">
+                    <div className="font-bold text-primary">{story.title}</div>
+                    <div className="text-foreground">
+                      <span className="font-bold">1 (Mở đầu cố định):</span> {story.fixedSentence}
+                    </div>
+                    {story.correctOrder.map((sId, idx) => {
+                      const sObj = story.sentences.find((s) => s.id === sId);
+                      return (
+                        <div key={sId} className="text-foreground">
+                          <span className="font-bold">{idx + 2}:</span> {sObj?.text || sId}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+
+              {currentStage.stageKey === "p3" && (
+                <div className="space-y-2">
+                  {examData.part3.questions.map((q, idx) => (
+                    <div key={q.id} className="p-3 rounded-xl bg-muted/40 border border-border space-y-1">
+                      <div className="font-semibold text-foreground">
+                        Câu {idx + 1}: {q.prompt}
+                      </div>
+                      <div className="text-primary font-bold">
+                        Đáp án đúng: <span className="underline">{q.correctAnswer}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {currentStage.stageKey === "p4" && (
+                <div className="space-y-2">
+                  {examData.part4.paragraphs.map((p) => (
+                    <div key={p.id} className="p-3 rounded-xl bg-muted/40 border border-border space-y-1">
+                      <div className="font-semibold text-foreground">
+                        Đoạn văn {p.paragraphNumber}
+                      </div>
+                      <div className="text-primary font-bold">
+                        Tiêu đề phù hợp: <span className="underline">{p.correctHeading}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="pt-2 border-t border-border flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowSampleAnswers(false)}
+                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold cursor-pointer"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
