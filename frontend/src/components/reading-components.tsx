@@ -161,17 +161,20 @@ export function ReadingSentenceOrder({
 
   // Synchronize state from currentOrder
   useEffect(() => {
+    const map = new Map(sentences.map((s) => [s.id, s]));
+    const newSlots: (SentenceItem | null)[] = [null, null, null, null];
     if (Array.isArray(currentOrder) && currentOrder.length > 0) {
-      const map = new Map(sentences.map((s) => [s.id, s]));
-      const newSlots: (SentenceItem | null)[] = [null, null, null, null];
       for (let i = 0; i < 4; i++) {
         if (currentOrder[i] && map.has(currentOrder[i])) {
           newSlots[i] = map.get(currentOrder[i])!;
         }
       }
-      setSlots(newSlots);
     }
-  }, [sentences]);
+    setSlots((prev) => {
+      const isSame = prev.every((p, idx) => p?.id === newSlots[idx]?.id);
+      return isSame ? prev : newSlots;
+    });
+  }, [sentences, currentOrder]);
 
   // Unplaced sentences in the pool
   const placedIds = new Set(slots.filter(Boolean).map((s) => s!.id));

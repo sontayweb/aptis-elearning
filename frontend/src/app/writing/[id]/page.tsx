@@ -561,6 +561,10 @@ function WritingExamRunnerContent() {
   const [showAiWaitingScreen, setShowAiWaitingScreen] = useState(false);
   const [showSampleAnswersModal, setShowSampleAnswersModal] = useState(false);
   const [showPartsDrawer, setShowPartsDrawer] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportType, setReportType] = useState("Lỗi đề bài hoặc câu hỏi");
+  const [reportNote, setReportNote] = useState("");
+  const [reportSent, setReportSent] = useState(false);
 
   // Khởi tạo Quota từ localStorage (hoặc 2 lượt như hệ thống gốc)
   useEffect(() => {
@@ -1352,20 +1356,53 @@ function WritingExamRunnerContent() {
 
           <button
             type="button"
-            onClick={() => alert("Chức năng ghi nhận báo lỗi đề thi đã được gửi đến ban quản trị.")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors"
+            onClick={() => {
+              setShowReportModal(true);
+              setReportSent(false);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer"
           >
             <Flag className="w-3.5 h-3.5" />
             <span>Báo lỗi</span>
           </button>
         </div>
 
-        {/* Center: Navigation Controls */}
+        {/* Center: Quick Part Pills & Navigation Controls */}
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 overflow-x-auto max-w-[42vw] sm:max-w-[36vw] py-1 px-1">
+            {parts.map((p, idx) => {
+              const isCurrent = currentPartIdx === idx;
+              const isAnswered = p.questions.some((_, qIdx) => {
+                const val = answers[`${idx}_${qIdx}`];
+                return val && val.trim().length > 0;
+              });
+
+              return (
+                <button
+                  key={p.partNumber}
+                  type="button"
+                  onClick={() => setCurrentPartIdx(idx)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                    isCurrent
+                      ? "bg-primary text-primary-foreground shadow-xs scale-105"
+                      : isAnswered
+                      ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                      : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                  }`}
+                  title={p.partSubtitle}
+                >
+                  Part {p.partNumber}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="h-5 w-px bg-border/60 shrink-0 hidden sm:block" />
+
           <button
             type="button"
             onClick={() => setShowPartsDrawer(true)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors cursor-pointer"
             title="Danh sách Parts"
           >
             <Menu className="w-4 h-4" />
@@ -1373,38 +1410,49 @@ function WritingExamRunnerContent() {
 
           <button
             type="button"
-            onClick={() => alert(`Đang làm bài: ${currentPart.partSubtitle}`)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
-            title="Thông tin bài thi"
-          >
-            <Info className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors"
+            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors cursor-pointer hidden sm:flex"
             title="Cuộn lên đầu trang"
           >
             <ArrowUp className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Right: Lượt chấm AI & Nút Submit */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+        {/* Right: Previous & Next / Submit */}
+        <div className="flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
             <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
             <span>Còn {aiQuota} lượt chấm AI</span>
           </div>
 
           <button
             type="button"
-            onClick={handleSubmit}
-            className="tech-btn inline-flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all cursor-pointer"
+            disabled={currentPartIdx === 0}
+            onClick={() => setCurrentPartIdx((p) => Math.max(0, p - 1))}
+            className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors cursor-pointer"
           >
-            <span>Submit</span>
-            <ArrowRight className="w-4 h-4" />
+            ← Previous
           </button>
+
+          {currentPartIdx < parts.length - 1 ? (
+            <button
+              type="button"
+              onClick={() => setCurrentPartIdx((p) => Math.min(parts.length - 1, p + 1))}
+              className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <span>Next</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="tech-btn inline-flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all cursor-pointer"
+            >
+              <span>Submit & Chấm AI</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </footer>
 
@@ -1489,6 +1537,82 @@ function WritingExamRunnerContent() {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL BÁO LỖI */}
+      {showReportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-destructive" />
+                <span>Báo lỗi câu hỏi Writing</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowReportModal(false)}
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {reportSent ? (
+              <div className="py-6 text-center space-y-2">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
+                <p className="text-xs font-bold text-foreground">Cảm ơn bạn đã phản hồi!</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Ban chuyên môn sẽ kiểm tra ngữ cảnh và bài tập viết trong thời gian sớm nhất.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3 text-xs">
+                <p className="text-muted-foreground">Vui lòng chọn loại lỗi bạn gặp phải:</p>
+                <div className="space-y-2">
+                  {[
+                    "Lỗi đề bài hoặc câu hỏi không rõ nghĩa",
+                    "Lỗi bài viết mẫu tham khảo",
+                    "Lỗi đếm số từ / giao diện gõ chữ",
+                    "Khác",
+                  ].map((t) => (
+                    <label key={t} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="writingReportType"
+                        value={t}
+                        checked={reportType === t}
+                        onChange={() => setReportType(t)}
+                        className="text-primary focus:ring-primary"
+                      />
+                      <span className="text-foreground">{t}</span>
+                    </label>
+                  ))}
+                </div>
+                <textarea
+                  value={reportNote}
+                  onChange={(e) => setReportNote(e.target.value)}
+                  placeholder="Mô tả chi tiết vấn đề (tùy chọn)..."
+                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs resize-none h-20 focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowReportModal(false)}
+                    className="px-3.5 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setReportSent(true)}
+                    className="px-4 py-1.5 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:opacity-90"
+                  >
+                    Gửi báo lỗi
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

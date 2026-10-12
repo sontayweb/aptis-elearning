@@ -581,6 +581,10 @@ function ListeningExamRunnerContent() {
   const [showScript, setShowScript] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
   const [drawerTab, setDrawerTab] = useState<"all" | "p1" | "p2" | "p3" | "p4">("all");
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportType, setReportType] = useState("Lỗi âm thanh hoặc audio");
+  const [reportNote, setReportNote] = useState("");
+  const [reportSent, setReportSent] = useState(false);
 
   // Dynamic Stage definitions based on actually loaded questions in examData
   const listeningStages: Array<{
@@ -1511,11 +1515,6 @@ function ListeningExamRunnerContent() {
                 >
                   {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
                 </button>
-
-                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span>{formatTime(timeLeft)}</span>
-                </div>
               </div>
             </div>
 
@@ -1881,8 +1880,11 @@ function ListeningExamRunnerContent() {
 
           <button
             type="button"
-            onClick={() => alert("Đã gửi phản hồi báo lỗi đề thi.")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors"
+            onClick={() => {
+              setShowReportModal(true);
+              setReportSent(false);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer"
           >
             <Flag className="w-3.5 h-3.5" />
             <span>Báo lỗi</span>
@@ -2053,6 +2055,82 @@ function ListeningExamRunnerContent() {
                 Đóng
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL BÁO LỖI */}
+      {showReportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-destructive" />
+                <span>Báo lỗi câu hỏi Listening</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowReportModal(false)}
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {reportSent ? (
+              <div className="py-6 text-center space-y-2">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
+                <p className="text-xs font-bold text-foreground">Cảm ơn bạn đã phản hồi!</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Ban chuyên môn sẽ kiểm tra file âm thanh và đề thi trong thời gian sớm nhất.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3 text-xs">
+                <p className="text-muted-foreground">Vui lòng chọn loại lỗi bạn gặp phải:</p>
+                <div className="space-y-2">
+                  {[
+                    "Lỗi âm thanh hoặc audio không phát được",
+                    "Lỗi đáp án hoặc giải thích chưa chuẩn",
+                    "Lỗi nội dung / câu hỏi hiển thị",
+                    "Khác",
+                  ].map((t) => (
+                    <label key={t} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="listeningReportType"
+                        value={t}
+                        checked={reportType === t}
+                        onChange={() => setReportType(t)}
+                        className="text-primary focus:ring-primary"
+                      />
+                      <span className="text-foreground">{t}</span>
+                    </label>
+                  ))}
+                </div>
+                <textarea
+                  value={reportNote}
+                  onChange={(e) => setReportNote(e.target.value)}
+                  placeholder="Mô tả chi tiết vấn đề (tùy chọn)..."
+                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs resize-none h-20 focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowReportModal(false)}
+                    className="px-3.5 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setReportSent(true)}
+                    className="px-4 py-1.5 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:opacity-90"
+                  >
+                    Gửi báo lỗi
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

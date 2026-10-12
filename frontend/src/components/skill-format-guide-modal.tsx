@@ -21,9 +21,10 @@ import {
   Award,
   Layers,
   HelpCircle,
+  BookA,
 } from "lucide-react";
 
-export type SkillType = "speaking" | "reading" | "listening" | "writing";
+export type SkillType = "speaking" | "reading" | "listening" | "writing" | "grammar";
 
 export interface SkillPartDetail {
   partNumber: number;
@@ -652,6 +653,100 @@ export const SKILL_GUIDES_DATA: Record<SkillType, SkillGuideData> = {
       "Dành 3–5 phút cuối giờ để rà soát lỗi chính tả và thì động từ",
     ],
   },
+
+  // -------------------------------------------------------------
+  // 5. GRAMMAR & VOCABULARY (25 phút, 50 câu, trắc nghiệm)
+  // -------------------------------------------------------------
+  grammar: {
+    skill: "grammar",
+    skillName: "Grammar & Vocabulary",
+    badgeTitle: "CẤU TRÚC ĐỀ THI APTIS GRAMMAR & VOCABULARY",
+    totalDuration: "25 phút",
+    totalTasksOrRecordings: "50 câu hỏi trắc nghiệm",
+    deliveryMethod: "Làm bài trắc nghiệm khách quan trên máy tính",
+    coreGoal: "Đánh giá ngữ pháp chuẩn mực và vốn từ vựng nền tảng hỗ trợ 4 kỹ năng chính",
+    parts: [
+      {
+        partNumber: 1,
+        partKey: "gv_p1",
+        name: "Part 1",
+        subName: "Grammar (Ngữ pháp)",
+        questionCount: "25 câu hỏi",
+        overview: "25 câu hỏi trắc nghiệm ngữ pháp 3 lựa chọn về các cấu trúc thường gặp.",
+        tasks: [
+          "25 câu trắc nghiệm ngữ pháp ngắn chọn 1 trong 3 phương án",
+          "Nội dung: 12 thì động từ, câu điều kiện, câu gián tiếp, mệnh đề quan hệ",
+          "Trật tự từ, giới từ, mạo từ, cụm động từ (Phrasal Verbs)",
+        ],
+        sampleQuestions: [
+          "If I _____ more time, I would travel around Europe. (had / have / will have)",
+          "She asked me where _____ living at that moment. (was I / I was / did I)",
+          "We are looking forward _____ you next week. (to meet / to meeting / meet)",
+        ],
+        exactTiming: {
+          suggestedTime: "12 phút",
+          note: "Khoảng 25-30 giây cho mỗi câu hỏi ngữ pháp",
+        },
+      },
+      {
+        partNumber: 2,
+        partKey: "gv_p2",
+        name: "Part 2",
+        subName: "Vocabulary (Từ vựng)",
+        questionCount: "25 câu hỏi",
+        overview: "25 câu hỏi kiểm tra độ rộng vốn từ theo các dạng bài nối và điền từ vựng.",
+        tasks: [
+          "Nối từ đồng nghĩa (Word Matching / Synonyms)",
+          "Định nghĩa từ vựng (Word Definitions)",
+          "Hoàn thành câu theo ngữ cảnh (Sentence Completion)",
+          "Cặp từ đi liền thông dụng (Collocations)",
+        ],
+        sampleQuestions: [
+          "Match the word with its synonym: huge -> enormous",
+          "Select the word that matches the definition: A person who studies the stars -> astronomer",
+          "Complete the collocation: pay _____ (attention / notice / care)",
+        ],
+        exactTiming: {
+          suggestedTime: "13 phút",
+          note: "Khoảng 30 giây cho mỗi câu hỏi từ vựng",
+        },
+      },
+    ],
+    studySteps: [
+      {
+        step: 1,
+        title: "Học theo chuyên đề ngữ pháp trọng tâm",
+        bullets: [
+          "Ôn chắc 12 thì cơ bản, sự hòa hợp chủ - vị, mệnh đề quan hệ và câu điều kiện.",
+          "Chú trọng cụm giới từ và động từ khuyết thiếu.",
+        ],
+        benefit: "Đảm bảo đạt tối thiểu 20/25 câu phần Ngữ pháp.",
+      },
+      {
+        step: 2,
+        title: "Tích lũy từ vựng theo cặp Collocations",
+        bullets: [
+          "Học từ vựng theo nhóm nghĩa và các cụm đi liền (make a decision, take responsibility...).",
+          "Ghi nhớ các tiền tố, hậu tố để đoán dạng từ.",
+        ],
+        benefit: "Làm bài nhanh chóng mà không cần suy dịch từng chữ.",
+      },
+      {
+        step: 3,
+        title: "Luyện đề bấm giờ 25 phút",
+        bullets: [
+          "Thực hành phản xạ 30 giây/câu để không bị áp lực thời gian.",
+          "Phân tích kỹ giải thích các câu làm sai sau mỗi đề.",
+        ],
+        benefit: "Tối ưu hóa số điểm lên Band B2 - C (40-50/50 điểm).",
+      },
+    ],
+    tips: [
+      "Phân chia thời gian hợp lý: 12 phút cho 25 câu Ngữ pháp, 13 phút cho 25 câu Từ vựng",
+      "Sử dụng phương pháp loại trừ nhanh các đáp án sai ngữ pháp hiển nhiên",
+      "Tuyệt đối không để trống câu hỏi nào vì không bị trừ điểm khi đoán đáp án",
+    ],
+  },
 };
 
 // =========================================================================
@@ -661,9 +756,9 @@ export const SKILL_GUIDES_DATA: Record<SkillType, SkillGuideData> = {
 export interface UniversalSkillGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Kỹ năng khởi tạo mặc định (speaking | reading | listening | writing) */
+  /** Kỹ năng khởi tạo mặc định (speaking | reading | listening | writing | grammar) */
   initialSkill?: SkillType;
-  /** Nếu true, cho phép chuyển đổi tab giữa cả 4 kỹ năng (mặc định: true) */
+  /** Nếu true, cho phép chuyển đổi tab giữa các kỹ năng (mặc định: true) */
   allowSkillSwitching?: boolean;
 }
 
@@ -705,6 +800,8 @@ export function UniversalSkillGuideModal({
         return <Mic className="w-4 h-4" />;
       case "writing":
         return <PenTool className="w-4 h-4" />;
+      case "grammar":
+        return <BookA className="w-4 h-4" />;
     }
   };
 
@@ -742,13 +839,13 @@ export function UniversalSkillGuideModal({
           </button>
         </div>
 
-        {/* Skill Tab Switcher (Nếu cho phép chuyển đổi 4 kỹ năng) */}
+        {/* Skill Tab Switcher (Nếu cho phép chuyển đổi 5 kỹ năng) */}
         {allowSkillSwitching && (
           <div className="px-5 sm:px-6 py-2.5 bg-card border-b border-border/70 flex items-center gap-2 overflow-x-auto shrink-0">
             <span className="text-xs font-bold text-muted-foreground shrink-0 mr-1 hidden sm:inline">
               Chọn kỹ năng:
             </span>
-            {(["listening", "reading", "speaking", "writing"] as SkillType[]).map((s) => {
+            {(["listening", "reading", "speaking", "writing", "grammar"] as SkillType[]).map((s) => {
               const isActive = currentSkill === s;
               const skillLabel =
                 s === "listening"
@@ -757,7 +854,9 @@ export function UniversalSkillGuideModal({
                   ? "Reading (Đọc)"
                   : s === "speaking"
                   ? "Speaking (Nói)"
-                  : "Writing (Viết)";
+                  : s === "writing"
+                  ? "Writing (Viết)"
+                  : "Grammar & Vocab";
               return (
                 <button
                   key={s}
