@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { UniversalSkillGuideModal } from "@/components/skill-format-guide-modal";
+import { WRITING_CLUBS_BANK } from "@/data/writing-clubs-bank";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import {
@@ -432,16 +433,22 @@ export default function WritingPracticePage() {
               {/* CARD 2..N: Practice Exam Cards */}
               {filteredExams.map((exam, idx) => {
                 const targetUrl = `/writing/${exam.id}${tabInfo.partQuery}`;
-                const displayTitle =
-                  activeTab === "full"
-                    ? exam.title
-                    : activeTab === "p1"
-                    ? `Đề 0${idx + 1} - Writing Part 1 (Short Answers)`
-                    : activeTab === "p2"
-                    ? `Đề 0${idx + 1} - Writing Part 2 (Club Form)`
-                    : activeTab === "p3"
-                    ? `Đề 0${idx + 1} - Writing Part 3 (Social Network)`
-                    : `Đề 0${idx + 1} - Writing Part 4 (Formal & Informal)`;
+                const club = WRITING_CLUBS_BANK[idx % WRITING_CLUBS_BANK.length];
+                const displayTitle = (() => {
+                  if (activeTab === "full") {
+                    return exam.title.includes("—") ? exam.title : `Đề 0${idx + 1} - Full Writing: ${club.clubNameEn}`;
+                  }
+                  if (activeTab === "p1") {
+                    return `Đề 0${idx + 1} - Writing Part 1: Form Filling (5 thông tin ngắn)`;
+                  }
+                  if (activeTab === "p2") {
+                    return `Đề 0${idx + 1} - ${club.clubNameEn} (Điền Form gia nhập CLB)`;
+                  }
+                  if (activeTab === "p3") {
+                    return `Đề 0${idx + 1} - ${club.clubNameEn} (Chat 3 thành viên CLB)`;
+                  }
+                  return `Đề 0${idx + 1} - ${club.clubNameEn} (Email Bạn & Quản Lý CLB)`;
+                })();
 
                 return (
                   <div
@@ -470,30 +477,39 @@ export default function WritingPracticePage() {
                               PRO
                             </span>
                           )}
-                          {exam.hotLevel === 3 ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-600 dark:text-rose-400 font-extrabold text-[10px] animate-pulse border border-rose-500/30">
-                              <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
-                              ĐỀ TỦ KỲ NÀY
-                            </span>
-                          ) : exam.hotLevel === 2 ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] border border-amber-500/30">
-                              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                              ĐỀ HOT
-                            </span>
-                          ) : exam.hotLevel === 1 ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 font-semibold text-[10px]">
-                              <Star className="w-3 h-3 text-orange-500" />
-                              Trọng tâm
-                            </span>
-                          ) : exam.priority === "HIGH" ? (
-                            <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px]">
-                              Ưu tiên cao
-                            </span>
-                          ) : exam.priority === "MEDIUM" ? (
-                            <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 font-bold text-[10px]">
-                              Ưu tiên vừa
-                            </span>
-                          ) : null}
+
+                          {/* Stickers đánh giá mức độ ưu tiên: ★★★★★ Hay ra | VIP | Đề tủ | Mới cập nhật */}
+                          {(() => {
+                            const mod = idx % 4;
+                            if (exam.hotLevel === 3 || mod === 0) {
+                              return (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-700 dark:text-rose-300 font-extrabold text-[10px] border border-rose-500/30">
+                                  <Star className="w-3 h-3 fill-rose-500 text-rose-500" />
+                                  ★★★★★ Hay ra
+                                </span>
+                              );
+                            } else if (exam.hotLevel === 2 || mod === 1) {
+                              return (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] border border-amber-500/30">
+                                  <Flame className="w-3 h-3 fill-amber-500 text-amber-500" />
+                                  Đề tủ
+                                </span>
+                              );
+                            } else if (mod === 2) {
+                              return (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 font-extrabold text-[10px] border border-purple-500/30">
+                                  <Sparkles className="w-3 h-3 text-purple-600" />
+                                  VIP
+                                </span>
+                              );
+                            } else {
+                              return (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] border border-emerald-500/30">
+                                  Mới cập nhật
+                                </span>
+                              );
+                            }
+                          })()}
                         </div>
 
                         {/* Top Right Trophy / Status */}
@@ -514,10 +530,17 @@ export default function WritingPracticePage() {
                         </div>
                       </div>
 
-                      {/* Title */}
-                      <h3 className="text-lg font-heading font-extrabold text-foreground mb-1.5 group-hover:text-primary transition-colors">
-                        {displayTitle}
-                      </h3>
+                      {/* Title & Club Name Subtitle */}
+                      <div>
+                        {activeTab !== "p1" && (
+                          <p className="text-[11px] text-primary font-bold mb-1 flex items-center gap-1">
+                            <span>🏛️ {club.clubNameVi}</span>
+                          </p>
+                        )}
+                        <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1.5 group-hover:text-primary transition-colors">
+                          {displayTitle}
+                        </h3>
+                      </div>
 
                       {/* Subtitle */}
                       <p className="text-xs text-muted-foreground">

@@ -37,7 +37,12 @@ router.post('/users/:id/adjust-quota', (req, res, next) =>
   adminController.adjustQuota(req, res, next)
 );
 
-// Quản lý đề thi
+// Quản lý đề thi & Smart Ingestion chuẩn Doanh nghiệp
+router.get('/exams/import/templates', (req, res, next) => adminController.getImportTemplates(req, res, next));
+router.post('/exams/import/validate', upload.single('file'), (req, res, next) =>
+  adminController.validateImportExamFile(req, res, next)
+);
+router.post('/exams/import/confirm', (req, res, next) => adminController.confirmImportExams(req, res, next));
 router.get('/exams', (req, res, next) => adminController.listExams(req, res, next));
 router.post('/exams', (req, res, next) => adminController.createExam(req, res, next));
 router.get('/exams/:id/full', (req, res, next) => adminController.getExamFull(req, res, next));

@@ -13,6 +13,24 @@ interface CacheEntry {
 let publicSettingsCache: CacheEntry | null = null;
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 phút
 
+const DEFAULT_EVENT_THEME_JSON = JSON.stringify({
+  enabled: true,
+  activeTemplate: 'tet',
+  name: 'Tết Nguyên Đán 🌸',
+  icon: '🌸',
+  badge: 'Xuân như ý',
+  description: 'Sắc xuân rạng ngời với hoa đào, hoa mai rơi nhẹ và phong bao lì xì may mắn',
+  primaryColor: '#DE1A35',
+  accentColor: '#F59E0B',
+  bannerEnabled: true,
+  bannerText: '🌸 Khai xuân đắc lộc — Lì xì khóa học và nhân đôi lượt chấm bài thi thử Aptis!',
+  bannerLink: '/pricing',
+  decorationType: 'blossoms',
+  appearanceMode: 'light',
+  forceEventTheme: true,
+  updatedAt: new Date().toISOString(),
+});
+
 const DEFAULT_SETTINGS = [
   {
     key: 'ZALO_CONTACT_URL',
@@ -42,6 +60,13 @@ const DEFAULT_SETTINGS = [
     description: 'Tên hiển thị của giảng viên tư vấn trên Zalo',
     is_public: true,
   },
+  {
+    key: 'SYSTEM_EVENT_THEME_CONFIG',
+    value: DEFAULT_EVENT_THEME_JSON,
+    category: 'THEME',
+    description: 'Cấu hình giao diện và banner sự kiện toàn hệ thống (Tết, Noel, Halloween, Custom)',
+    is_public: true,
+  },
 ];
 
 export class SettingsService {
@@ -61,10 +86,12 @@ export class SettingsService {
       where: { is_public: true },
     });
 
-    // 3. Nếu CSDL chưa có, tự động Seed dữ liệu chuẩn doanh nghiệp
-    if (settings.length === 0) {
+    // 3. Nếu CSDL chưa có hoặc thiếu key mặc định, tự động Seed / Bổ sung dữ liệu chuẩn
+    const existingKeys = new Set(settings.map((s) => s.key));
+    const missingDefaults = DEFAULT_SETTINGS.filter((item) => !existingKeys.has(item.key));
+    if (missingDefaults.length > 0) {
       await prisma.$transaction(
-        DEFAULT_SETTINGS.map((item) =>
+        missingDefaults.map((item) =>
           prisma.systemSetting.upsert({
             where: { key: item.key },
             update: {},
@@ -84,11 +111,21 @@ export class SettingsService {
       settingsMap[s.key] = s.value;
     }
 
+    let eventThemeConfig = null;
+    if (settingsMap['SYSTEM_EVENT_THEME_CONFIG']) {
+      try {
+        eventThemeConfig = JSON.parse(settingsMap['SYSTEM_EVENT_THEME_CONFIG']);
+      } catch (err) {
+        console.error('Lỗi parse SYSTEM_EVENT_THEME_CONFIG từ Database:', err);
+      }
+    }
+
     const formattedData = {
       zaloContactUrl: settingsMap['ZALO_CONTACT_URL'] || 'https://zalo.me/0379866596',
       hotlinePhone: settingsMap['HOTLINE_PHONE'] || '0379 866 596',
       fanpageUrl: settingsMap['FANPAGE_URL'] || 'https://www.facebook.com/Aptiskytich',
       consultantName: settingsMap['ZALO_CONSULTANT_NAME'] || 'Giảng viên Aptis ESOL',
+      eventThemeConfig,
       raw: settingsMap,
     };
 
@@ -132,7 +169,7 @@ export class SettingsService {
             key: item.key,
             value: item.value,
             description: item.description,
-            category: 'CONTACT',
+            category: item.key.includes('THEME') ? 'THEME' : 'CONTACT',
             is_public: true,
             updated_by: adminId,
           },

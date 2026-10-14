@@ -44,8 +44,10 @@ import {
   MoreHorizontal,
   Flame,
   Star,
+  UploadCloud,
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
+import ExamSmartImportModal from "@/components/admin/exam-smart-import-modal";
 
 interface ExamItem {
   id: string;
@@ -67,6 +69,7 @@ export default function AdminExamsPage() {
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [openMenuExamId, setOpenMenuExamId] = useState<string | null>(null);
+  const [smartImportOpen, setSmartImportOpen] = useState(false);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -602,6 +605,15 @@ export default function AdminExamsPage() {
             <BarChart3 className="w-3.5 h-3.5" />
             <span>{showMetrics ? "Thu gọn chỉ số" : "Chỉ số chi tiết"}</span>
             {showMetrics ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+
+          <button
+            onClick={() => setSmartImportOpen(true)}
+            className="px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-800/80 bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
+            title="Nhập đề thi chuẩn hóa từ file Word (.docx) hoặc Excel (.xlsx)"
+          >
+            <UploadCloud className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <span>Nhập File Chuẩn</span>
           </button>
 
           <button
@@ -1711,6 +1723,17 @@ export default function AdminExamsPage() {
         cancelText="Hủy bỏ"
         onConfirm={handleDeleteExam}
         onCancel={() => setConfirmDeleteExam(null)}
+      />
+
+      {/* Smart Import Enterprise Modal */}
+      <ExamSmartImportModal
+        isOpen={smartImportOpen}
+        onClose={() => setSmartImportOpen(false)}
+        onSuccess={() => {
+          setSmartImportOpen(false);
+          showToast("Nhập đề thi chuẩn hóa thành công!");
+          fetchExams();
+        }}
       />
     </div>
   );

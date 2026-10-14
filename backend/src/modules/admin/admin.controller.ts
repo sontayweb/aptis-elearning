@@ -13,6 +13,8 @@ import {
 } from './admin.dto';
 import { sendSuccess } from '../../utils/api-response';
 import { TransactionStatus } from '@prisma/client';
+import path from 'path';
+import { standardExamParser } from '../ingestion/parsers/standard-exam.parser';
 
 export class AdminController {
   async listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -315,6 +317,72 @@ export class AdminController {
       const questionId = req.params.questionId;
       const result = await adminService.deleteQuestion(questionId, req);
       sendSuccess(res, result, 'Xóa câu hỏi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async validateImportExamFile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.file || !req.file.buffer) {
+        throw { statusCode: 400, message: 'Vui lòng đính kèm tập tin Word (.docx) hoặc Excel (.xlsx).' };
+      }
+
+      const originalName = req.file.originalname || 'upload_file';
+      const ext = path.extname(originalName).toLowerCase();
+
+      let validationResult;
+      if (ext === '.docx') {
+        validationResult = standardExamParser.parseAndValidateDocx(req.file.buffer, originalName);
+      } else if (ext === '.xlsx' || ext === '.xls') {
+        validationResult = standardExamParser.parseAndValidateExcel(req.file.buffer, originalName);
+      } else {
+        throw { statusCode: 400, message: 'Định dạng tệp không được hỗ trợ. Vui lòng tải lên tệp .docx hoặc .xlsx.' };
+      }
+
+      sendSuccess(res, validationResult, 'Kiểm định tập tin đề thi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async confirmImportExams(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { exams } = req.body;
+      if (!exams || !Array.isArray(exams) || exams.length === 0) {
+        throw { statusCode: 400, message: 'Danh sách đề thi cần lưu không hợp lệ.' };
+      }
+
+      const creatorId = (req as any).user?.id;
+      const result = await standardExamParser.saveExamsToDatabase(exams, creatorId);
+      sendSuccess(res, result, `Lưu thành công ${result.count} đề thi vào hệ thống`, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getImportTemplates(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const templates = [
+        {
+          name: 'Bộ Khung Mẫu Speaking Part 2 & Part 3 (.docx)',
+          description: 'Mẫu Word chuẩn dành cho các bài thi miêu tả tranh và cặp tranh so sánh đối chiếu có bảng từ vựng song ngữ.',
+          fileName: 'Mau_Nhap_De_Speaking_Part2_Part3.docx',
+          downloadUrl: '/templates/Mau_Nhap_De_Speaking_Part2_Part3.docx',
+          fileType: 'DOCX',
+          size: '38 KB',
+        },
+        {
+          name: 'Bộ Khung Mẫu Reading & Listening (.xlsx)',
+          description: 'Mẫu bảng tính Excel chuẩn dành cho các bài đọc hiểu và trắc nghiệm câu hỏi nghe kèm đáp án và giải thích.',
+          fileName: 'Mau_Nhap_De_Reading_Listening.xlsx',
+          downloadUrl: '/templates/Mau_Nhap_De_Reading_Listening.xlsx',
+          fileType: 'XLSX',
+          size: '6 KB',
+        },
+      ];
+
+      sendSuccess(res, templates, 'Lấy danh sách tệp mẫu chuẩn thành công', 200);
     } catch (error) {
       next(error);
     }

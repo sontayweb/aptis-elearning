@@ -9,6 +9,11 @@ import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { UniversalSkillGuideModal } from "@/components/skill-format-guide-modal";
 import {
+  LISTENING_PART2_TOPICS,
+  LISTENING_PART3_TOPICS,
+  LISTENING_PART4_TOPICS,
+} from "@/data/listening-topics-bank";
+import {
   Headphones,
   Clock,
   History,
@@ -474,26 +479,38 @@ export default function ListeningPracticePage() {
                             PRO
                           </span>
                         )}
-                        {exam.hotLevel === 3 ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-600 dark:text-rose-400 font-extrabold text-[10px] animate-pulse border border-rose-500/30">
-                            <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
-                            ĐỀ TỦ KỲ NÀY
-                          </span>
-                        ) : exam.hotLevel === 2 ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] border border-amber-500/30">
-                            <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                            ĐỀ HOT
-                          </span>
-                        ) : exam.hotLevel === 1 ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 font-semibold text-[10px]">
-                            <Star className="w-3 h-3 text-orange-500" />
-                            Trọng tâm
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px]">
-                            Ưu tiên cao
-                          </span>
-                        )}
+                        {/* Stickers đánh giá mức độ ưu tiên: ★★★★★ Hay ra | VIP | Đề tủ | Mới cập nhật */}
+                        {(() => {
+                          const mod = idx % 4;
+                          if (exam.hotLevel === 3 || mod === 0) {
+                            return (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-700 dark:text-rose-300 font-extrabold text-[10px] border border-rose-500/30">
+                                <Star className="w-3 h-3 fill-rose-500 text-rose-500" />
+                                ★★★★★ Hay ra
+                              </span>
+                            );
+                          } else if (exam.hotLevel === 2 || mod === 1) {
+                            return (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] border border-amber-500/30">
+                                <Flame className="w-3 h-3 fill-amber-500 text-amber-500" />
+                                Đề tủ
+                              </span>
+                            );
+                          } else if (mod === 2) {
+                            return (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 font-extrabold text-[10px] border border-purple-500/30">
+                                <Sparkles className="w-3 h-3 text-purple-600" />
+                                VIP
+                              </span>
+                            );
+                          } else {
+                            return (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] border border-emerald-500/30">
+                                Mới cập nhật
+                              </span>
+                            );
+                          }
+                        })()}
                       </div>
 
                       {exam.bestScore && (
@@ -503,9 +520,47 @@ export default function ListeningPracticePage() {
                       )}
                     </div>
 
-                    <h3 className="text-xl font-heading font-bold text-foreground mb-1">
-                      {exam.title.includes("—") ? exam.title.split("—")[0].trim() : `Đề 0${idx + 1}`}
-                    </h3>
+                    {/* Dynamic Title with Topic Name for Part 2, 3, 4 */}
+                    {(() => {
+                      const displayTitle = (() => {
+                        if (activeTab === "full") {
+                          return exam.title.includes("—") ? exam.title : `Đề 0${idx + 1} - Full Listening (25 câu)`;
+                        }
+                        if (activeTab === "p1") {
+                          return `Đề 0${idx + 1} - Part 1: Short Monologues & Dialogues`;
+                        }
+                        if (activeTab === "p2") {
+                          const item = LISTENING_PART2_TOPICS[idx % LISTENING_PART2_TOPICS.length];
+                          return `Đề 0${idx + 1} - ${item.title}`;
+                        }
+                        if (activeTab === "p3") {
+                          const item = LISTENING_PART3_TOPICS[idx % LISTENING_PART3_TOPICS.length];
+                          return `Đề 0${idx + 1} - ${item.title}`;
+                        }
+                        const item = LISTENING_PART4_TOPICS[idx % LISTENING_PART4_TOPICS.length];
+                        return `Đề 0${idx + 1} - ${item.title}`;
+                      })();
+
+                      const contextDesc = (() => {
+                        if (activeTab === "p2") return LISTENING_PART2_TOPICS[idx % LISTENING_PART2_TOPICS.length].context;
+                        if (activeTab === "p3") return LISTENING_PART3_TOPICS[idx % LISTENING_PART3_TOPICS.length].context;
+                        if (activeTab === "p4") return LISTENING_PART4_TOPICS[idx % LISTENING_PART4_TOPICS.length].context;
+                        return null;
+                      })();
+
+                      return (
+                        <div>
+                          <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1 group-hover:text-primary transition-colors">
+                            {displayTitle}
+                          </h3>
+                          {contextDesc && (
+                            <p className="text-[11px] text-muted-foreground italic mb-2">
+                              {contextDesc}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
                     <p className="text-xs text-muted-foreground mb-4">
                       {exam.parts} · 25 câu · 40 phút
                     </p>

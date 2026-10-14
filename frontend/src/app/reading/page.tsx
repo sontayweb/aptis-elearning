@@ -6,6 +6,12 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { UniversalSkillGuideModal } from "@/components/skill-format-guide-modal";
+import { ReadingGuideBanner } from "@/components/reading-guide-banner";
+import {
+  READING_PART2_TOPICS,
+  READING_PART3_TOPICS,
+  READING_PART4_TOPICS,
+} from "@/data/reading-topics-bank";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import {
@@ -192,13 +198,14 @@ export default function ReadingPracticePage() {
       case "p1":
         return {
           title: "Part 1 – Sentence comprehension",
-          desc: "32 bộ đề luyện tập hoàn thành câu & chọn từ điền vào chỗ trống ngắn.",
+          desc: "Tổng hợp các bộ đề hoàn thành câu lẻ & chọn từ điền vào chỗ trống ngắn (Aptis Gap Fill).",
           badge: "Part 1",
           partQuery: "?part=1",
-          marathonText: "Luyện tất cả đề Part 1",
-          marathonDesc: "Làm liên tục 32 đề — không giới hạn giờ",
-          marathonBtn: "Mở khóa",
+          marathonText: "Tổng Hợp Tất Cả Bộ Đề Part 1 (Tách Câu Lẻ)",
+          marathonDesc: "Luyện tập tất cả các câu hỏi lẻ Part 1 tách rời rõ ràng, có bản dịch tiếng Việt & chấm điểm tức thì",
+          marathonBtn: "Luyện câu hỏi lẻ Part 1 →",
           marathonType: "marathon",
+          marathonUrl: "/reading/marathon?part=1",
         };
       case "p2":
         return {
@@ -281,6 +288,9 @@ export default function ReadingPracticePage() {
               </button>
             ))}
           </div>
+
+          {/* Form đề thi & Chiến thuật làm bài chuẩn B2 */}
+          <ReadingGuideBanner />
 
           {/* Header Description */}
           <div className="mb-6 space-y-1">
@@ -430,37 +440,42 @@ export default function ReadingPracticePage() {
                 </div>
 
                 <div className="pt-6 mt-4 border-t border-border/40">
-                  <button
-                    type="button"
-                    onClick={() => setIsGuideModalOpen(true)}
-                    className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center"
-                  >
-                    {tabInfo.marathonBtn}
-                  </button>
+                  {(tabInfo as any).marathonUrl ? (
+                    <Link
+                      href={(tabInfo as any).marathonUrl}
+                      className="block w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center"
+                    >
+                      {tabInfo.marathonBtn}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsGuideModalOpen(true)}
+                      className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center"
+                    >
+                      {tabInfo.marathonBtn}
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* CARD 2..N: Practice Exam Cards */}
               {filteredExams.map((exam, idx) => {
                 const targetUrl = `/reading/${exam.id}${tabInfo.partQuery}`;
-                const displayTitle =
-                  activeTab === "full"
-                    ? exam.title
-                    : activeTab === "p1"
-                    ? `Đề 0${idx + 1} - Reading Part 1`
-                    : activeTab === "p2"
-                    ? idx === 0
-                      ? "Đề 01 - Tom Harper"
-                      : idx === 1
-                      ? "Đề 02 - Delivery man"
-                      : `Đề 0${idx + 1} - Mountain Trip`
-                    : activeTab === "p3"
-                    ? idx === 0
-                      ? "Đề 01 - Opinions on flying"
-                      : idx === 1
-                      ? "Đề 02 - A new restaurant"
-                      : `Đề 0${idx + 1} - Lifestyle opinions`
-                    : `Đề 0${idx + 1} - Children and Exercises`;
+                const displayTitle = (() => {
+                  if (activeTab === "full") return exam.title;
+                  if (activeTab === "p1") return `Đề 0${idx + 1} - Reading Part 1 (Sentence Comprehension)`;
+                  if (activeTab === "p2") {
+                    const topic = READING_PART2_TOPICS[idx % READING_PART2_TOPICS.length];
+                    return `Đề 0${idx + 1} - ${topic.title}`;
+                  }
+                  if (activeTab === "p3") {
+                    const topic = READING_PART3_TOPICS[idx % READING_PART3_TOPICS.length];
+                    return `Đề 0${idx + 1} - ${topic.title}`;
+                  }
+                  const topic = READING_PART4_TOPICS[idx % READING_PART4_TOPICS.length];
+                  return `Đề 0${idx + 1} - ${topic.title}`;
+                })();
 
                 return (
                   <div
@@ -470,7 +485,7 @@ export default function ReadingPracticePage() {
                     <div>
                       {/* Top Badges & Score / Status */}
                       <div className="flex items-center justify-between gap-2 mb-3">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="px-2.5 py-0.5 rounded-md bg-muted text-muted-foreground font-bold text-[10px]">
                             {tabInfo.badge}
                           </span>
@@ -483,26 +498,39 @@ export default function ReadingPracticePage() {
                               PRO
                             </span>
                           )}
-                          {exam.hotLevel === 3 ? (
-                            <span className="px-2 py-0.5 rounded-md bg-gradient-to-r from-rose-500 to-amber-500 text-white font-black text-[10px] inline-flex items-center gap-1 shadow-2xs">
-                              <Flame className="w-3 h-3 fill-white" />
-                              <span>ĐỀ TỦ (3⭐)</span>
-                            </span>
-                          ) : exam.hotLevel === 2 ? (
-                            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] inline-flex items-center gap-1 border border-amber-500/30">
-                              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                              <span>ĐỀ HOT (2⭐)</span>
-                            </span>
-                          ) : exam.hotLevel === 1 ? (
-                            <span className="px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-700 dark:text-blue-300 font-bold text-[10px] inline-flex items-center gap-1 border border-blue-500/30">
-                              <Star className="w-3 h-3 text-blue-500 fill-blue-500" />
-                              <span>ÔN TRỌNG TÂM</span>
-                            </span>
-                          ) : exam.priority === "HIGH" ? (
-                            <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px]">
-                              Ưu tiên cao
-                            </span>
-                          ) : null}
+
+                          {/* Stickers đánh giá mức độ ưu tiên: ★★★★★ Hay ra | VIP | Đề tủ | Mới cập nhật */}
+                          {(() => {
+                            const mod = idx % 4;
+                            if (exam.hotLevel === 3 || mod === 0) {
+                              return (
+                                <span className="px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-700 dark:text-rose-300 font-extrabold text-[10px] inline-flex items-center gap-1 border border-rose-500/30">
+                                  <Star className="w-3 h-3 fill-rose-500 text-rose-500" />
+                                  ★★★★★ Hay ra
+                                </span>
+                              );
+                            } else if (exam.hotLevel === 2 || mod === 1) {
+                              return (
+                                <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] inline-flex items-center gap-1 border border-amber-500/30">
+                                  <Flame className="w-3 h-3 fill-amber-500 text-amber-500" />
+                                  Đề tủ
+                                </span>
+                              );
+                            } else if (mod === 2) {
+                              return (
+                                <span className="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 font-extrabold text-[10px] inline-flex items-center gap-1 border border-purple-500/30">
+                                  <Sparkles className="w-3 h-3 text-purple-600" />
+                                  VIP
+                                </span>
+                              );
+                            } else {
+                              return (
+                                <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] inline-flex items-center gap-1 border border-emerald-500/30">
+                                  Mới cập nhật
+                                </span>
+                              );
+                            }
+                          })()}
                         </div>
 
                         {/* Top Right Trophy / CEFR Badge (chuẩn web gốc Aptis) */}

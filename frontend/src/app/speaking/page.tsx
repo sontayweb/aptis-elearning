@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { UniversalSkillGuideModal } from "@/components/skill-format-guide-modal";
+import { SpeakingGuideBanner } from "@/components/speaking-guide-banner";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import {
@@ -215,10 +216,11 @@ export default function SpeakingPracticePage() {
           desc: "Trả lời 3 câu hỏi ngắn về bản thân, gia đình, công việc, sở thích... Thời gian nói 30 giây cho mỗi câu.",
           badge: "Part 1",
           partQuery: "?part=1",
-          marathonText: "Luyện tất cả đề Part 1",
-          marathonDesc: "Làm liên tục các đề Part 1 — AI nhận diện giọng nói & chấm phát âm tức thì",
-          marathonBtn: "Mở khóa",
+          marathonText: "Ngân Hàng Câu Hỏi Lẻ Part 1",
+          marathonDesc: "Luyện 90+ câu hỏi lẻ theo chủ đề kèm bài mẫu B2/C1 — AI nhận diện giọng nói & đếm giờ 30s",
+          marathonBtn: "Luyện câu hỏi lẻ Part 1 →",
           marathonType: "marathon",
+          marathonUrl: "/speaking/marathon?part=1",
         };
       case "p2":
         return {
@@ -227,10 +229,11 @@ export default function SpeakingPracticePage() {
           subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
           badge: "Part 2",
           partQuery: "?part=2",
-          marathonText: "Luyện tất cả đề Part 2",
-          marathonDesc: "Làm liên tục các đề miêu tả tranh sát đề thi thật British Council",
-          marathonBtn: "Mở khóa",
+          marathonText: "Tranh Trọng Điểm & Từ Vựng Part 2",
+          marathonDesc: "Bộ 25 tranh thi thật kèm bảng từ vựng song ngữ và 3 câu hỏi chi tiết theo từng tranh",
+          marathonBtn: "Luyện 25 đề tranh Part 2 →",
           marathonType: "marathon",
+          marathonUrl: "/speaking/marathon?part=2",
         };
       case "p3":
         return {
@@ -239,10 +242,11 @@ export default function SpeakingPracticePage() {
           subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
           badge: "Part 3",
           partQuery: "?part=3",
-          marathonText: "Luyện tất cả đề Part 3",
-          marathonDesc: "Rèn luyện phản xạ so sánh đối chiếu và sử dụng từ vựng nâng band",
-          marathonBtn: "Mở khóa",
+          marathonText: "So Sánh Cặp Tranh Part 3",
+          marathonDesc: "Bộ cặp tranh đối lập kèm bảng từ vựng so sánh chuẩn đề thi British Council",
+          marathonBtn: "Luyện cặp tranh Part 3 →",
           marathonType: "marathon",
+          marathonUrl: "/speaking/marathon?part=3",
         };
       case "p4":
         return {
@@ -250,10 +254,11 @@ export default function SpeakingPracticePage() {
           desc: "Xem tranh, có 1 phút chuẩn bị ghi chú và nói liên tục trong 2 phút trả lời 3 câu hỏi trải nghiệm/trừu tượng.",
           badge: "Part 4",
           partQuery: "?part=4",
-          marathonText: "Luyện tất cả đề Part 4",
-          marathonDesc: "Luyện nói dài 2 phút không vấp, giữ vững độ trôi chảy & cấu trúc ngữ pháp",
-          marathonBtn: "Mở khóa",
+          marathonText: "Luyện Nói Liên Tục 2 Phút Part 4",
+          marathonDesc: "Hiển thị cùng lúc 3 câu hỏi, chuẩn 1 phút chuẩn bị + 2 phút nói liên tục",
+          marathonBtn: "Luyện đề Part 4 →",
           marathonType: "marathon",
+          marathonUrl: "/speaking/marathon?part=1",
         };
     }
   };
@@ -301,6 +306,9 @@ export default function SpeakingPracticePage() {
               </button>
             ))}
           </div>
+
+          {/* Form đề thi + Hướng dẫn học toàn diện */}
+          <SpeakingGuideBanner />
 
           {/* Header Description */}
           <div className="mb-6 space-y-1">
@@ -448,13 +456,22 @@ export default function SpeakingPracticePage() {
                 </div>
 
                 <div className="pt-6 mt-4 border-t border-border/40">
-                  <button
-                    type="button"
-                    onClick={() => setIsGuideModalOpen(true)}
-                    className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center"
-                  >
-                    {tabInfo.marathonBtn}
-                  </button>
+                  {(tabInfo as any).marathonUrl ? (
+                    <Link
+                      href={(tabInfo as any).marathonUrl}
+                      className="block w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center"
+                    >
+                      {tabInfo.marathonBtn}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsGuideModalOpen(true)}
+                      className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center"
+                    >
+                      {tabInfo.marathonBtn}
+                    </button>
+                  )}
                 </div>
               </div>
 

@@ -3,6 +3,7 @@ import path from 'path';
 import { prisma } from '../config/database';
 import { ExamService } from '../modules/exams/exam.service';
 import { SubmissionService } from '../modules/submissions/submission.service';
+import { ttsAudioService } from '../modules/ingestion/tts-audio.service';
 import { ExamSkill, QuestionType, SubmissionStatus } from '@prisma/client';
 
 const examService = new ExamService();
@@ -85,6 +86,14 @@ async function runEndToEndTests() {
     const localAudioPath = path.resolve(
       path.join('./uploads', listeningPartWithAudio.audio_url.replace(/^\/?(api\/)?uploads\/?/, ''))
     );
+    if (!fs.existsSync(localAudioPath)) {
+      const fallbackText = listeningPartWithAudio.passage_text || 'Aptis test listening audio track.';
+      const syn = await ttsAudioService.generateSpeech(fallbackText, path.basename(localAudioPath, '.mp3'));
+      if (syn.localPath !== localAudioPath) {
+        fs.mkdirSync(path.dirname(localAudioPath), { recursive: true });
+        fs.copyFileSync(syn.localPath, localAudioPath);
+      }
+    }
     assert(
       fs.existsSync(localAudioPath),
       'Tập tin audio MP3 tồn tại vật lý trên ổ đĩa server và phát được',

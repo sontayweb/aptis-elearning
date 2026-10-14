@@ -68,11 +68,13 @@ export default function AdminEventsPage() {
     });
   }, [config]);
 
+  const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<"templates" | "custom">("templates");
 
-  const handleApplyPreset = (presetKey: EventTemplateId) => {
-    applyPreset(presetKey);
+  const handleApplyPreset = async (presetKey: EventTemplateId) => {
+    setIsSaving(true);
+    await applyPreset(presetKey);
     const preset = PRESET_TEMPLATES[presetKey];
     setFormData({
       activeTemplate: presetKey,
@@ -89,12 +91,15 @@ export default function AdminEventsPage() {
       appearanceMode: preset.appearanceMode || "light",
       forceEventTheme: preset.forceEventTheme,
     });
+    setIsSaving(false);
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);
   };
 
-  const handleSave = () => {
-    updateConfig(formData);
+  const handleSave = async () => {
+    setIsSaving(true);
+    await updateConfig(formData);
+    setIsSaving(false);
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);
   };
@@ -544,16 +549,17 @@ export default function AdminEventsPage() {
                 <button
                   type="button"
                   onClick={handleSave}
-                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold text-xs shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                  disabled={isSaving}
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-heading font-semibold text-xs shadow-xs transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Save className="w-3.5 h-3.5" />
-                  <span>Lưu cấu hình sự kiện</span>
+                  <span>{isSaving ? "Đang lưu..." : "Lưu cấu hình sự kiện"}</span>
                 </button>
 
                 {savedSuccess && (
                   <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 animate-in fade-in">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Đã lưu thành công!</span>
+                    <span>Đã lưu thành công vào Hệ thống!</span>
                   </span>
                 )}
               </div>

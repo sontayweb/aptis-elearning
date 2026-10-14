@@ -636,6 +636,31 @@ class ApiClient {
         method: 'POST',
       }),
 
+    getImportTemplates: () => this.request<any>('/admin/exams/import/templates'),
+
+    validateImportExamFile: (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+      return fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/admin/exams/import/validate`, {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      }).then(async (res) => {
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Lỗi khi kiểm định tập tin');
+        return json.data;
+      });
+    },
+
+    confirmImportExams: (exams: any[]) =>
+      this.request<any>('/admin/exams/import/confirm', {
+        method: 'POST',
+        body: JSON.stringify({ exams }),
+      }),
+
     // ── Content Editor ──────────────────────────────────────────
     getExamFull: (id: string) => this.request(`/admin/exams/${id}/full`),
 

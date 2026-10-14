@@ -63,7 +63,7 @@ export function EventAnnouncementBar() {
 
 export function EventDecorations() {
   const pathname = usePathname();
-  const { config, currentTheme } = useEventTheme();
+  const { config, currentTheme, isEventActive, userThemePreference } = useEventTheme();
 
   // Hide decorations on admin routes
   if (
@@ -76,8 +76,9 @@ export function EventDecorations() {
     return null;
   }
 
-  // Show decorations whenever event is enabled in admin
-  const shouldRender = config.enabled;
+  // Chỉ hiển thị hiệu ứng khi sự kiện bật VÀ người dùng đang chọn theme sự kiện (không ép khi user chọn Sáng/Tối)
+  const isUserInEventTheme = userThemePreference === "event" || (currentTheme !== "light" && currentTheme !== "dark");
+  const shouldRender = isEventActive && isUserInEventTheme;
 
   if (!shouldRender || config.decorationType === "none") {
     return null;

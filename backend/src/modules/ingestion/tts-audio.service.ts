@@ -46,7 +46,13 @@ export class TtsAudioService {
     const tempTextFile = path.join(this.audioDir, `temp_${Date.now()}_${Math.random().toString(36).substring(7)}.txt`);
     fs.writeFileSync(tempTextFile, text.trim(), 'utf-8');
 
-    const helperScript = path.resolve(__dirname, '../../tools/tts_helper.py');
+    let helperScript = path.resolve(__dirname, '../../tools/tts_helper.py');
+    if (!fs.existsSync(helperScript)) {
+      helperScript = path.resolve(process.cwd(), 'src/tools/tts_helper.py');
+    }
+    if (!fs.existsSync(helperScript)) {
+      helperScript = path.resolve(process.cwd(), 'dist/tools/tts_helper.py');
+    }
     const command = `python "${helperScript}" "${tempTextFile}" "${outputPath}" "${voice}"`;
 
     try {

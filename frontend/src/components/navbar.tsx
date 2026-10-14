@@ -70,7 +70,7 @@ function NavbarUserAvatar({ user }: { user?: { avatar_url?: string; full_name?: 
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
-  const { config: eventConfig, currentTheme, setTheme: setEventTheme } = useEventTheme();
+  const { config: eventConfig, currentTheme, setTheme: setEventTheme, userThemePreference } = useEventTheme();
   const pathname = usePathname();
   const [skillsDropdown, setSkillsDropdown] = useState(false);
   const [moreDropdown, setMoreDropdown] = useState(false);
@@ -482,7 +482,7 @@ export function Navbar() {
                           <span className="text-base leading-none">{eventConfig.icon || "🎃"}</span>
                           <span>{eventConfig.name}</span>
                         </div>
-                        {currentTheme === eventConfig.activeTemplate && (
+                        {(userThemePreference === "event" || currentTheme === eventConfig.activeTemplate) && (
                           <span className="text-red-500 font-bold text-base leading-none">✓</span>
                         )}
                       </button>

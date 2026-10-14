@@ -34,6 +34,8 @@ import {
   ExternalLink,
   Lock,
   ChevronDown,
+  Star,
+  Flame,
 } from "lucide-react";
 
 export interface SpeakingQuestion {
@@ -1730,48 +1732,105 @@ function SpeakingExamRunnerContent() {
                     </div>
                   )}
 
-                  {/* PART 4: Topic Box + Image + 3 Bullets + Preparation note (Screenshot 5) */}
-                  {currentQ.partNumber === 4 && (
-                    <div className="rounded-2xl bg-muted/30 border border-border p-5 md:p-6 space-y-4">
-                      <h3 className="font-heading font-bold text-base md:text-lg text-foreground">
-                        Topic: {currentQ.topic || "Achieving something"}
-                      </h3>
+                  {/* PART 4: Topic Box + Image + 3 Questions simultaneously + Stickers */}
+                  {currentQ.partNumber === 4 && (() => {
+                    const part4QuestionsList = (() => {
+                      if (currentQ.subQuestions && currentQ.subQuestions.length >= 3) {
+                        return currentQ.subQuestions.slice(0, 3);
+                      }
+                      if (currentQ.subQuestions && currentQ.subQuestions.length > 0) {
+                        const list = [...currentQ.subQuestions];
+                        if (list.length === 1) {
+                          list.push("How did you feel about this situation and what did you learn from it?");
+                          list.push("Do you think this experience is common for many people today? Why?");
+                        } else if (list.length === 2) {
+                          list.push("Why do you think this is important to consider for the future?");
+                        }
+                        return list;
+                      }
+                      const lines = (currentQ.prompt || "")
+                        .split(/(?:\n+|(?<=\?)\s+)/)
+                        .map((s) => s.trim().replace(/^[-•*0-9.]+\s*/, ""))
+                        .filter(Boolean);
+                      if (lines.length >= 3) return lines.slice(0, 3);
+                      if (lines.length === 2) return [...lines, "Why do you think this situation is significant?"];
+                      return [
+                        currentQ.prompt || "Tell me about a personal experience related to this topic.",
+                        "How did you feel about this situation at that time?",
+                        "Do you think this issue will change in the future? Why or why not?",
+                      ];
+                    })();
 
-                      {currentQ.imageUrl && (
-                        <div className="max-w-md overflow-hidden rounded-xl border border-border bg-muted/20 aspect-[16/10]">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={currentQ.imageUrl}
-                            alt="Topic presentation prompt"
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src =
-                                "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80";
-                            }}
-                          />
+                    return (
+                      <div className="rounded-2xl bg-muted/30 border-2 border-primary/40 p-5 md:p-6 space-y-4 shadow-xs">
+                        {/* Stickers yêu cầu: 2 phút / 3 câu - trả lời liên tục | ★★★★★ Hay ra */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-xs border border-amber-500/30">
+                            <Clock className="w-3.5 h-3.5 text-amber-600" />
+                            2 phút / 3 câu - trả lời liên tục
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-rose-500/15 text-rose-700 dark:text-rose-300 font-extrabold text-xs border border-rose-500/30">
+                            <Star className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
+                            ★★★★★ Hay ra
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary font-bold text-xs">
+                            1 phút chuẩn bị + 2 phút nói liên tục
+                          </span>
                         </div>
-                      )}
 
-                      {/* 3 bullet questions lấy trực tiếp từ dữ liệu bài thi */}
-                      <div className="space-y-2 pt-1">
-                        {currentQ.subQuestions && currentQ.subQuestions.length > 0 ? (
-                          currentQ.subQuestions.map((sub, sIdx) => (
-                            <p key={sIdx} className="text-xs md:text-sm text-foreground/90 font-medium">
-                              • {sub}
-                            </p>
-                          ))
-                        ) : (
-                          <p className="text-xs md:text-sm text-foreground/90 font-medium">
-                            • {currentQ.prompt}
+                        <div className="border-b border-border/50 pb-2">
+                          <h3 className="font-heading font-extrabold text-base md:text-lg text-foreground">
+                            Topic: {currentQ.topic || "Personal Experience & Opinion"}
+                          </h3>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Cả 3 câu hỏi dưới đây được hiển thị cùng lúc trên màn hình thi. Hãy chuẩn bị ghi chú trong 1 phút và nói liên tục trong 2 phút.
                           </p>
-                        )}
-                      </div>
+                        </div>
 
-                      <p className="text-xs text-muted-foreground font-semibold pt-2 border-t border-border/50">
-                        You now have one minute to think about your answers. You can make notes if you wish.
-                      </p>
-                    </div>
-                  )}
+                        {currentQ.imageUrl && (
+                          <div className="max-w-md overflow-hidden rounded-xl border border-border bg-muted/20 aspect-[16/10] shadow-xs">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={currentQ.imageUrl}
+                              alt="Topic presentation prompt"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src =
+                                  "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80";
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        {/* 3 câu hỏi hiển thị cùng lúc */}
+                        <div className="space-y-2.5 pt-1">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
+                            3 Câu hỏi trả lời liên tục trong 2 phút:
+                          </span>
+                          {part4QuestionsList.map((sub, sIdx) => (
+                            <div
+                              key={sIdx}
+                              className="p-3.5 rounded-xl bg-background border border-border/80 shadow-xs flex items-start gap-3 transition-all hover:border-primary/40"
+                            >
+                              <span className="w-6 h-6 rounded-full bg-primary/15 text-primary font-extrabold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                                {sIdx + 1}
+                              </span>
+                              <p className="text-xs md:text-sm text-foreground font-semibold leading-relaxed">
+                                {sub}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 dark:text-amber-200 flex items-center gap-2">
+                          <Info className="w-4 h-4 text-amber-600 shrink-0" />
+                          <span>
+                            You now have one minute to think about your answers and take notes. When the time begins, you have two minutes to speak without stopping.
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* BÀI NÓI MẪU (Sample Answer Box - Screenshot 2) */}

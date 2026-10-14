@@ -28,6 +28,7 @@ import {
   FileText,
   Languages,
 } from "lucide-react";
+import { DEFAULT_LISTENING_TEST } from "@/data/listening-benchmark";
 
 // Định nghĩa dữ liệu 4 Parts chuẩn Aptis Listening
 interface Part1Item {
@@ -38,6 +39,7 @@ interface Part1Item {
   correctAnswer: string;
   explanation: string;
   audioUrl?: string;
+  transcript?: string;
 }
 
 interface Part2Speaker {
@@ -96,224 +98,7 @@ export interface ListeningExamData {
   part4: Part4Recording[];
 }
 
-// Dữ liệu mẫu chuẩn Đề 01 Listening Aptis Kỳ Tích
-const DEFAULT_LISTENING_TEST = {
-  title: "Đề 01 — Full Listening · 4 Parts",
-  durationMinutes: 40,
-  part1: [
-    {
-      num: 1,
-      prompt: "A person calls a friend about his new car. How much does the small car cost him?",
-      options: ["3250 pounds", "3550 pounds", "4250 pounds"],
-      correctAnswer: "3250 pounds",
-      explanation: "The speaker states clearly that the small car was purchased for 3250 pounds.",
-    },
-    {
-      num: 2,
-      prompt: "Listen to a woman talking about her holiday. Where is she going?",
-      options: ["To the mountains", "To the seaside", "To an ancient city"],
-      correctAnswer: "To the seaside",
-      explanation: "She mentions relaxing on the sunny coast and swimming in the sea.",
-    },
-    {
-      num: 3,
-      prompt: "A man is ordering food at a cafe. What beverage does he order?",
-      options: ["Iced Americano", "Hot green tea", "Fresh orange juice"],
-      correctAnswer: "Iced Americano",
-      explanation: "He asks for a large cup of iced Americano with no sugar.",
-    },
-    {
-      num: 4,
-      prompt: "Listen to the airport announcement. Which gate should passengers for Flight BA204 go to?",
-      options: ["Gate 12B", "Gate 14A", "Gate 24C"],
-      correctAnswer: "Gate 14A",
-      explanation: "The announcer directs BA204 passengers immediately to Gate 14A.",
-    },
-    {
-      num: 5,
-      prompt: "What time will the library seminar begin tomorrow?",
-      options: ["9:15 AM", "9:45 AM", "10:30 AM"],
-      correctAnswer: "9:45 AM",
-      explanation: "The librarian confirms the opening address starts at quarter to ten (9:45 AM).",
-    },
-    {
-      num: 6,
-      prompt: "A customer is asking for directions in a shopping mall. Where is the bookstore located?",
-      options: ["On the ground floor", "On the second floor next to the cinema", "In the basement"],
-      correctAnswer: "On the second floor next to the cinema",
-      explanation: "Directions indicate taking the escalator up to the 2nd floor near the cinema.",
-    },
-    {
-      num: 7,
-      prompt: "Listen to the weather forecast. What will the weather be like on Sunday afternoon?",
-      options: ["Heavy thunderstorms", "Sunny with mild breezes", "Cloudy and misty"],
-      correctAnswer: "Sunny with mild breezes",
-      explanation: "The meteorologist predicts warm sunshine and gentle breeze across the region.",
-    },
-    {
-      num: 8,
-      prompt: "Why did the student miss the morning chemistry lecture?",
-      options: ["His bicycle had a flat tire", "He overslept", "The train was canceled"],
-      correctAnswer: "The train was canceled",
-      explanation: "The student explains that his regular morning train was abruptly canceled.",
-    },
-    {
-      num: 9,
-      prompt: "How much is the discounted admission ticket for university students?",
-      options: ["8 dollars", "12 dollars", "15 dollars"],
-      correctAnswer: "8 dollars",
-      explanation: "The museum counter informs students pay only 8 dollars with a valid ID.",
-    },
-    {
-      num: 10,
-      prompt: "Which sport class has been rescheduled to Thursday evening?",
-      options: ["Yoga", "Pilates", "Indoor tennis"],
-      correctAnswer: "Yoga",
-      explanation: "The fitness club notice confirms the beginner yoga session moves to Thursday.",
-    },
-    {
-      num: 11,
-      prompt: "What gift did David receive from his colleagues for his promotion?",
-      options: ["A leather briefcase", "A fountain pen", "A smart watch"],
-      correctAnswer: "A fountain pen",
-      explanation: "David expresses gratitude for the engraved fountain pen.",
-    },
-    {
-      num: 12,
-      prompt: "Listen to the phone message. What is the doctor appointment date?",
-      options: ["October 12th", "October 15th", "October 20th"],
-      correctAnswer: "October 15th",
-      explanation: "The receptionist books the consultation for Thursday, October 15th.",
-    },
-    {
-      num: 13,
-      prompt: "What did the woman leave behind in the taxi cab?",
-      options: ["Her sunglasses", "Her black handbag", "Her umbrella"],
-      correctAnswer: "Her black handbag",
-      explanation: "She calls the taxi hotline inquiring about a black leather handbag.",
-    },
-  ],
-  part2: {
-    topic: "Exercise Preferences",
-    instructions:
-      "Four people are talking about their exercise preferences. Match each person to the correct information.",
-    options: [
-      "Prefers early morning outdoor jogging in local parks",
-      "Enjoys competitive weekend team sports with colleagues",
-      "Works out with personal trainers in a high-tech gym",
-      "Practices gentle yoga and meditation at home",
-      "Does swimming regularly to recover from joint injuries",
-    ],
-    speakers: [
-      {
-        speaker: "Speaker A",
-        correctAnswer: "Prefers early morning outdoor jogging in local parks",
-        explanation: "Speaker A talks about waking up at 6 AM to run in the park nearby.",
-      },
-      {
-        speaker: "Speaker B",
-        correctAnswer: "Enjoys competitive weekend team sports with colleagues",
-        explanation: "Speaker B loves joining amateur basketball tournaments on Saturdays.",
-      },
-      {
-        speaker: "Speaker C",
-        correctAnswer: "Works out with personal trainers in a high-tech gym",
-        explanation: "Speaker C values structured weight training and customized gym routines.",
-      },
-      {
-        speaker: "Speaker D",
-        correctAnswer: "Practices gentle yoga and meditation at home",
-        explanation: "Speaker D prefers quiet mindfulness, stretching, and breathing exercises at home.",
-      },
-    ],
-    passageText: `Speaker A: "I wake up at 6 every morning to run in the park nearby. The fresh air and quiet streets give me energy for the whole day."\n\nSpeaker B: "Every Saturday afternoon, I meet up with my colleagues for amateur basketball tournaments. I love the teamwork and friendly competition."\n\nSpeaker C: "I work with a personal trainer at a modern gym three times a week. Having a structured routine and expert guidance keeps me motivated."\n\nSpeaker D: "I prefer gentle yoga and meditation in my living room. It helps calm my mind, relieves back stiffness, and requires no special gear."`,
-    translationText: `Người nói A: "Tôi thức dậy lúc 6 giờ sáng mỗi ngày để chạy bộ trong công viên gần nhà. Không khí trong lành và đường phố yên tĩnh tiếp thêm năng lượng cho cả ngày dài."\n\nNgười nói B: "Chiều thứ Bảy hàng tuần, tôi gặp đồng nghiệp tham gia giải bóng rổ phong trào. Tôi rất thích tinh thần đồng đội và sự thi đấu giao lưu vui vẻ."\n\nNgười nói C: "Tôi tập cùng huấn luyện viên cá nhân tại phòng gym hiện đại 3 buổi mỗi tuần. Lộ trình bài bản và sự chỉ dẫn chuyên môn giúp tôi luôn giữ vững động lực."\n\nNgười nói D: "Tôi thích tập yoga nhẹ nhàng và thiền định tại phòng khách. Nó giúp làm dịu tâm trí, giải tỏa đau mỏi lưng mà không cần dụng cụ phức tạp."`,
-  },
-  part3: {
-    topic: "There is too much information on the Internet",
-    instructions: "Who expresses which opinion?",
-    passageText: `Man: "It feels like we are constantly bombarded with endless articles and social feeds. There is simply too much information on the Internet these days."\n\nWoman: "I completely agree, but the real challenge is that finding reliable information now requires critical skills and filtering techniques."\n\nMan: "Recent studies also show that navigating all this digital noise actually rewires our brains and alters how we think and process facts."\n\nWoman: "Not to mention patience—teenagers expect instantaneous answers and struggle with deep, focused tasks because of the web."`,
-    translationText: `Nam: "Cảm giác như chúng ta liên tục bị bủa vây bởi vô số bài báo và nguồn cấp dữ liệu mạng xã hội. Thật sự có quá nhiều thông tin trên Internet ngày nay."\n\nNữ: "Tôi hoàn toàn đồng ý, nhưng thách thức thực sự là việc tìm kiếm thông tin đáng tin cậy đòi hỏi kỹ năng chọn lọc và tư duy phản biện sắc bén."\n\nNam: "Các nghiên cứu gần đây cũng chỉ ra rằng việc tiếp nhận quá nhiều tạp âm số đang làm thay đổi cách não bộ chúng ta tư duy và xử lý các sự kiện."\n\nNữ: "Chưa kể đến tính kiên nhẫn—thanh thiếu niên ngày nay mong đợi câu trả lời tức thì và rất khó tập trung lâu dài vào các việc đòi hỏi sự sâu sắc vì mạng internet."`,
-    opinions: [
-      {
-        statement: "1. There is too much information on the Internet",
-        correctAnswer: "Both" as const,
-        explanation: "Both speakers agree that information overload is a widespread digital challenge.",
-      },
-      {
-        statement: "2. Finding information on the Internet requires skills",
-        correctAnswer: "Woman" as const,
-        explanation: "The woman emphasizes the necessity of critical thinking and filtering tools.",
-      },
-      {
-        statement: "3. The use of the Internet affects the way we think.",
-        correctAnswer: "Man" as const,
-        explanation: "The man references neuroscientific studies on shortened attention spans.",
-      },
-      {
-        statement: "4. The Internet makes young people less patient.",
-        correctAnswer: "Woman" as const,
-        explanation: "The woman argues that instant gratification reduces patience among teenagers.",
-      },
-    ],
-  },
-  part4: [
-    {
-      recNum: 1,
-      title: "Recording 1 of 2",
-      passageText: "A book review of a prominent author new novel.",
-      questions: [
-        {
-          prompt: "1. What does the announcer say about the new novel?",
-          options: [
-            "It is different from his earlier works",
-            "It is romantic and soft",
-            "It is less famous than his earlier works",
-          ],
-          correctAnswer: "It is different from his earlier works",
-          explanation: "The critic highlights a bold thematic departure from the author previous style.",
-        },
-        {
-          prompt: "2. What does the announcer say the writer should do in the future?",
-          options: [
-            "The writer should continue to write this genre",
-            "The writer should go back to his original genre",
-            "He should listen to critics before writing his next work",
-          ],
-          correctAnswer: "The writer should continue to write this genre",
-          explanation: "The reviewer strongly encourages further exploration of this innovative narrative approach.",
-        },
-      ],
-    },
-    {
-      recNum: 2,
-      title: "Recording 2 of 2",
-      passageText: "An interview with an eco-architect about sustainable museum design.",
-      questions: [
-        {
-          prompt: "1. What inspired the architect to design the eco-friendly museum?",
-          options: [
-            "Ancient subterranean structures",
-            "Modern urban glass towers",
-            "Natural light and organic tree foliage",
-          ],
-          correctAnswer: "Natural light and organic tree foliage",
-          explanation: "The architect mentions biomimicry and sunlight filtering through leaves.",
-        },
-        {
-          prompt: "2. What challenge did the construction team encounter during building?",
-          options: [
-            "Budgetary constraints and material delays",
-            "Extremely adverse winter frost",
-            "Opposition from historical preservation societies",
-          ],
-          correctAnswer: "Budgetary constraints and material delays",
-          explanation: "The project suffered severe delays due to imported sustainable materials.",
-        },
-      ],
-    },
-  ],
-};
+// DEFAULT_LISTENING_TEST được import từ benchmark dataset chuẩn tại @/data/listening-benchmark
 
 // Bộ đề mẫu 02 — Thảo luận & Quan điểm nâng cao (Tránh trùng lặp)
 const DEFAULT_LISTENING_TEST_2 = {
@@ -686,7 +471,7 @@ function ListeningExamRunnerContent() {
       const q = examData.part1[currentStage.subIndex];
       return {
         title: `Part 1 — Câu hỏi ${currentStage.subIndex + 1}`,
-        script: q?.prompt || "",
+        script: q?.transcript || q?.prompt || "",
         translation: "",
       };
     }
@@ -709,6 +494,15 @@ function ListeningExamRunnerContent() {
       if (idx !== -1) setActiveStage(idx);
     }
   }, [searchParams, listeningStages]);
+
+  // Tự động cuộn pill câu hỏi đang chọn vào giữa thanh điều hướng
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const el = document.getElementById(`stage-pill-${activeStage}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [activeStage]);
 
   // Khởi tạo phiên làm bài trên backend
   useEffect(() => {
@@ -764,6 +558,18 @@ function ListeningExamRunnerContent() {
     if (examId) load();
   }, [examId]);
 
+  function extractTranscriptFromExplanation(rawExp?: string, explicitTranscript?: string): string {
+    if (explicitTranscript && explicitTranscript.trim()) return explicitTranscript.trim();
+    if (!rawExp) return "";
+    if (rawExp.includes("--- GIẢI THÍCH ĐÁP ÁN ---")) {
+      return rawExp.split("--- GIẢI THÍCH ĐÁP ÁN ---")[0].trim();
+    }
+    if (rawExp.length > 40 && !rawExp.toLowerCase().startsWith("đáp án chuẩn")) {
+      return rawExp.trim();
+    }
+    return "";
+  }
+
   // Parser dữ liệu từ Backend sang format hiển thị của Listening
   function parseApiToListeningData(apiData: any) {
     const parts = apiData.parts || [];
@@ -813,7 +619,15 @@ function ListeningExamRunnerContent() {
                 opts = ["A", "B", "C"];
               }
             }
-            if (p.audio_url) audioUrls[idx] = p.audio_url;
+            const rawAudio = q.audio_url || q.audioUrl || q.file || p.audio_url || "";
+            const resolvedAudio = rawAudio && !rawAudio.startsWith("http") && !rawAudio.startsWith("/")
+              ? `/uploads/audio/listening/${rawAudio}`
+              : rawAudio;
+            if (resolvedAudio) audioUrls[idx] = resolvedAudio;
+            const qTranscript = extractTranscriptFromExplanation(
+              q.explanation,
+              q.transcript || q.suggestion || q.passage_text
+            );
             return {
               id: q.id,
               num: q.question_number || idx + 1,
@@ -821,7 +635,8 @@ function ListeningExamRunnerContent() {
               options: opts,
               correctAnswer: q.correct_answer || opts[0] || "",
               explanation: q.explanation || "Đáp án chuẩn theo đoạn ghi âm đối thoại.",
-              audioUrl: p.audio_url || "",
+              audioUrl: resolvedAudio,
+              transcript: qTranscript,
             };
           });
         }
@@ -829,11 +644,22 @@ function ListeningExamRunnerContent() {
 
       // Part 2: Speakers matching
       if (pNum === 2 || pTitle.includes("part 2") || pTitle.includes("speaker")) {
-        if (p.passage_text) (result.part2 as any).passageText = p.passage_text;
+        const p2Script = extractTranscriptFromExplanation(
+          questions[0]?.explanation,
+          p.passage_text || p.transcript || p.suggestion
+        );
+        if (p2Script) {
+          (result.part2 as any).passageText = p2Script;
+          (result.part2 as any).transcript = p2Script;
+        }
         if (p.translation_text || p.passage_translation) (result.part2 as any).translationText = p.translation_text || p.passage_translation;
-        if (p.audio_url) {
-          (result.part2 as any).audioUrl = p.audio_url;
-          audioUrls[13] = p.audio_url;
+        const p2RawAudio = p.audio_url || (p as any).file || "";
+        const resolvedP2Audio = p2RawAudio && !p2RawAudio.startsWith("http") && !p2RawAudio.startsWith("/")
+          ? `/uploads/audio/listening/${p2RawAudio}`
+          : p2RawAudio;
+        if (resolvedP2Audio) {
+          (result.part2 as any).audioUrl = resolvedP2Audio;
+          audioUrls[13] = resolvedP2Audio;
         }
         if (questions.length > 0) {
           let extractedOptions: string[] = [];
@@ -860,11 +686,22 @@ function ListeningExamRunnerContent() {
 
       // Part 3: Opinion discussion
       if (pNum === 3 || pTitle.includes("part 3") || pTitle.includes("opinion")) {
-        if (p.passage_text) (result.part3 as any).passageText = p.passage_text;
+        const p3Script = extractTranscriptFromExplanation(
+          questions[0]?.explanation,
+          p.passage_text || p.transcript || p.suggestion
+        );
+        if (p3Script) {
+          (result.part3 as any).passageText = p3Script;
+          (result.part3 as any).transcript = p3Script;
+        }
         if (p.translation_text || p.passage_translation) (result.part3 as any).translationText = p.translation_text || p.passage_translation;
-        if (p.audio_url) {
-          (result.part3 as any).audioUrl = p.audio_url;
-          audioUrls[14] = p.audio_url;
+        const p3RawAudio = p.audio_url || (p as any).file || "";
+        const resolvedP3Audio = p3RawAudio && !p3RawAudio.startsWith("http") && !p3RawAudio.startsWith("/")
+          ? `/uploads/audio/listening/${p3RawAudio}`
+          : p3RawAudio;
+        if (resolvedP3Audio) {
+          (result.part3 as any).audioUrl = resolvedP3Audio;
+          audioUrls[14] = resolvedP3Audio;
         }
         if (questions.length > 0) {
           const opList = questions.map((q: any) => {
@@ -908,25 +745,37 @@ function ListeningExamRunnerContent() {
 
           const recordings: any[] = [];
           if (qList.length > 2) {
+            const p4RawAudio = p.audio_url || (p as any).file || "";
+            const resolvedP4Audio = p4RawAudio && !p4RawAudio.startsWith("http") && !p4RawAudio.startsWith("/")
+              ? `/uploads/audio/listening/${p4RawAudio}`
+              : p4RawAudio;
+            const p4Script1 = extractTranscriptFromExplanation(
+              qList[0]?.explanation,
+              p.passage_text || p.transcript || p.suggestion
+            );
+            const p4Script2 = extractTranscriptFromExplanation(
+              qList[2]?.explanation,
+              p.passage_text || p.transcript || p.suggestion
+            );
             recordings.push({
               recNum: 1,
               title: "Recording 1 of 2",
-              passageText: p.passage_text || "",
+              passageText: p4Script1,
               translationText: p.translation_text || p.passage_translation || "",
-              audioUrl: p.audio_url || "",
+              audioUrl: resolvedP4Audio,
               questions: qList.slice(0, 2),
             });
             recordings.push({
               recNum: 2,
               title: "Recording 2 of 2",
-              passageText: p.passage_text || "",
+              passageText: p4Script2 || p4Script1,
               translationText: p.translation_text || p.passage_translation || "",
-              audioUrl: p.audio_url || "",
+              audioUrl: resolvedP4Audio,
               questions: qList.slice(2, 4),
             });
-            if (p.audio_url) {
-              audioUrls[15] = p.audio_url;
-              audioUrls[16] = p.audio_url;
+            if (resolvedP4Audio) {
+              audioUrls[15] = resolvedP4Audio;
+              audioUrls[16] = resolvedP4Audio;
             }
           } else {
             recordings.push({
@@ -961,14 +810,22 @@ function ListeningExamRunnerContent() {
     if (!currentStage) return "";
     if (currentStage.partNum === 1) {
       const q = examData.part1[currentStage.subIndex];
-      return q ? `Question ${q.num}. ${q.prompt}` : "";
+      return q?.transcript || (q ? `Question ${q.num}. ${q.prompt}` : "");
     } else if (currentStage.partNum === 2) {
-      return `Part 2. Four people are talking. ${examData.part2.speakers.map((s) => s.speaker + ". " + s.correctAnswer).join(". ")}`;
+      return (
+        (examData.part2 as any).transcript ||
+        (examData.part2 as any).passageText ||
+        `Part 2. Four people are talking. ${examData.part2.speakers.map((s) => s.speaker + ". " + s.correctAnswer).join(". ")}`
+      );
     } else if (currentStage.partNum === 3) {
-      return `Part 3. A man and a woman are discussing: ${examData.part3.topic}. ${examData.part3.opinions.map((o) => o.statement).join(". ")}`;
+      return (
+        (examData.part3 as any).transcript ||
+        (examData.part3 as any).passageText ||
+        `Part 3. A man and a woman are discussing: ${examData.part3.topic}. ${examData.part3.opinions.map((o) => o.statement).join(". ")}`
+      );
     } else if (currentStage.partNum === 4) {
       const rec = examData.part4[currentStage.subIndex];
-      return rec?.passageText || "Monologue presentation.";
+      return (rec as any)?.transcript || rec?.passageText || "Monologue presentation.";
     }
     return "";
   };
@@ -1006,27 +863,7 @@ function ListeningExamRunnerContent() {
       return;
     }
 
-    // Bắt đầu phát âm thanh
-    const targetAudioSrc = audioUrlMap[activeStage];
-    let audioPlayed = false;
-
-    if (targetAudioSrc && audioRef.current) {
-      audioRef.current.src = targetAudioSrc;
-      audioRef.current.playbackRate = playbackSpeed;
-      audioRef.current
-        .play()
-        .then(() => {
-          audioPlayed = true;
-          setIsPlaying(true);
-          setPlayCounts((prev) => ({ ...prev, [activeStage]: currentCount + 1 }));
-        })
-        .catch(() => {
-          audioPlayed = false;
-        });
-    }
-
-    // Nếu không có file audio hoặc file audio bị lỗi đường dẫn: Dùng giọng nói tiếng Anh trình duyệt (SpeechSynthesis)
-    if (!audioPlayed) {
+    const playSpeechFallback = (count: number) => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();
         const scriptText = getCurrentStageScript();
@@ -1039,7 +876,7 @@ function ListeningExamRunnerContent() {
 
         utterance.onstart = () => {
           setIsPlaying(true);
-          setPlayCounts((prev) => ({ ...prev, [activeStage]: currentCount + 1 }));
+          setPlayCounts((prev) => ({ ...prev, [activeStage]: count + 1 }));
         };
 
         const progressTimer = setInterval(() => {
@@ -1064,9 +901,31 @@ function ListeningExamRunnerContent() {
       } else {
         // Fallback mô phỏng nếu trình duyệt không có speech API
         setIsPlaying(true);
-        setPlayCounts((prev) => ({ ...prev, [activeStage]: currentCount + 1 }));
+        setPlayCounts((prev) => ({ ...prev, [activeStage]: count + 1 }));
       }
+    };
+
+    // Bắt đầu phát âm thanh
+    const targetAudioSrc = currentStage?.audioUrl || audioUrlMap[activeStage];
+
+    if (targetAudioSrc && audioRef.current) {
+      audioRef.current.src = targetAudioSrc;
+      audioRef.current.playbackRate = playbackSpeed;
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+          setPlayCounts((prev) => ({ ...prev, [activeStage]: currentCount + 1 }));
+        })
+        .catch((err) => {
+          console.warn("Audio file playback error, falling back to Web Speech API:", err);
+          playSpeechFallback(currentCount);
+        });
+      return;
     }
+
+    // Nếu không có file audio: Dùng giọng nói tiếng Anh trình duyệt (SpeechSynthesis)
+    playSpeechFallback(currentCount);
   };
 
   const handleSpeedChange = (rate: number) => {
@@ -1892,65 +1751,73 @@ function ListeningExamRunnerContent() {
         </div>
 
         {/* Center: Quick Part Question Pills & Navigation Controls */}
-        <div className="flex items-center gap-2">
-          {/* Pills câu hỏi của Part đang mở */}
-          <div className="flex items-center gap-1 overflow-x-auto max-w-[42vw] sm:max-w-[36vw] py-1 px-1">
-            {listeningStages
-              .map((stage, idx) => ({ stage, idx }))
-              .filter(({ stage }) => stage.partNum === currentStage.partNum)
-              .map(({ stage, idx }) => {
-                const isCurrent = activeStage === idx;
-                let isAnswered = false;
-                if (stage.partNum === 1) {
-                  isAnswered = !!p1Answers[stage.subIndex];
-                } else if (stage.partNum === 2) {
-                  isAnswered = Object.keys(p2Answers).length > 0;
-                } else if (stage.partNum === 3) {
-                  isAnswered = Object.keys(p3Answers).length > 0;
-                } else if (stage.partNum === 4) {
-                  const part4KeyPrefix = `p4-${stage.subIndex}-`;
-                  isAnswered = Object.keys(p4Answers).some((k) => k.startsWith(part4KeyPrefix));
-                }
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Glass Dock bọc dãy câu hỏi */}
+          <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[42vw] sm:max-w-[44vw] md:max-w-[50vw] lg:max-w-[56vw] py-0.5 px-0.5">
+              {listeningStages
+                .map((stage, idx) => ({ stage, idx }))
+                .filter(({ stage }) => stage.partNum === currentStage.partNum)
+                .map(({ stage, idx }) => {
+                  const isCurrent = activeStage === idx;
+                  let isAnswered = false;
+                  if (stage.partNum === 1) {
+                    isAnswered = !!p1Answers[stage.subIndex];
+                  } else if (stage.partNum === 2) {
+                    isAnswered = Object.keys(p2Answers).length > 0;
+                  } else if (stage.partNum === 3) {
+                    isAnswered = Object.keys(p3Answers).length > 0;
+                  } else if (stage.partNum === 4) {
+                    const part4KeyPrefix = `p4-${stage.subIndex}-`;
+                    isAnswered = Object.keys(p4Answers).some((k) => k.startsWith(part4KeyPrefix));
+                  }
 
-                return (
-                  <button
-                    key={stage.id}
-                    type="button"
-                    onClick={() => setActiveStage(idx)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
-                      isCurrent
-                        ? "bg-primary text-primary-foreground shadow-xs scale-105"
-                        : isAnswered
-                        ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                    }`}
-                    title={stage.label}
-                  >
-                    {stage.label}
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={stage.id}
+                      id={`stage-pill-${idx}`}
+                      type="button"
+                      onClick={() => setActiveStage(idx)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
+                        isCurrent
+                          ? "bg-primary text-primary-foreground font-black shadow-sm ring-2 ring-primary/40 ring-offset-1 ring-offset-background scale-105"
+                          : isAnswered
+                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
+                          : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
+                      }`}
+                      title={stage.label}
+                    >
+                      {isAnswered && !isCurrent && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      )}
+                      <span>{stage.label}</span>
+                    </button>
+                  );
+                })}
+            </div>
+
+            <div className="h-4 w-px bg-border/70 shrink-0 mx-0.5 hidden sm:block" />
+
+            <button
+              type="button"
+              onClick={() => setShowDrawer(true)}
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0"
+              title="Danh sách tất cả câu hỏi"
+              aria-label="Danh sách tất cả câu hỏi"
+            >
+              <Menu className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0 hidden sm:flex"
+              title="Cuộn lên đầu trang"
+              aria-label="Cuộn lên đầu trang"
+            >
+              <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
           </div>
-
-          <div className="h-5 w-px bg-border/60 shrink-0 hidden sm:block" />
-
-          <button
-            type="button"
-            onClick={() => setShowDrawer(true)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer"
-            title="Danh sách tất cả câu hỏi"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer hidden sm:flex"
-            title="Cuộn lên đầu trang"
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
         </div>
 
         {/* Right: Previous & Next / Submit */}

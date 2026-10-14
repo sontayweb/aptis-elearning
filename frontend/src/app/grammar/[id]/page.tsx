@@ -10,6 +10,7 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
   Send,
   Flag,
   RotateCcw,
@@ -597,6 +598,15 @@ export default function GrammarExamRunner() {
     }
   }, [examId]);
 
+  // Tự động cuộn pill câu hỏi đang chọn vào giữa thanh điều hướng
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const el = document.getElementById(`grammar-question-pill-${currentIndex}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [currentIndex]);
+
   useEffect(() => {
     if (isSubmitted || loading || error || questions.length === 0) return;
     const timer = setInterval(() => {
@@ -953,51 +963,56 @@ export default function GrammarExamRunner() {
             </div>
 
             {/* Center: Question pills carousel + Drawer trigger + ArrowUp */}
-            <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
-              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 px-1 max-w-[200px] sm:max-w-xs md:max-w-sm">
-                {questions.map((q, idx) => {
-                  const isCurrent = currentIndex === idx;
-                  const isAnswered = selectedAnswers[idx] !== undefined;
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm">
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[200px] sm:max-w-xs md:max-w-md py-0.5 px-0.5">
+                  {questions.map((q, idx) => {
+                    const isCurrent = currentIndex === idx;
+                    const isAnswered = selectedAnswers[idx] !== undefined;
 
-                  return (
-                    <button
-                      key={q.id || idx}
-                      type="button"
-                      onClick={() => setCurrentIndex(idx)}
-                      className={`w-7 h-7 rounded-lg text-xs font-bold shrink-0 flex items-center justify-center transition-all cursor-pointer ${
-                        isCurrent
-                          ? "bg-primary text-primary-foreground shadow-xs scale-105"
-                          : isAnswered
-                          ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                          : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                      }`}
-                      title={`Câu ${idx + 1}`}
-                    >
-                      {idx + 1}
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={q.id || idx}
+                        id={`grammar-question-pill-${idx}`}
+                        type="button"
+                        onClick={() => setCurrentIndex(idx)}
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-xs font-bold shrink-0 flex items-center justify-center transition-all duration-150 cursor-pointer select-none ${
+                          isCurrent
+                            ? "bg-primary text-primary-foreground font-black shadow-sm ring-2 ring-primary/40 ring-offset-1 ring-offset-background scale-105"
+                            : isAnswered
+                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
+                            : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
+                        }`}
+                        title={`Câu ${idx + 1}`}
+                      >
+                        {idx + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="h-4 w-px bg-border/70 shrink-0 mx-0.5 hidden sm:block" />
+
+                <button
+                  type="button"
+                  onClick={() => setIsDrawerOpen(true)}
+                  className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0"
+                  title="Danh sách tất cả câu hỏi"
+                  aria-label="Danh sách tất cả câu hỏi"
+                >
+                  <Menu className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                  className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0 hidden sm:flex"
+                  title="Cuộn lên đầu trang"
+                  aria-label="Cuộn lên đầu trang"
+                >
+                  <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                </button>
               </div>
-
-              <div className="h-5 w-px bg-border/60 shrink-0 hidden sm:block" />
-
-              <button
-                type="button"
-                onClick={() => setIsDrawerOpen(true)}
-                className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer"
-                title="Danh sách tất cả câu hỏi"
-              >
-                <Menu className="w-4 h-4" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer hidden sm:flex"
-                title="Cuộn lên đầu trang"
-              >
-                <ArrowRight className="w-4 h-4 -rotate-90" />
-              </button>
             </div>
 
             {/* Right: Previous & Next / Submit */}

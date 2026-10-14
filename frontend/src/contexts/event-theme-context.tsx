@@ -1,9 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { api } from "@/lib/api-client";
 
 export type EventTemplateId = "halloween" | "noel" | "mid_autumn" | "tet" | "custom";
 export type EventAppearanceMode = "light" | "dark" | "adaptive";
+export type UserThemePreference = "event" | "light" | "dark";
 
 export interface EventThemeConfig {
   enabled: boolean;
@@ -18,8 +20,8 @@ export interface EventThemeConfig {
   bannerText: string;
   bannerLink: string;
   decorationType: "bat_pumpkin" | "snowflakes" | "lanterns" | "blossoms" | "none";
-  appearanceMode: EventAppearanceMode; // Chế độ nền mặc định: "light" (Nền sáng thanh lịch), "dark" (Nền tối huyền bí), "adaptive" (Theo tùy chọn người dùng)
-  forceEventTheme: boolean; // Nếu bật: khách truy cập mặc định thấy giao diện sự kiện
+  appearanceMode: EventAppearanceMode; // Chế độ nền mặc định: "light", "dark", "adaptive"
+  forceEventTheme: boolean; // Nếu bật: khách truy cập mới mặc định thấy giao diện sự kiện
   updatedAt: string;
 }
 
@@ -81,7 +83,7 @@ export const PRESET_TEMPLATES: Record<EventTemplateId, Omit<EventThemeConfig, "e
     bannerText: "🌸 Khai xuân đắc lộc — Lì xì khóa học và nhân đôi lượt chấm bài thi thử Aptis!",
     bannerLink: "/pricing",
     decorationType: "blossoms",
-    appearanceMode: "light", // Tết tươi sáng trang trọng trên nền trắng, KHÔNG bị tối đen
+    appearanceMode: "light", // Tết tươi sáng trang trọng trên nền trắng
     forceEventTheme: true,
   },
   custom: {
@@ -107,158 +109,280 @@ const DEFAULT_EVENT_CONFIG: EventThemeConfig = {
   updatedAt: new Date().toISOString(),
 };
 
+export const STORAGE_KEY = "system_event_theme_config";
+export const USER_THEME_STORAGE_KEY = "user_theme_preference";
+export const THEME_STORAGE_KEY = "theme";
+
 interface EventThemeContextType {
   config: EventThemeConfig;
   currentTheme: string;
+  userThemePreference: UserThemePreference;
   isEventActive: boolean;
   setTheme: (theme: string) => void;
-  updateConfig: (newConfig: Partial<EventThemeConfig>) => void;
-  applyPreset: (presetId: EventTemplateId) => void;
-  toggleEvent: (enabled: boolean) => void;
+  setUserThemePreference: (pref: UserThemePreference) => void;
+  updateConfig: (newConfig: Partial<EventThemeConfig>) => Promise<void>;
+  applyPreset: (presetId: EventTemplateId) => Promise<void>;
+  toggleEvent: (enabled: boolean) => Promise<void>;
+  refreshConfig: () => Promise<void>;
 }
 
 const EventThemeContext = createContext<EventThemeContextType | undefined>(undefined);
 
-const STORAGE_KEY = "system_event_theme_config";
-const THEME_STORAGE_KEY = "theme";
-
 export function EventThemeProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<EventThemeConfig>(DEFAULT_EVENT_CONFIG);
   const [currentTheme, setCurrentThemeState] = useState<string>("light");
+  const [userThemePreference, setUserThemePreferenceState] = useState<UserThemePreference>("event");
   const [hasMounted, setHasMounted] = useState(false);
 
-  const applyThemeToDOM = (themeName: string, eventConfig?: EventThemeConfig) => {
+  /**
+   * Áp dụng giao diện vào thẻ <html>:
+   * - Nếu themeName là "light": Bỏ data-event-theme, bỏ .dark
+   * - Nếu themeName là "dark": Bỏ data-event-theme, thêm .dark
+   * - Nếu themeName là eventTemplate: Gán data-event-theme, dark theo appearanceMode
+   */
+  const applyThemeToDOM = useCallback((themeName: string, activeCfg: EventThemeConfig) => {
     if (typeof document === "undefined") return;
     const root = document.documentElement;
-    const activeCfg = eventConfig || config;
 
     // Reset old event theme attribute
     root.removeAttribute("data-event-theme");
 
+    // Trường hợp 1: Người dùng chủ động chọn "Sáng"
+    if (themeName === "light") {
+      root.classList.remove("dark");
+      return;
+    }
+
+    // Trường hợp 2: Người dùng chủ động chọn "Tối"
+    if (themeName === "dark") {
+      root.classList.add("dark");
+      return;
+    }
+
+    // Trường hợp 3: Chế độ sự kiện (Tết, Noel, Halloween, Trung thu...)
     if (activeCfg.enabled) {
-      // Event is globally enabled: always bind data-event-theme to activeTemplate
       const eventTemplate = activeCfg.activeTemplate || "tet";
       root.setAttribute("data-event-theme", eventTemplate);
 
-      // Handle dark/light mode
-      if (themeName === "dark") {
+      const mode = activeCfg.appearanceMode || "light";
+      if (mode === "dark") {
         root.classList.add("dark");
-      } else if (themeName === "light") {
-        root.classList.remove("dark");
       } else {
-        const mode = activeCfg.appearanceMode || "light";
-        if (mode === "dark") {
-          root.classList.add("dark");
-        } else if (mode === "light") {
-          root.classList.remove("dark");
-        } else {
-          const savedBase = localStorage.getItem("theme");
-          if (savedBase === "dark") {
-            root.classList.add("dark");
+        root.classList.remove("dark");
+      }
+    } else {
+      // Sự kiện tắt: Mặc định nền sáng thương hiệu
+      root.classList.remove("dark");
+    }
+  }, []);
+
+  // Tải cấu hình từ API backend (Chuẩn Single Source of Truth)
+  const fetchRemoteConfig = useCallback(async () => {
+    try {
+      const res = await api.settings.getPublic();
+      if (res?.success && res?.data?.eventThemeConfig) {
+        const remoteCfg: EventThemeConfig = {
+          ...DEFAULT_EVENT_CONFIG,
+          ...res.data.eventThemeConfig,
+        };
+        setConfig(remoteCfg);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteCfg));
+        } catch {}
+
+        // Kiểm tra xem User hiện tại có đang bật chế độ event không
+        const savedPref = localStorage.getItem(USER_THEME_STORAGE_KEY);
+        if (savedPref === "event" || (!savedPref && remoteCfg.enabled)) {
+          if (remoteCfg.enabled) {
+            setCurrentThemeState(remoteCfg.activeTemplate);
+            applyThemeToDOM(remoteCfg.activeTemplate, remoteCfg);
           } else {
-            root.classList.remove("dark");
+            setCurrentThemeState("light");
+            applyThemeToDOM("light", remoteCfg);
           }
         }
       }
-    } else {
-      // Event disabled: standard light/dark brand
-      if (themeName === "dark") {
-        root.classList.add("dark");
-      } else {
-        root.classList.remove("dark");
-      }
+    } catch (err) {
+      console.warn("Dùng cấu hình sự kiện từ cache cục bộ:", err);
     }
-  };
+  }, [applyThemeToDOM]);
 
-  // Initialize config and current theme from localStorage
+  // Khởi tạo trạng thái khi mount (giữ nguyên tuyệt đối lựa chọn Sáng/Tối của user)
   useEffect(() => {
     setHasMounted(true);
-    let loadedConfig = DEFAULT_EVENT_CONFIG;
+
+    // 1. Đọc cache cấu hình sự kiện hệ thống
+    let activeConfig = DEFAULT_EVENT_CONFIG;
     try {
       const savedConfig = localStorage.getItem(STORAGE_KEY);
       if (savedConfig) {
-        loadedConfig = { ...DEFAULT_EVENT_CONFIG, ...JSON.parse(savedConfig) };
-        setConfig(loadedConfig);
-      } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_EVENT_CONFIG));
-      }
-
-      if (loadedConfig.enabled) {
-        const eventTheme = loadedConfig.activeTemplate;
-        setCurrentThemeState(eventTheme);
-        localStorage.setItem(THEME_STORAGE_KEY, eventTheme);
-        applyThemeToDOM(eventTheme, loadedConfig);
-      } else {
-        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || "light";
-        setCurrentThemeState(savedTheme);
-        applyThemeToDOM(savedTheme, loadedConfig);
+        activeConfig = { ...DEFAULT_EVENT_CONFIG, ...JSON.parse(savedConfig) };
+        setConfig(activeConfig);
       }
     } catch (e) {
-      console.error("Lỗi khi tải cấu hình sự kiện:", e);
+      console.warn("Lỗi đọc cache cấu hình sự kiện:", e);
     }
 
-    // Sync across tabs
+    // 2. Xác định tùy chọn giao diện của User (User Preference Hierarchy)
+    // Ưu tiên đọc key mới USER_THEME_STORAGE_KEY, fallback sang THEME_STORAGE_KEY cũ
+    const savedUserPref = localStorage.getItem(USER_THEME_STORAGE_KEY) || localStorage.getItem(THEME_STORAGE_KEY);
+
+    let resolvedPref: UserThemePreference;
+    let resolvedTheme: string;
+
+    if (savedUserPref === "light") {
+      // User đã chủ động chọn "Sáng" -> Tôn trọng tuyệt đối, KHÔNG đè!
+      resolvedPref = "light";
+      resolvedTheme = "light";
+    } else if (savedUserPref === "dark") {
+      // User đã chủ động chọn "Tối" -> Tôn trọng tuyệt đối, KHÔNG đè!
+      resolvedPref = "dark";
+      resolvedTheme = "dark";
+    } else if (savedUserPref === "event" || (savedUserPref && PRESET_TEMPLATES[savedUserPref as EventTemplateId])) {
+      // User muốn xem theme sự kiện
+      resolvedPref = "event";
+      resolvedTheme = activeConfig.enabled ? activeConfig.activeTemplate : "light";
+    } else {
+      // Khách mới lần đầu truy cập: Nếu có event thì bật event, không thì light
+      if (activeConfig.enabled) {
+        resolvedPref = "event";
+        resolvedTheme = activeConfig.activeTemplate;
+      } else {
+        resolvedPref = "light";
+        resolvedTheme = "light";
+      }
+    }
+
+    setUserThemePreferenceState(resolvedPref);
+    setCurrentThemeState(resolvedTheme);
+    applyThemeToDOM(resolvedTheme, activeConfig);
+
+    // 3. Tải cấu hình mới nhất từ Backend
+    fetchRemoteConfig();
+
+    // 4. Đồng bộ sự kiện đổi theme giữa các tab trình duyệt
     const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === USER_THEME_STORAGE_KEY && e.newValue) {
+        const newPref = e.newValue as UserThemePreference;
+        setUserThemePreferenceState(newPref);
+        if (newPref === "light" || newPref === "dark") {
+          setCurrentThemeState(newPref);
+          applyThemeToDOM(newPref, activeConfig);
+        } else {
+          const themeName = activeConfig.enabled ? activeConfig.activeTemplate : "light";
+          setCurrentThemeState(themeName);
+          applyThemeToDOM(themeName, activeConfig);
+        }
+      }
       if (e.key === STORAGE_KEY && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
           setConfig(parsed);
-          if (parsed.enabled) {
-            localStorage.setItem(THEME_STORAGE_KEY, parsed.activeTemplate);
-            setCurrentThemeState(parsed.activeTemplate);
-            applyThemeToDOM(parsed.activeTemplate, parsed);
-          } else {
-            applyThemeToDOM("light", parsed);
+          const currentPref = localStorage.getItem(USER_THEME_STORAGE_KEY);
+          if (currentPref === "event" || (!currentPref && parsed.enabled)) {
+            const themeName = parsed.enabled ? parsed.activeTemplate : "light";
+            setCurrentThemeState(themeName);
+            applyThemeToDOM(themeName, parsed);
           }
-        } catch { }
-      }
-      if (e.key === THEME_STORAGE_KEY && e.newValue) {
-        setCurrentThemeState(e.newValue);
-        applyThemeToDOM(e.newValue);
+        } catch {}
       }
     };
+
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+  }, [applyThemeToDOM, fetchRemoteConfig]);
 
+  /**
+   * Chuyển đổi giao diện bởi người dùng:
+   * - "light" -> Nền sáng
+   * - "dark" -> Nền tối
+   * - "event" hoặc templateId (tet, noel, halloween...) -> Theme sự kiện
+   */
   const setTheme = (newTheme: string) => {
-    setCurrentThemeState(newTheme);
-    localStorage.setItem(THEME_STORAGE_KEY, newTheme);
-    applyThemeToDOM(newTheme, config);
+    let pref: UserThemePreference;
+    let themeToApply: string;
+
+    if (newTheme === "light") {
+      pref = "light";
+      themeToApply = "light";
+    } else if (newTheme === "dark") {
+      pref = "dark";
+      themeToApply = "dark";
+    } else {
+      pref = "event";
+      themeToApply = config.enabled ? config.activeTemplate : "light";
+    }
+
+    setUserThemePreferenceState(pref);
+    setCurrentThemeState(themeToApply);
+
+    try {
+      localStorage.setItem(USER_THEME_STORAGE_KEY, pref);
+      localStorage.setItem(THEME_STORAGE_KEY, themeToApply);
+    } catch {}
+
+    applyThemeToDOM(themeToApply, config);
   };
 
-  const updateConfig = (newFields: Partial<EventThemeConfig>) => {
-    setConfig((prev) => {
-      const updated: EventThemeConfig = {
-        ...prev,
-        ...newFields,
-        updatedAt: new Date().toISOString(),
-      };
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      } catch (err) {
-        console.error("Lỗi khi lưu cấu hình sự kiện:", err);
-      }
-
-      // Re-apply DOM theme immediately
-      if (updated.enabled) {
-        localStorage.setItem(THEME_STORAGE_KEY, updated.activeTemplate);
-        setCurrentThemeState(updated.activeTemplate);
-        applyThemeToDOM(updated.activeTemplate, updated);
-      } else {
-        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || "light";
-        applyThemeToDOM(savedTheme === updated.activeTemplate ? "light" : savedTheme, updated);
-      }
-      return updated;
-    });
+  const setUserThemePreference = (pref: UserThemePreference) => {
+    setTheme(pref);
   };
 
-  const applyPreset = (presetId: EventTemplateId) => {
+  /**
+   * Admin cập nhật cấu hình:
+   * 1. Cập nhật state nội bộ ngay lập tức
+   * 2. Lưu cache localStorage để tránh chớp giật
+   * 3. Gửi API lưu vào CSDL backend (PostgreSQL) cho toàn bộ học viên
+   */
+  const updateConfig = async (newFields: Partial<EventThemeConfig>) => {
+    const updated: EventThemeConfig = {
+      ...config,
+      ...newFields,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setConfig(updated);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    } catch (err) {
+      console.error("Lỗi khi lưu cache cấu hình sự kiện:", err);
+    }
+
+    // Nếu người dùng hiện tại đang bật event, cập nhật DOM ngay
+    const currentPref = localStorage.getItem(USER_THEME_STORAGE_KEY);
+    if (currentPref === "event" || (!currentPref && updated.enabled)) {
+      const effectiveTheme = updated.enabled ? updated.activeTemplate : "light";
+      setCurrentThemeState(effectiveTheme);
+      applyThemeToDOM(effectiveTheme, updated);
+    }
+
+    // Gửi API cập nhật CSDL Backend
+    try {
+      await api.settings.update({
+        settings: [
+          {
+            key: "SYSTEM_EVENT_THEME_CONFIG",
+            value: JSON.stringify(updated),
+            description: "Cấu hình giao diện và banner sự kiện toàn hệ thống (Tết, Noel, Halloween, Custom)",
+          },
+        ],
+      });
+    } catch (err) {
+      console.error("Lỗi khi lưu cấu hình sự kiện lên server:", err);
+    }
+  };
+
+  const applyPreset = async (presetId: EventTemplateId) => {
     const preset = PRESET_TEMPLATES[presetId];
     if (!preset) return;
+
+    // Khi admin áp dụng preset, đồng thời kích hoạt hiển thị event trên máy admin
+    localStorage.setItem(USER_THEME_STORAGE_KEY, "event");
     localStorage.setItem(THEME_STORAGE_KEY, presetId);
+    setUserThemePreferenceState("event");
     setCurrentThemeState(presetId);
-    updateConfig({
+
+    await updateConfig({
       activeTemplate: presetId,
       name: preset.name,
       icon: preset.icon,
@@ -275,11 +399,10 @@ export function EventThemeProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const toggleEvent = (enabled: boolean) => {
-    updateConfig({ enabled });
+  const toggleEvent = async (enabled: boolean) => {
+    await updateConfig({ enabled });
   };
 
-  // If enabled, the event is active across the system
   const isEventActive = config.enabled;
 
   return (
@@ -287,11 +410,14 @@ export function EventThemeProvider({ children }: { children: ReactNode }) {
       value={{
         config,
         currentTheme,
+        userThemePreference,
         isEventActive,
         setTheme,
+        setUserThemePreference,
         updateConfig,
         applyPreset,
         toggleEvent,
+        refreshConfig: fetchRemoteConfig,
       }}
     >
       {children}
@@ -306,3 +432,4 @@ export function useEventTheme() {
   }
   return context;
 }
+

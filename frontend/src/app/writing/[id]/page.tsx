@@ -632,6 +632,36 @@ function WritingExamRunnerContent() {
               questions = defaultP.questions;
             }
 
+            // Đảm bảo Part 4 luôn luôn có đủ 2 email chuẩn Aptis ESOL:
+            // 1. Email thân mật gửi bạn (khoảng 50 từ)
+            // 2. Email trang trọng gửi Quản lý CLB / Club Manager (120 - 150 từ)
+            if (partNum === 4 && questions.length === 1) {
+              const q1 = questions[0];
+              const isManager = /manager|secretary|president|formal/i.test(q1.prompt);
+              if (isManager) {
+                questions = [
+                  {
+                    questionNumber: 1,
+                    prompt: "Write an email to a friend who is also a member of the club. Tell them about your feelings regarding this notice and discuss what you should do next. Write about 50 words.",
+                    sampleAnswer: "Hi there,\n\nDid you see the recent announcement from our club? I was quite disappointed to hear about this sudden decision. What do you think we should do about it? Let me know soon.\n\nBest,\nYour friend",
+                  },
+                  {
+                    ...q1,
+                    questionNumber: 2,
+                  },
+                ];
+              } else {
+                questions = [
+                  q1,
+                  {
+                    questionNumber: 2,
+                    prompt: "Write an email to the Club Manager. Explain how you feel about the announcement, outline how this decision impacts club members, and suggest practical alternatives or solutions. Write 120–150 words.",
+                    sampleAnswer: "Dear Club Manager,\n\nI am writing to express my concern regarding the recent announcement communicated to our club members. While I appreciate the operational challenges that the management is currently addressing, I feel this sudden change will negatively impact many dedicated members.\n\nFirstly, many members have arranged their personal commitments around the existing schedule. Secondly, this change causes substantial inconvenience and dissatisfaction among regular participants. Therefore, I would respectfully propose that the club committee consider alternative measures, such as organizing a member survey or exploring flexible compromise solutions.\n\nThank you for taking the time to consider our perspective on this important matter. I look forward to hearing your response.\n\nYours sincerely,\nClub Member",
+                  },
+                ];
+              }
+            }
+
             return {
               partNumber: partNum,
               partName: p.title || defaultP.partName,
@@ -663,6 +693,15 @@ function WritingExamRunnerContent() {
   useEffect(() => {
     if (examId) loadExamData();
   }, [examId]);
+
+  // Tự động cuộn pill part đang chọn vào giữa thanh điều hướng
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const el = document.getElementById(`writing-part-pill-${currentPartIdx}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [currentPartIdx]);
 
   // Cập nhật lại thời gian theo từng Part khi đổi Part
   useEffect(() => {
@@ -1368,54 +1407,62 @@ function WritingExamRunnerContent() {
         </div>
 
         {/* Center: Quick Part Pills & Navigation Controls */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 overflow-x-auto max-w-[42vw] sm:max-w-[36vw] py-1 px-1">
-            {parts.map((p, idx) => {
-              const isCurrent = currentPartIdx === idx;
-              const isAnswered = p.questions.some((_, qIdx) => {
-                const val = answers[`${idx}_${qIdx}`];
-                return val && val.trim().length > 0;
-              });
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[42vw] sm:max-w-[44vw] md:max-w-[50vw] lg:max-w-[56vw] py-0.5 px-0.5">
+              {parts.map((p, idx) => {
+                const isCurrent = currentPartIdx === idx;
+                const isAnswered = p.questions.some((_, qIdx) => {
+                  const val = answers[`${idx}_${qIdx}`];
+                  return val && val.trim().length > 0;
+                });
 
-              return (
-                <button
-                  key={p.partNumber}
-                  type="button"
-                  onClick={() => setCurrentPartIdx(idx)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
-                    isCurrent
-                      ? "bg-primary text-primary-foreground shadow-xs scale-105"
-                      : isAnswered
-                      ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                      : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                  }`}
-                  title={p.partSubtitle}
-                >
-                  Part {p.partNumber}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={p.partNumber}
+                    id={`writing-part-pill-${idx}`}
+                    type="button"
+                    onClick={() => setCurrentPartIdx(idx)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
+                      isCurrent
+                        ? "bg-primary text-primary-foreground font-black shadow-sm ring-2 ring-primary/40 ring-offset-1 ring-offset-background scale-105"
+                        : isAnswered
+                        ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
+                        : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
+                    }`}
+                    title={p.partSubtitle}
+                  >
+                    {isAnswered && !isCurrent && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    )}
+                    <span>Part {p.partNumber}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="h-4 w-px bg-border/70 shrink-0 mx-0.5 hidden sm:block" />
+
+            <button
+              type="button"
+              onClick={() => setShowPartsDrawer(true)}
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0"
+              title="Danh sách Parts"
+              aria-label="Danh sách Parts"
+            >
+              <Menu className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0 hidden sm:flex"
+              title="Cuộn lên đầu trang"
+              aria-label="Cuộn lên đầu trang"
+            >
+              <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
           </div>
-
-          <div className="h-5 w-px bg-border/60 shrink-0 hidden sm:block" />
-
-          <button
-            type="button"
-            onClick={() => setShowPartsDrawer(true)}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors cursor-pointer"
-            title="Danh sách Parts"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors cursor-pointer hidden sm:flex"
-            title="Cuộn lên đầu trang"
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
         </div>
 
         {/* Right: Previous & Next / Submit */}

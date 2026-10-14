@@ -541,6 +541,15 @@ function ReadingExamRunner() {
     }
   }, [partParam, stages]);
 
+  // Tự động cuộn pill phần thi đang chọn vào giữa thanh điều hướng
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const el = document.getElementById(`reading-stage-pill-${activeStage}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [activeStage]);
+
   // 2. Countdown Timer
   useEffect(() => {
     if (isSubmitted || loading) return;
@@ -1002,21 +1011,36 @@ function ReadingExamRunner() {
                         </span>
                       </div>
 
-                      {/* Gaps List */}
+                      {/* Gaps List - Tách rời từng câu riêng biệt, không dính liền */}
                       <div className="space-y-4">
                         {examData.part1.gaps.map((gap, gIdx) => {
-                          const parts = gap.prompt.split(/\[(?:gap|blank|\.\.\.)\]/i);
+                          const cleanPrompt = gap.prompt || "";
+                          const hasGapMarker = /\[(?:gap|blank|\.\.\.)\]/i.test(cleanPrompt);
+                          let beforeGap = cleanPrompt;
+                          let afterGap = "";
+
+                          if (hasGapMarker) {
+                            const split = cleanPrompt.split(/\[(?:gap|blank|\.\.\.)\]/i);
+                            beforeGap = split[0];
+                            afterGap = split[1] || "";
+                          } else if (gap.correctAnswer && cleanPrompt.toLowerCase().includes(gap.correctAnswer.toLowerCase())) {
+                            const regex = new RegExp(`\\b${gap.correctAnswer}\\b`, "i");
+                            const split = cleanPrompt.split(regex);
+                            beforeGap = split[0];
+                            afterGap = split[1] || "";
+                          }
+
                           const userVal = p1Answers[gap.id] || "";
 
                           return (
                             <div
                               key={gap.id}
-                              className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-all flex flex-wrap items-center gap-2.5 text-sm md:text-base leading-relaxed"
+                              className="p-4 md:p-5 rounded-2xl border border-border bg-card hover:border-primary/50 transition-all flex flex-wrap items-center gap-3 text-sm md:text-base leading-relaxed shadow-2xs"
                             >
-                              <span className="font-bold text-xs text-primary bg-primary/10 px-2 py-0.5 rounded">
-                                {gIdx + 1}
+                              <span className="font-extrabold text-xs text-primary bg-primary/10 px-2.5 py-1 rounded-lg shrink-0">
+                                Câu {gIdx + 1}
                               </span>
-                              <span>{parts[0]}</span>
+                              <span>{beforeGap}</span>
                               <select
                                 value={userVal}
                                 onChange={(e) =>
@@ -1025,20 +1049,20 @@ function ReadingExamRunner() {
                                     [gap.id]: e.target.value,
                                   }))
                                 }
-                                className={`px-3 py-1.5 rounded-lg border text-sm font-semibold transition-all cursor-pointer outline-none ${
+                                className={`px-3 py-1.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer outline-none shadow-2xs ${
                                   userVal
-                                    ? "border-primary bg-primary/10 text-primary"
-                                    : "border-border bg-card text-muted-foreground hover:border-primary/60"
+                                    ? "border-primary bg-primary/10 text-primary font-bold"
+                                    : "border-border bg-background text-muted-foreground hover:border-primary/60"
                                 }`}
                               >
-                                <option value="">— Chọn từ —</option>
+                                <option value="">— Chọn từ khuyết —</option>
                                 {gap.options.map((opt) => (
                                   <option key={opt} value={opt}>
                                     {opt}
                                   </option>
                                 ))}
                               </select>
-                              <span>{parts[1] || ""}</span>
+                              <span>{afterGap}</span>
                             </div>
                           );
                         })}
@@ -1410,70 +1434,78 @@ function ReadingExamRunner() {
           </div>
 
           {/* Center: Quick Stage Pills & Navigation Controls */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 overflow-x-auto max-w-[42vw] sm:max-w-[36vw] py-1 px-1">
-              {stages.map((stg, idx) => {
-                const isCurrent = activeStage === idx;
-                let isComplete = false;
-                if (stg.stageKey === "p1") {
-                  isComplete =
-                    Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length ===
-                    examData.part1.gaps.length;
-                } else if (stg.stageKey === "p2-1") {
-                  const stId = examData.part2.stories[0]?.id;
-                  isComplete = !!(stId && p2Orders[stId] && p2Orders[stId].filter(Boolean).length === 4);
-                } else if (stg.stageKey === "p2-2") {
-                  const stId = examData.part2.stories[1]?.id;
-                  isComplete = !!(stId && p2Orders[stId] && p2Orders[stId].filter(Boolean).length === 4);
-                } else if (stg.stageKey === "p3") {
-                  isComplete =
-                    Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length ===
-                    examData.part3.questions.length;
-                } else if (stg.stageKey === "p4") {
-                  isComplete =
-                    Object.keys(p4Answers).filter((k) => !!p4Answers[k]).length ===
-                    examData.part4.paragraphs.length;
-                }
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm">
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[42vw] sm:max-w-[44vw] md:max-w-[50vw] lg:max-w-[56vw] py-0.5 px-0.5">
+                {stages.map((stg, idx) => {
+                  const isCurrent = activeStage === idx;
+                  let isComplete = false;
+                  if (stg.stageKey === "p1") {
+                    isComplete =
+                      Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length ===
+                      examData.part1.gaps.length;
+                  } else if (stg.stageKey === "p2-1") {
+                    const stId = examData.part2.stories[0]?.id;
+                    isComplete = !!(stId && p2Orders[stId] && p2Orders[stId].filter(Boolean).length === 4);
+                  } else if (stg.stageKey === "p2-2") {
+                    const stId = examData.part2.stories[1]?.id;
+                    isComplete = !!(stId && p2Orders[stId] && p2Orders[stId].filter(Boolean).length === 4);
+                  } else if (stg.stageKey === "p3") {
+                    isComplete =
+                      Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length ===
+                      examData.part3.questions.length;
+                  } else if (stg.stageKey === "p4") {
+                    isComplete =
+                      Object.keys(p4Answers).filter((k) => !!p4Answers[k]).length ===
+                      examData.part4.paragraphs.length;
+                  }
 
-                return (
-                  <button
-                    key={stg.stageKey}
-                    type="button"
-                    onClick={() => setActiveStage(idx)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
-                      isCurrent
-                        ? "bg-primary text-primary-foreground shadow-xs scale-105"
-                        : isComplete
-                        ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                    }`}
-                    title={stg.label}
-                  >
-                    {stg.title}
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={stg.stageKey}
+                      id={`reading-stage-pill-${idx}`}
+                      type="button"
+                      onClick={() => setActiveStage(idx)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
+                        isCurrent
+                          ? "bg-primary text-primary-foreground font-black shadow-sm ring-2 ring-primary/40 ring-offset-1 ring-offset-background scale-105"
+                          : isComplete
+                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
+                          : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
+                      }`}
+                      title={stg.label}
+                    >
+                      {isComplete && !isCurrent && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      )}
+                      <span>{stg.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="h-4 w-px bg-border/70 shrink-0 mx-0.5 hidden sm:block" />
+
+              <button
+                type="button"
+                onClick={() => setShowDrawer(true)}
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0"
+                title="Danh sách tất cả phần thi Reading"
+                aria-label="Danh sách tất cả phần thi Reading"
+              >
+                <Menu className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0 hidden sm:flex"
+                title="Cuộn lên đầu trang"
+                aria-label="Cuộn lên đầu trang"
+              >
+                <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </button>
             </div>
-
-            <div className="h-5 w-px bg-border/60 shrink-0 hidden sm:block" />
-
-            <button
-              type="button"
-              onClick={() => setShowDrawer(true)}
-              className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer"
-              title="Danh sách tất cả phần thi Reading"
-            >
-              <Menu className="w-4 h-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="p-2 rounded-xl border border-border text-muted-foreground hover:bg-muted text-xs font-bold transition-colors shrink-0 cursor-pointer hidden sm:flex"
-              title="Cuộn lên đầu trang"
-            >
-              <ArrowUp className="w-4 h-4" />
-            </button>
           </div>
 
           {/* Right: Previous & Next / Submit */}

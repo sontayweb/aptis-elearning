@@ -415,8 +415,18 @@ export default function OfficialMockExamRoom() {
                 options: opts,
                 partNumber: part.part_number,
                 partTitle: part.title,
-                partAudioUrl: part.audio_url,
-                partPassageText: part.passage_text,
+                partAudioUrl: (q as any).audio_url || (q as any).file || part.audio_url,
+                partPassageText: (() => {
+                  if (part.passage_text && part.passage_text.length > 50) return part.passage_text;
+                  const exp = q.explanation || "";
+                  if (exp.includes("--- GIẢI THÍCH ĐÁP ÁN ---")) {
+                    return exp.split("--- GIẢI THÍCH ĐÁP ÁN ---")[0].trim();
+                  }
+                  if (exp.length > 40 && !exp.toLowerCase().startsWith("đáp án chuẩn")) {
+                    return exp.trim();
+                  }
+                  return part.passage_text;
+                })(),
                 partImageUrl: part.image_url,
                 partInstructions: part.instructions,
               });
