@@ -433,21 +433,31 @@ export default function WritingPracticePage() {
               {/* CARD 2..N: Practice Exam Cards */}
               {filteredExams.map((exam, idx) => {
                 const targetUrl = `/writing/${exam.id}${tabInfo.partQuery}`;
-                const club = WRITING_CLUBS_BANK[idx % WRITING_CLUBS_BANK.length];
+                const cleanClubName = (() => {
+                  const raw = exam.title
+                    .replace(/—\s*Full Writing.*$/i, "")
+                    .replace(/-\s*Writing Part.*$/i, "")
+                    .replace(/Writing Part\s*\d+\s*[-:]*/i, "")
+                    .replace(/^Đề\s*\d+\s*[-:]*\s*/i, "")
+                    .trim();
+                  return raw || WRITING_CLUBS_BANK[idx % WRITING_CLUBS_BANK.length].clubNameEn;
+                })();
+
                 const displayTitle = (() => {
+                  const numPrefix = `Đề ${String(idx + 1).padStart(2, "0")}`;
                   if (activeTab === "full") {
-                    return exam.title.includes("—") ? exam.title : `Đề 0${idx + 1} - Full Writing: ${club.clubNameEn}`;
+                    return `${numPrefix} - ${cleanClubName} (Full Writing · 4 Parts)`;
                   }
                   if (activeTab === "p1") {
-                    return `Đề 0${idx + 1} - Writing Part 1: Form Filling (5 thông tin ngắn)`;
+                    return `${numPrefix} - ${cleanClubName}: Form Filling (5 thông tin)`;
                   }
                   if (activeTab === "p2") {
-                    return `Đề 0${idx + 1} - ${club.clubNameEn} (Điền Form gia nhập CLB)`;
+                    return `${numPrefix} - ${cleanClubName}: Form gia nhập CLB (20-30 từ)`;
                   }
                   if (activeTab === "p3") {
-                    return `Đề 0${idx + 1} - ${club.clubNameEn} (Chat 3 thành viên CLB)`;
+                    return `${numPrefix} - ${cleanClubName}: Trò chuyện 3 thành viên`;
                   }
-                  return `Đề 0${idx + 1} - ${club.clubNameEn} (Email Bạn & Quản Lý CLB)`;
+                  return `${numPrefix} - ${cleanClubName}: Thư Bạn & Thư Quản Lý CLB`;
                 })();
 
                 return (

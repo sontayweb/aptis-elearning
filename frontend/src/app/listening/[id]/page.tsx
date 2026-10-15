@@ -644,9 +644,10 @@ function ListeningExamRunnerContent() {
 
       // Part 2: Speakers matching
       if (pNum === 2 || pTitle.includes("part 2") || pTitle.includes("speaker")) {
+        const p2Candidate = questions.find((q: any) => q.explanation || q.transcript);
         const p2Script = extractTranscriptFromExplanation(
-          questions[0]?.explanation,
-          p.passage_text || p.transcript || p.suggestion
+          p2Candidate?.explanation,
+          p.passage_text || p.transcript || p2Candidate?.transcript || p.suggestion
         );
         if (p2Script) {
           (result.part2 as any).passageText = p2Script;
@@ -678,6 +679,7 @@ function ListeningExamRunnerContent() {
             speaker: q.prompt && isNaN(Number(q.prompt)) ? q.prompt : `Speaker ${String.fromCharCode(65 + idx)}`,
             correctAnswer: q.correct_answer || "",
             explanation: q.explanation || "",
+            transcript: q.transcript || p2Script || "",
           }));
           result.part2.speakers = spkList;
           if (p.instructions) result.part2.instructions = p.instructions;
@@ -686,9 +688,10 @@ function ListeningExamRunnerContent() {
 
       // Part 3: Opinion discussion
       if (pNum === 3 || pTitle.includes("part 3") || pTitle.includes("opinion")) {
+        const p3Candidate = questions.find((q: any) => q.explanation || q.transcript);
         const p3Script = extractTranscriptFromExplanation(
-          questions[0]?.explanation,
-          p.passage_text || p.transcript || p.suggestion
+          p3Candidate?.explanation,
+          p.passage_text || p.transcript || p3Candidate?.transcript || p.suggestion
         );
         if (p3Script) {
           (result.part3 as any).passageText = p3Script;
@@ -714,6 +717,7 @@ function ListeningExamRunnerContent() {
               statement: q.prompt,
               correctAnswer: cor,
               explanation: q.explanation || "",
+              transcript: q.transcript || p3Script || "",
             };
           });
           result.part3.opinions = opList;
@@ -740,6 +744,7 @@ function ListeningExamRunnerContent() {
               options: opts,
               correctAnswer: q.correct_answer || opts[0] || "",
               explanation: q.explanation || "",
+              transcript: q.transcript || "",
             };
           });
 
@@ -749,18 +754,21 @@ function ListeningExamRunnerContent() {
             const resolvedP4Audio = p4RawAudio && !p4RawAudio.startsWith("http") && !p4RawAudio.startsWith("/")
               ? `/uploads/audio/listening/${p4RawAudio}`
               : p4RawAudio;
+            const q1Candidate = questions.slice(0, 2).find((q: any) => q.explanation || q.transcript);
+            const q2Candidate = questions.slice(2, 4).find((q: any) => q.explanation || q.transcript);
             const p4Script1 = extractTranscriptFromExplanation(
-              qList[0]?.explanation,
-              p.passage_text || p.transcript || p.suggestion
+              q1Candidate?.explanation,
+              p.passage_text || p.transcript || q1Candidate?.transcript || p.suggestion
             );
             const p4Script2 = extractTranscriptFromExplanation(
-              qList[2]?.explanation,
-              p.passage_text || p.transcript || p.suggestion
+              q2Candidate?.explanation,
+              p.passage_text || p.transcript || q2Candidate?.transcript || p.suggestion
             );
             recordings.push({
               recNum: 1,
               title: "Recording 1 of 2",
               passageText: p4Script1,
+              transcript: p4Script1,
               translationText: p.translation_text || p.passage_translation || "",
               audioUrl: resolvedP4Audio,
               questions: qList.slice(0, 2),
@@ -769,6 +777,7 @@ function ListeningExamRunnerContent() {
               recNum: 2,
               title: "Recording 2 of 2",
               passageText: p4Script2 || p4Script1,
+              transcript: p4Script2 || p4Script1,
               translationText: p.translation_text || p.passage_translation || "",
               audioUrl: resolvedP4Audio,
               questions: qList.slice(2, 4),
@@ -782,6 +791,7 @@ function ListeningExamRunnerContent() {
               recNum: 1,
               title: "Recording 1",
               passageText: p.passage_text || "",
+              transcript: p.transcript || p.passage_text || "",
               translationText: p.translation_text || p.passage_translation || "",
               audioUrl: p.audio_url || "",
               questions: qList,
@@ -810,22 +820,22 @@ function ListeningExamRunnerContent() {
     if (!currentStage) return "";
     if (currentStage.partNum === 1) {
       const q = examData.part1[currentStage.subIndex];
-      return q?.transcript || (q ? `Question ${q.num}. ${q.prompt}` : "");
+      return q?.transcript || "";
     } else if (currentStage.partNum === 2) {
       return (
         (examData.part2 as any).transcript ||
         (examData.part2 as any).passageText ||
-        `Part 2. Four people are talking. ${examData.part2.speakers.map((s) => s.speaker + ". " + s.correctAnswer).join(". ")}`
+        ""
       );
     } else if (currentStage.partNum === 3) {
       return (
         (examData.part3 as any).transcript ||
         (examData.part3 as any).passageText ||
-        `Part 3. A man and a woman are discussing: ${examData.part3.topic}. ${examData.part3.opinions.map((o) => o.statement).join(". ")}`
+        ""
       );
     } else if (currentStage.partNum === 4) {
       const rec = examData.part4[currentStage.subIndex];
-      return (rec as any)?.transcript || rec?.passageText || "Monologue presentation.";
+      return (rec as any)?.transcript || rec?.passageText || "";
     }
     return "";
   };

@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { prisma } from '../../config/database';
 import { ExamFilterInput, CustomExamBuilderInput } from './exam.dto';
 import { assertProAccess } from '../../utils/pro-guard';
@@ -472,9 +474,102 @@ export class ExamService {
       await assertProAccess(userId, 'Đề thi PRO');
     }
 
-    // BẢO MẬT: Tuyệt đối không để lộ explanation cho các kỹ năng trắc nghiệm (LISTENING, READING, GRAMMAR, FULL_TEST) khi chưa nộp bài
-    if (exam.skill !== 'SPEAKING' && exam.skill !== 'WRITING') {
-      for (const part of exam.parts) {
+    // Xử lý bảo mật & trích xuất transcript thoại cho LISTENING trước khi xóa explanation
+    function extractListeningTranscript(rawExp?: string | null): string {
+      if (!rawExp) return '';
+      if (rawExp.includes('--- GIẢI THÍCH ĐÁP ÁN ---')) {
+        return rawExp.split('--- GIẢI THÍCH ĐÁP ÁN ---')[0].trim();
+      }
+      if (rawExp.includes('--- GỢI Ý / BẢN DỊCH ---')) {
+        return rawExp.split('--- GỢI Ý / BẢN DỊCH ---')[0].trim();
+      }
+      if (rawExp.length > 20 && !rawExp.toLowerCase().startsWith('đáp án')) {
+        return rawExp.trim();
+      }
+      return '';
+    }
+
+    for (const part of exam.parts) {
+      const isListeningPart =
+        exam.skill === 'LISTENING' ||
+        part.title.toLowerCase().includes('listening') ||
+        (part.part_number <= 4 && exam.skill === 'FULL_TEST' && part.title.toLowerCase().includes('part'));
+
+      if (isListeningPart) {
+        const audioDir = path.resolve(process.env.UPLOAD_DIR || './uploads', 'audio', 'listening');
+        const existingFiles = fs.existsSync(audioDir) ? fs.readdirSync(audioDir) : [];
+
+        if (part.part_number === 1 || part.title.toLowerCase().includes('part 1')) {
+          for (let i = 0; i < part.questions.length; i++) {
+            const q = part.questions[i];
+            const transcript = extractListeningTranscript(q.explanation);
+            if (transcript) {
+              (q as any).transcript = transcript;
+            }
+            const qNumStr = String(i + 1).padStart(2, '0');
+            const matchingAudio = existingFiles.find(
+              (f) => f.startsWith(`de01_p1_q${qNumStr}_`) && f.endsWith('.mp3')
+            );
+            if (matchingAudio) {
+              (q as any).audio_url = `/uploads/audio/listening/${matchingAudio}`;
+            }
+          }
+        } else if (part.part_number === 2 || part.title.toLowerCase().includes('part 2')) {
+          const qWithExp = part.questions.find((q) => q.explanation && q.explanation.length > 30);
+          const transcript = extractListeningTranscript(qWithExp?.explanation || part.passage_text);
+          if (transcript) {
+            (part as any).passage_text = transcript;
+            (part as any).transcript = transcript;
+            for (const q of part.questions) {
+              (q as any).transcript = transcript;
+            }
+          }
+          const p2Audio = existingFiles.find((f) => f.startsWith('de01_p2_speakers_') && f.endsWith('.mp3'));
+          if (p2Audio) {
+            part.audio_url = `/uploads/audio/listening/${p2Audio}`;
+          }
+        } else if (part.part_number === 3 || part.title.toLowerCase().includes('part 3')) {
+          const qWithExp = part.questions.find((q) => q.explanation && q.explanation.length > 30);
+          const transcript = extractListeningTranscript(qWithExp?.explanation || part.passage_text);
+          if (transcript) {
+            (part as any).passage_text = transcript;
+            (part as any).transcript = transcript;
+            for (const q of part.questions) {
+              (q as any).transcript = transcript;
+            }
+          }
+          const p3Audio = existingFiles.find((f) => f.startsWith('de01_p3_discussion_') && f.endsWith('.mp3'));
+          if (p3Audio) {
+            part.audio_url = `/uploads/audio/listening/${p3Audio}`;
+          }
+        } else if (part.part_number === 4 || part.title.toLowerCase().includes('part 4')) {
+          const q1Exp = part.questions.slice(0, 2).find((q) => q.explanation && q.explanation.length > 30);
+          const q2Exp = part.questions.slice(2, 4).find((q) => q.explanation && q.explanation.length > 30);
+          const t1 = extractListeningTranscript(q1Exp?.explanation);
+          const t2 = extractListeningTranscript(q2Exp?.explanation);
+          if (t1) {
+            part.questions.slice(0, 2).forEach((q) => ((q as any).transcript = t1));
+          }
+          if (t2) {
+            part.questions.slice(2, 4).forEach((q) => ((q as any).transcript = t2));
+          }
+          if (t1 || t2) {
+            (part as any).passage_text = t1 || t2;
+            (part as any).transcript = t1 || t2;
+          }
+          const p4Rec1Audio = existingFiles.find((f) => f.startsWith('de01_p4_rec1_') && f.endsWith('.mp3'));
+          const p4Rec2Audio = existingFiles.find((f) => f.startsWith('de01_p4_rec2_') && f.endsWith('.mp3'));
+          if (p4Rec1Audio) {
+            part.questions.slice(0, 2).forEach((q) => ((q as any).audio_url = `/uploads/audio/listening/${p4Rec1Audio}`));
+          }
+          if (p4Rec2Audio) {
+            part.questions.slice(2, 4).forEach((q) => ((q as any).audio_url = `/uploads/audio/listening/${p4Rec2Audio}`));
+          }
+        }
+      }
+
+      // BẢO MẬT: Tuyệt đối không để lộ explanation cho các kỹ năng trắc nghiệm khi chưa nộp bài
+      if (exam.skill !== 'SPEAKING' && exam.skill !== 'WRITING') {
         for (const q of part.questions) {
           delete (q as any).explanation;
         }

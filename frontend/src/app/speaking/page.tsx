@@ -256,9 +256,9 @@ export default function SpeakingPracticePage() {
           partQuery: "?part=4",
           marathonText: "Luyện Nói Liên Tục 2 Phút Part 4",
           marathonDesc: "Hiển thị cùng lúc 3 câu hỏi, chuẩn 1 phút chuẩn bị + 2 phút nói liên tục",
-          marathonBtn: "Luyện đề Part 4 →",
-          marathonType: "marathon",
-          marathonUrl: "/speaking/marathon?part=1",
+          marathonBtn: "Chọn đề luyện Part 4 bên dưới ↓",
+          marathonType: "custom",
+          marathonUrl: "#exam-grid",
         };
     }
   };
