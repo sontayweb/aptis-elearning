@@ -41,6 +41,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
+import AdminPageHeader from "@/components/admin/admin-page-header";
 import { useAuth } from "@/contexts/auth-context";
 
 interface UserItem {
@@ -647,93 +648,51 @@ export default function AdminUsersPage() {
         onCancel={() => setConfirmModal({ isOpen: false, title: "", message: "" })}
       />
 
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
-            <Users className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-            <span>Quản trị Học viên & Tài khoản</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight">
-            Quản Lý Tài Khoản Học Viên
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
-            Tra cứu theo SĐT/Email, cấp gia hạn VIP 1 chạm, điều phối lượt chấm AI và xử lý tài vụ khẩn cấp
-          </p>
+      {/* Top Header — Sử dụng AdminPageHeader dùng chung */}
+      <AdminPageHeader
+        stats={[
+          { icon: Users, value: totalCount, label: "tài khoản" },
+          { icon: Crown, value: vipCount, label: "VIP", iconColor: "text-amber-500" },
+          { icon: GraduationCap, value: teacherCount, label: "giảng viên", iconColor: "text-blue-500" },
+          { icon: ShieldCheck, value: `${activeRate}%`, label: "hoạt động", iconColor: "text-emerald-500" },
+        ]}
+        showMetricsToggle
+        showMetrics={showMetrics}
+        metricsLabel="Chỉ số chi tiết"
+        onToggleMetrics={toggleMetrics}
+        actions={
+          <>
+            <button
+              onClick={() => handleExportCSV(false)}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-heading font-semibold transition-all shadow-2xs flex items-center gap-1"
+              title="Xuất file danh sách ra Excel/CSV"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Xuất Excel</span>
+            </button>
 
-          {/* Compact Inline Metrics Strip (Clean Subtext & Subtle Neutral Chips) */}
-          {!showMetrics && (
-            <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
-              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
-                Chỉ số nhanh:
-              </span>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                <Users className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-                <span>Tổng: <strong className="text-slate-900 dark:text-white font-mono">{totalCount}</strong></span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
-                <span>VIP: <strong className="text-slate-900 dark:text-white font-mono">{vipCount}</strong></span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                <GraduationCap className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-                <span>Giảng viên: <strong className="text-slate-900 dark:text-white font-mono">{teacherCount}</strong></span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                <span>Hoạt động: <strong className="text-slate-900 dark:text-white font-mono">{activeRate}%</strong></span>
-              </div>
-            </div>
-          )}
-        </div>
+            <button
+              onClick={() => {
+                setBulkResult(null);
+                setBulkFile(null);
+                setBulkModalOpen(true);
+              }}
+              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-heading font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-1"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              <span>Nhập từ Excel</span>
+            </button>
 
-        <div className="flex items-center gap-2">
-          {/* Smart Toggle Button for 4 KPI Cards */}
-          <button
-            type="button"
-            onClick={toggleMetrics}
-            className={`px-3.5 py-2 rounded-xl border text-xs font-heading font-semibold transition-all flex items-center gap-1.5 shadow-2xs ${
-              showMetrics
-                ? "bg-slate-900 dark:bg-slate-800 text-white border-slate-900 dark:border-slate-700 shadow-sm"
-                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
-            }`}
-            title={showMetrics ? "Thu gọn 4 thẻ chỉ số để giải phóng không gian bảng" : "Mở rộng 4 thẻ chỉ số thống kê"}
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>{showMetrics ? "Thu gọn chỉ số" : "Chỉ số chi tiết"}</span>
-            {showMetrics ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </button>
-
-          <button
-            onClick={() => handleExportCSV(false)}
-            className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
-            title="Xuất file danh sách ra Excel/CSV"
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span className="hidden sm:inline">Xuất Excel</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setBulkResult(null);
-              setBulkFile(null);
-              setBulkModalOpen(true);
-            }}
-            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
-          >
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>Nhập từ Excel</span>
-          </button>
-
-          <button
-            onClick={() => setCreateModalOpen(true)}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Thêm tài khoản</span>
-          </button>
-        </div>
-      </div>
+            <button
+              onClick={() => setCreateModalOpen(true)}
+              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-heading font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-1"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Thêm tài khoản</span>
+            </button>
+          </>
+        }
+      />
 
       {/* 4-Card Executive KPI Metrics Strip (Collapsible via Smart Toggle) */}
       {showMetrics && (

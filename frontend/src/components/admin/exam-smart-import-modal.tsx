@@ -210,14 +210,14 @@ export default function ExamSmartImportModal({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                  Nhập Đề Thi Chuẩn Doanh Nghiệp
+                  Thêm đề thi từ file có sẵn
                 </h3>
-                <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                  Semantic Ingestion
+                <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                  Tự động xử lý
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Nhập đề tự động theo file Word/Excel chuẩn hóa — Kiểm định tự động, không lo lỗi format
+                Soạn đề theo mẫu có sẵn → tải lên → hệ thống tự nhận diện và lưu vào ngân hàng đề
               </p>
             </div>
           </div>
@@ -246,7 +246,7 @@ export default function ExamSmartImportModal({
             >
               1
             </span>
-            <span>Tải File Mẫu & Tải Lên</span>
+            <span>Chọn mẫu & Tải lên</span>
           </div>
           <ChevronRight className="w-4 h-4 text-slate-400" />
           <div
@@ -266,7 +266,7 @@ export default function ExamSmartImportModal({
             >
               2
             </span>
-            <span>Kiểm Định & Xem Trước (Preview)</span>
+            <span>Xem trước kết quả</span>
           </div>
           <ChevronRight className="w-4 h-4 text-slate-400" />
           <div
@@ -283,7 +283,7 @@ export default function ExamSmartImportModal({
             >
               3
             </span>
-            <span>Hoàn Tất & Lưu</span>
+            <span>Lưu vào hệ thống</span>
           </div>
         </div>
 
@@ -305,9 +305,9 @@ export default function ExamSmartImportModal({
             <div className="space-y-6">
               {/* SECTION: TẢI FILE MẪU */}
               <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                   <Download className="w-4 h-4 text-blue-600" />
-                  Bước 1: Tải bộ khung mẫu chuẩn của hệ thống
+                  Bước 1: Tải file mẫu về máy và điền đề vào đó
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {templates.map((tpl, idx) => (
@@ -356,35 +356,35 @@ export default function ExamSmartImportModal({
 
               {/* SECTION: QUY ƯỚC CÁC THẺ */}
               <div className="p-4 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-800/50">
-                <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300 mb-2">
                   <Info className="w-4 h-4 text-blue-600" />
-                  Quy ước thẻ chuẩn trong file Word (.docx)
+                  File Word (.docx) dùng các từ khóa đặc biệt để phân tách đề:
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
                     <span className="font-bold text-blue-600">=== [ĐỀ MỚI] ===</span>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Bắt đầu 1 đề mới</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Dòng này = bắt đầu 1 đề mới</p>
                   </div>
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
                     <span className="font-bold text-blue-600">[PHẦN THI]:</span>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Speaking Part 2 / 3</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Tên phần thi, vd: Part 2</p>
                   </div>
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
                     <span className="font-bold text-blue-600">[HÌNH ẢNH]:</span>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Chèn ảnh trực tiếp</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Chèn ảnh ngay bên dưới</p>
                   </div>
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
                     <span className="font-bold text-blue-600">[TỪ VỰNG]:</span>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Bảng 2 cột Anh - Việt</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Bảng 2 cột: Anh | Việt</p>
                   </div>
                 </div>
               </div>
 
               {/* SECTION: DROPZONE UPLOAD */}
               <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                   <UploadCloud className="w-4 h-4 text-blue-600" />
-                  Bước 2: Tải lên tệp đã soạn thảo (.docx hoặc .xlsx)
+                  Bước 2: Tải file đã điền lên đây
                 </h4>
                 <div
                   onDragOver={handleDragOver}
@@ -414,12 +414,12 @@ export default function ExamSmartImportModal({
                   <div>
                     <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
                       {isValidating
-                        ? "Đang phân tích cấu trúc & kiểm định..."
-                        : "Kéo thả file Word/Excel vào đây, hoặc nhấn để chọn"}
+                        ? "Đang đọc file và kiểm tra nội dung..."
+                        : "Kéo thả file vào đây, hoặc nhấn để chọn"}
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      Hỗ trợ tập tin: <span className="font-semibold text-blue-600">.docx</span> (Speaking,
-                      Writing có kèm ảnh) hoặc <span className="font-semibold text-emerald-600">.xlsx</span>{" "}
+                      Nhận file <span className="font-semibold text-blue-600">.docx</span> (Speaking,
+                      Writing — có ảnh minh họa) và <span className="font-semibold text-emerald-600">.xlsx</span>{" "}
                       (Reading, Listening)
                     </p>
                   </div>
@@ -464,9 +464,9 @@ export default function ExamSmartImportModal({
 
               {/* LIST OF EXAMS PREVIEW */}
               <div className="space-y-4">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Eye className="w-4 h-4 text-blue-600" />
-                  Danh sách đề bóc tách được từ tệp:
+                  Hệ thống đã đọc được {validationResult.totalFound} đề từ file của bạn:
                 </h4>
 
                 <div className="space-y-3 max-h-[45vh] overflow-y-auto pr-1">

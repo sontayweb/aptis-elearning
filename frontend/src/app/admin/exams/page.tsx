@@ -48,6 +48,9 @@ import {
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
 import ExamSmartImportModal from "@/components/admin/exam-smart-import-modal";
+import AdminPageHeader from "@/components/admin/admin-page-header";
+import AdminFilterBar from "@/components/admin/admin-filter-bar";
+import AdminTableCard from "@/components/admin/admin-table-card";
 
 interface ExamItem {
   id: string;
@@ -70,6 +73,20 @@ export default function AdminExamsPage() {
   const [loading, setLoading] = useState(true);
   const [openMenuExamId, setOpenMenuExamId] = useState<string | null>(null);
   const [smartImportOpen, setSmartImportOpen] = useState(false);
+  const [importDropdownOpen, setImportDropdownOpen] = useState(false);
+
+  // Close importDropdown on outside click
+  useEffect(() => {
+    if (!importDropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("[data-import-dropdown]")) {
+        setImportDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [importDropdownOpen]);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -550,93 +567,48 @@ export default function AdminExamsPage() {
         </div>
       )}
 
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
-            <BookOpen className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-            <span>Ngân Hàng Khảo Thí & Đề Thi</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <span>Ngân hàng Đề thi Aptis</span>
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
-            Quản trị ngân hàng đề thi chuẩn British Council ESOL, phân phối kỹ năng, xuất bản và giám sát lượt làm bài
-          </p>
+      {/* Top Header — Sử dụng AdminPageHeader dùng chung */}
+      <AdminPageHeader
+        stats={[
+          { icon: BookOpen, value: totalCount || exams.length, label: "đề" },
+          { icon: Sparkles, value: fullTestCount, label: "Full Test", iconColor: "text-purple-400" },
+          { icon: Crown, value: proCount, label: "VIP", subValue: `(${freeCount} Free)`, iconColor: "text-amber-500" },
+          { icon: CheckCircle2, value: totalAttempts, label: "lượt thi", iconColor: "text-emerald-500" },
+        ]}
+        showMetricsToggle
+        showMetrics={showMetrics}
+        metricsLabel="Chỉ số chi tiết"
+        onToggleMetrics={toggleMetrics}
+        actions={
+          <>
+            <button
+              onClick={() => setSmartImportOpen(true)}
+              className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/70 bg-blue-50/70 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-[11px] font-heading font-semibold transition-all flex items-center gap-1"
+              title="Nhập đề từ file Word/Excel chuẩn"
+            >
+              <UploadCloud className="w-3 h-3 text-blue-500" />
+              <span>Nhập File Chuẩn</span>
+            </button>
 
-          {/* Compact Inline Metrics Strip (Subtle Neutral Gray Chips per Guideline 2) */}
-          {!showMetrics && (
-            <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
-              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
-                Chỉ số nhanh:
-              </span>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                <BookOpen className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-                <span>Tổng: <strong className="text-slate-900 dark:text-white font-mono">{totalCount || exams.length}</strong> đề</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                <Sparkles className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-                <span>Full Test: <strong className="text-slate-900 dark:text-white font-mono">{fullTestCount}</strong></span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
-                <span>VIP PRO: <strong className="text-slate-900 dark:text-white font-mono">{proCount}</strong> ({freeCount} Free)</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                <span>Lượt thi: <strong className="text-slate-900 dark:text-white font-mono">{totalAttempts}</strong></span>
-              </div>
-            </div>
-          )}
-        </div>
+            <button
+              onClick={() => setJsonModalOpen(true)}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-heading font-semibold transition-all flex items-center gap-1"
+              title="Nhập đề cấu trúc JSON"
+            >
+              <FileCode className="w-3 h-3 text-slate-400" />
+              <span>Nhập JSON</span>
+            </button>
 
-        <div className="flex items-center gap-2">
-          {/* Smart Toggle Button */}
-          <button
-            type="button"
-            onClick={toggleMetrics}
-            className={`px-3.5 py-2 rounded-xl border text-xs font-heading font-semibold transition-all flex items-center gap-1.5 shadow-2xs ${
-              showMetrics
-                ? "bg-slate-900 dark:bg-slate-800 text-white border-slate-900 dark:border-slate-700 shadow-sm"
-                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
-            }`}
-            title={showMetrics ? "Thu gọn 4 thẻ chỉ số để giải phóng không gian danh sách" : "Mở rộng 4 thẻ chỉ số thống kê"}
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>{showMetrics ? "Thu gọn chỉ số" : "Chỉ số chi tiết"}</span>
-            {showMetrics ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </button>
-
-          <button
-            onClick={() => setSmartImportOpen(true)}
-            className="px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-800/80 bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
-            title="Nhập đề thi chuẩn hóa từ file Word (.docx) hoặc Excel (.xlsx)"
-          >
-            <UploadCloud className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            <span>Nhập File Chuẩn</span>
-          </button>
-
-          <button
-            onClick={() => setJsonModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold transition-all shadow-2xs flex items-center gap-1.5"
-            title="Nhập đề thi cấu trúc JSON"
-          >
-            <FileCode className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span className="hidden sm:inline">Nhập JSON</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setWizardStep(1);
-              setWizardOpen(true);
-            }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-heading font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Tạo đề thi mới</span>
-          </button>
-        </div>
-      </div>
+            <button
+              onClick={() => { setWizardStep(1); setWizardOpen(true); }}
+              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-heading font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-1"
+            >
+              <Plus className="w-3 h-3" />
+              <span>Tạo đề thi mới</span>
+            </button>
+          </>
+        }
+      />
 
       {/* 4 Executive KPI Cards (Collapsible via Smart Toggle) */}
       {showMetrics && (
@@ -703,81 +675,62 @@ export default function AdminExamsPage() {
         </div>
       )}
 
-      {/* Skill Filters & Search */}
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm theo tên đề thi..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-sans"
+      {/* Skill Filters & Search — Sử dụng AdminFilterBar dùng chung */}
+      <AdminFilterBar
+        searchPlaceholder="Tìm theo tên đề thi..."
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        tabs={[
+          { id: "ALL", label: "Tất cả" },
+          { id: "FULL_TEST", label: "Full Test" },
+          { id: "LISTENING", label: "Listening" },
+          { id: "READING", label: "Reading" },
+          { id: "SPEAKING", label: "Speaking" },
+          { id: "WRITING", label: "Writing" },
+        ]}
+        activeTab={skillFilter}
+        onTabChange={(id) => {
+          setSkillFilter(id);
+          setPage(1);
+        }}
+        onRefresh={fetchExams}
+        isRefreshing={loading}
+      >
+        {/* Hot level filter — compact select */}
+        <select
+          value={hotFilter}
+          onChange={(e) => setHotFilter(e.target.value)}
+          className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-heading font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500/20 shrink-0"
+          title="Lọc theo độ hot"
+        >
+          <option value="ALL">🔥 Hot</option>
+          <option value="HOT_ALL">⭐ Có sao</option>
+          <option value="HOT_3">🔥 3⭐ Đề tủ</option>
+          <option value="HOT_2">⭐⭐ 2⭐ Hot</option>
+          <option value="HOT_1">⭐ 1⭐ Ôn tập</option>
+          <option value="HOT_0">⚪ Chưa gán</option>
+        </select>
+      </AdminFilterBar>
+
+      {/* Exams Grid Table — Sử dụng AdminTableCard dùng chung */}
+      <AdminTableCard
+        pagination={
+          <AdminPagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalItems={totalCount || sortedExams.length}
+            pageSize={pageSize}
+            pageSizeOptions={[10, 15, 25, 50]}
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setPage(1);
+            }}
+            itemName="đề thi"
           />
-        </div>
-
-        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto">
-          <div className="p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 flex items-center gap-1 overflow-x-auto">
-            {[
-              { id: "ALL", label: "Tất cả kỹ năng" },
-              { id: "FULL_TEST", label: "Full Test" },
-              { id: "LISTENING", label: "Listening" },
-              { id: "READING", label: "Reading" },
-              { id: "SPEAKING", label: "Speaking" },
-              { id: "WRITING", label: "Writing" },
-              { id: "GRAMMAR_VOCABULARY", label: "Grammar & Vocab" },
-            ].map((tab) => {
-              const isActive = skillFilter === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setSkillFilter(tab.id);
-                    setPage(1);
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all ${
-                    isActive
-                      ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold ring-1 ring-slate-900/5 dark:ring-white/10"
-                      : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Hot Level Filter */}
-          <div className="shrink-0">
-            <select
-              value={hotFilter}
-              onChange={(e) => setHotFilter(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500/20"
-              title="Lọc đề thi theo mức độ hot / dự đoán đề tủ"
-            >
-              <option value="ALL">🔥 Tất cả độ hot</option>
-              <option value="HOT_ALL">⭐ Chỉ đề Hot (≥1⭐)</option>
-              <option value="HOT_3">🔥🔥🔥 Đề tủ (3⭐)</option>
-              <option value="HOT_2">⭐⭐ Đề Hot (2⭐)</option>
-              <option value="HOT_1">⭐ Ôn tập (1⭐)</option>
-              <option value="HOT_0">⚪ Mặc định (0⭐)</option>
-            </select>
-          </div>
-
-          <button
-            onClick={fetchExams}
-            title="Làm mới danh sách đề thi"
-            className="p-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors border border-slate-200 dark:border-slate-700 shrink-0"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-slate-900 dark:text-white" : ""}`} />
-          </button>
-        </div>
-      </div>
-
-      {/* Exams Grid Table */}
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        }
+      >
+        <table className="w-full text-left text-xs">
             <thead className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200/80 dark:border-slate-700/80 text-slate-500 dark:text-slate-400 font-heading font-bold uppercase tracking-wider text-[10px]">
               <tr>
                 <SortableHeader
@@ -802,14 +755,7 @@ export default function AdminExamsPage() {
                 />
                 <SortableHeader
                   field="durationMinutes"
-                  title="Thời lượng"
-                  currentSort={sortState}
-                  onSort={handleSort}
-                  align="right"
-                />
-                <SortableHeader
-                  field="questionsCount"
-                  title="Cấu trúc đề"
+                  title="Thời lượng / Cấu trúc"
                   currentSort={sortState}
                   onSort={handleSort}
                   align="right"
@@ -823,7 +769,7 @@ export default function AdminExamsPage() {
                 />
                 <SortableHeader
                   field="isPro"
-                  title="Gói truy cập"
+                  title="Gói"
                   currentSort={sortState}
                   onSort={handleSort}
                   align="center"
@@ -841,7 +787,7 @@ export default function AdminExamsPage() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium text-slate-900 dark:text-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="py-16 text-center text-slate-400 dark:text-slate-500">
+                  <td colSpan={8} className="py-16 text-center text-slate-400 dark:text-slate-500">
                     <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-slate-600 dark:text-slate-400" />
                     Đang tải danh sách đề thi...
                   </td>
@@ -889,7 +835,7 @@ export default function AdminExamsPage() {
                         <button
                           type="button"
                           onClick={() => handleCycleHotLevel(exam)}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-heading font-bold border transition-all hover:scale-105 active:scale-95"
+                          className="inline-flex items-center gap-1 rounded-full text-[10px] font-heading font-bold border-transparent transition-all hover:scale-105 active:scale-95"
                           title="Bấm để đổi nhanh mức độ hot (0⭐ -> 1⭐ -> 2⭐ -> 3⭐)"
                         >
                           {exam.hotLevel === 3 ? (
@@ -914,24 +860,15 @@ export default function AdminExamsPage() {
                           )}
                         </button>
                       </td>
-
-                      {/* Duration (Right aligned per UX Guideline 5) */}
+                      {/* Duration + Structure merged */}
                       <td className="py-3.5 px-4 text-right">
-                        <span className="inline-flex items-center gap-1.5 font-mono text-slate-700 dark:text-slate-300 font-medium">
-                          <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                          {exam.durationMinutes}p
-                        </span>
-                      </td>
-
-                      {/* Structure (Right aligned per UX Guideline 5) */}
-                      <td className="py-3.5 px-4 text-right">
-                        <span className="font-heading font-semibold text-slate-900 dark:text-white">
-                          {exam.partsCount} phần
-                        </span>{" "}
-                        <span className="text-slate-300 dark:text-slate-600">•</span>{" "}
-                        <span className="text-slate-500 dark:text-slate-400 font-normal">
-                          {exam.questionsCount} câu
-                        </span>
+                        <div className="inline-flex items-center gap-1 font-mono text-slate-700 dark:text-slate-300 font-medium">
+                          <Clock className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                          <span>{exam.durationMinutes}p</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                          {exam.partsCount} phần · {exam.questionsCount} câu
+                        </div>
                       </td>
 
                       {/* Live Toggle: Published vs Draft (Centered per UX Guideline 5) */}
@@ -1073,23 +1010,7 @@ export default function AdminExamsPage() {
               )}
             </tbody>
           </table>
-        </div>
-
-        {/* Standard Admin Pagination Footer */}
-        <AdminPagination
-          currentPage={page}
-          totalPages={totalPages}
-          totalItems={totalCount || sortedExams.length}
-          pageSize={pageSize}
-          pageSizeOptions={[10, 15, 25, 50]}
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newSize) => {
-            setPageSize(newSize);
-            setPage(1);
-          }}
-          itemName="đề thi"
-        />
-      </div>
+      </AdminTableCard>
 
       {/* MODAL 1: PREVIEW EXAM */}
       {previewExam && (

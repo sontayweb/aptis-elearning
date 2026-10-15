@@ -406,7 +406,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       isCollapsed ? "justify-center w-full py-2 px-0" : "justify-between px-3 py-2"
                     } rounded-xl font-heading font-medium text-[13px] transition-all duration-150 ${
                       isActive
-                        ? "bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-semibold shadow-md shadow-blue-500/25 ring-1 ring-blue-400/30"
+                        ? "bg-slate-900 text-white dark:bg-blue-600 dark:text-white font-semibold shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80"
                     }`}
                   >
