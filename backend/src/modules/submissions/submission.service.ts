@@ -257,7 +257,10 @@ export class SubmissionService {
         questionsMap.set(q.id, q);
         if (
           q.question_type === QuestionType.ESSAY ||
-          q.question_type === QuestionType.SPEAKING_AUDIO
+          q.question_type === QuestionType.SPEAKING_AUDIO ||
+          q.question_type === QuestionType.SHORT_TEXT ||
+          submission.exam.skill === 'WRITING' ||
+          submission.exam.skill === 'SPEAKING'
         ) {
           hasSubjective = true;
         }

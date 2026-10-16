@@ -544,7 +544,7 @@ export default function WritingPracticePage() {
                       <div>
                         {activeTab !== "p1" && (
                           <p className="text-[11px] text-primary font-bold mb-1 flex items-center gap-1">
-                            <span>🏛️ {club.clubNameVi}</span>
+                            <span>🏛️ {cleanClubName}</span>
                           </p>
                         )}
                         <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1.5 group-hover:text-primary transition-colors">

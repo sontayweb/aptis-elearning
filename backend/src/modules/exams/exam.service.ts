@@ -499,6 +499,19 @@ export class ExamService {
         const audioDir = path.resolve(process.env.UPLOAD_DIR || './uploads', 'audio', 'listening');
         const existingFiles = fs.existsSync(audioDir) ? fs.readdirSync(audioDir) : [];
 
+        // Kiểm tra xem part.audio_url có file thực tế trên ổ đĩa không, nếu là link ảo v3_ cũ không tồn tại thì xóa
+        if (part.audio_url && !part.audio_url.startsWith('http')) {
+          const rawFilename = path.basename(part.audio_url);
+          if (!existingFiles.includes(rawFilename)) {
+            part.audio_url = null;
+          }
+        }
+
+        // Trích xuất số hiệu đề từ exam.title (vd: "Đề 01", "Đề 07", "Đề 30") hoặc exam.id
+        const numMatch = exam.title.match(/Đề\s*(\d+)/i) || exam.title.match(/Test\s*(\d+)/i) || exam.title.match(/\b(\d+)\b/);
+        const examNumStr = numMatch ? String(numMatch[1]).padStart(2, '0') : null;
+        const examPrefix = examNumStr ? `de${examNumStr}` : null;
+
         if (part.part_number === 1 || part.title.toLowerCase().includes('part 1')) {
           for (let i = 0; i < part.questions.length; i++) {
             const q = part.questions[i];
@@ -508,7 +521,10 @@ export class ExamService {
             }
             const qNumStr = String(i + 1).padStart(2, '0');
             const matchingAudio = existingFiles.find(
-              (f) => f.startsWith(`de01_p1_q${qNumStr}_`) && f.endsWith('.mp3')
+              (f) =>
+                ((examPrefix && f.startsWith(`${examPrefix}_p1_q${qNumStr}_`)) ||
+                 f.startsWith(`${exam.id}_p1_q${qNumStr}_`)) &&
+                f.endsWith('.mp3')
             );
             if (matchingAudio) {
               (q as any).audio_url = `/uploads/audio/listening/${matchingAudio}`;
@@ -524,7 +540,12 @@ export class ExamService {
               (q as any).transcript = transcript;
             }
           }
-          const p2Audio = existingFiles.find((f) => f.startsWith('de01_p2_speakers_') && f.endsWith('.mp3'));
+          const p2Audio = existingFiles.find(
+            (f) =>
+              ((examPrefix && f.startsWith(`${examPrefix}_p2_speakers_`)) ||
+               f.startsWith(`${exam.id}_p2_speakers_`)) &&
+              f.endsWith('.mp3')
+          );
           if (p2Audio) {
             part.audio_url = `/uploads/audio/listening/${p2Audio}`;
           }
@@ -538,7 +559,12 @@ export class ExamService {
               (q as any).transcript = transcript;
             }
           }
-          const p3Audio = existingFiles.find((f) => f.startsWith('de01_p3_discussion_') && f.endsWith('.mp3'));
+          const p3Audio = existingFiles.find(
+            (f) =>
+              ((examPrefix && f.startsWith(`${examPrefix}_p3_discussion_`)) ||
+               f.startsWith(`${exam.id}_p3_discussion_`)) &&
+              f.endsWith('.mp3')
+          );
           if (p3Audio) {
             part.audio_url = `/uploads/audio/listening/${p3Audio}`;
           }
@@ -557,8 +583,18 @@ export class ExamService {
             (part as any).passage_text = t1 || t2;
             (part as any).transcript = t1 || t2;
           }
-          const p4Rec1Audio = existingFiles.find((f) => f.startsWith('de01_p4_rec1_') && f.endsWith('.mp3'));
-          const p4Rec2Audio = existingFiles.find((f) => f.startsWith('de01_p4_rec2_') && f.endsWith('.mp3'));
+          const p4Rec1Audio = existingFiles.find(
+            (f) =>
+              ((examPrefix && f.startsWith(`${examPrefix}_p4_rec1_`)) ||
+               f.startsWith(`${exam.id}_p4_rec1_`)) &&
+              f.endsWith('.mp3')
+          );
+          const p4Rec2Audio = existingFiles.find(
+            (f) =>
+              ((examPrefix && f.startsWith(`${examPrefix}_p4_rec2_`)) ||
+               f.startsWith(`${exam.id}_p4_rec2_`)) &&
+              f.endsWith('.mp3')
+          );
           if (p4Rec1Audio) {
             part.questions.slice(0, 2).forEach((q) => ((q as any).audio_url = `/uploads/audio/listening/${p4Rec1Audio}`));
           }
