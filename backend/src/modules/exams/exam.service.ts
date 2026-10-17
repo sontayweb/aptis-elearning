@@ -609,38 +609,135 @@ export class ExamService {
       const examTitleLower = (exam.title || '').toLowerCase();
       let partType: 'PART_1' | 'PART_2' | 'PART_3' | 'PART_4' = 'PART_1';
 
-      if (partTitleLower.includes('part 4') || partTitleLower.includes('part4') || (part.part_number === 4 && exam.parts.length === 4)) {
+      if (
+        partTitleLower.includes('part 4') ||
+        partTitleLower.includes('part4') ||
+        partTitleLower.includes('heading') ||
+        partTitleLower.includes('email') ||
+        (part.part_number === 4 && exam.parts.length === 4) ||
+        examTitleLower.includes('part 4') ||
+        examTitleLower.includes('part4')
+      ) {
         partType = 'PART_4';
-      } else if (partTitleLower.includes('part 3') || partTitleLower.includes('part3') || (part.part_number === 3 && exam.parts.length === 4)) {
+      } else if (
+        partTitleLower.includes('part 3') ||
+        partTitleLower.includes('part3') ||
+        partTitleLower.includes('opinion') ||
+        partTitleLower.includes('three questions') ||
+        partTitleLower.includes('chat') ||
+        (part.part_number === 3 && exam.parts.length === 4) ||
+        examTitleLower.includes('part 3') ||
+        examTitleLower.includes('part3')
+      ) {
         partType = 'PART_3';
-      } else if (partTitleLower.includes('part 2') || partTitleLower.includes('part2') || (part.part_number === 2 && exam.parts.length === 4)) {
-        partType = 'PART_2';
-      } else if (examTitleLower.includes('part 4') || examTitleLower.includes('part4')) {
-        partType = 'PART_4';
-      } else if (examTitleLower.includes('part 3') || examTitleLower.includes('part3')) {
-        partType = 'PART_3';
-      } else if (examTitleLower.includes('part 2') || examTitleLower.includes('part2')) {
+      } else if (
+        partTitleLower.includes('part 2') ||
+        partTitleLower.includes('part2') ||
+        partTitleLower.includes('cohesion') ||
+        partTitleLower.includes('order') ||
+        partTitleLower.includes('short text') ||
+        partTitleLower.includes('social') ||
+        (part.part_number === 2 && exam.parts.length === 4) ||
+        examTitleLower.includes('part 2') ||
+        examTitleLower.includes('part2')
+      ) {
         partType = 'PART_2';
       } else {
         partType = 'PART_1';
       }
       (part as any).partType = partType;
 
+      // Cấu hình chuẩn hóa khảo thí theo từng kỹ năng (Single Source of Truth)
       if (exam.skill === 'SPEAKING') {
         if (partType === 'PART_4') {
           part.image_url = null;
           (part as any).prepTime = 60;
           (part as any).speakTime = 120;
-        } else if (partType === 'PART_2') {
-          (part as any).prepTime = 12;
-          (part as any).speakTime = 45;
-        } else if (partType === 'PART_3') {
+        } else if (partType === 'PART_2' || partType === 'PART_3') {
           (part as any).prepTime = 12;
           (part as any).speakTime = 45;
         } else {
           part.image_url = null;
           (part as any).prepTime = 5;
           (part as any).speakTime = 30;
+        }
+      } else if (exam.skill === 'WRITING') {
+        if (partType === 'PART_1') {
+          (part as any).minWords = 1;
+          (part as any).maxWords = 5;
+          (part as any).recommendedMinutes = 3;
+          (part as any).partSubtitle = 'Part 1 - Short Answers';
+        } else if (partType === 'PART_2') {
+          (part as any).minWords = 20;
+          (part as any).maxWords = 30;
+          (part as any).recommendedMinutes = 7;
+          (part as any).partSubtitle = 'Part 2 - Social Media Response';
+        } else if (partType === 'PART_3') {
+          (part as any).minWords = 30;
+          (part as any).maxWords = 40;
+          (part as any).recommendedMinutes = 10;
+          (part as any).partSubtitle = 'Part 3 - Three Questions';
+        } else if (partType === 'PART_4') {
+          (part as any).minWords = 50;
+          (part as any).maxWords = 150;
+          (part as any).recommendedMinutes = 30;
+          (part as any).partSubtitle = 'Part 4 - Formal & Informal Email';
+
+          // Đảm bảo Part 4 luôn có đủ 2 email chuẩn khảo thí Aptis ESOL
+          if (part.questions.length === 1) {
+            const q1 = part.questions[0];
+            const isManager = /manager|secretary|president|formal|ban quản lý/i.test(q1.prompt);
+            if (isManager) {
+              part.questions = [
+                {
+                  id: `${q1.id}_email1`,
+                  question_number: 1,
+                  question_type: 'ESSAY',
+                  prompt:
+                    'Write an email to a friend who is also a member of the club. Tell them about your feelings regarding this notice and discuss what you should do next. Write about 50 words.',
+                  options: null,
+                  correct_answer: '',
+                  max_score: 5,
+                  explanation:
+                    'Hi there,\n\nDid you see the recent announcement from our club? I was quite disappointed to hear about this sudden decision. What do you think we should do about it? Let me know soon.\n\nBest,\nYour friend',
+                } as any,
+                {
+                  ...q1,
+                  question_number: 2,
+                },
+              ];
+            } else {
+              part.questions = [
+                q1,
+                {
+                  id: `${q1.id}_email2`,
+                  question_number: 2,
+                  question_type: 'ESSAY',
+                  prompt:
+                    'Write an email to the Club Manager. Explain how you feel about the announcement, outline how this decision impacts club members, and suggest practical alternatives or solutions. Write 120-150 words.',
+                  options: null,
+                  correct_answer: '',
+                  max_score: 10,
+                  explanation:
+                    'Dear Club Manager,\n\nI am writing to express my concern regarding the recent announcement communicated to our club members. While I appreciate the operational challenges that the management is currently addressing, I feel this sudden change will negatively impact many dedicated members.\n\nFirstly, many members have arranged their personal commitments around the existing schedule. Secondly, this change causes substantial inconvenience and dissatisfaction among regular participants. Therefore, I would respectfully propose that the club committee consider alternative measures, such as organizing a member survey or exploring flexible compromise solutions.\n\nThank you for taking the time to consider our perspective on this important matter. I look forward to hearing your response.\n\nYours sincerely,\nClub Member',
+                } as any,
+              ];
+            }
+          }
+        }
+      } else if (exam.skill === 'READING') {
+        if (partType === 'PART_1') {
+          (part as any).recommendedMinutes = 7;
+          (part as any).partSubtitle = 'Part 1 - Sentence Completion (Gap Fill)';
+        } else if (partType === 'PART_2') {
+          (part as any).recommendedMinutes = 8;
+          (part as any).partSubtitle = 'Part 2 - Text Cohesion (Ordering)';
+        } else if (partType === 'PART_3') {
+          (part as any).recommendedMinutes = 10;
+          (part as any).partSubtitle = 'Part 3 - Text Reading (Opinion Matching)';
+        } else if (partType === 'PART_4') {
+          (part as any).recommendedMinutes = 10;
+          (part as any).partSubtitle = 'Part 4 - Long Text (Heading Matching)';
         }
       }
 
