@@ -37,6 +37,8 @@ import {
   Star,
   Flame,
 } from "lucide-react";
+import { SPEAKING_PART2_BANK } from "@/data/speaking-part2-bank";
+import { SPEAKING_PART3_BANK } from "@/data/speaking-part3-bank";
 
 export interface SpeakingQuestion {
   id: string;
@@ -692,7 +694,10 @@ function cleanSpeakingImageUrl(url: string | undefined): string | undefined {
   if (trimmed.includes("aptiskey.com/images/speaking/part3/")) {
     const filename = trimmed.split("/").pop() || "";
     const num = filename.replace(/\D/g, "");
-    if (num) return `/uploads/speaking/part3/image${num}.png`;
+    if (num) {
+      if (num === "1" || num === "4") return `/uploads/speaking/part3/image${num}.jpg`;
+      return `/uploads/speaking/part3/image${num}.png`;
+    }
   }
   // Uploads cục bộ
   if (trimmed.startsWith("/uploads/") || trimmed.startsWith("uploads/")) {
@@ -702,7 +707,24 @@ function cleanSpeakingImageUrl(url: string | undefined): string | undefined {
     return trimmed;
   }
 
-  // Tên file đơn giản (ví dụ: 1.png, 7.png, 15.png, de07_1.png)
+  // Part 3 đề thi (ví dụ: de07_1.png, de11_1.png, de15_1.png, de01_1.png)
+  const deMatch = trimmed.match(/^de0*(\d+)_(1|2)\.png$/i);
+  if (deMatch) {
+    const num = parseInt(deMatch[1], 10);
+    if (num === 1) return `/uploads/speaking/part3/image1.jpg`;
+    if (num === 4) return `/uploads/speaking/part3/image4.jpg`;
+    if (num >= 2 && num <= 15) return `/uploads/speaking/part3/image${num}.png`;
+    return `/uploads/speaking/part3/image${num}.png`;
+  }
+  const deSingleMatch = trimmed.match(/^de0*(\d+)\.png$/i);
+  if (deSingleMatch) {
+    const num = parseInt(deSingleMatch[1], 10);
+    if (num === 1) return `/uploads/speaking/part3/image1.jpg`;
+    if (num === 4) return `/uploads/speaking/part3/image4.jpg`;
+    if (num >= 2 && num <= 15) return `/uploads/speaking/part3/image${num}.png`;
+  }
+
+  // Tên file đơn giản cho Part 2 (ví dụ: 1.png, 7.png, 15.png)
   const numMatch = trimmed.match(/^(\d+)\.png$/i);
   if (numMatch) {
     return `/uploads/speaking/part2/image${numMatch[1]}.png`;
@@ -717,103 +739,237 @@ function cleanSpeakingImageUrl(url: string | undefined): string | undefined {
   return trimmed;
 }
 
-// Fallback ảnh chất lượng cao theo chủ đề cho Part 2 (1 tranh)
-function getPart2ThematicImage(text: string = ""): string {
-  const lower = text.toLowerCase();
-  if (lower.includes("văn phòng") || lower.includes("office") || lower.includes("meeting") || lower.includes("làm việc") || lower.includes("đồng nghiệp")) {
-    return "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("siêu thị") || lower.includes("supermarket") || lower.includes("shopping") || lower.includes("mua sắm") || lower.includes("cửa hàng")) {
-    return "https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("nấu ăn") || lower.includes("cooking") || lower.includes("bếp") || lower.includes("kitchen") || lower.includes("meal") || lower.includes("bữa ăn")) {
-    return "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("đọc sách") || lower.includes("reading") || lower.includes("thư viện") || lower.includes("library") || lower.includes("book")) {
-    return "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("máy tính") || lower.includes("computer") || lower.includes("laptop") || lower.includes("technology") || lower.includes("công nghệ")) {
-    return "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("công viên") || lower.includes("park") || lower.includes("bãi cỏ") || lower.includes("vườn") || lower.includes("garden")) {
-    return "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("du lịch") || lower.includes("travel") || lower.includes("bạn bè") || lower.includes("friends") || lower.includes("trip")) {
-    return "https://images.unsplash.com/photo-1539635278303-d4002c07eae3?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("cưỡi ngựa") || lower.includes("horse") || lower.includes("ngựa")) {
-    return "https://images.unsplash.com/photo-1553284965-83fd3e82fa5f?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("triển lãm") || lower.includes("art") || lower.includes("museum") || lower.includes("tranh") || lower.includes("bảo tàng")) {
-    return "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("bóng đá") || lower.includes("football") || lower.includes("thể thao") || lower.includes("sport") || lower.includes("chạy bộ")) {
-    return "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("âm nhạc") || lower.includes("music") || lower.includes("concert") || lower.includes("nhạc")) {
-    return "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80";
-  }
-  if (lower.includes("ăn uống") || lower.includes("restaurant") || lower.includes("eating out") || lower.includes("nhà hàng") || lower.includes("quán ăn")) {
-    return "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80";
-  }
-  return "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
+function formatTimerDisplay(seconds: number): string {
+  const s = Math.max(0, Math.floor(seconds || 0));
+  const m = Math.floor(s / 60);
+  const remSec = s % 60;
+  return `${m.toString().padStart(2, "0")}:${remSec.toString().padStart(2, "0")}`;
 }
 
-// Fallback ảnh cặp đối lập theo chủ đề cho Part 3 (2 tranh đối lập)
-function getPart3ThematicPair(text: string = ""): { img1: string; img2: string } {
-  const lower = text.toLowerCase();
-  if (lower.includes("núi") || lower.includes("mountain") || lower.includes("biển") || lower.includes("beach")) {
-    return {
-      img1: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
-      img2: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-    };
+function cleanSpeakingTextForMatch(text: string): string {
+  return (text || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function isGenericSpeakingQuestion(q: string): boolean {
+  const clean = cleanSpeakingTextForMatch(q);
+  return (
+    clean === "describe the picture" ||
+    clean === "describe this picture" ||
+    clean === "please describe the picture" ||
+    clean === "please describe what you see in the picture" ||
+    clean === "tell me what you see in the two pictures" ||
+    clean === "tell me what you see from the two pictures" ||
+    clean === "tell me what you see in the two photographs" ||
+    clean === "describe the two pictures" ||
+    clean === "compare 2 pictures" ||
+    clean === "please describe the 2 pictures" ||
+    clean.startsWith("describe the picture") ||
+    clean.startsWith("tell me what you see in the two") ||
+    clean.length < 15
+  );
+}
+
+// Tìm tranh Part 2 chuẩn khảo thí Aptis từ ngân hàng đề thật (SPEAKING_PART2_BANK)
+function resolveSpeakingPart2Image(contextText: string = "", rawImageUrl?: string): string {
+  const lower = contextText.toLowerCase();
+  const contextClean = cleanSpeakingTextForMatch(contextText);
+
+  // 1. Quét tìm trong SPEAKING_PART2_BANK bằng các câu hỏi trọng tâm (loại bỏ generic "Describe the picture")
+  let bestBankTopic: any = null;
+  let bestMatchScore = 0;
+
+  for (const topic of SPEAKING_PART2_BANK) {
+    if (!topic.imageUrl) continue;
+    const substantive = (topic.questions || []).filter((q) => !isGenericSpeakingQuestion(q));
+
+    for (const q of substantive) {
+      const qClean = cleanSpeakingTextForMatch(q);
+      if (qClean.length > 15 && contextClean.includes(qClean)) {
+        return topic.imageUrl;
+      }
+      const qWords = qClean.split(" ").filter((w) => w.length > 3 && !["tell", "about", "time", "when", "what", "your", "people", "think", "important"].includes(w));
+      if (qWords.length >= 2) {
+        const matches = qWords.filter((w) => contextClean.includes(w)).length;
+        const score = (matches / qWords.length) * 80;
+        if (matches >= 2 && score > bestMatchScore) {
+          bestMatchScore = score;
+          bestBankTopic = topic;
+        }
+      }
+    }
+
+    // Khớp tên chủ đề cụ thể (như "xe khách", "cưỡi ngựa", "siêu thị")
+    const tTitle = topic.title.toLowerCase();
+    if (tTitle.length > 5 && lower.includes(tTitle)) {
+      return topic.imageUrl;
+    }
   }
-  if (lower.includes("gia đình") || lower.includes("family") || lower.includes("một mình") || lower.includes("alone") || lower.includes("living")) {
-    return {
-      img1: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=800&q=80",
-      img2: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
-    };
+
+  if (bestBankTopic && bestMatchScore >= 45) {
+    return bestBankTopic.imageUrl;
+  }
+
+  // 2. Tra cứu theo bảng chủ đề chính xác của đề thi Aptis Part 2
+  if (lower.includes("read") || lower.includes("sách") || lower.includes("báo") || lower.includes("đọc") || lower.includes("book")) {
+    return "/uploads/speaking/part2/image18.png";
+  }
+  if (lower.includes("máy tính") || lower.includes("computer") || lower.includes("laptop") || lower.includes("technology")) {
+    return "/uploads/speaking/part2/image21.png";
+  }
+  if (lower.includes("siêu thị") || lower.includes("supermarket") || lower.includes("shopping") || lower.includes("mua sắm") || lower.includes("small shop") || lower.includes("cửa hàng")) {
+    return "/uploads/speaking/part2/image18.png";
+  }
+  if (lower.includes("group") || lower.includes("travel with a group") || lower.includes("xe khách") || lower.includes("xe buýt") || lower.includes("du lịch theo nhóm")) {
+    return "/uploads/speaking/part2/image10.png";
+  }
+  if (lower.includes("climb") || lower.includes("mountain") || lower.includes("leo núi") || lower.includes("outdoor")) {
+    return "/uploads/speaking/part2/image2.png";
+  }
+  if (lower.includes("animal") || lower.includes("ngựa") || lower.includes("horse") || lower.includes("động vật")) {
+    return "/uploads/speaking/part2/image16.png";
+  }
+  if (lower.includes("nấu ăn") || lower.includes("cooking") || lower.includes("cook") || lower.includes("kitchen") || lower.includes("bếp")) {
+    return "/uploads/speaking/part2/image5.png";
+  }
+  if (lower.includes("ăn cùng") || lower.includes("eating together") || lower.includes("bữa ăn gia đình") || lower.includes("dining")) {
+    return "/uploads/speaking/part2/image9.png";
+  }
+  if (lower.includes("nhà hàng") || lower.includes("restaurant") || lower.includes("eating out")) {
+    return "/uploads/speaking/part2/image8.png";
+  }
+  if (lower.includes("xe hơi") || lower.includes("ô tô") || lower.includes("car") || lower.includes("drive")) {
+    return "/uploads/speaking/part2/image23.png";
+  }
+  if (lower.includes("cười") || lower.includes("laugh") || lower.includes("rạp chiếu phim") || lower.includes("cinema")) {
+    return "/uploads/speaking/part2/image1.png";
+  }
+  if (lower.includes("đông đúc") || lower.includes("crowded") || lower.includes("thành phố")) {
+    return "/uploads/speaking/part2/image13.png";
+  }
+  if (lower.includes("tin tức") || lower.includes("news") || lower.includes("newspapers") || lower.includes("tivi")) {
+    return "/uploads/speaking/part2/image22.png";
+  }
+  if (lower.includes("thuyền") || lower.includes("biển") || lower.includes("sea") || lower.includes("boat") || lower.includes("ngắm cảnh")) {
+    return "/uploads/speaking/part2/image20.png";
+  }
+  if (lower.includes("tàu") || lower.includes("train") || lower.includes("ga") || lower.includes("station") || lower.includes("đợi")) {
+    return "/uploads/speaking/part2/image25.png";
+  }
+  if (lower.includes("thuyết trình") || lower.includes("presentation") || lower.includes("public speaking")) {
+    return "/uploads/speaking/part2/image4.png";
+  }
+  if (lower.includes("trang trí") || lower.includes("decorate") || lower.includes("decoration") || lower.includes("nhà cửa")) {
+    return "/uploads/speaking/part2/image3.png";
+  }
+  if (lower.includes("dạy học") || lower.includes("lớp học") || lower.includes("cô giáo") || lower.includes("classroom") || lower.includes("teacher")) {
+    return "/uploads/speaking/part2/image17.png";
+  }
+  if (lower.includes("phòng họp") || lower.includes("văn phòng") || lower.includes("office") || lower.includes("meeting") || lower.includes("làm việc")) {
+    return "/uploads/speaking/part2/image15.png";
+  }
+
+  // 3. Fallback theo URL sạch có sẵn
+  const cleaned = cleanSpeakingImageUrl(rawImageUrl);
+  if (cleaned && !cleaned.includes("unsplash")) return cleaned;
+
+  return "/uploads/speaking/part2/image15.png";
+}
+
+// Tìm tranh Part 3 chuẩn khảo thí Aptis từ ngân hàng đề thật (SPEAKING_PART3_BANK)
+function resolveSpeakingPart3Images(
+  contextText: string = "",
+  rawImg1?: string,
+  rawImg2?: string
+): { img1: string; img2?: string; isCompound: boolean } {
+  const lower = contextText.toLowerCase();
+  const contextClean = cleanSpeakingTextForMatch(contextText);
+
+  // 1. Quét tìm trong SPEAKING_PART3_BANK theo câu hỏi so sánh thực tế
+  let bestBankTopic: any = null;
+  let bestMatchScore = 0;
+
+  for (const topic of SPEAKING_PART3_BANK) {
+    if (!topic.imageUrl) continue;
+    const substantive = (topic.questions || []).filter((q) => !isGenericSpeakingQuestion(q));
+
+    for (const q of substantive) {
+      const qClean = cleanSpeakingTextForMatch(q);
+      if (qClean.length > 15 && contextClean.includes(qClean)) {
+        return { img1: topic.imageUrl, isCompound: true };
+      }
+      const qWords = qClean.split(" ").filter((w) => w.length > 3 && !["tell", "what", "pictures", "two", "photographs", "describe", "these", "between"].includes(w));
+      if (qWords.length >= 2) {
+        const matches = qWords.filter((w) => contextClean.includes(w)).length;
+        const score = (matches / qWords.length) * 80;
+        if (matches >= 2 && score > bestMatchScore) {
+          bestMatchScore = score;
+          bestBankTopic = topic;
+        }
+      }
+    }
+
+    const tTitle = topic.title.toLowerCase();
+    if (tTitle.length > 6 && lower.includes(tTitle)) {
+      return { img1: topic.imageUrl, isCompound: true };
+    }
+  }
+
+  if (bestBankTopic && bestMatchScore >= 45) {
+    return { img1: bestBankTopic.imageUrl, isCompound: true };
+  }
+
+  // 2. Tra cứu theo bảng chủ đề chính xác của Part 3
+  if (lower.includes("núi") || lower.includes("biển") || lower.includes("mountain") || lower.includes("beach") || lower.includes("natural beauty")) {
+    return { img1: "/uploads/speaking/part3/image5.png", isCompound: true };
+  }
+  if (lower.includes("gia đình") || lower.includes("một mình") || lower.includes("alone") || lower.includes("living with family") || lower.includes("living alone")) {
+    return { img1: "/uploads/speaking/part3/image6.png", isCompound: true };
+  }
+  if (lower.includes("sân bay") || lower.includes("ga tàu") || lower.includes("airport") || lower.includes("train station") || lower.includes("plane") || lower.includes("flight")) {
+    return { img1: "/uploads/speaking/part3/image1.jpg", isCompound: true };
   }
   if (lower.includes("rau") || lower.includes("hoa") || lower.includes("trồng") || lower.includes("garden") || lower.includes("gardening")) {
-    return {
-      img1: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
-      img2: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=800&q=80",
-    };
+    return { img1: "/uploads/speaking/part3/image2.png", isCompound: true };
   }
-  if (lower.includes("nhạc") || lower.includes("music") || lower.includes("sôi động") || lower.includes("du dương") || lower.includes("concert")) {
-    return {
-      img1: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80",
-      img2: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=800&q=80",
-    };
+  if (lower.includes("sách in") || lower.includes("e-book") || lower.includes("ebook") || lower.includes("printed book") || lower.includes("thư viện") || lower.includes("library")) {
+    return { img1: "/uploads/speaking/part3/image3.png", isCompound: true };
   }
-  if (lower.includes("xa xỉ") || lower.includes("bình dân") || lower.includes("luxury") || lower.includes("shopping") || lower.includes("mua")) {
-    return {
-      img1: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80",
-      img2: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80",
-    };
+  if (lower.includes("siêu thị") || lower.includes("chợ") || lower.includes("market") || lower.includes("supermarket")) {
+    return { img1: "/uploads/speaking/part3/image14.png", isCompound: true };
   }
-  if (lower.includes("sách") || lower.includes("game") || lower.includes("chơi game") || lower.includes("đọc")) {
-    return {
-      img1: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80",
-      img2: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80",
-    };
+  if (lower.includes("nhạc") || lower.includes("music") || lower.includes("nghe nhạc") || lower.includes("concert") || lower.includes("ban nhạc")) {
+    return { img1: "/uploads/speaking/part3/image9.png", isCompound: true };
   }
-  if (lower.includes("online") || lower.includes("trực tiếp") || lower.includes("in person") || lower.includes("remote") || lower.includes("làm việc")) {
-    return {
-      img1: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=800&q=80",
-      img2: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
-    };
+  if (lower.includes("healthy food") || lower.includes("fast food") || lower.includes("đồ ăn nhanh") || lower.includes("thực phẩm lành mạnh")) {
+    return { img1: "/uploads/speaking/part3/image11.png", isCompound: true };
   }
-  if (lower.includes("xe đạp") || lower.includes("ô tô") || lower.includes("bus") || lower.includes("bike") || lower.includes("car") || lower.includes("giao thông")) {
-    return {
-      img1: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80",
-      img2: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80",
-    };
+  if (lower.includes("tuyết") || lower.includes("tắm nắng") || lower.includes("mùa đông") || lower.includes("mùa hè") || lower.includes("summer") || lower.includes("winter") || lower.includes("snow")) {
+    return { img1: "/uploads/speaking/part3/image13.png", isCompound: true };
   }
-  return {
-    img1: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
-    img2: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80",
-  };
+  if (lower.includes("gym") || lower.includes("leo núi") || lower.includes("daily exercises") || lower.includes("tập thể dục")) {
+    return { img1: "/uploads/speaking/part3/image12.png", isCompound: true };
+  }
+  if (lower.includes("cờ vua") || lower.includes("indoor sports") || lower.includes("outdoor sports") || lower.includes("video games") || lower.includes("chess")) {
+    return { img1: "/uploads/speaking/part3/image15.png", isCompound: true };
+  }
+  if (lower.includes("farm") || lower.includes("nông trại") || lower.includes("văn phòng") || lower.includes("office")) {
+    return { img1: "/uploads/speaking/part3/image10.png", isCompound: true };
+  }
+
+  // 3. Fallback theo ảnh DB nếu có 2 ảnh rời
+  let c1 = cleanSpeakingImageUrl(rawImg1);
+  let c2 = cleanSpeakingImageUrl(rawImg2);
+  if (rawImg1 && !c2 && /de0*\d+_1\.png/i.test(rawImg1)) {
+    c2 = cleanSpeakingImageUrl(rawImg1.replace(/_1\.png/i, "_2.png"));
+  }
+  if (c1 && c2 && c1 !== c2 && !c1.includes("unsplash") && !c2.includes("unsplash")) {
+    return { img1: c1, img2: c2, isCompound: false };
+  }
+  if (c1 && !c1.includes("unsplash")) {
+    return { img1: c1, isCompound: true };
+  }
+
+  return { img1: "/uploads/speaking/part3/image5.png", isCompound: true };
 }
 
 // Nhận diện chính xác Part Number từ tiêu đề part, tiêu đề exam, query param
@@ -863,6 +1019,7 @@ function SpeakingExamRunnerContent() {
   const [stage, setStage] = useState<"prep" | "speaking" | "finished">("prep");
   const [timer, setTimer] = useState(0);
   const [prepNotes, setPrepNotes] = useState("");
+  const [isPrepPaused, setIsPrepPaused] = useState(false);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
 
@@ -980,7 +1137,8 @@ function SpeakingExamRunnerContent() {
           let img1 = cleanSpeakingImageUrl(rawImg1);
           let img2 = cleanSpeakingImageUrl(rawImg2);
 
-          const contextDesc = `${p.title || ""} ${res.data?.title || ""} ${qList[0]?.prompt || ""}`;
+          const allQPrompts = qList.map((q: any) => q.prompt || "").join(" ");
+          const contextDesc = `${p.title || ""} ${res.data?.title || ""} ${allQPrompts}`;
 
           if (pNum === 4) {
             // Chuẩn web gốc Aptis Kỳ Tích & British Council:
@@ -1024,7 +1182,8 @@ function SpeakingExamRunnerContent() {
                 prompt: firstQ.prompt,
                 prepTime: 60,
                 speakTime: 120,
-                imageUrl: img1 || "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80",
+                imageUrl: undefined,
+                secondImageUrl: undefined,
                 sampleAnswer: hasVn ? "" : rawExp,
                 guidanceNote: hasVn ? rawExp : undefined,
                 subQuestions: subQuestions.length > 0 ? subQuestions : undefined,
@@ -1040,22 +1199,16 @@ function SpeakingExamRunnerContent() {
             const defaultPrep = pNum === 2 || pNum === 3 ? 12 : 5;
             const defaultSpeak = pNum === 1 ? 30 : 45;
 
-            // Xử lý fallback ảnh cho Part 2 và Part 3
-            let resolvedImg1 = img1;
-            let resolvedImg2 = img2;
+            // Xử lý ảnh chuẩn khảo thí cho Part 2 và Part 3
+            let resolvedImg1: string | undefined;
+            let resolvedImg2: string | undefined;
 
-            if (pNum === 2 && !resolvedImg1) {
-              resolvedImg1 = getPart2ThematicImage(contextDesc);
+            if (pNum === 2) {
+              resolvedImg1 = resolveSpeakingPart2Image(contextDesc, rawImg1);
             } else if (pNum === 3) {
-              if (!resolvedImg1 && !resolvedImg2) {
-                const pair = getPart3ThematicPair(contextDesc);
-                resolvedImg1 = pair.img1;
-                resolvedImg2 = pair.img2;
-              } else if (resolvedImg1 && !resolvedImg2) {
-                resolvedImg2 = getPart3ThematicPair(contextDesc).img2;
-              } else if (!resolvedImg1 && resolvedImg2) {
-                resolvedImg1 = getPart3ThematicPair(contextDesc).img1;
-              }
+              const p3Res = resolveSpeakingPart3Images(contextDesc, rawImg1, rawImg2);
+              resolvedImg1 = p3Res.img1;
+              resolvedImg2 = p3Res.img2;
             }
 
             qList.forEach((q: any) => {
@@ -1211,6 +1364,7 @@ function SpeakingExamRunnerContent() {
         setAiResult(null);
         setUploadedUrl(null);
         setPrepNotes("");
+        setIsPrepPaused(false);
 
         if (q.prepTime > 0) {
           setStage("prep");
@@ -1237,12 +1391,15 @@ function SpeakingExamRunnerContent() {
 
     if (stage === "prep") {
       if (timer > 0) {
-        timerRef.current = setInterval(() => {
-          setTimer((t) => t - 1);
-        }, 1000);
+        if (!isPrepPaused) {
+          timerRef.current = setInterval(() => {
+            setTimer((t) => t - 1);
+          }, 1000);
+        }
       } else {
         // Hết thời gian chuẩn bị -> Bíp & Tự động ghi âm
         playStartBeep();
+        setIsPrepPaused(false);
         setStage("speaking");
         setTimer(currentQ.speakTime);
         startRecording();
@@ -1276,7 +1433,7 @@ function SpeakingExamRunnerContent() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [stage, timer, isRecording, currentQ, startRecording, stopRecording, isReviewMode, currentIndex, prepNotes]);
+  }, [stage, timer, isRecording, isPrepPaused, currentQ, startRecording, stopRecording, isReviewMode, currentIndex, prepNotes]);
 
   // Chọn câu hỏi từ danh sách
   const selectQuestion = async (index: number) => {
@@ -1305,6 +1462,7 @@ function SpeakingExamRunnerContent() {
   const handleStartSpeakingNow = async () => {
     if (!currentQ) return;
     if (timerRef.current) clearInterval(timerRef.current);
+    setIsPrepPaused(false);
     playStartBeep();
     setStage("speaking");
     setTimer(currentQ.speakTime);
@@ -1833,12 +1991,12 @@ function SpeakingExamRunnerContent() {
                           <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                              src={currentQ.imageUrl || getPart2ThematicImage(currentQ.prompt || currentQ.topic)}
+                              src={currentQ.imageUrl || "/uploads/speaking/part2/image15.png"}
                               alt="Speaking Aptis Prompt 1"
                               className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src =
-                                  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
+                                  "/uploads/speaking/part2/image15.png";
                               }}
                             />
                           </div>
@@ -1905,40 +2063,60 @@ function SpeakingExamRunnerContent() {
                   {/* PART 3: Two Contrasting Pictures + Vocabulary & Comparison Box */}
                   {currentQ.partNumber === 3 && (
                     <div className="space-y-4">
-                      {/* 2 Contrasting Pictures */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={currentQ.imageUrl || getPart3ThematicPair(currentQ.prompt || currentQ.topic).img1}
-                            alt="Speaking Aptis Prompt 1"
-                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src =
-                                "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80";
-                            }}
-                          />
-                          <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-black/60 text-white font-bold text-xs backdrop-blur-xs">
-                            Picture 1
-                          </span>
-                        </div>
+                      {/* Tranh so sánh: nếu có 2 ảnh riêng biệt -> 2 cột; nếu là ảnh ghép -> 1 khung rộng */}
+                      {currentQ.secondImageUrl ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={currentQ.imageUrl || "/uploads/speaking/part3/image5.png"}
+                              alt="Speaking Aptis Prompt 1"
+                              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src =
+                                  "/uploads/speaking/part3/image5.png";
+                              }}
+                            />
+                            <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-black/60 text-white font-bold text-xs backdrop-blur-xs">
+                              Picture 1
+                            </span>
+                          </div>
 
-                        <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
+                          <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={currentQ.secondImageUrl || "/uploads/speaking/part3/image6.png"}
+                              alt="Speaking Aptis Prompt 2"
+                              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src =
+                                  "/uploads/speaking/part3/image6.png";
+                              }}
+                            />
+                            <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-black/60 text-white font-bold text-xs backdrop-blur-xs">
+                              Picture 2
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 shadow-sm max-h-[460px] flex items-center justify-center bg-black/5">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={currentQ.secondImageUrl || getPart3ThematicPair(currentQ.prompt || currentQ.topic).img2}
-                            alt="Speaking Aptis Prompt 2"
-                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                            src={currentQ.imageUrl || "/uploads/speaking/part3/image5.png"}
+                            alt="Speaking Aptis Comparison"
+                            className="w-full h-auto max-h-[460px] object-contain transition-transform duration-300 hover:scale-[1.02]"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src =
-                                "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80";
+                                "/uploads/speaking/part3/image5.png";
                             }}
                           />
-                          <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-black/60 text-white font-bold text-xs backdrop-blur-xs">
-                            Picture 2
-                          </span>
+                          <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                            <span className="px-3 py-1 rounded-lg bg-black/75 text-white font-bold text-xs backdrop-blur-md border border-white/20 shadow-md">
+                              Picture 1 vs Picture 2 · So sánh hai bức ảnh
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       <p className="text-base md:text-lg text-foreground font-semibold leading-relaxed">
                         {currentQ.prompt}
@@ -2042,20 +2220,42 @@ function SpeakingExamRunnerContent() {
                           </p>
                         </div>
 
-                        {currentQ.imageUrl && (
-                          <div className="max-w-md overflow-hidden rounded-xl border border-border bg-muted/20 aspect-[16/10] shadow-xs">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={currentQ.imageUrl}
-                              alt="Topic presentation prompt"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80";
-                              }}
-                            />
+                        {/* Khung ghi chú dàn ý 1 phút chuẩn British Council Part 4 */}
+                        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 md:p-5 space-y-2.5 shadow-xs">
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div className="flex items-center gap-2">
+                              <FileEdit className="w-4 h-4 text-primary" />
+                              <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                                Khung ghi chú dàn ý (Preparation Notes)
+                              </span>
+                            </div>
+                            <span
+                              className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                                stage === "prep"
+                                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"
+                                  : stage === "speaking"
+                                  ? "bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30 animate-pulse"
+                                  : "bg-muted text-muted-foreground"
+                              }`}
+                            >
+                              {stage === "prep"
+                                ? `Đang chuẩn bị: còn ${formatTimerDisplay(timer)}`
+                                : stage === "speaking"
+                                ? `Đang ghi âm (${formatTimerDisplay(timer)}) - Dựa vào dàn ý để phát biểu`
+                                : "Đã hoàn thành"}
+                            </span>
                           </div>
-                        )}
+                          <textarea
+                            value={prepNotes}
+                            onChange={(e) => setPrepNotes(e.target.value)}
+                            placeholder="Nháp nhanh các ý tưởng, từ vựng khóa cho 3 câu hỏi trên trong 1 phút chuẩn bị...&#10;• Ý 1: ...&#10;• Ý 2: ...&#10;• Ý 3: ..."
+                            className="w-full h-28 md:h-32 p-3 rounded-xl border border-border bg-background text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none font-sans leading-relaxed shadow-inner"
+                          />
+                          <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-0.5">
+                            <span>💡 Ghi chú này luôn hiển thị trong suốt 2 phút nói để bạn tự tin nhìn theo.</span>
+                            <span>{prepNotes.trim().length} ký tự</span>
+                          </div>
+                        </div>
 
                         {/* 3 câu hỏi hiển thị cùng lúc */}
                         <div className="space-y-2.5 pt-1">
@@ -2303,30 +2503,143 @@ function SpeakingExamRunnerContent() {
               <div className="w-full lg:w-72 shrink-0">
                 {/* 1. STAGE: PREPARATION / INSTRUCTIONS (Screenshots 3, 4, 5) */}
                 {stage === "prep" && (
-                  <div className="rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                      <Volume2 className="w-7 h-7" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <h3 className="font-heading font-bold text-sm text-foreground">
-                        Instructions...
-                      </h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Nghe xong sẽ có tiếng bíp rồi bắt đầu ghi âm
-                      </p>
-                      <p className="text-[11px] font-semibold text-primary">
-                        Đang đọc đề... tối đa {timer}s
-                      </p>
-                    </div>
+                  <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
+                    {currentQ.partNumber === 4 ? (
+                      <>
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-xs border border-amber-500/30">
+                          <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                          <span>Chuẩn Bị 1 Phút (Part 4)</span>
+                        </div>
 
-                    <button
-                      type="button"
-                      onClick={handleStartSpeakingNow}
-                      className="tech-btn w-full py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 flex items-center justify-center gap-1.5 shadow-xs"
-                    >
-                      <Mic className="w-3.5 h-3.5" />
-                      <span>Nói ngay (Bỏ qua đếm)</span>
-                    </button>
+                        {/* Circular Countdown Timer cho 1 Phút Chuẩn Bị */}
+                        <div className="relative w-28 h-28 flex items-center justify-center">
+                          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="42"
+                              stroke="currentColor"
+                              strokeWidth="6"
+                              fill="transparent"
+                              className="text-muted/30"
+                            />
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="42"
+                              stroke="currentColor"
+                              strokeWidth="6"
+                              fill="transparent"
+                              strokeDasharray={264}
+                              strokeDashoffset={264 - (264 * timer) / (currentQ.prepTime || 60)}
+                              strokeLinecap="round"
+                              className="text-amber-500 transition-all duration-1000 ease-linear"
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-2xl font-black font-heading text-foreground">
+                              {formatTimerDisplay(timer)}
+                            </span>
+                            <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                              {isPrepPaused ? "Đang tạm dừng" : "Đang đếm ngược"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Set up thời gian chuẩn bị (Tùy chọn nhanh) */}
+                        <div className="w-full space-y-2 pt-1 border-t border-border/60">
+                          <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
+                            <span>Tùy chỉnh thời gian:</span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => setIsPrepPaused((p) => !p)}
+                                className="px-2 py-0.5 rounded-md text-[10px] font-bold border border-border bg-muted/50 hover:bg-muted text-foreground flex items-center gap-1 transition-colors"
+                              >
+                                {isPrepPaused ? <Play className="w-3 h-3 text-emerald-500" /> : <Pause className="w-3 h-3 text-amber-500" />}
+                                <span>{isPrepPaused ? "Tiếp tục" : "Tạm dừng"}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setTimer(60);
+                                  setIsPrepPaused(false);
+                                }}
+                                title="Reset về 60s"
+                                className="p-1 rounded-md text-[10px] font-bold border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors"
+                              >
+                                <RotateCcw className="w-3 h-3 text-primary" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-4 gap-1.5">
+                            {[
+                              { label: "60s", val: 60, title: "Chuẩn thi thật British Council" },
+                              { label: "45s", val: 45, title: "Luyện phản xạ nhanh" },
+                              { label: "30s", val: 30, title: "Tăng tốc" },
+                              { label: "15s", val: 15, title: "Thử thách cao" },
+                            ].map((preset) => (
+                              <button
+                                key={preset.val}
+                                type="button"
+                                title={preset.title}
+                                onClick={() => {
+                                  setTimer(preset.val);
+                                  setIsPrepPaused(false);
+                                }}
+                                className={`py-1 rounded-lg text-xs font-bold transition-all border ${
+                                  timer === preset.val
+                                    ? "bg-amber-500 text-white border-amber-500 shadow-xs scale-105"
+                                    : "bg-background border-border text-foreground/80 hover:border-amber-500/50 hover:bg-muted/30"
+                                }`}
+                              >
+                                {preset.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleStartSpeakingNow}
+                          className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 flex items-center justify-center gap-1.5 shadow-xs transition-all hover:scale-[1.02]"
+                        >
+                          <Mic className="w-4 h-4" />
+                          <span>Sẵn sàng · Bắt đầu nói (2p)</span>
+                        </button>
+
+                        <p className="text-[11px] text-muted-foreground leading-normal">
+                          💡 Hết 1 phút, máy sẽ tự động phát tiếng bíp và bắt đầu ghi âm 2 phút.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                          <Volume2 className="w-7 h-7" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <h3 className="font-heading font-bold text-sm text-foreground">
+                            Instructions...
+                          </h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Nghe xong sẽ có tiếng bíp rồi bắt đầu ghi âm
+                          </p>
+                          <p className="text-[11px] font-semibold text-primary">
+                            Đang chuẩn bị... còn {formatTimerDisplay(timer)}
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleStartSpeakingNow}
+                          className="tech-btn w-full py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 flex items-center justify-center gap-1.5 shadow-xs"
+                        >
+                          <Mic className="w-3.5 h-3.5" />
+                          <span>Nói ngay (Bỏ qua đếm)</span>
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -2364,9 +2677,12 @@ function SpeakingExamRunnerContent() {
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <Mic className="w-4 h-4 text-destructive mb-0.5" />
+                        <Mic className="w-4 h-4 text-destructive mb-0.5 animate-pulse" />
                         <span className="text-2xl font-black font-heading text-foreground">
-                          {timer}s
+                          {formatTimerDisplay(timer)}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground font-semibold">
+                          {currentQ.partNumber === 4 ? "Trả lời 2 phút" : "Thời gian nói"}
                         </span>
                       </div>
                     </div>

@@ -132,19 +132,33 @@ export default function ListeningPracticePage() {
   // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
   const currentTabExams = exams.filter((e) => {
     if (activeTab === "full") {
-      return e.title.includes("Full Listening") || e.totalParts === 4;
+      return e.totalParts === 4 || e.title.includes("Full Listening");
     } else if (activeTab === "p1") {
-      if (e.title.includes("Listening Part 1") || e.partTitle?.includes("Part 1")) return true;
-      return e.totalParts === 4 || e.title.includes("Full Listening");
+      return (
+        e.totalParts === 1 &&
+        (e.title.includes("Listening Part 1") ||
+          e.partTitle?.includes("Part 1") ||
+          e.partTitle?.includes("Information Recognition") ||
+          e.partTitle?.includes("Word Recognition"))
+      );
     } else if (activeTab === "p2") {
-      if (e.partTitle?.includes("Part 2") || e.partTitle?.includes("Information Matching")) return true;
-      return e.totalParts === 4 || e.title.includes("Full Listening");
+      return (
+        e.totalParts === 1 &&
+        (e.partTitle?.includes("Part 2") ||
+          e.partTitle?.includes("Information Matching"))
+      );
     } else if (activeTab === "p3") {
-      if (e.partTitle?.includes("Part 3") || e.partTitle?.includes("Opinion Matching")) return true;
-      return e.totalParts === 4 || e.title.includes("Full Listening");
+      return (
+        e.totalParts === 1 &&
+        (e.partTitle?.includes("Part 3") ||
+          e.partTitle?.includes("Opinion Matching"))
+      );
     } else if (activeTab === "p4") {
-      if (e.partTitle?.includes("Part 4") || e.partTitle?.includes("Monologue")) return true;
-      return e.totalParts === 4 || e.title.includes("Full Listening");
+      return (
+        e.totalParts === 1 &&
+        (e.partTitle?.includes("Part 4") ||
+          e.partTitle?.includes("Monologue"))
+      );
     }
     return true;
   });
@@ -165,7 +179,14 @@ export default function ListeningPracticePage() {
         ? e.status === "completed"
         : e.status !== "completed";
     return matchesSearch && matchesPriority && matchesStatus;
-  }).sort((a, b) => (b.hotLevel || 0) - (a.hotLevel || 0));
+  }).sort((a, b) => {
+    const matchA = a.title.match(/Đề\s+(\d+)/i);
+    const matchB = b.title.match(/Đề\s+(\d+)/i);
+    if (matchA && matchB) {
+      return parseInt(matchA[1], 10) - parseInt(matchB[1], 10);
+    }
+    return (b.hotLevel || 0) - (a.hotLevel || 0);
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -468,7 +489,17 @@ export default function ListeningPracticePage() {
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="px-2 py-0.5 rounded-md border border-border bg-muted/50 text-muted-foreground font-bold text-[10px]">
-                          Full Part
+                          {exam.totalParts === 4 || exam.title.includes("Full Listening")
+                            ? "Full Part"
+                            : activeTab === "p1"
+                            ? "Part 1"
+                            : activeTab === "p2"
+                            ? "Part 2"
+                            : activeTab === "p3"
+                            ? "Part 3"
+                            : activeTab === "p4"
+                            ? "Part 4"
+                            : (exam.partTitle?.split(" - ")[0] || exam.partTitle?.split(":")[0] || "Part")}
                         </span>
                         {exam.isFree ? (
                           <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
@@ -520,32 +551,28 @@ export default function ListeningPracticePage() {
                       )}
                     </div>
 
-                    {/* Dynamic Title with Topic Name for Part 2, 3, 4 */}
+                    {/* Dynamic Title with Real Topic Name from Database */}
                     {(() => {
                       const displayTitle = (() => {
-                        if (activeTab === "full") {
-                          return exam.title.includes("—") ? exam.title : `Đề 0${idx + 1} - Full Listening (25 câu)`;
+                        if (exam.title) {
+                          if (activeTab === "p1" && exam.title.includes("Listening Part 1")) {
+                            return exam.title.replace("Listening Part 1", "Part 1: Information Recognition");
+                          }
+                          return exam.title;
                         }
-                        if (activeTab === "p1") {
-                          return `Đề 0${idx + 1} - Part 1: Short Monologues & Dialogues`;
-                        }
+                        const padded = idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`;
+                        if (activeTab === "full") return `Đề ${padded} — Full Listening · 4 Parts`;
+                        if (activeTab === "p1") return `Đề ${padded} - Part 1: Information Recognition`;
                         if (activeTab === "p2") {
                           const item = LISTENING_PART2_TOPICS[idx % LISTENING_PART2_TOPICS.length];
-                          return `Đề 0${idx + 1} - ${item.title}`;
+                          return `Đề ${padded} - ${item.title}`;
                         }
                         if (activeTab === "p3") {
                           const item = LISTENING_PART3_TOPICS[idx % LISTENING_PART3_TOPICS.length];
-                          return `Đề 0${idx + 1} - ${item.title}`;
+                          return `Đề ${padded} - ${item.title}`;
                         }
                         const item = LISTENING_PART4_TOPICS[idx % LISTENING_PART4_TOPICS.length];
-                        return `Đề 0${idx + 1} - ${item.title}`;
-                      })();
-
-                      const contextDesc = (() => {
-                        if (activeTab === "p2") return LISTENING_PART2_TOPICS[idx % LISTENING_PART2_TOPICS.length].context;
-                        if (activeTab === "p3") return LISTENING_PART3_TOPICS[idx % LISTENING_PART3_TOPICS.length].context;
-                        if (activeTab === "p4") return LISTENING_PART4_TOPICS[idx % LISTENING_PART4_TOPICS.length].context;
-                        return null;
+                        return `Đề ${padded} - ${item.title}`;
                       })();
 
                       return (
@@ -553,16 +580,11 @@ export default function ListeningPracticePage() {
                           <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1 group-hover:text-primary transition-colors">
                             {displayTitle}
                           </h3>
-                          {contextDesc && (
-                            <p className="text-[11px] text-muted-foreground italic mb-2">
-                              {contextDesc}
-                            </p>
-                          )}
                         </div>
                       );
                     })()}
                     <p className="text-xs text-muted-foreground mb-4">
-                      {exam.parts} · 25 câu · 40 phút
+                      {exam.parts} · {exam.questionsCount} câu · {exam.duration}
                     </p>
 
                     <div className="text-xs">

@@ -603,6 +603,15 @@ function WritingExamRunnerContent() {
     }
   }, [searchParams, parts]);
 
+  // Điều hướng chuyển Part mượt mà, cuộn êm dịu lên đầu bài
+  const handleSelectPart = (idx: number) => {
+    if (idx === currentPartIdx) return;
+    setCurrentPartIdx(idx);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   // Load Exam Data từ Backend
   const loadExamData = async () => {
     try {
@@ -1127,7 +1136,7 @@ function WritingExamRunnerContent() {
       <main className="flex-1 py-6 px-3 md:px-6 pb-24">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Card Context & Header Banner */}
-          <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
+          <div key={`part-header-${currentPart.partNumber}`} className="part-transition bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 border-b border-border pb-4">
               <div className="space-y-1.5 max-w-xl">
                 <div className="flex items-center gap-2">
@@ -1170,7 +1179,8 @@ function WritingExamRunnerContent() {
             </div>
           </div>
 
-          {/* 3. INPUT QUESTION CARDS */}
+          {/* 3. INPUT QUESTION CARDS WITH SMOOTH PART TRANSITION */}
+          <div key={`part-questions-container-${currentPart.partNumber}`} className="part-transition space-y-4">
           {/* =========================================================================
               PART 1: 5 SHORT ANSWER QUESTIONS
               ========================================================================= */}
@@ -1488,6 +1498,7 @@ function WritingExamRunnerContent() {
               })}
             </div>
           )}
+          </div>
         </div>
       </main>
 
@@ -1533,8 +1544,8 @@ function WritingExamRunnerContent() {
                     key={p.partNumber}
                     id={`writing-part-pill-${idx}`}
                     type="button"
-                    onClick={() => setCurrentPartIdx(idx)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
+                    onClick={() => handleSelectPart(idx)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-300 ease-out active:scale-95 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
                       isCurrent
                         ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
                         : isAnswered
@@ -1586,8 +1597,8 @@ function WritingExamRunnerContent() {
           <button
             type="button"
             disabled={currentPartIdx === 0}
-            onClick={() => setCurrentPartIdx((p) => Math.max(0, p - 1))}
-            className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors cursor-pointer"
+            onClick={() => handleSelectPart(Math.max(0, currentPartIdx - 1))}
+            className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-all active:scale-95 cursor-pointer"
           >
             ← Previous
           </button>
@@ -1595,8 +1606,8 @@ function WritingExamRunnerContent() {
           {currentPartIdx < parts.length - 1 ? (
             <button
               type="button"
-              onClick={() => setCurrentPartIdx((p) => Math.min(parts.length - 1, p + 1))}
-              className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1 cursor-pointer"
+              onClick={() => handleSelectPart(Math.min(parts.length - 1, currentPartIdx + 1))}
+              className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
             >
               <span>Next</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -1605,7 +1616,7 @@ function WritingExamRunnerContent() {
             <button
               type="button"
               onClick={handleSubmit}
-              className="tech-btn inline-flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all cursor-pointer"
+              className="tech-btn inline-flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
             >
               <span>Submit & Chấm AI</span>
               <ArrowRight className="w-3.5 h-3.5" />

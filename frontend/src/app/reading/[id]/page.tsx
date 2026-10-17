@@ -943,7 +943,7 @@ function ReadingExamRunner() {
 
           {/* Exam Questions Workspace */}
           {!loading && !isSubmitted && (
-            <div className="space-y-6">
+            <div key={`reading-stage-wrap-${currentStage.stageKey}`} className="part-transition space-y-6">
               {/* Card Context & Header Banner */}
               <div className="bg-card rounded-2xl border border-border p-5 md:p-6 shadow-sm space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/70 pb-3">

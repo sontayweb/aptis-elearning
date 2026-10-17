@@ -711,8 +711,20 @@ function ListeningExamRunnerContent() {
       const pNum = p.part_number;
       const questions = p.questions || [];
 
+      // Phân định chính xác Part: Ưu tiên nhận diện từ title/part trước khi dùng pNum
+      let detectedPart = pNum;
+      if (pTitle.includes("part 2") || pTitle.includes("information matching") || pTitle.includes("speaker")) {
+        detectedPart = 2;
+      } else if (pTitle.includes("part 3") || pTitle.includes("opinion matching") || pTitle.includes("short conversation") || pTitle.includes("discussion")) {
+        detectedPart = 3;
+      } else if (pTitle.includes("part 4") || pTitle.includes("monologue") || pTitle.includes("recording")) {
+        detectedPart = 4;
+      } else if (pTitle.includes("part 1") || pTitle.includes("information recognition") || pTitle.includes("word recognition")) {
+        detectedPart = 1;
+      }
+
       // Part 1: Word Recognition
-      if (pNum === 1 || pTitle.includes("part 1")) {
+      if (detectedPart === 1) {
         if (questions.length > 0) {
           result.part1 = questions.map((q: any, idx: number) => {
             let opts: string[] = ["A", "B", "C"];
@@ -748,7 +760,7 @@ function ListeningExamRunnerContent() {
       }
 
       // Part 2: Speakers matching
-      if (pNum === 2 || pTitle.includes("part 2") || pTitle.includes("speaker")) {
+      if (detectedPart === 2) {
         let p2Topic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
         if (!p2Topic || /full\s*listening/i.test(p2Topic)) {
           const allP2Text = [
@@ -906,7 +918,7 @@ function ListeningExamRunnerContent() {
       }
 
       // Part 3: Opinion discussion
-      if (pNum === 3 || pTitle.includes("part 3") || pTitle.includes("opinion")) {
+      if (detectedPart === 3) {
         let p3Topic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
         if (!p3Topic || /full\s*listening/i.test(p3Topic)) {
           const allP3Text = [
@@ -967,7 +979,7 @@ function ListeningExamRunnerContent() {
       }
 
       // Part 4: Monologues
-      if (pNum === 4 || pTitle.includes("part 4") || pTitle.includes("monologue") || pTitle.includes("recording")) {
+      if (detectedPart === 4) {
         let p4BaseTopic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
         if (!p4BaseTopic || /full\s*listening/i.test(p4BaseTopic)) {
           p4BaseTopic = "Academic & Cultural Talks";
@@ -1859,7 +1871,8 @@ function ListeningExamRunnerContent() {
             </div>
           </div>
 
-          {/* 3. PART CONTENT CHUẨN */}
+          {/* 3. PART CONTENT CHUẨN WITH SMOOTH TRANSITION */}
+          <div key={`listening-stage-wrap-${activeStage}`} className="part-transition space-y-5">
           {/* =========================================================================
               PART 1: CÂU HỎI TRẮC NGHIỆM A, B, C
               ========================================================================= */}
@@ -2081,6 +2094,7 @@ function ListeningExamRunnerContent() {
               </div>
             );
           })()}
+          </div>
         </div>
       </main>
 

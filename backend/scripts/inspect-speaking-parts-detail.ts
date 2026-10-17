@@ -15,7 +15,7 @@ async function run() {
     for (const p of ex.parts) {
       console.log(`  Part num=${p.part_number} | title="${p.title}" | img="${p.image_url}" | qCount=${p.questions.length}`);
       for (const q of p.questions) {
-        console.log(`    Q num=${q.question_number} | prompt="${q.prompt?.slice(0, 45)}" | img="${q.image_url}" | opts=${JSON.stringify(q.options)}`);
+        console.log(`    Q num=${q.question_number} | prompt="${q.prompt?.slice(0, 45)}" | opts=${JSON.stringify(q.options)}`);
       }
     }
   }
