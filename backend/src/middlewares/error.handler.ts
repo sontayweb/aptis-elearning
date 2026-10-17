@@ -110,8 +110,16 @@ export const errorHandler = (
     console.error(err.stack);
   }
 
+  const defaultCode =
+    statusCode === 409 ? 'CONFLICT' :
+    statusCode === 404 ? 'NOT_FOUND' :
+    statusCode === 401 ? 'UNAUTHORIZED' :
+    statusCode === 403 ? 'FORBIDDEN' :
+    statusCode === 400 ? 'BAD_REQUEST' :
+    'INTERNAL_SERVER_ERROR';
+
   sendError(res, message, statusCode, {
-    code: err.code || 'INTERNAL_SERVER_ERROR',
+    code: err.code || defaultCode,
     stack: isDev ? err.stack : undefined,
   });
 };

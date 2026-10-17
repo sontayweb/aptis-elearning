@@ -20,7 +20,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw { statusCode: 409, message: 'Email này đã được đăng ký tài khoản' };
+      throw { statusCode: 409, code: 'EMAIL_ALREADY_EXISTS', message: 'Email này đã được đăng ký tài khoản' };
     }
 
     const passwordHash = await hashPassword(data.password);

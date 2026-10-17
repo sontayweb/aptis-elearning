@@ -85,6 +85,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshUser();
   }, []);
 
+  const extractErrorMessage = (res: any, fallback: string): string => {
+    if (res?.message) return res.message;
+    if (res?.error?.message) return res.error.message;
+    if (typeof res?.error === 'string') return res.error;
+    if (Array.isArray(res?.error?.details) && res.error.details.length > 0) {
+      return res.error.details[0].message || fallback;
+    }
+    return fallback;
+  };
+
   const login = async (email: string, password: string) => {
     const res = await api.auth.login({ email, password });
     if (res.success && res.data) {
@@ -95,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return {
       success: false,
-      error: res.error?.message || "Đăng nhập không thành công",
+      error: extractErrorMessage(res, "Đăng nhập không thành công"),
     };
   };
 
@@ -112,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return {
       success: false,
-      error: res.error?.message || "Đăng ký không thành công",
+      error: extractErrorMessage(res, "Đăng ký không thành công"),
     };
   };
 
