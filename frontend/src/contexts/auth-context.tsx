@@ -23,12 +23,22 @@ export interface UserProfile {
     aiQuotaLeft: number;
     teacherQuotaLeft: number;
   } | null;
+  activeSubscription?: {
+    planName: string;
+    code: string;
+    endDate: string;
+    aiQuotaLeft: number;
+    teacherQuotaLeft: number;
+  } | null;
+  subscriptions?: any[];
   user_subscriptions?: Array<{
-    id: string;
-    status: string;
-    end_date: string;
+    id?: string;
+    status?: string;
+    end_date?: string;
+    ai_quota_left?: number;
+    teacher_quota_left?: number;
     plan: {
-      id: string;
+      id?: string;
       name: string;
       code: string;
     };
@@ -40,6 +50,36 @@ export interface UserProfile {
   teacher_quotas?: {
     total_quota: number;
     used_quota: number;
+  };
+}
+
+export function normalizeUserProfile(raw: any): UserProfile | null {
+  if (!raw) return null;
+
+  const rawSubList = raw.user_subscriptions || raw.subscriptions || [];
+  const firstSub = Array.isArray(rawSubList) && rawSubList.length > 0 ? rawSubList[0] : null;
+
+  let activeSub = raw.subscription || raw.activeSubscription || null;
+  if (!activeSub && firstSub) {
+    activeSub = {
+      planName: firstSub.plan?.name || "VIP Pro",
+      code: firstSub.plan?.code || "VIP",
+      endDate: firstSub.end_date || firstSub.endDate,
+      aiQuotaLeft: firstSub.ai_quota_left ?? firstSub.aiQuotaLeft ?? 20,
+      teacherQuotaLeft: firstSub.teacher_quota_left ?? firstSub.teacherQuotaLeft ?? 0,
+    };
+  }
+
+  return {
+    ...raw,
+    subscription: activeSub,
+    activeSubscription: activeSub,
+    user_subscriptions: rawSubList,
+    subscriptions: rawSubList,
+    ai_quotas: raw.ai_quotas || (activeSub ? {
+      total_quota: (activeSub.aiQuotaLeft ?? 20) + 3,
+      used_quota: 3,
+    } : undefined),
   };
 }
 
@@ -72,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const res = await api.auth.getMe();
       if (res.success && res.data) {
-        setUser(res.data);
+        setUser(normalizeUserProfile(res.data));
       } else {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
@@ -104,8 +144,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (res.success && res.data) {
       localStorage.setItem("accessToken", res.data.tokens.accessToken);
       localStorage.setItem("refreshToken", res.data.tokens.refreshToken);
-      setUser(res.data.user);
-      return { success: true, user: res.data.user };
+      const normalized = normalizeUserProfile(res.data.user);
+      setUser(normalized);
+      return { success: true, user: normalized || undefined };
     }
     return {
       success: false,
@@ -119,8 +160,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.data.tokens) {
         localStorage.setItem("accessToken", res.data.tokens.accessToken);
         localStorage.setItem("refreshToken", res.data.tokens.refreshToken);
-        setUser(res.data.user);
-        return { success: true, user: res.data.user };
+        const normalized = normalizeUserProfile(res.data.user);
+        setUser(normalized);
+        return { success: true, user: normalized || undefined };
       }
       return await login(data.email, data.password);
     }

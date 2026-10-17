@@ -545,12 +545,14 @@ export class PaymentService {
     if (!activeSub) {
       return {
         hasActiveSubscription: false,
+        is_active: false,
         plan: null,
       };
     }
 
     return {
       hasActiveSubscription: true,
+      is_active: true,
       plan: {
         name: activeSub.plan.name,
         code: activeSub.plan.code,

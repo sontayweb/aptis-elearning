@@ -65,6 +65,7 @@ export async function grantOrExtendSubscription(
       is_active: true,
       end_date: { gt: now },
     },
+    include: { plan: true },
     orderBy: { end_date: 'desc' },
   });
 
@@ -74,10 +75,15 @@ export async function grantOrExtendSubscription(
     const newAiQuota = existingSub.ai_quota_left + planAiQuota;
     const newTeacherQuota = existingSub.teacher_quota_left + planTeacherQuota;
 
+    // Giữ nguyên gói cao nhất: Chỉ đổi sang plan_id mới nếu gói mới có cấp bậc hoặc giá cao hơn/bằng
+    // Tránh trường hợp đang ở gói 6 Tháng mua thêm ngày lại bị hạ cấp danh hiệu xuống 1 Tháng
+    const shouldUpgradePlanId = !existingSub.plan || (plan.price_vnd >= (existingSub.plan.price_vnd || 0));
+    const targetPlanId = shouldUpgradePlanId ? plan.id : existingSub.plan_id;
+
     return await db.userSubscription.update({
       where: { id: existingSub.id },
       data: {
-        plan_id: plan.id,
+        plan_id: targetPlanId,
         end_date: newEndDate,
         ai_quota_left: newAiQuota,
         teacher_quota_left: newTeacherQuota,

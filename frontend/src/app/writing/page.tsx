@@ -124,6 +124,43 @@ export default function WritingPracticePage() {
     loadExams();
   }, []);
 
+  // Đồng bộ tab từ URL (?tab=p1/p2/p3/p4/full) và lắng nghe sự kiện switch tab từ Guide Modal
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const syncTabFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam && ["full", "p1", "p2", "p3", "p4"].includes(tabParam)) {
+        setActiveTab(tabParam as any);
+        setTimeout(() => {
+          const el = document.getElementById("practice-sets-section");
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    };
+
+    syncTabFromUrl();
+
+    const handleSwitchTab = (e: Event) => {
+      const customEvent = e as CustomEvent<{ skill: string; tab: string }>;
+      if (customEvent.detail && (customEvent.detail.skill === "writing" || !customEvent.detail.skill)) {
+        const targetTab = customEvent.detail.tab;
+        if (["full", "p1", "p2", "p3", "p4"].includes(targetTab)) {
+          setActiveTab(targetTab as any);
+        }
+      }
+    };
+
+    window.addEventListener("aptis:switch-skill-tab", handleSwitchTab);
+    window.addEventListener("popstate", syncTabFromUrl);
+
+    return () => {
+      window.removeEventListener("aptis:switch-skill-tab", handleSwitchTab);
+      window.removeEventListener("popstate", syncTabFromUrl);
+    };
+  }, []);
+
   // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
   const currentTabExams = exams.filter((e) => {
     if (activeTab === "full") {
@@ -240,16 +277,26 @@ export default function WritingPracticePage() {
 
       <main className="flex-1 pt-[calc(var(--navbar-total-height,64px)+16px)] sm:pt-[calc(var(--navbar-total-height,64px)+22px)] md:pt-[calc(var(--navbar-total-height,64px)+28px)] transition-all duration-300">
         <section className="section-container py-6 md:py-8">
-          {/* Search Box */}
-          <div className="relative mb-6">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex w-full rounded-xl border border-input px-3 py-2 text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-sm"
-              placeholder="Tìm kiếm bộ đề Writing theo câu lạc bộ..."
-            />
+          {/* Search Box & Cẩm nang */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex w-full rounded-xl border border-input px-3 py-2 text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-sm"
+                placeholder="Tìm kiếm bộ đề Writing theo câu lạc bộ..."
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsGuideModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 px-4 h-11 rounded-xl border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold transition-all shadow-2xs shrink-0"
+            >
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span>Cẩm nang 4 Part chi tiết</span>
+            </button>
           </div>
 
           {/* Top 5 Part Tabs matching reading/listening layout */}
@@ -264,7 +311,14 @@ export default function WritingPracticePage() {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => {
+                  setActiveTab(tab.id as any);
+                  if (typeof window !== "undefined") {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("tab", tab.id);
+                    window.history.pushState({}, "", url.toString());
+                  }
+                }}
                 className={`whitespace-nowrap px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
                   activeTab === tab.id
                     ? "bg-primary text-primary-foreground shadow-md"
@@ -389,7 +443,7 @@ export default function WritingPracticePage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div id="practice-sets-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 scroll-mt-24">
               {/* CARD 1: Special Action Card (PRO Custom / Marathon) */}
               <div className="relative rounded-2xl border-2 border-primary/60 bg-card p-6 flex flex-col justify-between shadow-md hover:shadow-lg transition-all">
                 <div>
@@ -563,6 +617,10 @@ export default function WritingPracticePage() {
         isOpen={isGuideModalOpen}
         onClose={() => setIsGuideModalOpen(false)}
         initialSkill="writing"
+        onStartPractice={(_s, pIdx) => {
+          const tabKey = (`p${pIdx + 1}` as "p1" | "p2" | "p3" | "p4");
+          setActiveTab(tabKey);
+        }}
       />
     </div>
   );

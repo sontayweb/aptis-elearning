@@ -129,6 +129,43 @@ export default function ListeningPracticePage() {
     }).catch(() => {});
   }, []);
 
+  // Đồng bộ tab từ URL (?tab=p1/p2/p3/p4/full) và lắng nghe sự kiện switch tab từ Guide Modal
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const syncTabFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam && ["full", "p1", "p2", "p3", "p4"].includes(tabParam)) {
+        setActiveTab(tabParam as any);
+        setTimeout(() => {
+          const el = document.getElementById("practice-sets-section");
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    };
+
+    syncTabFromUrl();
+
+    const handleSwitchTab = (e: Event) => {
+      const customEvent = e as CustomEvent<{ skill: string; tab: string }>;
+      if (customEvent.detail && (customEvent.detail.skill === "listening" || !customEvent.detail.skill)) {
+        const targetTab = customEvent.detail.tab;
+        if (["full", "p1", "p2", "p3", "p4"].includes(targetTab)) {
+          setActiveTab(targetTab as any);
+        }
+      }
+    };
+
+    window.addEventListener("aptis:switch-skill-tab", handleSwitchTab);
+    window.addEventListener("popstate", syncTabFromUrl);
+
+    return () => {
+      window.removeEventListener("aptis:switch-skill-tab", handleSwitchTab);
+      window.removeEventListener("popstate", syncTabFromUrl);
+    };
+  }, []);
+
   // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
   const currentTabExams = exams.filter((e) => {
     if (activeTab === "full") {
@@ -264,79 +301,57 @@ export default function ListeningPracticePage() {
 
         {/* Search, Filter & Parts */}
         <section className="section-container py-8 md:py-10">
-          <div className="relative mb-6">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex w-full rounded-md border border-input px-3 py-2 text-base md:text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              placeholder="Tìm kiếm bộ đề Listening..."
-            />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex w-full rounded-xl border border-input px-3 py-2 text-base md:text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                placeholder="Tìm kiếm bộ đề Listening..."
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsGuideModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 px-4 h-11 rounded-xl border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold transition-all shadow-2xs shrink-0"
+            >
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span>Cẩm nang 4 Part chi tiết</span>
+            </button>
           </div>
 
           {/* Parts Filter Tabs */}
           <div className="inline-flex items-center justify-center rounded-xl text-muted-foreground w-full h-auto flex-wrap gap-1 bg-muted/50 p-1.5 mb-6">
-            <button
-              type="button"
-              onClick={() => setActiveTab("full")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "full"
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">Full Part</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– Tất cả các Part</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("p1")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "p1"
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">P.1</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– Word recognition (Câu 1 - 13)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("p2")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "p2"
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">P.2</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– Matching info (Câu 14)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("p3")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "p3"
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">P.3</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– Short conversations (Câu 15)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("p4")}
-              className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                activeTab === "p4"
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "hover:text-foreground"
-              }`}
-            >
-              <span className="font-semibold">P.4</span>
-              <span className="hidden lg:inline ml-1 opacity-80">– Monologues (Câu 16 - 17)</span>
-            </button>
+            {[
+              { id: "full", label: "Full Part", sub: "Tất cả các Part" },
+              { id: "p1", label: "P.1", sub: "Word recognition (Câu 1 - 13)" },
+              { id: "p2", label: "P.2", sub: "Matching info (Câu 14)" },
+              { id: "p3", label: "P.3", sub: "Short conversations (Câu 15)" },
+              { id: "p4", label: "P.4", sub: "Monologues (Câu 16 - 17)" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  setActiveTab(tab.id as any);
+                  if (typeof window !== "undefined") {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("tab", tab.id);
+                    window.history.pushState({}, "", url.toString());
+                  }
+                }}
+                className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
+                  activeTab === tab.id
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "hover:text-foreground"
+                }`}
+              >
+                <span className="font-semibold">{tab.label}</span>
+                <span className="hidden lg:inline ml-1 opacity-80">– {tab.sub}</span>
+              </button>
+            ))}
           </div>
 
           {/* 3 Hàng Bộ lọc chuẩn: Ưu tiên, Trạng thái, Nguồn */}
@@ -443,7 +458,7 @@ export default function ListeningPracticePage() {
               <p className="text-xs text-muted-foreground mt-1">Cơ sở dữ liệu hiện tại chưa có đề thi nào trong danh mục này.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div id="practice-sets-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 scroll-mt-24">
               {/* CARD 1: Tạo bộ đề của bạn (PRO) */}
               <div className="relative rounded-2xl border-2 border-primary/50 bg-card p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
                 <div>
@@ -632,6 +647,10 @@ export default function ListeningPracticePage() {
         isOpen={isGuideModalOpen}
         onClose={() => setIsGuideModalOpen(false)}
         initialSkill="listening"
+        onStartPractice={(_s, pIdx) => {
+          const tabKey = (`p${pIdx + 1}` as "p1" | "p2" | "p3" | "p4");
+          setActiveTab(tabKey);
+        }}
       />
     </div>
   );

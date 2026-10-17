@@ -418,12 +418,20 @@ export function Navbar() {
 
         {/* Right Action Controls */}
         <div className="hidden xl:flex items-center gap-1.5 xl:gap-2 shrink-0 ml-auto">
-          {/* Nâng cấp */}
-          <Link href="/pricing" data-discover="true">
-            <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap transition-all rounded-full h-8 px-3 text-xs font-bold gap-1 btn-brand-gradient text-white border-0 shadow-glow-soft">
-              <Crown className="w-3.5 h-3.5" /> Nâng cấp
-            </button>
-          </Link>
+          {/* Nâng cấp / VIP PRO */}
+          {user?.subscription || user?.activeSubscription || user?.user_subscriptions?.length ? (
+            <Link href="/pricing" data-discover="true">
+              <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap transition-all rounded-full h-8 px-3 text-xs font-black gap-1.5 bg-gradient-to-r from-amber-500 via-amber-600 to-orange-500 text-white shadow-md shadow-amber-500/25 hover:scale-105 cursor-pointer">
+                <Crown className="w-3.5 h-3.5 fill-amber-200 text-amber-100" /> VIP PRO
+              </button>
+            </Link>
+          ) : (
+            <Link href="/pricing" data-discover="true">
+              <button className="tech-btn inline-flex items-center justify-center whitespace-nowrap transition-all rounded-full h-8 px-3 text-xs font-bold gap-1 btn-brand-gradient text-white border-0 shadow-glow-soft">
+                <Crown className="w-3.5 h-3.5" /> Nâng cấp
+              </button>
+            </Link>
+          )}
 
           {/* Dashboard Button (Hiển thị trên màn hình rộng 2xl) */}
           <Link href="/dashboard" data-discover="true" className="hidden 2xl:inline-flex">

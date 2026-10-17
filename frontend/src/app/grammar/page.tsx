@@ -118,6 +118,34 @@ export default function GrammarPracticePage() {
     }).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const checkScroll = () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("tab")) {
+        setTimeout(() => {
+          const el = document.getElementById("practice-sets-section");
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    };
+
+    checkScroll();
+
+    const handleSwitchTab = () => {
+      setTimeout(() => {
+        const el = document.getElementById("practice-sets-section");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
+    };
+
+    window.addEventListener("aptis:switch-skill-tab", handleSwitchTab);
+    return () => {
+      window.removeEventListener("aptis:switch-skill-tab", handleSwitchTab);
+    };
+  }, []);
+
   const filteredExams = exams.filter((exam) => {
     const matchesSearch = exam.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter =
@@ -312,7 +340,7 @@ export default function GrammarPracticePage() {
               <p className="text-xs text-muted-foreground mt-1">Vui lòng thay đổi từ khóa tìm kiếm hoặc bỏ bộ lọc.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+            <div id="practice-sets-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 scroll-mt-24">
               {filteredExams.map((exam) => {
                 const isLocked = !exam.isFree && !isProOrAdmin;
 
@@ -436,6 +464,12 @@ export default function GrammarPracticePage() {
         isOpen={isGuideModalOpen}
         onClose={() => setIsGuideModalOpen(false)}
         initialSkill="grammar"
+        onStartPractice={() => {
+          setTimeout(() => {
+            const el = document.getElementById("practice-sets-section");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 150);
+        }}
       />
     </div>
   );

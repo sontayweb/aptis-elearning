@@ -42,14 +42,23 @@ export function DashboardView({ user }: DashboardViewProps) {
     loadDashboardStats();
   }, [user]);
 
-  const planName = user?.user_subscriptions?.length
-    ? user.user_subscriptions[0].plan.name
-    : "Miễn phí";
+  const activeSub = user?.subscription || user?.activeSubscription || (user?.user_subscriptions?.[0] ? {
+    planName: user.user_subscriptions[0].plan?.name,
+    code: user.user_subscriptions[0].plan?.code,
+    endDate: user.user_subscriptions[0].end_date,
+    aiQuotaLeft: user.user_subscriptions[0].ai_quota_left,
+    teacherQuotaLeft: user.user_subscriptions[0].teacher_quota_left,
+  } : null);
 
-  const aiRemaining = user?.ai_quotas
+  const isVip = Boolean(activeSub && activeSub.planName);
+  const planName = isVip ? (activeSub?.planName || "VIP Pro") : "Miễn phí";
+
+  const aiRemaining = activeSub?.aiQuotaLeft !== undefined
+    ? activeSub.aiQuotaLeft
+    : user?.ai_quotas
     ? user.ai_quotas.total_quota - user.ai_quotas.used_quota
     : 3;
-  const aiTotal = user?.ai_quotas ? user.ai_quotas.total_quota : 3;
+  const aiTotal = Math.max(aiRemaining, user?.ai_quotas?.total_quota || 20);
 
   const skillsCoveredCount = stats?.skillProgress
     ? stats.skillProgress.filter((s: any) => s.completedExams > 0).length

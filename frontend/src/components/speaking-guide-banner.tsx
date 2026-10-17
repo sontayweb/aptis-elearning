@@ -16,7 +16,11 @@ import {
   Flame,
 } from "lucide-react";
 
-export function SpeakingGuideBanner() {
+export interface SpeakingGuideBannerProps {
+  onOpenGuideModal?: () => void;
+}
+
+export function SpeakingGuideBanner({ onOpenGuideModal }: SpeakingGuideBannerProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"structure" | "steps" | "tips">("structure");
 
@@ -46,14 +50,26 @@ export function SpeakingGuideBanner() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-bold transition-all shadow-xs shrink-0"
-        >
-          <span>{isOpen ? "Thu gọn hướng dẫn" : "Xem Form đề & Cách học"}</span>
-          {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
+        <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+          {onOpenGuideModal && (
+            <button
+              type="button"
+              onClick={onOpenGuideModal}
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold transition-all shadow-2xs"
+            >
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span>Cẩm nang 4 Part chi tiết</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-bold transition-all shadow-xs shrink-0"
+          >
+            <span>{isOpen ? "Thu gọn hướng dẫn" : "Xem Form đề & Cách học"}</span>
+            {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
       {/* Collapsible Content */}

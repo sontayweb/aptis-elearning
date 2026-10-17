@@ -155,6 +155,17 @@ export class AuthService {
               teacherQuotaLeft: activeSubscription.teacher_quota_left,
             }
           : null,
+        activeSubscription: activeSubscription
+          ? {
+              planName: activeSubscription.plan.name,
+              code: activeSubscription.plan.code,
+              endDate: activeSubscription.end_date,
+              aiQuotaLeft: activeSubscription.ai_quota_left,
+              teacherQuotaLeft: activeSubscription.teacher_quota_left,
+            }
+          : null,
+        subscriptions: user.subscriptions || [],
+        user_subscriptions: user.subscriptions || [],
       },
       tokens,
     };
@@ -211,18 +222,22 @@ export class AuthService {
     }
 
     const activeSub = user.subscriptions[0] || null;
+    const subObj = activeSub
+      ? {
+          planName: activeSub.plan.name,
+          code: activeSub.plan.code,
+          endDate: activeSub.end_date,
+          aiQuotaLeft: activeSub.ai_quota_left,
+          teacherQuotaLeft: activeSub.teacher_quota_left,
+        }
+      : null;
 
     return {
       ...user,
-      activeSubscription: activeSub
-        ? {
-            planName: activeSub.plan.name,
-            code: activeSub.plan.code,
-            endDate: activeSub.end_date,
-            aiQuotaLeft: activeSub.ai_quota_left,
-            teacherQuotaLeft: activeSub.teacher_quota_left,
-          }
-        : null,
+      subscription: subObj,
+      activeSubscription: subObj,
+      user_subscriptions: user.subscriptions,
+      subscriptions: user.subscriptions,
     };
   }
 

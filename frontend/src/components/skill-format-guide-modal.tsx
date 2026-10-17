@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Clock,
   FileText,
@@ -760,6 +761,8 @@ export interface UniversalSkillGuideModalProps {
   initialSkill?: SkillType;
   /** Nếu true, cho phép chuyển đổi tab giữa các kỹ năng (mặc định: true) */
   allowSkillSwitching?: boolean;
+  /** Callback tùy chọn khi bấm vào luyện tập ngay */
+  onStartPractice?: (skill: SkillType, partIndex: number) => void;
 }
 
 export function UniversalSkillGuideModal({
@@ -767,7 +770,9 @@ export function UniversalSkillGuideModal({
   onClose,
   initialSkill = "speaking",
   allowSkillSwitching = true,
+  onStartPractice,
 }: UniversalSkillGuideModalProps) {
+  const router = useRouter();
   const [currentSkill, setCurrentSkill] = useState<SkillType>(initialSkill);
   const [activePartIndex, setActivePartIndex] = useState(0);
 
@@ -788,6 +793,58 @@ export function UniversalSkillGuideModal({
   const handleSwitchSkill = (s: SkillType) => {
     setCurrentSkill(s);
     setActivePartIndex(0);
+  };
+
+  const handleStartPractice = () => {
+    // 1. Invoke custom callback if provided by the parent page
+    if (onStartPractice) {
+      onStartPractice(currentSkill, safePartIndex);
+    }
+
+    // 2. Close modal
+    onClose();
+
+    // 3. Compute target skill path and tab
+    const targetPath = currentSkill === "grammar" ? "/grammar" : `/${currentSkill}`;
+    let partTab = "full";
+    if (currentSkill === "grammar") {
+      partTab = safePartIndex === 0 ? "grammar" : "vocab";
+    } else {
+      partTab = `p${safePartIndex + 1}`;
+    }
+
+    if (typeof window !== "undefined") {
+      const currentPath = window.location.pathname;
+
+      if (currentPath === targetPath) {
+        // If already on the same skill page:
+        // Update URL query string without reloading
+        const url = new URL(window.location.href);
+        url.searchParams.set("tab", partTab);
+        window.history.pushState({}, "", url.toString());
+
+        // Dispatch a custom event so the current page switches its activeTab state immediately
+        window.dispatchEvent(
+          new CustomEvent("aptis:switch-skill-tab", { detail: { skill: currentSkill, tab: partTab } })
+        );
+
+        // Smooth scroll to practice cards
+        setTimeout(() => {
+          const targetEl =
+            document.getElementById("practice-sets-section") ||
+            document.getElementById("practice-cards") ||
+            document.querySelector("section.section-container:nth-of-type(2)");
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          } else {
+            window.scrollTo({ top: 480, behavior: "smooth" });
+          }
+        }, 120);
+      } else {
+        // Navigate to the target skill page with the chosen tab
+        router.push(`${targetPath}?tab=${partTab}`);
+      }
+    }
   };
 
   const getSkillIcon = (s: SkillType) => {
@@ -1108,7 +1165,7 @@ export function UniversalSkillGuideModal({
           </span>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleStartPractice}
             className="w-full sm:w-auto h-9 px-5 rounded-xl btn-brand-gradient text-white font-bold cursor-pointer hover:shadow-md transition-all inline-flex items-center justify-center gap-1.5"
           >
             <span>Đã nắm rõ, vào luyện tập ngay</span>

@@ -1,0 +1,27 @@
+Total Listening Exams in DB: 405
+Full Tests (4 Parts): 38
+Single Part 1 Exams: 43
+Single Part 2 Exams: 41
+Single Part 3 Exams: 37
+Single Part 4 Exams: 54
+
+Total Part 1 Questions in Single-Part exams: 559
+Total Part 1 Questions in Full Tests: 470
+GRAND TOTAL Part 1 Questions: 1029
+
+--- DỮ LIỆU GỐC TỪ APTIS KỲ TÍCH ---
+Tổng số bộ đề Listening trong catalog: 175
+Số bộ đề Part 1 trong catalog gốc: 43
+Tổng số câu hỏi Part 1 trong file câu hỏi gốc: 559
+
+Danh sách các đề lẻ Part 1 (10 đề đầu):
+- Đề 01 - Listening Part 1: 13 câu
+- Đề 02 - Listening Part 1: 13 câu
+- Đề 03 - Listening Part 1: 13 câu
+- Đề 04 - Listening Part 1: 13 câu
+- Đề 06 - Listening Part 1: 13 câu
+- Đề 05 - Listening Part 1: 13 câu
+- Đề 07 - Listening Part 1: 13 câu
+- Đề 08 - Listening Part 1: 13 câu
+- Đề 09 - Listening Part 1: 13 câu
+- Đề 10 - Listening Part 1: 13 câu

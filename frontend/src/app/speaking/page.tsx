@@ -155,6 +155,43 @@ export default function SpeakingPracticePage() {
     loadExams();
   }, []);
 
+  // Đồng bộ tab từ URL (?tab=p1/p2/p3/p4/full) và lắng nghe sự kiện switch tab từ Guide Modal
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const syncTabFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam && ["full", "p1", "p2", "p3", "p4"].includes(tabParam)) {
+        setActiveTab(tabParam as any);
+        setTimeout(() => {
+          const el = document.getElementById("practice-sets-section");
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    };
+
+    syncTabFromUrl();
+
+    const handleSwitchTab = (e: Event) => {
+      const customEvent = e as CustomEvent<{ skill: string; tab: string }>;
+      if (customEvent.detail && (customEvent.detail.skill === "speaking" || !customEvent.detail.skill)) {
+        const targetTab = customEvent.detail.tab;
+        if (["full", "p1", "p2", "p3", "p4"].includes(targetTab)) {
+          setActiveTab(targetTab as any);
+        }
+      }
+    };
+
+    window.addEventListener("aptis:switch-skill-tab", handleSwitchTab);
+    window.addEventListener("popstate", syncTabFromUrl);
+
+    return () => {
+      window.removeEventListener("aptis:switch-skill-tab", handleSwitchTab);
+      window.removeEventListener("popstate", syncTabFromUrl);
+    };
+  }, []);
+
   // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
   const currentTabExams = exams.filter((e) => {
     if (activeTab === "full") {
@@ -295,7 +332,14 @@ export default function SpeakingPracticePage() {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => {
+                  setActiveTab(tab.id as any);
+                  if (typeof window !== "undefined") {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("tab", tab.id);
+                    window.history.pushState({}, "", url.toString());
+                  }
+                }}
                 className={`whitespace-nowrap px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
                   activeTab === tab.id
                     ? "bg-primary text-primary-foreground shadow-md"
@@ -308,7 +352,7 @@ export default function SpeakingPracticePage() {
           </div>
 
           {/* Form đề thi + Hướng dẫn học toàn diện */}
-          <SpeakingGuideBanner />
+          <SpeakingGuideBanner onOpenGuideModal={() => setIsGuideModalOpen(true)} />
 
           {/* Header Description */}
           <div className="mb-6 space-y-1">
@@ -423,7 +467,7 @@ export default function SpeakingPracticePage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div id="practice-sets-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 scroll-mt-24">
               {/* CARD 1: Special Action Card (PRO Custom / Marathon) */}
               <div className="relative rounded-2xl border-2 border-primary/60 bg-card p-6 flex flex-col justify-between shadow-md hover:shadow-lg transition-all">
                 <div>
@@ -666,6 +710,10 @@ export default function SpeakingPracticePage() {
         isOpen={isGuideModalOpen}
         onClose={() => setIsGuideModalOpen(false)}
         initialSkill="speaking"
+        onStartPractice={(_s, pIdx) => {
+          const tabKey = (`p${pIdx + 1}` as "p1" | "p2" | "p3" | "p4");
+          setActiveTab(tabKey);
+        }}
       />
     </div>
   );

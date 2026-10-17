@@ -19,6 +19,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { ReferralGiftCard } from "@/components/referral-gift-card";
+import { useAuth } from "@/contexts/auth-context";
 
 interface TodayRecommendationData {
   weakestPartTitle?: string;
@@ -32,6 +33,16 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
+  const { user } = useAuth();
+  const activeSub = user?.subscription || user?.activeSubscription || (user?.user_subscriptions?.[0] ? {
+    planName: user.user_subscriptions[0].plan?.name,
+    code: user.user_subscriptions[0].plan?.code,
+    endDate: user.user_subscriptions[0].end_date,
+    aiQuotaLeft: user.user_subscriptions[0].ai_quota_left,
+    teacherQuotaLeft: user.user_subscriptions[0].teacher_quota_left,
+  } : null);
+  const isVip = Boolean(activeSub && activeSub.planName);
+
   // Pro plan selection state (default: 1 month)
   const [selectedPlanId, setSelectedPlanId] = useState("1-month");
 
@@ -167,70 +178,104 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
       </div>
 
       {/* 2. Nâng cấp gói Pro (Luxury Gold VIP Style) */}
-      <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/5 via-primary/5 to-card/90 backdrop-blur-sm p-4 sm:p-5 shadow-sm hover:border-amber-500/50 transition-all duration-300">
-        <div className="flex items-start gap-2.5 mb-2">
-          <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">
-            <Crown className="w-4 h-4 fill-amber-500" />
+      {/* 2. Gói VIP hiện tại hoặc Nâng cấp gói Pro */}
+      {isVip && activeSub ? (
+        <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-br from-amber-500/10 via-primary/5 to-card/90 backdrop-blur-sm p-4 sm:p-5 shadow-sm">
+          <div className="flex items-start gap-2.5 mb-2">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/30">
+              <Crown className="w-4 h-4 fill-white" />
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[10px] font-black mb-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>VIP ĐANG HOẠT ĐỘNG</span>
+              </div>
+              <h3 className="font-heading font-black text-sm sm:text-base text-foreground leading-tight">
+                {activeSub.planName || "Gói VIP Pro"}
+              </h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Hạn dùng đến: <strong className="text-foreground">{activeSub.endDate ? new Date(activeSub.endDate).toLocaleDateString("vi-VN") : "Vĩnh viễn"}</strong>
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-heading font-black text-sm sm:text-base text-foreground leading-tight">
-              Nâng cấp gói Pro
-            </h3>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              Học không giới hạn kho đề + chấm AI Speaking &amp; Writing
-            </p>
+          <div className="mt-3 p-2.5 rounded-xl bg-background/60 border border-border/80 flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Lượt chấm AI:</span>
+            <span className="font-bold text-primary">{activeSub.aiQuotaLeft ?? 20} lượt</span>
           </div>
+          <Link
+            href="/pricing"
+            className="mt-3 w-full h-9 rounded-xl border border-amber-500/40 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-all"
+          >
+            <span>Gia hạn / Nâng cấp thêm</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
+      ) : (
+        <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/5 via-primary/5 to-card/90 backdrop-blur-sm p-4 sm:p-5 shadow-sm hover:border-amber-500/50 transition-all duration-300">
+          <div className="flex items-start gap-2.5 mb-2">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">
+              <Crown className="w-4 h-4 fill-amber-500" />
+            </div>
+            <div>
+              <h3 className="font-heading font-black text-sm sm:text-base text-foreground leading-tight">
+                Nâng cấp gói Pro
+              </h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Học không giới hạn kho đề + chấm AI Speaking &amp; Writing
+              </p>
+            </div>
+          </div>
 
-        {/* Radio Option Selector */}
-        <div className="mt-3.5 space-y-1.5">
-          {planOptions.map((opt) => {
-            const isSelected = selectedPlanId === opt.id;
-            return (
-              <label
-                key={opt.id}
-                onClick={() => setSelectedPlanId(opt.id)}
-                className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
-                  isSelected
-                    ? "border-amber-500/70 bg-amber-500/10 text-foreground shadow-2xs ring-1 ring-amber-500/30"
-                    : "border-border/70 bg-background/50 hover:bg-background/80 text-muted-foreground"
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      isSelected
-                        ? "border-amber-500 bg-amber-500 text-white"
-                        : "border-border bg-background"
-                    }`}
-                  >
-                    {isSelected && <CheckCircle2 className="w-3 h-3 text-white" />}
-                  </div>
-                  <span className={isSelected ? "font-bold text-foreground" : ""}>
-                    {opt.label}
-                  </span>
-                </div>
-                <span
-                  className={`font-black ${
-                    isSelected ? "text-amber-600 dark:text-amber-400" : "text-foreground"
+          {/* Radio Option Selector */}
+          <div className="mt-3.5 space-y-1.5">
+            {planOptions.map((opt) => {
+              const isSelected = selectedPlanId === opt.id;
+              return (
+                <label
+                  key={opt.id}
+                  onClick={() => setSelectedPlanId(opt.id)}
+                  className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
+                    isSelected
+                      ? "border-amber-500/70 bg-amber-500/10 text-foreground shadow-2xs ring-1 ring-amber-500/30"
+                      : "border-border/70 bg-background/50 hover:bg-background/80 text-muted-foreground"
                   }`}
                 >
-                  {opt.price}
-                </span>
-              </label>
-            );
-          })}
-        </div>
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                        isSelected
+                          ? "border-amber-500 bg-amber-500 text-white"
+                          : "border-border bg-background"
+                      }`}
+                    >
+                      {isSelected && <CheckCircle2 className="w-3 h-3 text-white" />}
+                    </div>
+                    <span className={isSelected ? "font-bold text-foreground" : ""}>
+                      {opt.label}
+                    </span>
+                  </div>
+                  <span
+                    className={`font-black ${
+                      isSelected ? "text-amber-600 dark:text-amber-400" : "text-foreground"
+                    }`}
+                  >
+                    {opt.price}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
 
-        {/* Upgrade CTA Button */}
-        <Link
-          href={`/pricing?plan=${selectedPlanId}`}
-          className="mt-3.5 w-full h-10 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs inline-flex items-center justify-center gap-2 shadow-md shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-500/35 transition-all hover:scale-[1.01] active:scale-95 cursor-pointer"
-        >
-          <Crown className="w-4 h-4 fill-white" />
-          <span>Nâng cấp ngay →</span>
-        </Link>
-      </div>
+          {/* Upgrade CTA Button */}
+          <Link
+            href={`/pricing?plan=${selectedPlanId}`}
+            className="mt-3.5 w-full h-10 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs inline-flex items-center justify-center gap-2 shadow-md shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-500/35 transition-all hover:scale-[1.01] active:scale-95 cursor-pointer"
+          >
+            <Crown className="w-4 h-4 fill-white" />
+            <span>Nâng cấp ngay →</span>
+          </Link>
+        </div>
+      )}
 
       {/* 3. Truy cập nhanh (Quick Actions) */}
       <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-4 sm:p-5 shadow-sm">

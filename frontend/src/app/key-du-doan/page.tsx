@@ -110,7 +110,11 @@ export default function KeyDuDoanPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isVipUser = Boolean(user?.user_subscriptions?.some((s: any) => s.is_active));
+  const isVipUser = Boolean(
+    user?.subscription ||
+    user?.activeSubscription ||
+    user?.user_subscriptions?.some((s: any) => s.is_active)
+  );
 
   const loadKeyExams = async () => {
     try {

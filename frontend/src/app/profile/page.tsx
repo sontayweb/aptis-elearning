@@ -268,21 +268,25 @@ export default function ProfilePage() {
     );
   }
 
-  const subscription = user.subscription || (user.user_subscriptions?.[0] ? {
+  const subscription = user.subscription || user.activeSubscription || (user.user_subscriptions?.[0] ? {
     planName: user.user_subscriptions[0].plan.name,
     code: user.user_subscriptions[0].plan.code,
     endDate: user.user_subscriptions[0].end_date,
-    aiQuotaLeft: user.ai_quotas ? user.ai_quotas.total_quota - user.ai_quotas.used_quota : 3,
-    teacherQuotaLeft: user.teacher_quotas ? user.teacher_quotas.total_quota - user.teacher_quotas.used_quota : 0,
+    aiQuotaLeft: user.user_subscriptions[0].ai_quota_left ?? (user.ai_quotas ? user.ai_quotas.total_quota - user.ai_quotas.used_quota : 20),
+    teacherQuotaLeft: user.user_subscriptions[0].teacher_quota_left ?? (user.teacher_quotas ? user.teacher_quotas.total_quota - user.teacher_quotas.used_quota : 0),
   } : null);
 
-  const aiQuota = user.ai_quotas
+  const aiQuota = subscription?.aiQuotaLeft !== undefined
+    ? subscription.aiQuotaLeft
+    : user.ai_quotas
     ? Math.max(0, user.ai_quotas.total_quota - user.ai_quotas.used_quota)
-    : subscription?.aiQuotaLeft ?? 3;
+    : 3;
 
-  const teacherQuota = user.teacher_quotas
+  const teacherQuota = subscription?.teacherQuotaLeft !== undefined
+    ? subscription.teacherQuotaLeft
+    : user.teacher_quotas
     ? Math.max(0, user.teacher_quotas.total_quota - user.teacher_quotas.used_quota)
-    : subscription?.teacherQuotaLeft ?? 0;
+    : 0;
 
   // Determine effective preview avatar
   const currentAvatarDisplay = avatarUrl || user.avatar_url;
