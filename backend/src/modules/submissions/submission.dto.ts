@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
 export const startSubmissionSchema = z.object({
-  examId: z.string().uuid('Exam ID không hợp lệ'),
+  examId: z.string().min(1, 'Exam ID không được để trống'),
+  forceNew: z.boolean().optional().default(false),
 });
 
 export const autosaveAnswerSchema = z.object({

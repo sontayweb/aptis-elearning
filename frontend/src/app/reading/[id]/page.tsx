@@ -32,6 +32,7 @@ import {
   ArrowUp,
 } from "lucide-react";
 import { ReadingSentenceOrder } from "@/components/reading-components";
+import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
 
 import {
   type Part1Gap,
@@ -84,6 +85,10 @@ function ReadingExamRunner() {
   const [showDrawer, setShowDrawer] = useState(false);
   const [showSampleAnswers, setShowSampleAnswers] = useState(false);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error" | "resumed">("idle");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [isResumedSession, setIsResumedSession] = useState(false);
+  const [resumedBannerDismissed, setResumedBannerDismissed] = useState(false);
 
   // Answers State
   const [p1Answers, setP1Answers] = useState<Record<string, string>>({});
@@ -349,7 +354,67 @@ function ReadingExamRunner() {
     return () => clearInterval(interval);
   }, [isSubmitted, loading]);
 
-  // 3. Init Database Submission
+  // 3. Khôi phục bản nháp LocalStorage ngay khi vào phòng thi Reading (Zero-latency recovery)
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId || isSubmitted) return;
+    try {
+      const raw = localStorage.getItem(`aptis_draft_reading_${examId}`);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (draft.p1Answers && Object.keys(draft.p1Answers).length > 0) {
+          setP1Answers((prev) => ({ ...draft.p1Answers, ...prev }));
+        }
+        if (draft.p2Orders && Object.keys(draft.p2Orders).length > 0) {
+          setP2Orders((prev) => ({ ...draft.p2Orders, ...prev }));
+        }
+        if (draft.p3Answers && Object.keys(draft.p3Answers).length > 0) {
+          setP3Answers((prev) => ({ ...draft.p3Answers, ...prev }));
+        }
+        if (draft.p4Answers && Object.keys(draft.p4Answers).length > 0) {
+          setP4Answers((prev) => ({ ...draft.p4Answers, ...prev }));
+        }
+      }
+    } catch {}
+  }, [examId, isSubmitted]);
+
+  // 4. Tự động ghi bản nháp vào LocalStorage khi câu trả lời thay đổi
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId || isSubmitted) return;
+    const hasAnswers =
+      Object.keys(p1Answers).length > 0 ||
+      Object.keys(p2Orders).length > 0 ||
+      Object.keys(p3Answers).length > 0 ||
+      Object.keys(p4Answers).length > 0;
+
+    if (hasAnswers) {
+      try {
+        localStorage.setItem(
+          `aptis_draft_reading_${examId}`,
+          JSON.stringify({
+            p1Answers,
+            p2Orders,
+            p3Answers,
+            p4Answers,
+            savedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
+  }, [p1Answers, p2Orders, p3Answers, p4Answers, examId, isSubmitted]);
+
+  // 5. Cảnh báo beforeunload chống vô tình F5/thoát trang khi đang thi
+  useEffect(() => {
+    if (isSubmitted) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Bạn đang làm bài thi Reading. Rời khỏi trang có thể làm gián đoạn bài làm!";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isSubmitted]);
+
+  // 6. Khởi tạo / Khôi phục Database Submission từ máy chủ
   useEffect(() => {
     async function initSubmission() {
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
@@ -357,7 +422,44 @@ function ReadingExamRunner() {
       try {
         const res = await api.submissions.start(examId);
         if (res.success && res.data) {
-          setSubmissionId(res.data.submissionId || res.data.id);
+          const subData = res.data;
+          setSubmissionId(subData.submissionId || subData.id);
+          if (subData.serverTimeRemaining !== undefined) {
+            setTimeLeft(subData.serverTimeRemaining);
+          }
+
+          if (subData.isResumed) {
+            setIsResumedSession(true);
+            setSyncStatus("resumed");
+            setTimeout(() => setSyncStatus("idle"), 4000);
+
+            if (subData.savedAnswers && typeof subData.savedAnswers === "object") {
+              const p1: Record<string, string> = {};
+              const p2: Record<string, string[]> = {};
+              const p3: Record<string, string> = {};
+              const p4: Record<string, string> = {};
+
+              Object.entries(subData.savedAnswers).forEach(([qId, ans]: [string, any]) => {
+                if (ans.selectedOption) {
+                  try {
+                    const parsed = JSON.parse(ans.selectedOption);
+                    if (Array.isArray(parsed)) {
+                      p2[qId] = parsed;
+                      return;
+                    }
+                  } catch {}
+                  p1[qId] = ans.selectedOption;
+                  p3[qId] = ans.selectedOption;
+                  p4[qId] = ans.selectedOption;
+                }
+              });
+
+              setP1Answers((prev) => ({ ...p1, ...prev }));
+              setP2Orders((prev) => ({ ...p2, ...prev }));
+              setP3Answers((prev) => ({ ...p3, ...prev }));
+              setP4Answers((prev) => ({ ...p4, ...prev }));
+            }
+          }
         }
       } catch (e) {
         console.warn("Offline reading session:", e);
@@ -416,6 +518,11 @@ function ReadingExamRunner() {
   // Grade & Submit calculation
   const handleSubmitExam = useCallback(async () => {
     setIsSubmitModalOpen(false);
+    if (typeof window !== "undefined" && examId) {
+      try {
+        localStorage.removeItem(`aptis_draft_reading_${examId}`);
+      } catch {}
+    }
 
     const activePartsCount =
       (examData.part1.gaps.length > 0 ? 1 : 0) +
@@ -596,10 +703,17 @@ function ReadingExamRunner() {
           </div>
         </div>
 
-        {/* Căn giữa: Đồng hồ đếm ngược */}
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-          <Clock className="w-4 h-4" />
-          <span>{formatTime(timeLeft)}</span>
+        {/* Căn giữa: Đồng hồ đếm ngược & Sync status */}
+        <div className="flex items-center gap-2.5">
+          <ExamSyncStatus
+            status={syncStatus}
+            lastSavedAt={lastSavedAt}
+            isResumed={isResumedSession}
+          />
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+            <Clock className="w-4 h-4" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -612,6 +726,14 @@ function ReadingExamRunner() {
           </Link>
         </div>
       </header>
+
+      {isResumedSession && !resumedBannerDismissed && (
+        <ExamRecoveryBanner
+          remainingSeconds={timeLeft}
+          answersCount={totalAnsweredCount}
+          onDismiss={() => setResumedBannerDismissed(true)}
+        />
+      )}
 
       {/* 2. MAIN WORKSPACE */}
       <main className="flex-1 py-6 px-3 md:px-6 pb-28">

@@ -8,7 +8,7 @@ import { gradeObjectiveQuestion } from '../../utils/scoring-engine';
 import { aiGradingService } from '../ai-grading/ai-grading.service';
 
 export class SubmissionService {
-  async startSubmission(userId: string, examId: string) {
+  async startSubmission(userId: string, examId: string, forceNew = false) {
     const trimmed = examId.trim();
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed);
     let exam = isUuid
@@ -36,6 +36,73 @@ export class SubmissionService {
     }
 
     const now = new Date();
+
+    // 1. Kiểm tra xem học viên có phiên IN_PROGRESS nào của đề này còn hạn không (trừ khi yêu cầu forceNew)
+    if (!forceNew) {
+      const activeSubmission = await prisma.examSubmission.findFirst({
+        where: {
+          user_id: userId,
+          exam_id: exam.id,
+          status: SubmissionStatus.IN_PROGRESS,
+          deadline_at: { gt: now },
+        },
+        include: {
+          exam: {
+            select: {
+              id: true,
+              title: true,
+              skill: true,
+              duration_minutes: true,
+            },
+          },
+          answers: true,
+        },
+        orderBy: { started_at: 'desc' },
+      });
+
+      if (activeSubmission) {
+        const serverTimeRemaining = Math.max(
+          0,
+          Math.floor((activeSubmission.deadline_at.getTime() - now.getTime()) / 1000)
+        );
+
+        const savedAnswersMap: Record<string, any> = {};
+        for (const ans of activeSubmission.answers) {
+          savedAnswersMap[ans.question_id] = {
+            selectedOption: ans.selected_option,
+            textAnswer: ans.text_answer,
+            audioUrl: ans.audio_url,
+            audioDuration: ans.audio_duration,
+          };
+        }
+
+        return {
+          submissionId: activeSubmission.id,
+          exam: activeSubmission.exam,
+          status: activeSubmission.status,
+          startedAt: activeSubmission.started_at,
+          deadlineAt: activeSubmission.deadline_at,
+          serverTimeRemaining,
+          isResumed: true,
+          savedAnswers: savedAnswersMap,
+        };
+      }
+    }
+
+    // 2. Tự động đóng các phiên IN_PROGRESS cũ đã quá hạn
+    await prisma.examSubmission.updateMany({
+      where: {
+        user_id: userId,
+        exam_id: exam.id,
+        status: SubmissionStatus.IN_PROGRESS,
+        deadline_at: { lte: now },
+      },
+      data: {
+        status: SubmissionStatus.SUBMITTED,
+      },
+    });
+
+    // 3. Tạo phiên thi mới
     const deadlineAt = new Date(now.getTime() + exam.duration_minutes * 60 * 1000);
 
     const submission = await prisma.examSubmission.create({
@@ -68,6 +135,8 @@ export class SubmissionService {
       startedAt: submission.started_at,
       deadlineAt: submission.deadline_at,
       serverTimeRemaining,
+      isResumed: false,
+      savedAnswers: {},
     };
   }
 

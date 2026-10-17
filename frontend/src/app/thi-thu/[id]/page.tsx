@@ -16,6 +16,7 @@ import {
   ReadingMatchingRow,
 } from "@/components/reading-components";
 import { ReadingResultCard } from "@/components/reading-result-card";
+import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
 import {
   Clock, ArrowLeft, ArrowRight, List, Info, LogOut,
   Mic, Volume2, CheckCircle2, Award, Sparkles, X, Loader2,
@@ -338,7 +339,10 @@ export default function OfficialMockExamRoom() {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [micTested, setMicTested] = useState(false);
   const [soundTested, setSoundTested] = useState(false);
-  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error" | "resumed">("idle");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [isResumedSession, setIsResumedSession] = useState<boolean>(false);
+  const [resumedBannerDismissed, setResumedBannerDismissed] = useState<boolean>(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [showListeningScript, setShowListeningScript] = useState<boolean>(false);
   const [hideAnswersReview, setHideAnswersReview] = useState<boolean>(false);
@@ -508,17 +512,125 @@ export default function OfficialMockExamRoom() {
     load();
   }, [testId, partParam, submissionIdParam]);
 
-  // ---- Init submission when exam starts ----
+  // 1. Phục hồi bản nháp cục bộ từ LocalStorage khi nạp xong danh sách câu hỏi (Zero-latency recovery)
+  useEffect(() => {
+    if (typeof window === "undefined" || !testId || isFinished || modeParam === "review") return;
+    try {
+      const raw = localStorage.getItem(`aptis_mock_draft_${testId}`);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (draft.selectedAnswers && Object.keys(draft.selectedAnswers).length > 0) {
+          setSelectedAnswers((prev) => ({ ...draft.selectedAnswers, ...prev }));
+        }
+        if (draft.textAnswers && Object.keys(draft.textAnswers).length > 0) {
+          setTextAnswers((prev) => ({ ...draft.textAnswers, ...prev }));
+        }
+        if (draft.audioUrls && Object.keys(draft.audioUrls).length > 0) {
+          setAudioUrls((prev) => ({ ...draft.audioUrls, ...prev }));
+        }
+        if (draft.orderAnswers && Object.keys(draft.orderAnswers).length > 0) {
+          setOrderAnswers((prev) => ({ ...draft.orderAnswers, ...prev }));
+        }
+        if (draft.matchingAnswers && Object.keys(draft.matchingAnswers).length > 0) {
+          setMatchingAnswers((prev) => ({ ...draft.matchingAnswers, ...prev }));
+        }
+      }
+    } catch {}
+  }, [testId, isFinished, modeParam]);
+
+  // 2. Ghi bản nháp tức thì vào LocalStorage mỗi khi có câu trả lời thay đổi
+  useEffect(() => {
+    if (typeof window === "undefined" || !testId || isFinished || stagePhase !== "exam") return;
+    const hasAnswers =
+      Object.keys(selectedAnswers).length > 0 ||
+      Object.keys(textAnswers).length > 0 ||
+      Object.keys(orderAnswers).length > 0 ||
+      Object.keys(matchingAnswers).length > 0 ||
+      Object.keys(audioUrls).length > 0;
+
+    if (hasAnswers) {
+      try {
+        localStorage.setItem(
+          `aptis_mock_draft_${testId}`,
+          JSON.stringify({
+            selectedAnswers,
+            textAnswers,
+            audioUrls,
+            orderAnswers,
+            matchingAnswers,
+            savedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
+  }, [selectedAnswers, textAnswers, audioUrls, orderAnswers, matchingAnswers, testId, isFinished, stagePhase]);
+
+  // 3. Khởi tạo hoặc Khôi phục phiên thi từ Server (Smart Session Auto-Resume)
   useEffect(() => {
     async function init() {
       if (modeParam === "review" || submissionIdParam) return;
-      if (!isAuthenticated || !testId || stagePhase !== "exam") return;
+      if (!isAuthenticated || !testId || questions.length === 0) return;
       try {
         const res = await api.submissions.start(testId);
         if (res.success && res.data) {
-          setSubmissionId(res.data.submissionId || res.data.id);
-          if (res.data.serverTimeRemaining) {
-            setServerTime(res.data.serverTimeRemaining);
+          const subData = res.data;
+          setSubmissionId(subData.submissionId || subData.id);
+          if (subData.serverTimeRemaining !== undefined) {
+            setServerTime(subData.serverTimeRemaining);
+          }
+
+          // NẾU LÀ PHIÊN THI ĐƯỢC KHÔI PHỤC (Học viên vừa reload trang hoặc quay lại bài thi dở dang)
+          if (subData.isResumed) {
+            setIsResumedSession(true);
+            setStagePhase("exam"); // Vượt qua màn instruction, vào thẳng bài thi
+            setAutoSaveStatus("resumed");
+            setTimeout(() => setAutoSaveStatus("idle"), 4000);
+
+            if (subData.savedAnswers && typeof subData.savedAnswers === "object") {
+              const loadedSel: Record<string, number> = {};
+              const loadedText: Record<string, string> = {};
+              const loadedAudio: Record<string, string> = {};
+              const loadedOrder: Record<string, string[]> = {};
+              const loadedMatching: Record<string, string> = {};
+
+              Object.entries(subData.savedAnswers).forEach(([qId, ans]: [string, any]) => {
+                const qIdx = questions.findIndex((q) => q.id === qId);
+                if (qIdx >= 0) {
+                  const q = questions[qIdx];
+                  if (ans.selectedOption) {
+                    if (q.question_type === "MULTIPLE_CHOICE") {
+                      const optChar = ans.selectedOption.trim().toUpperCase();
+                      const optIdx = optChar.charCodeAt(0) - 65;
+                      if (optIdx >= 0 && optIdx < (q.options?.length || 4)) {
+                        loadedSel[qIdx] = optIdx;
+                      }
+                    } else {
+                      loadedMatching[q.id] = ans.selectedOption;
+                    }
+                  }
+                  if (ans.textAnswer) {
+                    if (q.question_type === "SENTENCE_ORDER") {
+                      try {
+                        loadedOrder[q.id] = JSON.parse(ans.textAnswer);
+                      } catch {
+                        loadedText[q.id] = ans.textAnswer;
+                      }
+                    } else {
+                      loadedText[q.id] = ans.textAnswer;
+                    }
+                  }
+                  if (ans.audioUrl) {
+                    loadedAudio[q.id] = ans.audioUrl;
+                  }
+                }
+              });
+
+              setSelectedAnswers((prev) => ({ ...loadedSel, ...prev }));
+              setTextAnswers((prev) => ({ ...loadedText, ...prev }));
+              setAudioUrls((prev) => ({ ...loadedAudio, ...prev }));
+              setOrderAnswers((prev) => ({ ...loadedOrder, ...prev }));
+              setMatchingAnswers((prev) => ({ ...loadedMatching, ...prev }));
+            }
           }
         }
       } catch {
@@ -527,7 +639,7 @@ export default function OfficialMockExamRoom() {
     }
     init();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testId, isAuthenticated, stagePhase, modeParam, submissionIdParam]);
+  }, [testId, isAuthenticated, questions.length, modeParam, submissionIdParam]);
 
   // ---- Timer ----
   const handleExpired = useCallback(() => {
@@ -624,7 +736,8 @@ export default function OfficialMockExamRoom() {
       setAutoSaveStatus("saving");
       await api.submissions.autosave(submissionId, payload);
       setAutoSaveStatus("saved");
-      setTimeout(() => setAutoSaveStatus("idle"), 2000);
+      setLastSavedAt(new Date());
+      setTimeout(() => setAutoSaveStatus("idle"), 2500);
     } catch {
       setAutoSaveStatus("error");
     }
@@ -683,6 +796,11 @@ export default function OfficialMockExamRoom() {
     if (isSubmitting || isFinished) return;
     setIsSubmitting(true);
     setIsSubmitModalOpen(false);
+    if (typeof window !== "undefined" && testId) {
+      try {
+        localStorage.removeItem(`aptis_mock_draft_${testId}`);
+      } catch {}
+    }
     await doAutosave();
 
     let finalResult: any = null;
@@ -2361,16 +2479,12 @@ export default function OfficialMockExamRoom() {
             <span className="text-xs font-bold text-exam-text truncate hidden sm:block">
               {examData?.title || "Bài thi Aptis"}
             </span>
-            {autoSaveStatus === "saving" && (
-              <span className="text-[10px] text-exam-text-muted flex items-center gap-1">
-                <Loader2 className="w-3 h-3 animate-spin" /> Đang lưu...
-              </span>
-            )}
-            {autoSaveStatus === "saved" && (
-              <span className="text-[10px] text-emerald-500 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> Đã lưu
-              </span>
-            )}
+            <ExamSyncStatus
+              status={autoSaveStatus}
+              lastSavedAt={lastSavedAt}
+              isResumed={isResumedSession}
+              onRetry={doAutosave}
+            />
           </div>
 
           {/* Countdown Timer */}
@@ -2439,6 +2553,14 @@ export default function OfficialMockExamRoom() {
               })}
             </div>
           </div>
+        )}
+
+        {isResumedSession && !resumedBannerDismissed && (
+          <ExamRecoveryBanner
+            remainingSeconds={serverTime}
+            answersCount={answeredCount}
+            onDismiss={() => setResumedBannerDismissed(true)}
+          />
         )}
       </header>
 

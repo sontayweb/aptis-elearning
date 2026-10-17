@@ -31,6 +31,7 @@ import {
   Award,
 } from "lucide-react";
 
+import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
 import {
   type WritingQuestion,
   type WritingPart,
@@ -55,6 +56,10 @@ function WritingExamRunnerContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error" | "resumed">("idle");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [isResumedSession, setIsResumedSession] = useState(false);
+  const [resumedBannerDismissed, setResumedBannerDismissed] = useState(false);
 
   // AI Quota & Submission state
   const [aiQuota, setAiQuota] = useState(2);
@@ -268,7 +273,49 @@ function WritingExamRunnerContent() {
     return () => clearInterval(timer);
   }, [loading, isPaused, showPart2Result, showAiWaitingScreen]);
 
-  // Khởi tạo submission ở backend
+  // 1. Phục hồi bản nháp bài viết từ LocalStorage khi vào phòng thi (Zero data loss)
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId) return;
+    try {
+      const raw = localStorage.getItem(`aptis_draft_writing_${examId}`);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (draft.answers && Object.keys(draft.answers).length > 0) {
+          setAnswers((prev) => ({ ...draft.answers, ...prev }));
+        }
+      }
+    } catch {}
+  }, [examId]);
+
+  // 2. Tự động lưu bản nháp vào LocalStorage mỗi khi gõ phím
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId) return;
+    if (Object.keys(answers).length > 0) {
+      try {
+        localStorage.setItem(
+          `aptis_draft_writing_${examId}`,
+          JSON.stringify({
+            answers,
+            savedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
+  }, [answers, examId]);
+
+  // 3. Cảnh báo beforeunload chống vô tình F5/thoát trang làm mất bài viết
+  useEffect(() => {
+    if (showPart2Result || showAiWaitingScreen) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Bạn đang làm bài thi Writing. Rời khỏi trang có thể làm gián đoạn bài làm!";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [showPart2Result, showAiWaitingScreen]);
+
+  // 4. Khởi tạo / Khôi phục submission ở backend
   useEffect(() => {
     async function initWritingSubmission() {
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
@@ -276,14 +323,38 @@ function WritingExamRunnerContent() {
       try {
         const res = await api.submissions.start(examId);
         if (res.success && res.data) {
-          setSubmissionId(res.data.submissionId || res.data.id);
+          const subData = res.data;
+          setSubmissionId(subData.submissionId || subData.id);
+          if (subData.serverTimeRemaining !== undefined) {
+            setTimeLeft(subData.serverTimeRemaining);
+          }
+
+          if (subData.isResumed) {
+            setIsResumedSession(true);
+            setSyncStatus("resumed");
+            setTimeout(() => setSyncStatus("idle"), 4000);
+
+            if (subData.savedAnswers && typeof subData.savedAnswers === "object") {
+              const loaded: Record<string, string> = {};
+              parts.forEach((p, pIdx) => {
+                p.questions.forEach((q, qIdx) => {
+                  if (q.id && subData.savedAnswers[q.id]?.textAnswer) {
+                    loaded[`${pIdx}_${qIdx}`] = subData.savedAnswers[q.id].textAnswer;
+                  }
+                });
+              });
+              if (Object.keys(loaded).length > 0) {
+                setAnswers((prev) => ({ ...loaded, ...prev }));
+              }
+            }
+          }
         }
       } catch (err) {
         console.warn("Writing offline mode:", err);
       }
     }
     initWritingSubmission();
-  }, [examId, submissionId]);
+  }, [examId, submissionId, parts]);
 
   const currentPart = parts[currentPartIdx] || parts[0];
 
@@ -622,10 +693,17 @@ function WritingExamRunnerContent() {
           </div>
         </div>
 
-        {/* Căn giữa: Đồng hồ đếm ngược */}
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-          <Clock className="w-4 h-4" />
-          <span>{formatTime(timeLeft)}</span>
+        {/* Căn giữa: Đồng hồ đếm ngược & Sync status */}
+        <div className="flex items-center gap-2.5">
+          <ExamSyncStatus
+            status={syncStatus}
+            lastSavedAt={lastSavedAt}
+            isResumed={isResumedSession}
+          />
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+            <Clock className="w-4 h-4" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -638,6 +716,14 @@ function WritingExamRunnerContent() {
           </Link>
         </div>
       </header>
+
+      {isResumedSession && !resumedBannerDismissed && (
+        <ExamRecoveryBanner
+          remainingSeconds={timeLeft}
+          answersCount={Object.values(answers).filter(Boolean).length}
+          onDismiss={() => setResumedBannerDismissed(true)}
+        />
+      )}
 
       {/* 2. MAIN WORKSPACE */}
       <main className="flex-1 py-6 px-3 md:px-6 pb-24">

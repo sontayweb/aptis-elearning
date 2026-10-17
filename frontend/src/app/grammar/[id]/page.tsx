@@ -23,6 +23,7 @@ import {
   Award,
   Eye,
 } from "lucide-react";
+import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
 
 import {
   type Question,
@@ -45,6 +46,10 @@ export default function GrammarExamRunner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error" | "resumed">("idle");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [isResumedSession, setIsResumedSession] = useState(false);
+  const [resumedBannerDismissed, setResumedBannerDismissed] = useState(false);
 
   // Modals state
   const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -161,7 +166,49 @@ export default function GrammarExamRunner() {
     return () => clearInterval(timer);
   }, [isSubmitted, loading, error, questions.length]);
 
-  // Tạo phiên thi (submission) khi vào phòng Grammar
+  // 1. Phục hồi bản nháp trắc nghiệm từ LocalStorage khi nạp câu hỏi
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId || isSubmitted) return;
+    try {
+      const raw = localStorage.getItem(`aptis_draft_grammar_${examId}`);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (draft.selectedAnswers && Object.keys(draft.selectedAnswers).length > 0) {
+          setSelectedAnswers((prev) => ({ ...draft.selectedAnswers, ...prev }));
+        }
+      }
+    } catch {}
+  }, [examId, isSubmitted]);
+
+  // 2. Tự động ghi bản nháp vào LocalStorage khi chọn đáp án
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId || isSubmitted) return;
+    if (Object.keys(selectedAnswers).length > 0) {
+      try {
+        localStorage.setItem(
+          `aptis_draft_grammar_${examId}`,
+          JSON.stringify({
+            selectedAnswers,
+            savedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
+  }, [selectedAnswers, examId, isSubmitted]);
+
+  // 3. Cảnh báo beforeunload chống vô tình F5/thoát trang khi đang làm bài
+  useEffect(() => {
+    if (isSubmitted) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Bạn đang làm bài thi Grammar & Vocabulary. Rời khỏi trang có thể làm gián đoạn bài làm!";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isSubmitted]);
+
+  // 4. Khởi tạo / Khôi phục phiên thi trên máy chủ
   useEffect(() => {
     async function initGrammarSubmission() {
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
@@ -169,7 +216,32 @@ export default function GrammarExamRunner() {
       try {
         const res = await api.submissions.start(examId);
         if (res.success && res.data) {
-          setSubmissionId(res.data.submissionId || res.data.id);
+          const subData = res.data;
+          setSubmissionId(subData.submissionId || subData.id);
+          if (subData.serverTimeRemaining !== undefined) {
+            setTimeLeft(subData.serverTimeRemaining);
+          }
+
+          if (subData.isResumed) {
+            setIsResumedSession(true);
+            setSyncStatus("resumed");
+            setTimeout(() => setSyncStatus("idle"), 4000);
+
+            if (subData.savedAnswers && typeof subData.savedAnswers === "object") {
+              const loadedSel: Record<number, number> = {};
+              Object.entries(subData.savedAnswers).forEach(([qId, ans]: [string, any]) => {
+                const qIdx = questions.findIndex((q) => q.id === qId);
+                if (qIdx >= 0 && ans.selectedOption) {
+                  const optChar = ans.selectedOption.trim().toUpperCase();
+                  const optIdx = optChar.charCodeAt(0) - 65;
+                  if (optIdx >= 0) loadedSel[qIdx] = optIdx;
+                }
+              });
+              if (Object.keys(loadedSel).length > 0) {
+                setSelectedAnswers((prev) => ({ ...loadedSel, ...prev }));
+              }
+            }
+          }
         }
       } catch (err) {
         console.warn("Grammar offline mode:", err);
@@ -205,6 +277,11 @@ export default function GrammarExamRunner() {
 
   const handleSubmitExam = async () => {
     setIsSubmitModalOpen(false);
+    if (typeof window !== "undefined" && examId) {
+      try {
+        localStorage.removeItem(`aptis_draft_grammar_${examId}`);
+      } catch {}
+    }
     if (submissionId) {
       try {
         const formatted = Object.entries(selectedAnswers)
@@ -276,16 +353,23 @@ export default function GrammarExamRunner() {
             </div>
           </div>
 
-          {/* Countdown Timer */}
-          <div
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border font-mono text-xs font-bold transition-all ${
-              timeLeft < 300 && !isSubmitted
-                ? "bg-red-500/15 border-red-500/40 text-red-600 dark:text-red-400 animate-pulse"
-                : "bg-primary/10 border-primary/20 text-primary"
-            }`}
-          >
-            <Clock className="w-3.5 h-3.5" />
-            <span>{isSubmitted ? "Đã nộp bài" : formatTime(timeLeft)}</span>
+          {/* Countdown Timer & Sync status */}
+          <div className="flex items-center gap-2.5">
+            <ExamSyncStatus
+              status={syncStatus}
+              lastSavedAt={lastSavedAt}
+              isResumed={isResumedSession}
+            />
+            <div
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border font-mono text-xs font-bold transition-all ${
+                timeLeft < 300 && !isSubmitted
+                  ? "bg-red-500/15 border-red-500/40 text-red-600 dark:text-red-400 animate-pulse"
+                  : "bg-primary/10 border-primary/20 text-primary"
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>{isSubmitted ? "Đã nộp bài" : formatTime(timeLeft)}</span>
+            </div>
           </div>
 
           {/* Right Header: Progress info & Exit button */}
@@ -303,6 +387,14 @@ export default function GrammarExamRunner() {
           </div>
         </div>
       </header>
+
+      {isResumedSession && !resumedBannerDismissed && (
+        <ExamRecoveryBanner
+          remainingSeconds={timeLeft}
+          answersCount={answeredCount}
+          onDismiss={() => setResumedBannerDismissed(true)}
+        />
+      )}
 
       {/* 2. MAIN WORKSPACE */}
       <main className="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 space-y-6 pb-28">

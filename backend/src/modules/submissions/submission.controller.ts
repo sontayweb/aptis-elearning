@@ -28,9 +28,14 @@ export class SubmissionController {
   async start(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user!.userId;
-      const { examId } = startSubmissionSchema.parse(req.body);
-      const result = await submissionService.startSubmission(userId, examId);
-      sendSuccess(res, result, 'Bắt đầu bài thi thành công', 201);
+      const { examId, forceNew } = startSubmissionSchema.parse(req.body);
+      const result = await submissionService.startSubmission(userId, examId, forceNew);
+      sendSuccess(
+        res,
+        result,
+        result.isResumed ? 'Khôi phục phiên làm bài thi thành công' : 'Bắt đầu bài thi thành công',
+        result.isResumed ? 200 : 201
+      );
     } catch (error) {
       next(error);
     }

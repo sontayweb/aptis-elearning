@@ -30,6 +30,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { DEFAULT_LISTENING_TEST, DEFAULT_LISTENING_TEST_2 } from "@/data/listening-benchmark";
+import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
 
 // Định nghĩa dữ liệu 4 Parts chuẩn Aptis Listening
 interface Part1Item {
@@ -149,6 +150,10 @@ function ListeningExamRunnerContent() {
   const [showSampleAnswers, setShowSampleAnswers] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error" | "resumed">("idle");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [isResumedSession, setIsResumedSession] = useState(false);
+  const [resumedBannerDismissed, setResumedBannerDismissed] = useState(false);
   const [showScript, setShowScript] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
   const [drawerTab, setDrawerTab] = useState<"all" | "p1" | "p2" | "p3" | "p4">("all");
@@ -330,7 +335,59 @@ function ListeningExamRunnerContent() {
     }
   }, [activeStage]);
 
-  // Khởi tạo phiên làm bài trên backend
+  // 1. Phục hồi bản nháp LocalStorage ngay khi vào phòng thi Listening
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId || isSubmitted) return;
+    try {
+      const raw = localStorage.getItem(`aptis_draft_listening_${examId}`);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (draft.p1Answers) setP1Answers((prev) => ({ ...draft.p1Answers, ...prev }));
+        if (draft.p2Answers) setP2Answers((prev) => ({ ...draft.p2Answers, ...prev }));
+        if (draft.p3Answers) setP3Answers((prev) => ({ ...draft.p3Answers, ...prev }));
+        if (draft.p4Answers) setP4Answers((prev) => ({ ...draft.p4Answers, ...prev }));
+      }
+    } catch {}
+  }, [examId, isSubmitted]);
+
+  // 2. Tự động ghi bản nháp vào LocalStorage khi câu trả lời thay đổi
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId || isSubmitted) return;
+    const hasAnswers =
+      Object.keys(p1Answers).length > 0 ||
+      Object.keys(p2Answers).length > 0 ||
+      Object.keys(p3Answers).length > 0 ||
+      Object.keys(p4Answers).length > 0;
+
+    if (hasAnswers) {
+      try {
+        localStorage.setItem(
+          `aptis_draft_listening_${examId}`,
+          JSON.stringify({
+            p1Answers,
+            p2Answers,
+            p3Answers,
+            p4Answers,
+            savedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
+  }, [p1Answers, p2Answers, p3Answers, p4Answers, examId, isSubmitted]);
+
+  // 3. Cảnh báo beforeunload chống vô tình F5/thoát trang khi đang thi
+  useEffect(() => {
+    if (isSubmitted) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Bạn đang làm bài thi Listening. Rời khỏi trang có thể làm gián đoạn bài làm!";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isSubmitted]);
+
+  // 4. Khởi tạo / Khôi phục phiên làm bài trên backend
   useEffect(() => {
     async function initSubmission() {
       const token =
@@ -341,14 +398,56 @@ function ListeningExamRunnerContent() {
       try {
         const res = await api.submissions.start(examId);
         if (res.success && res.data) {
-          setSubmissionId(res.data.submissionId || res.data.id);
+          const subData = res.data;
+          setSubmissionId(subData.submissionId || subData.id);
+          if (subData.serverTimeRemaining !== undefined) {
+            setTimeLeft(subData.serverTimeRemaining);
+          }
+
+          if (subData.isResumed) {
+            setIsResumedSession(true);
+            setSyncStatus("resumed");
+            setTimeout(() => setSyncStatus("idle"), 4000);
+
+            if (subData.savedAnswers && typeof subData.savedAnswers === "object") {
+              const p1: Record<number, string> = {};
+              const p2: Record<number, string> = {};
+              const p3: Record<number, any> = {};
+              const p4: Record<string, string> = {};
+
+              Object.entries(subData.savedAnswers).forEach(([qId, ans]: [string, any]) => {
+                if (ans.selectedOption) {
+                  // match against parts
+                  examData.part1.forEach((item, idx) => {
+                    if (item.id === qId) p1[idx] = ans.selectedOption;
+                  });
+                  examData.part2.speakers.forEach((spk, idx) => {
+                    if (spk.id === qId) p2[idx] = ans.selectedOption;
+                  });
+                  examData.part3.opinions.forEach((opn, idx) => {
+                    if (opn.id === qId) p3[idx] = ans.selectedOption;
+                  });
+                  examData.part4.forEach((rec) => {
+                    rec.questions.forEach((q, qIdx) => {
+                      if (q.id === qId) p4[`${rec.recNum}_${qIdx}`] = ans.selectedOption;
+                    });
+                  });
+                }
+              });
+
+              setP1Answers((prev) => ({ ...p1, ...prev }));
+              setP2Answers((prev) => ({ ...p2, ...prev }));
+              setP3Answers((prev) => ({ ...p3, ...prev }));
+              setP4Answers((prev) => ({ ...p4, ...prev }));
+            }
+          }
         }
       } catch (e) {
         console.warn("Offline listening session:", e);
       }
     }
     initSubmission();
-  }, [examId, submissionId]);
+  }, [examId, submissionId, examData]);
 
   // Load đề thi từ backend với bộ parser đầy đủ
   useEffect(() => {
@@ -1084,9 +1183,13 @@ function ListeningExamRunnerContent() {
 
   const results = calculateResults();
 
-  // Nộp bài thi và đồng bộ kết quả lên Database
   const handleFinalSubmit = async () => {
     setIsSubmitted(true);
+    if (typeof window !== "undefined" && examId) {
+      try {
+        localStorage.removeItem(`aptis_draft_listening_${examId}`);
+      } catch {}
+    }
     let subId = submissionId;
     const token =
       typeof window !== "undefined"
@@ -1403,10 +1506,17 @@ function ListeningExamRunnerContent() {
           </div>
         </div>
 
-        {/* Căn giữa: Đồng hồ đếm ngược */}
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-          <Clock className="w-4 h-4" />
-          <span>{formatTime(timeLeft)}</span>
+        {/* Căn giữa: Đồng hồ đếm ngược & Sync status */}
+        <div className="flex items-center gap-2.5">
+          <ExamSyncStatus
+            status={syncStatus}
+            lastSavedAt={lastSavedAt}
+            isResumed={isResumedSession}
+          />
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+            <Clock className="w-4 h-4" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -1419,6 +1529,19 @@ function ListeningExamRunnerContent() {
           </Link>
         </div>
       </header>
+
+      {isResumedSession && !resumedBannerDismissed && (
+        <ExamRecoveryBanner
+          remainingSeconds={timeLeft}
+          answersCount={
+            Object.keys(p1Answers).length +
+            Object.keys(p2Answers).length +
+            Object.keys(p3Answers).length +
+            Object.keys(p4Answers).length
+          }
+          onDismiss={() => setResumedBannerDismissed(true)}
+        />
+      )}
 
       {/* 2. MAIN WORKSPACE */}
       <main className="flex-1 py-6 px-3 md:px-6 pb-24">

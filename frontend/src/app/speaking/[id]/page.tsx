@@ -1058,6 +1058,18 @@ function SpeakingExamRunnerContent() {
   const currentDuration = recordedData[currentIndex]?.duration || recordingDuration;
   const currentAiResult = recordedData[currentIndex]?.aiResult || aiResult;
 
+  // Cảnh báo beforeunload chống vô tình F5/thoát trang khi đang thi Speaking
+  useEffect(() => {
+    if (completedCount === 0 && !isRecording) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Bạn đang làm bài thi Speaking. Rời khỏi trang có thể làm gián đoạn bài làm!";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [completedCount, isRecording]);
+
   // Tính toán số câu trong part hiện tại (Question X of 3)
   const questionsInCurrentPart = currentQ
     ? questions.filter((q) => q.partNumber === currentQ.partNumber)

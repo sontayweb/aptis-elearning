@@ -177,10 +177,10 @@ class ApiClient {
   // 3. EXAM SUBMISSIONS & ROOM LIFECYCLE
   // ==========================================
   submissions = {
-    start: (examId: string) =>
+    start: (examId: string, forceNew = false) =>
       this.request('/submissions', {
         method: 'POST',
-        body: JSON.stringify({ examId }),
+        body: JSON.stringify({ examId, forceNew }),
       }),
 
     autosave: (
