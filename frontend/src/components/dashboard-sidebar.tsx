@@ -114,7 +114,7 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
       <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-4 sm:p-5 shadow-sm">
         <div className="flex items-center justify-between gap-2 mb-3.5">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
               <Calendar className="w-4 h-4" />
             </div>
             <h3 className="font-heading font-black text-sm sm:text-base text-foreground tracking-tight">
@@ -124,7 +124,7 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
 
           <Link
             href="/thi-thu"
-            className="text-xs font-bold text-primary hover:text-primary-glow inline-flex items-center gap-0.5"
+            className="text-xs font-bold text-primary hover:text-primary-glow inline-flex items-center gap-0.5 transition-colors"
           >
             <span>Xem thêm</span>
             <ArrowRight className="w-3 h-3" />
@@ -157,7 +157,7 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
 
               <Link
                 href={t.href}
-                className="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white font-bold text-[11px] shrink-0 transition-colors"
+                className="px-3 py-1 rounded-lg bg-primary/10 hover:bg-primary text-primary hover:text-white font-bold text-[11px] shrink-0 transition-all border border-primary/20 shadow-2xs active:scale-95"
               >
                 Bắt đầu
               </Link>
@@ -166,7 +166,7 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
         </div>
       </div>
 
-      {/* 2. Nâng cấp gói Pro (Khớp chuẩn Mockup Radio Selector) */}
+      {/* 2. Nâng cấp gói Pro (Luxury Gold VIP Style) */}
       <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/5 via-primary/5 to-card/90 backdrop-blur-sm p-4 sm:p-5 shadow-sm hover:border-amber-500/50 transition-all duration-300">
         <div className="flex items-start gap-2.5 mb-2">
           <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">
@@ -192,7 +192,7 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
                 onClick={() => setSelectedPlanId(opt.id)}
                 className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
                   isSelected
-                    ? "border-emerald-500/60 bg-emerald-500/10 text-foreground shadow-2xs"
+                    ? "border-amber-500/70 bg-amber-500/10 text-foreground shadow-2xs ring-1 ring-amber-500/30"
                     : "border-border/70 bg-background/50 hover:bg-background/80 text-muted-foreground"
                 }`}
               >
@@ -200,7 +200,7 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
                   <div
                     className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                       isSelected
-                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        ? "border-amber-500 bg-amber-500 text-white"
                         : "border-border bg-background"
                     }`}
                   >
@@ -212,7 +212,7 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
                 </div>
                 <span
                   className={`font-black ${
-                    isSelected ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"
+                    isSelected ? "text-amber-600 dark:text-amber-400" : "text-foreground"
                   }`}
                 >
                   {opt.price}
@@ -225,9 +225,9 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
         {/* Upgrade CTA Button */}
         <Link
           href={`/pricing?plan=${selectedPlanId}`}
-          className="mt-3.5 w-full h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md transition-all active:scale-95"
+          className="mt-3.5 w-full h-10 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs inline-flex items-center justify-center gap-2 shadow-md shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-500/35 transition-all hover:scale-[1.01] active:scale-95 cursor-pointer"
         >
-          <Crown className="w-3.5 h-3.5 fill-current" />
+          <Crown className="w-4 h-4 fill-white" />
           <span>Nâng cấp ngay →</span>
         </Link>
       </div>
@@ -235,8 +235,8 @@ export function DashboardSidebar({ recommendation }: DashboardSidebarProps) {
       {/* 3. Truy cập nhanh (Quick Actions) */}
       <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-4 sm:p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-            <Zap className="w-4 h-4 fill-emerald-500/20" />
+          <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+            <Zap className="w-4 h-4 fill-primary/20" />
           </div>
           <h3 className="font-heading font-black text-sm sm:text-base text-foreground tracking-tight">
             Truy cập nhanh

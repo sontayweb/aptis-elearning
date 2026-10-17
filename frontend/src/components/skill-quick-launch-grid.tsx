@@ -40,13 +40,14 @@ export function SkillQuickLaunchGrid({ skills }: SkillQuickLaunchGridProps) {
   const skillCards = [
     {
       key: "grammar",
-      title: "Grammar & Vocabulary",
+      title: "Grammar & Vocab",
       href: "/grammar",
       pct: getSkillPct("grammar"),
       icon: SpellCheck,
       iconBg: "bg-rose-500/10 text-rose-500 border-rose-500/20",
       progressColor: "bg-rose-500",
-      btnClass: "bg-emerald-600 hover:bg-emerald-700 text-white",
+      hoverBorder: "hover:border-rose-500/40",
+      btnClass: "bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white shadow-2xs shadow-rose-500/20",
     },
     {
       key: "reading",
@@ -56,7 +57,8 @@ export function SkillQuickLaunchGrid({ skills }: SkillQuickLaunchGridProps) {
       icon: BookOpen,
       iconBg: "bg-blue-500/10 text-blue-500 border-blue-500/20",
       progressColor: "bg-blue-500",
-      btnClass: "bg-emerald-600 hover:bg-emerald-700 text-white",
+      hoverBorder: "hover:border-blue-500/40",
+      btnClass: "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-2xs shadow-blue-500/20",
     },
     {
       key: "listening",
@@ -66,7 +68,8 @@ export function SkillQuickLaunchGrid({ skills }: SkillQuickLaunchGridProps) {
       icon: Headphones,
       iconBg: "bg-amber-500/10 text-amber-500 border-amber-500/20",
       progressColor: "bg-amber-500",
-      btnClass: "bg-emerald-600 hover:bg-emerald-700 text-white",
+      hoverBorder: "hover:border-amber-500/40",
+      btnClass: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-2xs shadow-amber-500/20",
     },
     {
       key: "writing",
@@ -76,7 +79,8 @@ export function SkillQuickLaunchGrid({ skills }: SkillQuickLaunchGridProps) {
       icon: PenTool,
       iconBg: "bg-purple-500/10 text-purple-500 border-purple-500/20",
       progressColor: "bg-purple-500",
-      btnClass: "bg-emerald-600 hover:bg-emerald-700 text-white",
+      hoverBorder: "hover:border-purple-500/40",
+      btnClass: "bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white shadow-2xs shadow-purple-500/20",
     },
     {
       key: "speaking",
@@ -86,7 +90,8 @@ export function SkillQuickLaunchGrid({ skills }: SkillQuickLaunchGridProps) {
       icon: Mic,
       iconBg: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
       progressColor: "bg-emerald-500",
-      btnClass: "bg-emerald-600 hover:bg-emerald-700 text-white",
+      hoverBorder: "hover:border-emerald-500/40",
+      btnClass: "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-2xs shadow-emerald-500/20",
     },
   ];
 
@@ -95,7 +100,7 @@ export function SkillQuickLaunchGrid({ skills }: SkillQuickLaunchGridProps) {
       {/* Header */}
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
             <Layers className="w-4 h-4" />
           </div>
           <h2 className="font-heading font-black text-base sm:text-lg text-foreground tracking-tight">
@@ -105,7 +110,7 @@ export function SkillQuickLaunchGrid({ skills }: SkillQuickLaunchGridProps) {
 
         <Link
           href="/progress"
-          className="text-xs font-bold text-primary hover:text-primary-glow inline-flex items-center gap-1"
+          className="text-xs font-bold text-primary hover:text-primary-glow inline-flex items-center gap-1 transition-colors"
         >
           <span>Xem chi tiết</span>
           <ArrowRight className="w-3 h-3" />
@@ -117,7 +122,7 @@ export function SkillQuickLaunchGrid({ skills }: SkillQuickLaunchGridProps) {
         {skillCards.map((card) => (
           <div
             key={card.key}
-            className="flex flex-col justify-between rounded-2xl border border-border/80 bg-background/50 hover:bg-background/90 hover:border-primary/40 p-3 sm:p-3.5 transition-all duration-200 group shadow-2xs hover:shadow-xs"
+            className={`flex flex-col justify-between rounded-2xl border border-border/80 bg-background/50 hover:bg-background/90 ${card.hoverBorder} p-3 sm:p-3.5 transition-all duration-200 group shadow-2xs hover:shadow-xs`}
           >
             <div>
               {/* Top Icon */}
@@ -150,7 +155,7 @@ export function SkillQuickLaunchGrid({ skills }: SkillQuickLaunchGridProps) {
             {/* CTA Button */}
             <Link
               href={card.href}
-              className={`w-full h-8.5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-all duration-200 shadow-xs active:scale-95 ${card.btnClass}`}
+              className={`w-full h-8.5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 hover:opacity-95 ${card.btnClass}`}
             >
               <span>Luyện ngay</span>
               <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
