@@ -8,15 +8,27 @@ export const adminUserFilterSchema = z.object({
   limit: z.string().optional().default('20').transform(Number),
 });
 
-export const adminCreateUserSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  fullName: z.string().min(2),
-  role: z.nativeEnum(UserRole).default(UserRole.STUDENT),
-  phoneNumber: z.string().optional(),
-  targetBand: z.nativeEnum(TargetBand).optional(),
-  internalNotes: z.string().optional(),
-});
+export const adminCreateUserSchema = z.preprocess(
+  (val: any) => {
+    if (val && typeof val === 'object') {
+      return {
+        ...val,
+        fullName: val.fullName || val.full_name,
+        phoneNumber: val.phoneNumber || val.phone || val.phone_number,
+      };
+    }
+    return val;
+  },
+  z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+    fullName: z.string().min(2),
+    role: z.nativeEnum(UserRole).default(UserRole.STUDENT),
+    phoneNumber: z.string().optional(),
+    targetBand: z.nativeEnum(TargetBand).optional(),
+    internalNotes: z.string().optional(),
+  })
+);
 
 export const adminUpdateUserStatusSchema = z.object({
   isActive: z.boolean(),

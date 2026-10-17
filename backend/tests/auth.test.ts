@@ -27,7 +27,7 @@ describe('--- MODULE 1: AUTHENTICATION MODULE TESTS ---', () => {
   });
 
   describe('1. POST /api/auth/register', () => {
-    it('Nên đăng ký thành công tài khoản mới với đầy đủ thông tin hợp lệ', async () => {
+    it('Nên đăng ký thành công tài khoản mới với đầy đủ thông tin hợp lệ (camelCase: fullName)', async () => {
       const res = await request(app).post('/api/auth/register').send(testUser);
 
       expect(res.status).toBe(201);
@@ -37,6 +37,23 @@ describe('--- MODULE 1: AUTHENTICATION MODULE TESTS ---', () => {
       expect(res.body.data.user.role).toBe('STUDENT');
       expect(res.body.data.tokens.accessToken).toBeDefined();
       expect(res.body.data.tokens.refreshToken).toBeDefined();
+    });
+
+    it('Nên đăng ký thành công tài khoản mới khi gửi dạng snake_case (full_name, phone)', async () => {
+      const snakeUser = {
+        email: `snake_${Date.now()}@aptiskytich.vn`,
+        password: 'Password123!',
+        full_name: 'Trần Văn Snake',
+        phone: '0912345678',
+      };
+      const res = await request(app).post('/api/auth/register').send(snakeUser);
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.user.full_name).toBe(snakeUser.full_name);
+      expect(res.body.data.tokens.accessToken).toBeDefined();
+
+      await prisma.user.deleteMany({ where: { email: snakeUser.email } });
     });
 
     it('Nên trả về 409 Conflict khi đăng ký với email đã tồn tại', async () => {

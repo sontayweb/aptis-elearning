@@ -88,8 +88,18 @@ class ApiClient {
   // 1. AUTHENTICATION & USER PROFILE
   // ==========================================
   auth = {
-    register: (body: { email: string; password: string; full_name: string; phone?: string }) =>
-      this.request('/auth/register', { method: 'POST', body: JSON.stringify(body) }),
+    register: (body: { email: string; password: string; full_name?: string; fullName?: string; phone?: string; phoneNumber?: string }) => {
+      const payload = {
+        email: body.email,
+        password: body.password,
+        fullName: body.fullName || body.full_name || '',
+        phoneNumber: body.phoneNumber || body.phone,
+      };
+      return this.request<{ user: any; tokens: { accessToken: string; refreshToken: string } }>('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+    },
 
     login: (body: { email: string; password: string }) =>
       this.request<{ user: any; tokens: { accessToken: string; refreshToken: string } }>(

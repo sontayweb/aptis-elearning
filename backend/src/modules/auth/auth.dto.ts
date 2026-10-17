@@ -1,11 +1,23 @@
 import { z } from 'zod';
 
-export const registerSchema = z.object({
-  email: z.string().email('Email không đúng định dạng'),
-  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-  fullName: z.string().min(2, 'Họ và tên phải có ít nhất 2 ký tự'),
-  phoneNumber: z.string().optional(),
-});
+export const registerSchema = z.preprocess(
+  (val: any) => {
+    if (val && typeof val === 'object') {
+      return {
+        ...val,
+        fullName: val.fullName || val.full_name,
+        phoneNumber: val.phoneNumber || val.phone || val.phone_number,
+      };
+    }
+    return val;
+  },
+  z.object({
+    email: z.string().email('Email không đúng định dạng'),
+    password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+    fullName: z.string().min(2, 'Họ và tên phải có ít nhất 2 ký tự'),
+    phoneNumber: z.string().optional(),
+  })
+);
 
 export const loginSchema = z.object({
   email: z.string().email('Email không đúng định dạng'),
@@ -29,12 +41,25 @@ export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token không được để trống'),
 });
 
-export const updateProfileSchema = z.object({
-  fullName: z.string().min(2, 'Họ và tên phải có ít nhất 2 ký tự').optional(),
-  phoneNumber: z.string().optional().nullable(),
-  avatarUrl: z.string().optional().nullable(),
-  targetBand: z.enum(['B1_TARGET', 'B2_TARGET', 'C_TARGET']).optional().nullable(),
-});
+export const updateProfileSchema = z.preprocess(
+  (val: any) => {
+    if (val && typeof val === 'object') {
+      return {
+        ...val,
+        fullName: val.fullName !== undefined ? val.fullName : val.full_name,
+        phoneNumber: val.phoneNumber !== undefined ? val.phoneNumber : (val.phone_number !== undefined ? val.phone_number : val.phone),
+        avatarUrl: val.avatarUrl !== undefined ? val.avatarUrl : val.avatar_url,
+      };
+    }
+    return val;
+  },
+  z.object({
+    fullName: z.string().min(2, 'Họ và tên phải có ít nhất 2 ký tự').optional(),
+    phoneNumber: z.string().optional().nullable(),
+    avatarUrl: z.string().optional().nullable(),
+    targetBand: z.enum(['B1_TARGET', 'B2_TARGET', 'C_TARGET']).optional().nullable(),
+  })
+);
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Vui lòng nhập mật khẩu hiện tại'),

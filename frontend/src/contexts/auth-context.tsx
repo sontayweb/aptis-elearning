@@ -46,7 +46,7 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: UserProfile }>;
-  register: (data: { email: string; password: string; full_name: string; phone?: string }) => Promise<{ success: boolean; error?: string; user?: UserProfile }>;
+  register: (data: { email: string; password: string; full_name?: string; fullName?: string; phone?: string; phoneNumber?: string }) => Promise<{ success: boolean; error?: string; user?: UserProfile }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   quickLogin: (role: "student" | "teacher" | "admin" | "super_admin") => Promise<{ success: boolean; error?: string; user?: UserProfile }>;
@@ -99,9 +99,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   };
 
-  const register = async (data: { email: string; password: string; full_name: string; phone?: string }) => {
+  const register = async (data: { email: string; password: string; full_name?: string; fullName?: string; phone?: string; phoneNumber?: string }) => {
     const res = await api.auth.register(data);
     if (res.success && res.data) {
+      if (res.data.tokens) {
+        localStorage.setItem("accessToken", res.data.tokens.accessToken);
+        localStorage.setItem("refreshToken", res.data.tokens.refreshToken);
+        setUser(res.data.user);
+        return { success: true, user: res.data.user };
+      }
       return await login(data.email, data.password);
     }
     return {

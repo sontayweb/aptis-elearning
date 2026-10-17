@@ -80,7 +80,9 @@ export function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalPr
         const res = await register({
           email,
           password,
+          fullName,
           full_name: fullName,
+          phoneNumber: phone || undefined,
           phone: phone || undefined,
         });
         if (res.success) {
