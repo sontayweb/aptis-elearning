@@ -9,9 +9,9 @@ def run_ssh_command(cmd):
     stdin, stdout, stderr = ssh.exec_command(cmd)
     out = stdout.read().decode('utf-8', errors='replace')
     err = stderr.read().decode('utf-8', errors='replace')
-    print("STDOUT:\n", out)
+    print("STDOUT:\n", out.encode('ascii', 'replace').decode('ascii'))
     if err:
-        print("STDERR:\n", err)
+        print("STDERR:\n", err.encode('ascii', 'replace').decode('ascii'))
     ssh.close()
     return out
 
