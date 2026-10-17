@@ -27,6 +27,7 @@ import {
   Sparkles,
   FileText,
   Languages,
+  RefreshCw,
 } from "lucide-react";
 import { DEFAULT_LISTENING_TEST, DEFAULT_LISTENING_TEST_2 } from "@/data/listening-benchmark";
 
@@ -215,16 +216,56 @@ function ListeningExamRunnerContent() {
   });
 
   if (listeningStages.length === 0) {
-    listeningStages.push({
-      id: "p1_0",
-      partNum: 1,
-      subIndex: 0,
-      title: "Part 1 — Câu 1",
-      label: "Câu 1",
-    });
+    const isP2 = examData.title.toLowerCase().includes("part 2") || (examData.part2 as any)?.speakers?.length > 0;
+    const isP3 = examData.title.toLowerCase().includes("part 3") || (examData.part3 as any)?.opinions?.length > 0;
+    const isP4 = examData.title.toLowerCase().includes("part 4") || examData.part4.length > 0;
+    if (isP2) {
+      listeningStages.push({
+        id: "p2",
+        partNum: 2,
+        subIndex: 0,
+        title: "Part 2 — Matching Info (4 Speakers)",
+        label: "Part 2: 4 Speakers",
+        audioUrl: (examData.part2 as any).audioUrl || audioUrlMap[13],
+      });
+    } else if (isP3) {
+      listeningStages.push({
+        id: "p3",
+        partNum: 3,
+        subIndex: 0,
+        title: "Part 3 — Short Conversations (Opinions)",
+        label: "Part 3: Opinions",
+        audioUrl: (examData.part3 as any).audioUrl || audioUrlMap[14],
+      });
+    } else if (isP4) {
+      listeningStages.push({
+        id: "p4_0",
+        partNum: 4,
+        subIndex: 0,
+        title: "Part 4 — Bài thuyết trình 1",
+        label: "Part 4: Rec 1",
+        audioUrl: audioUrlMap[15],
+      });
+    } else {
+      listeningStages.push({
+        id: "p1_0",
+        partNum: 1,
+        subIndex: 0,
+        title: "Part 1 — Câu 1",
+        label: "Câu 1",
+      });
+    }
   }
 
-  const currentStage = listeningStages[activeStage] || listeningStages[0];
+  const safeStageIndex = activeStage < listeningStages.length ? activeStage : 0;
+  const currentStage = listeningStages[safeStageIndex] || listeningStages[0];
+
+  // Tự động điều chỉnh activeStage nếu vượt quá số stages thực tế
+  useEffect(() => {
+    if (activeStage >= listeningStages.length && listeningStages.length > 0) {
+      setActiveStage(0);
+    }
+  }, [activeStage, listeningStages.length]);
 
   // Lấy Script và Bản dịch song song cho stage hiện tại
   const getCurrentBilingualData = () => {
@@ -569,10 +610,26 @@ function ListeningExamRunnerContent() {
 
         // Trường hợp 1 câu hỏi tổng hợp
         if (questions.length === 1 && (!questions[0]?.options || questions[0]?.options.length === 0)) {
-          const parsedFromExp = parseP2FromExplanation(questions[0]?.explanation || p.passage_text || "");
+          const parsedFromExp = parseP2FromExplanation(
+            questions[0]?.explanation || p.passage_text || questions[0]?.transcript || ""
+          );
           if (parsedFromExp.speakers.length > 0) {
             result.part2.speakers = parsedFromExp.speakers;
             result.part2.options = parsedFromExp.options;
+          } else {
+            // Tự động bóc tách các Speaker từ transcript nếu explanation bị ẩn
+            const rawText = questions[0]?.transcript || p.passage_text || "";
+            const spkMatches = Array.from(rawText.matchAll(/(Speaker\s+[A-D])/gi));
+            const distinctSpk = Array.from(new Set(spkMatches.map((m: any) => m[1])));
+            const speakersToUse = distinctSpk.length >= 2 ? distinctSpk : ["Speaker A", "Speaker B", "Speaker C", "Speaker D"];
+            result.part2.speakers = speakersToUse.map((spk) => ({
+              speaker: spk,
+              correctAnswer: "",
+              explanation: `Giải thích cho ${spk}`,
+            }));
+            if (parsedFromExp.options.length > 0) {
+              result.part2.options = parsedFromExp.options;
+            }
           }
         } else if (questions.length > 0) {
           let extractedOptions: string[] = [];
@@ -1359,6 +1416,20 @@ function ListeningExamRunnerContent() {
             </div>
           </div>
         </main>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // MÀN HÌNH CHỜ TẢI DỮ LIỆU ĐỀ THI
+  // =========================================================================
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <div className="flex flex-col items-center gap-3">
+          <RefreshCw className="w-8 h-8 text-primary animate-spin" />
+          <p className="text-sm font-semibold text-muted-foreground">Đang tải phòng thi Listening...</p>
+        </div>
       </div>
     );
   }
