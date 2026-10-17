@@ -779,41 +779,6 @@ export class ExamService {
           (part as any).topic = 'Lectures & Public Announcements';
         }
 
-        // Tự động chuẩn hóa Part 2 dạng 1 câu hỏi tổng hợp cũ sang 4 câu hỏi Speaker rời rạc có options
-        if (partType === 'PART_2' && part.questions.length === 1 && (!part.questions[0].options || (part.questions[0].options as any[]).length === 0)) {
-          const q0 = part.questions[0] as any;
-          const exp = q0.explanation || '';
-          const speakerMap: Record<string, string> = {};
-          let distractors: string[] = [];
-
-          const expMatch = exp.match(/A\s*[:=]\s*([^\n(]+)[\s\S]*?B\s*[:=]\s*([^\n(]+)[\s\S]*?C\s*[:=]\s*([^\n(]+)[\s\S]*?D\s*[:=]\s*([^\n(]+)/i);
-          if (expMatch) {
-            speakerMap['Speaker A'] = expMatch[1].trim().replace(/[.,;]$/, '');
-            speakerMap['Speaker B'] = expMatch[2].trim().replace(/[.,;]$/, '');
-            speakerMap['Speaker C'] = expMatch[3].trim().replace(/[.,;]$/, '');
-            speakerMap['Speaker D'] = expMatch[4].trim().replace(/[.,;]$/, '');
-          }
-          const distractorMatch = exp.match(/nhiễu\s*[:=]\s*([^\n.]+)/i);
-          if (distractorMatch) {
-            distractors = distractorMatch[1].split(/[,;]/).map((s: string) => s.trim()).filter(Boolean);
-          }
-          const allOptions = Array.from(new Set([...Object.values(speakerMap), ...distractors])).filter(Boolean);
-
-          if (allOptions.length > 0) {
-            const newQuestions = ['Speaker A', 'Speaker B', 'Speaker C', 'Speaker D'].map((spk, idx) => ({
-              id: `${q0.id}_${idx + 1}`,
-              question_number: idx + 1,
-              question_type: 'MATCHING' as const,
-              prompt: spk,
-              options: allOptions,
-              correct_answer: speakerMap[spk] || '',
-              max_score: 1.25,
-              transcript: q0.transcript,
-              audio_url: q0.audio_url || part.audio_url,
-            }));
-            part.questions = newQuestions as any;
-          }
-        }
       }
 
       // BẢO MẬT: Tuyệt đối không để lộ explanation và correct_answer cho các kỹ năng trắc nghiệm khi chưa nộp bài

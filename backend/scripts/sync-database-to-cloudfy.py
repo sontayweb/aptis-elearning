@@ -173,9 +173,8 @@ SELECT 'Submissions: ' || count(*) FROM \\\"ExamSubmission\\\";
     # -------------------------------------------------------------
     # BƯỚC 6: KHỞI ĐỘNG LẠI BACKEND TRÊN CLOUDFY & KIỂM TRA
     # -------------------------------------------------------------
-    print_step(6, "KHỞI ĐỘNG LẠI BACKEND TRÊN CLOUDFY")
-    print(f"Đang khởi động lại container {BACKEND_CONTAINER}...")
-    stdin, stdout, stderr = ssh.exec_command(f"docker restart {BACKEND_CONTAINER}")
+    print(f"Đang khởi động lại container backend...")
+    stdin, stdout, stderr = ssh.exec_command("docker restart $(docker ps -q -f name=rujigoulsjkdrha58tgtrvsr)")
     stdout.channel.recv_exit_status()
     print("[OK] Backend container đã khởi động lại!")
 

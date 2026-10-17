@@ -467,38 +467,6 @@ function ListeningExamRunnerContent() {
     return defaultTopic;
   }
 
-  // Tự động phân tích các Speaker và Options từ explanation khi đề chỉ có 1 câu hỏi tổng hợp
-  function parseP2FromExplanation(explanation?: string): {
-    speakers: Array<{ speaker: string; correctAnswer: string; explanation: string }>;
-    options: string[];
-  } {
-    if (!explanation) return { speakers: [], options: [] };
-    const speakerMap: Record<string, string> = {};
-    let distractors: string[] = [];
-
-    // Tìm dạng A = ..., B = ..., C = ..., D = ...
-    const expMatch = explanation.match(/A\s*[:=]\s*([^\n(]+)[\s\S]*?B\s*[:=]\s*([^\n(]+)[\s\S]*?C\s*[:=]\s*([^\n(]+)[\s\S]*?D\s*[:=]\s*([^\n(]+)/i);
-    if (expMatch) {
-      speakerMap["Speaker A"] = expMatch[1].trim().replace(/[.,;]$/, "");
-      speakerMap["Speaker B"] = expMatch[2].trim().replace(/[.,;]$/, "");
-      speakerMap["Speaker C"] = expMatch[3].trim().replace(/[.,;]$/, "");
-      speakerMap["Speaker D"] = expMatch[4].trim().replace(/[.,;]$/, "");
-    }
-
-    const distractorMatch = explanation.match(/nhiễu\s*[:=]\s*([^\n.]+)/i);
-    if (distractorMatch) {
-      distractors = distractorMatch[1].split(/[,;]/).map((s) => s.trim()).filter(Boolean);
-    }
-
-    const speakers = ["Speaker A", "Speaker B", "Speaker C", "Speaker D"].map((spk) => ({
-      speaker: spk,
-      correctAnswer: speakerMap[spk] || "",
-      explanation: `Giải thích đáp án cho ${spk}`,
-    }));
-
-    const allOpts = Array.from(new Set([...Object.values(speakerMap), ...distractors])).filter(Boolean);
-    return { speakers, options: allOpts };
-  }
 
   // Parser dữ liệu từ Backend sang format hiển thị của Listening
   function parseApiToListeningData(apiData: any) {
@@ -608,30 +576,7 @@ function ListeningExamRunnerContent() {
           audioUrls[13] = resolvedP2Audio;
         }
 
-        // Trường hợp 1 câu hỏi tổng hợp
-        if (questions.length === 1 && (!questions[0]?.options || questions[0]?.options.length === 0)) {
-          const parsedFromExp = parseP2FromExplanation(
-            questions[0]?.explanation || p.passage_text || questions[0]?.transcript || ""
-          );
-          if (parsedFromExp.speakers.length > 0) {
-            result.part2.speakers = parsedFromExp.speakers;
-            result.part2.options = parsedFromExp.options;
-          } else {
-            // Tự động bóc tách các Speaker từ transcript nếu explanation bị ẩn
-            const rawText = questions[0]?.transcript || p.passage_text || "";
-            const spkMatches = Array.from(rawText.matchAll(/(Speaker\s+[A-D])/gi));
-            const distinctSpk = Array.from(new Set(spkMatches.map((m: any) => m[1])));
-            const speakersToUse = distinctSpk.length >= 2 ? distinctSpk : ["Speaker A", "Speaker B", "Speaker C", "Speaker D"];
-            result.part2.speakers = speakersToUse.map((spk) => ({
-              speaker: spk,
-              correctAnswer: "",
-              explanation: `Giải thích cho ${spk}`,
-            }));
-            if (parsedFromExp.options.length > 0) {
-              result.part2.options = parsedFromExp.options;
-            }
-          }
-        } else if (questions.length > 0) {
+        if (questions.length > 0) {
           let extractedOptions: string[] = [];
           for (const q of questions) {
             let qOpts: string[] = [];
