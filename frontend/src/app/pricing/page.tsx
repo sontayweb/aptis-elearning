@@ -666,6 +666,12 @@ export default function PricingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {plans.map((plan) => {
+              const currentPlanAmount =
+                (activeSub?.code === "PREMIER_6M" || activeSub?.planName?.includes("6 Tháng")) ? 699000 :
+                (activeSub?.code === "VIP_3M" || activeSub?.planName?.includes("3 Tháng")) ? 399000 :
+                (activeSub?.code === "VIP_1M" || activeSub?.planName?.includes("1 Tháng")) ? 199000 :
+                0;
+
               const isCurrentPlan = isVip && (
                 (plan.code && activeSub?.code && plan.code === activeSub.code) ||
                 (plan.amount > 0 && activeSub?.planName && plan.name.toLowerCase().includes(activeSub.planName.toLowerCase())) ||
@@ -674,6 +680,8 @@ export default function PricingPage() {
                 (plan.amount === 199000 && activeSub?.planName?.includes("1 Tháng"))
               );
 
+              const isLowerTier = isVip && !isCurrentPlan && plan.amount > 0 && plan.amount < currentPlanAmount;
+              const isHigherTier = isVip && !isCurrentPlan && plan.amount > currentPlanAmount;
               const isRecommended = plan.isPopular || plan.code === "VIP_3M";
               const isPremier = plan.code === "PREMIER_6M" || plan.amount === 699000;
 
@@ -747,38 +755,63 @@ export default function PricingPage() {
                     </ul>
                   </div>
 
-                  {/* CTA Button */}
-                  <button
-                    type="button"
-                    onClick={() => !isCurrentPlan && handleSelectPlan(plan)}
-                    disabled={isCurrentPlan || (isVip && plan.amount === 0)}
-                    className={`w-full py-2.5 px-4 rounded-xl font-heading font-bold text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 ${
-                      isCurrentPlan
-                        ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white cursor-default shadow-amber-500/20"
-                        : isVip && plan.amount === 0
-                        ? "bg-muted text-muted-foreground border border-border cursor-not-allowed opacity-50"
-                        : isPremier
-                        ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/20 cursor-pointer"
-                        : isRecommended
-                        ? "bg-primary hover:brightness-90 text-primary-foreground shadow-primary/25 cursor-pointer"
-                        : "border border-primary text-primary hover:bg-primary/10 cursor-pointer"
-                    }`}
-                  >
-                    {isCurrentPlan ? (
-                      <>
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Đang Sử Dụng {remainingDays !== null ? `(${remainingDays} ngày)` : ""}</span>
-                      </>
-                    ) : isVip && plan.amount === 0 ? (
-                      <span>Gói Cơ Bản (Đã Có VIP)</span>
-                    ) : isVip && plan.amount > 0 ? (
-                      <span>Gia Hạn Thêm Gói Này</span>
-                    ) : plan.amount === 0 ? (
-                      "Bắt đầu miễn phí"
-                    ) : (
-                      "Nâng cấp ngay"
+                  {/* CTA Button & Context Help */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => (plan.amount > 0) && handleSelectPlan(plan)}
+                      disabled={isVip && plan.amount === 0}
+                      className={`w-full py-2.5 px-4 rounded-xl font-heading font-bold text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 ${
+                        isCurrentPlan
+                          ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white cursor-pointer shadow-md shadow-amber-500/25"
+                          : isVip && plan.amount === 0
+                          ? "bg-muted text-muted-foreground border border-border cursor-not-allowed opacity-50"
+                          : isLowerTier
+                          ? "border border-border bg-card hover:bg-muted text-foreground/80 hover:text-foreground cursor-pointer"
+                          : isHigherTier
+                          ? "bg-primary hover:brightness-90 text-primary-foreground shadow-md shadow-primary/25 cursor-pointer"
+                          : isPremier
+                          ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/20 cursor-pointer"
+                          : isRecommended
+                          ? "bg-primary hover:brightness-90 text-primary-foreground shadow-primary/25 cursor-pointer"
+                          : "border border-primary text-primary hover:bg-primary/10 cursor-pointer"
+                      }`}
+                    >
+                      {isCurrentPlan ? (
+                        <>
+                          <Sparkles className="w-3.5 h-3.5 fill-white" />
+                          <span>Gia Hạn Thêm ({plan.amount === 699000 ? "+180 ngày" : plan.amount === 399000 ? "+90 ngày" : "+30 ngày"})</span>
+                        </>
+                      ) : isVip && plan.amount === 0 ? (
+                        <span>Gói Cơ Bản (Đã Có VIP)</span>
+                      ) : isLowerTier ? (
+                        <span>Mua Cộng Dồn ({plan.amount === 199000 ? "+30 ngày" : "+90 ngày"})</span>
+                      ) : isHigherTier ? (
+                        <span>Nâng Cấp Lên Gói Này</span>
+                      ) : plan.amount === 0 ? (
+                        "Bắt đầu miễn phí"
+                      ) : (
+                        "Nâng cấp ngay"
+                      )}
+                    </button>
+
+                    {/* Explanatory note below button */}
+                    {isCurrentPlan && remainingDays !== null && (
+                      <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold text-center mt-2">
+                        Đang sử dụng (Còn {remainingDays} ngày) · Nhấn để gia hạn cộng dồn
+                      </p>
                     )}
-                  </button>
+                    {isLowerTier && (
+                      <p className="text-[10px] text-muted-foreground text-center mt-2 leading-tight">
+                        Gói thấp hơn gói hiện tại · Mua sẽ cộng dồn ngày &amp; lượt AI (không làm giảm quyền lợi VIP Premier)
+                      </p>
+                    )}
+                    {isHigherTier && (
+                      <p className="text-[10px] text-primary font-semibold text-center mt-2 leading-tight">
+                        Gói cấp cao hơn · Nâng cấp sẽ cộng dồn toàn bộ ngày còn lại
+                      </p>
+                    )}
+                  </div>
                 </div>
               );
             })}
