@@ -7,6 +7,7 @@ import {
   PRESET_TEMPLATES,
   EventTemplateId,
 } from "@/contexts/event-theme-context";
+import ConfirmModal from "@/components/admin/confirm-modal";
 import {
   Sparkles,
   Zap,
@@ -71,6 +72,86 @@ export default function AdminEventsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<"templates" | "custom">("templates");
+
+  // State quản lý Modal xác nhận kích hoạt sự kiện
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText: string;
+    type: "success" | "warning" | "info" | "danger";
+    action: () => Promise<void> | void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    confirmText: "Xác nhận",
+    type: "success",
+    action: () => {},
+  });
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const handleToggleClick = (targetState: boolean) => {
+    if (targetState) {
+      setConfirmModal({
+        isOpen: true,
+        title: "Kích hoạt Sự kiện Lễ hội toàn trang?",
+        message: `Bạn có chắc chắn muốn bật sự kiện "${config.name}" ${config.icon} trên toàn bộ hệ thống? Giao diện theo mùa, banner thông báo và hiệu ứng tương tác sẽ được hiển thị ngay lập tức cho toàn bộ học viên khi truy cập website.`,
+        confirmText: "Kích hoạt sự kiện ngay",
+        type: "success",
+        action: async () => {
+          setConfirmLoading(true);
+          try {
+            await toggleEvent(true);
+          } finally {
+            setConfirmLoading(false);
+            setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+          }
+        },
+      });
+    } else {
+      setConfirmModal({
+        isOpen: true,
+        title: "Tạm dừng Sự kiện Lễ hội?",
+        message: `Bạn có chắc chắn muốn tắt sự kiện "${config.name}"? Toàn bộ giao diện hệ thống sẽ quay về chế độ hiển thị tiêu chuẩn.`,
+        confirmText: "Tắt sự kiện",
+        type: "warning",
+        action: async () => {
+          setConfirmLoading(true);
+          try {
+            await toggleEvent(false);
+          } finally {
+            setConfirmLoading(false);
+            setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+          }
+        },
+      });
+    }
+  };
+
+  const handleRequestApplyPreset = (presetKey: EventTemplateId) => {
+    const preset = PRESET_TEMPLATES[presetKey];
+    const targetPreset = presetsList.find((p) => p.key === presetKey);
+    const eventName = targetPreset?.title || preset.name;
+    const eventEmoji = targetPreset?.emoji || preset.icon;
+
+    setConfirmModal({
+      isOpen: true,
+      title: `Áp dụng Template ${eventName} ${eventEmoji}?`,
+      message: `Bạn có chắc chắn muốn kích hoạt chủ đề "${eventName}"? Màu sắc chủ đạo, banner thông báo và hiệu ứng (${targetPreset?.desc || preset.description}) sẽ được cập nhật và kích hoạt hiển thị cho toàn bộ học viên.`,
+      confirmText: `Kích hoạt ${eventEmoji}`,
+      type: "success",
+      action: async () => {
+        setConfirmLoading(true);
+        try {
+          await handleApplyPreset(presetKey);
+        } finally {
+          setConfirmLoading(false);
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
+  };
 
   const handleApplyPreset = async (presetKey: EventTemplateId) => {
     setIsSaving(true);
@@ -214,7 +295,7 @@ export default function AdminEventsPage() {
 
           <button
             type="button"
-            onClick={() => toggleEvent(!config.enabled)}
+            onClick={() => handleToggleClick(!config.enabled)}
             className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
               config.enabled ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"
             }`}
@@ -306,7 +387,10 @@ export default function AdminEventsPage() {
 
                       <button
                         type="button"
-                        onClick={() => handleApplyPreset(preset.key)}
+                        onClick={() => {
+                          if (isCurrent) return;
+                          handleRequestApplyPreset(preset.key);
+                        }}
                         className={`w-full py-2 px-3 rounded-xl text-xs font-heading font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                           isCurrent
                             ? "bg-blue-600 text-white shadow-xs"
@@ -730,6 +814,22 @@ export default function AdminEventsPage() {
           </div>
         </div>
       </div>
+      {/* Modal Xác nhận Kích hoạt / Tắt sự kiện */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText="Hủy bỏ"
+        type={confirmModal.type}
+        loading={confirmLoading}
+        onConfirm={() => confirmModal.action()}
+        onCancel={() => {
+          if (!confirmLoading) {
+            setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+          }
+        }}
+      />
     </div>
   );
 }
