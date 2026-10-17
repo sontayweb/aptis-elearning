@@ -214,5 +214,168 @@ export function EventDecorations() {
     );
   }
 
+  // 5. Women's Day Roses (20/10 & 8/3 - Cánh hoa hồng rơi lãng mạn)
+  if (config.decorationType === "roses") {
+    return (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-30 overflow-hidden select-none"
+      >
+        <div className="absolute bottom-20 right-6 opacity-90 drop-shadow-[0_0_12px_rgba(225,29,72,0.6)]">
+          <span className="text-3xl sm:text-4xl">💐</span>
+        </div>
+        <div className="absolute bottom-20 left-6 opacity-90 drop-shadow-[0_0_12px_rgba(244,63,94,0.6)]">
+          <span className="text-3xl sm:text-4xl">🎁</span>
+        </div>
+        {[...Array(9)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-rose-400/80 animate-petal-fall"
+            style={{
+              left: `${i * 11 + 4}%`,
+              top: `-20px`,
+              fontSize: `${14 + (i % 3) * 4}px`,
+              animationDelay: `${i * 0.8}s`,
+              animationDuration: `${5.5 + (i % 3) * 1.5}s`,
+            }}
+          >
+            {i % 2 === 0 ? "🌹" : "🌸"}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // 6. Teachers' Day Sunflowers (20/11 - Hoa hướng dương & sách ước mơ)
+  if (config.decorationType === "sunflowers") {
+    return (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-30 overflow-hidden select-none"
+      >
+        <div className="absolute bottom-20 right-6 opacity-90 drop-shadow-[0_0_12px_rgba(217,119,6,0.6)]">
+          <span className="text-3xl sm:text-4xl">🎓</span>
+        </div>
+        <div className="absolute bottom-20 left-6 opacity-90 drop-shadow-[0_0_12px_rgba(37,99,235,0.6)]">
+          <span className="text-3xl sm:text-4xl">📚</span>
+        </div>
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-amber-400/85 animate-petal-fall"
+            style={{
+              left: `${i * 12 + 6}%`,
+              top: `-20px`,
+              fontSize: `${15 + (i % 3) * 3}px`,
+              animationDelay: `${i * 0.9}s`,
+              animationDuration: `${6 + (i % 2) * 2}s`,
+            }}
+          >
+            {i % 3 === 0 ? "🌻" : i % 3 === 1 ? "✨" : "🍂"}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // 7. National Day Fireworks & Flag (30/4, 1/5, 2/9 - Pháo hoa & cờ đỏ sao vàng)
+  if (config.decorationType === "fireworks") {
+    return (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-30 overflow-hidden select-none"
+      >
+        <div className="absolute bottom-20 right-6 opacity-95 drop-shadow-[0_0_15px_rgba(220,38,38,0.7)] animate-bounce duration-1000">
+          <span className="text-3xl sm:text-4xl">🇻🇳</span>
+        </div>
+        <div className="absolute top-16 right-8 opacity-80 drop-shadow-[0_0_12px_rgba(234,179,8,0.7)]">
+          <span className="text-3xl">🎆</span>
+        </div>
+        <div className="absolute top-20 left-8 opacity-80 drop-shadow-[0_0_12px_rgba(239,68,68,0.7)]">
+          <span className="text-3xl">🎇</span>
+        </div>
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-yellow-400/80 animate-snow-fall"
+            style={{
+              left: `${i * 12 + 5}%`,
+              top: `-20px`,
+              fontSize: `${13 + (i % 3) * 3}px`,
+              animationDelay: `${i * 0.7}s`,
+              animationDuration: `${5 + (i % 2) * 2}s`,
+            }}
+          >
+            {i % 2 === 0 ? "⭐" : "✨"}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // 8. Exam Season Stars & Rockets (Mùa thi bứt phá & Tựu trường)
+  if (config.decorationType === "stars") {
+    return (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-30 overflow-hidden select-none"
+      >
+        <div className="absolute bottom-20 right-6 opacity-90 drop-shadow-[0_0_12px_rgba(79,70,229,0.6)]">
+          <span className="text-3xl sm:text-4xl">🚀</span>
+        </div>
+        <div className="absolute bottom-20 left-6 opacity-90 drop-shadow-[0_0_12px_rgba(234,179,8,0.6)]">
+          <span className="text-3xl sm:text-4xl">🏆</span>
+        </div>
+        {[...Array(10)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-indigo-400/80 animate-snow-fall"
+            style={{
+              left: `${i * 10 + 3}%`,
+              top: `-20px`,
+              fontSize: `${12 + (i % 3) * 4}px`,
+              animationDelay: `${i * 0.6}s`,
+              animationDuration: `${4.5 + (i % 3) * 1.5}s`,
+            }}
+          >
+            {i % 3 === 0 ? "⭐" : i % 3 === 1 ? "✨" : "🎯"}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // 9. Valentine Hearts (14/2 - Trái tim tình yêu bay bổng)
+  if (config.decorationType === "hearts") {
+    return (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-30 overflow-hidden select-none"
+      >
+        <div className="absolute bottom-20 right-6 opacity-90 drop-shadow-[0_0_12px_rgba(236,72,153,0.6)]">
+          <span className="text-3xl sm:text-4xl">💖</span>
+        </div>
+        <div className="absolute bottom-20 left-6 opacity-90 drop-shadow-[0_0_12px_rgba(190,24,93,0.6)]">
+          <span className="text-3xl sm:text-4xl">🍫</span>
+        </div>
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-pink-400/80 animate-petal-fall"
+            style={{
+              left: `${i * 12 + 5}%`,
+              top: `-20px`,
+              fontSize: `${14 + (i % 3) * 4}px`,
+              animationDelay: `${i * 0.8}s`,
+              animationDuration: `${5.5 + (i % 2) * 2}s`,
+            }}
+          >
+            {i % 2 === 0 ? "💕" : "💗"}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return null;
 }

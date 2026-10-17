@@ -187,11 +187,46 @@ export default function AdminEventsPage() {
 
   const presetsList: Array<{ key: EventTemplateId; title: string; emoji: string; color: string; desc: string }> = [
     {
+      key: "women_day",
+      title: "Phụ nữ VN 20/10 & 8/3",
+      emoji: "💐",
+      color: "from-pink-500 to-rose-600",
+      desc: "Tôn vinh phái đẹp với sắc hồng ngọt ngào, cánh hoa hồng rơi và hộp quà",
+    },
+    {
+      key: "teachers_day",
+      title: "Nhà giáo VN 20/11",
+      emoji: "🎓",
+      color: "from-amber-500 to-blue-600",
+      desc: "Tri ân thầy cô giáo với hoa hướng dương vàng kim, nón cử nhân và trang sách",
+    },
+    {
+      key: "national_day",
+      title: "Đại lễ Quốc khánh 2/9 & 30/4",
+      emoji: "🇻🇳",
+      color: "from-red-600 to-amber-500",
+      desc: "Tự hào Việt Nam với sắc cờ đỏ sao vàng, pháo hoa rực rỡ chào mừng ngày lễ lớn",
+    },
+    {
+      key: "back_to_school",
+      title: "Mùa thi bứt phá & Tựu trường",
+      emoji: "🚀",
+      color: "from-blue-600 to-indigo-600",
+      desc: "Tiếp lửa bứt phá kỳ thi Aptis, ngôi sao may mắn, cúp vinh danh và mục tiêu B1-C",
+    },
+    {
+      key: "valentine",
+      title: "Valentine & Mùa yêu thương",
+      emoji: "💖",
+      color: "from-rose-500 to-pink-600",
+      desc: "Mùa yêu thương ngọt ngào với trái tim bay bổng, hộp quà socola và ưu đãi đôi",
+    },
+    {
       key: "halloween",
       title: "Halloween",
       emoji: "🎃",
       color: "from-orange-500 to-purple-600",
-      desc: "Lễ hội ma quái với bí ngô, dơi bay và mạng nhện",
+      desc: "Lễ hội ma quái với bí ngô, dơi bay và mạng nhện huyền bí",
     },
     {
       key: "noel",
@@ -212,19 +247,29 @@ export default function AdminEventsPage() {
       title: "Tết Nguyên Đán",
       emoji: "🌸",
       color: "from-rose-600 to-amber-500",
-      desc: "Khai xuân rực rỡ với hoa đào, hoa mai rơi và bao lì xì",
+      desc: "Khai xuân rực rỡ với hoa đào, hoa mai rơi và bao lì xì may mắn",
     },
     {
       key: "custom",
       title: "Tùy biến tự do",
       emoji: "✨",
       color: "from-blue-600 to-indigo-600",
-      desc: "Cấu hình riêng cho các đợt thi hoặc chiến dịch marketing",
+      desc: "Cấu hình riêng cho các đợt thi hoặc chiến dịch marketing đặc biệt",
     },
   ];
 
   const getDecorationLabel = (type: string) => {
     switch (type) {
+      case "roses":
+        return "🌹 Cánh hoa hồng & Quà tặng (20/10, 8/3)";
+      case "sunflowers":
+        return "🌻 Hướng dương & Cử nhân (20/11)";
+      case "fireworks":
+        return "🎆 Pháo hoa & Cờ Tổ quốc (Đại lễ)";
+      case "stars":
+        return "⭐ Ngôi sao may mắn & Tên lửa (Mùa thi)";
+      case "hearts":
+        return "💖 Trái tim bay bổng (Valentine)";
       case "bat_pumpkin":
         return "🎃 Bí ngô & Dơi bay";
       case "snowflakes":
@@ -450,6 +495,11 @@ export default function AdminEventsPage() {
                     }}
                     className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer font-semibold"
                   >
+                    <option value="women_day">💐 Phụ nữ Việt Nam (20/10 & 8/3)</option>
+                    <option value="teachers_day">🎓 Ngày Nhà giáo Việt Nam (20/11)</option>
+                    <option value="national_day">🇻🇳 Đại lễ Quốc khánh (2/9, 30/4 & 1/5)</option>
+                    <option value="back_to_school">🚀 Mùa thi bứt phá & Tựu trường</option>
+                    <option value="valentine">💖 Valentine & Mùa yêu thương (14/2)</option>
                     <option value="noel">🎄 Giáng sinh (Noel)</option>
                     <option value="mid_autumn">🥮 Tết Trung Thu</option>
                     <option value="halloween">🎃 Halloween</option>
@@ -518,6 +568,11 @@ export default function AdminEventsPage() {
                     }
                     className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                   >
+                    <option value="roses">🌹 Cánh hoa hồng & Quà tặng (20/10, 8/3)</option>
+                    <option value="sunflowers">🌻 Hoa hướng dương & Cử nhân (20/11)</option>
+                    <option value="fireworks">🎆 Pháo hoa rực rỡ & Cờ Tổ quốc (Đại lễ)</option>
+                    <option value="stars">⭐ Ngôi sao may mắn & Tên lửa (Mùa thi)</option>
+                    <option value="hearts">💖 Trái tim bay bổng & Hộp quà (Valentine)</option>
                     <option value="bat_pumpkin">🎃 Bí ngô, dơi bay & mạng nhện (Halloween)</option>
                     <option value="snowflakes">❄ Hoa tuyết rơi lấp lánh (Giáng sinh)</option>
                     <option value="lanterns">🏮 Đèn lồng & bánh trung thu (Trung thu)</option>

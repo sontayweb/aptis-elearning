@@ -3,7 +3,17 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { api } from "@/lib/api-client";
 
-export type EventTemplateId = "halloween" | "noel" | "mid_autumn" | "tet" | "custom";
+export type EventTemplateId =
+  | "women_day"
+  | "teachers_day"
+  | "national_day"
+  | "back_to_school"
+  | "valentine"
+  | "halloween"
+  | "noel"
+  | "mid_autumn"
+  | "tet"
+  | "custom";
 export type EventAppearanceMode = "light" | "dark" | "adaptive";
 export type UserThemePreference = "event" | "light" | "dark";
 
@@ -19,13 +29,98 @@ export interface EventThemeConfig {
   bannerEnabled: boolean;
   bannerText: string;
   bannerLink: string;
-  decorationType: "bat_pumpkin" | "snowflakes" | "lanterns" | "blossoms" | "none";
+  decorationType:
+    | "roses"
+    | "sunflowers"
+    | "fireworks"
+    | "stars"
+    | "hearts"
+    | "bat_pumpkin"
+    | "snowflakes"
+    | "lanterns"
+    | "blossoms"
+    | "none";
   appearanceMode: EventAppearanceMode; // Chế độ nền mặc định: "light", "dark", "adaptive"
   forceEventTheme: boolean; // Nếu bật: khách truy cập mới mặc định thấy giao diện sự kiện
   updatedAt: string;
 }
 
 export const PRESET_TEMPLATES: Record<EventTemplateId, Omit<EventThemeConfig, "enabled" | "updatedAt">> = {
+  women_day: {
+    activeTemplate: "women_day",
+    name: "Phụ nữ Việt Nam 💐",
+    icon: "💐",
+    badge: "20/10 & 8/3",
+    description: "Sắc hoa hồng rạng rỡ, gửi trọn yêu thương và quà tặng tri ân đến một nửa thế giới",
+    primaryColor: "#E11D48", // Rose-600
+    accentColor: "#F43F5E", // Rose-500
+    bannerEnabled: true,
+    bannerText: "💐 Mừng Ngày Phụ Nữ Việt Nam 20/10 — Tặng học bổng & nhân đôi lượt chấm AI Speaking/Writing cho toàn bộ học viên nữ!",
+    bannerLink: "/pricing",
+    decorationType: "roses",
+    appearanceMode: "light",
+    forceEventTheme: true,
+  },
+  teachers_day: {
+    activeTemplate: "teachers_day",
+    name: "Nhà giáo Việt Nam 🎓",
+    icon: "🎓",
+    badge: "Tri ân 20/11",
+    description: "Không khí tri ân ấm áp với hoa hướng dương rực rỡ, cánh phượng vàng và trang sách ước mơ",
+    primaryColor: "#D97706", // Amber-600
+    accentColor: "#2563EB", // Blue-600
+    bannerEnabled: true,
+    bannerText: "🎓 Tri ân Thầy Cô 20/11 — Tặng mã giảm 30% gói luyện thi Aptis & tặng ca chữa bài 1:1 cùng giáo viên!",
+    bannerLink: "/pricing",
+    decorationType: "sunflowers",
+    appearanceMode: "light",
+    forceEventTheme: true,
+  },
+  national_day: {
+    activeTemplate: "national_day",
+    name: "Đại lễ Quốc khánh 🇻🇳",
+    icon: "🇻🇳",
+    badge: "Mừng Đại Lễ",
+    description: "Sắc đỏ sao vàng rực rỡ, pháo hoa chào mừng các ngày lễ lớn của đất nước (30/4, 1/5 & 2/9)",
+    primaryColor: "#DC2626", // Red-600
+    accentColor: "#EAB308", // Yellow-500
+    bannerEnabled: true,
+    bannerText: "🇻🇳 Chào mừng Đại lễ Non Sông — Khám phá bộ đề Marathon Aptis đặc biệt nhận quà cực hot!",
+    bannerLink: "/thi-thu",
+    decorationType: "fireworks",
+    appearanceMode: "light",
+    forceEventTheme: true,
+  },
+  back_to_school: {
+    activeTemplate: "back_to_school",
+    name: "Mùa thi bứt phá 🚀",
+    icon: "🚀",
+    badge: "Vượt vũ môn",
+    description: "Tinh thần quyết tâm đạt B1/B2/C Aptis với năng lượng bùng nổ và lộ trình bứt phá",
+    primaryColor: "#4F46E5", // Indigo-600
+    accentColor: "#06B6D4", // Cyan-500
+    bannerEnabled: true,
+    bannerText: "🚀 Cao điểm mùa thi Aptis — Tải ngay bộ Key dự đoán độc quyền & tự tin đạt mục tiêu B1/B2/C!",
+    bannerLink: "/key-du-doan",
+    decorationType: "stars",
+    appearanceMode: "light",
+    forceEventTheme: true,
+  },
+  valentine: {
+    activeTemplate: "valentine",
+    name: "Valentine 14/2 💖",
+    icon: "💖",
+    badge: "Mùa yêu thương",
+    description: "Không gian ngọt ngào với trái tim bay bổng, socola và combo học chung đôi bạn cùng tiến",
+    primaryColor: "#EC4899", // Pink-500
+    accentColor: "#BE185D", // Pink-700
+    bannerEnabled: true,
+    bannerText: "💖 Mùa yêu thương 14/2 — Đăng ký học đôi giảm ngay 50%, cùng nhau chinh phục chứng chỉ Aptis!",
+    bannerLink: "/pricing",
+    decorationType: "hearts",
+    appearanceMode: "light",
+    forceEventTheme: true,
+  },
   halloween: {
     activeTemplate: "halloween",
     name: "Halloween 🎃",
