@@ -584,10 +584,10 @@ export default function AdminExamsPage() {
             <button
               onClick={() => setSmartImportOpen(true)}
               className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/70 bg-blue-50/70 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-[11px] font-heading font-semibold transition-all flex items-center gap-1"
-              title="Nhập đề từ file Word/Excel chuẩn"
+              title="Tải lên đề từ file Word (.docx) hoặc Excel (.xlsx)"
             >
               <UploadCloud className="w-3 h-3 text-blue-500" />
-              <span>Nhập File Chuẩn</span>
+              <span>Nhập từ Word / Excel</span>
             </button>
 
             <button
@@ -596,7 +596,7 @@ export default function AdminExamsPage() {
               title="Nhập đề cấu trúc JSON"
             >
               <FileCode className="w-3 h-3 text-slate-400" />
-              <span>Nhập JSON</span>
+              <span>Nhập từ JSON</span>
             </button>
 
             <button
@@ -604,7 +604,7 @@ export default function AdminExamsPage() {
               className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-heading font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-1"
             >
               <Plus className="w-3 h-3" />
-              <span>Tạo đề thi mới</span>
+              <span>Tạo đề thủ công</span>
             </button>
           </>
         }
@@ -1329,7 +1329,7 @@ export default function AdminExamsPage() {
             </div>
 
             <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">
-              Dán cấu trúc JSON chuẩn gồm các trường: <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-mono text-[11px]">title</code>, <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-mono text-[11px]">skill</code>,{" "}
+              Dán dữ liệu đề thi định dạng JSON gồm các trường: <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-mono text-[11px]">title</code>, <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-mono text-[11px]">skill</code>,{" "}
               <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-mono text-[11px]">durationMinutes</code>, <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-mono text-[11px]">parts</code> (mỗi part có mảng{" "}
               <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-mono text-[11px]">questions</code>).
             </p>
@@ -1652,7 +1652,7 @@ export default function AdminExamsPage() {
         onClose={() => setSmartImportOpen(false)}
         onSuccess={() => {
           setSmartImportOpen(false);
-          showToast("Nhập đề thi chuẩn hóa thành công!");
+          showToast("Đã nhập đề thi thành công!");
           fetchExams();
         }}
       />

@@ -365,16 +365,16 @@ export class AdminController {
     try {
       const templates = [
         {
-          name: 'Bộ Khung Mẫu Speaking Part 2 & Part 3 (.docx)',
-          description: 'Mẫu Word chuẩn dành cho các bài thi miêu tả tranh và cặp tranh so sánh đối chiếu có bảng từ vựng song ngữ.',
+          name: 'Mẫu đề Speaking Part 2 & Part 3 (.docx)',
+          description: 'Mẫu Word thuận tiện cho các bài thi miêu tả tranh và so sánh đối chiếu có bảng từ vựng song ngữ.',
           fileName: 'Mau_Nhap_De_Speaking_Part2_Part3.docx',
           downloadUrl: '/templates/Mau_Nhap_De_Speaking_Part2_Part3.docx',
           fileType: 'DOCX',
           size: '38 KB',
         },
         {
-          name: 'Bộ Khung Mẫu Reading & Listening (.xlsx)',
-          description: 'Mẫu bảng tính Excel chuẩn dành cho các bài đọc hiểu và trắc nghiệm câu hỏi nghe kèm đáp án và giải thích.',
+          name: 'Mẫu đề Reading & Listening (.xlsx)',
+          description: 'Mẫu bảng tính Excel nhanh cho bài đọc hiểu và trắc nghiệm câu hỏi nghe kèm đáp án và giải thích.',
           fileName: 'Mau_Nhap_De_Reading_Listening.xlsx',
           downloadUrl: '/templates/Mau_Nhap_De_Reading_Listening.xlsx',
           fileType: 'XLSX',
@@ -382,7 +382,7 @@ export class AdminController {
         },
       ];
 
-      sendSuccess(res, templates, 'Lấy danh sách tệp mẫu chuẩn thành công', 200);
+      sendSuccess(res, templates, 'Lấy danh sách file mẫu thành công', 200);
     } catch (error) {
       next(error);
     }

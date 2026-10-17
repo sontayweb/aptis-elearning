@@ -110,16 +110,16 @@ export default function ExamSmartImportModal({
       // Fallback
       setTemplates([
         {
-          name: "Bộ Khung Mẫu Speaking Part 2 & Part 3 (.docx)",
-          description: "Mẫu Word chuẩn dành cho các bài thi miêu tả tranh và cặp tranh so sánh đối chiếu có bảng từ vựng song ngữ.",
+          name: "Mẫu đề Speaking Part 2 & Part 3 (.docx)",
+          description: "Mẫu Word thuận tiện cho các bài thi miêu tả tranh và so sánh đối chiếu có bảng từ vựng song ngữ.",
           fileName: "Mau_Nhap_De_Speaking_Part2_Part3.docx",
           downloadUrl: "/templates/Mau_Nhap_De_Speaking_Part2_Part3.docx",
           fileType: "DOCX",
           size: "38 KB",
         },
         {
-          name: "Bộ Khung Mẫu Reading & Listening (.xlsx)",
-          description: "Mẫu bảng tính Excel chuẩn dành cho các bài đọc hiểu và trắc nghiệm câu hỏi nghe kèm đáp án và giải thích.",
+          name: "Mẫu đề Reading & Listening (.xlsx)",
+          description: "Mẫu bảng tính Excel nhanh cho bài đọc hiểu và trắc nghiệm câu hỏi nghe kèm đáp án và giải thích.",
           fileName: "Mau_Nhap_De_Reading_Listening.xlsx",
           downloadUrl: "/templates/Mau_Nhap_De_Reading_Listening.xlsx",
           fileType: "XLSX",
@@ -210,14 +210,14 @@ export default function ExamSmartImportModal({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                  Thêm đề thi từ file có sẵn
+                  Tải lên đề thi từ Word & Excel
                 </h3>
                 <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                  Tự động xử lý
+                  Tự động nhận diện
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Soạn đề theo mẫu có sẵn → tải lên → hệ thống tự nhận diện và lưu vào ngân hàng đề
+                Tải lên file Word hoặc Excel, hệ thống sẽ tự động bóc tách câu hỏi, hình ảnh và từ vựng vào ngân hàng đề
               </p>
             </div>
           </div>
@@ -246,7 +246,7 @@ export default function ExamSmartImportModal({
             >
               1
             </span>
-            <span>Chọn mẫu & Tải lên</span>
+            <span>Chọn mẫu & Tải file</span>
           </div>
           <ChevronRight className="w-4 h-4 text-slate-400" />
           <div
@@ -266,7 +266,7 @@ export default function ExamSmartImportModal({
             >
               2
             </span>
-            <span>Xem trước kết quả</span>
+            <span>Kiểm tra nội dung</span>
           </div>
           <ChevronRight className="w-4 h-4 text-slate-400" />
           <div
@@ -283,7 +283,7 @@ export default function ExamSmartImportModal({
             >
               3
             </span>
-            <span>Lưu vào hệ thống</span>
+            <span>Hoàn tất & Lưu đề</span>
           </div>
         </div>
 
@@ -307,7 +307,7 @@ export default function ExamSmartImportModal({
               <div>
                 <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                   <Download className="w-4 h-4 text-blue-600" />
-                  Bước 1: Tải file mẫu về máy và điền đề vào đó
+                  Bước 1: Tải file mẫu tham khảo (nếu chưa có định dạng)
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {templates.map((tpl, idx) => (
@@ -346,7 +346,7 @@ export default function ExamSmartImportModal({
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors"
                         >
                           <Download className="w-3.5 h-3.5" />
-                          Tải File Mẫu
+                          Tải mẫu này
                         </a>
                       </div>
                     </div>
@@ -354,28 +354,28 @@ export default function ExamSmartImportModal({
                 </div>
               </div>
 
-              {/* SECTION: QUY ƯỚC CÁC THẺ */}
+              {/* SECTION: GỢI Ý ĐỊNH DẠNG WORD */}
               <div className="p-4 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-800/50">
                 <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300 mb-2">
                   <Info className="w-4 h-4 text-blue-600" />
-                  File Word (.docx) dùng các từ khóa đặc biệt để phân tách đề:
+                  Gợi ý định dạng nhanh cho file Word (.docx):
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
                     <span className="font-bold text-blue-600">=== [ĐỀ MỚI] ===</span>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Dòng này = bắt đầu 1 đề mới</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Đánh dấu bắt đầu một đề thi mới</p>
                   </div>
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
                     <span className="font-bold text-blue-600">[PHẦN THI]:</span>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Tên phần thi, vd: Part 2</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Tên phần thi (VD: Part 2)</p>
                   </div>
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
                     <span className="font-bold text-blue-600">[HÌNH ẢNH]:</span>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Chèn ảnh ngay bên dưới</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Chèn ảnh minh họa ngay bên dưới</p>
                   </div>
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
                     <span className="font-bold text-blue-600">[TỪ VỰNG]:</span>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Bảng 2 cột: Anh | Việt</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Bảng từ vựng song ngữ (Anh - Việt)</p>
                   </div>
                 </div>
               </div>
@@ -384,7 +384,7 @@ export default function ExamSmartImportModal({
               <div>
                 <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                   <UploadCloud className="w-4 h-4 text-blue-600" />
-                  Bước 2: Tải file đã điền lên đây
+                  Bước 2: Tải file đề thi lên
                 </h4>
                 <div
                   onDragOver={handleDragOver}
@@ -415,11 +415,11 @@ export default function ExamSmartImportModal({
                     <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
                       {isValidating
                         ? "Đang đọc file và kiểm tra nội dung..."
-                        : "Kéo thả file vào đây, hoặc nhấn để chọn"}
+                        : "Kéo thả file vào đây hoặc bấm để chọn từ máy tính"}
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      Nhận file <span className="font-semibold text-blue-600">.docx</span> (Speaking,
-                      Writing — có ảnh minh họa) và <span className="font-semibold text-emerald-600">.xlsx</span>{" "}
+                      Hỗ trợ file <span className="font-semibold text-blue-600">.docx</span> (Speaking,
+                      Writing kèm ảnh minh họa) và <span className="font-semibold text-emerald-600">.xlsx</span>{" "}
                       (Reading, Listening)
                     </p>
                   </div>
@@ -434,7 +434,7 @@ export default function ExamSmartImportModal({
               {/* SUMMARY STATS BAR */}
               <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <div className="text-xs text-slate-500">Tệp đã nạp:</div>
+                  <div className="text-xs text-slate-500">File đã chọn:</div>
                   <div className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                     {validationResult.fileType === "DOCX" ? (
                       <FileText className="w-4 h-4 text-blue-600" />
@@ -447,7 +447,7 @@ export default function ExamSmartImportModal({
 
                 <div className="flex items-center gap-3">
                   <div className="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 text-xs font-semibold">
-                    Tổng: {validationResult.totalFound} đề
+                    Tổng cộng: {validationResult.totalFound} đề
                   </div>
                   <div className="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-semibold flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
@@ -456,7 +456,7 @@ export default function ExamSmartImportModal({
                   {validationResult.invalidCount > 0 && (
                     <div className="px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 text-xs font-semibold flex items-center gap-1.5">
                       <XCircle className="w-4 h-4" />
-                      Lỗi format: {validationResult.invalidCount}
+                      Cần điều chỉnh: {validationResult.invalidCount}
                     </div>
                   )}
                 </div>
@@ -466,7 +466,7 @@ export default function ExamSmartImportModal({
               <div className="space-y-4">
                 <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Eye className="w-4 h-4 text-blue-600" />
-                  Hệ thống đã đọc được {validationResult.totalFound} đề từ file của bạn:
+                  Đã nhận diện thành công {validationResult.totalFound} đề thi từ file:
                 </h4>
 
                 <div className="space-y-3 max-h-[45vh] overflow-y-auto pr-1">
@@ -509,11 +509,11 @@ export default function ExamSmartImportModal({
                               </span>
                               {item.isValid ? (
                                 <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-semibold">
-                                  <CheckCircle2 className="w-3.5 h-3.5" /> Chuẩn hợp lệ
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> Hợp lệ, sẵn sàng lưu
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 text-[11px] text-rose-600 font-semibold">
-                                  <XCircle className="w-3.5 h-3.5" /> Lỗi định dạng
+                                  <XCircle className="w-3.5 h-3.5" /> Cần bổ sung thông tin
                                 </span>
                               )}
                             </div>
@@ -580,10 +580,10 @@ export default function ExamSmartImportModal({
                 <CheckCircle2 className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                Nhập Đề Thi Thành Công!
+                Đã Lưu Đề Thi Thành Công!
               </h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                {successMsg || "Toàn bộ các đề thi hợp lệ đã được lưu trữ an toàn trong ngân hàng đề thi."}
+                {successMsg || "Các đề thi hợp lệ đã được đưa vào ngân hàng đề thi và sẵn sàng cho học viên luyện tập."}
               </p>
             </div>
           )}
@@ -596,7 +596,7 @@ export default function ExamSmartImportModal({
               onClick={() => setActiveStep(1)}
               className="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             >
-              Chọn Tệp Khác
+              Chọn file khác
             </button>
           ) : (
             <div />
@@ -623,12 +623,12 @@ export default function ExamSmartImportModal({
                 {isSaving ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    Đang lưu vào ngân hàng đề...
+                    Đang lưu đề thi...
                   </>
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    Lưu {validationResult?.validCount} Đề Hợp Lệ Vào Hệ Thống
+                    Lưu {validationResult?.validCount} đề vào ngân hàng đề
                   </>
                 )}
               </button>
