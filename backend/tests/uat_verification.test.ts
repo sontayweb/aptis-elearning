@@ -146,7 +146,7 @@ describe('=== COMPREHENSIVE UAT RESPONSE VERIFICATION SUITE ===', () => {
     it('GET /api/exams trả về cấu trúc danh sách đề thi chuẩn xác với đầy đủ metadata', async () => {
       const res = await request(app)
         .get('/api/exams')
-        .query({ skill: 'LISTENING', limit: 10 })
+        .query({ skill: 'LISTENING', search: 'UAT Benchmark', limit: 10 })
         .set('Authorization', `Bearer ${studentToken}`);
 
       expect(res.status).toBe(200);

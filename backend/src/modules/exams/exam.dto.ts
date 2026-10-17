@@ -16,6 +16,7 @@ export const examFilterSchema = z.object({
     .optional()
     .transform((val) => (val !== undefined && val !== '' ? Number(val) : undefined)),
   source: z.string().optional(),
+  search: z.string().optional(),
   page: z.string().optional().default('1').transform(Number),
   limit: z.string().optional().default('20').transform(Number),
 });

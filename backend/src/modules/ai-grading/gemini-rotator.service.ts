@@ -51,7 +51,7 @@ export class GeminiRotatorService {
    * - Đẩy các bản Preview / Exp hay bị 503 quá tải xuống cuối danh sách.
    */
   public async discoverModelsFromGoogle(): Promise<string[]> {
-    if (!this.apiKey) return [];
+    if (process.env.NODE_ENV === 'test' || !this.apiKey) return this.modelsPool;
     if (this.isDiscovering) return this.modelsPool;
 
     try {

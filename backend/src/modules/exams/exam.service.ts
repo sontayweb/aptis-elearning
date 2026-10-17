@@ -6,15 +6,25 @@ import { assertProAccess } from '../../utils/pro-guard';
 
 export class ExamService {
   async listExams(filter: ExamFilterInput, userId?: string) {
-    const { skill, isPro, isHot, hotLevel, source, page, limit } = filter;
+    const { skill, isPro, isHot, hotLevel, source, search, page, limit } = filter;
     const skip = (page - 1) * limit;
 
     const where: any = {
       is_published: true,
     };
 
-    if (source) {
+    if (source === 'KEY') {
+      where.OR = [
+        { hot_level: { gt: 0 } },
+        { forecast_tag: { not: null } },
+        { source: 'KEY' },
+      ];
+    } else if (source) {
       where.source = source;
+    }
+
+    if (search && search.trim()) {
+      where.title = { contains: search.trim(), mode: 'insensitive' };
     }
 
     if (skill) {
@@ -754,12 +764,27 @@ export class ExamService {
       } else if (isGrammarVocabPart) {
         (part as any).recommendedMinutes = 25;
         (part as any).partSubtitle = 'Grammar & Vocabulary Core';
+      } else if (isListeningPart) {
+        if (partType === 'PART_1') {
+          (part as any).partSubtitle = 'Part 1 - Information Recognition';
+          (part as any).topic = 'Everyday Information & Announcements';
+        } else if (partType === 'PART_2') {
+          (part as any).partSubtitle = 'Part 2 - Information Matching (4 Speakers)';
+          (part as any).topic = 'Workplace & Daily Life Views';
+        } else if (partType === 'PART_3') {
+          (part as any).partSubtitle = 'Part 3 - Opinion Matching (Discussion)';
+          (part as any).topic = 'Discussion & Perspectives';
+        } else if (partType === 'PART_4') {
+          (part as any).partSubtitle = 'Part 4 - Monologue Comprehension';
+          (part as any).topic = 'Lectures & Public Announcements';
+        }
       }
 
-      // BẢO MẬT: Tuyệt đối không để lộ explanation cho các kỹ năng trắc nghiệm khi chưa nộp bài
+      // BẢO MẬT: Tuyệt đối không để lộ explanation và correct_answer cho các kỹ năng trắc nghiệm khi chưa nộp bài
       if (exam.skill !== 'SPEAKING' && exam.skill !== 'WRITING') {
         for (const q of part.questions) {
           delete (q as any).explanation;
+          delete (q as any).correct_answer;
         }
       }
     }

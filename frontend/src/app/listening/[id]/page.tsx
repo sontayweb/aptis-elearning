@@ -545,32 +545,7 @@ function ListeningExamRunnerContent() {
 
       // Part 2: Speakers matching
       if (detectedPart === 2) {
-        let p2Topic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
-        if (!p2Topic || /full\s*listening/i.test(p2Topic)) {
-          const allP2Text = [
-            p.instructions,
-            p.passage_text,
-            ...questions.map((q: any) => q.explanation || ""),
-            ...questions.map((q: any) => q.prompt || ""),
-          ].join(" ");
-
-          if (/talking\s+about\s+(?:their\s+|the\s+)?([^.,\n\r<]+)/i.test(allP2Text)) {
-            const m = allP2Text.match(/talking\s+about\s+(?:their\s+|the\s+)?([^.,\n\r<]+)/i);
-            if (m && m[1]) p2Topic = m[1].trim().replace(/\b\w/g, (c) => c.toUpperCase());
-          } else if (/exercise|bike|running|walking|horse|sport/i.test(allP2Text)) {
-            p2Topic = "Exercise Preferences & Sports";
-          } else if (/job|career|work|office|company|commute/i.test(allP2Text)) {
-            p2Topic = "Work & Career Preferences";
-          } else if (/holiday|vacation|travel|trip|tourist/i.test(allP2Text)) {
-            p2Topic = "Holiday & Travel Experiences";
-          } else if (/book|reading|library|novel|author/i.test(allP2Text)) {
-            p2Topic = "Reading Habits & Literature";
-          } else if (/film|movie|cinema|television|tv/i.test(allP2Text)) {
-            p2Topic = "Film & Entertainment";
-          } else {
-            p2Topic = "Workplace & Daily Life";
-          }
-        }
+        const p2Topic = (p as any).topic || p.topic || p.partSubtitle || extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "Workplace & Daily Life Views");
         result.part2.topic = p2Topic;
 
         const p2Candidate = questions.find((q: any) => q.explanation || q.transcript);
@@ -703,26 +678,7 @@ function ListeningExamRunnerContent() {
 
       // Part 3: Opinion discussion
       if (detectedPart === 3) {
-        let p3Topic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
-        if (!p3Topic || /full\s*listening/i.test(p3Topic)) {
-          const allP3Text = [
-            p.instructions,
-            p.passage_text,
-            ...questions.map((q: any) => q.prompt || ""),
-            ...questions.map((q: any) => q.explanation || ""),
-          ].join(" ");
-          if (/internet|online|screen|technology|social\s*media|digital/i.test(allP3Text)) {
-            p3Topic = "The Internet & Digital Life";
-          } else if (/environment|pollution|climate|recycle|nature/i.test(allP3Text)) {
-            p3Topic = "Environmental Protection & Society";
-          } else if (/education|school|study|learning|university|student/i.test(allP3Text)) {
-            p3Topic = "Education & Learning Methods";
-          } else if (/shopping|online\s*shopping|retail|consumer/i.test(allP3Text)) {
-            p3Topic = "Consumer Habits & Shopping";
-          } else {
-            p3Topic = "Discussion & Opinions";
-          }
-        }
+        const p3Topic = (p as any).topic || p.topic || p.partSubtitle || extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "Discussion & Perspectives");
         result.part3.topic = p3Topic;
 
         const p3Candidate = questions.find((q: any) => q.explanation || q.transcript);
@@ -764,10 +720,7 @@ function ListeningExamRunnerContent() {
 
       // Part 4: Monologues
       if (detectedPart === 4) {
-        let p4BaseTopic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
-        if (!p4BaseTopic || /full\s*listening/i.test(p4BaseTopic)) {
-          p4BaseTopic = "Academic & Cultural Talks";
-        }
+        const p4BaseTopic = (p as any).topic || p.topic || p.partSubtitle || extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "Lectures & Public Announcements");
 
         if (questions.length > 0) {
           const qList = questions.map((q: any) => {

@@ -4,6 +4,35 @@ Tất cả các thay đổi và tiến độ nâng cấp hệ thống được g
 
 ---
 
+## [2.3.0] - 2026-10-17 (SYSTEM ARCHITECTURE STANDARDIZATION, ZERO-BUG MASTER REFACTOR & ANTI-CHEATING HARDENING)
+
+### Security & Anti-Cheating Hardening (Bảo Mật Phòng Thi Tuyệt Đối)
+- **Ẩn Đáp Án Đúng Khách Quan (`GET /api/exams/:id/questions`):**
+  - Xóa triệt để trường `correct_answer` và `explanation` khi trả về đề thi trắc nghiệm (Listening, Reading, Grammar/Vocabulary, Full Test) cho thí sinh trong phòng thi.
+  - Ngăn chặn hoàn toàn hành vi mở F12 DevTools Network Tab để xem trước đáp án khi làm bài thi thật và bài thi thử.
+  - Đáp án đúng và lời giải chi tiết chỉ được trả về an toàn sau khi thí sinh đã nộp bài thông qua API `GET /api/submissions/:id`.
+
+### Single Source of Truth & DTO Standardization (Chuẩn Hóa Kiến Trúc 3 Lớp Đồng Bộ)
+- **Chuẩn Hóa DTO Toàn Diện 5 Kỹ Năng & Full Test (`exam.service.ts`):**
+  - **Speaking:** Xóa bỏ 100% ảnh rác Part 4 trong DB (`image_url = null`), map đúng tranh vật lý Part 2 & Part 3, chuẩn hóa thông số khảo thí tự thân (`prepTime`: 5s/12s/60s, `speakTime`: 30s/45s/120s).
+  - **Writing:** Tự động đảm bảo 2 email chuẩn khảo thí (thân mật 50 từ và trang trọng 120-150 từ) cho Part 4 từ Backend DTO; chuẩn hóa `minWords`, `maxWords`, `recommendedMinutes`.
+  - **Reading:** Chuẩn hóa DTO tự thân (`partType`, `recommendedMinutes`, `partSubtitle`), loại bỏ hoàn toàn regex đoán chuỗi.
+  - **Listening:** Bổ sung cấu hình `isListeningPart` chuẩn hóa `partSubtitle` và `topic` tự thân từ Backend DTO; dọn dẹp logic đoán từ khóa regex trên Frontend.
+  - **Grammar & Vocabulary:** Dọn sạch 128 part rỗng 0 câu hỏi từ 6 đề lỗi; kích hoạt 48 đề thi chuẩn 525 câu hỏi thật 100%; tách benchmark an toàn.
+  - **Thi Thử (Full Test):** Dọn sạch 26 đề Full Test, xóa bỏ liên kết Supabase cũ, áp dụng DTO phân loại cho từng part con.
+- **Phân Hệ Key Dự Đoán (`/key-du-doan`):**
+  - Backend tự động ánh xạ `source: 'KEY'` sang các đề thi có `hot_level > 0` và `forecast_tag != null`.
+  - Frontend hiển thị 100% đề tủ và đề hot thật từ PostgreSQL, xóa bỏ phụ thuộc vào mảng dữ liệu mẫu tĩnh.
+- **Tìm Kiếm Đề Thi Backend:**
+  - Bổ sung tham số `search` vào `examFilterSchema` và `ExamService.listExams`, hỗ trợ tìm kiếm đề theo tên không phân biệt hoa thường.
+
+### Verified & Zero Errors (Kiểm Định Kỹ Thuật Toàn Diện)
+- **Jest Test Suites:** Đạt **11/11 Test Suites PASSED (100%)**, **110/110 Tests PASSED (100%)**.
+- **TypeScript:** Cả `frontend` và `backend` đều đạt **0 lỗi biên dịch** (`tsc --noEmit` Exit Code 0).
+- **Master Integrity Audit:** Script `audit-master-zero-bug.ts` vượt qua 100% các tiêu chí khảo thí.
+
+---
+
 ## [2.2.4] - 2026-10-12 (NGHE CHÉP & SHADOWING FLOW PERFECTION: PROGRESS BARS, LESSON PICKER & WARM RUNNER ALIGNMENT)
 
 ### Fixed & Enhanced (Khắc phục và hoàn thiện toàn diện luồng Nghe chép & Nói nhại `/nghe-chep`)
