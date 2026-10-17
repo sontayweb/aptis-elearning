@@ -37,8 +37,6 @@ import {
   Star,
   Flame,
 } from "lucide-react";
-import { SPEAKING_PART2_BANK } from "@/data/speaking-part2-bank";
-import { SPEAKING_PART3_BANK } from "@/data/speaking-part3-bank";
 
 export interface SpeakingQuestion {
   id: string;
@@ -746,231 +744,6 @@ function formatTimerDisplay(seconds: number): string {
   return `${m.toString().padStart(2, "0")}:${remSec.toString().padStart(2, "0")}`;
 }
 
-function cleanSpeakingTextForMatch(text: string): string {
-  return (text || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function isGenericSpeakingQuestion(q: string): boolean {
-  const clean = cleanSpeakingTextForMatch(q);
-  return (
-    clean === "describe the picture" ||
-    clean === "describe this picture" ||
-    clean === "please describe the picture" ||
-    clean === "please describe what you see in the picture" ||
-    clean === "tell me what you see in the two pictures" ||
-    clean === "tell me what you see from the two pictures" ||
-    clean === "tell me what you see in the two photographs" ||
-    clean === "describe the two pictures" ||
-    clean === "compare 2 pictures" ||
-    clean === "please describe the 2 pictures" ||
-    clean.startsWith("describe the picture") ||
-    clean.startsWith("tell me what you see in the two") ||
-    clean.length < 15
-  );
-}
-
-// Tìm tranh Part 2 chuẩn khảo thí Aptis từ ngân hàng đề thật (SPEAKING_PART2_BANK)
-function resolveSpeakingPart2Image(contextText: string = "", rawImageUrl?: string): string {
-  const lower = contextText.toLowerCase();
-  const contextClean = cleanSpeakingTextForMatch(contextText);
-
-  // 1. Quét tìm trong SPEAKING_PART2_BANK bằng các câu hỏi trọng tâm (loại bỏ generic "Describe the picture")
-  let bestBankTopic: any = null;
-  let bestMatchScore = 0;
-
-  for (const topic of SPEAKING_PART2_BANK) {
-    if (!topic.imageUrl) continue;
-    const substantive = (topic.questions || []).filter((q) => !isGenericSpeakingQuestion(q));
-
-    for (const q of substantive) {
-      const qClean = cleanSpeakingTextForMatch(q);
-      if (qClean.length > 15 && contextClean.includes(qClean)) {
-        return topic.imageUrl;
-      }
-      const qWords = qClean.split(" ").filter((w) => w.length > 3 && !["tell", "about", "time", "when", "what", "your", "people", "think", "important"].includes(w));
-      if (qWords.length >= 2) {
-        const matches = qWords.filter((w) => contextClean.includes(w)).length;
-        const score = (matches / qWords.length) * 80;
-        if (matches >= 2 && score > bestMatchScore) {
-          bestMatchScore = score;
-          bestBankTopic = topic;
-        }
-      }
-    }
-
-    // Khớp tên chủ đề cụ thể (như "xe khách", "cưỡi ngựa", "siêu thị")
-    const tTitle = topic.title.toLowerCase();
-    if (tTitle.length > 5 && lower.includes(tTitle)) {
-      return topic.imageUrl;
-    }
-  }
-
-  if (bestBankTopic && bestMatchScore >= 45) {
-    return bestBankTopic.imageUrl;
-  }
-
-  // 2. Tra cứu theo bảng chủ đề chính xác của đề thi Aptis Part 2
-  if (lower.includes("read") || lower.includes("sách") || lower.includes("báo") || lower.includes("đọc") || lower.includes("book")) {
-    return "/uploads/speaking/part2/image18.png";
-  }
-  if (lower.includes("máy tính") || lower.includes("computer") || lower.includes("laptop") || lower.includes("technology")) {
-    return "/uploads/speaking/part2/image21.png";
-  }
-  if (lower.includes("siêu thị") || lower.includes("supermarket") || lower.includes("shopping") || lower.includes("mua sắm") || lower.includes("small shop") || lower.includes("cửa hàng")) {
-    return "/uploads/speaking/part2/image18.png";
-  }
-  if (lower.includes("group") || lower.includes("travel with a group") || lower.includes("xe khách") || lower.includes("xe buýt") || lower.includes("du lịch theo nhóm")) {
-    return "/uploads/speaking/part2/image10.png";
-  }
-  if (lower.includes("climb") || lower.includes("mountain") || lower.includes("leo núi") || lower.includes("outdoor")) {
-    return "/uploads/speaking/part2/image2.png";
-  }
-  if (lower.includes("animal") || lower.includes("ngựa") || lower.includes("horse") || lower.includes("động vật")) {
-    return "/uploads/speaking/part2/image16.png";
-  }
-  if (lower.includes("nấu ăn") || lower.includes("cooking") || lower.includes("cook") || lower.includes("kitchen") || lower.includes("bếp")) {
-    return "/uploads/speaking/part2/image5.png";
-  }
-  if (lower.includes("ăn cùng") || lower.includes("eating together") || lower.includes("bữa ăn gia đình") || lower.includes("dining")) {
-    return "/uploads/speaking/part2/image9.png";
-  }
-  if (lower.includes("nhà hàng") || lower.includes("restaurant") || lower.includes("eating out")) {
-    return "/uploads/speaking/part2/image8.png";
-  }
-  if (lower.includes("xe hơi") || lower.includes("ô tô") || lower.includes("car") || lower.includes("drive")) {
-    return "/uploads/speaking/part2/image23.png";
-  }
-  if (lower.includes("cười") || lower.includes("laugh") || lower.includes("rạp chiếu phim") || lower.includes("cinema")) {
-    return "/uploads/speaking/part2/image1.png";
-  }
-  if (lower.includes("đông đúc") || lower.includes("crowded") || lower.includes("thành phố")) {
-    return "/uploads/speaking/part2/image13.png";
-  }
-  if (lower.includes("tin tức") || lower.includes("news") || lower.includes("newspapers") || lower.includes("tivi")) {
-    return "/uploads/speaking/part2/image22.png";
-  }
-  if (lower.includes("thuyền") || lower.includes("biển") || lower.includes("sea") || lower.includes("boat") || lower.includes("ngắm cảnh")) {
-    return "/uploads/speaking/part2/image20.png";
-  }
-  if (lower.includes("tàu") || lower.includes("train") || lower.includes("ga") || lower.includes("station") || lower.includes("đợi")) {
-    return "/uploads/speaking/part2/image25.png";
-  }
-  if (lower.includes("thuyết trình") || lower.includes("presentation") || lower.includes("public speaking")) {
-    return "/uploads/speaking/part2/image4.png";
-  }
-  if (lower.includes("trang trí") || lower.includes("decorate") || lower.includes("decoration") || lower.includes("nhà cửa")) {
-    return "/uploads/speaking/part2/image3.png";
-  }
-  if (lower.includes("dạy học") || lower.includes("lớp học") || lower.includes("cô giáo") || lower.includes("classroom") || lower.includes("teacher")) {
-    return "/uploads/speaking/part2/image17.png";
-  }
-  if (lower.includes("phòng họp") || lower.includes("văn phòng") || lower.includes("office") || lower.includes("meeting") || lower.includes("làm việc")) {
-    return "/uploads/speaking/part2/image15.png";
-  }
-
-  // 3. Fallback theo URL sạch có sẵn
-  const cleaned = cleanSpeakingImageUrl(rawImageUrl);
-  if (cleaned && !cleaned.includes("unsplash")) return cleaned;
-
-  return "/uploads/speaking/part2/image15.png";
-}
-
-// Tìm tranh Part 3 chuẩn khảo thí Aptis từ ngân hàng đề thật (SPEAKING_PART3_BANK)
-function resolveSpeakingPart3Images(
-  contextText: string = "",
-  rawImg1?: string,
-  rawImg2?: string
-): { img1: string; img2?: string; isCompound: boolean } {
-  const lower = contextText.toLowerCase();
-  const contextClean = cleanSpeakingTextForMatch(contextText);
-
-  // 1. Quét tìm trong SPEAKING_PART3_BANK theo câu hỏi so sánh thực tế
-  let bestBankTopic: any = null;
-  let bestMatchScore = 0;
-
-  for (const topic of SPEAKING_PART3_BANK) {
-    if (!topic.imageUrl) continue;
-    const substantive = (topic.questions || []).filter((q) => !isGenericSpeakingQuestion(q));
-
-    for (const q of substantive) {
-      const qClean = cleanSpeakingTextForMatch(q);
-      if (qClean.length > 15 && contextClean.includes(qClean)) {
-        return { img1: topic.imageUrl, isCompound: true };
-      }
-      const qWords = qClean.split(" ").filter((w) => w.length > 3 && !["tell", "what", "pictures", "two", "photographs", "describe", "these", "between"].includes(w));
-      if (qWords.length >= 2) {
-        const matches = qWords.filter((w) => contextClean.includes(w)).length;
-        const score = (matches / qWords.length) * 80;
-        if (matches >= 2 && score > bestMatchScore) {
-          bestMatchScore = score;
-          bestBankTopic = topic;
-        }
-      }
-    }
-
-    const tTitle = topic.title.toLowerCase();
-    if (tTitle.length > 6 && lower.includes(tTitle)) {
-      return { img1: topic.imageUrl, isCompound: true };
-    }
-  }
-
-  if (bestBankTopic && bestMatchScore >= 45) {
-    return { img1: bestBankTopic.imageUrl, isCompound: true };
-  }
-
-  // 2. Tra cứu theo bảng chủ đề chính xác của Part 3
-  if (lower.includes("núi") || lower.includes("biển") || lower.includes("mountain") || lower.includes("beach") || lower.includes("natural beauty")) {
-    return { img1: "/uploads/speaking/part3/image5.png", isCompound: true };
-  }
-  if (lower.includes("gia đình") || lower.includes("một mình") || lower.includes("alone") || lower.includes("living with family") || lower.includes("living alone")) {
-    return { img1: "/uploads/speaking/part3/image6.png", isCompound: true };
-  }
-  if (lower.includes("sân bay") || lower.includes("ga tàu") || lower.includes("airport") || lower.includes("train station") || lower.includes("plane") || lower.includes("flight")) {
-    return { img1: "/uploads/speaking/part3/image1.jpg", isCompound: true };
-  }
-  if (lower.includes("rau") || lower.includes("hoa") || lower.includes("trồng") || lower.includes("garden") || lower.includes("gardening")) {
-    return { img1: "/uploads/speaking/part3/image2.png", isCompound: true };
-  }
-  if (lower.includes("sách in") || lower.includes("e-book") || lower.includes("ebook") || lower.includes("printed book") || lower.includes("thư viện") || lower.includes("library")) {
-    return { img1: "/uploads/speaking/part3/image3.png", isCompound: true };
-  }
-  if (lower.includes("siêu thị") || lower.includes("chợ") || lower.includes("market") || lower.includes("supermarket")) {
-    return { img1: "/uploads/speaking/part3/image14.png", isCompound: true };
-  }
-  if (lower.includes("nhạc") || lower.includes("music") || lower.includes("nghe nhạc") || lower.includes("concert") || lower.includes("ban nhạc")) {
-    return { img1: "/uploads/speaking/part3/image9.png", isCompound: true };
-  }
-  if (lower.includes("healthy food") || lower.includes("fast food") || lower.includes("đồ ăn nhanh") || lower.includes("thực phẩm lành mạnh")) {
-    return { img1: "/uploads/speaking/part3/image11.png", isCompound: true };
-  }
-  if (lower.includes("tuyết") || lower.includes("tắm nắng") || lower.includes("mùa đông") || lower.includes("mùa hè") || lower.includes("summer") || lower.includes("winter") || lower.includes("snow")) {
-    return { img1: "/uploads/speaking/part3/image13.png", isCompound: true };
-  }
-  if (lower.includes("gym") || lower.includes("leo núi") || lower.includes("daily exercises") || lower.includes("tập thể dục")) {
-    return { img1: "/uploads/speaking/part3/image12.png", isCompound: true };
-  }
-  if (lower.includes("cờ vua") || lower.includes("indoor sports") || lower.includes("outdoor sports") || lower.includes("video games") || lower.includes("chess")) {
-    return { img1: "/uploads/speaking/part3/image15.png", isCompound: true };
-  }
-  if (lower.includes("farm") || lower.includes("nông trại") || lower.includes("văn phòng") || lower.includes("office")) {
-    return { img1: "/uploads/speaking/part3/image10.png", isCompound: true };
-  }
-
-  // 3. Fallback theo ảnh DB nếu có 2 ảnh rời
-  let c1 = cleanSpeakingImageUrl(rawImg1);
-  let c2 = cleanSpeakingImageUrl(rawImg2);
-  if (rawImg1 && !c2 && /de0*\d+_1\.png/i.test(rawImg1)) {
-    c2 = cleanSpeakingImageUrl(rawImg1.replace(/_1\.png/i, "_2.png"));
-  }
-  if (c1 && c2 && c1 !== c2 && !c1.includes("unsplash") && !c2.includes("unsplash")) {
-    return { img1: c1, img2: c2, isCompound: false };
-  }
-  if (c1 && !c1.includes("unsplash")) {
-    return { img1: c1, isCompound: true };
-  }
-
-  return { img1: "/uploads/speaking/part3/image5.png", isCompound: true };
-}
 
 // Nhận diện chính xác Part Number từ tiêu đề part, tiêu đề exam, query param
 function detectSpeakingPartNumber(p: any, examTitle?: string, fallbackPart?: number | null): 1 | 2 | 3 | 4 {
@@ -1104,7 +877,13 @@ function SpeakingExamRunnerContent() {
         const loaded: SpeakingQuestion[] = [];
 
         parts.forEach((p: any) => {
-          const pNum = detectSpeakingPartNumber(p, res.data?.title, targetPart);
+          let pNum: 1 | 2 | 3 | 4 = 1;
+          if (p.partType === "PART_4" || p.part_number === 4) pNum = 4;
+          else if (p.partType === "PART_3" || p.part_number === 3) pNum = 3;
+          else if (p.partType === "PART_2" || p.part_number === 2) pNum = 2;
+          else if (p.partType === "PART_1" || p.part_number === 1) pNum = 1;
+          else pNum = detectSpeakingPartNumber(p, res.data?.title, targetPart);
+
           const pTitle = p.title || `Part ${pNum}`;
           const qList = p.questions || [];
           const partVocab = parseSpeakingVocabulary(p.passage_text || p.suggestion || p.instructions);
@@ -1134,16 +913,13 @@ function SpeakingExamRunnerContent() {
             }
           }
 
-          let img1 = cleanSpeakingImageUrl(rawImg1);
-          let img2 = cleanSpeakingImageUrl(rawImg2);
-
           const allQPrompts = qList.map((q: any) => q.prompt || "").join(" ");
           const contextDesc = `${p.title || ""} ${res.data?.title || ""} ${allQPrompts}`;
 
           if (pNum === 4) {
             // Chuẩn web gốc Aptis Kỳ Tích & British Council:
             // Part 4 là 1 bài thuyết trình dài (Long Turn: 60s chuẩn bị, 120s nói liên tục)
-            // Hiển thị 3 câu hỏi phụ trên cùng 1 màn hình duy nhất
+            // Hiển thị 3 câu hỏi phụ trên cùng 1 màn hình duy nhất, KHÔNG HIỂN THỊ TRANH
             if (qList.length > 0) {
               const firstQ = qList[0];
               let subQuestions: string[] = parseSubQuestions(firstQ.options);
@@ -1180,8 +956,8 @@ function SpeakingExamRunnerContent() {
                 part: pTitle,
                 title: firstQ.prompt && firstQ.prompt.length > 50 ? firstQ.prompt.substring(0, 50) + "..." : firstQ.prompt,
                 prompt: firstQ.prompt,
-                prepTime: 60,
-                speakTime: 120,
+                prepTime: p.prepTime || 60,
+                speakTime: p.speakTime || 120,
                 imageUrl: undefined,
                 secondImageUrl: undefined,
                 sampleAnswer: hasVn ? "" : rawExp,
@@ -1196,20 +972,14 @@ function SpeakingExamRunnerContent() {
             // Part 1: prep 5s, speak 30s
             // Part 2: prep 12s, speak 45s (chính xác 45s theo chuẩn BC)
             // Part 3: prep 12s, speak 45s (chính xác 45s theo chuẩn BC)
-            const defaultPrep = pNum === 2 || pNum === 3 ? 12 : 5;
-            const defaultSpeak = pNum === 1 ? 30 : 45;
+            const defaultPrep = p.prepTime || (pNum === 2 || pNum === 3 ? 12 : 5);
+            const defaultSpeak = p.speakTime || (pNum === 1 ? 30 : 45);
 
-            // Xử lý ảnh chuẩn khảo thí cho Part 2 và Part 3
-            let resolvedImg1: string | undefined;
-            let resolvedImg2: string | undefined;
-
-            if (pNum === 2) {
-              resolvedImg1 = resolveSpeakingPart2Image(contextDesc, rawImg1);
-            } else if (pNum === 3) {
-              const p3Res = resolveSpeakingPart3Images(contextDesc, rawImg1, rawImg2);
-              resolvedImg1 = p3Res.img1;
-              resolvedImg2 = p3Res.img2;
-            }
+            // Hình ảnh chuẩn hóa từ Database (Single Source of Truth)
+            const resolvedImg1: string | undefined =
+              cleanSpeakingImageUrl(rawImg1) ||
+              (pNum === 2 ? "/uploads/speaking/part2/image15.png" : pNum === 3 ? "/uploads/speaking/part3/image5.png" : undefined);
+            const resolvedImg2: string | undefined = cleanSpeakingImageUrl(rawImg2);
 
             qList.forEach((q: any) => {
               const rawExp = (q.explanation || "").trim();

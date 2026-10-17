@@ -301,3 +301,222 @@ export const DEFAULT_LISTENING_TEST: ListeningExamData = {
     }
   ]
 };
+
+// Bộ đề mẫu 02 — Thảo luận & Quan điểm nâng cao (Tránh trùng lặp)
+export const DEFAULT_LISTENING_TEST_2: ListeningExamData = {
+  title: "Đề 02 — Full Listening · 4 Parts",
+  durationMinutes: 40,
+  part1: [
+    {
+      num: 1,
+      prompt: "A woman is calling a customer service center. What is her issue with the package?",
+      options: ["It was delivered to the wrong address", "The contents inside were damaged", "The delivery was delayed by three days"],
+      correctAnswer: "It was delivered to the wrong address",
+      explanation: "She confirms the parcel went to apartment 4B instead of 4A.",
+    },
+    {
+      num: 2,
+      prompt: "Listen to an announcement at a train station. Which platform should passengers take for Oxford?",
+      options: ["Platform 3", "Platform 5B", "Platform 8"],
+      correctAnswer: "Platform 5B",
+      explanation: "The station announcer directs Oxford commuters to platform 5B.",
+    },
+    {
+      num: 3,
+      prompt: "A doctor is speaking to a patient. What lifestyle advice does she emphasize?",
+      options: ["Drink more herbal tea", "Get at least 30 minutes of daily walking", "Avoid carbohydrates entirely"],
+      correctAnswer: "Get at least 30 minutes of daily walking",
+      explanation: "She strongly recommends brisk walking for half an hour daily.",
+    },
+    {
+      num: 4,
+      prompt: "A radio host interviews an architect. What feature of the new library is unique?",
+      options: ["Rooftop solar garden", "Underground cinema", "All-glass reading atrium"],
+      correctAnswer: "All-glass reading atrium",
+      explanation: "The architect highlights the transparent atrium maximizing daylight.",
+    },
+    {
+      num: 5,
+      prompt: "Listen to a voicemail message. What time does the team meeting start on Monday?",
+      options: ["8:30 AM", "9:00 AM", "10:15 AM"],
+      correctAnswer: "10:15 AM",
+      explanation: "The manager postponed the kickoff session to 10:15 AM.",
+    },
+    {
+      num: 6,
+      prompt: "A receptionist is booking a tour. How much is the discount for family groups?",
+      options: ["10 percent", "15 percent", "25 percent"],
+      correctAnswer: "15 percent",
+      explanation: "Family bookings of four or more receive a 15% markdown.",
+    },
+    {
+      num: 7,
+      prompt: "What will the weather in the southern region be like tomorrow?",
+      options: ["Heavy rain and thunderstorms", "Misty and cold", "Sunny and dry"],
+      correctAnswer: "Sunny and dry",
+      explanation: "Warm dry sunshine will prevail across southern districts.",
+    },
+    {
+      num: 8,
+      prompt: "Why was the flight to Frankfurt rescheduled?",
+      options: ["Technical engine check", "Dense morning fog", "Air traffic strike"],
+      correctAnswer: "Dense morning fog",
+      explanation: "Visibility dropped below safe thresholds due to heavy fog.",
+    },
+    {
+      num: 9,
+      prompt: "A student asks a librarian about returning textbooks. Where is the drop box?",
+      options: ["By the main exit door", "Next to the computer lab", "On the third floor"],
+      correctAnswer: "By the main exit door",
+      explanation: "The return slot is conveniently located right beside the exterior exit door.",
+    },
+    {
+      num: 10,
+      prompt: "Which museum exhibit is free for high school students this week?",
+      options: ["Modern Sculptures", "Ancient Egyptian Artifacts", "Digital Art Gallery"],
+      correctAnswer: "Ancient Egyptian Artifacts",
+      explanation: "The historical Egypt exhibition provides free admission for teens.",
+    },
+    {
+      num: 11,
+      prompt: "A customer orders a birthday cake. What flavor does she choose?",
+      options: ["Vanilla strawberry", "Dark chocolate fudge", "Matcha green tea"],
+      correctAnswer: "Dark chocolate fudge",
+      explanation: "She specifies a 2-tier dark chocolate fudge cake with white icing.",
+    },
+    {
+      num: 12,
+      prompt: "Listen to the guide at an art gallery. How long does the guided tour take?",
+      options: ["45 minutes", "60 minutes", "90 minutes"],
+      correctAnswer: "60 minutes",
+      explanation: "The full gallery walk-through lasts exactly one hour.",
+    },
+    {
+      num: 13,
+      prompt: "A caller leaves a message for David. What does she want him to bring to the dinner?",
+      options: ["Fresh dessert fruits", "A bottle of olive oil", "Home-baked bread"],
+      correctAnswer: "Home-baked bread",
+      explanation: "She requests a loaf of his signature sourdough bread.",
+    },
+  ],
+  part2: {
+    topic: "Workplace Productivity & Remote Work",
+    instructions: "Four employees share their views on working from home. Match each speaker to their statement.",
+    options: [
+      "Saves two hours of commute time daily",
+      "Misses spontaneous brainstorming with teammates",
+      "Struggles to separate office tasks from personal life",
+      "Enjoys quiet focus without office interruptions",
+      "Finds remote setup too expensive for home utilities",
+    ],
+    speakers: [
+      {
+        speaker: "Speaker A",
+        correctAnswer: "Saves two hours of commute time daily",
+        explanation: "Speaker A loves not having to ride crowded morning trains.",
+      },
+      {
+        speaker: "Speaker B",
+        correctAnswer: "Misses spontaneous brainstorming with teammates",
+        explanation: "Speaker B feels creative ideas emerge better in person.",
+      },
+      {
+        speaker: "Speaker C",
+        correctAnswer: "Struggles to separate office tasks from personal life",
+        explanation: "Speaker C frequently answers emails late into the night.",
+      },
+      {
+        speaker: "Speaker D",
+        correctAnswer: "Enjoys quiet focus without office interruptions",
+        explanation: "Speaker D produces deeper research output at home.",
+      },
+    ],
+    passageText: `Speaker A: "Working remotely saves me over two hours of commuting in crowded subway trains each day, giving me more time with family."\n\nSpeaker B: "I really miss the spontaneous hallway brainstorming and casual coffee talks with teammates that only happen in person."\n\nSpeaker C: "My biggest struggle is boundary setting. With work laptops at home, I often end up responding to emails until late at night."\n\nSpeaker D: "I get so much more deep analytical work done without constant open-plan office disruptions and impromptu meetings."`,
+    translationText: `Người nói A: "Làm việc từ xa giúp tôi tiết kiệm hơn 2 giờ đi lại trên các chuyến tàu điện ngầm đông đúc mỗi ngày, dành được nhiều thời gian hơn cho gia đình."\n\nNgười nói B: "Tôi thực sự nhớ những buổi trao đổi ý tưởng ngẫu hứng ở hành lang và lúc trò chuyện cà phê trực tiếp cùng đồng nghiệp."\n\nNgười nói C: "Khó khăn lớn nhất của tôi là thiết lập ranh giới làm việc. Để máy tính ở nhà khiến tôi thường xuyên phải trả lời email đến tận đêm muộn."\n\nNgười nói D: "Tôi hoàn thành được nhiều nghiên cứu phân tích chuyên sâu hơn hẳn khi không bị phân tâm bởi môi trường văn phòng mở và các cuộc họp đột xuất."`,
+  },
+  part3: {
+    topic: "Electric Vehicles and Environmental Future",
+    instructions: "Who expresses which opinion? Select Man, Woman, or Both.",
+    passageText: `Man: "Electric vehicles are gaining popularity, but rural charging networks remain painfully sparse across the countryside."\n\nWoman: "I agree, charging deserts outside major metropolitan highways are still a major roadblock for everyday drivers."\n\nMan: "We also cannot overlook the significant carbon and environmental footprint tied to rare metal battery mining."\n\nWoman: "True, but as technology scales and subsidies expand, EVs will definitely dominate passenger transit by 2035."`,
+    translationText: `Nam: "Xe điện đang ngày càng phổ biến hơn, nhưng mạng lưới trạm sạc ở khu vực nông thôn vẫn còn quá thưa thớt."\n\nNữ: "Tôi đồng ý, các khoảng trống thiếu trạm sạc ngoài trục đô thị lớn vẫn là trở ngại đáng kể với tài xế đi lại hàng ngày."\n\nNam: "Chúng ta cũng không thể xem nhẹ dấu chân carbon và tác động môi trường không nhỏ từ hoạt động khai thác kim loại hiếm làm pin."\n\nNữ: "Đúng vậy, nhưng khi công nghệ được tối ưu và chính sách trợ cấp mở rộng, xe điện chắc chắn sẽ giữ thế áp đảo trong phương tiện giao thông trước năm 2035."`,
+    opinions: [
+      {
+        statement: "1. Charging infrastructure in rural areas is still inadequate.",
+        correctAnswer: "Both" as const,
+        explanation: "Both participants acknowledge rural charging deserts.",
+      },
+      {
+        statement: "2. Battery manufacturing has a notable environmental footprint.",
+        correctAnswer: "Man" as const,
+        explanation: "The man quotes lifecycle battery mining assessments.",
+      },
+      {
+        statement: "3. Government subsidies should be expanded for buyers.",
+        correctAnswer: "Woman" as const,
+        explanation: "The woman argues price parity needs fiscal policy support.",
+      },
+      {
+        statement: "4. Electric cars will dominate passenger transit by 2035.",
+        correctAnswer: "Woman" as const,
+        explanation: "The woman is confident in rapid technological adoption.",
+      },
+    ],
+  },
+  part4: [
+    {
+      recNum: 1,
+      title: "Recording 1 of 2",
+      passageText: "An environmental specialist discusses renewable wind energy offshore.",
+      questions: [
+        {
+          prompt: "1. What is the primary benefit of offshore wind farms mentioned by the speaker?",
+          options: [
+            "Stronger and more consistent ocean wind streams",
+            "Lower installation and maintenance costs",
+            "Easier visual acceptance from coastal residents",
+          ],
+          correctAnswer: "Stronger and more consistent ocean wind streams",
+          explanation: "Ocean winds blow faster and smoother without land friction.",
+        },
+        {
+          prompt: "2. What technical obstacle is engineering research aiming to solve?",
+          options: [
+            "Floating anchors in ultra-deep ocean waters",
+            "Saltwater corrosion of steel turbine blades",
+            "Impact on migratory marine mammal communication",
+          ],
+          correctAnswer: "Floating anchors in ultra-deep ocean waters",
+          explanation: "Tethering turbines stably beyond 100 meters depth remains the key challenge.",
+        },
+      ],
+    },
+    {
+      recNum: 2,
+      title: "Recording 2 of 2",
+      passageText: "A university lecturer delivers an introduction to Behavioral Economics.",
+      questions: [
+        {
+          prompt: "1. How does Behavioral Economics diverge from Classical Economics?",
+          options: [
+            "It accounts for psychological and emotional biases in decisions",
+            "It solely analyzes financial stock market algorithms",
+            "It assumes consumers always maximize mathematical utility",
+          ],
+          correctAnswer: "It accounts for psychological and emotional biases in decisions",
+          explanation: "Human decision makers rely on cognitive shortcuts rather than strict logic.",
+        },
+        {
+          prompt: "2. What practical application does the lecturer recommend for policymakers?",
+          options: [
+            "Gentle 'nudges' that guide better retirement saving choices",
+            "Heavy financial fines on unhealthy food consumption",
+            "Complete deregulation of consumer lending markets",
+          ],
+          correctAnswer: "Gentle 'nudges' that guide better retirement saving choices",
+          explanation: "Default opt-in schemes dramatically improve national pension savings.",
+        },
+      ],
+    },
+  ],
+};
+

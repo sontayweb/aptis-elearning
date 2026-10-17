@@ -604,6 +604,46 @@ export class ExamService {
         }
       }
 
+      // Chuẩn hóa partType và thời gian khảo thí theo chuẩn British Council (Single Source of Truth)
+      const partTitleLower = (part.title || '').toLowerCase();
+      const examTitleLower = (exam.title || '').toLowerCase();
+      let partType: 'PART_1' | 'PART_2' | 'PART_3' | 'PART_4' = 'PART_1';
+
+      if (partTitleLower.includes('part 4') || partTitleLower.includes('part4') || (part.part_number === 4 && exam.parts.length === 4)) {
+        partType = 'PART_4';
+      } else if (partTitleLower.includes('part 3') || partTitleLower.includes('part3') || (part.part_number === 3 && exam.parts.length === 4)) {
+        partType = 'PART_3';
+      } else if (partTitleLower.includes('part 2') || partTitleLower.includes('part2') || (part.part_number === 2 && exam.parts.length === 4)) {
+        partType = 'PART_2';
+      } else if (examTitleLower.includes('part 4') || examTitleLower.includes('part4')) {
+        partType = 'PART_4';
+      } else if (examTitleLower.includes('part 3') || examTitleLower.includes('part3')) {
+        partType = 'PART_3';
+      } else if (examTitleLower.includes('part 2') || examTitleLower.includes('part2')) {
+        partType = 'PART_2';
+      } else {
+        partType = 'PART_1';
+      }
+      (part as any).partType = partType;
+
+      if (exam.skill === 'SPEAKING') {
+        if (partType === 'PART_4') {
+          part.image_url = null;
+          (part as any).prepTime = 60;
+          (part as any).speakTime = 120;
+        } else if (partType === 'PART_2') {
+          (part as any).prepTime = 12;
+          (part as any).speakTime = 45;
+        } else if (partType === 'PART_3') {
+          (part as any).prepTime = 12;
+          (part as any).speakTime = 45;
+        } else {
+          part.image_url = null;
+          (part as any).prepTime = 5;
+          (part as any).speakTime = 30;
+        }
+      }
+
       // BẢO MẬT: Tuyệt đối không để lộ explanation cho các kỹ năng trắc nghiệm khi chưa nộp bài
       if (exam.skill !== 'SPEAKING' && exam.skill !== 'WRITING') {
         for (const q of part.questions) {
