@@ -978,7 +978,7 @@ export default function GrammarExamRunner() {
                         onClick={() => setCurrentIndex(idx)}
                         className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-xs font-bold shrink-0 flex items-center justify-center transition-all duration-150 cursor-pointer select-none ${
                           isCurrent
-                            ? "bg-primary text-primary-foreground font-black shadow-sm ring-2 ring-primary/40 ring-offset-1 ring-offset-background scale-105"
+                            ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
                             : isAnswered
                             ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
                             : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"

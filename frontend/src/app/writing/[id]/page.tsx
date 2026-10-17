@@ -581,11 +581,27 @@ function WritingExamRunnerContent() {
   // Xử lý tab part từ URL nếu có (?part=p1, ?part=p2, ?part=1, etc.)
   useEffect(() => {
     const partQuery = searchParams?.get("part")?.toLowerCase();
-    if (partQuery === "p1" || partQuery === "1") setCurrentPartIdx(0);
-    else if (partQuery === "p2" || partQuery === "2") setCurrentPartIdx(1);
-    else if (partQuery === "p3" || partQuery === "3") setCurrentPartIdx(2);
-    else if (partQuery === "p4" || partQuery === "4") setCurrentPartIdx(3);
-  }, [searchParams]);
+    if (!partQuery || parts.length === 0) return;
+
+    // Nếu là bài thi lẻ (chỉ có 1 Part duy nhất), luôn giữ currentPartIdx = 0
+    if (parts.length === 1) {
+      setCurrentPartIdx(0);
+      return;
+    }
+
+    let targetPartNum = 1;
+    if (partQuery === "p1" || partQuery === "1") targetPartNum = 1;
+    else if (partQuery === "p2" || partQuery === "2") targetPartNum = 2;
+    else if (partQuery === "p3" || partQuery === "3") targetPartNum = 3;
+    else if (partQuery === "p4" || partQuery === "4") targetPartNum = 4;
+
+    const matchedIdx = parts.findIndex((p) => p.partNumber === targetPartNum);
+    if (matchedIdx !== -1) {
+      setCurrentPartIdx(matchedIdx);
+    } else {
+      setCurrentPartIdx(0);
+    }
+  }, [searchParams, parts]);
 
   // Load Exam Data từ Backend
   const loadExamData = async () => {
@@ -602,12 +618,12 @@ function WritingExamRunnerContent() {
         const loadedParts: WritingPart[] = (res.data.parts || []).map(
           (p: any, idx: number) => {
             const rawPartNum = p.part_number || idx + 1;
-            const pTitleLower = (p.title || "").toLowerCase();
+            const combinedTitle = `${p.title || ""} ${title} ${rawPartNum}`.toLowerCase();
             let partNum = rawPartNum;
-            if (pTitleLower.includes("part 4") || pTitleLower.includes("email")) partNum = 4;
-            else if (pTitleLower.includes("part 3") || pTitleLower.includes("three response") || pTitleLower.includes("chat")) partNum = 3;
-            else if (pTitleLower.includes("part 2") || pTitleLower.includes("short text") || pTitleLower.includes("social")) partNum = 2;
-            else if (pTitleLower.includes("part 1") || pTitleLower.includes("word-level")) partNum = 1;
+            if (/part\s*4|email/i.test(combinedTitle)) partNum = 4;
+            else if (/part\s*3|three\s*response|chat/i.test(combinedTitle)) partNum = 3;
+            else if (/part\s*2|short\s*text|social/i.test(combinedTitle)) partNum = 2;
+            else if (/part\s*1|word-level/i.test(combinedTitle)) partNum = 1;
 
             const subTitle =
               partNum === 1
@@ -622,12 +638,22 @@ function WritingExamRunnerContent() {
 
             let questions: WritingQuestion[] = [];
             if (p.questions && p.questions.length > 0) {
-              questions = p.questions.map((q: any, qIdx: number) => ({
-                id: q.id,
-                questionNumber: q.question_number || qIdx + 1,
-                prompt: q.prompt || defaultP.questions[qIdx]?.prompt || `Question ${qIdx + 1}`,
-                sampleAnswer: q.explanation || defaultP.questions[qIdx]?.sampleAnswer,
-              }));
+              questions = p.questions.map((q: any, qIdx: number) => {
+                let promptText = q.prompt || defaultP.questions[qIdx]?.prompt || `Question ${qIdx + 1}`;
+                if (partNum === 2) {
+                  // Làm sạch nếu prompt còn chứa đoạn chỉ dẫn thừa
+                  const m = promptText.match(/^(?:.*?(?:fill in the form|write in sentences|use 20[–-]30 words|recommended time:[^.]*)[.\s]+)(.+)$/i);
+                  if (m && m[1].trim().length > 5) {
+                    promptText = m[1].trim();
+                  }
+                }
+                return {
+                  id: q.id,
+                  questionNumber: q.question_number || qIdx + 1,
+                  prompt: promptText,
+                  sampleAnswer: q.explanation || defaultP.questions[qIdx]?.sampleAnswer,
+                };
+              });
             } else {
               questions = defaultP.questions;
             }
@@ -662,6 +688,12 @@ function WritingExamRunnerContent() {
               }
             }
 
+            let instructions = p.instructions || defaultP.instructions;
+            if (partNum === 2 && (!instructions || instructions === "Write your response in English.")) {
+              const cleanClub = title.replace(/\s*—.*$/, '').replace(/\s*-.*$/, '').trim();
+              instructions = `You are a new member of the ${cleanClub}. Fill in the form. Write in sentences. Use 20–30 words. Recommended time: 7 minutes.`;
+            }
+
             return {
               partNumber: partNum,
               partName: p.title || defaultP.partName,
@@ -669,7 +701,7 @@ function WritingExamRunnerContent() {
               minWords: defaultP.minWords,
               maxWords: defaultP.maxWords,
               recommendedMinutes: defaultP.recommendedMinutes,
-              instructions: p.instructions || defaultP.instructions,
+              instructions,
               passageText: p.passage_text,
               questions,
             };
@@ -855,8 +887,11 @@ function WritingExamRunnerContent() {
   // MÀN HÌNH KẾT QUẢ PART 2 (THEO THEME CHUẨN CỦA HỆ THỐNG MÌNH)
   // =========================================================================
   if (showPart2Result) {
-    const part2Answer = answers["1_0"] || answers[`${currentPartIdx}_0`] || "";
+    const part2Idx = parts.findIndex((p) => p.partNumber === 2);
+    const pIdxToUse = part2Idx !== -1 ? part2Idx : currentPartIdx;
+    const part2Answer = answers[`${pIdxToUse}_0`] || answers["1_0"] || answers["0_0"] || "";
     const hasAnswer = part2Answer.trim().length > 0;
+    const part2Obj = parts.find((p) => p.partNumber === 2) || currentPart;
 
     return (
       <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
@@ -993,10 +1028,10 @@ function WritingExamRunnerContent() {
               <div className="space-y-2 text-xs md:text-sm">
                 <span className="font-bold text-primary">{examTitle || "Writing Test"}</span>
                 <p className="text-muted-foreground leading-relaxed">
-                  {parts[1]?.instructions || "You are a new member of the club. Fill in the form. Write in sentences. Use 20-30 words. Recommended time: 7 minutes."}
+                  {part2Obj?.instructions || "You are a new member of the club. Fill in the form. Write in sentences. Use 20-30 words. Recommended time: 7 minutes."}
                 </p>
                 <p className="font-medium text-foreground">
-                  {parts[1]?.questions[0]?.prompt || "Tell us about your interests and why you want to join this club."}
+                  {part2Obj?.questions[0]?.prompt || "Tell us about your interests and why you want to join this club."}
                 </p>
               </div>
 
@@ -1019,7 +1054,7 @@ function WritingExamRunnerContent() {
                   <span>Bài mẫu tham khảo của đề</span>
                 </span>
                 <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 leading-relaxed font-sans">
-                  {parts[1]?.questions[0]?.sampleAnswer || "I really enjoy participating in club activities because it helps me learn new things and meet great people."}
+                  {part2Obj?.questions[0]?.sampleAnswer || "I really enjoy participating in club activities because it helps me learn new things and meet great people."}
                 </div>
               </div>
             </div>
@@ -1097,7 +1132,7 @@ function WritingExamRunnerContent() {
               <div className="space-y-1.5 max-w-xl">
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-                    Phần {currentPart.partNumber} / 4
+                    {parts.length > 1 ? `Phần ${currentPart.partNumber} / ${parts.length}` : `Part ${currentPart.partNumber} · Đề luyện lẻ`}
                   </span>
                   <h2 className="font-heading font-bold text-base md:text-lg text-foreground">
                     {currentPart.partName}
@@ -1133,13 +1168,6 @@ function WritingExamRunnerContent() {
                 </div>
               </div>
             </div>
-
-            {/* Part 2 Specific Prompt */}
-            {currentPart.partNumber === 2 && (
-              <div className="text-xs md:text-sm font-semibold text-foreground pt-1">
-                {currentPart.questions[0]?.prompt || "Please tell us about yourself and your reasons for joining this club."}
-              </div>
-            )}
           </div>
 
           {/* 3. INPUT QUESTION CARDS */}
@@ -1183,13 +1211,57 @@ function WritingExamRunnerContent() {
           )}
 
           {/* =========================================================================
-              PART 2: FORM RESPONSE
+              PART 2: FORM RESPONSE (20–30 WORDS)
               ========================================================================= */}
           {currentPart.partNumber === 2 && (
-            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-3">
-              <label className="text-xs md:text-sm font-semibold text-foreground block leading-relaxed">
-                {currentPart.questions[0]?.prompt || "Please complete the club registration form in 20-30 words."}
-              </label>
+            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-border pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground shadow-sm">
+                    Câu hỏi điền đơn (Form Field)
+                  </span>
+                  <span className="text-xs text-muted-foreground font-medium hidden sm:inline">
+                    Mục tiêu: 20 – 30 từ · Thời gian gợi ý: ~7 phút
+                  </span>
+                </div>
+
+                {/* Word status badge */}
+                {(() => {
+                  const val = answers[`${currentPartIdx}_0`] || "";
+                  const words = getWordCount(val);
+                  let wordStatusText = "Chưa nhập bài";
+                  let wordStatusColor = "text-muted-foreground bg-muted border-border";
+                  if (words > 0) {
+                    if (words < 20) {
+                      wordStatusText = `Chưa đủ dung lượng (${words}/20–30 từ)`;
+                      wordStatusColor = "text-amber-700 bg-amber-500/10 border-amber-300 dark:text-amber-400";
+                    } else if (words <= 35) {
+                      wordStatusText = `Đạt chuẩn dung lượng (${words}/20–30 từ)`;
+                      wordStatusColor = "text-emerald-700 bg-emerald-500/10 border-emerald-300 dark:text-emerald-400";
+                    } else {
+                      wordStatusText = `Vượt số từ khuyến nghị (${words}/30 từ)`;
+                      wordStatusColor = "text-blue-700 bg-blue-500/10 border-blue-300 dark:text-blue-400";
+                    }
+                  }
+                  return (
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${wordStatusColor}`}>
+                      {wordStatusText}
+                    </span>
+                  );
+                })()}
+              </div>
+
+              {/* Hộp hiển thị câu hỏi nổi bật rõ ràng */}
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-1">
+                <div className="text-[11px] font-bold uppercase text-primary tracking-wider flex items-center gap-1.5">
+                  <PenTool className="w-3.5 h-3.5" />
+                  <span>Câu hỏi cần trả lời:</span>
+                </div>
+                <div className="text-sm md:text-base font-bold text-foreground leading-relaxed">
+                  {currentPart.questions[0]?.prompt || "Please tell us about yourself and your reasons for joining this club."}
+                </div>
+              </div>
+
               <textarea
                 rows={5}
                 value={answers[`${currentPartIdx}_0`] || ""}
@@ -1199,11 +1271,38 @@ function WritingExamRunnerContent() {
                     [`${currentPartIdx}_0`]: e.target.value,
                   }))
                 }
-                placeholder="Type your answer here"
-                className="w-full p-4 rounded-xl border border-input bg-background text-foreground text-sm md:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans resize-y leading-relaxed transition-all"
+                placeholder="Write in sentences (20–30 words). Type your answer here..."
+                className="w-full p-4 rounded-xl border border-input bg-background text-foreground text-sm md:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans resize-y leading-relaxed transition-all shadow-inner"
               />
-              <div className="flex justify-end text-xs text-muted-foreground font-mono">
-                Words {getWordCount(answers[`${currentPartIdx}_0`])} / 45
+
+              <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-24 sm:w-36 h-2 rounded-full bg-muted overflow-hidden">
+                    {(() => {
+                      const words = getWordCount(answers[`${currentPartIdx}_0`] || "");
+                      return (
+                        <div
+                          className={`h-full transition-all duration-300 ${
+                            words >= 20 && words <= 35
+                              ? "bg-emerald-500"
+                              : words > 35
+                              ? "bg-blue-500"
+                              : "bg-primary"
+                          }`}
+                          style={{
+                            width: `${Math.min(100, (words / 30) * 100)}%`,
+                          }}
+                        />
+                      );
+                    })()}
+                  </div>
+                  <span className="font-mono font-medium">
+                    {getWordCount(answers[`${currentPartIdx}_0`]) || 0} / 30 từ
+                  </span>
+                </div>
+                <span className="text-[11px] italic">
+                  Khuyến nghị: Viết 2–3 câu hoàn chỉnh có chủ vị
+                </span>
               </div>
             </div>
           )}
@@ -1252,6 +1351,18 @@ function WritingExamRunnerContent() {
               ========================================================================= */}
           {currentPart.partNumber === 4 && (
             <div className="space-y-6">
+              {/* Thông báo tình huống Part 4 nếu có */}
+              {currentPart.passageText && (
+                <div className="bg-card rounded-2xl border border-primary/20 bg-primary/[0.02] p-5 md:p-6 shadow-sm space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+                    <FileText className="w-4 h-4" />
+                    <span>Thông báo từ Ban Quản lý Câu lạc bộ (Club Announcement)</span>
+                  </div>
+                  <div className="p-4 rounded-xl bg-muted/40 border border-border text-xs md:text-sm text-foreground/90 leading-relaxed font-sans whitespace-pre-line">
+                    {currentPart.passageText}
+                  </div>
+                </div>
+              )}
               {currentPart.questions.map((q, qIdx) => {
                 const answerKey = `${currentPartIdx}_${qIdx}`;
                 const val = answers[answerKey] || "";
@@ -1425,7 +1536,7 @@ function WritingExamRunnerContent() {
                     onClick={() => setCurrentPartIdx(idx)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
                       isCurrent
-                        ? "bg-primary text-primary-foreground font-black shadow-sm ring-2 ring-primary/40 ring-offset-1 ring-offset-background scale-105"
+                        ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
                         : isAnswered
                         ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
                         : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"

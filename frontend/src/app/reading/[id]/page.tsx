@@ -496,16 +496,16 @@ function ReadingExamRunner() {
     if (examData.part3.questions.length > 0) {
       list.push({
         stageKey: "p3",
-        title: "Part 3",
-        label: "Part 3 – Opinion Matching",
+        title: "Part 4",
+        label: "Part 4 – " + (examData.part3.title || "Opinion Matching"),
         count: examData.part3.questions.length,
       });
     }
     if (examData.part4.paragraphs.length > 0) {
       list.push({
         stageKey: "p4",
-        title: "Part 4",
-        label: "Part 4 – Long Reading",
+        title: "Part 5",
+        label: "Part 5 – " + (examData.part4.title || "Long Reading"),
         count: examData.part4.paragraphs.length,
       });
     }
@@ -531,8 +531,10 @@ function ReadingExamRunner() {
         : p === "2" || p === "p2" || p === "part2"
         ? "p2-1"
         : p === "3" || p === "p3" || p === "part3"
-        ? "p3"
-        : p === "4" || p === "p4" || p === "part4" || p === "5" || p === "p5" || p === "part5"
+        ? (stages.some((s) => s.stageKey === "p2-2") ? "p2-2" : "p3")
+        : p === "4" || p === "p4" || p === "part4"
+        ? (stages.some((s) => s.stageKey === "p3") ? "p3" : "p4")
+        : p === "5" || p === "p5" || p === "part5"
         ? "p4"
         : null;
     if (targetKey) {
@@ -1468,7 +1470,7 @@ function ReadingExamRunner() {
                       onClick={() => setActiveStage(idx)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
                         isCurrent
-                          ? "bg-primary text-primary-foreground font-black shadow-sm ring-2 ring-primary/40 ring-offset-1 ring-offset-background scale-105"
+                          ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
                           : isComplete
                           ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
                           : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
@@ -1779,8 +1781,28 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
     const pTitle = (p.title || "").toLowerCase();
     const pNum = p.part_number;
 
+    // Phân loại Part chuẩn xác dựa trên tiêu đề hoặc số part
+    const isP2 =
+      pTitle.includes("cohesion") ||
+      pTitle.includes("part 2") ||
+      (pNum === 2 && !pTitle.includes("long") && !pTitle.includes("opinion"));
+    const isP3 =
+      pTitle.includes("opinion") ||
+      (pTitle.includes("part 4") && !pTitle.includes("long") && !pTitle.includes("heading")) ||
+      (pTitle.includes("part 3") && !pTitle.includes("cohesion"));
+    const isP4 =
+      pTitle.includes("long") ||
+      pTitle.includes("heading") ||
+      pNum === 5 ||
+      (pNum === 4 && (pTitle.includes("long") || pTitle.includes("heading")));
+    const isP1 =
+      !isP2 &&
+      !isP3 &&
+      !isP4 &&
+      (pNum === 1 || pTitle.includes("part 1") || pTitle.includes("gap") || pTitle.includes("sentence"));
+
     // Part 1: Gap Fill
-    if (pNum === 1 || pTitle.includes("part 1") || pTitle.includes("gap")) {
+    if (isP1) {
       const gaps: Part1Gap[] = (p.questions || []).map((q: any) => {
         let opts: string[] = [];
         if (Array.isArray(q.options)) opts = q.options;
@@ -1805,8 +1827,9 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
     }
 
     // Part 2: Sentence Order
-    if (pNum === 2 || pTitle.includes("part 2") || pTitle.includes("cohesion")) {
-      const stories: Part2Story[] = (p.questions || []).map((q: any, idx: number) => {
+    if (isP2) {
+      const stories: Part2Story[] = [];
+      (p.questions || []).forEach((q: any, idx: number) => {
         let optsObj: any = {};
         if (typeof q.options === "string") {
           try {
@@ -1818,6 +1841,43 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
           optsObj = q.options;
         }
 
+        // Trường hợp 1: options là mảng chuỗi (dữ liệu thô từ crawler)
+        if (Array.isArray(q.options) || Array.isArray(optsObj)) {
+          const rawArr: string[] = Array.isArray(q.options) ? q.options : optsObj;
+          if (rawArr.length >= 8) {
+            const mid = Math.ceil(rawArr.length / 2);
+            const st1Sentences = rawArr.slice(0, mid);
+            const st2Sentences = rawArr.slice(mid);
+
+            stories.push({
+              id: `${q.id}-1`,
+              title: q.prompt && q.prompt !== "Put the sentences in the correct order." ? q.prompt : "Đoạn văn 1",
+              fixedSentence: st1Sentences[0] || "Sentence 1 is fixed.",
+              sentences: st1Sentences.slice(1).map((text, sIdx) => ({ id: `s${sIdx + 2}`, text })),
+              correctOrder: st1Sentences.slice(1).map((_, sIdx) => `s${sIdx + 2}`),
+            });
+
+            stories.push({
+              id: `${q.id}-2`,
+              title: "Đoạn văn 2",
+              fixedSentence: st2Sentences[0] || "Sentence 1 is fixed.",
+              sentences: st2Sentences.slice(1).map((text, sIdx) => ({ id: `s${mid + sIdx + 2}`, text })),
+              correctOrder: st2Sentences.slice(1).map((_, sIdx) => `s${mid + sIdx + 2}`),
+            });
+            return;
+          } else if (rawArr.length >= 4) {
+            stories.push({
+              id: String(q.id),
+              title: q.prompt && q.prompt !== "Put the sentences in the correct order." ? q.prompt : `Đoạn văn ${idx + 1}`,
+              fixedSentence: rawArr.length === 5 ? rawArr[0] : "Sentence 1 is fixed.",
+              sentences: (rawArr.length === 5 ? rawArr.slice(1) : rawArr).map((text, sIdx) => ({ id: `s${sIdx + 2}`, text })),
+              correctOrder: (rawArr.length === 5 ? rawArr.slice(1) : rawArr).map((_, sIdx) => `s${sIdx + 2}`),
+            });
+            return;
+          }
+        }
+
+        // Trường hợp 2: options là object chuẩn { title, fixedSentence, sentences }
         let corArr: string[] = [];
         if (Array.isArray(q.correct_answer)) corArr = q.correct_answer;
         else if (typeof q.correct_answer === "string") {
@@ -1828,30 +1888,25 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
           }
         }
 
-        return {
+        stories.push({
           id: String(q.id),
-          title: optsObj.title || `Đoạn văn ${idx + 1}`,
-          fixedSentence: optsObj.fixedSentence || "Sentence 1 fixed",
+          title: optsObj.title || q.prompt || `Đoạn văn ${idx + 1}`,
+          fixedSentence: optsObj.fixedSentence || "Sentence 1 is fixed here.",
           sentences: optsObj.sentences || [],
           correctOrder: corArr.length > 0 ? corArr : (optsObj.sentences || []).map((s: any) => s.id),
-        };
+        });
       });
+
       if (stories.length > 0) {
         result.part2.stories = stories;
         if (p.instructions) result.part2.instructions = p.instructions;
       }
     }
 
-    // Part 3: Opinion Matching (Hỗ trợ pNum 3 hoặc pNum 4 nếu có nhãn opinion)
-    const isOpinionMatching =
-      pNum === 3 ||
-      pTitle.includes("part 3") ||
-      pTitle.includes("opinion") ||
-      (pNum === 4 && !pTitle.includes("long") && !pTitle.includes("heading"));
-
-    if (isOpinionMatching) {
+    // Part 3/4: Opinion Matching
+    if (isP3) {
       if (p.passage_text) {
-        const cleanText = p.passage_text.replace(/<[^>]+>/g, "\n");
+        const cleanText = p.passage_text.replace(/\r\n/g, "\n").replace(/<[^>]+>/g, "\n");
         // Tách 4 đoạn review A, B, C, D nếu có trong passage_text
         const matches = Array.from(
           cleanText.matchAll(/(?:^|\n)\s*(?:Person\s*)?([A-D])\s*[:.-]?\s*([\s\S]*?)(?=(?:\n\s*(?:Person\s*)?[A-D]\s*[:.-]?)|$)/gi)
@@ -1875,7 +1930,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
 
       const questions: Part3Question[] = (p.questions || []).map((q: any) => {
         let opts: string[] = ["Person A", "Person B", "Person C", "Person D"];
-        if (Array.isArray(q.options)) opts = q.options;
+        if (Array.isArray(q.options) && q.options.length > 0) opts = q.options;
         return {
           id: String(q.id),
           prompt: q.prompt,
@@ -1890,15 +1945,8 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
       }
     }
 
-    // Part 4: Long Reading / Heading Matching (Hỗ trợ pNum 4 hoặc 5 có nhãn long/headings)
-    const isLongReading =
-      pNum === 5 ||
-      pTitle.includes("part 5") ||
-      pTitle.includes("long") ||
-      pTitle.includes("heading") ||
-      (pNum === 4 && (pTitle.includes("long") || pTitle.includes("heading")));
-
-    if (isLongReading) {
+    // Part 4/5: Long Reading / Heading Matching
+    if (isP4) {
       const headingsSet = new Set<string>();
       const paragraphs: Part4Paragraph[] = (p.questions || []).map((q: any, idx: number) => {
         if (Array.isArray(q.options)) {
@@ -1906,7 +1954,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
         }
         return {
           id: String(q.id),
-          paragraphNumber: idx + 1,
+          paragraphNumber: q.question_number || (idx + 1),
           text: q.prompt ? q.prompt.replace(/^Paragraph\s*\d+\s*:\s*/i, "") : "",
           correctHeading: String(q.correct_answer || ""),
         };
@@ -1917,7 +1965,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
           result.part4.allHeadings = Array.from(headingsSet);
         }
         if (p.instructions) result.part4.instructions = p.instructions;
-        if (p.title) result.part4.title = p.title;
+        result.part4.title = p.passage_text || p.title || "Long reading";
       }
     }
   });

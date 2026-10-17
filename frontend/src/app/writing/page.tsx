@@ -37,6 +37,7 @@ interface WritingExam {
   bestScore?: string | null;
   bestScoreNumber?: number | null;
   userAttempts: number;
+  partNumber?: number;
   priority?: "HIGH" | "MEDIUM" | "LOW";
   hotLevel?: number;
 }
@@ -93,6 +94,7 @@ export default function WritingPracticePage() {
                 parts: isFullWriting ? "Full Writing · 4 Parts" : (exam.partTitle || "Writing Part"),
                 totalParts: exam.totalParts || 1,
                 partTitle: exam.partTitle,
+                partNumber: exam.parts?.[0]?.partNumber ?? exam.parts?.[0]?.part_number,
                 questionsCount: exam.totalQuestions || 4,
                 duration: `${exam.durationMinutes || 50} phút`,
                 isFree: !exam.isPro,
@@ -129,19 +131,19 @@ export default function WritingPracticePage() {
     } else if (activeTab === "p1") {
       // Part 1: Word-level Writing (Form thông tin ngắn)
       if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
-      return e.partTitle?.includes("Part 1") || e.title.includes("Writing Part 1");
+      return e.partNumber === 1 || /part\s*1/i.test(e.partTitle || "") || /part\s*1/i.test(e.title);
     } else if (activeTab === "p2") {
       // Part 2: Short Text Writing (Đoạn văn ngắn 20-30 từ)
       if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
-      return e.partTitle?.includes("Part 2") || e.title.includes("Writing Part 2");
+      return e.partNumber === 2 || /part\s*2/i.test(e.partTitle || "") || /part\s*2/i.test(e.title);
     } else if (activeTab === "p3") {
       // Part 3: Three Responses (Chat CLB)
       if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
-      return e.partTitle?.includes("Part 3") || e.title.includes("Writing Part 3");
+      return e.partNumber === 3 || /part\s*3/i.test(e.partTitle || "") || /part\s*3/i.test(e.title);
     } else if (activeTab === "p4") {
       // Part 4: Formal & Informal Emails
       if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
-      return e.partTitle?.includes("Part 4") || e.title.includes("Writing Part 4");
+      return e.partNumber === 4 || /part\s*4/i.test(e.partTitle || "") || /part\s*4/i.test(e.title);
     }
     return true;
   });
@@ -433,32 +435,7 @@ export default function WritingPracticePage() {
               {/* CARD 2..N: Practice Exam Cards */}
               {filteredExams.map((exam, idx) => {
                 const targetUrl = `/writing/${exam.id}${tabInfo.partQuery}`;
-                const cleanClubName = (() => {
-                  const raw = exam.title
-                    .replace(/—\s*Full Writing.*$/i, "")
-                    .replace(/-\s*Writing Part.*$/i, "")
-                    .replace(/Writing Part\s*\d+\s*[-:]*/i, "")
-                    .replace(/^Đề\s*\d+\s*[-:]*\s*/i, "")
-                    .trim();
-                  return raw || WRITING_CLUBS_BANK[idx % WRITING_CLUBS_BANK.length].clubNameEn;
-                })();
-
-                const displayTitle = (() => {
-                  const numPrefix = `Đề ${String(idx + 1).padStart(2, "0")}`;
-                  if (activeTab === "full") {
-                    return `${numPrefix} - ${cleanClubName} (Full Writing · 4 Parts)`;
-                  }
-                  if (activeTab === "p1") {
-                    return `${numPrefix} - ${cleanClubName}: Form Filling (5 thông tin)`;
-                  }
-                  if (activeTab === "p2") {
-                    return `${numPrefix} - ${cleanClubName}: Form gia nhập CLB (20-30 từ)`;
-                  }
-                  if (activeTab === "p3") {
-                    return `${numPrefix} - ${cleanClubName}: Trò chuyện 3 thành viên`;
-                  }
-                  return `${numPrefix} - ${cleanClubName}: Thư Bạn & Thư Quản Lý CLB`;
-                })();
+                const displayTitle = exam.title;
 
                 return (
                   <div
@@ -540,21 +517,14 @@ export default function WritingPracticePage() {
                         </div>
                       </div>
 
-                      {/* Title & Club Name Subtitle */}
-                      <div>
-                        {activeTab !== "p1" && (
-                          <p className="text-[11px] text-primary font-bold mb-1 flex items-center gap-1">
-                            <span>🏛️ {cleanClubName}</span>
-                          </p>
-                        )}
-                        <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1.5 group-hover:text-primary transition-colors">
-                          {displayTitle}
-                        </h3>
-                      </div>
+                      {/* Title */}
+                      <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1.5 group-hover:text-primary transition-colors">
+                        {displayTitle}
+                      </h3>
 
                       {/* Subtitle */}
-                      <p className="text-xs text-muted-foreground">
-                        {activeTab === "full" ? "Full Writing · 4 Parts (50 phút)" : "✍️ Đề luyện tập AI chấm Writing"}
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {activeTab === "full" ? "Full Writing · 4 Parts (50 phút)" : (exam.parts || "Writing Practice")}
                       </p>
                     </div>
 

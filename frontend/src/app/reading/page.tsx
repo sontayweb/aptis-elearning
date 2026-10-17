@@ -153,15 +153,15 @@ export default function ReadingPracticePage() {
     } else if (activeTab === "p2") {
       // Part 2: Text cohesion (sắp xếp câu)
       if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
-      return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Text Cohesion");
+      return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Text Cohesion") || e.partTitle?.includes("Cohesion");
     } else if (activeTab === "p3") {
       // Part 4: Opinion matching (nối ý kiến)
       if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
-      return e.partTitle?.includes("Part 3") || e.partTitle?.includes("Gap Fill") || e.partTitle?.includes("Opinion");
+      return e.partTitle?.includes("Opinion") || (e.partTitle?.includes("Part 4") && !e.partTitle?.includes("Long")) || (e.partTitle?.includes("Part 3") && !e.partTitle?.includes("Cohesion"));
     } else if (activeTab === "p4") {
       // Part 5: Long reading (đọc bài dài & nối heading)
       if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
-      return e.partTitle?.includes("Part 4") || e.partTitle?.includes("Long Text") || e.partTitle?.includes("Long Reading");
+      return e.partTitle?.includes("Long") || e.partTitle?.includes("Part 5") || (e.partTitle?.includes("Part 4") && e.partTitle?.includes("Long"));
     }
     return true;
   });
@@ -462,19 +462,20 @@ export default function ReadingPracticePage() {
               {/* CARD 2..N: Practice Exam Cards */}
               {filteredExams.map((exam, idx) => {
                 const targetUrl = `/reading/${exam.id}${tabInfo.partQuery}`;
-                const displayTitle = (() => {
-                  if (activeTab === "full") return exam.title;
-                  if (activeTab === "p1") return `Đề 0${idx + 1} - Reading Part 1 (Sentence Comprehension)`;
+                const displayTitle = exam.title || (() => {
+                  const numStr = idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`;
+                  if (activeTab === "full") return `Đề ${numStr} — Full Reading · 4 Parts`;
+                  if (activeTab === "p1") return `Đề ${numStr} - Reading Part 1 (Sentence Comprehension)`;
                   if (activeTab === "p2") {
                     const topic = READING_PART2_TOPICS[idx % READING_PART2_TOPICS.length];
-                    return `Đề 0${idx + 1} - ${topic.title}`;
+                    return `Đề ${numStr} - ${topic.title}`;
                   }
                   if (activeTab === "p3") {
                     const topic = READING_PART3_TOPICS[idx % READING_PART3_TOPICS.length];
-                    return `Đề 0${idx + 1} - ${topic.title}`;
+                    return `Đề ${numStr} - ${topic.title}`;
                   }
                   const topic = READING_PART4_TOPICS[idx % READING_PART4_TOPICS.length];
-                  return `Đề 0${idx + 1} - ${topic.title}`;
+                  return `Đề ${numStr} - ${topic.title}`;
                 })();
 
                 return (

@@ -435,7 +435,7 @@ export class StandardExamParser {
               title: item.title,
               instructions: item.instructions || `Thực hiện bài thi Part ${item.partNumber}`,
               passage_text: item.passageText || null,
-              image_url: item.imageUrls[0] || null,
+              image_url: item.imageUrls.length > 0 ? item.imageUrls.join(',') : null,
               questions: {
                 create: item.questions.map((q) => ({
                   question_number: q.questionNumber,

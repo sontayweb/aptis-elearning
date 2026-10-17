@@ -78,6 +78,7 @@ export interface ListeningExamData {
   durationMinutes: number;
   part1: Part1Item[];
   part2: {
+    topic?: string;
     prompt?: string;
     instructions?: string;
     options?: string[];
@@ -570,6 +571,110 @@ function ListeningExamRunnerContent() {
     return "";
   }
 
+  // Trích xuất chủ đề (Topic) cho các phần Listening từ tiêu đề hoặc đề bài
+  function extractListeningTopic(
+    partTitle?: string,
+    examTitle?: string,
+    extraContent?: string,
+    defaultTopic: string = "General Topic"
+  ): string {
+    const pTitle = (partTitle || "").trim();
+    const eTitle = (examTitle || "").trim();
+    const extra = (extraContent || "").trim();
+
+    // 1. Dạng: Topic : ... trong tiêu đề part
+    const pMatch = pTitle.match(/topic\s*[:\-–]\s*([^(\n\r<]+)/i);
+    if (pMatch && pMatch[1].trim()) {
+      return pMatch[1].trim().replace(/\s*-\s*(nam|nữ|nu|nam noi|nu noi|đề trộn|phiên bản|version).*$/i, "").trim();
+    }
+
+    // 2. Dạng: Topic : ... trong instructions hoặc passage_text hoặc explanation
+    if (extra) {
+      const extraMatch = extra.match(/topic\s*[:\-–]\s*([^(\n\r<]+)/i);
+      if (extraMatch && extraMatch[1].trim()) {
+        return extraMatch[1].trim().replace(/\s*-\s*(nam|nữ|nu|nam noi|nu noi|đề trộn|phiên bản|version).*$/i, "").trim();
+      }
+    }
+
+    // 3. Dạng: Four people are talking about ... / discussing ... trong instructions
+    if (extra) {
+      const talkingMatch = extra.match(/(?:talking|discussing|speaking)\s+about\s+(?:their\s+|the\s+|how\s+)?([^.,\n\r<]+)/i);
+      if (talkingMatch && talkingMatch[1].trim()) {
+        const rawT = talkingMatch[1].trim();
+        return rawT.replace(/\b\w/g, (c) => c.toUpperCase());
+      }
+    }
+
+    // 4. Dạng: Topic : ... trong tiêu đề exam
+    const eMatch = eTitle.match(/topic\s*[:\-–]\s*([^(\n\r<]+)/i);
+    if (eMatch && eMatch[1].trim()) {
+      return eMatch[1].trim().replace(/\s*-\s*(nam|nữ|nu|nam noi|nu noi|đề trộn|phiên bản|version).*$/i, "").trim();
+    }
+
+    // 5. Tiêu đề exam cụ thể (ví dụ: "The Art", "Đề 14 - Doing exercise" -> "Doing exercise")
+    // LOẠI TRỪ các chuỗi generic kiểu Full Listening / Full Test / 4 Parts / Aptis
+    const isGenericExamTitle =
+      /full\s*(listening|test|exam|part)/i.test(eTitle) ||
+      /4\s*parts/i.test(eTitle) ||
+      /kỳ\s*tích/i.test(eTitle) ||
+      /aptis\s*esol/i.test(eTitle);
+
+    if (eTitle && !isGenericExamTitle) {
+      const cleanExam = eTitle.replace(/^Đề\s*\d+\s*[-:—–]*\s*/i, "").trim();
+      if (cleanExam.length > 2 && !/full\s*listening/i.test(cleanExam)) return cleanExam;
+    }
+
+    // 6. Tiêu đề part sau dấu gạch nối (loại trừ các tên dạng kỹ thuật)
+    const cleanPart = pTitle.replace(/^.*part\s*\d+\s*[-:—–]*\s*/i, "").trim();
+    if (
+      cleanPart &&
+      !/matching/i.test(cleanPart) &&
+      !/comprehension/i.test(cleanPart) &&
+      !/monologue/i.test(cleanPart) &&
+      !/information/i.test(cleanPart) &&
+      !/opinion/i.test(cleanPart) &&
+      !/recognition/i.test(cleanPart) &&
+      !/part\s*\d+/i.test(cleanPart)
+    ) {
+      return cleanPart;
+    }
+
+    return defaultTopic;
+  }
+
+  // Tự động phân tích các Speaker và Options từ explanation khi đề chỉ có 1 câu hỏi tổng hợp
+  function parseP2FromExplanation(explanation?: string): {
+    speakers: Array<{ speaker: string; correctAnswer: string; explanation: string }>;
+    options: string[];
+  } {
+    if (!explanation) return { speakers: [], options: [] };
+    const speakerMap: Record<string, string> = {};
+    let distractors: string[] = [];
+
+    // Tìm dạng A = ..., B = ..., C = ..., D = ...
+    const expMatch = explanation.match(/A\s*[:=]\s*([^\n(]+)[\s\S]*?B\s*[:=]\s*([^\n(]+)[\s\S]*?C\s*[:=]\s*([^\n(]+)[\s\S]*?D\s*[:=]\s*([^\n(]+)/i);
+    if (expMatch) {
+      speakerMap["Speaker A"] = expMatch[1].trim().replace(/[.,;]$/, "");
+      speakerMap["Speaker B"] = expMatch[2].trim().replace(/[.,;]$/, "");
+      speakerMap["Speaker C"] = expMatch[3].trim().replace(/[.,;]$/, "");
+      speakerMap["Speaker D"] = expMatch[4].trim().replace(/[.,;]$/, "");
+    }
+
+    const distractorMatch = explanation.match(/nhiễu\s*[:=]\s*([^\n.]+)/i);
+    if (distractorMatch) {
+      distractors = distractorMatch[1].split(/[,;]/).map((s) => s.trim()).filter(Boolean);
+    }
+
+    const speakers = ["Speaker A", "Speaker B", "Speaker C", "Speaker D"].map((spk) => ({
+      speaker: spk,
+      correctAnswer: speakerMap[spk] || "",
+      explanation: `Giải thích đáp án cho ${spk}`,
+    }));
+
+    const allOpts = Array.from(new Set([...Object.values(speakerMap), ...distractors])).filter(Boolean);
+    return { speakers, options: allOpts };
+  }
+
   // Parser dữ liệu từ Backend sang format hiển thị của Listening
   function parseApiToListeningData(apiData: any) {
     const parts = apiData.parts || [];
@@ -644,6 +749,34 @@ function ListeningExamRunnerContent() {
 
       // Part 2: Speakers matching
       if (pNum === 2 || pTitle.includes("part 2") || pTitle.includes("speaker")) {
+        let p2Topic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
+        if (!p2Topic || /full\s*listening/i.test(p2Topic)) {
+          const allP2Text = [
+            p.instructions,
+            p.passage_text,
+            ...questions.map((q: any) => q.explanation || ""),
+            ...questions.map((q: any) => q.prompt || ""),
+          ].join(" ");
+
+          if (/talking\s+about\s+(?:their\s+|the\s+)?([^.,\n\r<]+)/i.test(allP2Text)) {
+            const m = allP2Text.match(/talking\s+about\s+(?:their\s+|the\s+)?([^.,\n\r<]+)/i);
+            if (m && m[1]) p2Topic = m[1].trim().replace(/\b\w/g, (c) => c.toUpperCase());
+          } else if (/exercise|bike|running|walking|horse|sport/i.test(allP2Text)) {
+            p2Topic = "Exercise Preferences & Sports";
+          } else if (/job|career|work|office|company|commute/i.test(allP2Text)) {
+            p2Topic = "Work & Career Preferences";
+          } else if (/holiday|vacation|travel|trip|tourist/i.test(allP2Text)) {
+            p2Topic = "Holiday & Travel Experiences";
+          } else if (/book|reading|library|novel|author/i.test(allP2Text)) {
+            p2Topic = "Reading Habits & Literature";
+          } else if (/film|movie|cinema|television|tv/i.test(allP2Text)) {
+            p2Topic = "Film & Entertainment";
+          } else {
+            p2Topic = "Workplace & Daily Life";
+          }
+        }
+        result.part2.topic = p2Topic;
+
         const p2Candidate = questions.find((q: any) => q.explanation || q.transcript);
         const p2Script = extractTranscriptFromExplanation(
           p2Candidate?.explanation,
@@ -662,32 +795,140 @@ function ListeningExamRunnerContent() {
           (result.part2 as any).audioUrl = resolvedP2Audio;
           audioUrls[13] = resolvedP2Audio;
         }
-        if (questions.length > 0) {
+
+        // Trường hợp 1 câu hỏi tổng hợp
+        if (questions.length === 1 && (!questions[0]?.options || questions[0]?.options.length === 0)) {
+          const parsedFromExp = parseP2FromExplanation(questions[0]?.explanation || p.passage_text || "");
+          if (parsedFromExp.speakers.length > 0) {
+            result.part2.speakers = parsedFromExp.speakers;
+            result.part2.options = parsedFromExp.options;
+          }
+        } else if (questions.length > 0) {
           let extractedOptions: string[] = [];
-          if (Array.isArray(questions[0]?.options)) extractedOptions = questions[0].options;
-          else if (typeof questions[0]?.options === "string") {
-            try {
-              extractedOptions = JSON.parse(questions[0].options);
-            } catch {
-              extractedOptions = [];
+          for (const q of questions) {
+            let qOpts: string[] = [];
+            if (Array.isArray(q.options)) qOpts = q.options;
+            else if (typeof q.options === "string") {
+              try { qOpts = JSON.parse(q.options); } catch {}
+            }
+            if (qOpts.length > 0) {
+              extractedOptions = Array.from(new Set([...extractedOptions, ...qOpts]));
             }
           }
-          if (extractedOptions.length > 0) result.part2.options = extractedOptions;
+          extractedOptions = extractedOptions
+            .map((o) => o.trim())
+            .filter((o) => o && !/sẽ có thêm|gây nhiễu|đáp án nhiễu/i.test(o) && !/^[0-9a-f-]{30,}$/i.test(o));
 
-          const spkList = questions.map((q: any, idx: number) => ({
-            id: q.id,
-            speaker: q.prompt && isNaN(Number(q.prompt)) ? q.prompt : `Speaker ${String.fromCharCode(65 + idx)}`,
-            correctAnswer: q.correct_answer || "",
-            explanation: q.explanation || "",
-            transcript: q.transcript || p2Script || "",
-          }));
+          // Thu thập toàn bộ văn bản từ explanation, suggestion, passage_text, instructions, title để bóc tách đáp án
+          const allSourceText = [
+            ...questions.map((q: any) => q.explanation || ""),
+            p.suggestion || "",
+            p.passage_text || "",
+            p.instructions || "",
+            p.title || "",
+          ].join("\n");
+
+          const cleanText = allSourceText
+            .replace(/<br\s*\/?>/gi, "\n")
+            .replace(/<\/p>/gi, "\n")
+            .replace(/<[^>]*>/g, " ")
+            .replace(/&nbsp;/gi, " ");
+
+          const explAnswerMap: Record<string, string> = {};
+
+          // Dạng A: / A. / A - / Speaker A:
+          const letterMatches = cleanText.matchAll(/(?:Speaker\s*)?([A-D])\s*[:.\-=–]\s*([^\n\r]+)/gi);
+          for (const m of letterMatches) {
+            const letter = m[1].toUpperCase();
+            const val = m[2].trim().replace(/^["']|["']$/g, "").replace(/[.,;]$/, "").trim();
+            if (val && !/topic|version|phiên bản|đáp án/i.test(val) && !explAnswerMap[letter]) {
+              explAnswerMap[letter] = val;
+            }
+          }
+
+          // Dạng 1. / 2. / 3. / 4.
+          const numMatches = cleanText.matchAll(/(?:^|\n)\s*([1-4])\s*[:.\-=–]\s*([^\n\r]+)/gi);
+          const numToLetter: Record<string, string> = { "1": "A", "2": "B", "3": "C", "4": "D" };
+          for (const m of numMatches) {
+            const letter = numToLetter[m[1]];
+            const val = m[2].trim().replace(/^["']|["']$/g, "").replace(/[.,;]$/, "").trim();
+            if (val && !explAnswerMap[letter]) {
+              explAnswerMap[letter] = val;
+            }
+          }
+
+          // Khớp với extractedOptions để chuẩn hóa chính xác hoa/thường và khoảng trắng
+          for (const [letter, val] of Object.entries(explAnswerMap)) {
+            const matchedOpt = extractedOptions.find(
+              (o) =>
+                o.toLowerCase().trim() === val.toLowerCase().trim() ||
+                o.toLowerCase().includes(val.toLowerCase()) ||
+                val.toLowerCase().includes(o.toLowerCase())
+            );
+            if (matchedOpt) {
+              explAnswerMap[letter] = matchedOpt;
+            }
+          }
+
+          const spkList = questions.map((q: any, idx: number) => {
+            const letter = String.fromCharCode(65 + idx);
+            let ans = (q.correct_answer || "").trim();
+
+            if (/^\d+$/.test(ans)) {
+              const num = Number(ans);
+              if (extractedOptions[num]) ans = extractedOptions[num];
+            } else if (ans.length > 20 || /^[0-9a-f-]{30,}$/i.test(ans) || !ans) {
+              if (explAnswerMap[letter]) ans = explAnswerMap[letter];
+              else if (extractedOptions[idx]) ans = extractedOptions[idx];
+            }
+
+            return {
+              id: q.id,
+              speaker: q.prompt && isNaN(Number(q.prompt)) && !q.prompt.startsWith("<p>") ? q.prompt : `Speaker ${letter}`,
+              correctAnswer: ans,
+              explanation: q.explanation || `Giải thích đáp án cho Speaker ${letter}`,
+              transcript: q.transcript || p2Script || "",
+            };
+          });
+
           result.part2.speakers = spkList;
+          const finalOptions = Array.from(
+            new Set([
+              ...extractedOptions,
+              ...Object.values(explAnswerMap),
+              ...spkList.map((s: any) => s.correctAnswer),
+            ])
+          ).filter((o) => o && !/^[0-9a-f-]{30,}$/i.test(o) && !/sẽ có thêm|gây nhiễu/i.test(o));
+
+          result.part2.options = finalOptions.length >= 4 ? finalOptions : (result.part2.options || finalOptions);
           if (p.instructions) result.part2.instructions = p.instructions;
         }
       }
 
       // Part 3: Opinion discussion
       if (pNum === 3 || pTitle.includes("part 3") || pTitle.includes("opinion")) {
+        let p3Topic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
+        if (!p3Topic || /full\s*listening/i.test(p3Topic)) {
+          const allP3Text = [
+            p.instructions,
+            p.passage_text,
+            ...questions.map((q: any) => q.prompt || ""),
+            ...questions.map((q: any) => q.explanation || ""),
+          ].join(" ");
+          if (/internet|online|screen|technology|social\s*media|digital/i.test(allP3Text)) {
+            p3Topic = "The Internet & Digital Life";
+          } else if (/environment|pollution|climate|recycle|nature/i.test(allP3Text)) {
+            p3Topic = "Environmental Protection & Society";
+          } else if (/education|school|study|learning|university|student/i.test(allP3Text)) {
+            p3Topic = "Education & Learning Methods";
+          } else if (/shopping|online\s*shopping|retail|consumer/i.test(allP3Text)) {
+            p3Topic = "Consumer Habits & Shopping";
+          } else {
+            p3Topic = "Discussion & Opinions";
+          }
+        }
+        result.part3.topic = p3Topic;
+
         const p3Candidate = questions.find((q: any) => q.explanation || q.transcript);
         const p3Script = extractTranscriptFromExplanation(
           p3Candidate?.explanation,
@@ -727,6 +968,11 @@ function ListeningExamRunnerContent() {
 
       // Part 4: Monologues
       if (pNum === 4 || pTitle.includes("part 4") || pTitle.includes("monologue") || pTitle.includes("recording")) {
+        let p4BaseTopic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
+        if (!p4BaseTopic || /full\s*listening/i.test(p4BaseTopic)) {
+          p4BaseTopic = "Academic & Cultural Talks";
+        }
+
         if (questions.length > 0) {
           const qList = questions.map((q: any) => {
             let opts: string[] = [];
@@ -766,7 +1012,7 @@ function ListeningExamRunnerContent() {
             );
             recordings.push({
               recNum: 1,
-              title: "Recording 1 of 2",
+              title: `${p4BaseTopic} (Recording 1/2)`,
               passageText: p4Script1,
               transcript: p4Script1,
               translationText: p.translation_text || p.passage_translation || "",
@@ -775,7 +1021,7 @@ function ListeningExamRunnerContent() {
             });
             recordings.push({
               recNum: 2,
-              title: "Recording 2 of 2",
+              title: `${p4BaseTopic} (Recording 2/2)`,
               passageText: p4Script2 || p4Script1,
               transcript: p4Script2 || p4Script1,
               translationText: p.translation_text || p.passage_translation || "",
@@ -789,7 +1035,7 @@ function ListeningExamRunnerContent() {
           } else {
             recordings.push({
               recNum: 1,
-              title: "Recording 1",
+              title: `${p4BaseTopic} (Recording 1)`,
               passageText: p.passage_text || "",
               transcript: p.transcript || p.passage_text || "",
               translationText: p.translation_text || p.passage_translation || "",
@@ -877,6 +1123,77 @@ function ListeningExamRunnerContent() {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();
         const scriptText = getCurrentStageScript();
+        if (!scriptText) {
+          setIsPlaying(false);
+          return;
+        }
+
+        // ĐỐI VỚI PART 3: PHÁT 2 GIỌNG ĐỐI THOẠI (NAM & NỮ)
+        if (currentStage?.partNum === 3) {
+          const rawLines = scriptText
+            .replace(/<br\s*\/?>/gi, "\n")
+            .replace(/<\/p>/gi, "\n")
+            .replace(/<[^>]*>/g, "")
+            .replace(/&nbsp;/gi, " ")
+            .split(/\n+/)
+            .map((l: string) => l.trim())
+            .filter(Boolean);
+
+          const voices = window.speechSynthesis.getVoices();
+          const maleVoice =
+            voices.find((v) => v.lang.startsWith("en") && /male|david|george|ryan|james|guy|daniel/i.test(v.name)) ||
+            voices.find((v) => v.lang.startsWith("en"));
+          const femaleVoice =
+            voices.find((v) => v.lang.startsWith("en") && /female|zira|susan|sonia|jenny|victoria|catherine|karen/i.test(v.name)) ||
+            voices.find((v) => v.lang.startsWith("en") && v !== maleVoice);
+
+          let currentIdx = 0;
+          setIsPlaying(true);
+          setPlayCounts((prev) => ({ ...prev, [activeStage]: count + 1 }));
+
+          const playNextDialogueLine = () => {
+            if (currentIdx >= rawLines.length) {
+              setIsPlaying(false);
+              setPlaybackProgress(100);
+              return;
+            }
+            const line = rawLines[currentIdx];
+            const isFemale =
+              /^woman\s*[:.\-]/i.test(line) ||
+              /^[wW]\s*[:.\-]/i.test(line) ||
+              /^nữ\s*[:.\-]/i.test(line) ||
+              (!/^(man|m|nam)\s*[:.\-]/i.test(line) && currentIdx % 2 === 1);
+
+            const cleanLine = line.replace(/^(man|woman|narrator|m|w|nam|nữ)\s*[:.\-]\s*/i, "").trim();
+
+            const utt = new SpeechSynthesisUtterance(cleanLine || line);
+            utt.lang = "en-GB";
+            utt.rate = playbackSpeed;
+            if (isFemale) {
+              if (femaleVoice) utt.voice = femaleVoice;
+              utt.pitch = 1.3; // Giọng Nữ cao, thanh thoát
+            } else {
+              if (maleVoice) utt.voice = maleVoice;
+              utt.pitch = 0.8; // Giọng Nam trầm, ấm
+            }
+
+            utt.onend = () => {
+              currentIdx++;
+              setPlaybackProgress(Math.min(100, Math.round((currentIdx / rawLines.length) * 100)));
+              playNextDialogueLine();
+            };
+            utt.onerror = () => {
+              setIsPlaying(false);
+            };
+
+            window.speechSynthesis.speak(utt);
+          };
+
+          playNextDialogueLine();
+          return;
+        }
+
+        // CÁC PART KHÁC (1, 2, 4): Phát thông thường
         const utterance = new SpeechSynthesisUtterance(scriptText);
         utterance.lang = "en-GB"; // Chuẩn giọng Anh British Council
         utterance.rate = playbackSpeed;
@@ -909,7 +1226,6 @@ function ListeningExamRunnerContent() {
 
         window.speechSynthesis.speak(utterance);
       } else {
-        // Fallback mô phỏng nếu trình duyệt không có speech API
         setIsPlaying(true);
         setPlayCounts((prev) => ({ ...prev, [activeStage]: count + 1 }));
       }
@@ -1103,19 +1419,20 @@ function ListeningExamRunnerContent() {
     } else if (currentStage.partNum === 2) {
       return {
         partName: "Part 2 – Matching Information",
-        subTitle: "Matching 4 Speakers",
+        subTitle: `Topic: ${examData.part2.topic || "Matching 4 Speakers"}`,
         isLast,
       };
     } else if (currentStage.partNum === 3) {
       return {
         partName: "Part 3 – Short Conversations",
-        subTitle: "Opinion Discussion (4 Questions)",
+        subTitle: `Topic: ${examData.part3.topic || "Opinion Discussion"}`,
         isLast,
       };
     } else {
+      const rec = examData.part4[currentStage.subIndex];
       return {
         partName: "Part 4 – Monologues",
-        subTitle: `Recording ${currentStage.subIndex + 1} of ${Math.max(1, examData.part4.length)}`,
+        subTitle: rec?.title ? `Topic: ${rec.title}` : `Recording ${currentStage.subIndex + 1} of ${Math.max(1, examData.part4.length)}`,
         isLast,
       };
     }
@@ -1354,15 +1671,13 @@ function ListeningExamRunnerContent() {
                   </h2>
                 </div>
                 <p className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans pt-1">
-                  {activeStage <= 12
+                  {currentStage.partNum === 1
                     ? "Listen to the short recording and answer the question. You can listen twice."
-                    : activeStage === 13
-                    ? examData.part2.instructions
-                    : activeStage === 14
-                    ? `${examData.part3.topic}. ${examData.part3.instructions}`
-                    : activeStage === 15
-                    ? "Listen to the first monologue and answer the questions."
-                    : "Listen to the second monologue and answer the questions."}
+                    : currentStage.partNum === 2
+                    ? `Topic: ${examData.part2.topic}. ${examData.part2.instructions || "Match each speaker to their statement."}`
+                    : currentStage.partNum === 3
+                    ? `Topic: ${examData.part3.topic}. ${examData.part3.instructions || "Who expresses which opinion? Select Man, Woman, or Both."}`
+                    : `Topic: ${examData.part4[currentStage.subIndex]?.title || "Monologue"}. Listen to the recording and answer the questions.`}
                 </p>
               </div>
 
@@ -1596,9 +1911,17 @@ function ListeningExamRunnerContent() {
               ========================================================================= */}
           {currentStage.partNum === 2 && examData.part2.speakers && examData.part2.speakers.length > 0 && (
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
-              <h3 className="text-sm font-semibold text-foreground">
-                Ghép thông tin tương ứng cho các người nói:
-              </h3>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20">
+                    Topic
+                  </span>
+                  <h3 className="text-base font-bold text-foreground">
+                    {examData.part2.topic || "Matching Information"}
+                  </h3>
+                </div>
+                <span className="text-xs text-muted-foreground font-medium">Ghép thông tin tương ứng cho 4 người nói</span>
+              </div>
 
               <div className="space-y-4">
                 {examData.part2.speakers.map((spk, idx) => (
@@ -1638,9 +1961,23 @@ function ListeningExamRunnerContent() {
               ========================================================================= */}
           {currentStage.partNum === 3 && examData.part3.opinions && examData.part3.opinions.length > 0 && (
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
-              <h3 className="text-sm font-semibold text-foreground">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20">
+                    Topic
+                  </span>
+                  <h3 className="text-base font-bold text-foreground">
+                    {examData.part3.topic || "Short Conversations & Opinions"}
+                  </h3>
+                </div>
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  🎙️ Đối thoại Man & Woman
+                </span>
+              </div>
+
+              <h4 className="text-xs md:text-sm font-semibold text-muted-foreground">
                 Xác định ai là người đưa ra từng quan điểm dưới đây:
-              </h3>
+              </h4>
 
               <div className="space-y-4">
                 {examData.part3.opinions.map((op, idx) => (
@@ -1682,6 +2019,19 @@ function ListeningExamRunnerContent() {
             const recIdx = currentStage.subIndex;
             return (
               <div className="space-y-6">
+                <div className="bg-card rounded-2xl border border-border p-5 shadow-sm flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20">
+                      Topic
+                    </span>
+                    <h3 className="text-sm md:text-base font-bold text-foreground">
+                      {rec.title || `Monologue ${recIdx + 1}`}
+                    </h3>
+                  </div>
+                  <span className="text-xs text-muted-foreground font-medium hidden sm:inline">
+                    Recording {recIdx + 1} of {examData.part4.length}
+                  </span>
+                </div>
                 {rec.questions.map((q, qIdx) => {
                   const answerKey = `${recIdx}_${qIdx}`;
                   const selected = p4Answers[answerKey];
@@ -1790,7 +2140,7 @@ function ListeningExamRunnerContent() {
                       onClick={() => setActiveStage(idx)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
                         isCurrent
-                          ? "bg-primary text-primary-foreground font-black shadow-sm ring-2 ring-primary/40 ring-offset-1 ring-offset-background scale-105"
+                          ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
                           : isAnswered
                           ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
                           : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"

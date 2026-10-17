@@ -52,6 +52,52 @@ export interface SpeakingQuestion {
   guidanceNote?: string;
   subQuestions?: string[];
   topic?: string;
+  vocabulary?: Array<{ en: string; vi: string }>;
+}
+
+// Helper phân tích danh sách từ vựng gợi ý từ passage_text hoặc suggestion
+function parseSpeakingVocabulary(rawText?: string): Array<{ en: string; vi: string }> {
+  if (!rawText) return [];
+  const trimmed = rawText.trim();
+  // 1. JSON parse
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((item: any) => ({
+            en: String(item.en || item.word || item.english || "").trim(),
+            vi: String(item.vi || item.meaning || item.vietnamese || "").trim(),
+          }))
+          .filter((v: any) => v.en);
+      }
+      if (parsed && Array.isArray(parsed.vocabulary)) {
+        return parsed.vocabulary
+          .map((item: any) => ({
+            en: String(item.en || item.word || item.english || "").trim(),
+            vi: String(item.vi || item.meaning || item.vietnamese || "").trim(),
+          }))
+          .filter((v: any) => v.en);
+      }
+    } catch {}
+  }
+  // 2. Line by line text (vd: "word - meaning" hoặc "word: meaning" hoặc "| word | meaning |")
+  const lines = trimmed.split("\n");
+  const result: Array<{ en: string; vi: string }> = [];
+  for (const line of lines) {
+    const clean = line.replace(/<[^>]*>/g, "").trim();
+    if (!clean || clean.startsWith("---") || /^(english|tiếng anh|từ vựng)/i.test(clean)) continue;
+    const pipeMatch = clean.match(/^\|?\s*([^|:]+?)\s*\|\s*([^|:]+?)\s*\|?$/);
+    if (pipeMatch) {
+      result.push({ en: pipeMatch[1].trim(), vi: pipeMatch[2].trim() });
+      continue;
+    }
+    const colonMatch = clean.match(/^([^:\-–]+)\s*[:\-–]\s*(.+)$/);
+    if (colonMatch) {
+      result.push({ en: colonMatch[1].trim(), vi: colonMatch[2].trim() });
+    }
+  }
+  return result;
 }
 
 // Bíp báo hiệu chuẩn British Council
@@ -472,7 +518,7 @@ function parseSubQuestions(options: any): string[] {
 }
 
 interface SpeakingAudioPlayerProps {
-  src: string;
+  src: string | null;
   duration?: number;
 }
 
@@ -581,7 +627,7 @@ function SpeakingAudioPlayer({ src, duration }: SpeakingAudioPlayerProps) {
     <div className="w-full p-2.5 rounded-xl bg-muted/40 border border-border flex items-center gap-2.5 shadow-2xs">
       <audio
         ref={audioRef}
-        src={src}
+        src={src || undefined}
         onEnded={handleEnded}
         preload="metadata"
         className="hidden"
@@ -622,6 +668,176 @@ function SpeakingAudioPlayer({ src, duration }: SpeakingAudioPlayerProps) {
       <Volume2 className="w-3.5 h-3.5 text-muted-foreground shrink-0 hidden sm:block" />
     </div>
   );
+}
+
+// Helper chuẩn hóa URL hình ảnh Speaking
+function cleanSpeakingImageUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  let trimmed = String(url).trim();
+  if (!trimmed || trimmed === "null" || trimmed === "undefined") return undefined;
+
+  // Host CDN Aptis Academy
+  if (trimmed.startsWith("speaking/")) {
+    return `https://files.aptisacademy.com.vn/${trimmed}`;
+  }
+  if (trimmed.startsWith("https://files.aptisacademy.com.vn/")) {
+    return trimmed;
+  }
+  // Xử lý link cũ aptiskey.com chuyển sang assets nội bộ
+  if (trimmed.includes("aptiskey.com/images/speaking/part2/")) {
+    const filename = trimmed.split("/").pop() || "";
+    const num = filename.replace(/\D/g, "");
+    if (num) return `/uploads/speaking/part2/image${num}.png`;
+  }
+  if (trimmed.includes("aptiskey.com/images/speaking/part3/")) {
+    const filename = trimmed.split("/").pop() || "";
+    const num = filename.replace(/\D/g, "");
+    if (num) return `/uploads/speaking/part3/image${num}.png`;
+  }
+  // Uploads cục bộ
+  if (trimmed.startsWith("/uploads/") || trimmed.startsWith("uploads/")) {
+    return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  }
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  // Tên file đơn giản (ví dụ: 1.png, 7.png, 15.png, de07_1.png)
+  const numMatch = trimmed.match(/^(\d+)\.png$/i);
+  if (numMatch) {
+    return `/uploads/speaking/part2/image${numMatch[1]}.png`;
+  }
+  if (trimmed.startsWith("Tranh_tr_ng__i_m_part_2_")) {
+    return `/uploads/exams/speaking/${trimmed}`;
+  }
+  if (trimmed.startsWith("Tranh_tr_ng__i_m_part_3_")) {
+    return `/uploads/exams/speaking/${trimmed}`;
+  }
+
+  return trimmed;
+}
+
+// Fallback ảnh chất lượng cao theo chủ đề cho Part 2 (1 tranh)
+function getPart2ThematicImage(text: string = ""): string {
+  const lower = text.toLowerCase();
+  if (lower.includes("văn phòng") || lower.includes("office") || lower.includes("meeting") || lower.includes("làm việc") || lower.includes("đồng nghiệp")) {
+    return "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("siêu thị") || lower.includes("supermarket") || lower.includes("shopping") || lower.includes("mua sắm") || lower.includes("cửa hàng")) {
+    return "https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("nấu ăn") || lower.includes("cooking") || lower.includes("bếp") || lower.includes("kitchen") || lower.includes("meal") || lower.includes("bữa ăn")) {
+    return "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("đọc sách") || lower.includes("reading") || lower.includes("thư viện") || lower.includes("library") || lower.includes("book")) {
+    return "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("máy tính") || lower.includes("computer") || lower.includes("laptop") || lower.includes("technology") || lower.includes("công nghệ")) {
+    return "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("công viên") || lower.includes("park") || lower.includes("bãi cỏ") || lower.includes("vườn") || lower.includes("garden")) {
+    return "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("du lịch") || lower.includes("travel") || lower.includes("bạn bè") || lower.includes("friends") || lower.includes("trip")) {
+    return "https://images.unsplash.com/photo-1539635278303-d4002c07eae3?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("cưỡi ngựa") || lower.includes("horse") || lower.includes("ngựa")) {
+    return "https://images.unsplash.com/photo-1553284965-83fd3e82fa5f?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("triển lãm") || lower.includes("art") || lower.includes("museum") || lower.includes("tranh") || lower.includes("bảo tàng")) {
+    return "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("bóng đá") || lower.includes("football") || lower.includes("thể thao") || lower.includes("sport") || lower.includes("chạy bộ")) {
+    return "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("âm nhạc") || lower.includes("music") || lower.includes("concert") || lower.includes("nhạc")) {
+    return "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80";
+  }
+  if (lower.includes("ăn uống") || lower.includes("restaurant") || lower.includes("eating out") || lower.includes("nhà hàng") || lower.includes("quán ăn")) {
+    return "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80";
+  }
+  return "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
+}
+
+// Fallback ảnh cặp đối lập theo chủ đề cho Part 3 (2 tranh đối lập)
+function getPart3ThematicPair(text: string = ""): { img1: string; img2: string } {
+  const lower = text.toLowerCase();
+  if (lower.includes("núi") || lower.includes("mountain") || lower.includes("biển") || lower.includes("beach")) {
+    return {
+      img1: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+      img2: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    };
+  }
+  if (lower.includes("gia đình") || lower.includes("family") || lower.includes("một mình") || lower.includes("alone") || lower.includes("living")) {
+    return {
+      img1: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=800&q=80",
+      img2: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+    };
+  }
+  if (lower.includes("rau") || lower.includes("hoa") || lower.includes("trồng") || lower.includes("garden") || lower.includes("gardening")) {
+    return {
+      img1: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
+      img2: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=800&q=80",
+    };
+  }
+  if (lower.includes("nhạc") || lower.includes("music") || lower.includes("sôi động") || lower.includes("du dương") || lower.includes("concert")) {
+    return {
+      img1: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80",
+      img2: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=800&q=80",
+    };
+  }
+  if (lower.includes("xa xỉ") || lower.includes("bình dân") || lower.includes("luxury") || lower.includes("shopping") || lower.includes("mua")) {
+    return {
+      img1: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80",
+      img2: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80",
+    };
+  }
+  if (lower.includes("sách") || lower.includes("game") || lower.includes("chơi game") || lower.includes("đọc")) {
+    return {
+      img1: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80",
+      img2: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80",
+    };
+  }
+  if (lower.includes("online") || lower.includes("trực tiếp") || lower.includes("in person") || lower.includes("remote") || lower.includes("làm việc")) {
+    return {
+      img1: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=800&q=80",
+      img2: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
+    };
+  }
+  if (lower.includes("xe đạp") || lower.includes("ô tô") || lower.includes("bus") || lower.includes("bike") || lower.includes("car") || lower.includes("giao thông")) {
+    return {
+      img1: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80",
+      img2: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80",
+    };
+  }
+  return {
+    img1: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+    img2: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80",
+  };
+}
+
+// Nhận diện chính xác Part Number từ tiêu đề part, tiêu đề exam, query param
+function detectSpeakingPartNumber(p: any, examTitle?: string, fallbackPart?: number | null): 1 | 2 | 3 | 4 {
+  const pTitle = (p?.title || "").toLowerCase();
+  if (/(?:part\s*4|p4\b|thuyết trình|abstract|long turn)/i.test(pTitle)) return 4;
+  if (/(?:part\s*3|p3\b|so sánh|hai bức tranh|compare)/i.test(pTitle)) return 3;
+  if (/(?:part\s*2|p2\b|mô tả tranh|bức tranh|describe)/i.test(pTitle)) return 2;
+  if (/(?:part\s*1|p1\b|personal|phỏng vấn)/i.test(pTitle)) return 1;
+
+  if (fallbackPart && fallbackPart >= 1 && fallbackPart <= 4) {
+    return fallbackPart as 1 | 2 | 3 | 4;
+  }
+
+  const eTitle = (examTitle || "").toLowerCase();
+  if (/(?:part\s*4|p4\b|thuyết trình|abstract|long turn)/i.test(eTitle)) return 4;
+  if (/(?:part\s*3|p3\b|so sánh|hai bức tranh|compare)/i.test(eTitle)) return 3;
+  if (/(?:part\s*2|p2\b|mô tả tranh|bức tranh|describe)/i.test(eTitle)) return 2;
+  if (/(?:part\s*1|p1\b|personal|phỏng vấn)/i.test(eTitle)) return 1;
+
+  const rawNum = Number(p?.part_number ?? p?.partNumber);
+  if (rawNum >= 1 && rawNum <= 4) return rawNum as 1 | 2 | 3 | 4;
+
+  return 1;
 }
 
 function SpeakingExamRunnerContent() {
@@ -731,9 +947,40 @@ function SpeakingExamRunnerContent() {
         const loaded: SpeakingQuestion[] = [];
 
         parts.forEach((p: any) => {
-          const pNum = (p.part_number || p.partNumber || 1) as 1 | 2 | 3 | 4;
+          const pNum = detectSpeakingPartNumber(p, res.data?.title, targetPart);
           const pTitle = p.title || `Part ${pNum}`;
           const qList = p.questions || [];
+          const partVocab = parseSpeakingVocabulary(p.passage_text || p.suggestion || p.instructions);
+
+          // Phân tích hình ảnh: tách dấu phẩy (nếu có 2 link trong 1 chuỗi)
+          let rawImg1: string | undefined;
+          let rawImg2: string | undefined;
+          if (p.image_url) {
+            const splits = String(p.image_url).split(",").map((s) => s.trim()).filter(Boolean);
+            if (splits.length > 1) {
+              rawImg1 = splits[0];
+              rawImg2 = splits[1];
+            } else if (splits.length === 1) {
+              rawImg1 = splits[0];
+            }
+          }
+
+          // Part 3: Nếu chưa có ảnh 2, tìm trong q.options
+          if (pNum === 3 && !rawImg2 && qList.length > 0) {
+            for (const q of qList) {
+              if (Array.isArray(q.options)) {
+                const found = q.options.find((opt: any) => typeof opt === "string" && (opt.startsWith("http") || opt.startsWith("speaking/") || opt.includes(".png") || opt.includes(".jpg")));
+                if (found) { rawImg2 = found; break; }
+              } else if (typeof q.options === "string" && (q.options.startsWith("http") || q.options.startsWith("speaking/"))) {
+                rawImg2 = q.options; break;
+              }
+            }
+          }
+
+          let img1 = cleanSpeakingImageUrl(rawImg1);
+          let img2 = cleanSpeakingImageUrl(rawImg2);
+
+          const contextDesc = `${p.title || ""} ${res.data?.title || ""} ${qList[0]?.prompt || ""}`;
 
           if (pNum === 4) {
             // Chuẩn web gốc Aptis Kỳ Tích & British Council:
@@ -744,15 +991,22 @@ function SpeakingExamRunnerContent() {
               let subQuestions: string[] = parseSubQuestions(firstQ.options);
               if (!subQuestions || subQuestions.length === 0) {
                 if (qList.length > 1) {
-                  // CSDL lưu 3 questions riêng biệt -> Lấy prompt của từng câu làm subQuestions
                   subQuestions = qList.map((q: any) => q.prompt?.trim()).filter(Boolean);
                 } else if (firstQ.prompt) {
                   const lines = firstQ.prompt
                     .split(/\n+/)
-                    .map((l: string) => l.trim().replace(/^[-•*]\s*/, ""))
+                    .map((l: string) => l.trim().replace(/^[-•*0-9.]+\s*/, ""))
                     .filter(Boolean);
                   if (lines.length > 1) subQuestions = lines;
                 }
+              }
+
+              if (!subQuestions || subQuestions.length === 0) {
+                subQuestions = [
+                  firstQ.prompt || "Tell me about a personal experience related to this topic.",
+                  "How did you feel about this situation and what did you learn from it?",
+                  "Why do you think this issue is significant today?"
+                ];
               }
 
               const rawExp =
@@ -770,30 +1024,41 @@ function SpeakingExamRunnerContent() {
                 prompt: firstQ.prompt,
                 prepTime: 60,
                 speakTime: 120,
-                imageUrl:
-                  p.image_url ||
-                  "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80",
+                imageUrl: img1 || "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80",
                 sampleAnswer: hasVn ? "" : rawExp,
                 guidanceNote: hasVn ? rawExp : undefined,
                 subQuestions: subQuestions.length > 0 ? subQuestions : undefined,
                 topic: p.title ? p.title.replace(/^Part\s*\d+\s*[-:]*\s*/i, "").trim() : undefined,
+                vocabulary: partVocab.length > 0 ? partVocab : undefined,
               });
             }
           } else {
-            // Part 1, Part 2, Part 3: Mỗi câu hỏi là 1 lượt nói riêng biệt (30s hoặc 45s)
-            qList.forEach((q: any) => {
-              const defaultPrep = pNum === 2 || pNum === 3 ? 12 : 5;
-              const defaultSpeak = pNum === 1 ? 30 : 45;
+            // Part 1, Part 2, Part 3:
+            // Part 1: prep 5s, speak 30s
+            // Part 2: prep 12s, speak 45s (chính xác 45s theo chuẩn BC)
+            // Part 3: prep 12s, speak 45s (chính xác 45s theo chuẩn BC)
+            const defaultPrep = pNum === 2 || pNum === 3 ? 12 : 5;
+            const defaultSpeak = pNum === 1 ? 30 : 45;
 
-              let secondImageUrl: string | undefined;
-              if (pNum === 3) {
-                if (Array.isArray(q.options) && typeof q.options[0] === "string" && q.options[0].startsWith("http")) {
-                  secondImageUrl = q.options[0];
-                } else if (typeof q.options === "string" && q.options.startsWith("http")) {
-                  secondImageUrl = q.options;
-                }
+            // Xử lý fallback ảnh cho Part 2 và Part 3
+            let resolvedImg1 = img1;
+            let resolvedImg2 = img2;
+
+            if (pNum === 2 && !resolvedImg1) {
+              resolvedImg1 = getPart2ThematicImage(contextDesc);
+            } else if (pNum === 3) {
+              if (!resolvedImg1 && !resolvedImg2) {
+                const pair = getPart3ThematicPair(contextDesc);
+                resolvedImg1 = pair.img1;
+                resolvedImg2 = pair.img2;
+              } else if (resolvedImg1 && !resolvedImg2) {
+                resolvedImg2 = getPart3ThematicPair(contextDesc).img2;
+              } else if (!resolvedImg1 && resolvedImg2) {
+                resolvedImg1 = getPart3ThematicPair(contextDesc).img1;
               }
+            }
 
+            qList.forEach((q: any) => {
               const rawExp = (q.explanation || "").trim();
               const hasVn = isVietnameseText(rawExp);
 
@@ -805,21 +1070,12 @@ function SpeakingExamRunnerContent() {
                 prompt: q.prompt,
                 prepTime: defaultPrep,
                 speakTime: defaultSpeak,
-                imageUrl:
-                  p.image_url ||
-                  (pNum === 2
-                    ? "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80"
-                    : pNum === 3
-                    ? "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=800&q=80"
-                    : undefined),
-                secondImageUrl:
-                  secondImageUrl ||
-                  (pNum === 3
-                    ? "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80"
-                    : undefined),
+                imageUrl: resolvedImg1,
+                secondImageUrl: pNum === 3 ? resolvedImg2 : undefined,
                 sampleAnswer: hasVn ? "" : rawExp,
                 guidanceNote: hasVn ? rawExp : undefined,
                 topic: p.title ? p.title.replace(/^Part\s*\d+\s*[-:]*\s*/i, "").trim() : undefined,
+                vocabulary: partVocab.length > 0 ? partVocab : undefined,
               });
             });
           }
@@ -1574,20 +1830,18 @@ function SpeakingExamRunnerContent() {
                       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                         {/* Cột trái (7 cols): Hình ảnh đề thi */}
                         <div className="lg:col-span-7 space-y-3">
-                          {currentQ.imageUrl && (
-                            <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={currentQ.imageUrl}
-                                alt="Speaking Aptis Prompt 1"
-                                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src =
-                                    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
-                                }}
-                              />
-                            </div>
-                          )}
+                          <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={currentQ.imageUrl || getPart2ThematicImage(currentQ.prompt || currentQ.topic)}
+                              alt="Speaking Aptis Prompt 1"
+                              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src =
+                                  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
+                              }}
+                            />
+                          </div>
                           <p className="text-base md:text-lg text-foreground font-semibold leading-relaxed pt-1">
                             {currentQ.prompt}
                           </p>
@@ -1656,12 +1910,12 @@ function SpeakingExamRunnerContent() {
                         <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={currentQ.imageUrl}
+                            src={currentQ.imageUrl || getPart3ThematicPair(currentQ.prompt || currentQ.topic).img1}
                             alt="Speaking Aptis Prompt 1"
                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src =
-                                "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80";
+                                "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80";
                             }}
                           />
                           <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-black/60 text-white font-bold text-xs backdrop-blur-xs">
@@ -1672,7 +1926,7 @@ function SpeakingExamRunnerContent() {
                         <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={currentQ.secondImageUrl || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80"}
+                            src={currentQ.secondImageUrl || getPart3ThematicPair(currentQ.prompt || currentQ.topic).img2}
                             alt="Speaking Aptis Prompt 2"
                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                             onError={(e) => {
@@ -1735,11 +1989,12 @@ function SpeakingExamRunnerContent() {
                   {/* PART 4: Topic Box + Image + 3 Questions simultaneously + Stickers */}
                   {currentQ.partNumber === 4 && (() => {
                     const part4QuestionsList = (() => {
-                      if (currentQ.subQuestions && currentQ.subQuestions.length >= 3) {
-                        return currentQ.subQuestions.slice(0, 3);
+                      const sub = currentQ.subQuestions;
+                      if (sub && sub.length >= 3) {
+                        return sub.slice(0, 3);
                       }
-                      if (currentQ.subQuestions && currentQ.subQuestions.length > 0) {
-                        const list = [...currentQ.subQuestions];
+                      if (sub && sub.length > 0) {
+                        const list = [...sub];
                         if (list.length === 1) {
                           list.push("How did you feel about this situation and what did you learn from it?");
                           list.push("Do you think this experience is common for many people today? Why?");
@@ -1832,6 +2087,35 @@ function SpeakingExamRunnerContent() {
                     );
                   })()}
                 </div>
+
+                {/* TỪ VỰNG & COLLOCATIONS GỢI Ý (Nếu đề thi có cung cấp từ ngân hàng đề / file Word) */}
+                {currentQ.vocabulary && currentQ.vocabulary.length > 0 && (
+                  <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 md:p-5 space-y-3 shadow-xs animate-in fade-in">
+                    <div className="flex items-center justify-between border-b border-primary/15 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-primary">
+                          Từ vựng & Cụm từ gợi ý (Vocabulary & Collocations)
+                        </h4>
+                      </div>
+                      <span className="text-[11px] text-muted-foreground font-medium">
+                        {currentQ.vocabulary.length} cụm từ
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {currentQ.vocabulary.map((v, vIdx) => (
+                        <div
+                          key={vIdx}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-card border border-border text-foreground text-xs shadow-2xs hover:border-primary/40 transition-colors"
+                        >
+                          <span className="font-bold text-primary">{v.en}</span>
+                          {v.vi && <span className="text-muted-foreground text-[11px]">({v.vi})</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* BÀI NÓI MẪU (Sample Answer Box - Screenshot 2) */}
                 {showSampleAnswer && (

@@ -3,20 +3,37 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function run() {
-  const exam = await prisma.exam.findUnique({
-    where: { id: '0619a445-76fe-475c-b7b7-176990b6d9b8' },
-    include: {
-      parts: {
-        include: { questions: true }
-      }
-    }
+  const sub = await prisma.exam.findFirst({
+    where: { title: 'Art club - Writing Part 2' },
+    include: { parts: { include: { questions: true } } }
   });
 
-  console.log('EXAM:', exam?.title);
-  for (const p of exam?.parts || []) {
+  console.log('--- SUB-EXAM ---');
+  console.log('ID:', sub?.id, '| Title:', sub?.title);
+  for (const p of sub?.parts || []) {
     console.log(`Part ${p.part_number}:`, p.title, `(${p.questions.length} questions)`);
+    console.log(`  Instructions:`, p.instructions);
     for (const q of p.questions) {
-      console.log(`  Q${q.question_number}: prompt="${q.prompt}", opts=${JSON.stringify(q.options)}, ans="${q.correct_answer}"`);
+      console.log(`  Q${q.question_number}: prompt="${q.prompt}"`);
+      console.log(`  Q${q.question_number}: explanation="${q.explanation}"`);
+    }
+  }
+
+  const full = await prisma.exam.findFirst({
+    where: { title: { contains: 'Art club — Full Writing' } },
+    include: { parts: { include: { questions: true } } }
+  });
+
+  console.log('\n--- FULL EXAM ---');
+  console.log('ID:', full?.id, '| Title:', full?.title);
+  for (const p of full?.parts || []) {
+    if (p.part_number === 2 || p.title.includes('Part 2')) {
+      console.log(`Part ${p.part_number}:`, p.title, `(${p.questions.length} questions)`);
+      console.log(`  Instructions:`, p.instructions);
+      for (const q of p.questions) {
+        console.log(`  Q${q.question_number}: prompt="${q.prompt}"`);
+        console.log(`  Q${q.question_number}: explanation="${q.explanation}"`);
+      }
     }
   }
 

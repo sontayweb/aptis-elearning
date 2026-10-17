@@ -477,17 +477,63 @@ export default function SpeakingPracticePage() {
 
               {/* CARD 2..N: Practice Exam Cards */}
               {filteredExams.map((exam, idx) => {
+                const examNumStr = `Đề ${String(idx + 1).padStart(3, "0")}`;
+                const rawTitle = (exam.title || "").trim();
+                let topicName = rawTitle
+                  .replace(/^Đề\s*\d+\s*[-:—–]\s*/i, "")
+                  .replace(/^Speaking\s*[-:—–]\s*/i, "")
+                  .replace(/\s*[-:—–]\s*Part\s*\d+.*$/i, "")
+                  .replace(/—\s*Full Speaking.*$/i, "")
+                  .trim();
+
+                const isGenericTopic =
+                  !topicName ||
+                  /^full speaking/i.test(topicName) ||
+                  /^speaking part/i.test(topicName);
+
+                const displayTitle = (() => {
+                  if (activeTab === "full") {
+                    return rawTitle.includes("—") || rawTitle.includes("-")
+                      ? rawTitle
+                      : `${examNumStr} — ${rawTitle}`;
+                  }
+                  if (!isGenericTopic) {
+                    return `${examNumStr} — ${topicName}`;
+                  }
+                  const partDefaults: Record<string, string> = {
+                    p1: "Personal Information",
+                    p2: "Picture Description",
+                    p3: "Two Pictures Comparison",
+                    p4: "Experience & Opinion",
+                  };
+                  return `${examNumStr} — ${partDefaults[activeTab] || "Speaking Practice"}`;
+                })();
+
+                const displaySubtitle = (() => {
+                  if (activeTab === "full") {
+                    return "Full Speaking · 4 Parts liên tục (12 phút)";
+                  }
+                  if (activeTab === "p1") {
+                    return exam.totalParts === 4
+                      ? "Trích từ đề Full Test · Part 1 (30s/câu)"
+                      : "Part 1 · Phỏng vấn cá nhân (3 câu · 30s/câu)";
+                  }
+                  if (activeTab === "p2") {
+                    return exam.totalParts === 4
+                      ? "Trích từ đề Full Test · Part 2 (45s/câu)"
+                      : "Part 2 · Miêu tả tranh & Quan điểm (45s/câu)";
+                  }
+                  if (activeTab === "p3") {
+                    return exam.totalParts === 4
+                      ? "Trích từ đề Full Test · Part 3 (45s/câu)"
+                      : "Part 3 · So sánh 2 bức tranh (45s/câu)";
+                  }
+                  return exam.totalParts === 4
+                    ? "Trích từ đề Full Test · Part 4 (Chuẩn bị 1p · Nói 2p)"
+                    : "Part 4 · Thuyết trình chủ đề (Chuẩn bị 1p · Nói 2p)";
+                })();
+
                 const targetUrl = `/speaking/${exam.id}${tabInfo.partQuery}`;
-                const displayTitle =
-                  activeTab === "full"
-                    ? exam.title
-                    : activeTab === "p1"
-                    ? `Đề 0${idx + 1} - Speaking Part 1 (Personal Info)`
-                    : activeTab === "p2"
-                    ? `Đề 0${idx + 1} - Speaking Part 2 (Picture Description)`
-                    : activeTab === "p3"
-                    ? `Đề 0${idx + 1} - Speaking Part 3 (Comparison)`
-                    : `Đề 0${idx + 1} - Speaking Part 4 (Abstract Discussion)`;
 
                 return (
                   <div
@@ -559,7 +605,7 @@ export default function SpeakingPracticePage() {
 
                       {/* Subtitle */}
                       <p className="text-xs text-muted-foreground mb-2.5">
-                        {activeTab === "full" ? "Full Speaking · 4 Parts" : (exam.parts || "Full Speaking · 4 Parts")}
+                        {displaySubtitle}
                       </p>
 
                       {/* Progress Badge chuẩn web gốc Aptis: Đã hoàn thành / Đã làm X/4 Part / Chưa bắt đầu */}
