@@ -2446,7 +2446,11 @@ export default function OfficialMockExamRoom() {
       {(() => {
         const isReadingSkillOrPart =
           examData?.skill === "READING" || currentQ?.partTitle?.includes("READING");
+        const isSpeakingPart4 =
+          (currentQ?.partTitle || "").toLowerCase().includes("part 4") ||
+          (currentQ?.partTitle || "").toLowerCase().includes("abstract");
         const hasCueImage =
+          !isSpeakingPart4 &&
           currentQ?.question_type === "SPEAKING_AUDIO" &&
           (currentQ?.image_url || currentQ?.partImageUrl);
         const hasLeftPanel =
@@ -2484,12 +2488,14 @@ export default function OfficialMockExamRoom() {
                         src={
                           (() => {
                             const rawUrl = currentQ.image_url || currentQ.partImageUrl || "";
+                            if (!rawUrl) return "";
                             if (rawUrl.startsWith("http")) return rawUrl;
                             const apiOrigin = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
-                            if (rawUrl.startsWith("/uploads") || rawUrl.startsWith("uploads") || rawUrl.startsWith("/api/uploads")) {
-                              return `${apiOrigin}/${rawUrl.replace(/^\/+/, "")}`;
+                            const clean = rawUrl.replace(/^\/+/, "");
+                            if (clean.startsWith("uploads/")) {
+                              return `${apiOrigin}/${clean}`;
                             }
-                            return `https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/images/${rawUrl.replace(/^\/+/, "")}`;
+                            return `${apiOrigin}/uploads/${clean}`;
                           })()
                         }
                         alt="Speaking Cue"

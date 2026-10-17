@@ -647,21 +647,33 @@ export class ExamService {
       }
       (part as any).partType = partType;
 
-      // Cấu hình chuẩn hóa khảo thí theo từng kỹ năng (Single Source of Truth)
-      if (exam.skill === 'SPEAKING') {
+      // Cấu hình chuẩn hóa khảo thí theo từng Part thực tế (Áp dụng cho cả Đề Đơn Lẻ và FULL_TEST)
+      const isSpeakingPart = exam.skill === 'SPEAKING' || partTitleLower.includes('speaking') || partTitleLower.includes('nói');
+      const isWritingPart = exam.skill === 'WRITING' || partTitleLower.includes('writing') || partTitleLower.includes('viết');
+      const isReadingPart = exam.skill === 'READING' || partTitleLower.includes('reading') || partTitleLower.includes('đọc');
+      const isGrammarVocabPart = exam.skill === 'GRAMMAR_VOCABULARY' || partTitleLower.includes('grammar') || partTitleLower.includes('vocab');
+
+      if (isSpeakingPart) {
         if (partType === 'PART_4') {
           part.image_url = null;
           (part as any).prepTime = 60;
           (part as any).speakTime = 120;
-        } else if (partType === 'PART_2' || partType === 'PART_3') {
+          (part as any).partSubtitle = 'Part 4 - Abstract Discussion';
+        } else if (partType === 'PART_2') {
           (part as any).prepTime = 12;
           (part as any).speakTime = 45;
+          (part as any).partSubtitle = 'Part 2 - Describe & Opinion';
+        } else if (partType === 'PART_3') {
+          (part as any).prepTime = 12;
+          (part as any).speakTime = 45;
+          (part as any).partSubtitle = 'Part 3 - Compare & Explain';
         } else {
           part.image_url = null;
           (part as any).prepTime = 5;
           (part as any).speakTime = 30;
+          (part as any).partSubtitle = 'Part 1 - Personal Information';
         }
-      } else if (exam.skill === 'WRITING') {
+      } else if (isWritingPart) {
         if (partType === 'PART_1') {
           (part as any).minWords = 1;
           (part as any).maxWords = 5;
@@ -725,7 +737,7 @@ export class ExamService {
             }
           }
         }
-      } else if (exam.skill === 'READING') {
+      } else if (isReadingPart) {
         if (partType === 'PART_1') {
           (part as any).recommendedMinutes = 7;
           (part as any).partSubtitle = 'Part 1 - Sentence Completion (Gap Fill)';
@@ -739,6 +751,9 @@ export class ExamService {
           (part as any).recommendedMinutes = 10;
           (part as any).partSubtitle = 'Part 4 - Long Text (Heading Matching)';
         }
+      } else if (isGrammarVocabPart) {
+        (part as any).recommendedMinutes = 25;
+        (part as any).partSubtitle = 'Grammar & Vocabulary Core';
       }
 
       // BẢO MẬT: Tuyệt đối không để lộ explanation cho các kỹ năng trắc nghiệm khi chưa nộp bài
