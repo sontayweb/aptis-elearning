@@ -360,26 +360,39 @@ export default function ProfilePage() {
 
             {/* Compact Info Section */}
             <div className="flex-1 text-center sm:text-left space-y-1.5 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5">
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground tracking-tight truncate">
-                  {fullName || user.full_name}
-                </h1>
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${roleInfo.style}`}>
-                    <RoleIcon className="w-3 h-3" />
-                    {roleInfo.label}
-                  </span>
-                  {subscription ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                      <Crown className="w-3 h-3" />
-                      {subscription.planName}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5">
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground tracking-tight truncate">
+                    {fullName || user.full_name}
+                  </h1>
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${roleInfo.style}`}>
+                      <RoleIcon className="w-3 h-3" />
+                      {roleInfo.label}
                     </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-muted text-muted-foreground border border-border">
-                      Gói Miễn Phí
-                    </span>
-                  )}
+                    {subscription ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                        <Crown className="w-3 h-3" />
+                        {subscription.planName}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-muted text-muted-foreground border border-border">
+                        Gói Miễn Phí
+                      </span>
+                    )}
+                  </div>
                 </div>
+
+                {/* Mobile & Desktop Logout Button in Header Card */}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold transition-all shadow-2xs cursor-pointer self-center sm:self-auto shrink-0"
+                  title="Đăng xuất khỏi tài khoản"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Đăng xuất</span>
+                </button>
               </div>
 
               <p className="text-xs text-muted-foreground flex items-center justify-center sm:justify-start gap-1.5 truncate">
@@ -429,43 +442,45 @@ export default function ProfilePage() {
         </div>
 
         {/* Tab Navigation - Streamlined Segmented Control */}
-        <div className="mb-6 overflow-x-auto pb-1 scrollbar-none">
-          <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border/80 shadow-xs">
-            <button
-              onClick={() => setActiveTab("info")}
-              className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                activeTab === "info"
-                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-              }`}
-            >
-              <User className="w-3.5 h-3.5" />
-              Thông tin cá nhân & Mục tiêu
-            </button>
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="overflow-x-auto pb-1 scrollbar-none">
+            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border/80 shadow-xs">
+              <button
+                onClick={() => setActiveTab("info")}
+                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                  activeTab === "info"
+                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                }`}
+              >
+                <User className="w-3.5 h-3.5" />
+                Thông tin cá nhân & Mục tiêu
+              </button>
 
-            <button
-              onClick={() => setActiveTab("password")}
-              className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                activeTab === "password"
-                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-              }`}
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              Đổi mật khẩu bảo mật
-            </button>
+              <button
+                onClick={() => setActiveTab("password")}
+                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                  activeTab === "password"
+                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                }`}
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                Đổi mật khẩu bảo mật
+              </button>
 
-            <button
-              onClick={() => setActiveTab("plan")}
-              className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                activeTab === "plan"
-                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-              }`}
-            >
-              <Crown className="w-3.5 h-3.5" />
-              Gói cước & Quyền lợi VIP
-            </button>
+              <button
+                onClick={() => setActiveTab("plan")}
+                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                  activeTab === "plan"
+                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                }`}
+              >
+                <Crown className="w-3.5 h-3.5" />
+                Gói cước & Quyền lợi VIP
+              </button>
+            </div>
           </div>
         </div>
 

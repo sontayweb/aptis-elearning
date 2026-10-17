@@ -642,18 +642,37 @@ export function Navbar() {
             </button>
           )}
           {isAuthenticated && user && (
-            <Link
-              href="/profile"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-            >
-              <div className="w-6 h-6 rounded-full overflow-hidden shrink-0">
-                <NavbarUserAvatar user={user} />
-              </div>
-              <div className="min-w-0 flex-1 truncate">
-                <span>{user.full_name || "Hồ sơ cá nhân & Đổi mật khẩu"}</span>
-              </div>
-            </Link>
+            <div className="flex items-center gap-2 p-1.5 rounded-xl bg-muted/50 border border-border/80">
+              <Link
+                href="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 min-w-0 flex items-center gap-2.5 px-2 py-1 rounded-lg hover:bg-muted/70 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/30">
+                  <NavbarUserAvatar user={user} />
+                </div>
+                <div className="min-w-0 flex-1 text-left">
+                  <p className="text-xs font-bold text-foreground truncate">
+                    {user.full_name || "Học viên"}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground truncate">
+                    {user.email}
+                  </p>
+                </div>
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold transition-colors shrink-0 cursor-pointer"
+                title="Đăng xuất"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Đăng xuất</span>
+              </button>
+            </div>
           )}
           <Link
             href="/thi-thu"
@@ -741,14 +760,44 @@ export function Navbar() {
             >
               Giới thiệu nền tảng
             </Link>
-            <Link
-              href="/about"
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
-            >
-              Về chúng tôi
-            </Link>
           </div>
+
+          {/* Mobile Menu Footer Actions for Logged-in User */}
+          {isAuthenticated && user && (
+            <div className="pt-2.5 mt-2 border-t border-border/70 flex items-center justify-between text-xs">
+              <Link
+                href="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground font-semibold py-1.5 px-2 rounded-lg hover:bg-muted transition-colors"
+              >
+                <User className="w-3.5 h-3.5 text-primary" />
+                <span>Cài đặt tài khoản</span>
+              </Link>
+
+              {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold py-1.5 px-2 rounded-lg hover:bg-amber-500/10 transition-colors"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Admin</span>
+                </Link>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                className="inline-flex items-center gap-1.5 text-red-600 dark:text-red-400 font-bold py-1.5 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 transition-colors cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Đăng xuất</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
       </nav>
