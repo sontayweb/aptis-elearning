@@ -12,10 +12,12 @@ router.post('/refresh', (req, res, next) => authController.refreshToken(req, res
 router.post('/google', (req, res, next) => authController.googleAuth(req, res, next));
 router.post('/forgot-password', authRateLimiter, (req, res, next) => authController.forgotPassword(req, res, next));
 router.post('/reset-password', authRateLimiter, (req, res, next) => authController.resetPassword(req, res, next));
+router.post('/verify-email', authRateLimiter, (req, res, next) => authController.verifyEmail(req, res, next));
 
 // Protected routes
 router.get('/me', authGuard, (req, res, next) => authController.getMe(req, res, next));
 router.patch('/profile', authGuard, (req, res, next) => authController.updateProfile(req, res, next));
 router.post('/change-password', authGuard, (req, res, next) => authController.changePassword(req, res, next));
+router.post('/resend-verification', authGuard, authRateLimiter, (req, res, next) => authController.resendVerification(req, res, next));
 
 export default router;

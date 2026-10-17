@@ -9,6 +9,7 @@ import { FloatingActions } from "@/components/floating-actions";
 import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api-client";
 import { AuthModal } from "@/components/auth-modal";
+import { EmailVerificationNotice } from "@/components/email-verification-notice";
 import {
   User,
   Mail,
@@ -330,6 +331,11 @@ export default function ProfilePage() {
       <Navbar />
 
       <main className="flex-1 container max-w-5xl mx-auto px-4 sm:px-6 pt-[calc(var(--navbar-total-height,64px)+1rem)] sm:pt-[calc(var(--navbar-total-height,64px)+1.5rem)] pb-12 transition-all duration-300">
+        {/* Email Verification Banner */}
+        <div className="mb-5">
+          <EmailVerificationNotice />
+        </div>
+
         {/* Compact Hero Banner Card */}
         <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border/80 bg-gradient-to-br from-card via-card/95 to-primary/5 p-4 sm:p-5 md:p-6 shadow-md mb-6 backdrop-blur-sm">
           <div className="absolute top-0 right-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none" />

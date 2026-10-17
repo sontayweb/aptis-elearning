@@ -15,6 +15,7 @@ import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { GoLivePromoBanner } from "@/components/golive-promo-banner";
+import { EmailVerificationNotice } from "@/components/email-verification-notice";
 
 interface DashboardViewProps {
   user: any;
@@ -68,6 +69,9 @@ export function DashboardView({ user }: DashboardViewProps) {
             <div className="lg:col-span-8 space-y-5 sm:space-y-6">
               {/* 0. Quà tặng Go-Live 14 ngày VIP Pro */}
               <GoLivePromoBanner />
+
+              {/* 0b. Thông báo xác thực Email (chỉ hiện khi chưa verify) */}
+              <EmailVerificationNotice />
 
               {/* 1. Hero Cockpit (Bảo tồn Event Theme Canvas + Thẻ Goal Cockpit) */}
               <HeroBanner

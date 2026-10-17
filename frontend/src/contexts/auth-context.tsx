@@ -13,6 +13,8 @@ export interface UserProfile {
   role: "STUDENT" | "TEACHER" | "ADMIN" | "SUPER_ADMIN";
   is_active?: boolean;
   target_band?: "B1_TARGET" | "B2_TARGET" | "C_TARGET" | null;
+  email_verified?: boolean;
+  email_verified_at?: string | null;
   created_at?: string;
   subscription?: {
     planName: string;
@@ -50,6 +52,8 @@ interface AuthContextType {
   logout: () => void;
   refreshUser: () => Promise<void>;
   quickLogin: (role: "student" | "teacher" | "admin" | "super_admin") => Promise<{ success: boolean; error?: string; user?: UserProfile }>;
+  verifyEmail: (token: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  resendVerification: () => Promise<{ success: boolean; message?: string; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -143,6 +147,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return await login(credentials.email, credentials.password);
   };
 
+  const verifyEmail = async (token: string) => {
+    const res = await api.auth.verifyEmail(token);
+    if (res.success) {
+      await refreshUser();
+      return { success: true, message: res.message || "Xác thực email thành công!" };
+    }
+    return {
+      success: false,
+      error: extractErrorMessage(res, "Xác thực email thất bại hoặc liên kết đã hết hạn"),
+    };
+  };
+
+  const resendVerification = async () => {
+    const res = await api.auth.resendVerification();
+    if (res.success) {
+      return { success: true, message: res.message || "Đã gửi lại email xác thực thành công!" };
+    }
+    return {
+      success: false,
+      error: extractErrorMessage(res, "Không thể gửi lại email xác thực"),
+    };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -154,6 +181,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         refreshUser,
         quickLogin,
+        verifyEmail,
+        resendVerification,
       }}
     >
       {children}

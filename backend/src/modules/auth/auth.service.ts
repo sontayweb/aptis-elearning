@@ -32,6 +32,7 @@ export class AuthService {
         full_name: data.fullName,
         phone_number: data.phoneNumber || null,
         role: 'STUDENT',
+        email_verified: false,
       },
       select: {
         id: true,
@@ -40,8 +41,26 @@ export class AuthService {
         phone_number: true,
         avatar_url: true,
         role: true,
+        email_verified: true,
+        email_verified_at: true,
         created_at: true,
       },
+    });
+
+    // 1. Sinh token xác thực email (Thời hạn 24 giờ)
+    const verificationToken = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        type: 'EMAIL_VERIFICATION',
+      },
+      process.env.JWT_ACCESS_SECRET || 'aptis_secret_access_key_super_secure_2026',
+      { expiresIn: '24h' }
+    );
+
+    // 2. Gửi email xác thực bất đồng bộ (Non-blocking) để không làm chậm luồng đăng ký của học viên
+    emailService.sendVerificationEmail(user.email, verificationToken, user.full_name).catch((err) => {
+      console.error('[AuthService] Lỗi khi gửi email xác thực tài khoản:', err);
     });
 
     const tokens = generateTokens({
@@ -64,7 +83,12 @@ export class AuthService {
       },
     });
 
-    return { user, tokens };
+    return {
+      user,
+      tokens,
+      verificationSent: true,
+      message: 'Đăng ký tài khoản thành công! Một email xác thực đã được gửi tới hòm thư của bạn.',
+    };
   }
 
   async login(data: LoginInput, req?: Request) {
@@ -171,6 +195,8 @@ export class AuthService {
         avatar_url: true,
         role: true,
         target_band: true,
+        email_verified: true,
+        email_verified_at: true,
         created_at: true,
         subscriptions: {
           where: { is_active: true, end_date: { gt: new Date() } },
@@ -243,16 +269,24 @@ export class AuthService {
           full_name: fullName,
           avatar_url: avatarUrl,
           role: 'STUDENT',
+          email_verified: true,
+          email_verified_at: new Date(),
         },
       });
     } else {
       if (!user.is_active) {
         throw { statusCode: 403, message: 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin.' };
       }
-      if (!user.avatar_url && avatarUrl) {
+      const updateData: any = {};
+      if (!user.avatar_url && avatarUrl) updateData.avatar_url = avatarUrl;
+      if (!user.email_verified) {
+        updateData.email_verified = true;
+        updateData.email_verified_at = new Date();
+      }
+      if (Object.keys(updateData).length > 0) {
         user = await prisma.user.update({
           where: { id: user.id },
-          data: { avatar_url: avatarUrl },
+          data: updateData,
         });
       }
     }
@@ -470,6 +504,114 @@ export class AuthService {
     });
 
     return { message: 'Đổi mật khẩu thành công. Vui lòng sử dụng mật khẩu mới cho các lần đăng nhập tiếp theo.' };
+  }
+
+  /**
+   * 11. Xác thực Email từ liên kết trong hộp thư (Token 24h)
+   */
+  async verifyEmail(token: string) {
+    try {
+      const decoded: any = jwt.verify(
+        token,
+        process.env.JWT_ACCESS_SECRET || 'aptis_secret_access_key_super_secure_2026'
+      );
+
+      if (decoded.type !== 'EMAIL_VERIFICATION') {
+        throw { statusCode: 400, code: 'INVALID_VERIFICATION_TOKEN', message: 'Mã xác thực email không hợp lệ' };
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+      });
+
+      if (!user) {
+        throw { statusCode: 404, code: 'USER_NOT_FOUND', message: 'Tài khoản người dùng không tồn tại' };
+      }
+
+      if (user.email_verified) {
+        return {
+          alreadyVerified: true,
+          message: 'Địa chỉ email này đã được xác thực trước đó.',
+          user: {
+            id: user.id,
+            email: user.email,
+            fullName: user.full_name,
+            emailVerified: true,
+          },
+        };
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          email_verified: true,
+          email_verified_at: new Date(),
+        },
+        select: {
+          id: true,
+          email: true,
+          full_name: true,
+          email_verified: true,
+          email_verified_at: true,
+          role: true,
+        },
+      });
+
+      auditService.record({
+        action: AuditAction.USER_STATUS_CHANGE,
+        entityType: 'USER',
+        entityId: user.id,
+        description: `Học viên hoàn tất xác thực email: ${user.email}`,
+        newValue: { emailVerified: true, verifiedAt: new Date() },
+        systemActor: { id: user.id, name: user.full_name, email: user.email, role: user.role },
+      }).catch(() => {});
+
+      return {
+        alreadyVerified: false,
+        message: 'Xác thực địa chỉ email thành công! Tài khoản của bạn đã được kích hoạt đầy đủ quyền lợi.',
+        user: updatedUser,
+      };
+    } catch (err: any) {
+      if (err.name === 'TokenExpiredError') {
+        throw { statusCode: 400, code: 'VERIFICATION_TOKEN_EXPIRED', message: 'Liên kết xác thực email đã hết hạn (quá 24 giờ). Vui lòng yêu cầu gửi lại email mới.' };
+      }
+      if (err.statusCode) throw err;
+      throw { statusCode: 400, code: 'INVALID_VERIFICATION_TOKEN', message: err.message || 'Mã xác thực không hợp lệ hoặc đã bị chỉnh sửa' };
+    }
+  }
+
+  /**
+   * 12. Gửi lại Email Xác thực (Resend Verification Email)
+   */
+  async resendVerification(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw { statusCode: 404, code: 'USER_NOT_FOUND', message: 'Tài khoản người dùng không tồn tại' };
+    }
+
+    if (user.email_verified) {
+      return { alreadyVerified: true, message: 'Địa chỉ email này đã được xác thực trước đó, không cần gửi lại.' };
+    }
+
+    const verificationToken = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        type: 'EMAIL_VERIFICATION',
+      },
+      process.env.JWT_ACCESS_SECRET || 'aptis_secret_access_key_super_secure_2026',
+      { expiresIn: '24h' }
+    );
+
+    await emailService.sendVerificationEmail(user.email, verificationToken, user.full_name);
+
+    return {
+      success: true,
+      message: `Đã gửi liên kết xác thực tới hòm thư ${user.email}. Vui lòng kiểm tra hộp thư đến (hoặc hòm thư Rác/Spam).`,
+    };
   }
 }
 

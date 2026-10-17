@@ -66,6 +66,10 @@ export const changePasswordSchema = z.object({
   newPassword: z.string().min(6, 'Mật khẩu mới phải có ít nhất 6 ký tự'),
 });
 
+export const verifyEmailSchema = z.object({
+  token: z.string().min(1, 'Mã token xác thực email không được để trống'),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
@@ -74,4 +78,5 @@ export type GoogleAuthInput = z.infer<typeof googleAuthSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
 

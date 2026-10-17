@@ -131,6 +131,8 @@ model User {
   target_band     TargetBand?    @default(B2_TARGET)
   internal_notes  String?
   is_active       Boolean        @default(true)
+  email_verified  Boolean        @default(false)
+  email_verified_at DateTime?
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt
 

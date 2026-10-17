@@ -132,6 +132,17 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify(body),
       }),
+
+    verifyEmail: (token: string) =>
+      this.request('/auth/verify-email', {
+        method: 'POST',
+        body: JSON.stringify({ token }),
+      }),
+
+    resendVerification: () =>
+      this.request('/auth/resend-verification', {
+        method: 'POST',
+      }),
   };
 
   // ==========================================

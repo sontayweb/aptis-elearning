@@ -219,6 +219,44 @@ export class EmailService {
   }
 
   /**
+   * 1b. Gửi email Xác thực tài khoản (Email Verification)
+   */
+  async sendVerificationEmail(toEmail: string, verificationToken: string, fullName?: string): Promise<void> {
+    const verifyUrl = `${this.frontendUrl}/auth/verify-email?token=${encodeURIComponent(verificationToken)}`;
+    const recipientName = fullName || 'Học viên';
+
+    const bodyContent = `
+      <h2 style="margin-top:0; color:#0f172a; font-size:20px;">Xác thực tài khoản học tập của bạn</h2>
+      <p>Xin chào <strong>${recipientName}</strong>,</p>
+      <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>Aptis Kỳ Tích</strong> — Nền tảng Luyện thi &amp; Chấm điểm Chuẩn British Council.</p>
+      <p>Để bảo vệ tài khoản, kích hoạt đầy đủ quyền lợi nhận kết quả chấm thi Nói/Viết và thông báo quan trọng, bạn vui lòng xác nhận địa chỉ email bằng cách nhấp vào nút bên dưới:</p>
+      
+      <div style="text-align: center; margin: 28px 0;">
+        <a href="${verifyUrl}" class="email-btn" target="_blank" style="background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);">Xác Thực Email Ngay</a>
+      </div>
+
+      <div class="info-box">
+        <p style="margin:0; font-size:13px; color:#475569;">
+          ⏱️ <strong>Thời hạn hiệu lực:</strong> Liên kết này có giá trị trong vòng <strong>24 giờ</strong>.<br>
+          🛡️ <strong>Bảo mật:</strong> Nếu bạn không thực hiện đăng ký tài khoản này, vui lòng bỏ qua email.
+        </p>
+      </div>
+
+      <p style="font-size:12px; color:#94a3b8; word-break:break-all;">
+        Nếu nút bấm không hoạt động, bạn có thể sao chép liên kết này vào trình duyệt: <br>
+        <a href="${verifyUrl}" style="color:#4f46e5;">${verifyUrl}</a>
+      </p>
+    `;
+
+    await this.sendMail({
+      to: toEmail,
+      subject: '✉️ [Aptis Kỳ Tích] Vui lòng xác thực địa chỉ email của bạn',
+      html: this.wrapEmailTemplate('Xác thực tài khoản', bodyContent),
+      text: `Xin chào ${recipientName}, truy cập link sau để xác thực email: ${verifyUrl}`,
+    });
+  }
+
+  /**
    * 2. Gửi email Chào mừng & Cấp tài khoản mới (Bulk Import / Admin tạo)
    */
   async sendAccountCreatedEmail(toEmail: string, tempPassword: string, fullName: string, role: string = 'STUDENT'): Promise<void> {

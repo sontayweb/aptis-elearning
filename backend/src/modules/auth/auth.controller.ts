@@ -9,6 +9,7 @@ import {
   refreshTokenSchema,
   updateProfileSchema,
   changePasswordSchema,
+  verifyEmailSchema,
 } from './auth.dto';
 import { sendSuccess } from '../../utils/api-response';
 import { AuthenticatedRequest } from '../../middlewares/auth.guard';
@@ -100,6 +101,26 @@ export class AuthController {
       const userId = req.user!.userId;
       const validatedData = changePasswordSchema.parse(req.body);
       const result = await authService.changePassword(userId, validatedData, req);
+      sendSuccess(res, result, result.message, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { token } = verifyEmailSchema.parse(req.body);
+      const result = await authService.verifyEmail(token);
+      sendSuccess(res, result, result.message, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resendVerification(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user!.userId;
+      const result = await authService.resendVerification(userId);
       sendSuccess(res, result, result.message, 200);
     } catch (error) {
       next(error);
