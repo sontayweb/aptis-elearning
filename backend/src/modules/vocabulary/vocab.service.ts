@@ -448,6 +448,259 @@ export class VocabService {
       data: { is_memorized: isMemorized },
     });
   }
+
+  /**
+   * Tra cứu từ vựng và dịch nghĩa văn bản tức thì
+   * Hỗ trợ tra từ đơn (IPA, audio phát âm, nghĩa, CEFR) và dịch cả câu tiếng Anh sang tiếng Việt
+   */
+  async translateAndLookup(rawText: string, userId?: string) {
+    const text = (rawText || '').trim();
+    if (!text) {
+      throw { statusCode: 400, message: 'Vui lòng cung cấp nội dung cần tra cứu hoặc dịch' };
+    }
+    if (text.length > 1000) {
+      throw { statusCode: 400, message: 'Đoạn văn bản quá dài (tối đa 1000 ký tự)' };
+    }
+
+    const words = text.split(/\s+/).filter(Boolean);
+    const isSingleWord = words.length === 1 && /^[a-zA-Z'’-]+$/.test(text);
+
+    let translatedText = '';
+    let phonetic: string | null = null;
+    let audioUrl: string | null = null;
+    let partOfSpeech: string | null = null;
+    let definitionEn: string | null = null;
+    let exampleEn: string | null = null;
+    let cefrLevel: string = 'B1';
+    let wordId: string | null = null;
+    let isSavedInNotebook = false;
+
+    // 1. Nếu là 1 từ đơn, kiểm tra trước trong DB VocabWord có sẵn không
+    if (isSingleWord) {
+      const dbWord = await prisma.vocabWord.findFirst({
+        where: {
+          word: { equals: text, mode: 'insensitive' },
+        },
+      });
+
+      if (dbWord) {
+        wordId = dbWord.id;
+        translatedText = dbWord.meaning_vi;
+        phonetic = dbWord.phonetic;
+        audioUrl = dbWord.audio_url;
+        exampleEn = dbWord.example_sentence;
+        cefrLevel = dbWord.cefr_level || 'B2';
+      }
+    }
+
+    // 2. Gọi Google Translate API để lấy bản dịch chuẩn tiếng Việt
+    try {
+      let gRes: Response;
+      if (text.length > 800) {
+        const params = new URLSearchParams({
+          client: 'gtx',
+          sl: 'auto',
+          tl: 'vi',
+          dt: 't',
+          q: text,
+        });
+        if (isSingleWord) params.append('dt', 'bd');
+        gRes = await fetch('https://translate.googleapis.com/translate_a/single', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'Mozilla/5.0',
+          },
+          body: params.toString(),
+        });
+      } else {
+        const gUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=vi&dt=t&dt=bd&q=${encodeURIComponent(text)}`;
+        gRes = await fetch(gUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0' },
+        });
+      }
+
+      if (gRes.ok) {
+        const gData: any = await gRes.json();
+        if (Array.isArray(gData?.[0])) {
+          translatedText = gData[0].map((s: any) => s[0]).join('');
+        }
+        if (isSingleWord && Array.isArray(gData?.[1])) {
+          const firstDict = gData[1][0];
+          if (firstDict?.[0] && !partOfSpeech) {
+            partOfSpeech = firstDict[0];
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[Translate] Google Translate error:', e);
+    }
+
+    // 3. Nếu là từ đơn và chưa có phiên âm hoặc audio, tra Free Dictionary API
+    if (isSingleWord) {
+      try {
+        const cleanWord = text.toLowerCase().replace(/[^a-z]/g, '');
+        const dRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${cleanWord}`);
+        if (dRes.ok) {
+          const dData: any = await dRes.json();
+          if (Array.isArray(dData) && dData[0]) {
+            const entry = dData[0];
+            if (!phonetic && entry.phonetic) {
+              phonetic = entry.phonetic;
+            }
+            if (!phonetic && Array.isArray(entry.phonetics)) {
+              const pItem = entry.phonetics.find((p: any) => p.text);
+              if (pItem) phonetic = pItem.text;
+            }
+            if (!audioUrl && Array.isArray(entry.phonetics)) {
+              const aItem = entry.phonetics.find((p: any) => p.audio && p.audio.trim().length > 0);
+              if (aItem) audioUrl = aItem.audio;
+            }
+            if (!partOfSpeech && entry.meanings?.[0]?.partOfSpeech) {
+              partOfSpeech = entry.meanings[0].partOfSpeech;
+            }
+            if (!definitionEn && entry.meanings?.[0]?.definitions?.[0]?.definition) {
+              definitionEn = entry.meanings[0].definitions[0].definition;
+            }
+            if (!exampleEn && entry.meanings?.[0]?.definitions?.[0]?.example) {
+              exampleEn = entry.meanings[0].definitions[0].example;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[Translate] Dictionary API error:', e);
+      }
+
+      if (!cefrLevel) {
+        cefrLevel = text.length > 8 ? 'B2' : 'B1';
+      }
+
+      // Kiểm tra xem học viên đã lưu từ này vào notebook chưa
+      if (userId) {
+        if (wordId) {
+          const inNotebook = await prisma.vocabNotebook.findUnique({
+            where: { user_id_word_id: { user_id: userId, word_id: wordId } },
+          });
+          isSavedInNotebook = Boolean(inNotebook);
+        } else {
+          const inNotebook = await prisma.vocabNotebook.findFirst({
+            where: {
+              user_id: userId,
+              word: { word: { equals: text, mode: 'insensitive' } },
+            },
+          });
+          isSavedInNotebook = Boolean(inNotebook);
+          if (inNotebook) {
+            wordId = inNotebook.word_id;
+          }
+        }
+      }
+    }
+
+    return {
+      originalText: text,
+      translatedText: translatedText || text,
+      isWord: isSingleWord,
+      phonetic,
+      audioUrl,
+      partOfSpeech,
+      definitionEn,
+      exampleEn,
+      cefrLevel,
+      wordId,
+      isSavedInNotebook,
+    };
+  }
+
+  /**
+   * Lưu nhanh từ vừa tra cứu vào Sổ tay từ vựng của học viên
+   */
+  async quickSaveToNotebook(
+    userId: string,
+    data: {
+      word: string;
+      meaning_vi: string;
+      phonetic?: string;
+      example_sentence?: string;
+      cefr_level?: string;
+      audio_url?: string;
+    }
+  ) {
+    const wordClean = (data.word || '').trim();
+    if (!wordClean) {
+      throw { statusCode: 400, message: 'Từ vựng không hợp lệ' };
+    }
+
+    // 1. Tìm hoặc tạo bộ từ mặc định "Sổ tay tra cứu cá nhân"
+    let userSet = await prisma.vocabSet.findFirst({
+      where: {
+        category: 'Personal Saved Words',
+      },
+    });
+
+    if (!userSet) {
+      userSet = await prisma.vocabSet.create({
+        data: {
+          title: 'Sổ tay từ vựng tra cứu nhanh khi luyện đề',
+          category: 'Personal Saved Words',
+          is_free: true,
+          total_words: 0,
+        },
+      });
+    }
+
+    // 2. Tìm hoặc tạo từ trong vocabWord
+    let word = await prisma.vocabWord.findFirst({
+      where: {
+        set_id: userSet.id,
+        word: { equals: wordClean, mode: 'insensitive' },
+      },
+    });
+
+    if (!word) {
+      word = await prisma.vocabWord.create({
+        data: {
+          set_id: userSet.id,
+          word: wordClean,
+          meaning_vi: data.meaning_vi || 'Đang cập nhật',
+          phonetic: data.phonetic || null,
+          example_sentence: data.example_sentence || null,
+          cefr_level: data.cefr_level || 'B1',
+          audio_url: data.audio_url || null,
+        },
+      });
+      await prisma.vocabSet.update({
+        where: { id: userSet.id },
+        data: { total_words: { increment: 1 } },
+      });
+    }
+
+    // 3. Upsert vào VocabNotebook của học viên
+    const item = await prisma.vocabNotebook.upsert({
+      where: {
+        user_id_word_id: {
+          user_id: userId,
+          word_id: word.id,
+        },
+      },
+      update: {
+        is_memorized: false,
+      },
+      create: {
+        user_id: userId,
+        word_id: word.id,
+        is_memorized: false,
+      },
+      include: { word: true },
+    });
+
+    return {
+      success: true,
+      wordId: word.id,
+      item,
+      message: 'Đã lưu từ vào Sổ tay từ vựng của bạn!',
+    };
+  }
 }
 
 export const vocabService = new VocabService();

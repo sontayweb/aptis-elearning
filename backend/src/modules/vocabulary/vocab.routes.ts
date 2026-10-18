@@ -25,4 +25,12 @@ router.patch('/notebook/:wordId', authGuard, (req, res, next) =>
   vocabController.toggleMemorized(req, res, next)
 );
 
+// Quick Translation & Instant Lookup routes (Bôi đen tra từ và dịch câu)
+router.post('/translate', optionalAuthGuard, (req, res, next) =>
+  vocabController.translate(req, res, next)
+);
+router.post('/notebook/quick-save', authGuard, (req, res, next) =>
+  vocabController.quickSaveToNotebook(req, res, next)
+);
+
 export default router;

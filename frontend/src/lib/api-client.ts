@@ -390,6 +390,39 @@ class ApiClient {
         method: 'PUT',
         body: JSON.stringify({ is_memorized: isMemorized }),
       }),
+
+    translate: (text: string) =>
+      this.request<{
+        originalText: string;
+        translatedText: string;
+        isWord: boolean;
+        phonetic?: string | null;
+        audioUrl?: string | null;
+        partOfSpeech?: string | null;
+        definitionEn?: string | null;
+        exampleEn?: string | null;
+        cefrLevel?: string;
+        wordId?: string | null;
+        isSavedInNotebook: boolean;
+      }>('/vocabulary/translate', {
+        method: 'POST',
+        body: JSON.stringify({ text }),
+      }),
+
+    quickSaveToNotebook: (data: {
+      word: string;
+      meaning_vi: string;
+      phonetic?: string;
+      example_sentence?: string;
+      cefr_level?: string;
+      audio_url?: string;
+    }) =>
+      this.request('/vocabulary/notebook/quick-save', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
+    getNotebook: () => this.request('/vocabulary/notebook'),
   };
 
   // ==========================================

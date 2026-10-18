@@ -110,8 +110,9 @@ backend/test-db-connection.js
 backend/export-backup-json.js
 backend/verify-inserted-data.ts
 backend/uploads/
-uploads/
+/uploads/
 storage/
+!frontend/public/uploads/
 
 # Skill development & miscellaneous
 _dev/

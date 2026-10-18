@@ -119,6 +119,27 @@ export class VocabController {
       next(error);
     }
   }
+
+  async translate(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = (req as AuthenticatedRequest).user?.userId;
+      const { text } = req.body;
+      const result = await vocabService.translateAndLookup(text, userId);
+      sendSuccess(res, result, 'Dịch và tra từ vựng thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async quickSaveToNotebook(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user!.userId;
+      const result = await vocabService.quickSaveToNotebook(userId, req.body);
+      sendSuccess(res, result, result.message, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const vocabController = new VocabController();

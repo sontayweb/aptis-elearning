@@ -71,6 +71,7 @@ import { SiteSettingsProvider } from "@/contexts/site-settings-context";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EventDecorations } from "@/components/event-decorations";
 import { PwaRegister } from "@/components/pwa-register";
+import { SelectionTranslator } from "@/components/selection-translator";
 
 export default function RootLayout({
   children,
@@ -125,6 +126,7 @@ export default function RootLayout({
           <SiteSettingsProvider>
             <AuthProvider>
               {children}
+              <SelectionTranslator />
               <EventDecorations />
               <MobileBottomNav />
               <PwaRegister />

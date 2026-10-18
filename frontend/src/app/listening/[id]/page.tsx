@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, useRef } from "react";
+import { useState, useEffect, Suspense, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
@@ -28,6 +28,9 @@ import {
   FileText,
   Languages,
   RefreshCw,
+  Loader2,
+  Copy,
+  Check,
 } from "lucide-react";
 import { DEFAULT_LISTENING_TEST, DEFAULT_LISTENING_TEST_2 } from "@/data/listening-benchmark";
 import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
@@ -42,6 +45,7 @@ interface Part1Item {
   explanation: string;
   audioUrl?: string;
   transcript?: string;
+  translation?: string;
 }
 
 interface Part2Speaker {
@@ -161,6 +165,9 @@ function ListeningExamRunnerContent() {
   const [reportType, setReportType] = useState("Lỗi âm thanh hoặc audio");
   const [reportNote, setReportNote] = useState("");
   const [reportSent, setReportSent] = useState(false);
+  const [translationCache, setTranslationCache] = useState<Record<string, string>>({});
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [copiedTrans, setCopiedTrans] = useState(false);
 
   // Dynamic Stage definitions based on actually loaded questions in examData
   const listeningStages: Array<{
@@ -303,7 +310,7 @@ function ListeningExamRunnerContent() {
       return {
         title: `Part 1 — Câu hỏi ${currentStage.subIndex + 1}`,
         script: q?.transcript || q?.prompt || "",
-        translation: "",
+        translation: q?.translation || (q as any)?.translationText || "",
       };
     }
     return null;
@@ -386,6 +393,119 @@ function ListeningExamRunnerContent() {
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isSubmitted]);
+
+  // 3b. Khôi phục cache bản dịch tiếng Việt từ LocalStorage
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId) return;
+    try {
+      const raw = localStorage.getItem(`aptis_listening_trans_${examId}`);
+      if (raw) {
+        setTranslationCache(JSON.parse(raw));
+      }
+    } catch {}
+  }, [examId]);
+
+  // Tách phần transcript tiếng Anh và phần giải thích đáp án tiếng Việt (nếu có lẫn trong transcript)
+  const parseBilingualContent = (rawText: string) => {
+    if (!rawText) return { scriptEn: "", explanationVi: "" };
+    const match = rawText.match(/(\n*---+\s*GIẢI THÍCH[\s\S]*)/i);
+    if (match && match.index !== undefined) {
+      return {
+        scriptEn: rawText.slice(0, match.index).trim(),
+        explanationVi: match[1].trim(),
+      };
+    }
+    return {
+      scriptEn: rawText.trim(),
+      explanationVi: "",
+    };
+  };
+
+  // Hàm tự động gọi AI dịch nghĩa script sang tiếng Việt
+  const fetchBilingualTranslation = useCallback(
+    async (stageIdx: number, force = false) => {
+      const stageKey = `stage_${stageIdx}`;
+      if (!force && translationCache[stageKey]) return translationCache[stageKey];
+
+      const current = listeningStages[stageIdx];
+      if (!current) return null;
+
+      let rawScript = "";
+      let staticTrans = "";
+      if (current.partNum === 1) {
+        const q = examData.part1[current.subIndex];
+        rawScript = q?.transcript || q?.prompt || "";
+        staticTrans = q?.translation || "";
+      } else if (current.partNum === 2) {
+        rawScript =
+          (examData.part2 as any).passageText ||
+          examData.part2.speakers.map((s) => `${s.speaker}: "${s.correctAnswer}"`).join("\n\n");
+        staticTrans = (examData.part2 as any).translationText || "";
+      } else if (current.partNum === 3) {
+        rawScript =
+          (examData.part3 as any).passageText ||
+          examData.part3.opinions.map((o) => `• ${o.statement} (${o.correctAnswer})`).join("\n\n");
+        staticTrans = (examData.part3 as any).translationText || "";
+      } else if (current.partNum === 4) {
+        const rec = examData.part4[current.subIndex];
+        rawScript = rec?.passageText || "";
+        staticTrans = rec?.translationText || "";
+      }
+
+      if (!force && staticTrans) {
+        return staticTrans;
+      }
+
+      if (!rawScript || rawScript.trim().length < 5) return null;
+
+      const { scriptEn, explanationVi } = parseBilingualContent(rawScript);
+      if (!scriptEn) return null;
+
+      setIsTranslating(true);
+      try {
+        const res = await api.vocabulary.translate(scriptEn);
+        if (res.success && res.data?.translatedText) {
+          const finalVi = explanationVi
+            ? `${res.data.translatedText.trim()}\n\n${explanationVi}`
+            : res.data.translatedText.trim();
+
+          setTranslationCache((prev) => {
+            const next = { ...prev, [stageKey]: finalVi };
+            try {
+              if (examId) {
+                localStorage.setItem(`aptis_listening_trans_${examId}`, JSON.stringify(next));
+              }
+            } catch {}
+            return next;
+          });
+          return finalVi;
+        }
+      } catch (err) {
+        console.warn("[Listening] Auto translation error:", err);
+      } finally {
+        setIsTranslating(false);
+      }
+      return null;
+    },
+    [listeningStages, examData, translationCache, examId]
+  );
+
+  // Kích hoạt dịch tự động khi người dùng bật tab dịch hoặc chuyển câu hỏi
+  useEffect(() => {
+    if (!showTranslation) return;
+    const stageKey = `stage_${activeStage}`;
+    if (!translationCache[stageKey]) {
+      fetchBilingualTranslation(activeStage);
+    }
+  }, [showTranslation, activeStage, fetchBilingualTranslation, translationCache]);
+
+  const handleCopyTranslation = (text: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedTrans(true);
+      setTimeout(() => setCopiedTrans(false), 2000);
+    }
+  };
 
   // 4. Khởi tạo / Khôi phục phiên làm bài trên backend
   useEffect(() => {
@@ -646,6 +766,7 @@ function ListeningExamRunnerContent() {
               explanation: q.explanation || "Đáp án chuẩn theo đoạn ghi âm đối thoại.",
               audioUrl: resolvedAudio,
               transcript: qTranscript,
+              translation: q.translation_text || q.translation || "",
             };
           });
         }
@@ -1709,19 +1830,36 @@ function ListeningExamRunnerContent() {
               {(showScript || showTranslation) && (() => {
                 const bilingual = getCurrentBilingualData();
                 if (!bilingual) return null;
+                const stageKey = `stage_${activeStage}`;
+                const activeTranslation =
+                  bilingual.translation || translationCache[stageKey];
+
                 return (
                   <div className="mt-3 p-4 rounded-xl border border-primary/20 bg-muted/20 space-y-3">
                     <div className="flex items-center justify-between text-xs text-muted-foreground border-b border-border/60 pb-1.5">
                       <span className="font-bold text-foreground">{bilingual.title}</span>
-                      <span className="text-[10px]">Hiển thị song song hỗ trợ ôn luyện</span>
+                      <span className="text-[10px] hidden sm:inline">Hiển thị song song hỗ trợ ôn luyện</span>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                       {showScript && (
                         <div className={!showTranslation ? "md:col-span-2" : ""}>
-                          <div className="flex items-center gap-1.5 font-bold text-primary mb-1.5 text-[11px] uppercase tracking-wide">
-                            <FileText className="w-3.5 h-3.5" />
-                            <span>Script Ghi Âm (Tiếng Anh)</span>
+                          <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                            <div className="flex items-center gap-1.5 font-bold text-primary text-[11px] uppercase tracking-wide">
+                              <FileText className="w-3.5 h-3.5" />
+                              <span>Script Ghi Âm (Tiếng Anh)</span>
+                            </div>
+                            {bilingual.script && (
+                              <button
+                                type="button"
+                                onClick={() => handleCopyTranslation(bilingual.script)}
+                                className="text-[10.5px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-muted transition-colors cursor-pointer"
+                                title="Sao chép script tiếng Anh"
+                              >
+                                <Copy className="w-3 h-3" />
+                                <span className="hidden sm:inline">Sao chép</span>
+                              </button>
+                            )}
                           </div>
                           <div className="p-3 rounded-lg bg-background border border-border text-foreground leading-relaxed whitespace-pre-line font-mono text-[11.5px] max-h-64 overflow-y-auto">
                             {bilingual.script || "Đang cập nhật script cho phần này."}
@@ -1731,12 +1869,71 @@ function ListeningExamRunnerContent() {
 
                       {showTranslation && (
                         <div className={!showScript ? "md:col-span-2" : ""}>
-                          <div className="flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400 mb-1.5 text-[11px] uppercase tracking-wide">
-                            <Languages className="w-3.5 h-3.5" />
-                            <span>Bản Dịch Nghĩa (Tiếng Việt)</span>
+                          <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                            <div className="flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400 text-[11px] uppercase tracking-wide">
+                              <Languages className="w-3.5 h-3.5" />
+                              <span>Bản Dịch Nghĩa (Tiếng Việt)</span>
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                <Sparkles className="w-2.5 h-2.5" />
+                                AI Song Ngữ
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1.5">
+                              {activeTranslation && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyTranslation(activeTranslation)}
+                                  className="text-[10.5px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-muted transition-colors cursor-pointer"
+                                  title="Sao chép bản dịch"
+                                >
+                                  {copiedTrans ? (
+                                    <>
+                                      <Check className="w-3 h-3 text-emerald-500" />
+                                      <span className="text-emerald-500 font-medium">Đã chép</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="w-3 h-3" />
+                                      <span className="hidden sm:inline">Sao chép</span>
+                                    </>
+                                  )}
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                disabled={isTranslating}
+                                onClick={() => fetchBilingualTranslation(activeStage, true)}
+                                className="text-[10.5px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer"
+                                title="Làm mới bản dịch AI"
+                              >
+                                <RotateCcw className={`w-3 h-3 ${isTranslating ? "animate-spin" : ""}`} />
+                                <span className="hidden sm:inline">Dịch lại</span>
+                              </button>
+                            </div>
                           </div>
+
                           <div className="p-3 rounded-lg bg-background border border-border text-foreground leading-relaxed whitespace-pre-line text-[11.5px] max-h-64 overflow-y-auto">
-                            {bilingual.translation || "Bản dịch nghĩa đang được hoàn thiện."}
+                            {activeTranslation ? (
+                              activeTranslation
+                            ) : isTranslating ? (
+                              <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
+                                <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+                                <span className="text-[11px] font-medium">Đang tạo bản dịch tiếng Việt bằng AI...</span>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center justify-center py-4 gap-2 text-muted-foreground text-center">
+                                <span className="text-[11px]">Bản dịch nghĩa đang được hoàn thiện.</span>
+                                <button
+                                  type="button"
+                                  onClick={() => fetchBilingualTranslation(activeStage, true)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors cursor-pointer"
+                                >
+                                  <Sparkles className="w-3.5 h-3.5" />
+                                  <span>Dịch ngay bằng AI</span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
