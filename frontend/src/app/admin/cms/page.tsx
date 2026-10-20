@@ -22,6 +22,7 @@ import {
   Check,
   Zap,
 } from "lucide-react";
+import AdminPageHeader from "@/components/admin/admin-page-header";
 
 interface PlanItem {
   id: string;
@@ -289,66 +290,67 @@ export default function AdminCmsPricingPage() {
         </div>
       )}
 
-      {/* 1. TOP HEADER & METRICS */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
-            <CreditCard className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-            <span>Monetization & VIP Tier Management</span>
+      {/* 1. TOP HEADER & METRICS — Chuẩn hóa AdminPageHeader */}
+      <AdminPageHeader
+        badge={{
+          icon: CreditCard,
+          label: "Monetization & VIP Tier Management",
+        }}
+        title="Quản Lý Gói Cước VIP"
+        description="Cấu hình bảng giá niêm yết, phân bổ hạn ngạch chấm AI & Giảng viên và thông số đối soát cổng SePay"
+        stats={[
+          {
+            icon: Crown,
+            label: "Gói cước",
+            value: plans.length,
+            subValue: "Hệ thống",
+            iconColor: "text-amber-500",
+          },
+          {
+            icon: Zap,
+            label: "Đang mở bán",
+            value: activePlansCount,
+            subValue: "Hiển thị web",
+            iconColor: "text-emerald-500",
+          },
+          {
+            icon: Users,
+            label: "Thuê bao đang học",
+            value: totalSubscribers,
+            subValue: "Học viên VIP",
+            iconColor: "text-blue-500",
+          },
+          {
+            icon: CreditCard,
+            label: "Cổng SePay",
+            value: "Tự động",
+            subValue: "24/7 Active",
+            iconColor: "text-emerald-500",
+          },
+        ]}
+        actions={
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/transactions"
+              className="px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <CreditCard className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+              <span className="hidden sm:inline">Đối soát SePay</span>
+              <ExternalLink className="w-3 h-3 text-slate-400" />
+            </Link>
+
+            <button
+              type="button"
+              onClick={fetchPlans}
+              disabled={loading}
+              className="px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-blue-600 dark:text-blue-400" : ""}`} />
+              <span>Làm mới</span>
+            </button>
           </div>
-          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <span>Quản Lý Gói Cước VIP</span>
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
-            Cấu hình bảng giá niêm yết, phân bổ hạn ngạch chấm AI & Giảng viên và thông số đối soát cổng SePay
-          </p>
-
-          {/* Quick Metrics Chips */}
-          <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
-              Chỉ số:
-            </span>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              <Crown className="w-3 h-3 text-amber-500" />
-              <span>Tổng: <strong className="text-slate-900 dark:text-white font-mono">{plans.length}</strong> gói cước</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              <Zap className="w-3 h-3 text-emerald-500" />
-              <span>Đang mở bán: <strong className="text-slate-900 dark:text-white font-mono">{activePlansCount}</strong></span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              <Users className="w-3 h-3 text-blue-500" />
-              <span>Thuê bao đang học: <strong className="text-slate-900 dark:text-white font-mono">{totalSubscribers}</strong></span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>Cổng SePay: Tự động 24/7</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Top Action Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
-          <Link
-            href="/admin/transactions"
-            className="px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            <CreditCard className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span className="hidden sm:inline">Đối soát SePay</span>
-            <ExternalLink className="w-3 h-3 text-slate-400" />
-          </Link>
-
-          <button
-            type="button"
-            onClick={fetchPlans}
-            disabled={loading}
-            className="px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-blue-600 dark:text-blue-400" : ""}`} />
-            <span>Làm mới</span>
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* 2. PLANS PRICING GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

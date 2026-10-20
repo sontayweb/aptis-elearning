@@ -21,6 +21,8 @@ import {
   Check,
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
+import AdminPageHeader from "@/components/admin/admin-page-header";
+import AdminFilterBar from "@/components/admin/admin-filter-bar";
 
 interface ReviewItem {
   id: string;
@@ -148,88 +150,66 @@ export default function AdminReviewsPage() {
       )}
 
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
-            <MessageSquare className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-            <span>Cộng đồng & Phản hồi học viên</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <span>Kiểm duyệt Đánh giá Học viên</span>
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
-            Phê duyệt cảm nhận học viên thi đạt chứng chỉ Aptis ESOL và thêm nhận xét động viên của thầy cô lên Bảng Vàng
-          </p>
-
-          {/* Quick Metrics Chips */}
-          <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
-              Chỉ số:
-            </span>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              <MessageSquare className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-              <span>Tổng: <strong className="text-slate-900 dark:text-white font-mono">{totalCount}</strong></span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-              <span>Hiển thị: <strong className="text-slate-900 dark:text-white font-mono">{approvedCount}</strong></span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              <EyeOff className="w-3 h-3 text-amber-500" />
-              <span>Chờ duyệt: <strong className="text-slate-900 dark:text-white font-mono">{pendingCount}</strong></span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-              <span>Điểm TB: <strong className="text-slate-900 dark:text-white font-mono">{avgRating} / 5</strong></span>
-            </div>
-          </div>
-        </div>
-
-        <button
-          onClick={fetchReviews}
-          className="self-start sm:self-auto px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors flex items-center gap-2"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-slate-900 dark:text-white" : ""}`} />
-          <span>Làm mới dữ liệu</span>
-        </button>
-      </div>
+      <AdminPageHeader
+        badge={{
+          icon: MessageSquare,
+          label: "Cộng đồng & Phản hồi học viên",
+        }}
+        title="Kiểm duyệt Đánh giá Học viên"
+        description="Phê duyệt cảm nhận học viên thi đạt chứng chỉ Aptis ESOL và thêm nhận xét động viên của thầy cô lên Bảng Vàng"
+        stats={[
+          {
+            icon: MessageSquare,
+            label: "Tổng đánh giá",
+            value: totalCount,
+            subValue: "Học viên gửi về",
+          },
+          {
+            icon: CheckCircle2,
+            label: "Đang hiển thị",
+            value: approvedCount,
+            iconColor: "text-emerald-500",
+            subValue: "Lên Bảng Vàng",
+          },
+          {
+            icon: EyeOff,
+            label: "Chờ phê duyệt",
+            value: pendingCount,
+            iconColor: "text-amber-500",
+            subValue: "Cần duyệt",
+          },
+          {
+            icon: Star,
+            label: "Điểm TB hài lòng",
+            value: `${avgRating} / 5`,
+            iconColor: "text-amber-400 fill-amber-400",
+            subValue: "Đánh giá 5 sao",
+          },
+        ]}
+        actions={
+          <button
+            onClick={fetchReviews}
+            className="px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-slate-900 dark:text-white" : ""}`} />
+            <span>Làm mới dữ liệu</span>
+          </button>
+        }
+      />
 
       {/* Filter & Search Bar */}
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm theo tên học viên, điểm số, nội dung..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-sans"
-          />
-        </div>
-
-        <div className="p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 flex items-center gap-1 w-full md:w-auto overflow-x-auto">
-          {[
-            { id: "ALL", label: `Tất cả (${totalCount})` },
-            { id: "APPROVED", label: `Đang hiển thị (${approvedCount})` },
-            { id: "PENDING", label: `Chờ kiểm duyệt (${pendingCount})` },
-          ].map((tab) => {
-            const isActive = statusFilter === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setStatusFilter(tab.id as any)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all ${
-                  isActive
-                    ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold ring-1 ring-slate-900/5 dark:ring-white/10"
-                    : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <AdminFilterBar
+        searchPlaceholder="Tìm theo tên học viên, điểm số, nội dung..."
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        tabs={[
+          { id: "ALL", label: "Tất cả", count: totalCount },
+          { id: "APPROVED", label: "Đang hiển thị", count: approvedCount },
+          { id: "PENDING", label: "Chờ kiểm duyệt", count: pendingCount },
+        ]}
+        activeTab={statusFilter}
+        onTabChange={(tabId) => setStatusFilter(tabId as any)}
+      />
 
       {/* Feed Cards List */}
       <div className="space-y-4">

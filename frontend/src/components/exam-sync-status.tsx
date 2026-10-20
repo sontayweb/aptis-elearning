@@ -79,7 +79,7 @@ export function ExamSyncStatus({
       {status === "idle" && (
         <>
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-          <span className="hidden sm:inline">Tự động bảo vệ</span>
+          <span className="hidden sm:inline">Tự động lưu</span>
         </>
       )}
 
@@ -102,6 +102,11 @@ export function ExamRecoveryBanner({
   answersCount?: number;
   onDismiss?: () => void;
 }) {
+  // Không hiện banner khôi phục nếu không có câu trả lời nào được phục hồi (tránh gây hiểu lầm khi vào thi mới)
+  if (answersCount !== undefined && answersCount <= 0) {
+    return null;
+  }
+
   const mins = remainingSeconds ? Math.floor(remainingSeconds / 60) : 0;
 
   return (

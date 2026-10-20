@@ -29,6 +29,7 @@ import {
   Radio,
   Sliders,
 } from "lucide-react";
+import AdminPageHeader from "@/components/admin/admin-page-header";
 
 export default function AdminEventsPage() {
   const { config, updateConfig, applyPreset, toggleEvent, currentTheme, setTheme } = useEventTheme();
@@ -285,75 +286,69 @@ export default function AdminEventsPage() {
 
   return (
     <div className="space-y-6 pb-16">
-      {/* 1. TOP HEADER WITH MASTER SWITCH */}
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold mb-1.5">
-            <Palette className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-            <span>Seasonal Theming & Interactive Gamification</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <span>Quản Trị Sự Kiện & Giao Diện Lễ Hội</span>
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
-            Bật/tắt sự kiện toàn trang, chuyển đổi template lễ hội (Halloween, Trung thu, Noel, Tết...) và trang trí giao diện học viên
-          </p>
+      {/* 1. TOP HEADER WITH MASTER SWITCH — Chuẩn hóa AdminPageHeader */}
+      <AdminPageHeader
+        badge={{
+          icon: Palette,
+          label: "Seasonal Theming & Interactive Gamification",
+        }}
+        title="Quản Trị Sự Kiện & Giao Diện Lễ Hội"
+        description="Bật/tắt sự kiện toàn trang, chuyển đổi template lễ hội (Halloween, Trung thu, Noel, Tết...) và trang trí giao diện học viên"
+        stats={[
+          {
+            icon: Sparkles,
+            label: "Theme đang chọn",
+            value: `${config.name} ${config.icon}`,
+            subValue: "Sự kiện hiện tại",
+            iconColor: "text-amber-500",
+          },
+          {
+            icon: Layers,
+            label: "Hiệu ứng rơi",
+            value: config.decorationType,
+            subValue: "Trang trí tương tác",
+            iconColor: "text-blue-500",
+          },
+          {
+            icon: Radio,
+            label: "Trạng thái hiển thị",
+            value: config.enabled ? "Đang BẬT" : "Đang TẮT",
+            subValue: config.enabled ? "Áp dụng toàn web" : "Tạm dừng hiển thị",
+            iconColor: config.enabled ? "text-emerald-500" : "text-slate-400",
+          },
+        ]}
+        actions={
+          <div className="flex items-center gap-3 p-1.5 sm:px-3 sm:py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 shrink-0">
+            <div className="text-right">
+              <span className="text-[11px] font-heading font-bold block text-slate-800 dark:text-slate-200">
+                Công tắc Sự kiện:
+              </span>
+              <span
+                className={`text-[10px] font-semibold ${
+                  config.enabled ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"
+                }`}
+              >
+                {config.enabled ? "Đang áp dụng" : "Đang tạm dừng"}
+              </span>
+            </div>
 
-          {/* Quick Metrics Strip */}
-          <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-0.5">
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold font-heading uppercase tracking-wider">
-              Chỉ số:
-            </span>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              <Sparkles className="w-3 h-3 text-amber-500" />
-              <span>Theme: <strong className="text-slate-900 dark:text-white">{config.name} {config.icon}</strong></span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              <Layers className="w-3 h-3 text-blue-500" />
-              <span>Hiệu ứng: <strong className="text-slate-900 dark:text-white font-normal">{getDecorationLabel(config.decorationType)}</strong></span>
-            </div>
-            <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold border ${
-              config.enabled
-                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300"
-                : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400"
-            }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${config.enabled ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`}></span>
-              <span>{config.enabled ? "Đang BẬT toàn web" : "Đang TẮT"}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Master Toggle Button */}
-        <div className="flex items-center gap-3 self-start lg:self-auto p-2 sm:p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 shrink-0">
-          <div className="text-right">
-            <span className="text-xs font-heading font-bold block text-slate-800 dark:text-slate-200">
-              Công tắc Sự kiện:
-            </span>
-            <span
-              className={`text-[11px] font-semibold ${
-                config.enabled ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"
+            <button
+              type="button"
+              onClick={() => handleToggleClick(!config.enabled)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                config.enabled ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"
               }`}
+              aria-label="Bật tắt sự kiện"
             >
-              {config.enabled ? "Đang áp dụng" : "Đang tạm dừng"}
-            </span>
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                  config.enabled ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
           </div>
-
-          <button
-            type="button"
-            onClick={() => handleToggleClick(!config.enabled)}
-            className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-              config.enabled ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"
-            }`}
-            aria-label="Bật tắt sự kiện"
-          >
-            <span
-              className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                config.enabled ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* 2. MAIN CONTENT GRID: LEFT CONFIGURATION & RIGHT LIVE PREVIEW */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">

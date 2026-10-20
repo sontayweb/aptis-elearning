@@ -695,17 +695,12 @@ class ApiClient {
     validateImportExamFile: (file: File) => {
       const formData = new FormData();
       formData.append('file', file);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-      return fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/admin/exams/import/validate`, {
+      return this.request<any>('/admin/exams/import/validate', {
         method: 'POST',
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
         body: formData,
-      }).then(async (res) => {
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.message || 'Lỗi khi kiểm định tập tin');
-        return json.data;
+      }).then((res) => {
+        if (!res.success) throw new Error(res.message || 'Lỗi khi kiểm định tập tin');
+        return res.data;
       });
     },
 
@@ -714,6 +709,18 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify({ exams }),
       }),
+
+    uploadImportImage: (image: File) => {
+      const formData = new FormData();
+      formData.append('image', image);
+      return this.request<any>('/admin/exams/import/upload-image', {
+        method: 'POST',
+        body: formData,
+      }).then((res) => {
+        if (!res.success) throw new Error(res.message || 'Lỗi khi tải ảnh lên');
+        return res.data;
+      });
+    },
 
     // ── Content Editor ──────────────────────────────────────────
     getExamFull: (id: string) => this.request(`/admin/exams/${id}/full`),

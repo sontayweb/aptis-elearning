@@ -429,10 +429,6 @@ function ReadingExamRunner() {
           }
 
           if (subData.isResumed) {
-            setIsResumedSession(true);
-            setSyncStatus("resumed");
-            setTimeout(() => setSyncStatus("idle"), 4000);
-
             if (subData.savedAnswers && typeof subData.savedAnswers === "object") {
               const p1: Record<string, string> = {};
               const p2: Record<string, string[]> = {};
@@ -443,7 +439,7 @@ function ReadingExamRunner() {
                 if (ans.selectedOption) {
                   try {
                     const parsed = JSON.parse(ans.selectedOption);
-                    if (Array.isArray(parsed)) {
+                    if (Array.isArray(parsed) && parsed.length > 0) {
                       p2[qId] = parsed;
                       return;
                     }
@@ -454,10 +450,22 @@ function ReadingExamRunner() {
                 }
               });
 
-              setP1Answers((prev) => ({ ...p1, ...prev }));
-              setP2Orders((prev) => ({ ...p2, ...prev }));
-              setP3Answers((prev) => ({ ...p3, ...prev }));
-              setP4Answers((prev) => ({ ...p4, ...prev }));
+              const totalRecovered =
+                Object.keys(p1).length +
+                Object.keys(p2).length +
+                Object.keys(p3).length +
+                Object.keys(p4).length;
+
+              if (totalRecovered > 0) {
+                setP1Answers((prev) => ({ ...p1, ...prev }));
+                setP2Orders((prev) => ({ ...p2, ...prev }));
+                setP3Answers((prev) => ({ ...p3, ...prev }));
+                setP4Answers((prev) => ({ ...p4, ...prev }));
+
+                setIsResumedSession(true);
+                setSyncStatus("resumed");
+                setTimeout(() => setSyncStatus("idle"), 4000);
+              }
             }
           }
         }

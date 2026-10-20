@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
@@ -60,6 +60,7 @@ function WritingExamRunnerContent() {
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [isResumedSession, setIsResumedSession] = useState(false);
   const [resumedBannerDismissed, setResumedBannerDismissed] = useState(false);
+  const isStartingSubmissionRef = useRef(false);
 
   // AI Quota & Submission state
   const [aiQuota, setAiQuota] = useState(2);
@@ -319,7 +320,8 @@ function WritingExamRunnerContent() {
   useEffect(() => {
     async function initWritingSubmission() {
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-      if (!token || !examId || submissionId) return;
+      if (!token || !examId || submissionId || isStartingSubmissionRef.current || parts.length === 0) return;
+      isStartingSubmissionRef.current = true;
       try {
         const res = await api.submissions.start(examId);
         if (res.success && res.data) {
@@ -330,26 +332,35 @@ function WritingExamRunnerContent() {
           }
 
           if (subData.isResumed) {
-            setIsResumedSession(true);
-            setSyncStatus("resumed");
-            setTimeout(() => setSyncStatus("idle"), 4000);
-
+            let loadedCount = 0;
             if (subData.savedAnswers && typeof subData.savedAnswers === "object") {
               const loaded: Record<string, string> = {};
               parts.forEach((p, pIdx) => {
                 p.questions.forEach((q, qIdx) => {
-                  if (q.id && subData.savedAnswers[q.id]?.textAnswer) {
-                    loaded[`${pIdx}_${qIdx}`] = subData.savedAnswers[q.id].textAnswer;
+                  if (q.id) {
+                    const text = (subData.savedAnswers as Record<string, any>)[q.id]?.textAnswer;
+                    if (typeof text === "string" && text.trim().length > 0) {
+                      loaded[`${pIdx}_${qIdx}`] = text;
+                    }
                   }
                 });
               });
-              if (Object.keys(loaded).length > 0) {
+              loadedCount = Object.keys(loaded).length;
+              if (loadedCount > 0) {
                 setAnswers((prev) => ({ ...loaded, ...prev }));
               }
+            }
+
+            // CHỈ kích hoạt khôi phục nếu thực sự có câu trả lời được phục hồi
+            if (loadedCount > 0) {
+              setIsResumedSession(true);
+              setSyncStatus("resumed");
+              setTimeout(() => setSyncStatus("idle"), 4000);
             }
           }
         }
       } catch (err) {
+        isStartingSubmissionRef.current = false;
         console.warn("Writing offline mode:", err);
       }
     }

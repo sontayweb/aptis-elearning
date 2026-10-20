@@ -226,10 +226,11 @@ export default function WritingPracticePage() {
           desc: "Trả lời 5 câu hỏi tin nhắn ngắn từ 1 đến 5 từ. Kiểm tra khả năng cung cấp thông tin ngắn gọn, chuẩn xác.",
           badge: "Part 1",
           partQuery: "?part=1",
-          marathonText: "Luyện tất cả đề Part 1",
-          marathonDesc: "Làm liên tục các câu hỏi Part 1 — Rèn luyện phản xạ từ vựng cơ bản",
-          marathonBtn: "Mở khóa",
+          marathonText: "Ngân Hàng Câu Hỏi Lẻ Part 1",
+          marathonDesc: "Luyện tập tất cả các câu hỏi tin nhắn ngắn Part 1 kèm câu trả lời mẫu B2/C1 chuẩn đếm từ",
+          marathonBtn: "Luyện câu hỏi lẻ Part 1 →",
           marathonType: "marathon",
+          marathonUrl: "/writing/marathon?part=1",
         };
       case "p2":
         return {
@@ -238,10 +239,11 @@ export default function WritingPracticePage() {
           subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
           badge: "Part 2",
           partQuery: "?part=2",
-          marathonText: "Luyện tất cả đề Part 2",
-          marathonDesc: "Luyện tập các chủ đề CLB sát đề thi thật British Council",
-          marathonBtn: "Mở khóa",
+          marathonText: "Tổng Hợp Các Form Điền Đơn CLB Part 2",
+          marathonDesc: "Bộ 15 chủ đề CLB sát đề thi thật British Council kèm đếm từ tự động và bài mẫu ăn điểm",
+          marathonBtn: "Luyện 15 đề form CLB Part 2 →",
           marathonType: "marathon",
+          marathonUrl: "/writing/marathon?part=2",
         };
       case "p3":
         return {
@@ -250,10 +252,11 @@ export default function WritingPracticePage() {
           subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
           badge: "Part 3",
           partQuery: "?part=3",
-          marathonText: "Luyện tất cả đề Part 3",
-          marathonDesc: "Luyện viết đoạn văn trao đổi ý kiến, biểu đạt cảm xúc và quan điểm",
-          marathonBtn: "Mở khóa",
+          marathonText: "Phòng Chat Diễn Đàn CLB Part 3",
+          marathonDesc: "Luyện viết phản hồi 3 thành viên liên hoàn, bám sát độ dài 30-40 từ và bài mẫu B2/C1",
+          marathonBtn: "Luyện phòng chat CLB Part 3 →",
           marathonType: "marathon",
+          marathonUrl: "/writing/marathon?part=3",
         };
       case "p4":
         return {
@@ -261,10 +264,11 @@ export default function WritingPracticePage() {
           desc: "Viết 2 bức email: 1 email thân mật gửi bạn (khoảng 50 từ) và 1 email trang trọng gửi ban quản lý (120-150 từ).",
           badge: "Part 4",
           partQuery: "?part=4",
-          marathonText: "Luyện tất cả đề Part 4",
-          marathonDesc: "Rèn luyện phong cách trang trọng (Formal) và nâng band CEFR B2/C1",
-          marathonBtn: "Mở khóa",
+          marathonText: "Viết Thư Kép Thân Mật & Trang Trọng Part 4",
+          marathonDesc: "Rèn luyện phân biệt phong cách Formal vs Informal, dàn ý 4 bước và bài mẫu nâng band",
+          marathonBtn: "Luyện viết thư kép Part 4 →",
           marathonType: "marathon",
+          marathonUrl: "/writing/marathon?part=4",
         };
     }
   };
@@ -476,13 +480,22 @@ export default function WritingPracticePage() {
                 </div>
 
                 <div className="pt-6 mt-4 border-t border-border/40">
-                  <button
-                    type="button"
-                    onClick={() => setIsGuideModalOpen(true)}
-                    className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center"
-                  >
-                    {tabInfo.marathonBtn}
-                  </button>
+                  {(tabInfo as any).marathonUrl ? (
+                    <Link
+                      href={(tabInfo as any).marathonUrl}
+                      className="block w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center cursor-pointer"
+                    >
+                      {tabInfo.marathonBtn}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsGuideModalOpen(true)}
+                      className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center cursor-pointer"
+                    >
+                      {tabInfo.marathonBtn}
+                    </button>
+                  )}
                 </div>
               </div>
 

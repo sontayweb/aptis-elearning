@@ -69,19 +69,36 @@ function SpeakingMarathonContent() {
   const [timeLeft, setTimeLeft] = useState(30);
   const [audioBlobUrl, setAudioBlobUrl] = useState<string | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [currentPlayTime, setCurrentPlayTime] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
   const [showSampleInModal, setShowSampleInModal] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+  const actualMimeTypeRef = useRef<string>("");
+
+  const formatAudioTime = (sec: number) => {
+    const s = Math.max(0, Math.floor(sec || 0));
+    const m = Math.floor(s / 60);
+    const rem = s % 60;
+    return `${m}:${rem.toString().padStart(2, "0")}`;
+  };
 
   // Cleanup timer & recording on unmount
   useEffect(() => {
     return () => {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-        mediaRecorderRef.current.stop();
+        try {
+          mediaRecorderRef.current.stop();
+        } catch {}
+      }
+      if (audioPlayerRef.current) {
+        try {
+          audioPlayerRef.current.pause();
+        } catch {}
       }
     };
   }, []);
@@ -130,6 +147,24 @@ function SpeakingMarathonContent() {
     });
   }, [searchTerm]);
 
+  // Dọn dẹp tài nguyên âm thanh
+  const cleanupAudio = () => {
+    if (audioPlayerRef.current) {
+      try {
+        audioPlayerRef.current.pause();
+        audioPlayerRef.current.currentTime = 0;
+      } catch {}
+    }
+    setIsPlayingAudio(false);
+    setCurrentPlayTime(0);
+    setAudioDuration(0);
+    if (audioBlobUrl) {
+      try {
+        URL.revokeObjectURL(audioBlobUrl);
+      } catch {}
+    }
+  };
+
   // Launch Question practice
   const openPracticeModal = (params: {
     part: number;
@@ -140,6 +175,7 @@ function SpeakingMarathonContent() {
     vocab?: { en: string; vi: string }[];
     timeLimit: number;
   }) => {
+    cleanupAudio();
     setActiveQuestion(params);
     setTimeLeft(params.timeLimit);
     setIsRecording(false);
@@ -148,10 +184,16 @@ function SpeakingMarathonContent() {
   };
 
   const closePracticeModal = () => {
-    if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-      mediaRecorderRef.current.stop();
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
     }
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {}
+    }
+    cleanupAudio();
     setActiveQuestion(null);
     setIsRecording(false);
     setAudioBlobUrl(null);
@@ -159,26 +201,47 @@ function SpeakingMarathonContent() {
 
   // Start Voice Recording
   const startRecording = async () => {
+    cleanupAudio();
+    setAudioBlobUrl(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunksRef.current = [];
-      const mediaRecorder = new MediaRecorder(stream);
+
+      let mimeType = "";
+      const candidates = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/ogg;codecs=opus",
+        "audio/mp4",
+        "audio/aac",
+      ];
+      for (const cand of candidates) {
+        if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(cand)) {
+          mimeType = cand;
+          break;
+        }
+      }
+      const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
+      const actualType = mediaRecorder.mimeType || mimeType || "audio/webm";
+      actualMimeTypeRef.current = actualType;
 
       mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
+        if (event.data && event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const audioBlob = new Blob(audioChunksRef.current, { type: actualType });
         const url = URL.createObjectURL(audioBlob);
         setAudioBlobUrl(url);
         stream.getTracks().forEach((track) => track.stop());
       };
 
-      mediaRecorder.start();
+      // flush mỗi 250ms để dữ liệu luôn được nạp đầy đủ
+      mediaRecorder.start(250);
       setIsRecording(true);
       setTimeLeft(activeQuestion?.timeLimit || 30);
 
@@ -201,26 +264,51 @@ function SpeakingMarathonContent() {
 
   // Stop Voice Recording
   const stopRecording = () => {
-    if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-      mediaRecorderRef.current.stop();
+      try {
+        mediaRecorderRef.current.requestData();
+      } catch {}
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {}
     }
     setIsRecording(false);
   };
 
   // Audio Playback
   const togglePlayAudio = () => {
-    if (!audioBlobUrl) return;
-    if (!audioPlayerRef.current) {
-      audioPlayerRef.current = new Audio(audioBlobUrl);
-      audioPlayerRef.current.onended = () => setIsPlayingAudio(false);
-    }
+    const audio = audioPlayerRef.current;
+    if (!audio || !audioBlobUrl) return;
+
     if (isPlayingAudio) {
-      audioPlayerRef.current.pause();
+      audio.pause();
       setIsPlayingAudio(false);
     } else {
-      audioPlayerRef.current.play();
-      setIsPlayingAudio(true);
+      if (audio.ended || (audio.duration && audio.currentTime >= audio.duration)) {
+        audio.currentTime = 0;
+      }
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlayingAudio(true);
+          })
+          .catch((err) => {
+            console.error("Audio playback error:", err);
+            setIsPlayingAudio(false);
+            try {
+              audio.load();
+              audio
+                .play()
+                .then(() => setIsPlayingAudio(true))
+                .catch(() => setIsPlayingAudio(false));
+            } catch {}
+          });
+      }
     }
   };
 
@@ -770,24 +858,121 @@ function SpeakingMarathonContent() {
               )}
 
               {audioBlobUrl && !isRecording && (
-                <div className="flex items-center gap-3 w-full justify-center">
-                  <button
-                    type="button"
-                    onClick={togglePlayAudio}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs hover:bg-emerald-700"
-                  >
-                    {isPlayingAudio ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                    <span>{isPlayingAudio ? "Đang phát..." : "Nghe lại bài nói"}</span>
-                  </button>
+                <div className="w-full space-y-3 pt-1">
+                  <audio
+                    ref={audioPlayerRef}
+                    src={audioBlobUrl}
+                    preload="auto"
+                    onPlay={() => setIsPlayingAudio(true)}
+                    onPause={() => setIsPlayingAudio(false)}
+                    onEnded={() => {
+                      setIsPlayingAudio(false);
+                      setCurrentPlayTime(0);
+                    }}
+                    onTimeUpdate={() => {
+                      if (audioPlayerRef.current) {
+                        setCurrentPlayTime(audioPlayerRef.current.currentTime);
+                      }
+                    }}
+                    onLoadedMetadata={() => {
+                      const audio = audioPlayerRef.current;
+                      if (!audio) return;
+                      // Fix bug duration = Infinity trên Chrome khi phát WebM Blob
+                      if (audio.duration === Infinity) {
+                        audio.currentTime = 1e101;
+                        audio.ontimeupdate = () => {
+                          audio.ontimeupdate = null;
+                          audio.currentTime = 0;
+                          if (isFinite(audio.duration) && audio.duration > 0) {
+                            setAudioDuration(audio.duration);
+                          }
+                        };
+                      } else if (isFinite(audio.duration) && audio.duration > 0) {
+                        setAudioDuration(audio.duration);
+                      }
+                    }}
+                    className="hidden"
+                  />
 
-                  <button
-                    type="button"
-                    onClick={startRecording}
-                    className="px-4 py-2 rounded-xl border border-border bg-card text-foreground font-bold text-xs flex items-center gap-1.5 hover:bg-muted"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Nói lại</span>
-                  </button>
+                  {/* Thanh tiến trình phát lại âm thanh */}
+                  <div className="w-full p-2.5 rounded-xl bg-muted/60 border border-border/80 flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={togglePlayAudio}
+                      className="w-9 h-9 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs transition-transform active:scale-95 cursor-pointer"
+                      title={isPlayingAudio ? "Tạm dừng" : "Nghe lại bài nói"}
+                    >
+                      {isPlayingAudio ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                    </button>
+
+                    <div className="flex-1 flex flex-col gap-1">
+                      <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground font-semibold">
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">{formatAudioTime(currentPlayTime)}</span>
+                        <span>{formatAudioTime(audioDuration || (activeQuestion.timeLimit - timeLeft))}</span>
+                      </div>
+                      <div
+                        role="progressbar"
+                        aria-valuenow={Math.round(
+                          (audioDuration || (activeQuestion.timeLimit - timeLeft)) > 0
+                            ? (currentPlayTime / (audioDuration || (activeQuestion.timeLimit - timeLeft))) * 100
+                            : 0
+                        )}
+                        onClick={(e) => {
+                          const audio = audioPlayerRef.current;
+                          const dur = audioDuration || (activeQuestion.timeLimit - timeLeft);
+                          if (!audio || dur <= 0) return;
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                          audio.currentTime = ratio * dur;
+                          setCurrentPlayTime(ratio * dur);
+                        }}
+                        className="w-full h-2 bg-muted-foreground/20 hover:h-2.5 rounded-full overflow-hidden cursor-pointer relative transition-all"
+                      >
+                        <div
+                          className="h-full bg-emerald-600 rounded-full transition-all duration-75"
+                          style={{
+                            width: `${
+                              (audioDuration || (activeQuestion.timeLimit - timeLeft)) > 0
+                                ? Math.min(
+                                    100,
+                                    Math.max(
+                                      0,
+                                      (currentPlayTime /
+                                        (audioDuration || (activeQuestion.timeLimit - timeLeft))) *
+                                        100
+                                    )
+                                  )
+                                : 0
+                            }%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Nút hành động chính */}
+                  <div className="flex items-center gap-3 w-full justify-center">
+                    <button
+                      type="button"
+                      onClick={togglePlayAudio}
+                      className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs hover:bg-emerald-700 transition-all active:scale-95 cursor-pointer"
+                    >
+                      {isPlayingAudio ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                      <span>{isPlayingAudio ? "Tạm dừng" : "Nghe lại bài nói"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        cleanupAudio();
+                        startRecording();
+                      }}
+                      className="px-5 py-2.5 rounded-xl border border-border bg-card text-foreground font-bold text-xs flex items-center gap-1.5 hover:bg-muted transition-all active:scale-95 cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Nói lại</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

@@ -341,6 +341,45 @@ export default function GrammarPracticePage() {
             </div>
           ) : (
             <div id="practice-sets-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 scroll-mt-24">
+              {/* CARD 1: Marathon Card */}
+              <div className="relative rounded-2xl border-2 border-primary/50 bg-card p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px]">
+                        ∞ Marathon
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-700 dark:text-rose-300 font-bold text-[10px]">
+                        PRO
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-muted-foreground">Chưa làm</span>
+                  </div>
+
+                  <h3 className="text-lg font-heading font-extrabold text-foreground mb-2">
+                    Ngân Hàng Marathon Ngữ Pháp &amp; Từ Vựng
+                  </h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Luyện tập 50 câu trắc nghiệm chuyên sâu (25 câu Ngữ pháp + 25 câu Từ vựng) phân theo chủ điểm kèm giải thích chi tiết tiếng Việt.
+                  </p>
+                </div>
+
+                <div className="pt-6 mt-4 border-t border-border/40 grid grid-cols-2 gap-2">
+                  <Link
+                    href="/grammar/marathon?part=grammar"
+                    className="py-2.5 px-2 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center cursor-pointer truncate"
+                  >
+                    Luyện Ngữ pháp →
+                  </Link>
+                  <Link
+                    href="/grammar/marathon?part=vocab"
+                    className="py-2.5 px-2 rounded-xl border border-primary text-primary hover:bg-primary/10 font-bold text-xs transition-colors text-center cursor-pointer truncate"
+                  >
+                    Luyện Từ vựng →
+                  </Link>
+                </div>
+              </div>
+
               {filteredExams.map((exam) => {
                 const isLocked = !exam.isFree && !isProOrAdmin;
 

@@ -251,10 +251,11 @@ export default function ReadingPracticePage() {
           subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
           badge: "Part 2 + 3",
           partQuery: "?part=2",
-          marathonText: "Luyện tất cả đề Part 2 + 3",
-          marathonDesc: "Làm liên tục 32 đề — không giới hạn giờ",
-          marathonBtn: "Mở khóa",
+          marathonText: "Luyện Sắp Xếp Trật Tự Câu Part 2 + 3",
+          marathonDesc: "Bộ 12 đề luyện tập di chuyển và sắp xếp trật tự logic câu văn có giải thích chi tiết",
+          marathonBtn: "Luyện sắp xếp câu Part 2 + 3 →",
           marathonType: "marathon",
+          marathonUrl: "/reading/marathon?part=2",
         };
       case "p3":
         return {
@@ -263,10 +264,11 @@ export default function ReadingPracticePage() {
           subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
           badge: "Part 4",
           partQuery: "?part=4",
-          marathonText: "Luyện tất cả đề Part 4",
-          marathonDesc: "Làm liên tục 32 đề — không giới hạn giờ",
-          marathonBtn: "Mở khóa",
+          marathonText: "Ngân Hàng Nối Ý Kiến Nhân Vật Part 4",
+          marathonDesc: "Bộ 12 đề ghép 7 nhận định với phát biểu của 4 nhân vật chuẩn format đề thi thật",
+          marathonBtn: "Luyện nối ý kiến Part 4 →",
           marathonType: "marathon",
+          marathonUrl: "/reading/marathon?part=3",
         };
       case "p4":
         return {
@@ -274,10 +276,11 @@ export default function ReadingPracticePage() {
           desc: "32 bộ đề luyện tập đọc hiểu bài văn dài và chọn tiêu đề Heading cho 7 đoạn văn.",
           badge: "Part 5",
           partQuery: "?part=5",
-          marathonText: "Luyện tất cả đề Part 5",
-          marathonDesc: "Làm liên tục 32 đề — không giới hạn giờ",
-          marathonBtn: "Mở khóa",
+          marathonText: "Ngân Hàng Chọn Heading Đoạn Văn Part 5",
+          marathonDesc: "Bộ 12 bài đọc dài 750 từ kèm chiến thuật chọn Topic Sentence và Heading bao quát",
+          marathonBtn: "Luyện đọc dài Part 5 →",
           marathonType: "marathon",
+          marathonUrl: "/reading/marathon?part=4",
         };
     }
   };

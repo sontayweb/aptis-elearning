@@ -42,6 +42,9 @@ router.get('/exams/import/templates', (req, res, next) => adminController.getImp
 router.post('/exams/import/validate', upload.single('file'), (req, res, next) =>
   adminController.validateImportExamFile(req, res, next)
 );
+router.post('/exams/import/upload-image', upload.single('image'), (req, res, next) =>
+  adminController.uploadImportImage(req, res, next)
+);
 router.post('/exams/import/confirm', (req, res, next) => adminController.confirmImportExams(req, res, next));
 router.get('/exams', (req, res, next) => adminController.listExams(req, res, next));
 router.post('/exams', (req, res, next) => adminController.createExam(req, res, next));

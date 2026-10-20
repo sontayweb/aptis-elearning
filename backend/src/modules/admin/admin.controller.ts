@@ -14,6 +14,7 @@ import {
 import { sendSuccess } from '../../utils/api-response';
 import { TransactionStatus } from '@prisma/client';
 import path from 'path';
+import fs from 'fs';
 import { standardExamParser } from '../ingestion/parsers/standard-exam.parser';
 
 export class AdminController {
@@ -373,6 +374,14 @@ export class AdminController {
           size: '38 KB',
         },
         {
+          name: 'Mẫu đề Writing 4 Parts (.docx)',
+          description: 'Mẫu Word chuẩn cho bài thi Viết 4 phần: Điền form, Viết ngắn, Chat nhóm câu lạc bộ và Viết thư/Email.',
+          fileName: 'Mau_Nhap_De_Writing.docx',
+          downloadUrl: '/templates/Mau_Nhap_De_Writing.docx',
+          fileType: 'DOCX',
+          size: '36 KB',
+        },
+        {
           name: 'Mẫu đề Reading & Listening (.xlsx)',
           description: 'Mẫu bảng tính Excel nhanh cho bài đọc hiểu và trắc nghiệm câu hỏi nghe kèm đáp án và giải thích.',
           fileName: 'Mau_Nhap_De_Reading_Listening.xlsx',
@@ -383,6 +392,29 @@ export class AdminController {
       ];
 
       sendSuccess(res, templates, 'Lấy danh sách file mẫu thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async uploadImportImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.file || !req.file.buffer) {
+        throw { statusCode: 400, message: 'Vui lòng đính kèm hình ảnh (PNG, JPG, WEBP).' };
+      }
+
+      const uploadDir = path.resolve(process.env.UPLOAD_DIR || './uploads', 'exams', 'speaking');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const safeOriginalName = (req.file.originalname || 'image.png').replace(/[^a-zA-Z0-9._-]/g, '_');
+      const filename = `manual_${Date.now()}_${safeOriginalName}`;
+      const filePath = path.join(uploadDir, filename);
+      fs.writeFileSync(filePath, req.file.buffer);
+
+      const publicUrl = `/uploads/exams/speaking/${filename}`;
+      sendSuccess(res, { url: publicUrl }, 'Tải ảnh lên thành công', 200);
     } catch (error) {
       next(error);
     }

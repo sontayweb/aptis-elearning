@@ -225,6 +225,58 @@ export default function ListeningPracticePage() {
     return (b.hotLevel || 0) - (a.hotLevel || 0);
   });
 
+  const getTabInfo = () => {
+    switch (activeTab) {
+      case "full":
+        return {
+          title: "Full Test Listening",
+          marathonText: "Tạo bộ đề của bạn",
+          marathonDesc: "Tự ghép các đề lẻ thành bộ full test hoặc full part của riêng bạn. Dành cho tài khoản Pro.",
+          marathonBtn: "Nâng cấp để tạo →",
+          marathonType: "custom",
+          marathonUrl: null,
+        };
+      case "p1":
+        return {
+          title: "Part 1 – Information Recognition",
+          marathonText: "Ngân Hàng Câu Hỏi Nghe Part 1",
+          marathonDesc: "Luyện tập tất cả các câu hỏi nhận diện thông tin ngắn có audio thật, transcript song ngữ và giải thích chi tiết",
+          marathonBtn: "Luyện 13 câu nghe Part 1 →",
+          marathonType: "marathon",
+          marathonUrl: "/listening/marathon?part=1",
+        };
+      case "p2":
+        return {
+          title: "Part 2 – Speaker Matching",
+          marathonText: "Ngân Hàng Ghép Người Nói Part 2",
+          marathonDesc: "Bộ 8 chủ đề 4 người phát biểu kèm audio bản ngữ chuẩn British Council và phân tích bẫy nghe",
+          marathonBtn: "Luyện 8 đề ghép người nói Part 2 →",
+          marathonType: "marathon",
+          marathonUrl: "/listening/marathon?part=2",
+        };
+      case "p3":
+        return {
+          title: "Part 3 – Opinion Matching",
+          marathonText: "Đàm Thoại Quan Điểm Part 3",
+          marathonDesc: "Luyện nghe bắt quan điểm Man/Woman/Both agree với 6 bộ đàm thoại hay ra trong đề thi thật",
+          marathonBtn: "Luyện đàm thoại Part 3 →",
+          marathonType: "marathon",
+          marathonUrl: "/listening/marathon?part=3",
+        };
+      case "p4":
+        return {
+          title: "Part 4 – Monologue & Lectures",
+          marathonText: "Nghe Độc Thoại & Bài Giảng Part 4",
+          marathonDesc: "Rèn luyện nghe hiểu sâu 6 bài thuyết trình & bản tin radio dài chuẩn format Aptis ESOL",
+          marathonBtn: "Luyện bài độc thoại Part 4 →",
+          marathonType: "marathon",
+          marathonUrl: "/listening/marathon?part=4",
+        };
+    }
+  };
+
+  const tabInfo = getTabInfo();
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
@@ -459,31 +511,54 @@ export default function ListeningPracticePage() {
             </div>
           ) : (
             <div id="practice-sets-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 scroll-mt-24">
-              {/* CARD 1: Tạo bộ đề của bạn (PRO) */}
+              {/* CARD 1: Marathon / Custom Card */}
               <div className="relative rounded-2xl border-2 border-primary/50 bg-card p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px] uppercase">
-                      PRO
-                    </span>
+                    {tabInfo.marathonType === "custom" ? (
+                      <span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px] uppercase">
+                        PRO
+                      </span>
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px]">
+                          ∞ Marathon
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
+                          PRO
+                        </span>
+                      </div>
+                    )}
+                    {tabInfo.marathonType === "marathon" && (
+                      <span className="text-[11px] font-semibold text-muted-foreground">Chưa làm</span>
+                    )}
                   </div>
 
                   <h3 className="text-lg font-heading font-extrabold text-foreground mb-2">
-                    Tạo bộ đề của bạn
+                    {tabInfo.marathonText}
                   </h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Tự ghép các đề lẻ thành bộ full test hoặc full part của riêng bạn. Dành cho tài khoản Pro.
+                    {tabInfo.marathonDesc}
                   </p>
                 </div>
 
                 <div className="pt-6 mt-4 border-t border-border/40">
-                  <button
-                    type="button"
-                    onClick={() => setIsGuideModalOpen(true)}
-                    className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-colors text-center"
-                  >
-                    Nâng cấp để tạo →
-                  </button>
+                  {tabInfo.marathonUrl ? (
+                    <Link
+                      href={tabInfo.marathonUrl}
+                      className="block w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center cursor-pointer"
+                    >
+                      {tabInfo.marathonBtn}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsGuideModalOpen(true)}
+                      className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-colors text-center cursor-pointer"
+                    >
+                      {tabInfo.marathonBtn}
+                    </button>
+                  )}
                 </div>
               </div>
 

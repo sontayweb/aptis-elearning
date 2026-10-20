@@ -15,6 +15,7 @@ import {
   Zap,
   Search,
   ArrowLeft,
+  Eye,
   LucideIcon,
 } from "lucide-react";
 
@@ -31,6 +32,7 @@ interface TourStep {
   description: string;
   tips: string[];
   preferredPlacement?: "right" | "bottom" | "top" | "left";
+  mediaUrl?: string;
 }
 
 export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialModalProps) {
@@ -125,6 +127,37 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
         "Tạo đề thi mới theo từng bước trực quan, dễ quản trị.",
         "Nghe thử file âm thanh Audio trực tiếp trước khi xuất bản cho học viên.",
         "Gắn cờ VIP PRO để bảo vệ tài nguyên đề thi chất lượng cao.",
+      ],
+    },
+    {
+      targetId: "tour-nav-exams",
+      preferredPlacement: "right",
+      badge: "Biên soạn Speaking",
+      title: "Sửa Tranh & Câu hỏi Speaking Thủ công",
+      icon: BookOpen,
+      mediaUrl: "/tutorials/guide_admin_edit_speaking.webp",
+      description:
+        "Hướng dẫn trực quan cách thay đổi tiêu đề tranh, link hình ảnh tranh (Part Image) và nội dung câu hỏi (Prompt) cho bài thi Speaking trực tiếp trên Admin Portal.",
+      tips: [
+        "Vào tab Speaking -> bấm nút 'Biên soạn' tại đề cần sửa.",
+        "Mở rộng Part 2/3 -> bấm 'Sửa' để đổi tên tranh và dán link ảnh mới (image_url).",
+        "Bấm 'Sửa' tại từng câu hỏi để sửa nội dung (Prompt) hoặc thêm câu hỏi mới.",
+      ],
+    },
+    {
+      targetId: "tour-nav-exams",
+      preferredPlacement: "right",
+      badge: "Kiểm định đề thi 4 Kỹ năng",
+      title: "Phòng Kiểm Định & Soi Chi Tiết Đề Thi (Tránh Duyệt Nhầm)",
+      icon: Eye,
+      mediaUrl: "/tutorials/guide_exam_inspection_studio.webp",
+      description:
+        "Video hướng dẫn toàn diện cách soi chi tiết đề thi trước khi nhập vào hệ thống: nghe thử kịch bản Listening bằng giọng bản xứ TTS, đọc đoạn văn Reading, kiểm tra tranh Speaking & xử lý thiếu ảnh trực tiếp, xem thông báo Writing và rà soát đáp án đúng.",
+      tips: [
+        "Nghe thử kịch bản âm thanh: Bấm '🔊 Nghe thử kịch bản' để phát audio mô phỏng cho bài Nghe.",
+        "Kiểm tra đáp án đúng: Bấm trực tiếp vào các lựa chọn A, B, C, D để đổi đáp án đúng nếu file Excel bị gõ nhầm.",
+        "Xử lý thiếu ảnh Speaking: Bấm tải ảnh đính kèm ngay tại chỗ mà không cần mở lại file Word.",
+        "Tích chọn từng đề: Chỉ những đề hợp lệ được tích chọn mới được lưu vào hệ thống, đề lỗi sẽ bị loại trừ.",
       ],
     },
     {
@@ -408,6 +441,18 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
             <p className="text-slate-700 dark:text-slate-200 leading-relaxed font-normal text-xs sm:text-[13px]">
               {current.description}
             </p>
+
+            {/* Media Tutorial Video / Image */}
+            {current.mediaUrl && (
+              <div className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-black/5 dark:bg-black/40 p-1">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={current.mediaUrl}
+                  alt={current.title}
+                  className="w-full h-auto max-h-56 object-contain rounded-lg mx-auto shadow-xs"
+                />
+              </div>
+            )}
 
             {/* Key Tips */}
             <div className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-3.5 space-y-2">

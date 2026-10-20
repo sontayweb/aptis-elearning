@@ -198,30 +198,40 @@ export class StandardExamParser {
       const errors: string[] = [];
       const warnings: string[] = [];
 
+      let isWriting = false;
       let partNumber = 2;
       let topic = '';
+      let passageText = '';
       const questions: ValidatedQuestion[] = [];
 
       for (const line of block) {
         if (line.includes('[PHẦN THI]:')) {
           const partStr = line.replace(/.*\[PHẦN THI\]:\s*/i, '').trim();
-          if (partStr.includes('3')) partNumber = 3;
+          if (partStr.toLowerCase().includes('writing') || partStr.toLowerCase().includes('viết')) {
+            isWriting = true;
+          }
+          if (partStr.includes('1')) partNumber = 1;
+          else if (partStr.includes('3')) partNumber = 3;
           else if (partStr.includes('4')) partNumber = 4;
-          else partNumber = 2;
+          else if (partStr.includes('2')) partNumber = 2;
         } else if (line.includes('[CHỦ ĐỀ]:')) {
           topic = line.replace(/.*\[CHỦ ĐỀ\]:\s*/i, '').trim();
+        } else if (line.includes('[NGỮ CẢNH]:') || line.includes('[THÔNG BÁO]:')) {
+          passageText = line.replace(/.*\[(NGỮ CẢNH|THÔNG BÁO)\]:\s*/i, '').trim();
         } else if (/\[CÂU HỎI \d+\]:/i.test(line)) {
           const qText = line.replace(/.*\[CÂU HỎI \d+\]:\s*/i, '').trim();
           questions.push({
             questionNumber: questions.length + 1,
             prompt: qText,
-            questionType: QuestionType.SPEAKING_AUDIO,
+            questionType: isWriting
+              ? (partNumber === 1 ? QuestionType.SHORT_TEXT : QuestionType.ESSAY)
+              : QuestionType.SPEAKING_AUDIO,
           });
         }
       }
 
       if (!topic) {
-        topic = `Chủ đề luyện thi Speaking Part ${partNumber} (Bài ${i + 1})`;
+        topic = `Chủ đề luyện thi ${isWriting ? 'Writing' : 'Speaking'} Part ${partNumber} (Bài ${i + 1})`;
         warnings.push('Chưa có thẻ [CHỦ ĐỀ]: Hệ thống tự gán tên chủ đề mặc định.');
       }
 
@@ -233,7 +243,7 @@ export class StandardExamParser {
 
       // Gán hình ảnh
       const imageUrls: string[] = [];
-      const requiredImages = partNumber === 3 ? 2 : 1;
+      const requiredImages = isWriting ? 0 : (partNumber === 3 ? 2 : 1);
 
       for (let imgK = 0; imgK < requiredImages; imgK++) {
         if (mediaFileIndex < mediaFiles.length) {
@@ -249,28 +259,42 @@ export class StandardExamParser {
       }
 
       // Kiểm tra câu hỏi
-      if (questions.length < 3) {
-        // Nếu thiếu thẻ câu hỏi, tự tạo fallback và cảnh báo
+      if (isWriting) {
         if (questions.length === 0) {
-          errors.push('Thiếu các thẻ câu hỏi: Cần có đủ 3 câu [CÂU HỎI 1], [CÂU HỎI 2], [CÂU HỎI 3].');
-        } else {
-          errors.push(`Chưa đủ 3 câu hỏi (hiện chỉ có ${questions.length} câu).`);
+          errors.push('Thiếu thẻ câu hỏi [CÂU HỎI ...].');
+        }
+      } else {
+        if (questions.length < 3) {
+          if (questions.length === 0) {
+            errors.push('Thiếu các thẻ câu hỏi: Cần có đủ 3 câu [CÂU HỎI 1], [CÂU HỎI 2], [CÂU HỎI 3].');
+          } else {
+            errors.push(`Chưa đủ 3 câu hỏi (hiện chỉ có ${questions.length} câu).`);
+          }
         }
       }
 
       const isValid = errors.length === 0;
 
+      const instructions = isWriting
+        ? (partNumber === 1
+            ? 'You want to join a club. Fill in the form with 1 to 5 words for each question.'
+            : partNumber === 2
+            ? 'Please write in full sentences (20–30 words). You have 7 minutes.'
+            : partNumber === 3
+            ? 'You are in the club chat room. Write responses to 3 club members (30–40 words each).'
+            : 'You received an urgent notice from the club. Write an email to a friend (50 words) and an email to the club president (120–150 words).')
+        : (partNumber === 2
+            ? 'In this part, you will see a picture. Answer 3 questions (45 seconds each).'
+            : 'Compare the two pictures and answer 3 questions (45 seconds each).');
+
       validatedExams.push({
         idTemp: `temp_docx_${i + 1}_${Date.now()}`,
-        title: `Speaking Part ${partNumber}: ${topic}`,
-        skill: ExamSkill.SPEAKING,
+        title: `${isWriting ? 'Writing' : 'Speaking'} Part ${partNumber}: ${topic}`,
+        skill: isWriting ? ExamSkill.WRITING : ExamSkill.SPEAKING,
         partNumber,
         topic,
-        instructions:
-          partNumber === 2
-            ? 'In this part, you will see a picture. Answer 3 questions (45 seconds each).'
-            : 'Compare the two pictures and answer 3 questions (45 seconds each).',
-        passageText: vocab.length > 0 ? JSON.stringify({ vocabulary: vocab }) : undefined,
+        instructions,
+        passageText: passageText || (vocab.length > 0 ? JSON.stringify({ vocabulary: vocab }) : undefined),
         imageUrls,
         vocabulary: vocab,
         questions,
@@ -423,7 +447,7 @@ export class StandardExamParser {
           title: item.title,
           description: `Đề thi nhập tự động theo chuẩn Doanh nghiệp. Chủ đề: ${item.topic}`,
           skill: item.skill,
-          duration_minutes: item.skill === ExamSkill.SPEAKING ? 12 : 35,
+          duration_minutes: item.skill === ExamSkill.SPEAKING ? 12 : (item.skill === ExamSkill.WRITING ? 50 : 35),
           is_published: true,
           hot_level: 5,
           forecast_tag: '★★★★★ Hay ra',
@@ -444,7 +468,7 @@ export class StandardExamParser {
                   options: q.options && q.options.length > 0 ? q.options : undefined,
                   correct_answer: q.correctAnswer || null,
                   explanation: q.explanation || null,
-                  max_score: item.skill === ExamSkill.SPEAKING ? 5.0 : 1.0,
+                  max_score: item.skill === ExamSkill.SPEAKING ? 5.0 : (item.skill === ExamSkill.WRITING ? (item.partNumber === 4 ? 10.0 : 5.0) : 1.0),
                 })),
               },
             },

@@ -21,7 +21,19 @@ async function testStandardImport() {
   if (docxResult.exams.length > 0) {
     const e1 = docxResult.exams[0];
     console.log(`   - Đề 1: "${e1.title}" (Part ${e1.partNumber})`);
-    console.log(`   - Số câu hỏi: ${e1.questions.length} | Từ vựng: ${e1.vocabulary.length} từ`);
+  }
+
+  // 1b. Kiểm tra Parse Word Template Mẫu Writing
+  const writingDocxPath = path.resolve('../frontend/public/templates/Mau_Nhap_De_Writing.docx');
+  console.log('\n✍️ 1b. Kiểm định File Word Mẫu Writing (4 Parts)...');
+  if (fs.existsSync(writingDocxPath)) {
+    const writingBuffer = fs.readFileSync(writingDocxPath);
+    const writingResult = standardExamParser.parseAndValidateDocx(writingBuffer, 'Mau_Nhap_De_Writing.docx');
+    console.log(`   - Tổng đề bóc tách: ${writingResult.totalFound}`);
+    console.log(`   - Hợp lệ: ${writingResult.validCount} | Cảnh báo/Lỗi: ${writingResult.invalidCount}`);
+    writingResult.exams.forEach((ex, idx) => {
+      console.log(`   - Đề ${idx + 1}: "${ex.title}" (${ex.skill} Part ${ex.partNumber}) - ${ex.questions.length} câu hỏi - Hợp lệ: ${ex.isValid}`);
+    });
   }
 
   // 2. Kiểm tra Parse Excel Template Mẫu Chuẩn
