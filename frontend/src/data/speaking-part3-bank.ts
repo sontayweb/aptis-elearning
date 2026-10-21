@@ -15,7 +15,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_1",
     "topicNumber": 1,
     "title": "Tranh vài người leo núi + tranh ở biển 0 người",
-    "imageUrl": "/uploads/speaking/part3/image5.png",
+    "imageUrl": "/uploads/speaking/part3/image5.png, /uploads/speaking/part3/beach.jpg",
     "questions": [
       "Tell me what you see in the two pictures.",
       "What's so attractive about these two places?",
@@ -121,7 +121,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_3",
     "topicNumber": 3,
     "title": "Tranh 1 người nhìn máy bay + 1 người đứng đợi tàu",
-    "imageUrl": "/uploads/speaking/part3/image1.jpg",
+    "imageUrl": "/uploads/speaking/part3/image1.jpg, /uploads/speaking/part3/image4.jpg",
     "questions": [
       "Tell me what you see in the two pictures.",
       "Which means of transport do you prefer? Why?",
@@ -174,7 +174,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_4",
     "topicNumber": 4,
     "title": "Người thu hoạch táo + người tưới cây",
-    "imageUrl": "/uploads/speaking/part3/image2.png",
+    "imageUrl": "/uploads/speaking/part3/image2.png, /uploads/speaking/part3/image8.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "What are the attractions of the two pictures?",
@@ -227,7 +227,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_5",
     "topicNumber": 5,
     "title": "Đọc sách truyền thống + đọc sách online",
-    "imageUrl": "/uploads/speaking/part3/image3.png",
+    "imageUrl": "/uploads/speaking/part3/image3.png, /uploads/speaking/part3/image7.png",
     "questions": [
       "Tell me what you see from the two pictures.",
       "Do you prefer reading printed books or e-books?",

@@ -155,6 +155,19 @@ function AudioPlayer({ src, label }: { src: string; label?: string }) {
   );
 }
 
+function resolveExamImageUrl(rawUrl: string | undefined): string {
+  if (!rawUrl) return "";
+  const trimmed = String(rawUrl).trim();
+  if (!trimmed || trimmed === "null" || trimmed === "undefined") return "";
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+  if (trimmed.startsWith("/uploads/") || trimmed.startsWith("uploads/")) {
+    return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  }
+  const apiOrigin = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
+  const clean = trimmed.replace(/^\/+/, "");
+  return `${apiOrigin}/uploads/${clean}`;
+}
+
 /* ====================================================
    SPEAKING RECORDER - Ghi âm + Upload Speaking
    ==================================================== */
@@ -414,6 +427,13 @@ export default function OfficialMockExamRoom() {
               } else if (typeof q.options === "string") {
                 try { opts = JSON.parse(q.options); } catch { opts = q.options; }
               }
+              const rawImgs = (part.image_url || (part as any).imageUrl || "")
+                .split(",")
+                .map((s: string) => s.trim())
+                .filter(Boolean);
+              const pImg1 = (part as any).imageUrl || rawImgs[0] || part.image_url;
+              const pImg2 = (part as any).secondImageUrl || rawImgs[1] || undefined;
+
               flat.push({
                 ...q,
                 options: opts,
@@ -431,7 +451,9 @@ export default function OfficialMockExamRoom() {
                   }
                   return part.passage_text;
                 })(),
-                partImageUrl: part.image_url,
+                partImageUrl: pImg1,
+                partSecondImageUrl: pImg2,
+                partImages: rawImgs,
                 partInstructions: part.instructions,
               });
             }
@@ -2167,17 +2189,63 @@ export default function OfficialMockExamRoom() {
               {activeRevQ.question_type === "SPEAKING_AUDIO" && (
                 <div className="space-y-4">
                   {/* Tranh thi thật nếu có */}
-                  {activeRevQ.partImageUrl && (
+                  {Boolean(activeRevQ.partImageUrl || activeRevQ.image_url) && (
                     <div className="p-3 rounded-2xl border border-exam-border bg-card/60 space-y-2 text-center">
                       <span className="text-xs font-bold text-exam-text-muted block text-left">
                         🖼️ Hình ảnh đề thi:
                       </span>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={activeRevQ.partImageUrl}
-                        alt="Đề thi Speaking"
-                        className="rounded-xl border border-exam-border max-h-72 object-contain mx-auto shadow-sm"
-                      />
+                      {(() => {
+                        const revAll = [
+                          ...(activeRevQ.partImages || []),
+                          activeRevQ.partImageUrl,
+                          activeRevQ.partSecondImageUrl,
+                          activeRevQ.image_url,
+                        ]
+                          .filter(Boolean)
+                          .flatMap((s: string) => String(s).split(","))
+                          .map((s: string) => s.trim())
+                          .filter(Boolean);
+
+                        const uniqueRev = Array.from(new Set(revAll));
+
+                        if (uniqueRev.length >= 2) {
+                          return (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div className="relative rounded-xl border border-exam-border overflow-hidden aspect-[16/10] bg-black/5">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={resolveExamImageUrl(uniqueRev[0])}
+                                  alt="Picture 1"
+                                  className="w-full h-full object-cover"
+                                />
+                                <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/75 text-white font-bold text-[10px] backdrop-blur-xs">
+                                  Picture 1
+                                </span>
+                              </div>
+                              <div className="relative rounded-xl border border-exam-border overflow-hidden aspect-[16/10] bg-black/5">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={resolveExamImageUrl(uniqueRev[1])}
+                                  alt="Picture 2"
+                                  className="w-full h-full object-cover"
+                                />
+                                <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/75 text-white font-bold text-[10px] backdrop-blur-xs">
+                                  Picture 2
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={resolveExamImageUrl(uniqueRev[0] || activeRevQ.partImageUrl)}
+                            alt="Đề thi Speaking"
+                            className="rounded-xl border border-exam-border max-h-72 object-contain mx-auto shadow-sm"
+                          />
+                        );
+                      })()}
                     </div>
                   )}
 
@@ -2602,31 +2670,81 @@ export default function OfficialMockExamRoom() {
                 )}
                 {hasCueImage && (
                   <div className="mb-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-primary mb-2">
-                      🖼️ Hình ảnh đề bài Speaking
-                    </p>
-                    <div className="rounded-xl border border-exam-border overflow-hidden bg-black/5 dark:bg-white/5 flex items-center justify-center p-2">
-                      <img
-                        src={
-                          (() => {
-                            const rawUrl = currentQ.image_url || currentQ.partImageUrl || "";
-                            if (!rawUrl) return "";
-                            if (rawUrl.startsWith("http")) return rawUrl;
-                            const apiOrigin = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
-                            const clean = rawUrl.replace(/^\/+/, "");
-                            if (clean.startsWith("uploads/")) {
-                              return `${apiOrigin}/${clean}`;
-                            }
-                            return `${apiOrigin}/uploads/${clean}`;
-                          })()
-                        }
-                        alt="Speaking Cue"
-                        className="max-h-72 object-contain rounded-lg shadow-xs"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = "none";
-                        }}
-                      />
-                    </div>
+                    {(() => {
+                      const allRaw = [
+                        ...(currentQ.partImages || []),
+                        currentQ.partImageUrl,
+                        currentQ.partSecondImageUrl,
+                        currentQ.image_url,
+                      ]
+                        .filter(Boolean)
+                        .flatMap((s: string) => String(s).split(","))
+                        .map((s: string) => s.trim())
+                        .filter(Boolean);
+
+                      const uniqueImgs = Array.from(new Set(allRaw));
+
+                      if (uniqueImgs.length >= 2) {
+                        return (
+                          <div className="space-y-2">
+                            <p className="text-xs font-bold uppercase tracking-wider text-primary flex items-center justify-between">
+                              <span>🖼️ Hình ảnh đề bài Speaking (Part 3)</span>
+                              <span className="text-[10px] text-exam-text-muted font-normal lowercase">so sánh 2 bức tranh</span>
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div className="relative rounded-xl border border-exam-border overflow-hidden bg-black/5 dark:bg-white/5 aspect-[16/10] flex items-center justify-center p-1 group">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={resolveExamImageUrl(uniqueImgs[0])}
+                                  alt="Picture 1"
+                                  className="w-full h-full object-cover rounded-lg shadow-xs group-hover:scale-105 transition-transform"
+                                />
+                                <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/75 text-white font-bold text-[10px] backdrop-blur-xs">
+                                  Picture 1
+                                </span>
+                              </div>
+                              <div className="relative rounded-xl border border-exam-border overflow-hidden bg-black/5 dark:bg-white/5 aspect-[16/10] flex items-center justify-center p-1 group">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={resolveExamImageUrl(uniqueImgs[1])}
+                                  alt="Picture 2"
+                                  className="w-full h-full object-cover rounded-lg shadow-xs group-hover:scale-105 transition-transform"
+                                />
+                                <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/75 text-white font-bold text-[10px] backdrop-blur-xs">
+                                  Picture 2
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="space-y-2">
+                          <p className="text-xs font-bold uppercase tracking-wider text-primary mb-2">
+                            🖼️ Hình ảnh đề bài Speaking
+                          </p>
+                          <div className="rounded-xl border border-exam-border overflow-hidden bg-black/5 dark:bg-white/5 flex items-center justify-center p-2 relative">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={resolveExamImageUrl(uniqueImgs[0] || "")}
+                              alt="Speaking Cue"
+                              className="max-h-72 object-contain rounded-lg shadow-xs"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = "none";
+                              }}
+                            />
+                            {((currentQ?.partTitle || "").includes("Part 3") || currentQ?.partNumber === 3) && (
+                              <div className="absolute bottom-3 left-3">
+                                <span className="px-2.5 py-1 rounded-md bg-black/70 text-white font-bold text-[11px] backdrop-blur-xs">
+                                  Picture 1 vs Picture 2
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
                 {currentQ.partPassageText && (

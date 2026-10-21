@@ -671,15 +671,52 @@ function SpeakingMarathonContent() {
                     <div>
                       {/* Topic Image */}
                       <div className="relative aspect-[16/10] bg-muted/30 overflow-hidden border-b border-border/60">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={topic.imageUrl}
-                          alt={topic.title}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
-                        <div className="absolute top-2.5 left-2.5">
-                          <span className="px-2 py-0.5 rounded-md bg-purple-700/80 text-white font-bold text-[10px] backdrop-blur-xs">
+                        {(() => {
+                          const imgs = (topic.imageUrl || "").split(",").map((s) => s.trim()).filter(Boolean);
+                          if (imgs.length >= 2) {
+                            return (
+                              <div className="grid grid-cols-2 h-full w-full">
+                                <div className="relative h-full overflow-hidden border-r border-border/40">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={imgs[0]}
+                                    alt={`${topic.title} - Picture 1`}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    loading="lazy"
+                                  />
+                                  <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-white font-bold text-[9px] backdrop-blur-xs">
+                                    Picture 1
+                                  </span>
+                                </div>
+                                <div className="relative h-full overflow-hidden">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={imgs[1]}
+                                    alt={`${topic.title} - Picture 2`}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    loading="lazy"
+                                  />
+                                  <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-white font-bold text-[9px] backdrop-blur-xs">
+                                    Picture 2
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          }
+                          return (
+                            <>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={topic.imageUrl}
+                                alt={topic.title}
+                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                loading="lazy"
+                              />
+                            </>
+                          );
+                        })()}
+                        <div className="absolute top-2.5 left-2.5 z-10">
+                          <span className="px-2 py-0.5 rounded-md bg-purple-700/90 text-white font-bold text-[10px] backdrop-blur-xs shadow-xs">
                             Cặp Tranh 0{topic.topicNumber}
                           </span>
                         </div>
@@ -802,14 +839,50 @@ function SpeakingMarathonContent() {
             {/* Prompt & Picture */}
             <div className="space-y-3">
               {activeQuestion.imageUrl && (
-                <div className="relative aspect-[16/10] max-h-56 rounded-xl overflow-hidden border border-border mx-auto bg-muted/20">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={activeQuestion.imageUrl}
-                    alt="Prompt"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                (() => {
+                  const imgs = (activeQuestion.imageUrl || "")
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                  if (imgs.length >= 2) {
+                    return (
+                      <div className="grid grid-cols-2 gap-3 max-h-56 mx-auto">
+                        <div className="relative aspect-[16/10] rounded-xl overflow-hidden border border-border bg-muted/20">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={imgs[0]}
+                            alt="Picture 1"
+                            className="w-full h-full object-cover"
+                          />
+                          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/75 text-white font-bold text-[10px] backdrop-blur-xs">
+                            Picture 1
+                          </span>
+                        </div>
+                        <div className="relative aspect-[16/10] rounded-xl overflow-hidden border border-border bg-muted/20">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={imgs[1]}
+                            alt="Picture 2"
+                            className="w-full h-full object-cover"
+                          />
+                          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/75 text-white font-bold text-[10px] backdrop-blur-xs">
+                            Picture 2
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="relative aspect-[16/10] max-h-56 rounded-xl overflow-hidden border border-border mx-auto bg-muted/20">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={activeQuestion.imageUrl}
+                        alt="Prompt"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  );
+                })()
               )}
 
               <div className="p-4 rounded-xl bg-muted/40 border border-border/60">

@@ -8,8 +8,13 @@ export function PwaRegister() {
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
-    // 1. Register Service Worker in production / supported environments
+    // Register Service Worker in production
     if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      if (process.env.NODE_ENV !== "production") {
+        navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((r) => r.unregister()));
+        return;
+      }
+
       // Register after page is fully loaded to avoid competing for bandwidth
       const handleLoad = () => {
         navigator.serviceWorker

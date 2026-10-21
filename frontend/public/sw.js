@@ -60,6 +60,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Bypass entirely in local development
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+    return;
+  }
+
   // 2. Bypass API requests — APIs should always be live, never stale
   if (url.pathname.startsWith('/api') || url.pathname.startsWith('/admin')) {
     return;
