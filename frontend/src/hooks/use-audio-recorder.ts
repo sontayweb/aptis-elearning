@@ -60,62 +60,13 @@ export function useAudioRecorder() {
     return "";
   }, []);
 
-  const isSimulatedRef = useRef<boolean>(false);
-  const simIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Tạo tệp âm thanh WAV giọng nói tổng hợp khi không có microphone phần cứng
-  const generateSyntheticAudio = useCallback((durationSeconds: number): { blob: Blob; url: string } => {
-    const sampleRate = 16000;
-    const dur = Math.max(2, durationSeconds || 15);
-    const numSamples = sampleRate * dur;
-    const buffer = new ArrayBuffer(44 + numSamples * 2);
-    const view = new DataView(buffer);
-
-    const writeString = (offset: number, str: string) => {
-      for (let i = 0; i < str.length; i++) {
-        view.setUint8(offset + i, str.charCodeAt(i));
-      }
-    };
-
-    writeString(0, "RIFF");
-    view.setUint32(4, 36 + numSamples * 2, true);
-    writeString(8, "WAVE");
-    writeString(12, "fmt ");
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true); // PCM
-    view.setUint16(22, 1, true); // Mono
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2, true);
-    view.setUint16(32, 2, true);
-    view.setUint16(34, 16, true);
-    writeString(36, "data");
-    view.setUint32(40, numSamples * 2, true);
-
-    let offset = 44;
-    for (let i = 0; i < numSamples; i++) {
-      const t = i / sampleRate;
-      const speechCadence = (t % 2.2) < 1.7 ? 1.0 : 0.05;
-      const formant =
-        Math.sin(2 * Math.PI * 220 * t) * 0.4 +
-        Math.sin(2 * Math.PI * 440 * t) * 0.25 +
-        Math.sin(2 * Math.PI * 880 * t) * 0.1;
-      const sample = Math.max(-1, Math.min(1, formant * speechCadence * 0.35));
-      view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
-      offset += 2;
-    }
-
-    const blob = new Blob([buffer], { type: "audio/wav" });
-    const url = URL.createObjectURL(blob);
-    return { blob, url };
-  }, []);
-
   // Yêu cầu quyền truy cập Microphone
   const requestPermission = useCallback(async (): Promise<boolean> => {
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
       setState((prev) => ({
         ...prev,
         permissionState: "denied",
-        errorMessage: "Trình duyệt không hỗ trợ Web Audio. Đang chuyển sang chế độ ghi âm mô phỏng.",
+        errorMessage: "Trình duyệt không hỗ trợ Web Audio. Vui lòng sử dụng Chrome, Edge hoặc Safari.",
       }));
       return false;
     }
@@ -142,7 +93,7 @@ export function useAudioRecorder() {
       if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
         message = "Bạn đã từ chối quyền Micro. Hãy nhấp vào biểu tượng ổ khóa cạnh thanh địa chỉ để cấp quyền.";
       } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-        message = "Không tìm thấy thiết bị Microphone. Hệ thống sẽ kích hoạt chế độ ghi âm mẫu để bạn kiểm tra bài thi.";
+        message = "Không tìm thấy thiết bị Microphone. Vui lòng kết nối micro hoặc tai nghe để thực hiện bài nói.";
       }
 
       setState((prev) => ({
@@ -193,57 +144,29 @@ export function useAudioRecorder() {
     }
   }, []);
 
-  // Bắt đầu ghi âm (hỗ trợ cả Micro thật và Chế độ mô phỏng)
+  // Bắt đầu ghi âm thật từ Microphone
   const startRecording = useCallback(
-    async (forceSimulate = false): Promise<boolean> => {
-      // Nếu yêu cầu mô phỏng hoặc không có mic thật
-      if (forceSimulate) {
-        isSimulatedRef.current = true;
-        startTimeRef.current = Date.now();
-
-        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-        if (simIntervalRef.current) clearInterval(simIntervalRef.current);
-
-        timerIntervalRef.current = setInterval(() => {
-          setState((prev) => ({
-            ...prev,
-            recordingDuration: Math.round((Date.now() - startTimeRef.current) / 1000),
-          }));
-        }, 500);
-
-        // Mô phỏng sóng âm nhảy múa cho visualizer
-        simIntervalRef.current = setInterval(() => {
-          const fakeVol = Math.floor(35 + Math.random() * 45);
-          setState((prev) => ({ ...prev, volumeLevel: fakeVol }));
-        }, 150);
-
-        setState((prev) => ({
-          ...prev,
-          isRecording: true,
-          errorMessage: null,
-          audioBlob: null,
-          audioUrl: null,
-        }));
-        return true;
-      }
-
+    async (): Promise<boolean> => {
       // Thử dùng micro thật
       let stream = mediaStreamRef.current;
       if (!stream || !stream.active) {
         const granted = await requestPermission();
         if (!granted) {
-          // Micro thật không được cấp quyền -> Tự động chuyển sang chế độ mô phỏng
-          return startRecording(true);
+          return false;
         }
         stream = mediaStreamRef.current;
       }
 
       if (!stream) {
-        return startRecording(true);
+        setState((prev) => ({
+          ...prev,
+          isRecording: false,
+          errorMessage: "Không thể kết nối Microphone. Vui lòng kiểm tra lại thiết bị.",
+        }));
+        return false;
       }
 
       try {
-        isSimulatedRef.current = false;
         audioChunksRef.current = [];
         const mimeType = getSupportedMimeType();
 
@@ -278,24 +201,24 @@ export function useAudioRecorder() {
         }));
 
         return true;
-      } catch {
-        // Nếu MediaRecorder lỗi, fallback sang mô phỏng
-        return startRecording(true);
+      } catch (err: any) {
+        setState((prev) => ({
+          ...prev,
+          isRecording: false,
+          errorMessage: `Không thể bắt đầu ghi âm: ${err.message}`,
+        }));
+        return false;
       }
     },
     [getSupportedMimeType, requestPermission, setupAudioAnalyser]
   );
 
   // Dừng ghi âm và trả về Promise chứa { blob, url, duration }
-  const stopRecording = useCallback((): Promise<{ blob: Blob; url: string; duration: number }> => {
+  const stopRecording = useCallback((): Promise<{ blob: Blob | null; url: string | null; duration: number }> => {
     return new Promise((resolve) => {
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
         timerIntervalRef.current = null;
-      }
-      if (simIntervalRef.current) {
-        clearInterval(simIntervalRef.current);
-        simIntervalRef.current = null;
       }
       if (animFrameRef.current) {
         cancelAnimationFrame(animFrameRef.current);
@@ -304,22 +227,6 @@ export function useAudioRecorder() {
 
       const durationSec = Math.max(1, Math.round((Date.now() - startTimeRef.current) / 1000));
 
-      // 1. Nếu đang ghi âm mô phỏng
-      if (isSimulatedRef.current) {
-        const { blob, url } = generateSyntheticAudio(durationSec);
-        setState((prev) => ({
-          ...prev,
-          isRecording: false,
-          audioBlob: blob,
-          audioUrl: url,
-          recordingDuration: durationSec,
-          volumeLevel: 0,
-        }));
-        resolve({ blob, url, duration: durationSec });
-        return;
-      }
-
-      // 2. Nếu đang ghi âm thật bằng MediaRecorder
       const recorder = mediaRecorderRef.current;
       if (recorder && recorder.state === "recording") {
         try {
@@ -331,16 +238,25 @@ export function useAudioRecorder() {
         }
         recorder.onstop = () => {
           const finalMime = recorder.mimeType || "audio/webm";
-          let blob = new Blob(audioChunksRef.current, { type: finalMime });
-          let url = URL.createObjectURL(blob);
+          const blob = audioChunksRef.current.length > 0
+            ? new Blob(audioChunksRef.current, { type: finalMime })
+            : null;
 
-          // Nếu tệp quá nhỏ (do không có data thực), tạo tệp dự phòng
-          if (blob.size < 100) {
-            const synth = generateSyntheticAudio(durationSec);
-            blob = synth.blob;
-            url = synth.url;
+          if (!blob || blob.size < 50) {
+            setState((prev) => ({
+              ...prev,
+              isRecording: false,
+              audioBlob: null,
+              audioUrl: null,
+              recordingDuration: 0,
+              volumeLevel: 0,
+              errorMessage: "Bản thu không có dữ liệu âm thanh. Vui lòng nói to và rõ hơn.",
+            }));
+            resolve({ blob: null, url: null, duration: 0 });
+            return;
           }
 
+          const url = URL.createObjectURL(blob);
           setState((prev) => ({
             ...prev,
             isRecording: false,
@@ -348,6 +264,7 @@ export function useAudioRecorder() {
             audioUrl: url,
             recordingDuration: durationSec,
             volumeLevel: 0,
+            errorMessage: null,
           }));
 
           if (audioContextRef.current && audioContextRef.current.state !== "closed") {
@@ -359,20 +276,18 @@ export function useAudioRecorder() {
 
         recorder.stop();
       } else {
-        // Fallback tức thì nếu recorder không ở trạng thái recording
-        const { blob, url } = generateSyntheticAudio(durationSec);
         setState((prev) => ({
           ...prev,
           isRecording: false,
-          audioBlob: blob,
-          audioUrl: url,
-          recordingDuration: durationSec,
+          audioBlob: null,
+          audioUrl: null,
+          recordingDuration: 0,
           volumeLevel: 0,
         }));
-        resolve({ blob, url, duration: durationSec });
+        resolve({ blob: null, url: null, duration: 0 });
       }
     });
-  }, [generateSyntheticAudio]);
+  }, []);
 
   // Reset bản thu để nói lại (chỉ cho câu hiện tại)
   const resetRecording = useCallback(() => {

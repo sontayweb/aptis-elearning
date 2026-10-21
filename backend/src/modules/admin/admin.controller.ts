@@ -221,8 +221,38 @@ export class AdminController {
       const page = Number(req.query.page || 1);
       const limit = Number(req.query.limit || 50);
       const skill = req.query.skill as string | undefined;
-      const result = await adminService.listExams(page, limit, skill);
+      const search = req.query.search as string | undefined;
+      const partNumber = req.query.partNumber ? Number(req.query.partNumber) : undefined;
+      const result = await adminService.listExams(page, limit, skill, search, partNumber);
       sendSuccess(res, result.exams, 'Lấy danh sách đề thi thành công', 200, {
+        total: result.total,
+        page: result.page,
+        totalPages: result.totalPages,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async searchQuestions(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = Number(req.query.page || 1);
+      const limit = Number(req.query.limit || 20);
+      const search = req.query.search as string | undefined;
+      const skill = req.query.skill as string | undefined;
+      const partNumber = req.query.partNumber ? Number(req.query.partNumber) : undefined;
+      const questionType = req.query.questionType as string | undefined;
+
+      const result = await adminService.searchQuestions({
+        page,
+        limit,
+        search,
+        skill,
+        partNumber,
+        questionType,
+      });
+
+      sendSuccess(res, result.questions, 'Tìm kiếm câu hỏi thành công', 200, {
         total: result.total,
         page: result.page,
         totalPages: result.totalPages,

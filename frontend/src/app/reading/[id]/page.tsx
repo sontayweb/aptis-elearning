@@ -279,19 +279,20 @@ function ReadingExamRunner() {
         });
       }
     }
+    const isFullExam = examData.part1.gaps.length > 0 && examData.part4.paragraphs.length > 0;
     if (examData.part3.questions.length > 0) {
       list.push({
         stageKey: "p3",
-        title: "Part 4",
-        label: "Part 4 – " + (examData.part3.title || "Opinion Matching"),
+        title: isFullExam ? "Part 3" : (examData.part3.title?.includes("Part 3") ? "Part 3" : "Part 4"),
+        label: (isFullExam ? "Part 3 – " : "Part 4 – ") + (examData.part3.title?.replace(/^Part\s*\d+\s*–?\s*/i, "") || "Opinion Matching"),
         count: examData.part3.questions.length,
       });
     }
     if (examData.part4.paragraphs.length > 0) {
       list.push({
         stageKey: "p4",
-        title: "Part 5",
-        label: "Part 5 – " + (examData.part4.title || "Long Reading"),
+        title: isFullExam ? "Part 4" : (examData.part4.title?.includes("Part 4") ? "Part 4" : "Part 5"),
+        label: (isFullExam ? "Part 4 – " : "Part 5 – ") + (examData.part4.title?.replace(/^Part\s*\d+\s*–?\s*/i, "") || "Long Reading"),
         count: examData.part4.paragraphs.length,
       });
     }
@@ -309,7 +310,12 @@ function ReadingExamRunner() {
 
   // Adjust activeStage if URL contains ?part=
   useEffect(() => {
-    if (!partParam || stages.length === 0) return;
+    if (stages.length === 0) return;
+    if (stages.length === 1) {
+      setActiveStage(0);
+      return;
+    }
+    if (!partParam) return;
     const p = partParam.toLowerCase();
     const targetKey =
       p === "1" || p === "p1" || p === "part1"
@@ -319,7 +325,7 @@ function ReadingExamRunner() {
         : p === "3" || p === "p3" || p === "part3"
         ? (stages.some((s) => s.stageKey === "p2-2") ? "p2-2" : "p3")
         : p === "4" || p === "p4" || p === "part4"
-        ? (stages.some((s) => s.stageKey === "p3") ? "p3" : "p4")
+        ? (stages.some((s) => s.stageKey === "p4") ? "p4" : "p3")
         : p === "5" || p === "p5" || p === "part5"
         ? "p4"
         : null;
@@ -913,16 +919,18 @@ function ReadingExamRunner() {
                       </div>
 
                       {/* Example Sentence */}
-                      <div className="p-4 rounded-xl border border-border/70 bg-card/60 flex items-center gap-2 flex-wrap text-sm md:text-base">
-                        <span>{examData.part1.exampleText.prefix}</span>
-                        <span className="px-3 py-1 rounded-md border border-border bg-muted/60 text-muted-foreground font-bold text-xs select-none">
-                          {examData.part1.exampleText.word}
-                        </span>
-                        <span>{examData.part1.exampleText.suffix}</span>
-                        <span className="text-[11px] text-muted-foreground italic ml-2">
-                          (Câu ví dụ mẫu)
-                        </span>
-                      </div>
+                      {Boolean(examData.part1.exampleText?.word) && (
+                        <div className="p-4 rounded-xl border border-border/70 bg-card/60 flex items-center gap-2 flex-wrap text-sm md:text-base">
+                          <span>{examData.part1.exampleText.prefix}</span>
+                          <span className="px-3 py-1 rounded-md border border-border bg-muted/60 text-muted-foreground font-bold text-xs select-none">
+                            {examData.part1.exampleText.word}
+                          </span>
+                          <span>{examData.part1.exampleText.suffix}</span>
+                          <span className="text-[11px] text-muted-foreground italic ml-2">
+                            (Câu ví dụ mẫu)
+                          </span>
+                        </div>
+                      )}
 
                       {/* Gaps List - Tách rời từng câu riêng biệt, không dính liền */}
                       <div className="space-y-4">
@@ -1693,9 +1701,9 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
     const pNum = p.part_number;
     // Single Source of Truth: Ưu tiên partType chuẩn hóa từ Backend DTO
     const partType = p.partType || 
-      (p.part_number === 4 || (p.title && /part 4|heading|long/i.test(p.title)) ? 'PART_4' :
-       p.part_number === 3 || (p.title && /part 3|opinion/i.test(p.title)) ? 'PART_3' :
-       p.part_number === 2 || (p.title && /part 2|cohesion|order/i.test(p.title)) ? 'PART_2' : 'PART_1');
+      ((p.title && /heading|long|part 5/i.test(p.title)) || p.part_number === 5 || (p.part_number === 4 && (!p.title || !/opinion/i.test(p.title))) ? 'PART_4' :
+       (p.title && /opinion/i.test(p.title)) || p.part_number === 3 ? 'PART_3' :
+       (p.title && /cohesion|order|part 2/i.test(p.title)) || p.part_number === 2 ? 'PART_2' : 'PART_1');
 
     const isP1 = partType === 'PART_1';
     const isP2 = partType === 'PART_2';

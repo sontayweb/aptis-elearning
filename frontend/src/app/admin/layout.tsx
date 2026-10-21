@@ -273,7 +273,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   );
 
   return (
-    <div className="admin-root min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex relative selection:bg-blue-500/20 selection:text-blue-600 font-sans transition-colors duration-200">
+    <div className="admin-root min-h-screen bg-[#F8FAFC] dark:bg-[#090D16] text-slate-900 dark:text-slate-100 flex relative selection:bg-blue-500/20 selection:text-blue-600 font-sans transition-colors duration-200">
       {/* Modals */}
       <AdminTutorialModal isOpen={tutorialOpen} onClose={() => setTutorialOpen(false)} />
       <CommandPalette
@@ -286,61 +286,63 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {mobileSidebarOpen && (
         <div
           onClick={() => setMobileSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden animate-in fade-in"
+          className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm lg:hidden animate-in fade-in duration-200"
         />
       )}
 
-      {/* Apple/Stripe Clean Sidebar */}
+      {/* Enterprise Executive Sidebar */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 flex flex-col transition-all duration-300 shadow-[1px_0_3px_0_rgba(0,0,0,0.02)] ${
+        className={`fixed top-0 bottom-0 left-0 z-50 bg-white dark:bg-[#0D1424] border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col transition-all duration-300 shadow-[1px_0_12px_0_rgba(15,23,42,0.03)] ${
           mobileSidebarOpen ? "translate-x-0 w-72" : "-translate-x-full lg:translate-x-0"
-        } ${isCollapsed ? "lg:w-20" : "lg:w-68"}`}
+        } ${isCollapsed ? "lg:w-[76px]" : "lg:w-[272px]"}`}
       >
         {/* Brand Header */}
         <div
-          className={`h-16 border-b border-slate-200/80 dark:border-slate-800 flex items-center ${
+          className={`h-16 border-b border-slate-200/70 dark:border-slate-800/80 flex items-center ${
             isCollapsed ? "justify-center px-2" : "justify-between px-5"
-          } shrink-0`}
+          } shrink-0 bg-white/50 dark:bg-[#0D1424]/50 backdrop-blur-xs`}
         >
           {isCollapsed ? (
             <button
               id="tour-sidebar-collapse"
               onClick={toggleSidebarCollapse}
               title="Mở rộng thanh điều hướng"
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all flex items-center justify-center group"
+              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all flex items-center justify-center group cursor-pointer"
             >
               <Image
                 src="/logo.webp"
                 alt="APTIS ESOL PREMIER"
-                width={30}
-                height={30}
-                className="h-7 w-7 shrink-0 transition-transform group-hover:scale-105"
+                width={32}
+                height={32}
+                className="h-8 w-8 shrink-0 transition-transform group-hover:scale-105"
                 priority
               />
             </button>
           ) : (
             <>
               <Link href="/admin" className="flex items-center gap-3 overflow-hidden group">
-                <div className="w-8 h-8 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
-                  <Image
-                    src="/logo.webp"
-                    alt="APTIS ESOL PREMIER"
-                    width={24}
-                    height={24}
-                    className="h-6 w-6 shrink-0 transition-transform duration-200 group-hover:scale-105"
-                    priority
-                  />
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 p-[1px] shadow-sm shadow-blue-500/20 shrink-0">
+                  <div className="w-full h-full rounded-[11px] bg-white dark:bg-slate-900 flex items-center justify-center">
+                    <Image
+                      src="/logo.webp"
+                      alt="APTIS ESOL PREMIER"
+                      width={24}
+                      height={24}
+                      className="h-6 w-6 shrink-0 transition-transform duration-200 group-hover:scale-105"
+                      priority
+                    />
+                  </div>
                 </div>
                 <div className="transition-opacity duration-200 min-w-0">
-                  <div className="font-heading font-bold text-sm text-slate-900 tracking-tight leading-tight flex items-center gap-1.5 whitespace-nowrap">
+                  <div className="font-heading font-bold text-sm text-slate-900 dark:text-white tracking-tight leading-tight flex items-center gap-1.5 whitespace-nowrap">
                     <span>Aptis Admin</span>
-                    <span className="inline-flex items-center gap-1 text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Live
+                    <span className="inline-flex items-center gap-1 text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/80">
+                      v2.4
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 whitespace-nowrap font-medium">
-                    PREMIER Workspace
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 whitespace-nowrap font-medium flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                    PREMIER Enterprise
                   </p>
                 </div>
               </Link>
@@ -348,7 +350,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               {/* Close mobile button */}
               <button
                 onClick={() => setMobileSidebarOpen(false)}
-                className="lg:hidden text-slate-500 hover:text-slate-900 p-1 rounded-lg hover:bg-slate-100"
+                className="lg:hidden text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                aria-label="Đóng thanh điều hướng"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -358,7 +361,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 id="tour-sidebar-collapse"
                 onClick={toggleSidebarCollapse}
                 title="Thu gọn thanh điều hướng"
-                className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
               >
                 <PanelLeftClose className="w-4 h-4" />
               </button>
@@ -369,17 +372,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Navigation Groups */}
         <nav
           className={`flex-1 overflow-y-auto overflow-x-hidden ${
-            isCollapsed ? "px-2" : "px-3"
-          } py-4 space-y-4`}
+            isCollapsed ? "px-2.5" : "px-3.5"
+          } py-4 space-y-5 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800`}
         >
           {filteredNavGroups.map((group, groupIdx) => (
             <div key={group.group} className="space-y-1">
               {!isCollapsed ? (
-                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 py-1 font-heading">
-                  {group.group}
+                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 py-1 font-mono flex items-center justify-between">
+                  <span>{group.group}</span>
                 </div>
               ) : (
-                groupIdx > 0 && <div className="h-px bg-slate-200/80 dark:bg-slate-800 mx-2 my-2" />
+                groupIdx > 0 && <div className="h-px bg-slate-200/80 dark:bg-slate-800/80 mx-2 my-2.5" />
               )}
 
               {group.items.map((item) => {
@@ -403,28 +406,28 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         : undefined
                     }
                     className={`group relative flex items-center ${
-                      isCollapsed ? "justify-center w-full py-2 px-0" : "justify-between px-3 py-2"
+                      isCollapsed ? "justify-center w-full py-2.5 px-0" : "justify-between px-3 py-2.5"
                     } rounded-xl font-heading font-medium text-[13px] transition-all duration-150 ${
                       isActive
-                        ? "bg-slate-900 text-white dark:bg-blue-600 dark:text-white font-semibold shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80"
+                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold shadow-sm shadow-blue-600/30 ring-1 ring-blue-500/50"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/50"
                     }`}
                   >
-                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"}`}>
                       <Icon
                         className={`w-4 h-4 shrink-0 transition-transform duration-150 ${
                           isActive
                             ? "text-white"
-                            : "text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                            : "text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:scale-105"
                         }`}
                       />
-                      {!isCollapsed && <span className="whitespace-nowrap">{item.title}</span>}
+                      {!isCollapsed && <span className="whitespace-nowrap tracking-tight">{item.title}</span>}
                     </div>
 
                     {/* Badge for expanded mode */}
                     {!isCollapsed && item.badge && (
                       <span
-                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
+                        className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
                           isActive
                             ? "bg-white/20 text-white"
                             : item.badgeColor || "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
@@ -434,9 +437,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       </span>
                     )}
 
-                    {/* Dot for collapsed mode */}
+                    {/* Dot indicator for collapsed mode */}
                     {isCollapsed && item.badge && (
-                      <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white animate-pulse" />
+                      <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
                     )}
                   </Link>
                 );
@@ -445,19 +448,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           ))}
         </nav>
 
-        {/* Footer Profile with Neat Popover Menu (Guideline 6) */}
-        <div id="tour-profile-footer" className="p-3 pb-4 border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 relative">
-          {/* Trigger: Avatar + Name only */}
+        {/* Footer Profile with Modern Popover Menu */}
+        <div id="tour-profile-footer" className="p-3 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#0B1120] shrink-0 relative">
           <button
             type="button"
             onClick={() => setSidebarProfileOpen(!sidebarProfileOpen)}
             className={`w-full flex items-center ${
-              isCollapsed ? "justify-center p-1" : "justify-between p-2"
-            } rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left group`}
+              isCollapsed ? "justify-center p-1.5" : "justify-between p-2"
+            } rounded-xl hover:bg-white dark:hover:bg-slate-800/70 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all text-left group cursor-pointer shadow-none hover:shadow-xs`}
             title={isCollapsed ? user?.full_name || "Quản trị viên" : undefined}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-xs group-hover:scale-105 transition-transform">
                 {user?.full_name?.charAt(0) || "A"}
               </div>
               {!isCollapsed && (
@@ -465,8 +467,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <div className="text-xs font-semibold text-slate-900 dark:text-white truncate">
                     {user?.full_name || "Quản trị viên"}
                   </div>
-                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono truncate">
-                    {isSuperAdmin ? "Super Admin" : "Admin"}
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono truncate flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                    {isSuperAdmin ? "Super Admin" : "Operator Admin"}
                   </div>
                 </div>
               )}
@@ -485,8 +488,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div
               onClick={() => setSidebarProfileOpen(false)}
               className={`absolute ${
-                isCollapsed ? "left-16 bottom-2 w-56" : "bottom-full left-3 right-3 mb-2"
-              } rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-50 text-xs animate-in fade-in slide-in-from-bottom-2`}
+                isCollapsed ? "left-[82px] bottom-2 w-60" : "bottom-full left-3 right-3 mb-2"
+              } rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-900/10 p-2 z-50 text-xs animate-in fade-in zoom-in-95`}
             >
               <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
                 <div className="flex items-center justify-between gap-2">
@@ -494,7 +497,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     {user?.full_name}
                   </span>
                   <span
-                    className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                    className={`text-[9px] font-mono px-1.5 py-0.5 rounded-md font-bold ${
                       isSuperAdmin
                         ? "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400"
                         : "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400"
@@ -511,31 +514,31 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <div className="space-y-0.5">
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Portal Học viên</span>
+                  <span>Về Portal Học viên</span>
                 </Link>
 
                 <button
                   type="button"
                   onClick={() => setTutorialOpen(true)}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-rose-500" />
+                  <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                   <span>Hướng dẫn vận hành</span>
                 </button>
               </div>
 
-              <div className="h-px bg-slate-100 dark:border-slate-800 my-1" />
+              <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
 
               <button
                 type="button"
                 onClick={logout}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors font-medium text-left"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors font-medium text-left cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Đăng xuất</span>
+                <span>Đăng xuất Quản trị</span>
               </button>
             </div>
           )}
@@ -545,26 +548,28 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Main Content Shell */}
       <div
         className={`flex-1 flex flex-col min-h-screen transition-[padding] duration-300 ${
-          isCollapsed ? "lg:pl-20" : "lg:pl-68"
+          isCollapsed ? "lg:pl-[76px]" : "lg:pl-[272px]"
         }`}
       >
-        {/* Clean Executive Header (Guideline 1) */}
-        <header className="h-16 px-5 sm:px-8 border-b border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between gap-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.02)]">
+        {/* Modern Executive Top Header */}
+        <header className="h-16 px-5 sm:px-8 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-[#090D16]/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between gap-4 shadow-[0_1px_3px_0_rgba(15,23,42,0.02)]">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileSidebarOpen(true)}
-              className="lg:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="lg:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              aria-label="Mở menu điều hướng"
             >
               <Menu className="w-5 h-5" />
             </button>
 
             {/* Breadcrumb Navigation */}
             <div className="flex items-center gap-2 text-xs font-heading font-medium text-slate-500 dark:text-slate-400">
-              <Link href="/admin" className="hover:text-slate-900 dark:hover:text-white transition-colors font-medium">
-                Quản trị
+              <Link href="/admin" className="hover:text-slate-900 dark:hover:text-white transition-colors font-medium flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Quản trị</span>
               </Link>
               <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
-              <span className="text-slate-900 dark:text-white font-semibold">{currentNav?.title || "Bảng điều khiển"}</span>
+              <span className="text-slate-900 dark:text-white font-semibold tracking-tight">{currentNav?.title || "Bảng điều khiển"}</span>
             </div>
           </div>
 
@@ -574,12 +579,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <button
               id="tour-search-btn"
               onClick={() => setCommandPaletteOpen(true)}
-              className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-xs transition-all shadow-none"
+              className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-xs transition-all shadow-none cursor-pointer"
             >
               <Search className="w-3.5 h-3.5 text-slate-400" />
-              <span className="font-medium">Tìm nhanh...</span>
+              <span className="font-medium">Tìm tác vụ nhanh...</span>
               <kbd className="px-1.5 py-0.5 rounded-md bg-white dark:bg-slate-900 text-[10px] font-mono text-slate-400 border border-slate-200 dark:border-slate-700 shadow-2xs">
-                ctrl k
+                ⌘K
               </kbd>
             </button>
 
@@ -587,7 +592,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <button
               type="button"
               onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
-              className="flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors shadow-2xs"
+              className="flex items-center justify-center h-8.5 w-8.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors shadow-2xs cursor-pointer"
               title={currentTheme === "dark" ? "Chuyển sang giao diện Sáng" : "Chuyển sang giao diện Tối"}
               aria-label="Chuyển đổi giao diện Sáng / Tối"
             >
@@ -598,14 +603,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               )}
             </button>
 
-            {/* Notifications Popover (Guideline 1: Popovers only) */}
+            {/* Notifications Popover */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className="relative flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors shadow-2xs"
-                title="Thông báo hệ thống"
-                aria-label="Thông báo hệ thống"
+                className="relative flex items-center justify-center h-8.5 w-8.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors shadow-2xs cursor-pointer"
+                title="Thông báo vận hành"
+                aria-label="Thông báo vận hành"
               >
                 <Bell className="w-4 h-4" />
                 {pendingTxCount > 0 && (
@@ -616,11 +621,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               {notificationsOpen && (
                 <div
                   onClick={() => setNotificationsOpen(false)}
-                  className="absolute right-0 mt-2 w-80 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-3 z-50 text-xs animate-in fade-in zoom-in-95"
+                  className="absolute right-0 mt-2 w-84 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-950/10 p-3.5 z-50 text-xs animate-in fade-in zoom-in-95"
                 >
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-2">
+                  <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800 mb-2.5">
                     <span className="font-heading font-bold text-slate-900 dark:text-white">
-                      Thông báo vận hành
+                      Trung tâm thông báo
                     </span>
                     {pendingTxCount > 0 && (
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
@@ -633,15 +638,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     {pendingTxCount > 0 ? (
                       <Link
                         href="/admin/transactions"
-                        className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-2.5 hover:bg-amber-500/15 transition-colors block"
+                        className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-2.5 hover:bg-amber-500/15 transition-colors block"
                       >
                         <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                         <div>
                           <div className="font-semibold text-amber-900 dark:text-amber-300">
-                            {pendingTxCount} đơn nạp SePay đang chờ duyệt
+                            {pendingTxCount} đơn SePay đang chờ đối soát
                           </div>
                           <div className="text-[11px] text-amber-700/80 dark:text-amber-400/80 mt-0.5">
-                            Bấm để mở trang giao dịch và khớp lệnh thủ công
+                            Bấm để mở danh sách giao dịch và khớp lệnh tức thì
                           </div>
                         </div>
                       </Link>
@@ -653,7 +658,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
                     <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800 flex items-center gap-2.5 text-slate-600 dark:text-slate-300">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                      <span className="text-[11px]">MB Bank VietQR Webhook đang lắng nghe 24/7</span>
+                      <span className="text-[11px]">MB Bank VietQR Webhook đang sẵn sàng 24/7</span>
                     </div>
                   </div>
                 </div>
@@ -661,7 +666,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </div>
 
             {/* Realtime Status Pill */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-[11px] font-medium font-mono">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>MB Bank Synced</span>
             </div>
@@ -670,7 +675,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="relative">
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs hover:brightness-110 transition-all"
+                className="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs hover:brightness-110 transition-all cursor-pointer ring-2 ring-blue-500/20"
               >
                 {user?.full_name?.charAt(0) || "A"}
               </button>
@@ -678,74 +683,38 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               {profileDropdownOpen && (
                 <div
                   onClick={() => setProfileDropdownOpen(false)}
-                  className="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-1.5 z-50 text-xs animate-in fade-in zoom-in-95"
+                  className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-50 text-xs animate-in fade-in zoom-in-95"
                 >
                   <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
                     <div className="font-heading font-bold text-slate-900 dark:text-white truncate">{user?.full_name}</div>
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">{user?.email}</div>
                   </div>
 
-                  {/* Theme Switcher Options */}
-                  <div className="px-3 pt-1 pb-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                    Giao diện
-                  </div>
-                  <div className="grid grid-cols-2 gap-1 px-1 mb-2">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTheme("light");
-                      }}
-                      className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                        currentTheme === "light"
-                          ? "bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-800"
-                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      }`}
+                  <div className="space-y-0.5">
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
-                      <Sun className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Sáng</span>
-                    </button>
+                      <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Về Portal Học viên</span>
+                    </Link>
+
                     <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTheme("dark");
-                      }}
-                      className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                        currentTheme === "dark"
-                          ? "bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-800"
-                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      }`}
+                      onClick={logout}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors font-medium text-left cursor-pointer"
                     >
-                      <Moon className="w-3.5 h-3.5" />
-                      <span>Tối</span>
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Đăng xuất Quản trị</span>
                     </button>
                   </div>
-
-                  <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
-
-                  <Link
-                    href="/dashboard"
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium"
-                  >
-                    <ArrowLeft className="w-4 h-4 text-slate-400" />
-                    <span>Về Portal Học viên</span>
-                  </Link>
-                  <button
-                    onClick={logout}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors font-medium text-left"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Đăng xuất Quản trị</span>
-                  </button>
                 </div>
               )}
             </div>
           </div>
         </header>
 
-        {/* Page Inner Container (Flexible wide screen layout per Guideline 4) */}
-        <main className="admin-main flex-1 p-5 sm:p-8 w-full max-w-[1680px] mx-auto">{children}</main>
+        {/* Page Inner Container (Flexible wide screen layout) */}
+        <main className="admin-main flex-1 p-5 sm:p-7 md:p-8 w-full max-w-[1720px] mx-auto">{children}</main>
       </div>
     </div>
   );

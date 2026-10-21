@@ -614,71 +614,150 @@ export class ExamService {
         }
       }
 
-      // Chuẩn hóa partType và thời gian khảo thí theo chuẩn British Council (Single Source of Truth)
+      // Cấu hình chuẩn hóa khảo thí theo từng Part thực tế (Áp dụng cho cả Đề Đơn Lẻ và FULL_TEST)
       const partTitleLower = (part.title || '').toLowerCase();
       const examTitleLower = (exam.title || '').toLowerCase();
-      let partType: 'PART_1' | 'PART_2' | 'PART_3' | 'PART_4' = 'PART_1';
-
-      if (
-        partTitleLower.includes('part 4') ||
-        partTitleLower.includes('part4') ||
-        partTitleLower.includes('heading') ||
-        partTitleLower.includes('email') ||
-        (part.part_number === 4 && exam.parts.length === 4) ||
-        examTitleLower.includes('part 4') ||
-        examTitleLower.includes('part4')
-      ) {
-        partType = 'PART_4';
-      } else if (
-        partTitleLower.includes('part 3') ||
-        partTitleLower.includes('part3') ||
-        partTitleLower.includes('opinion') ||
-        partTitleLower.includes('three questions') ||
-        partTitleLower.includes('chat') ||
-        (part.part_number === 3 && exam.parts.length === 4) ||
-        examTitleLower.includes('part 3') ||
-        examTitleLower.includes('part3')
-      ) {
-        partType = 'PART_3';
-      } else if (
-        partTitleLower.includes('part 2') ||
-        partTitleLower.includes('part2') ||
-        partTitleLower.includes('cohesion') ||
-        partTitleLower.includes('order') ||
-        partTitleLower.includes('short text') ||
-        partTitleLower.includes('social') ||
-        (part.part_number === 2 && exam.parts.length === 4) ||
-        examTitleLower.includes('part 2') ||
-        examTitleLower.includes('part2')
-      ) {
-        partType = 'PART_2';
-      } else {
-        partType = 'PART_1';
-      }
-      (part as any).partType = partType;
-
-      // Cấu hình chuẩn hóa khảo thí theo từng Part thực tế (Áp dụng cho cả Đề Đơn Lẻ và FULL_TEST)
       const isSpeakingPart = exam.skill === 'SPEAKING' || partTitleLower.includes('speaking') || partTitleLower.includes('nói');
       const isWritingPart = exam.skill === 'WRITING' || partTitleLower.includes('writing') || partTitleLower.includes('viết');
       const isReadingPart = exam.skill === 'READING' || partTitleLower.includes('reading') || partTitleLower.includes('đọc');
       const isGrammarVocabPart = exam.skill === 'GRAMMAR_VOCABULARY' || partTitleLower.includes('grammar') || partTitleLower.includes('vocab');
 
+      let partType: 'PART_1' | 'PART_2' | 'PART_3' | 'PART_4' = 'PART_1';
+
+      if (isReadingPart) {
+        // Chuẩn hóa Reading theo Aptis ESOL British Council:
+        // - Part 1: Sentence completion (Gap fill)
+        // - Part 2: Text cohesion (Ordering sentences)
+        // - Part 3: Text reading (Opinion matching 4 người A, B, C, D - trong DB nhiều bộ gán tên "Part 4 – Opinion matching")
+        // - Part 4: Long text reading (Heading matching 7 đoạn - trong DB gán tên "Part 5 – Long reading")
+        if (
+          partTitleLower.includes('heading') ||
+          partTitleLower.includes('long reading') ||
+          partTitleLower.includes('long text') ||
+          partTitleLower.includes('part 5') ||
+          partTitleLower.includes('part5') ||
+          part.part_number === 5 ||
+          (partTitleLower.includes('part 4') && !partTitleLower.includes('opinion'))
+        ) {
+          partType = 'PART_4';
+        } else if (
+          partTitleLower.includes('opinion') ||
+          partTitleLower.includes('person') ||
+          partTitleLower.includes('part 3') ||
+          partTitleLower.includes('part3') ||
+          (part.part_number === 4 && partTitleLower.includes('opinion')) ||
+          (part.part_number === 3 && exam.parts.length === 4)
+        ) {
+          partType = 'PART_3';
+        } else if (
+          partTitleLower.includes('cohesion') ||
+          partTitleLower.includes('order') ||
+          partTitleLower.includes('part 2') ||
+          partTitleLower.includes('part2') ||
+          part.part_number === 2
+        ) {
+          partType = 'PART_2';
+        } else {
+          partType = 'PART_1';
+        }
+      } else if (isSpeakingPart) {
+        if (
+          partTitleLower.includes('part 4') ||
+          partTitleLower.includes('part4') ||
+          partTitleLower.includes('abstract') ||
+          partTitleLower.includes('long turn') ||
+          part.part_number === 4
+        ) {
+          partType = 'PART_4';
+        } else if (
+          partTitleLower.includes('part 3') ||
+          partTitleLower.includes('part3') ||
+          partTitleLower.includes('compare') ||
+          partTitleLower.includes('so sánh') ||
+          (part.part_number === 3 && !partTitleLower.includes('part 2'))
+        ) {
+          partType = 'PART_3';
+        } else if (
+          partTitleLower.includes('part 2') ||
+          partTitleLower.includes('part2') ||
+          partTitleLower.includes('describe') ||
+          partTitleLower.includes('mô tả') ||
+          part.part_number === 2
+        ) {
+          partType = 'PART_2';
+        } else {
+          partType = 'PART_1';
+        }
+      } else {
+        if (
+          partTitleLower.includes('part 4') ||
+          partTitleLower.includes('part4') ||
+          partTitleLower.includes('heading') ||
+          partTitleLower.includes('email') ||
+          (part.part_number === 4 && exam.parts.length === 4) ||
+          examTitleLower.includes('part 4') ||
+          examTitleLower.includes('part4')
+        ) {
+          partType = 'PART_4';
+        } else if (
+          partTitleLower.includes('part 3') ||
+          partTitleLower.includes('part3') ||
+          (partTitleLower.includes('opinion') && !partTitleLower.includes('part 2')) ||
+          partTitleLower.includes('three questions') ||
+          partTitleLower.includes('chat') ||
+          (part.part_number === 3 && exam.parts.length === 4) ||
+          examTitleLower.includes('part 3') ||
+          examTitleLower.includes('part3')
+        ) {
+          partType = 'PART_3';
+        } else if (
+          partTitleLower.includes('part 2') ||
+          partTitleLower.includes('part2') ||
+          partTitleLower.includes('cohesion') ||
+          partTitleLower.includes('order') ||
+          partTitleLower.includes('short text') ||
+          partTitleLower.includes('social') ||
+          (part.part_number === 2 && exam.parts.length === 4) ||
+          examTitleLower.includes('part 2') ||
+          examTitleLower.includes('part2')
+        ) {
+          partType = 'PART_2';
+        } else {
+          partType = 'PART_1';
+        }
+      }
+      (part as any).partType = partType;
+
       if (isSpeakingPart) {
         if (partType === 'PART_4') {
           part.image_url = null;
+          (part as any).imageUrl = null;
+          (part as any).secondImageUrl = null;
+          (part as any).images = [];
           (part as any).prepTime = 60;
           (part as any).speakTime = 120;
           (part as any).partSubtitle = 'Part 4 - Abstract Discussion';
         } else if (partType === 'PART_2') {
+          const imgs = (part.image_url || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+          (part as any).imageUrl = imgs[0] || null;
+          (part as any).secondImageUrl = null;
+          (part as any).images = imgs;
           (part as any).prepTime = 12;
           (part as any).speakTime = 45;
           (part as any).partSubtitle = 'Part 2 - Describe & Opinion';
         } else if (partType === 'PART_3') {
+          const imgs = (part.image_url || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+          (part as any).imageUrl = imgs[0] || null;
+          (part as any).secondImageUrl = imgs[1] || null;
+          (part as any).images = imgs;
           (part as any).prepTime = 12;
           (part as any).speakTime = 45;
           (part as any).partSubtitle = 'Part 3 - Compare & Explain';
         } else {
           part.image_url = null;
+          (part as any).imageUrl = null;
+          (part as any).secondImageUrl = null;
+          (part as any).images = [];
           (part as any).prepTime = 5;
           (part as any).speakTime = 30;
           (part as any).partSubtitle = 'Part 1 - Personal Information';

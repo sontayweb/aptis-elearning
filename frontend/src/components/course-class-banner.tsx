@@ -25,6 +25,7 @@ import {
   Check,
   CreditCard,
   QrCode,
+  AlertCircle,
 } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { useSiteSettings } from "@/contexts/site-settings-context";
@@ -208,6 +209,7 @@ export function CourseClassBanner() {
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [copiedAccount, setCopiedAccount] = useState(false);
 
   useEffect(() => {
@@ -229,6 +231,7 @@ export function CourseClassBanner() {
     setSelectedBatch(batch);
     setActiveTab(tab);
     setSubmitSuccess(false);
+    setSubmitError(null);
     setModalOpen(true);
   };
 
@@ -237,8 +240,9 @@ export function CourseClassBanner() {
     if (!fullName.trim() || !phoneNumber.trim()) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      await api.courses.registerLead({
+      const res = await api.courses.registerLead({
         batchId: selectedBatch?.id,
         batchDateStr: selectedBatch?.dateStr,
         fullName: fullName.trim(),
@@ -246,10 +250,15 @@ export function CourseClassBanner() {
         note: note.trim() || undefined,
         targetBand: "B2",
       });
+      if (res && res.success === false) {
+        throw new Error(res.message || "Gửi thông tin đăng ký thất bại.");
+      }
       setSubmitSuccess(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Lỗi khi đăng ký giữ chỗ:", err);
-      setSubmitSuccess(true); // Fallback friendly UX
+      setSubmitError(
+        err?.message || "Không thể kết nối máy chủ để lưu thông tin. Vui lòng bấm Nhắn Zalo hoặc gọi Hotline để giữ chỗ ngay!"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -799,6 +808,14 @@ export function CourseClassBanner() {
 
                       {/* Form gửi thông tin */}
                       <form onSubmit={handleSubmitLead} className="space-y-3">
+                        {submitError && (
+                          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs flex items-start gap-2">
+                            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
+                            <div className="flex-1">
+                              <p className="font-semibold">{submitError}</p>
+                            </div>
+                          </div>
+                        )}
                         <div>
                           <label className="block text-xs font-bold text-foreground mb-1.5">
                             Họ và tên <span className="text-rose-500">*</span>

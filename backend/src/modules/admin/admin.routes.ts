@@ -59,6 +59,7 @@ router.patch('/parts/:partId', (req, res, next) => adminController.updatePart(re
 router.delete('/parts/:partId', (req, res, next) => adminController.deletePart(req, res, next));
 
 // Content Editor — Questions
+router.get('/questions', (req, res, next) => adminController.searchQuestions(req, res, next));
 router.post('/parts/:partId/questions', (req, res, next) => adminController.addQuestion(req, res, next));
 router.patch('/questions/:questionId', (req, res, next) => adminController.updateQuestion(req, res, next));
 router.delete('/questions/:questionId', (req, res, next) => adminController.deleteQuestion(req, res, next));

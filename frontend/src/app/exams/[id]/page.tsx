@@ -49,14 +49,16 @@ export default function ExamDispatcherPage() {
             router.replace(targetUrl);
           }
           return;
+        } else {
+          if (isMounted) {
+            setError(res?.message || "Không tìm thấy thông tin đề thi trong hệ thống.");
+          }
         }
-      } catch (err) {
-        console.warn("Could not determine exam skill, defaulting to Full Test room:", err);
-      }
-
-      // Fallback to Full Test room if fetch fails
-      if (isMounted) {
-        router.replace(`/thi-thu/${examId}`);
+      } catch (err: any) {
+        console.error("Could not determine exam skill:", err);
+        if (isMounted) {
+          setError(err?.message || "Lỗi kết nối khi tải cấu hình đề thi. Vui lòng thử lại.");
+        }
       }
     }
 
@@ -66,6 +68,39 @@ export default function ExamDispatcherPage() {
       isMounted = false;
     };
   }, [examId, router]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white p-6">
+        <div className="text-center space-y-4 max-w-sm p-6 rounded-2xl bg-slate-800 border border-slate-700 shadow-xl">
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto border border-rose-500/30">
+            <span className="text-xl font-bold">!</span>
+          </div>
+          <h2 className="font-heading font-bold text-lg text-white">Không thể kết nối phòng thi</h2>
+          <p className="text-xs text-slate-400 leading-relaxed">{error}</p>
+          <div className="pt-2 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => router.push("/exams")}
+              className="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold transition-colors cursor-pointer"
+            >
+              Quay lại danh sách
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setError(null);
+                window.location.reload();
+              }}
+              className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold transition-colors cursor-pointer"
+            >
+              Thử lại
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white p-6">

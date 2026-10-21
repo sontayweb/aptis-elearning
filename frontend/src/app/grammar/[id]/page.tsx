@@ -27,7 +27,6 @@ import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-statu
 
 import {
   type Question,
-  DEFAULT_GRAMMAR_QUESTIONS,
 } from "@/data/grammar-benchmark";
 
 export default function GrammarExamRunner() {
@@ -35,15 +34,15 @@ export default function GrammarExamRunner() {
   const router = useRouter();
   const examId = params.id as string;
 
-  const [questions, setQuestions] = useState<Question[]>(DEFAULT_GRAMMAR_QUESTIONS);
-  const [examTitle, setExamTitle] = useState<string>("Đề 01 — Full Grammar & Vocabulary · 50 Questions");
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [examTitle, setExamTitle] = useState<string>("Grammar & Vocabulary");
   const [durationMinutes, setDurationMinutes] = useState<number>(25);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [flagged, setFlagged] = useState<Record<number, boolean>>({});
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error" | "resumed">("idle");
@@ -118,19 +117,13 @@ export default function GrammarExamRunner() {
           setQuestions(loadedQuestions);
           setCurrentIndex(0);
         } else {
-          // Dùng bộ đề tiêu chuẩn mẫu
-          setQuestions(DEFAULT_GRAMMAR_QUESTIONS);
-          setCurrentIndex(0);
+          setError("Bộ đề này hiện chưa có câu hỏi nào được cập nhật.");
         }
       } else {
-        // Fallback bộ 50 câu tiêu chuẩn
-        setQuestions(DEFAULT_GRAMMAR_QUESTIONS);
-        setCurrentIndex(0);
+        setError(res?.message || "Không thể tải danh sách câu hỏi cho đề thi này.");
       }
-    } catch {
-      // Khi offline hoặc id mẫu, tự động nạp bộ 50 câu chuẩn Aptis ESOL
-      setQuestions(DEFAULT_GRAMMAR_QUESTIONS);
-      setCurrentIndex(0);
+    } catch (err: any) {
+      setError(err?.message || "Lỗi kết nối khi tải đề thi. Vui lòng kiểm tra lại đường truyền.");
     } finally {
       setLoading(false);
     }

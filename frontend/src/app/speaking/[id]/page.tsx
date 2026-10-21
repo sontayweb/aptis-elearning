@@ -163,9 +163,9 @@ function resolveSpeakingSampleAnswers(
     (pLower.includes("experience") && pLower.includes("life"))
   ) {
     return {
-      b1: "I had a very similar experience last semester when I worked on a group assignment with my close classmates at university. We met at a cozy coffee shop near our campus to discuss our topic, prepare the slides, and divide the tasks. We had a great time sharing creative ideas, helping each other, and laughing together. In the end, our team got a high score, and that memorable experience really brought us much closer together.",
-      b2: "Looking at this picture truly reminds me of a memorable collaborative project I participated in during my final year at university. My teammates and I gathered regularly at a local cafe with our laptops to conduct research, brainstorm creative solutions, and assemble our final presentation. Although we encountered several challenges coordinating our perspectives, we managed to foster excellent teamwork and constructive discussions. Ultimately, our combined efforts paid off with an outstanding grade, and that valuable experience taught me crucial lessons about effective communication and teamwork under pressure.",
-      guidance: resolvedGuidance || "Nói về trải nghiệm cá nhân liên quan đến bối cảnh bức tranh.",
+      b1: "Looking at this picture reminds me of a time when I had a very memorable experience related to this activity. I remember that I was with my friends, and we had a great time sharing ideas, supporting each other, and enjoying the moment. That experience brought us closer and left a lasting positive impression on me.",
+      b2: "This visual context brings to mind a particularly memorable occasion in my life when I participated in a similar activity. At that time, my peers and I collaborated closely to overcome challenges and achieve our shared objective. Although the process was demanding, the camaraderie and sense of accomplishment made it truly worthwhile, teaching me invaluable lessons about teamwork and perseverance.",
+      guidance: resolvedGuidance || "Khung kể trải nghiệm bản thân: 1. Nêu bối cảnh/sự kiện tương tự -> 2. Diễn biến và người cùng tham gia -> 3. Cảm xúc & bài học rút ra.",
     };
   }
 
@@ -176,9 +176,9 @@ function resolveSpeakingSampleAnswers(
     pLower.includes("describe this picture")
   ) {
     return {
-      b1: "In this picture, I can see a group of young people sitting together around a wooden table in a cafe. They are looking at their laptops and working on a project together. A woman in the center is smiling and laughing happily while communicating with her friends. The atmosphere looks very pleasant, friendly, and energetic.",
-      b2: "This picture captures a lively and collaborative moment among three young adults, presumably university students or young professionals working together in a cozy cafe. In the foreground, a woman is typing on her laptop while engaging in an upbeat discussion with her peers. The person in the denim jacket is smiling warmly and actively listening. The modern interior and warm natural lighting create a productive yet relaxed ambiance, reflecting modern teamwork.",
-      guidance: resolvedGuidance || "Miêu tả tổng quan: Ai? Ở đâu? Đang làm gì? Cảm xúc và không gian xung quanh.",
+      b1: "In this picture, I can see the main subjects engaged in their activity. In the foreground, there are clear details showing their actions and expressions. The background reveals the surrounding environment and setting. Overall, the atmosphere seems very lively, engaging, and pleasant.",
+      b2: "This photograph captures a vibrant scene depicting the central subjects immersed in their setting. In the foreground, prominent details highlight their dynamic interactions and focused expressions, while the background provides rich contextual elements that reflect the overall ambiance. The balanced composition conveys a sense of energy and purpose.",
+      guidance: resolvedGuidance || "Khung miêu tả tranh: 1. Tổng quan (Ai/Cái gì, ở đâu) -> 2. Cận cảnh tiền cảnh (Hành động, biểu cảm) -> 3. Hậu cảnh & Không gian chung.",
     };
   }
 
@@ -190,9 +190,9 @@ function resolveSpeakingSampleAnswers(
     (pLower.includes("important") && pLower.includes("activity"))
   ) {
     return {
-      b1: "In my opinion, studying or working in groups is very important because it allows people to learn from one another and solve difficult problems together. When people share their knowledge, they can finish tasks faster and achieve better results. In addition, meeting in a relaxing environment like a cafe helps reduce stress, boosts creativity, and strengthens friendships among colleagues or classmates.",
-      b2: "From my perspective, collaborative activities like group study or brainstorming sessions play an indispensable role in both academic and professional success. Firstly, they foster diverse viewpoints, allowing individuals to approach complex challenges from multiple angles and arrive at innovative solutions. Secondly, working alongside peers in dynamic settings promotes essential interpersonal soft skills, such as active listening, constructive debate, and emotional intelligence, which are vital for career advancement in today's interconnected world.",
-      guidance: resolvedGuidance || "Đánh giá quan điểm và lợi ích xã hội / cá nhân.",
+      b1: "In my opinion, this activity is very important because it offers meaningful benefits to people. Firstly, it helps individuals develop practical skills and decompress after stressful working hours. In addition, participating in such activities strengthens social bonds and encourages a healthy, positive lifestyle.",
+      b2: "From an analytical perspective, this activity plays an indispensable role in contemporary life for several compelling reasons. Firstly, it provides individuals with a vital outlet to recharge mental energy and foster essential life competencies. Furthermore, engaging in such pursuits cultivates interpersonal connections and promotes overall well-being in an increasingly demanding society.",
+      guidance: resolvedGuidance || "Khung nêu quan điểm: 1. Khẳng định tầm quan trọng -> 2. Luận điểm thứ nhất (kỹ năng/thư giãn) -> 3. Luận điểm thứ hai (xã hội/sức khỏe).",
     };
   }
 
@@ -204,9 +204,9 @@ function resolveSpeakingSampleAnswers(
     (pLower.includes("compare") && pLower.includes("picture"))
   ) {
     return {
-      b1: "Both pictures illustrate different ways people spend their time. In the first picture, I can see people engaging in outdoor activities surrounded by nature, looking energetic and refreshed. In contrast, the second picture depicts individuals staying indoors, focusing on digital screens. The primary difference is the environment and the level of physical activity involved.",
-      b2: "Both photographs portray contrasting lifestyles and recreational pursuits. The first image depicts an energetic outdoor scene where individuals are immersed in nature, highlighting vitality, fresh air, and physical wellness. Conversely, the second image showcases an indoor setting where individuals are engaged with modern technological devices. The stark contrast between natural tranquility and contemporary digital convenience is clearly evident here.",
-      guidance: resolvedGuidance || "Cấu trúc: Both pictures show... In the first picture... Whereas in the second picture...",
+      b1: "Both pictures illustrate different aspects of the same theme. In the first picture, I can see the first situation with its distinct setting and active atmosphere. In contrast, the second picture shows an alternative approach with different surroundings. The primary difference lies in the environment and the way people engage with the situation.",
+      b2: "Both photographs portray contrasting dimensions of this theme. The first image depicts a dynamic setting where the subjects are actively engaged in their environment, highlighting vitality and direct interaction. Conversely, the second image showcases an alternative context with distinct conditions. The stark contrast between these two scenarios illustrates varying preferences and lifestyle approaches.",
+      guidance: resolvedGuidance || "Khung so sánh 2 tranh: Both pictures illustrate... In the first picture... In contrast, the second picture... The main difference is...",
     };
   }
 
@@ -217,9 +217,9 @@ function resolveSpeakingSampleAnswers(
     pLower.includes("which option")
   ) {
     return {
-      b1: "If I had to choose between the two options, I would definitely prefer the first one. Spending time outdoors helps me recharge my energy and disconnect from digital screens after stressful working hours. It also gives me a wonderful opportunity to stay healthy and appreciate nature.",
-      b2: "Personally speaking, I would undeniably gravitate towards the first option. After spending extended hours immersed in screen time and academic demands, being close to nature provides profound psychological relaxation and rejuvenates my mental clarity. Furthermore, participating in physical outdoor activities enhances both cardiovascular health and overall vitality far more effectively than remaining sedentary indoors.",
-      guidance: resolvedGuidance || "Lựa chọn cá nhân: I would definitely prefer... First of all... Secondly...",
+      b1: "If I had to choose between the two options shown, I would definitely prefer the first one. Primarily, it offers great convenience and allows me to recharge my energy effectively. Besides, it fits my personal routine and helps me maintain a balanced lifestyle.",
+      b2: "Given the choice between these two alternatives, I would undeniably gravitate towards the first option. Primarily, it provides substantial psychological relaxation and aligns closely with my personal priorities. Furthermore, engaging in this option fosters greater personal fulfillment and practical convenience compared to the alternative.",
+      guidance: resolvedGuidance || "Khung nêu lựa chọn: Khẳng định lựa chọn (I would definitely prefer...) -> Lý do 1 (Primarily...) -> Lý do 2 (Furthermore...).",
     };
   }
 
@@ -229,9 +229,9 @@ function resolveSpeakingSampleAnswers(
     pLower.includes("change in the future")
   ) {
     return {
-      b1: "In my opinion, more people in the future will seek a balance between technology and outdoor life. As life becomes faster and more stressful, people will recognize the value of mental health and make time to relax outdoors with their family and friends.",
-      b2: "Looking ahead, I anticipate that advancing technology and urban lifestyles will further accelerate digital integration into daily routines. However, this may trigger a counter-trend where individuals consciously embrace digital detoxes and prioritize outdoor wellness to combat screen fatigue and mental burnout.",
-      guidance: resolvedGuidance || "Bình luận xu hướng xã hội trong tương lai.",
+      b1: "In my opinion, this situation will continue to evolve significantly in the future. As technology advances and societal priorities shift, people will increasingly adopt modern methods while seeking greater efficiency and balance in their daily routines.",
+      b2: "Looking ahead, I anticipate that advancing technologies and shifting demographic trends will substantially transform this domain. While digital solutions will introduce unprecedented convenience, individuals will likely strive to maintain core human connections and sustainable practices to balance rapid modernisation.",
+      guidance: resolvedGuidance || "Khung dự đoán tương lai: Nhận định xu hướng -> Tác động của công nghệ/xã hội -> Dự đoán cân bằng trong tương lai.",
     };
   }
 
@@ -288,9 +288,9 @@ function resolveSpeakingSampleAnswers(
   // 12. Part 4 (120s): Đề thuyết trình 3 câu hỏi
   if (partNumber === 4 || pLower.includes("achieve") || pLower.includes("goal") || pLower.includes("journey") || pLower.includes("event")) {
     return {
-      b1: "I would like to share an experience regarding this topic. A few years ago, I had a very memorable opportunity when I took part in an important project at my university. At first, I felt nervous and anxious because the challenge was quite demanding. However, my friends and teachers gave me great encouragement and guidance. When I finally accomplished my objective, I felt immensely proud and joyful. In my view, experiences like this are essential for everyone. They teach us resilience, self-confidence, and the value of hard work. Setting clear goals gives people motivation and direction in life. Without goals, it is difficult to measure progress and achieve meaningful success. That is why I believe embracing challenges is crucial for personal development.",
-      b2: "I would like to address this topic by sharing a defining experience from my academic journey. A few years ago, I undertook a comprehensive research project that required extensive fieldwork and data analysis. Initially, I felt overwhelmed by the sheer scope of the assignment and the tight deadlines. Nevertheless, with persistent effort, structured planning, and mentorship from my professors, I managed to present our findings successfully. That moment brought me a tremendous sense of fulfillment and reinforced my confidence in overcoming complex obstacles. Looking at the broader picture, I firmly believe that setting and pursuing meaningful goals is indispensable for personal and professional growth. Goals provide us with a tangible sense of purpose and direction, preventing stagnation in an increasingly competitive world. Furthermore, overcoming challenges during this process cultivates perseverance, problem-solving skills, and emotional maturity. Ultimately, it is through these demanding experiences that individuals discover their true potential and develop the resilience required to thrive.",
-      guidance: resolvedGuidance || "Kể lại trải nghiệm, cảm xúc cá nhân và bình luận quan điểm mở rộng.",
+      b1: "I would like to address the questions regarding this topic. Regarding the first point, I had a memorable personal experience where I faced a meaningful challenge with the support of my peers. Secondly, the emotional impact was profound, giving me great confidence and joy. Lastly, I firmly believe experiences like this are essential for everyone because they foster resilience and self-development.",
+      b2: "To comprehensively address this topic, let me begin by sharing a defining experience that presented complex challenges requiring structured planning and perseverance. Moving on to the emotional dimension, accomplishing that objective instilled a profound sense of fulfillment and resilience. Looking at the broader picture, navigating such demanding situations is indispensable for personal and professional maturity, allowing individuals to discover their true capabilities.",
+      guidance: resolvedGuidance || "Khung thuyết trình Part 4 (2 phút): Trả lời tuần tự cả 3 câu hỏi, kết nối mượt bằng 'To begin with...', 'Moving on to...', 'Ultimately...'",
     };
   }
 
@@ -888,30 +888,9 @@ function SpeakingExamRunnerContent() {
           const qList = p.questions || [];
           const partVocab = parseSpeakingVocabulary(p.passage_text || p.suggestion || p.instructions);
 
-          // Phân tích hình ảnh: tách dấu phẩy (nếu có 2 link trong 1 chuỗi)
-          let rawImg1: string | undefined;
-          let rawImg2: string | undefined;
-          if (p.image_url) {
-            const splits = String(p.image_url).split(",").map((s) => s.trim()).filter(Boolean);
-            if (splits.length > 1) {
-              rawImg1 = splits[0];
-              rawImg2 = splits[1];
-            } else if (splits.length === 1) {
-              rawImg1 = splits[0];
-            }
-          }
-
-          // Part 3: Nếu chưa có ảnh 2, tìm trong q.options
-          if (pNum === 3 && !rawImg2 && qList.length > 0) {
-            for (const q of qList) {
-              if (Array.isArray(q.options)) {
-                const found = q.options.find((opt: any) => typeof opt === "string" && (opt.startsWith("http") || opt.startsWith("speaking/") || opt.includes(".png") || opt.includes(".jpg")));
-                if (found) { rawImg2 = found; break; }
-              } else if (typeof q.options === "string" && (q.options.startsWith("http") || q.options.startsWith("speaking/"))) {
-                rawImg2 = q.options; break;
-              }
-            }
-          }
+          // Lấy hình ảnh trực tiếp từ Backend DTO / Database (Single Source of Truth)
+          const rawImg1: string | undefined = p.imageUrl || (p.image_url ? String(p.image_url).split(",")[0]?.trim() : undefined);
+          const rawImg2: string | undefined = p.secondImageUrl || (p.image_url && String(p.image_url).includes(",") ? String(p.image_url).split(",")[1]?.trim() : undefined);
 
           const allQPrompts = qList.map((q: any) => q.prompt || "").join(" ");
           const contextDesc = `${p.title || ""} ${res.data?.title || ""} ${allQPrompts}`;
@@ -975,10 +954,8 @@ function SpeakingExamRunnerContent() {
             const defaultPrep = p.prepTime || (pNum === 2 || pNum === 3 ? 12 : 5);
             const defaultSpeak = p.speakTime || (pNum === 1 ? 30 : 45);
 
-            // Hình ảnh chuẩn hóa từ Database (Single Source of Truth)
-            const resolvedImg1: string | undefined =
-              cleanSpeakingImageUrl(rawImg1) ||
-              (pNum === 2 ? "/uploads/speaking/part2/image15.png" : pNum === 3 ? "/uploads/speaking/part3/image5.png" : undefined);
+            // Hình ảnh chuẩn hóa từ Database (Single Source of Truth - không gán fallback tĩnh)
+            const resolvedImg1: string | undefined = cleanSpeakingImageUrl(rawImg1);
             const resolvedImg2: string | undefined = cleanSpeakingImageUrl(rawImg2);
 
             qList.forEach((q: any) => {
@@ -1017,10 +994,21 @@ function SpeakingExamRunnerContent() {
           }
         }
       } else {
-        setError(res.error?.message || "Không thể tải nội dung đề thi nói từ cơ sở dữ liệu.");
+        const errorMsg =
+          res.message ||
+          res.error?.message ||
+          (res.error?.code === "FORBIDDEN" ? "Đề thi PRO yêu cầu đăng nhập và nâng cấp gói VIP để truy cập." : "Không thể tải nội dung đề thi nói từ cơ sở dữ liệu.");
+        setError(errorMsg);
+        if (res.error?.code === "FORBIDDEN" || errorMsg.includes("VIP") || errorMsg.includes("PRO")) {
+          setIsProModalOpen(true);
+        }
       }
     } catch (err: any) {
-      setError(err?.message || "Lỗi kết nối khi tải đề thi nói.");
+      const errorMsg = err?.response?.data?.message || err?.message || "Lỗi kết nối khi tải đề thi nói.";
+      setError(errorMsg);
+      if (err?.response?.status === 403 || errorMsg.includes("VIP") || errorMsg.includes("PRO")) {
+        setIsProModalOpen(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -1555,50 +1543,20 @@ function SpeakingExamRunnerContent() {
           return;
         }
       } else {
-        const errorMsg = aiRes.error?.message || aiRes.message || "Chấm điểm thất bại.";
+        const errorMsg =
+          aiRes.error?.message ||
+          aiRes.message ||
+          "Dịch vụ chấm điểm AI tạm thời chưa hoàn tất. Vui lòng kiểm tra lại bản ghi âm và bấm Chấm điểm lại.";
         console.warn("[AI Evaluation] API trả về thông báo:", errorMsg);
+        alert(errorMsg);
       }
-
-      // 4. Fallback cục bộ chỉ khi server hoàn toàn không phản hồi hoặc mất mạng
-      const dur = rec?.duration || recordingDuration || 25;
-      const targetDur = targetQ.speakTime;
-      const ratio = Math.min(1, dur / (targetDur * 0.7));
-      const baseScore = Math.round(34 + ratio * 14);
-      const bandLabel =
-        baseScore >= 45
-          ? "C1 Target (Xuất sắc)"
-          : baseScore >= 38
-          ? "B2 Target (Vững vàng)"
-          : baseScore >= 30
-          ? "B1 Target (Đạt yêu cầu)"
-          : "A2 Target (Cần rèn thêm)";
-
-      const fallbackResult = {
-        band: bandLabel,
-        score: baseScore,
-        pronunciation: Math.min(94, Math.round(75 + ratio * 15)),
-        fluency: Math.min(92, Math.round(70 + ratio * 20)),
-        grammar: Math.min(90, Math.round(76 + ratio * 14)),
-        vocabulary: Math.min(92, Math.round(78 + ratio * 12)),
-        feedback: [
-          "Tốc độ phát âm đều đặn, phân nhịp (chunking) tự nhiên ở các mệnh đề quan hệ.",
-          "Ý tưởng rõ ràng, bám sát các câu hỏi phụ của đề bài.",
-        ],
-        strengths: [
-          "Độ dài câu trả lời bám sát thời lượng tiêu chuẩn British Council.",
-        ],
-        upgrades: [
-          "Thay vì dùng từ đơn giản, bạn có thể bổ sung các liên từ nối như 'Furthermore', 'Consequently' để câu nói mạch lạc hơn.",
-        ],
-      };
-
-      if (qIdx === currentIndex) setAiResult(fallbackResult);
-      setRecordedData((prev) => ({
-        ...prev,
-        [qIdx]: { ...(prev[qIdx] || {}), aiResult: fallbackResult },
-      }));
     } catch (err: any) {
       console.error("[AI Evaluation Exception]:", err);
+      alert(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Không thể kết nối máy chủ chấm điểm AI. Vui lòng kiểm tra đường truyền và thử lại."
+      );
     } finally {
       setIsEvaluating(false);
     }
@@ -1722,20 +1680,57 @@ function SpeakingExamRunnerContent() {
             </div>
           )}
 
-          {/* Error State */}
+          {/* Error / VIP State */}
           {error && !loading && (
-            <div className="p-8 text-center rounded-2xl border border-destructive/30 bg-destructive/10 max-w-lg mx-auto">
-              <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-3" />
-              <h2 className="font-heading font-bold text-sm text-foreground mb-1">
-                Không thể tải đề thi nói
-              </h2>
-              <p className="text-xs text-muted-foreground mb-4">{error}</p>
-              <Link
-                href="/speaking"
-                className="inline-block px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold"
-              >
-                Quay lại danh sách đề
-              </Link>
+            <div className={`p-8 text-center rounded-2xl border max-w-lg mx-auto ${
+              error.includes("VIP") || error.includes("PRO")
+                ? "border-amber-500/30 bg-amber-500/10 shadow-lg shadow-amber-500/5"
+                : "border-destructive/30 bg-destructive/10"
+            }`}>
+              {error.includes("VIP") || error.includes("PRO") ? (
+                <>
+                  <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto mb-4 border border-amber-500/30">
+                    <Lock className="w-7 h-7" />
+                  </div>
+                  <h2 className="font-heading font-extrabold text-base text-foreground mb-1.5 flex items-center justify-center gap-1.5">
+                    <span>Đề Thi Thuộc Gói PRO / VIP</span>
+                    <Crown className="w-4 h-4 text-amber-500 inline" />
+                  </h2>
+                  <p className="text-xs text-muted-foreground mb-6 leading-relaxed max-w-sm mx-auto">
+                    {error}
+                  </p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setIsProModalOpen(true)}
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <Crown className="w-3.5 h-3.5" />
+                      <span>Nâng cấp VIP ngay</span>
+                    </button>
+                    <Link
+                      href="/speaking"
+                      className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition-all"
+                    >
+                      Chọn đề miễn phí khác
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-3" />
+                  <h2 className="font-heading font-bold text-sm text-foreground mb-1">
+                    Không thể tải đề thi nói
+                  </h2>
+                  <p className="text-xs text-muted-foreground mb-4">{error}</p>
+                  <Link
+                    href="/speaking"
+                    className="inline-block px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold"
+                  >
+                    Quay lại danh sách đề
+                  </Link>
+                </>
+              )}
             </div>
           )}
 
@@ -1770,18 +1765,16 @@ function SpeakingExamRunnerContent() {
                       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                         {/* Cột trái (7 cols): Hình ảnh đề thi */}
                         <div className="lg:col-span-7 space-y-3">
-                          <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={currentQ.imageUrl || "/uploads/speaking/part2/image15.png"}
-                              alt="Speaking Aptis Prompt 1"
-                              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  "/uploads/speaking/part2/image15.png";
-                              }}
-                            />
-                          </div>
+                          {currentQ.imageUrl && (
+                            <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={currentQ.imageUrl}
+                                alt="Speaking Aptis Prompt 1"
+                                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                              />
+                            </div>
+                          )}
                           <p className="text-base md:text-lg text-foreground font-semibold leading-relaxed pt-1">
                             {currentQ.prompt}
                           </p>
@@ -1851,13 +1844,9 @@ function SpeakingExamRunnerContent() {
                           <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                              src={currentQ.imageUrl || "/uploads/speaking/part3/image5.png"}
+                              src={currentQ.imageUrl || undefined}
                               alt="Speaking Aptis Prompt 1"
                               className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  "/uploads/speaking/part3/image5.png";
-                              }}
                             />
                             <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-black/60 text-white font-bold text-xs backdrop-blur-xs">
                               Picture 1
@@ -1867,30 +1856,22 @@ function SpeakingExamRunnerContent() {
                           <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 aspect-[16/10] shadow-sm">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                              src={currentQ.secondImageUrl || "/uploads/speaking/part3/image6.png"}
+                              src={currentQ.secondImageUrl}
                               alt="Speaking Aptis Prompt 2"
                               className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  "/uploads/speaking/part3/image6.png";
-                              }}
                             />
                             <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-black/60 text-white font-bold text-xs backdrop-blur-xs">
                               Picture 2
                             </span>
                           </div>
                         </div>
-                      ) : (
+                      ) : currentQ.imageUrl ? (
                         <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 shadow-sm max-h-[460px] flex items-center justify-center bg-black/5">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={currentQ.imageUrl || "/uploads/speaking/part3/image5.png"}
+                            src={currentQ.imageUrl}
                             alt="Speaking Aptis Comparison"
                             className="w-full h-auto max-h-[460px] object-contain transition-transform duration-300 hover:scale-[1.02]"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src =
-                                "/uploads/speaking/part3/image5.png";
-                            }}
                           />
                           <div className="absolute bottom-3 left-3 flex items-center gap-2">
                             <span className="px-3 py-1 rounded-lg bg-black/75 text-white font-bold text-xs backdrop-blur-md border border-white/20 shadow-md">
@@ -1898,7 +1879,7 @@ function SpeakingExamRunnerContent() {
                             </span>
                           </div>
                         </div>
-                      )}
+                      ) : null}
 
                       <p className="text-base md:text-lg text-foreground font-semibold leading-relaxed">
                         {currentQ.prompt}

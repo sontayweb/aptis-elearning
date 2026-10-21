@@ -952,11 +952,30 @@ export class AdminService {
     return user;
   }
 
-  async listExams(page: number = 1, limit: number = 50, skill?: string) {
+  async listExams(
+    page: number = 1,
+    limit: number = 50,
+    skill?: string,
+    search?: string,
+    partNumber?: number
+  ) {
     const skip = (page - 1) * limit;
     const where: any = {};
     if (skill && skill !== 'ALL') {
       where.skill = skill;
+    }
+    if (search && search.trim()) {
+      where.OR = [
+        { title: { contains: search.trim(), mode: 'insensitive' } },
+        { description: { contains: search.trim(), mode: 'insensitive' } },
+      ];
+    }
+    if (partNumber) {
+      where.parts = {
+        some: {
+          part_number: Number(partNumber),
+        },
+      };
     }
 
     const [exams, total] = await Promise.all([
@@ -967,7 +986,11 @@ export class AdminService {
         orderBy: [{ hot_level: 'desc' }, { created_at: 'desc' }],
         include: {
           parts: {
-            include: {
+            orderBy: { part_number: 'asc' },
+            select: {
+              id: true,
+              part_number: true,
+              title: true,
               _count: { select: { questions: true } },
             },
           },
@@ -996,11 +1019,136 @@ export class AdminService {
         partsCount: exam.parts.length,
         questionsCount: totalQuestions,
         attemptsCount: exam._count.submissions,
+        parts: exam.parts.map((p) => ({
+          id: p.id,
+          partNumber: p.part_number,
+          title: p.title,
+          questionsCount: p._count.questions,
+        })),
       };
     });
 
     return {
       exams: formatted,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // CONTENT SEARCH: Search & Filter Questions across database
+  // ──────────────────────────────────────────────────────────────
+  async searchQuestions(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    skill?: string;
+    partNumber?: number;
+    questionType?: string;
+  }) {
+    const page = Math.max(1, Number(params.page || 1));
+    const limit = Math.min(100, Math.max(1, Number(params.limit || 20)));
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    const partWhere: any = {};
+
+    if (params.skill && params.skill !== 'ALL') {
+      partWhere.exam = { skill: params.skill };
+    }
+    if (params.partNumber) {
+      partWhere.part_number = Number(params.partNumber);
+    }
+    if (Object.keys(partWhere).length > 0) {
+      where.part = partWhere;
+    }
+
+    if (params.questionType && params.questionType !== 'ALL') {
+      where.question_type = params.questionType;
+    }
+
+    if (params.search && params.search.trim()) {
+      const term = params.search.trim();
+      where.OR = [
+        { prompt: { contains: term, mode: 'insensitive' } },
+        { explanation: { contains: term, mode: 'insensitive' } },
+        { correct_answer: { contains: term, mode: 'insensitive' } },
+        {
+          part: {
+            title: { contains: term, mode: 'insensitive' },
+          },
+        },
+        {
+          part: {
+            passage_text: { contains: term, mode: 'insensitive' },
+          },
+        },
+        {
+          part: {
+            exam: {
+              title: { contains: term, mode: 'insensitive' },
+            },
+          },
+        },
+      ];
+    }
+
+    const [questions, total] = await Promise.all([
+      prisma.question.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: [{ created_at: 'desc' }, { question_number: 'asc' }],
+        include: {
+          part: {
+            select: {
+              id: true,
+              part_number: true,
+              title: true,
+              passage_text: true,
+              audio_url: true,
+              image_url: true,
+              exam: {
+                select: {
+                  id: true,
+                  title: true,
+                  skill: true,
+                  is_pro: true,
+                  is_published: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      prisma.question.count({ where }),
+    ]);
+
+    const formatted = questions.map((q) => ({
+      id: q.id,
+      partId: q.part_id,
+      questionNumber: q.question_number,
+      questionType: q.question_type,
+      prompt: q.prompt,
+      options: q.options,
+      correctAnswer: q.correct_answer,
+      explanation: q.explanation,
+      maxScore: q.max_score,
+      createdAt: q.created_at,
+      part: {
+        id: q.part.id,
+        partNumber: q.part.part_number,
+        title: q.part.title,
+        passageText: q.part.passage_text,
+        audioUrl: q.part.audio_url,
+        imageUrl: q.part.image_url,
+        exam: q.part.exam,
+      },
+    }));
+
+    return {
+      questions: formatted,
       total,
       page,
       totalPages: Math.ceil(total / limit),

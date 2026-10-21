@@ -29,28 +29,27 @@ export function ReadingPart1Story({
   answers = {},
   onSelect,
 }: ReadingPart1StoryProps) {
-  // Mặc định câu ví dụ chuẩn Aptis nếu không có
-  const example = exampleText || {
-    prefix: "I",
-    word: "live",
-    suffix: "in a flat.",
-  };
+  const hasExample = Boolean(exampleText && exampleText.word);
 
   return (
     <div className="space-y-6 max-w-2xl py-2">
       <p className="text-sm font-bold text-exam-text">
-        Choose the word that fits in the gap. The first one is done for you.
+        {hasExample
+          ? "Choose the word that fits in the gap. The first one is done for you."
+          : "Choose the word that fits in each gap."}
       </p>
 
       <div className="space-y-4 text-base font-normal text-exam-text leading-relaxed">
-        {/* Câu ví dụ mẫu (Cố định - Done for you) */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span>{example.prefix}</span>
-          <span className="px-3 py-1 rounded-md border border-exam-border bg-exam-bg/70 text-exam-text-muted font-medium text-sm select-none">
-            {example.word}
-          </span>
-          <span>{example.suffix}</span>
-        </div>
+        {/* Câu ví dụ mẫu (Chỉ hiển thị khi đề thi thực sự có câu ví dụ) */}
+        {hasExample && exampleText && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span>{exampleText.prefix}</span>
+            <span className="px-3 py-1 rounded-md border border-exam-border bg-exam-bg/70 text-exam-text-muted font-medium text-sm select-none">
+              {exampleText.word}
+            </span>
+            <span>{exampleText.suffix}</span>
+          </div>
+        )}
 
         {/* Các câu hỏi điền từ của Part 1 */}
         {gaps.map((gap) => {

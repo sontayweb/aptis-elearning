@@ -23,6 +23,7 @@ import {
   BookmarkCheck,
   Clock,
   ArrowRight,
+  BookOpen,
 } from "lucide-react";
 
 interface WordItem {
@@ -198,9 +199,9 @@ export default function VocabularyDetailPage() {
   const setId = typeof params?.id === "string" ? params.id : "";
 
   // Topic Metadata & Word List
-  const [topicName, setTopicName] = useState("ANIMALS");
-  const [categoryName, setCategoryName] = useState("APTIS GENERAL");
-  const [words, setWords] = useState<WordItem[]>(FALLBACK_WORDS);
+  const [topicName, setTopicName] = useState("TỪ VỰNG APTIS");
+  const [categoryName, setCategoryName] = useState("");
+  const [words, setWords] = useState<WordItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Active Mode
@@ -281,10 +282,15 @@ export default function VocabularyDetailPage() {
               ],
             }));
             setWords(formatted);
+          } else {
+            setWords([]);
           }
+        } else {
+          setWords([]);
         }
       } catch (err) {
-        console.warn("Could not load backend vocab words, using standard wordset:", err);
+        console.warn("Could not load backend vocab words:", err);
+        setWords([]);
       } finally {
         setLoading(false);
       }
@@ -310,8 +316,8 @@ export default function VocabularyDetailPage() {
   }, [setId]);
 
   // Current active word for Browse & Flashcard
-  const currentWord = words[currentIndex] || words[0] || FALLBACK_WORDS[0];
-  const currentFlashcardWord = words[flashcardIndex] || words[0] || FALLBACK_WORDS[0];
+  const currentWord: WordItem | undefined = words[currentIndex] || words[0];
+  const currentFlashcardWord: WordItem | undefined = words[flashcardIndex] || words[0];
 
   // Helper toggle memorized
   const toggleMemorizeWord = (wordId: string) => {
@@ -482,10 +488,11 @@ export default function VocabularyDetailPage() {
 
   // Word family helper
   const wordFamilyList = useMemo(() => {
+    if (!currentWord) return [];
     if (currentWord.word_family && currentWord.word_family.length > 0) {
       return currentWord.word_family;
     }
-    const parts = currentWord.word.split(" ");
+    const parts = (currentWord.word || "").split(" ");
     if (parts.length > 1) {
       return parts.map((p, idx) => ({
         word: p,
@@ -524,7 +531,9 @@ export default function VocabularyDetailPage() {
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-muted-foreground font-mono px-2.5 py-1 rounded-md bg-muted/60">
-              {mode === "browse"
+              {words.length === 0
+                ? "0/0"
+                : mode === "browse"
                 ? `${currentIndex + 1}/${words.length}`
                 : mode === "flashcard"
                 ? `${flashcardIndex + 1}/${words.length}`
@@ -541,13 +550,15 @@ export default function VocabularyDetailPage() {
             className="h-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] transition-all duration-300"
             style={{
               width:
-                mode === "browse"
+                words.length === 0
+                  ? "0%"
+                  : mode === "browse"
                   ? `${((currentIndex + 1) / words.length) * 100}%`
                   : mode === "flashcard"
                   ? `${((flashcardIndex + 1) / words.length) * 100}%`
                   : mode === "quiz"
-                  ? `${((quizIndex + 1) / quizList.length) * 100}%`
-                  : `${(matchedIds.size / Math.min(8, words.length)) * 100}%`,
+                  ? `${((quizIndex + 1) / Math.max(1, quizList.length)) * 100}%`
+                  : `${(matchedIds.size / Math.max(1, Math.min(8, words.length))) * 100}%`,
             }}
           />
         </div>
@@ -615,7 +626,24 @@ export default function VocabularyDetailPage() {
             <div className="w-9 h-9 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="text-xs font-semibold text-muted-foreground">Đang tải bộ từ vựng luyện tập...</p>
           </div>
-        ) : mode === "browse" ? (
+        ) : words.length === 0 ? (
+          <div className="py-20 text-center space-y-4 max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-muted/60 text-muted-foreground mx-auto flex items-center justify-center">
+              <BookOpen className="w-8 h-8" />
+            </div>
+            <h3 className="font-heading font-bold text-lg text-foreground">Chủ đề từ vựng chưa có nội dung</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Bộ từ vựng này hiện chưa có dữ liệu câu hỏi hoặc đang được cập nhật. Vui lòng quay lại danh sách để chọn chủ đề khác.
+            </p>
+            <Link
+              href="/vocabulary"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Quay về kho từ vựng</span>
+            </Link>
+          </div>
+        ) : mode === "browse" && currentWord ? (
           /* ========================================================
              MODE 1: DUYỆT TỪ (Screenshot 1)
              ======================================================== */

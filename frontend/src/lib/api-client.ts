@@ -658,11 +658,13 @@ class ApiClient {
         body: JSON.stringify(body),
       }),
 
-    getExams: (params?: { page?: number; limit?: number; skill?: string; hotLevel?: number }) => {
+    getExams: (params?: { page?: number; limit?: number; skill?: string; search?: string; partNumber?: number; hotLevel?: number }) => {
       const query = new URLSearchParams();
       if (params?.page) query.append('page', params.page.toString());
       if (params?.limit) query.append('limit', params.limit.toString());
       if (params?.skill && params.skill !== 'ALL') query.append('skill', params.skill);
+      if (params?.search && params.search.trim()) query.append('search', params.search.trim());
+      if (params?.partNumber) query.append('partNumber', params.partNumber.toString());
       if (params?.hotLevel !== undefined) query.append('hotLevel', params.hotLevel.toString());
       const qs = query.toString();
       return this.request(`/admin/exams${qs ? `?${qs}` : ''}`);
@@ -762,6 +764,25 @@ class ApiClient {
 
     deleteQuestion: (questionId: string) =>
       this.request(`/admin/questions/${questionId}`, { method: 'DELETE' }),
+
+    searchQuestions: (params?: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      skill?: string;
+      partNumber?: number;
+      questionType?: string;
+    }) => {
+      const query = new URLSearchParams();
+      if (params?.page) query.append('page', params.page.toString());
+      if (params?.limit) query.append('limit', params.limit.toString());
+      if (params?.search && params.search.trim()) query.append('search', params.search.trim());
+      if (params?.skill && params.skill !== 'ALL') query.append('skill', params.skill);
+      if (params?.partNumber) query.append('partNumber', params.partNumber.toString());
+      if (params?.questionType && params.questionType !== 'ALL') query.append('questionType', params.questionType);
+      const qs = query.toString();
+      return this.request<any>(`/admin/questions${qs ? `?${qs}` : ''}`);
+    },
 
     getPlans: () => this.request('/admin/plans'),
 
