@@ -1847,6 +1847,35 @@ export default function AdminExamsPage() {
                       </div>
                     )}
 
+                    {/* Part Illustration Image (Speaking / Reading) */}
+                    {q.part.imageUrl && (
+                      <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={q.part.imageUrl}
+                          alt="Part illustration"
+                          className="h-16 w-24 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs shrink-0"
+                        />
+                        <div className="min-w-0 flex-1 text-xs">
+                          <span className="font-heading font-bold text-slate-800 dark:text-slate-200 block text-[11px] mb-0.5">
+                            🖼️ Tranh ảnh minh họa ({q.part.title}):
+                          </span>
+                          <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 truncate block">
+                            {q.part.imageUrl}
+                          </span>
+                          <a
+                            href={q.part.imageUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[10px] text-purple-600 dark:text-purple-400 hover:underline inline-flex items-center gap-1 mt-0.5 font-semibold"
+                          >
+                            <span>Xem ảnh gốc</span>
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Question Prompt */}
                     <div className="text-xs font-heading font-semibold text-slate-900 dark:text-white leading-relaxed">
                       {q.prompt}

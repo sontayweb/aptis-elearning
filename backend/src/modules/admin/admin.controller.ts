@@ -427,27 +427,51 @@ export class AdminController {
     }
   }
 
-  async uploadImportImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async uploadExamImage(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.file || !req.file.buffer) {
-        throw { statusCode: 400, message: 'Vui lòng đính kèm hình ảnh (PNG, JPG, WEBP).' };
+        throw { statusCode: 400, message: 'Vui lòng đính kèm tệp hình ảnh (PNG, JPG, WEBP, GIF).' };
       }
 
-      const uploadDir = path.resolve(process.env.UPLOAD_DIR || './uploads', 'exams', 'speaking');
+      const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!allowedMimes.includes(req.file.mimetype)) {
+        throw { statusCode: 400, message: 'Định dạng ảnh không hợp lệ. Hệ thống chỉ chấp nhận PNG, JPG, WEBP, GIF.' };
+      }
+
+      const category = (req.body.category || req.query.category || 'speaking')
+        .toString()
+        .replace(/[^a-zA-Z0-9_-]/g, '');
+      const uploadDir = path.resolve(process.env.UPLOAD_DIR || './uploads', 'exams', category || 'speaking');
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
-      const safeOriginalName = (req.file.originalname || 'image.png').replace(/[^a-zA-Z0-9._-]/g, '_');
-      const filename = `manual_${Date.now()}_${safeOriginalName}`;
+      const ext = path.extname(req.file.originalname) || '.png';
+      const safeOriginalName = path.basename(req.file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 30);
+      const filename = `exam_${Date.now()}_${safeOriginalName}${ext}`;
       const filePath = path.join(uploadDir, filename);
       fs.writeFileSync(filePath, req.file.buffer);
 
-      const publicUrl = `/uploads/exams/speaking/${filename}`;
-      sendSuccess(res, { url: publicUrl }, 'Tải ảnh lên thành công', 200);
+      const publicUrl = `/uploads/exams/${category || 'speaking'}/${filename}`;
+      sendSuccess(
+        res,
+        {
+          url: publicUrl,
+          filename,
+          size: req.file.size,
+          mimetype: req.file.mimetype,
+        },
+        'Tải ảnh lên máy chủ thành công',
+        200
+      );
     } catch (error) {
       next(error);
     }
+  }
+
+  // Alias for backward compatibility with import flow
+  async uploadImportImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    return this.uploadExamImage(req, res, next);
   }
 }
 

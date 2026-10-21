@@ -712,6 +712,19 @@ class ApiClient {
         body: JSON.stringify({ exams }),
       }),
 
+    uploadExamImage: (image: File, category?: string) => {
+      const formData = new FormData();
+      formData.append('image', image);
+      if (category) formData.append('category', category);
+      return this.request<any>('/admin/exams/upload-image', {
+        method: 'POST',
+        body: formData,
+      }).then((res) => {
+        if (!res.success) throw new Error(res.message || 'Lỗi khi tải ảnh lên');
+        return res.data;
+      });
+    },
+
     uploadImportImage: (image: File) => {
       const formData = new FormData();
       formData.append('image', image);

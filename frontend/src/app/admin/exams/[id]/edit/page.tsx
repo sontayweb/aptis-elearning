@@ -10,6 +10,7 @@ import {
   AlertTriangle, Check, GripVertical, HelpCircle, Play,
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
+import ImageUploadInput from "@/components/admin/image-upload-input";
 
 interface Question {
   id: string;
@@ -497,25 +498,13 @@ export default function ExamEditorPage() {
                     )}
                   </div>
                   <div>
-                    <label className={lc}>URL Hình ảnh (Speaking)</label>
-                    <input
-                      type="text"
-                      className={ic + " font-mono text-[11px]"}
-                      placeholder="https://...jpg"
+                    <ImageUploadInput
+                      label="Hình ảnh minh họa Part (Speaking / Reading)"
                       value={partForm.image_url}
-                      onChange={e => setPartForm({ ...partForm, image_url: e.target.value })}
+                      onChange={(url) => setPartForm({ ...partForm, image_url: url })}
+                      category={exam.skill.toLowerCase()}
+                      helperText="Ảnh hiển thị trong bài thi học viên (VD: đề bài Part 2, Part 3 Nói)."
                     />
-                    {partForm.image_url && (
-                      <div className="mt-1.5 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500 block mb-1 font-semibold">Xem trước ảnh:</span>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={partForm.image_url}
-                          alt="Part illustration"
-                          className="max-h-28 rounded object-contain mx-auto"
-                        />
-                      </div>
-                    )}
                   </div>
                 </div>
                 <div className="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
