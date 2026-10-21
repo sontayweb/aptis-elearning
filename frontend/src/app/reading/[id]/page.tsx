@@ -222,7 +222,13 @@ function ReadingExamRunner() {
           });
           setP2Orders(initialP2Orders);
         } else {
-          // Use default benchmark
+          // Xử lý khi yêu cầu quyền VIP / PRO
+          const msg = res.message || "";
+          if (msg.includes("VIP") || msg.includes("PRO") || res.error?.code === "FORBIDDEN") {
+            setError(msg || "Đề thi PRO yêu cầu đăng nhập tài khoản VIP để truy cập");
+            return;
+          }
+          // Dùng benchmark mặc định nếu không tìm thấy đề
           setExamData(DEFAULT_READING_TEST);
           const initialP2Orders: Record<string, string[]> = {};
           DEFAULT_READING_TEST.part2.stories.forEach((st) => {
@@ -231,6 +237,10 @@ function ReadingExamRunner() {
           setP2Orders(initialP2Orders);
         }
       } catch (err: any) {
+        if (err?.status === 403 || err?.message?.includes("VIP") || err?.message?.includes("PRO")) {
+          setError(err?.message || "Đề thi PRO yêu cầu đăng nhập tài khoản VIP để truy cập");
+          return;
+        }
         console.warn("Using offline benchmark reading data:", err);
         setExamData(DEFAULT_READING_TEST);
         const initialP2Orders: Record<string, string[]> = {};
@@ -858,8 +868,37 @@ function ReadingExamRunner() {
             </div>
           )}
 
+          {/* Error / VIP Access Required State */}
+          {!loading && error && (
+            <div className="p-8 md:p-12 text-center rounded-2xl border border-border bg-card max-w-xl mx-auto space-y-4 shadow-sm animate-in zoom-in-95">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                <AlertCircle className="w-7 h-7" />
+              </div>
+              <h3 className="font-heading font-bold text-lg text-foreground">
+                Yêu cầu quyền truy cập VIP
+              </h3>
+              <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                {error}
+              </p>
+              <div className="pt-2 flex flex-wrap justify-center gap-3">
+                <Link
+                  href="/login"
+                  className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-sm hover:bg-primary-glow transition-all"
+                >
+                  Đăng nhập tài khoản
+                </Link>
+                <Link
+                  href="/reading"
+                  className="px-5 py-2.5 rounded-xl border border-border hover:bg-muted font-bold text-xs transition-all"
+                >
+                  Chọn đề thi khác
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* Exam Questions Workspace */}
-          {!loading && !isSubmitted && (
+          {!loading && !isSubmitted && !error && (
             <div key={`reading-stage-wrap-${currentStage.stageKey}`} className="part-transition space-y-6">
               {/* Card Context & Header Banner */}
               <div className="bg-card rounded-2xl border border-border p-5 md:p-6 shadow-sm space-y-3">
@@ -1072,8 +1111,8 @@ function ReadingExamRunner() {
                         </div>
                       </div>
 
-                      {/* 4 Review Cards in 2 columns */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* 4 Review Cards in 2 columns (or 1 column if single passage) */}
+                      <div className={`grid gap-4 ${examData.part3.reviews.length === 1 ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}>
                         {examData.part3.reviews.map((rev) => (
                           <div
                             key={rev.person}
@@ -1082,7 +1121,7 @@ function ReadingExamRunner() {
                             onTouchEnd={() => handleTextSelection(rev.person)}
                           >
                             <span className="px-2.5 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-xs inline-block">
-                              {rev.person}
+                              {rev.name || rev.person}
                             </span>
                             <p className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans">
                               {renderHighlightedContent(rev.review, rev.person)}
@@ -1816,16 +1855,47 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
     if (isP3) {
       if (p.passage_text) {
         const cleanText = p.passage_text.replace(/\r\n/g, "\n").replace(/<[^>]+>/g, "\n");
-        // Tách 4 đoạn review A, B, C, D nếu có trong passage_text
-        const matches = Array.from(
+
+        // 1. Thử match theo định dạng Person A/B/C/D
+        let matches = Array.from(
           cleanText.matchAll(/(?:^|\n)\s*(?:Person\s*)?([A-D])\s*[:.-]?\s*([\s\S]*?)(?=(?:\n\s*(?:Person\s*)?[A-D]\s*[:.-]?)|$)/gi)
         );
+
+        // 2. Nếu không có Person A-D, match theo Person <Tên>: hoặc <Tên>: (ví dụ: Person Nadia:, Person Cora:)
+        if (!matches || matches.length < 4) {
+          const namedMatches = Array.from(
+            cleanText.matchAll(/(?:^|\n)\s*(?:Person\s+)?([A-Za-z]+)\s*[:.-]\s*([\s\S]*?)(?=(?:\n\s*(?:Person\s+)?[A-Za-z]+\s*[:.-])|$)/gi)
+          );
+          if (namedMatches && namedMatches.length >= 4) {
+            matches = namedMatches;
+          }
+        }
+
+        // 3. Nếu vẫn chưa match được, thử tách theo 4 đoạn văn cách nhau bởi 2 dấu xuống dòng (\n\n)
+        if (!matches || matches.length < 4) {
+          const paragraphs = cleanText.split(/\n\s*\n/).map((s) => s.trim()).filter((s) => s.length > 30);
+          if (paragraphs.length >= 4) {
+            matches = paragraphs.slice(0, 4).map((para, idx) => {
+              const letter = String.fromCharCode(65 + idx);
+              return [para, letter, para];
+            });
+          }
+        }
+
+        const letters = ["A", "B", "C", "D"];
         if (matches && matches.length >= 4) {
-          result.part3.reviews = matches.slice(0, 4).map((m: any) => ({
-            person: `Person ${m[1].toUpperCase()}`,
-            name: `Person ${m[1].toUpperCase()}`,
-            review: m[2]?.trim() || "",
-          }));
+          result.part3.reviews = matches.slice(0, 4).map((m: any, idx: number) => {
+            const letter = letters[idx];
+            const rawName = (m[1] || "").trim();
+            const displayName = /^[A-D]$/i.test(rawName)
+              ? `Person ${rawName.toUpperCase()}`
+              : `Person ${letter} (${rawName})`;
+            return {
+              person: `Person ${letter}`,
+              name: displayName,
+              review: m[2]?.trim() || "",
+            };
+          });
         } else {
           result.part3.reviews = [
             {
