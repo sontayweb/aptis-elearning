@@ -16,6 +16,8 @@ import {
   READING_PART3_TOPICS,
   READING_PART4_TOPICS,
 } from "@/data/reading-topics-bank";
+import { READING_PART2_BANK } from "@/data/reading-part2-bank";
+import { READING_PART3_BANK } from "@/data/reading-part3-bank";
 import {
   ArrowLeft,
   Search,
@@ -91,15 +93,18 @@ function ReadingMarathonContent() {
   const [showResults, setShowResults] = useState<Record<string, boolean>>({});
   const [showTranslations, setShowTranslations] = useState<Record<string, boolean>>({});
 
-  // Part 2 Cohesion order state
+  // Part 2 Cohesion order state (Đầy đủ 27 bộ đề thi)
   const [cohesionOrder, setCohesionOrder] = useState<Record<number, string[]>>(() => {
     const initial: Record<number, string[]> = {};
-    PART2_COHESION_DEMO.forEach((demo) => {
-      // Shuffle sentences for practice
+    READING_PART2_BANK.forEach((demo) => {
       initial[demo.id] = [...demo.correctOrder].sort(() => 0.5 - Math.random());
     });
     return initial;
   });
+
+  // Part 3 Answers state
+  const [p3Answers, setP3Answers] = useState<Record<string, "A" | "B" | "C" | "D">>({});
+  const [p3ShowResults, setP3ShowResults] = useState<Record<number, boolean>>({});
 
   const [cohesionChecked, setCohesionChecked] = useState<Record<number, boolean>>({});
 
@@ -143,6 +148,30 @@ function ReadingMarathonContent() {
   const toggleTranslation = (setId: string) => {
     setShowTranslations((prev) => ({ ...prev, [setId]: !prev[setId] }));
   };
+
+  // Filter Part 2
+  const filteredP2Demos = useMemo(() => {
+    if (!searchTerm) return READING_PART2_BANK;
+    const term = searchTerm.toLowerCase();
+    return READING_PART2_BANK.filter(
+      (d) =>
+        d.title.toLowerCase().includes(term) ||
+        d.leakKeywordNote.toLowerCase().includes(term) ||
+        d.correctOrder.some((s) => s.toLowerCase().includes(term))
+    );
+  }, [searchTerm]);
+
+  // Filter Part 3
+  const filteredP3Bank = useMemo(() => {
+    if (!searchTerm) return READING_PART3_BANK;
+    const term = searchTerm.toLowerCase();
+    return READING_PART3_BANK.filter(
+      (t) =>
+        t.title.toLowerCase().includes(term) ||
+        t.persons.some((p) => p.text.toLowerCase().includes(term)) ||
+        t.questions.some((q) => q.prompt.toLowerCase().includes(term))
+    );
+  }, [searchTerm]);
 
   // Move sentence helper in Part 2
   const moveSentence = (demoId: number, fromIdx: number, toIdx: number) => {
@@ -450,25 +479,32 @@ function ReadingMarathonContent() {
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0 self-start sm:self-center">
-                  12 bộ chủ đề sát đề thi
+                  27 bộ chủ đề sát đề thi (Full Part 2)
                 </span>
               </div>
 
               <div className="space-y-6">
-                {PART2_COHESION_DEMO.map((demo) => {
+                {filteredP2Demos.map((demo) => {
                   const currentSentences = cohesionOrder[demo.id] || demo.correctOrder;
                   const isChecked = cohesionChecked[demo.id];
 
                   return (
                     <div key={demo.id} className="rounded-2xl border border-border bg-card p-5 md:p-6 shadow-xs space-y-4">
-                      <div className="flex items-center justify-between border-b border-border/60 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
-                            Chủ đề #{demo.id}
-                          </span>
-                          <h4 className="font-heading font-bold text-sm text-foreground">
-                            {demo.title}
-                          </h4>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                              {demo.title.split(" - ")[0]}
+                            </span>
+                            <h4 className="font-heading font-bold text-sm text-foreground">
+                              {demo.title}
+                            </h4>
+                          </div>
+                          {demo.leakKeywordNote && (
+                            <p className="text-[11px] text-amber-700 dark:text-amber-300 font-semibold mt-1 bg-amber-500/10 px-2 py-0.5 rounded-md inline-block">
+                              🔑 Mẹo từ khóa thứ tự: {demo.leakKeywordNote}
+                            </p>
+                          )}
                         </div>
 
                         <button

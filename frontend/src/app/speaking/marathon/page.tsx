@@ -20,6 +20,10 @@ import {
   SpeakingPart3Topic,
 } from "@/data/speaking-part3-bank";
 import {
+  SPEAKING_PART4_BANK,
+  SpeakingPart4Cluster,
+} from "@/data/speaking-part4-bank";
+import {
   Mic,
   MicOff,
   Clock,
@@ -46,8 +50,8 @@ function SpeakingMarathonContent() {
   const searchParams = useSearchParams();
   const initialPart = searchParams.get("part") || "1";
 
-  const [currentPart, setCurrentPart] = useState<"1" | "2" | "3">(
-    initialPart === "2" ? "2" : initialPart === "3" ? "3" : "1"
+  const [currentPart, setCurrentPart] = useState<"1" | "2" | "3" | "4">(
+    initialPart === "2" ? "2" : initialPart === "3" ? "3" : initialPart === "4" ? "4" : "1"
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUnit, setSelectedUnit] = useState<string>("all");
@@ -128,6 +132,20 @@ function SpeakingMarathonContent() {
           v.vi.toLowerCase().includes(searchTerm.toLowerCase())
       );
       return matchTitle || matchQuestion || matchVocab;
+    });
+  }, [searchTerm]);
+
+  // Filter Part 4
+  const filteredP4Clusters = useMemo(() => {
+    return SPEAKING_PART4_BANK.filter((cluster) => {
+      if (!searchTerm) return true;
+      const term = searchTerm.toLowerCase();
+      return (
+        cluster.title.toLowerCase().includes(term) ||
+        cluster.coverage.toLowerCase().includes(term) ||
+        cluster.story.toLowerCase().includes(term) ||
+        cluster.sampleSpeech.toLowerCase().includes(term)
+      );
     });
   }, [searchTerm]);
 
@@ -380,6 +398,17 @@ function SpeakingMarathonContent() {
               >
                 Part 3 (So sánh 2 tranh)
               </button>
+              <button
+                type="button"
+                onClick={() => setCurrentPart("4")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  currentPart === "4"
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Part 4 (6 Cụm Đề Vạn Năng)
+              </button>
             </div>
           </div>
 
@@ -396,7 +425,9 @@ function SpeakingMarathonContent() {
                     ? "Tìm kiếm câu hỏi Part 1 (family, hobbies, hometown...)"
                     : currentPart === "2"
                     ? "Tìm kiếm tranh Part 2 hoặc từ vựng (phòng họp, siêu thị, gia đình...)"
-                    : "Tìm kiếm tranh Part 3 (leo núi, biển, phương tiện...)"
+                    : currentPart === "3"
+                    ? "Tìm kiếm tranh Part 3 (leo núi, biển, phương tiện...)"
+                    : "Tìm kiếm cụm đề Part 4 (du lịch, học tập, quà tặng, bạn bè...)"
                 }
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-input bg-card text-xs sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs"
               />
@@ -801,6 +832,88 @@ function SpeakingMarathonContent() {
                       >
                         <Mic className="w-3.5 h-3.5" />
                         <span>Luyện nói cặp tranh này (45s)</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* 4. PART 4 MARATHON DISPLAY (6 Cụm Đề Vạn Năng)            */}
+          {/* ========================================================= */}
+          {currentPart === "4" && (
+            <div className="space-y-6">
+              <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-heading font-bold text-sm text-foreground">
+                    Cẩm Nang 6 Cụm Đề Vạn Năng Part 4 (Gộp 23 Đề Thi Thật)
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Thời gian chuẩn bị 1 phút · Nói liên tục 2 phút (120s). Mỗi cụm có cốt truyện gộp vạn năng và bài mẫu B2/C1 đạt điểm tối đa.
+                  </p>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-amber-500 text-white font-bold text-xs shrink-0 self-start sm:self-center">
+                  6 Cụm đề bao phủ 100%
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {filteredP4Clusters.map((cluster) => (
+                  <div
+                    key={cluster.id}
+                    className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4 flex flex-col justify-between hover:border-amber-500/40 transition-all"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
+                          {cluster.title.split(" - ")[0]}
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                          ☘️☘️☘️☘️☘️ Trọng điểm
+                        </span>
+                      </div>
+
+                      <h4 className="font-heading font-bold text-sm text-foreground">
+                        {cluster.title}
+                      </h4>
+
+                      <div className="p-3 rounded-xl bg-muted/40 border border-border/60 text-xs space-y-1.5">
+                        <p className="text-muted-foreground font-semibold">
+                          <strong className="text-foreground">Đề bao phủ:</strong> {cluster.coverage}
+                        </p>
+                        <p className="text-muted-foreground leading-relaxed">
+                          <strong className="text-foreground">Cốt truyện gộp:</strong> {cluster.story}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs space-y-2">
+                        <div className="flex items-center justify-between font-bold text-amber-800 dark:text-amber-200">
+                          <span>🎙️ Bài nói mẫu 2 phút (B2/C1):</span>
+                        </div>
+                        <p className="italic text-muted-foreground leading-relaxed text-[11.5px]">
+                          {cluster.sampleSpeech}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-border/60 flex items-center justify-between gap-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openPracticeModal({
+                            part: 4,
+                            title: cluster.title,
+                            prompt: cluster.story,
+                            sampleAnswer: cluster.sampleSpeech,
+                            timeLimit: 120,
+                          })
+                        }
+                        className="w-full py-2.5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5"
+                      >
+                        <Mic className="w-3.5 h-3.5" />
+                        <span>Luyện nói 2 phút đề này</span>
                       </button>
                     </div>
                   </div>
