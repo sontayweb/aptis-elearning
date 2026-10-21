@@ -223,12 +223,6 @@ export default function AdminAuditLogsPage() {
     <div className="space-y-5 pb-16">
       {/* 1. TOP HEADER & METRICS — Chuẩn hóa AdminPageHeader */}
       <AdminPageHeader
-        badge={{
-          icon: ShieldCheck,
-          label: "Enterprise Audit Trail & Compliance",
-        }}
-        title="Nhật Ký Kiểm Toán Hệ Thống"
-        description="Ghi nhận toàn bộ thao tác vận hành, đối soát thay đổi và bảo vệ tính toàn vẹn hệ thống"
         stats={[
           {
             icon: History,

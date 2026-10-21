@@ -407,12 +407,6 @@ export default function AdminVocabularyPage() {
       {/* Top Header — Chuẩn hóa theo AdminPageHeader */}
       {!selectedSet ? (
         <AdminPageHeader
-          badge={{
-            icon: BookMarked,
-            label: "Kho Từ Vựng Khảo Thí",
-          }}
-          title="Kho Từ vựng Aptis"
-          description="Ngân hàng từ vựng học thuật CEFR B1 - C2, từ điển chuyên ngành và công cụ biên tập trực tiếp"
           stats={[
             { icon: BookMarked, label: "bộ từ vựng", value: sets.length, subValue: "Chủ đề Aptis" },
             { icon: Layers, label: "từ trong kho", value: totalWordsInSystem, subValue: "Chuẩn IPA & Ví dụ", iconColor: "text-emerald-500" },
@@ -435,13 +429,8 @@ export default function AdminVocabularyPage() {
         />
       ) : (
         <AdminPageHeader
-          badge={{
-            icon: BookMarked,
-            label: `Chủ đề: ${selectedSet.category || "Aptis Core"}`,
-          }}
-          title={selectedSet.title}
-          description="Biên tập từ vựng, phiên âm IPA, nghĩa tiếng Việt và ví dụ câu minh họa chuẩn British Council"
           stats={[
+            { icon: BookMarked, label: selectedSet.title, value: selectedSet.category || "Aptis Core", iconColor: "text-blue-500" },
             { icon: Layers, label: "từ vựng trong bộ", value: words.length, subValue: "Đang lưu" },
             { icon: Volume2, label: "Phát âm IPA", value: "Chuẩn Anh-Mỹ", subValue: "Audio AI", iconColor: "text-blue-500" },
             { icon: selectedSet.is_free ? Sparkles : Crown, label: "Phân loại", value: selectedSet.is_free ? "Miễn phí" : "VIP PRO", iconColor: selectedSet.is_free ? "text-emerald-500" : "text-amber-500" },

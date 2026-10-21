@@ -292,12 +292,6 @@ export default function AdminCmsPricingPage() {
 
       {/* 1. TOP HEADER & METRICS — Chuẩn hóa AdminPageHeader */}
       <AdminPageHeader
-        badge={{
-          icon: CreditCard,
-          label: "Monetization & VIP Tier Management",
-        }}
-        title="Quản Lý Gói Cước VIP"
-        description="Cấu hình bảng giá niêm yết, phân bổ hạn ngạch chấm AI & Giảng viên và thông số đối soát cổng SePay"
         stats={[
           {
             icon: Crown,

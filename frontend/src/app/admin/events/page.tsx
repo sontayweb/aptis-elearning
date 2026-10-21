@@ -288,12 +288,6 @@ export default function AdminEventsPage() {
     <div className="space-y-6 pb-16">
       {/* 1. TOP HEADER WITH MASTER SWITCH — Chuẩn hóa AdminPageHeader */}
       <AdminPageHeader
-        badge={{
-          icon: Palette,
-          label: "Seasonal Theming & Interactive Gamification",
-        }}
-        title="Quản Trị Sự Kiện & Giao Diện Lễ Hội"
-        description="Bật/tắt sự kiện toàn trang, chuyển đổi template lễ hội (Halloween, Trung thu, Noel, Tết...) và trang trí giao diện học viên"
         stats={[
           {
             icon: Sparkles,

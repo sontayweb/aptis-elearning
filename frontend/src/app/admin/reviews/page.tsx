@@ -151,12 +151,6 @@ export default function AdminReviewsPage() {
 
       {/* Top Header */}
       <AdminPageHeader
-        badge={{
-          icon: MessageSquare,
-          label: "Cộng đồng & Phản hồi học viên",
-        }}
-        title="Kiểm duyệt Đánh giá Học viên"
-        description="Phê duyệt cảm nhận học viên thi đạt chứng chỉ Aptis ESOL và thêm nhận xét động viên của thầy cô lên Bảng Vàng"
         stats={[
           {
             icon: MessageSquare,

@@ -632,12 +632,6 @@ export default function AdminPermissionsPage() {
 
       {/* 1. TOP HEADER — Chuẩn hóa theo AdminPageHeader */}
       <AdminPageHeader
-        badge={{
-          icon: ShieldCheck,
-          label: "Role-Based Access Control Studio (RBAC)",
-        }}
-        title="Phân Quyền Vai Trò & Chức Năng"
-        description="Chọn nhóm chức vụ và chuyển quyền giữa hai cột: Kho quyền khả dụng ➔ Thẩm quyền đã cấp"
         stats={[
           {
             icon: ShieldCheck,
