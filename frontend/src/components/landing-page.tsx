@@ -28,13 +28,27 @@ import {
   Check,
   Crown,
   HelpCircle,
+  X,
+  ChevronLeft,
+  Maximize2,
 } from "lucide-react";
+import { api } from "@/lib/api-client";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { AuthModal } from "@/components/auth-modal";
 import { GoLivePromoBanner } from "@/components/golive-promo-banner";
 import { useEventTheme } from "@/contexts/event-theme-context";
+
+// 41 ảnh feedback học viên thật từ thư mục /ảnh feedback (đã copy vào /public/feedback)
+const FEEDBACK_IMAGES = Array.from({ length: 41 }, (_, i) => {
+  const num = (i + 1).toString().padStart(2, "0");
+  return {
+    id: i + 1,
+    url: `/feedback/fb-${num}.jpg`,
+    title: `Bảng điểm / Tin nhắn báo đỗ B1, B2 Aptis ESOL #${num}`,
+  };
+});
 
 function hexToRgb(hex?: string): { r: number; g: number; b: number } {
   if (!hex || !hex.startsWith("#")) return { r: 37, g: 99, b: 235 };
@@ -54,6 +68,31 @@ export function LandingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [activeFeatureTab, setActiveFeatureTab] = useState<number>(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // ── Database Dynamic Pricing Plans State
+  const [dbPlans, setDbPlans] = useState<any[]>([]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
+
+  // ── Real Feedback Lightbox State
+  const [selectedFeedbackIndex, setSelectedFeedbackIndex] = useState<number | null>(null);
+  const [feedbackViewCount, setFeedbackViewCount] = useState<number>(12);
+
+  // Nạp danh sách bảng giá động từ database
+  useEffect(() => {
+    async function loadPricingPlans() {
+      try {
+        const res = await api.payment.getPlans();
+        if (res.success && res.data && res.data.length > 0) {
+          setDbPlans(res.data);
+        }
+      } catch (err) {
+        console.error("Lỗi tải bảng giá từ database:", err);
+      } finally {
+        setLoadingPlans(false);
+      }
+    }
+    loadPricingPlans();
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -696,292 +735,296 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* ====================================================
-            3. KEY METRICS COUNTER BAR
-            ==================================================== */}
-        <section className="relative -mt-6 z-20 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 p-4 sm:p-6 rounded-3xl bg-card border border-border shadow-xl backdrop-blur-xl">
-            {stats.map((s, idx) => (
-              <div key={idx} className="p-3 sm:p-4 text-center border-r last:border-r-0 border-border/60">
-                <div className="font-heading text-xl sm:text-2xl font-black text-primary tracking-tight">
-                  {s.value}
-                </div>
-                <div className="text-[11px] sm:text-xs font-semibold text-foreground mt-0.5">{s.label}</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block">{s.desc}</div>
+        {/* =========================================================================
+            [ĐÃ COMMENT CODE THEO YÊU CẦU]:
+            - 870+ Đề thi Aptis sát thật, 8.500+ Học viên đang luyện...
+            - Sát đề thật 100%, AI chấm Speaking, AI chấm Writing...
+            - LỘ TRÌNH DÀNH CHO NGƯỜI MỚI (Bắt đầu học với 4 bước này...)
+            - TÍNH NĂNG NỔI BẬT (01 Thi thử, 02 Luyện kỹ năng, 03 Theo dõi tiến độ...)
+            Chỉ giữ lại content từ mục "Vì sao chọn APTIS ESOL PREMIER?" đổ xuống.
+            ========================================================================= */}
+        {false && (
+          <>
+            {/* 3. KEY METRICS COUNTER BAR */}
+            <section className="relative -mt-6 z-20 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 p-4 sm:p-6 rounded-3xl bg-card border border-border shadow-xl backdrop-blur-xl">
+                {stats.map((s, idx) => (
+                  <div key={idx} className="p-3 sm:p-4 text-center border-r last:border-r-0 border-border/60">
+                    <div className="font-heading text-xl sm:text-2xl font-black text-primary tracking-tight">
+                      {s.value}
+                    </div>
+                    <div className="text-[11px] sm:text-xs font-semibold text-foreground mt-0.5">{s.label}</div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block">{s.desc}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
 
-        {/* ====================================================
-            4. 5 CORE VALUE PROPOSITIONS ROW
-            ==================================================== */}
-        <section className="py-12 md:py-16 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-border bg-muted/20 p-6 sm:p-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-              {coreBenefits.map((item, idx) => {
-                const Icon = item.icon;
-                return (
-                  <div key={idx} className="flex flex-col items-start gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <h2 className="text-xs sm:text-[13px] font-bold text-foreground">{item.title}</h2>
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+            {/* 4. 5 CORE VALUE PROPOSITIONS ROW */}
+            <section className="py-12 md:py-16 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="rounded-3xl border border-border bg-muted/20 p-6 sm:p-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                  {coreBenefits.map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                      <div key={idx} className="flex flex-col items-start gap-2.5">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <h2 className="text-xs sm:text-[13px] font-bold text-foreground">{item.title}</h2>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
 
-        {/* ====================================================
-            5. 4-STEP LEARNING ROADMAP ("Bắt đầu học với 4 bước này")
-            ==================================================== */}
-        <section className="py-12 md:py-20 bg-muted/30 border-y border-border">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-              <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
-                LỘ TRÌNH DÀNH CHO NGƯỜI MỚI
-              </span>
-              <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
-                Bắt đầu học với <span className="text-primary">4 bước này</span>
-              </h2>
-              <p className="text-[11.5px] text-muted-foreground">
-                Được xây dựng từ kinh nghiệm của hơn 8.500 thí sinh đã thi đỗ B1 & B2 Aptis ESOL
-              </p>
-            </div>
+            {/* 5. 4-STEP LEARNING ROADMAP ("Bắt đầu học với 4 bước này") */}
+            <section className="py-12 md:py-20 bg-muted/30 border-y border-border">
+              <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+                  <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
+                    LỘ TRÌNH DÀNH CHO NGƯỜI MỚI
+                  </span>
+                  <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
+                    Bắt đầu học với <span className="text-primary">4 bước này</span>
+                  </h2>
+                  <p className="text-[11.5px] text-muted-foreground">
+                    Được xây dựng từ kinh nghiệm của hơn 8.500 thí sinh đã thi đỗ B1 & B2 Aptis ESOL
+                  </p>
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {steps.map((st, idx) => (
-                <div
-                  key={idx}
-                  className="relative rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:border-primary/40 transition-all flex flex-col justify-between"
-                >
-                  <div className="space-y-4">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1D4ED8] to-[#2563EB] text-white flex items-center justify-center font-heading font-black text-xs shadow-xs">
-                      {st.step}
-                    </div>
-                    <h3 className="font-heading font-bold text-xs sm:text-[13px] text-foreground leading-snug">
-                      {st.title}
-                    </h3>
-                    <p className="text-[11.5px] text-muted-foreground leading-relaxed">
-                      {st.desc}
-                    </p>
-                  </div>
-
-                  <div className="pt-6 mt-4 border-t border-border/60">
-                    <Link
-                      href={st.href}
-                      className="inline-flex items-center gap-1.5 text-[11px] font-bold text-primary hover:text-blue-700 transition-colors"
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {steps.map((st, idx) => (
+                    <div
+                      key={idx}
+                      className="relative rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:border-primary/40 transition-all flex flex-col justify-between"
                     >
-                      <span>{st.actionText}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <div className="space-y-4">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1D4ED8] to-[#2563EB] text-white flex items-center justify-center font-heading font-black text-xs shadow-xs">
+                          {st.step}
+                        </div>
+                        <h3 className="font-heading font-bold text-xs sm:text-[13px] text-foreground leading-snug">
+                          {st.title}
+                        </h3>
+                        <p className="text-[11.5px] text-muted-foreground leading-relaxed">
+                          {st.desc}
+                        </p>
+                      </div>
+
+                      <div className="pt-6 mt-4 border-t border-border/60">
+                        <Link
+                          href={st.href}
+                          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-primary hover:text-blue-700 transition-colors"
+                        >
+                          <span>{st.actionText}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* 6. FEATURE SHOWCASES ("Tính năng nổi bật") */}
+            <section id="tinh-nang" className="py-16 md:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+              <div className="text-center max-w-2xl mx-auto space-y-3">
+                <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
+                  TÍNH NĂNG NỔI BẬT
+                </span>
+                <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
+                  Trải nghiệm luyện thi cùng <span className="text-primary">APTIS ESOL PREMIER</span>
+                </h2>
+                <p className="text-[11.5px] text-muted-foreground">
+                  Mọi công cụ bạn cần để đạt band mục tiêu, gói gọn trên một nền tảng thông minh duy nhất.
+                </p>
+              </div>
+
+              {/* Feature 01: Thi thử & AI chấm Speaking - Writing */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-lg">
+                <div className="lg:col-span-6 space-y-5">
+                  <span className="font-heading text-base font-black text-primary/30">01</span>
+                  <h3 className="font-heading text-base sm:text-lg font-bold text-foreground">
+                    Thi thử & AI chấm Speaking – Writing
+                  </h3>
+                  <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
+                    Làm bài mô phỏng đề thật, AI thông minh chấm cả Speaking & Writing — trả điểm số, band CEFR và phân tích chi tiết từng lỗi sai ngay sau khi nộp.
+                  </p>
+                  <div className="space-y-2.5 text-xs text-foreground pt-2">
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span><strong>Chấm theo 4 tiêu chí CEFR:</strong> Task Fulfillment, Grammar, Vocab, Cohesion.</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span><strong>Chỉ rõ lỗi sai & bài mẫu nâng band:</strong> Sửa từng câu văn chưa tự nhiên.</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span><strong>Lưu kết quả & theo dõi cải thiện:</strong> So sánh sự tiến bộ qua từng đề luyện.</span>
+                    </div>
+                  </div>
+                  <div className="pt-2">
+                    <Link
+                      href="/thi-thu"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-xs sm:text-sm shadow-md hover:bg-blue-700 transition-all"
+                    >
+                      <span>Thử chấm bài ngay</span>
+                      <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        {/* ====================================================
-            6. FEATURE SHOWCASES ("Tính năng nổi bật")
-            ==================================================== */}
-        <section id="tinh-nang" className="py-16 md:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
-              TÍNH NĂNG NỔI BẬT
-            </span>
-            <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
-              Trải nghiệm luyện thi cùng <span className="text-primary">APTIS ESOL PREMIER</span>
-            </h2>
-            <p className="text-[11.5px] text-muted-foreground">
-              Mọi công cụ bạn cần để đạt band mục tiêu, gói gọn trên một nền tảng thông minh duy nhất.
-            </p>
-          </div>
-
-          {/* Feature 01: Thi thử & AI chấm Speaking - Writing */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-lg">
-            <div className="lg:col-span-6 space-y-5">
-              <span className="font-heading text-base font-black text-primary/30">01</span>
-              <h3 className="font-heading text-base sm:text-lg font-bold text-foreground">
-                Thi thử & AI chấm Speaking – Writing
-              </h3>
-              <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
-                Làm bài mô phỏng đề thật, AI thông minh chấm cả Speaking & Writing — trả điểm số, band CEFR và phân tích chi tiết từng lỗi sai ngay sau khi nộp.
-              </p>
-              <div className="space-y-2.5 text-xs text-foreground pt-2">
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span><strong>Chấm theo 4 tiêu chí CEFR:</strong> Task Fulfillment, Grammar, Vocab, Cohesion.</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span><strong>Chỉ rõ lỗi sai & bài mẫu nâng band:</strong> Sửa từng câu văn chưa tự nhiên.</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span><strong>Lưu kết quả & theo dõi cải thiện:</strong> So sánh sự tiến bộ qua từng đề luyện.</span>
+                {/* Feature 01 Demo Visual */}
+                <div className="lg:col-span-6 rounded-2xl border border-border bg-muted/40 p-4 sm:p-6 space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-border/80 text-xs">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-500" />
+                      <span className="font-bold text-foreground">Báo cáo đánh giá AI APTIS ESOL</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 font-bold text-xs">
+                      Điểm: 17.8 / 20 (Band B2)
+                    </span>
+                  </div>
+                  <div className="space-y-3 text-xs text-foreground/90">
+                    <div className="p-3 rounded-xl bg-card border border-border/60 space-y-1">
+                      <div className="font-bold text-foreground">Task 1: Thư thân mật (Email to a friend)</div>
+                      <p className="text-muted-foreground text-[11px] leading-relaxed">
+                        Nội dung đầy đủ, sử dụng từ ngữ tự nhiên, mạch lạc tốt. Ngữ pháp chuẩn xác, không có lỗi chính tả đáng kể.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-card border border-border/60 space-y-1">
+                      <div className="font-bold text-foreground">Task 2: Thư trang trọng (Formal Complaint)</div>
+                      <p className="text-muted-foreground text-[11px] leading-relaxed">
+                        Sử dụng các cấu trúc trang trọng xuất sắc: <em>"I am writing to express my dissatisfaction..."</em>. Vốn từ phong phú đạt chuẩn B2.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="pt-2">
-                <Link
-                  href="/thi-thu"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-xs sm:text-sm shadow-md hover:bg-blue-700 transition-all"
-                >
-                  <span>Thử chấm bài ngay</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
 
-            {/* Feature 01 Demo Visual */}
-            <div className="lg:col-span-6 rounded-2xl border border-border bg-muted/40 p-4 sm:p-6 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-border/80 text-xs">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span className="font-bold text-foreground">Báo cáo đánh giá AI APTIS ESOL</span>
+              {/* Feature 02: Luyện theo kỹ năng sát đề thật */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-lg">
+                <div className="lg:col-span-6 order-2 lg:order-1 rounded-2xl border border-border bg-muted/40 p-4 sm:p-6 space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-border/80 text-xs">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-primary" />
+                      <span className="font-bold text-foreground">Reading · Part 2: Sắp xếp câu</span>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-primary">⏱ 18:42</span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-card border border-primary/40 font-medium text-foreground flex items-center justify-between">
+                      <span>1. The festival begins with a parade through the town centre.</span>
+                      <span className="text-[10px] text-primary font-bold">Mẫu</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-card border border-border text-foreground/80">
+                      2. People gather early to find the best spots along the route.
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-card border border-border text-foreground/80">
+                      3. Afterwards, there are live music performances in the main square.
+                    </div>
+                  </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 font-bold text-xs">
-                  Điểm: 17.8 / 20 (Band B2)
-                </span>
-              </div>
-              <div className="space-y-3 text-xs text-foreground/90">
-                <div className="p-3 rounded-xl bg-card border border-border/60 space-y-1">
-                  <div className="font-bold text-foreground">Task 1: Thư thân mật (Email to a friend)</div>
-                  <p className="text-muted-foreground text-[11px] leading-relaxed">
-                    Nội dung đầy đủ, sử dụng từ ngữ tự nhiên, mạch lạc tốt. Ngữ pháp chuẩn xác, không có lỗi chính tả đáng kể.
+
+                <div className="lg:col-span-6 order-1 lg:order-2 space-y-5">
+                  <span className="font-heading text-base font-black text-primary/30">02</span>
+                  <h3 className="font-heading text-base sm:text-lg font-bold text-foreground">
+                    Luyện theo kỹ năng sát đề thi thật
+                  </h3>
+                  <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
+                    5 kỹ năng riêng biệt với đúng thao tác bài thi: kéo thả (drag & drop), dropdown inline, bấm giờ. Luyện từng phần nhỏ hoặc trọn bộ như thi thật.
                   </p>
+                  <div className="space-y-2.5 text-xs text-foreground pt-2">
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span><strong>Kéo thả & dropdown y hệt máy thi:</strong> Làm quen thao tác trước ngày thi.</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span><strong>Đủ 5 kỹ năng:</strong> Listening, Reading, Speaking, Writing, Grammar & Vocab.</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span><strong>Tùy chọn luyện part:</strong> Cày đúng dạng bài mình đang yếu để tiết kiệm thời gian.</span>
+                    </div>
+                  </div>
+                  <div className="pt-2">
+                    <Link
+                      href="/listening"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-xs sm:text-sm shadow-md hover:bg-blue-700 transition-all"
+                    >
+                      <span>Khám phá 5 kỹ năng</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
-                <div className="p-3 rounded-xl bg-card border border-border/60 space-y-1">
-                  <div className="font-bold text-foreground">Task 2: Thư trang trọng (Formal Complaint)</div>
-                  <p className="text-muted-foreground text-[11px] leading-relaxed">
-                    Sử dụng các cấu trúc trang trọng xuất sắc: <em>"I am writing to express my dissatisfaction..."</em>. Vốn từ phong phú đạt chuẩn B2.
+              </div>
+
+              {/* Feature 03: Theo dõi tiến độ & Giữ streak */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-lg">
+                <div className="lg:col-span-6 space-y-5">
+                  <span className="font-heading text-base font-black text-primary/30">03</span>
+                  <h3 className="font-heading text-base sm:text-lg font-bold text-foreground">
+                    Theo dõi tiến độ & giữ streak
+                  </h3>
+                  <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
+                    Xem band tăng theo từng kỹ năng, biểu đồ tiến bộ theo thời gian thực và giữ chuỗi streak học tập để duy trì thói quen mỗi ngày.
                   </p>
+                  <div className="space-y-2.5 text-xs text-foreground pt-2">
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span><strong>Biểu đồ tiến bộ từng kỹ năng:</strong> Nhìn thấy sự bứt phá từ B1 lên B2.</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span><strong>Streak & Lịch sử học tập:</strong> Nhắc nhở kỷ luật học tập không bỏ lỡ ngày nào.</span>
+                    </div>
+                  </div>
+                  <div className="pt-2">
+                    <Link
+                      href="/history"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-xs sm:text-sm shadow-md hover:bg-blue-700 transition-all"
+                    >
+                      <span>Xem hồ sơ học tập</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Feature 02: Luyện theo kỹ năng sát đề thật */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-lg">
-            <div className="lg:col-span-6 order-2 lg:order-1 rounded-2xl border border-border bg-muted/40 p-4 sm:p-6 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-border/80 text-xs">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-primary" />
-                  <span className="font-bold text-foreground">Reading · Part 2: Sắp xếp câu</span>
-                </div>
-                <span className="text-xs font-mono font-bold text-primary">⏱ 18:42</span>
-              </div>
-              <div className="space-y-2 text-xs">
-                <div className="p-2.5 rounded-xl bg-card border border-primary/40 font-medium text-foreground flex items-center justify-between">
-                  <span>1. The festival begins with a parade through the town centre.</span>
-                  <span className="text-[10px] text-primary font-bold">Mẫu</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-card border border-border text-foreground/80">
-                  2. People gather early to find the best spots along the route.
-                </div>
-                <div className="p-2.5 rounded-xl bg-card border border-border text-foreground/80">
-                  3. Afterwards, there are live music performances in the main square.
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-6 order-1 lg:order-2 space-y-5">
-              <span className="font-heading text-base font-black text-primary/30">02</span>
-              <h3 className="font-heading text-base sm:text-lg font-bold text-foreground">
-                Luyện theo kỹ năng sát đề thi thật
-              </h3>
-              <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
-                5 kỹ năng riêng biệt với đúng thao tác bài thi: kéo thả (drag & drop), dropdown inline, bấm giờ. Luyện từng phần nhỏ hoặc trọn bộ như thi thật.
-              </p>
-              <div className="space-y-2.5 text-xs text-foreground pt-2">
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span><strong>Kéo thả & dropdown y hệt máy thi:</strong> Làm quen thao tác trước ngày thi.</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span><strong>Đủ 5 kỹ năng:</strong> Listening, Reading, Speaking, Writing, Grammar & Vocab.</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span><strong>Tùy chọn luyện part:</strong> Cày đúng dạng bài mình đang yếu để tiết kiệm thời gian.</span>
+                {/* Feature 03 Demo Visual */}
+                <div className="lg:col-span-6 rounded-2xl border border-border bg-muted/40 p-4 sm:p-6 space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-border/80 text-xs">
+                    <div>
+                      <span className="text-[11px] text-muted-foreground block">Tiến độ tuần này</span>
+                      <span className="font-heading font-black text-base text-foreground">B1 → B2</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 font-bold text-xs">
+                      <Flame className="w-3.5 h-3.5 fill-amber-500" />
+                      <span>18 ngày streak</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 pt-2 text-center">
+                    <div className="p-3 rounded-xl bg-card border border-border/60">
+                      <div className="text-[11px] text-muted-foreground">Reading</div>
+                      <div className="text-base font-bold text-primary mt-0.5">B2 (44/50)</div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-card border border-border/60">
+                      <div className="text-[11px] text-muted-foreground">Listening</div>
+                      <div className="text-base font-bold text-primary mt-0.5">B1+ (38/50)</div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-card border border-border/60">
+                      <div className="text-[11px] text-muted-foreground">Writing</div>
+                      <div className="text-base font-bold text-primary mt-0.5">B2 (42/50)</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="pt-2">
-                <Link
-                  href="/listening"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-xs sm:text-sm shadow-md hover:bg-blue-700 transition-all"
-                >
-                  <span>Khám phá 5 kỹ năng</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 03: Theo dõi tiến độ & Giữ streak */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-lg">
-            <div className="lg:col-span-6 space-y-5">
-              <span className="font-heading text-base font-black text-primary/30">03</span>
-              <h3 className="font-heading text-base sm:text-lg font-bold text-foreground">
-                Theo dõi tiến độ & giữ streak
-              </h3>
-              <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
-                Xem band tăng theo từng kỹ năng, biểu đồ tiến bộ theo thời gian thực và giữ chuỗi streak học tập để duy trì thói quen mỗi ngày.
-              </p>
-              <div className="space-y-2.5 text-xs text-foreground pt-2">
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span><strong>Biểu đồ tiến bộ từng kỹ năng:</strong> Nhìn thấy sự bứt phá từ B1 lên B2.</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span><strong>Streak & Lịch sử học tập:</strong> Nhắc nhở kỷ luật học tập không bỏ lỡ ngày nào.</span>
-                </div>
-              </div>
-              <div className="pt-2">
-                <Link
-                  href="/history"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-xs sm:text-sm shadow-md hover:bg-blue-700 transition-all"
-                >
-                  <span>Xem hồ sơ học tập</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Feature 03 Demo Visual */}
-            <div className="lg:col-span-6 rounded-2xl border border-border bg-muted/40 p-4 sm:p-6 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-border/80 text-xs">
-                <div>
-                  <span className="text-[11px] text-muted-foreground block">Tiến độ tuần này</span>
-                  <span className="font-heading font-black text-base text-foreground">B1 → B2</span>
-                </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 font-bold text-xs">
-                  <Flame className="w-3.5 h-3.5 fill-amber-500" />
-                  <span>18 ngày streak</span>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3 pt-2 text-center">
-                <div className="p-3 rounded-xl bg-card border border-border/60">
-                  <div className="text-[11px] text-muted-foreground">Reading</div>
-                  <div className="text-base font-bold text-primary mt-0.5">B2 (44/50)</div>
-                </div>
-                <div className="p-3 rounded-xl bg-card border border-border/60">
-                  <div className="text-[11px] text-muted-foreground">Listening</div>
-                  <div className="text-base font-bold text-primary mt-0.5">B1+ (38/50)</div>
-                </div>
-                <div className="p-3 rounded-xl bg-card border border-border/60">
-                  <div className="text-[11px] text-muted-foreground">Writing</div>
-                  <div className="text-base font-bold text-primary mt-0.5">B2 (42/50)</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+            </section>
+          </>
+        )}
 
         {/* ====================================================
             7. VÌ SAO CHỌN APTIS ESOL PREMIER ("Điểm mạnh")
@@ -1069,24 +1112,74 @@ export function LandingPage() {
             9. STUDENT TESTIMONIALS / PROOF ("Học viên nói gì")
             ==================================================== */}
         <section className="py-16 md:py-24 bg-muted/20 border-y border-border">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div className="text-center max-w-2xl mx-auto space-y-3">
               <span className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
-                KẾT QUẢ THỰC TẾ
+                BẢNG ĐIỂM & TIN NHẮN THỰC TẾ
               </span>
-              <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">
+              <h2 className="font-heading text-lg sm:text-2xl font-extrabold text-foreground">
                 Feedback từ <span className="text-primary">thí sinh đã đạt chứng chỉ</span>
               </h2>
-              <p className="text-[11.5px] text-muted-foreground">
-                Hàng nghìn học viên đã đạt chuẩn đầu ra B1, B2 và C1 ngay trong lần thi đầu tiên.
+              <p className="text-xs sm:text-[13px] text-muted-foreground">
+                Hơn 8.500+ học viên đã đạt chuẩn đầu ra B1, B2 và C1. Dưới đây là bảng điểm thật British Council và tin nhắn chia sẻ niềm vui của các bạn!
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Grid 41 ảnh feedback thật */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {FEEDBACK_IMAGES.slice(0, feedbackViewCount).map((fb, idx) => (
+                <div
+                  key={fb.id}
+                  onClick={() => setSelectedFeedbackIndex(idx)}
+                  className="group relative aspect-[3/4] rounded-2xl overflow-hidden border border-border bg-card shadow-xs hover:shadow-xl hover:border-primary/60 transition-all cursor-pointer"
+                >
+                  <img
+                    src={fb.url}
+                    alt={fb.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2.5 text-white">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold bg-primary/90 px-2 py-0.5 rounded-full">
+                        Bảng điểm thật #{fb.id}
+                      </span>
+                      <Maximize2 className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Nút Xem thêm / Thu gọn ảnh feedback */}
+            <div className="flex justify-center pt-2">
+              {feedbackViewCount < FEEDBACK_IMAGES.length ? (
+                <button
+                  type="button"
+                  onClick={() => setFeedbackViewCount(FEEDBACK_IMAGES.length)}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary font-bold text-xs transition-all shadow-xs"
+                >
+                  <span>Xem thêm {FEEDBACK_IMAGES.length - feedbackViewCount} bảng điểm thật khác</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setFeedbackViewCount(12)}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-border bg-card hover:bg-muted text-muted-foreground font-bold text-xs transition-all shadow-xs"
+                >
+                  <span>Thu gọn danh sách</span>
+                  <ChevronDown className="w-4 h-4 rotate-180" />
+                </button>
+              )}
+            </div>
+
+            {/* Testimonials tóm tắt */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
               {feedbacks.map((f, idx) => (
                 <div
                   key={idx}
-                  className="p-6 rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                  className="p-6 rounded-2xl border border-border bg-card shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -1119,6 +1212,75 @@ export function LandingPage() {
           </div>
         </section>
 
+        {/* Modal Lightbox Xem Bảng Điểm Full Size */}
+        {selectedFeedbackIndex !== null && (
+          <div
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+            onClick={() => setSelectedFeedbackIndex(null)}
+          >
+            <div
+              className="relative max-w-4xl w-full max-h-[92vh] flex flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header Modal */}
+              <div className="w-full flex items-center justify-between text-white/90 pb-3 px-2">
+                <span className="text-xs sm:text-sm font-semibold">
+                  Bảng điểm & Feedback thật ({selectedFeedbackIndex + 1} / {FEEDBACK_IMAGES.length})
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedFeedbackIndex(null)}
+                  className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  title="Đóng (Esc)"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Ảnh chính & Điều hướng */}
+              <div className="relative overflow-hidden rounded-2xl bg-black/60 border border-white/10 shadow-2xl flex items-center justify-center max-h-[80vh]">
+                <img
+                  src={FEEDBACK_IMAGES[selectedFeedbackIndex].url}
+                  alt={FEEDBACK_IMAGES[selectedFeedbackIndex].title}
+                  className="max-h-[78vh] max-w-[88vw] object-contain rounded-xl"
+                />
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedFeedbackIndex((prev) =>
+                      prev !== null ? (prev - 1 + FEEDBACK_IMAGES.length) % FEEDBACK_IMAGES.length : 0
+                    );
+                  }}
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 transition-all shadow-lg hover:scale-110"
+                  title="Ảnh trước"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedFeedbackIndex((prev) =>
+                      prev !== null ? (prev + 1) % FEEDBACK_IMAGES.length : 0
+                    );
+                  }}
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 transition-all shadow-lg hover:scale-110"
+                  title="Ảnh kế tiếp"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              <p className="text-white/70 text-xs sm:text-[13px] text-center mt-3">
+                Bảng điểm Aptis ESOL British Council thật từ cộng đồng thí sinh APTIS ESOL PREMIER
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* ====================================================
             10. PRICING PREVIEW ("Bảng giá luyện thi")
             ==================================================== */}
@@ -1135,113 +1297,139 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto gap-6 items-stretch">
-            {/* Free Tier */}
-            <div className="p-8 rounded-3xl border border-border bg-card shadow-sm flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-muted text-muted-foreground inline-block">
-                  GÓI TRẢI NGHIỆM
-                </span>
-                <div className="font-heading text-2xl font-extrabold text-foreground">
-                  0đ <span className="text-xs font-normal text-muted-foreground">/ Miễn phí</span>
+          {(() => {
+            // Lấy thông tin gói từ database động
+            const freePlan = dbPlans.find((p) => p.code === "FREE" || p.price_vnd === 0);
+            const vipPlan =
+              dbPlans.find((p) => p.code === "VIP_1M" || (p.price_vnd > 0 && p.price_vnd <= 250000)) ||
+              dbPlans.find((p) => p.price_vnd > 0);
+
+            const freeName = freePlan?.name || "GÓI TRẢI NGHIỆM";
+            const freePrice = freePlan ? (freePlan.price_vnd === 0 ? "0đ" : `${freePlan.price_vnd.toLocaleString("vi-VN")}đ`) : "0đ";
+            const freeDesc = freePlan?.description || "Phù hợp để làm quen với cấu trúc bài thi Aptis trên máy tính.";
+
+            const vipName = vipPlan?.name || "GÓI VIP PRO TRỌN GÓI";
+            const vipPrice = vipPlan?.price_vnd ? `${vipPlan.price_vnd.toLocaleString("vi-VN")}đ` : "199.000đ";
+            const vipOrigPrice = vipPlan?.original_price_vnd ? `${vipPlan.original_price_vnd.toLocaleString("vi-VN")}đ` : "499.000đ";
+            const vipDesc = vipPlan?.description || "Mở khóa toàn bộ 870+ đề và công nghệ AI chấm không giới hạn.";
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto gap-6 items-stretch">
+                {/* Gói Trải Nghiệm (Free Tier từ DB) */}
+                <div className="p-8 rounded-3xl border border-border bg-card shadow-sm flex flex-col justify-between space-y-6">
+                  <div className="space-y-4">
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-muted text-muted-foreground inline-block">
+                      {freeName}
+                    </span>
+                    <div className="font-heading text-2xl font-extrabold text-foreground">
+                      {freePrice} <span className="text-xs font-normal text-muted-foreground">/ Miễn phí</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {freeDesc}
+                    </p>
+                    <div className="space-y-2.5 pt-2 text-xs text-foreground">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span>Thi thử 2 đề Full Test miễn phí</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span>Luyện tập các part Reading cơ bản</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span>{freePlan?.ai_grading_limit ? `${freePlan.ai_grading_limit} lượt chấm AI Speaking & Writing` : "3 lượt chấm AI Speaking & Writing"}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/thi-thu"
+                    className="w-full text-center py-3 rounded-xl border border-border bg-muted/50 hover:bg-muted font-bold text-xs text-foreground transition-all"
+                  >
+                    Bắt đầu học miễn phí
+                  </Link>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Phù hợp để làm quen với cấu trúc bài thi Aptis trên máy tính.
-                </p>
-                <div className="space-y-2.5 pt-2 text-xs text-foreground">
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>Thi thử 2 đề Full Test miễn phí</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>Luyện tập các part Reading cơ bản</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>3 lượt chấm AI Speaking & Writing</span>
-                  </div>
-                </div>
-              </div>
 
-              <Link
-                href="/thi-thu"
-                className="w-full text-center py-3 rounded-xl border border-border bg-muted/50 hover:bg-muted font-bold text-xs text-foreground transition-all"
-              >
-                Bắt đầu học miễn phí
-              </Link>
-            </div>
-
-            {/* Pro Tier (Featured) */}
-            <div className="relative p-8 rounded-3xl border-2 border-primary bg-gradient-to-b from-primary/5 via-card to-card shadow-xl flex flex-col justify-between space-y-6">
-              <div
-                className="absolute -top-3.5 right-6 px-3 py-0.5 rounded-full text-white font-extrabold text-[10px] uppercase tracking-wider shadow-sm"
-                style={{
-                  background: config.enabled
-                    ? `linear-gradient(90deg, ${config.primaryColor}, ${config.accentColor || config.primaryColor})`
-                    : "linear-gradient(to right, #F59E0B, #EA580C)",
-                }}
-              >
-                {config.enabled ? `${config.icon} ƯU ĐÃI ${config.badge.toUpperCase()}` : "KHUYÊN DÙNG"}
-              </div>
-
-              <div className="space-y-4">
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary/10 text-primary inline-flex items-center gap-1">
-                  <Crown className="w-3.5 h-3.5" />
-                  GÓI VIP PRO TRỌN GÓI
-                </span>
-                <div className="font-heading text-2xl font-extrabold text-foreground">
-                  199.000đ{" "}
-                  <span className="text-xs font-normal line-through text-muted-foreground">
-                    499.000đ
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Mở khóa toàn bộ 870+ đề và công nghệ AI chấm không giới hạn.
-                </p>
-                <div className="space-y-2.5 pt-2 text-xs text-foreground">
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-primary font-bold shrink-0" />
-                    <span><strong>Mở khóa trọn bộ 870+ đề thi thật</strong></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-primary font-bold shrink-0" />
-                    <span><strong>Không giới hạn lượt chấm AI Speaking & Writing</strong></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-primary font-bold shrink-0" />
-                    <span><strong>Bộ đề Key Dự Đoán ưu tiên sát kỳ thi</strong></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-primary font-bold shrink-0" />
-                    <span>Hỗ trợ giải đáp thắc mắc 24/7 từ đội ngũ Admin</span>
+                {/* Gói VIP PRO (Động từ DB + Sự kiện) */}
+                <div className="relative p-8 rounded-3xl border-2 border-primary bg-gradient-to-b from-primary/5 via-card to-card shadow-xl flex flex-col justify-between space-y-6">
+                  <div
+                    className="absolute -top-3.5 right-6 px-3 py-0.5 rounded-full text-white font-extrabold text-[10px] uppercase tracking-wider shadow-sm"
+                    style={{
+                      background: config.enabled
+                        ? `linear-gradient(90deg, ${config.primaryColor}, ${config.accentColor || config.primaryColor})`
+                        : "linear-gradient(to right, #F59E0B, #EA580C)",
+                    }}
+                  >
+                    {config.enabled ? `${config.icon} ƯU ĐÃI ${config.name?.toUpperCase() || config.badge.toUpperCase()}` : "💐 ƯU ĐÃI 20/10 & 8/3"}
                   </div>
 
-                  {config.enabled && (
-                    <div
-                      className="flex items-center gap-2 p-2 rounded-xl text-xs font-semibold animate-in fade-in"
-                      style={{
-                        backgroundColor: `${config.primaryColor}15`,
-                        color: config.primaryColor,
-                      }}
-                    >
-                      <span className="text-base">{config.icon}</span>
-                      <span>
-                        <strong>Đặc quyền {config.name}:</strong> Nhân đôi quyền lợi chấm AI & quà tặng
+                  <div className="space-y-4">
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary/10 text-primary inline-flex items-center gap-1">
+                      <Crown className="w-3.5 h-3.5" />
+                      {vipName}
+                    </span>
+                    <div className="font-heading text-2xl font-extrabold text-foreground">
+                      {vipPrice}{" "}
+                      <span className="text-xs font-normal line-through text-muted-foreground">
+                        {vipOrigPrice}
                       </span>
                     </div>
-                  )}
+                    <p className="text-xs text-muted-foreground">
+                      {vipDesc}
+                    </p>
+                    <div className="space-y-2.5 pt-2 text-xs text-foreground">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-primary font-bold shrink-0" />
+                        <span><strong>Mở khóa trọn bộ 870+ đề thi thật</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-primary font-bold shrink-0" />
+                        <span><strong>Không giới hạn lượt chấm AI Speaking & Writing</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-primary font-bold shrink-0" />
+                        <span><strong>Bộ đề Key Dự Đoán ưu tiên sát kỳ thi</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-primary font-bold shrink-0" />
+                        <span>Hỗ trợ giải đáp thắc mắc 24/7 từ đội ngũ Admin</span>
+                      </div>
+
+                      {config.enabled ? (
+                        <div
+                          className="flex items-center gap-2 p-2 rounded-xl text-xs font-semibold animate-in fade-in"
+                          style={{
+                            backgroundColor: `${config.primaryColor}15`,
+                            color: config.primaryColor,
+                          }}
+                        >
+                          <span className="text-base">{config.icon}</span>
+                          <span>
+                            <strong>Đặc quyền {config.name}:</strong> Nhân đôi quyền lợi chấm AI & quà tặng
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 p-2 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-600 animate-in fade-in">
+                          <span className="text-base">💐</span>
+                          <span>
+                            <strong>Đặc quyền Phụ nữ Việt Nam 💐:</strong> Nhân đôi quyền lợi chấm AI & quà tặng
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/pricing"
+                    className="w-full text-center py-3 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-extrabold text-xs shadow-md shadow-blue-500/25 hover:brightness-110 active:scale-95 transition-all"
+                  >
+                    Nâng cấp VIP PRO ngay
+                  </Link>
                 </div>
               </div>
-
-              <Link
-                href="/pricing"
-                className="w-full text-center py-3 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-extrabold text-xs shadow-md shadow-blue-500/25 hover:brightness-110 active:scale-95 transition-all"
-              >
-                Nâng cấp VIP PRO ngay
-              </Link>
-            </div>
-          </div>
+            );
+          })()}
         </section>
 
         {/* ====================================================
