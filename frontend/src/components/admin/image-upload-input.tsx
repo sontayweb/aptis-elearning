@@ -61,7 +61,8 @@ export default function ImageUploadInput({
 
     setUploading(true);
     try {
-      const res = await api.admin.uploadExamImage(file, category);
+      // Truyền previousUrl để backend tự động dọn dẹp file cũ nếu đang thay thế ảnh
+      const res = await api.admin.uploadExamImage(file, category, value || undefined);
       if (res && res.url) {
         onChange(res.url);
       } else {
@@ -71,6 +72,20 @@ export default function ImageUploadInput({
       setError(err?.message || "Lỗi khi tải ảnh lên máy chủ.");
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    const currentUrl = value;
+    onChange("");
+    // Nếu là ảnh nội bộ lưu trên server, tự động dọn dẹp file rác trên server
+    if (currentUrl && currentUrl.startsWith("/uploads/exams/")) {
+      try {
+        await api.admin.deleteExamImage(currentUrl);
+      } catch {
+        // im lặng bỏ qua nếu file đã được xóa
+      }
     }
   };
 
@@ -201,7 +216,7 @@ export default function ImageUploadInput({
             {value && (
               <button
                 type="button"
-                onClick={() => onChange("")}
+                onClick={handleRemoveImage}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-rose-500 rounded"
                 title="Xóa link"
               >
@@ -263,7 +278,7 @@ export default function ImageUploadInput({
               </a>
               <button
                 type="button"
-                onClick={() => onChange("")}
+                onClick={handleRemoveImage}
                 className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                 title="Gỡ ảnh này"
               >

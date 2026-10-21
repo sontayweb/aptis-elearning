@@ -45,6 +45,8 @@ router.post('/exams/import/validate', upload.single('file'), (req, res, next) =>
 router.post('/exams/upload-image', upload.single('image'), (req, res, next) =>
   adminController.uploadExamImage(req, res, next)
 );
+router.delete('/exams/image', (req, res, next) => adminController.deleteExamImage(req, res, next));
+router.post('/exams/delete-image', (req, res, next) => adminController.deleteExamImage(req, res, next));
 router.post('/exams/import/upload-image', upload.single('image'), (req, res, next) =>
   adminController.uploadExamImage(req, res, next)
 );

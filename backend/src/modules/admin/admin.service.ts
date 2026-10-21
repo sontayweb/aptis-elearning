@@ -16,6 +16,8 @@ import { Request } from 'express';
 import { grantOrExtendSubscription } from '../../utils/subscription-helper';
 import * as xlsx from 'xlsx';
 import { emailService } from '../email/email.service';
+import fs from 'fs';
+import path from 'path';
 
 export class AdminService {
   async listUsers(filter: AdminUserFilterInput) {
@@ -407,6 +409,13 @@ export class AdminService {
     const part = await prisma.examPart.findUnique({ where: { id: partId } });
     if (!part) throw { statusCode: 404, message: 'Phần thi không tồn tại' };
 
+    // Dọn dẹp ảnh cũ nếu người dùng đổi hoặc gỡ ảnh (tránh rác bộ nhớ server)
+    if (input.imageUrl !== undefined && part.image_url && part.image_url !== input.imageUrl) {
+      if (part.image_url.startsWith('/uploads/exams/')) {
+        this.safeDeleteExamImage(part.image_url);
+      }
+    }
+
     const updated = await prisma.examPart.update({
       where: { id: partId },
       data: {
@@ -479,6 +488,11 @@ export class AdminService {
     });
     if (!part) throw { statusCode: 404, message: 'Phần thi không tồn tại' };
 
+    // Dọn dẹp ảnh đính kèm nếu có khi xóa part
+    if (part.image_url && part.image_url.startsWith('/uploads/exams/')) {
+      this.safeDeleteExamImage(part.image_url);
+    }
+
     await prisma.examPart.delete({ where: { id: partId } });
 
     auditService.record({
@@ -491,6 +505,33 @@ export class AdminService {
     });
 
     return { success: true };
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // FILE STORAGE: Xóa an toàn ảnh đính kèm đề thi khỏi máy chủ
+  // ──────────────────────────────────────────────────────────────
+  safeDeleteExamImage(imageUrl?: string | null): boolean {
+    try {
+      if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.startsWith('/uploads/exams/')) {
+        return false;
+      }
+      const allowedRoot = path.resolve(process.env.UPLOAD_DIR || './uploads', 'exams');
+      const relPath = imageUrl.replace(/^\/?(api\/)?uploads\/?/, '');
+      const fullPath = path.resolve(process.env.UPLOAD_DIR || './uploads', relPath);
+
+      // Chống Path Traversal: Đảm bảo đường dẫn tuyệt đối phải nằm trong thư mục uploads/exams
+      if (!fullPath.startsWith(allowedRoot)) {
+        return false;
+      }
+
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
   }
 
   // ──────────────────────────────────────────────────────────────

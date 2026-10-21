@@ -712,16 +712,24 @@ class ApiClient {
         body: JSON.stringify({ exams }),
       }),
 
-    uploadExamImage: (image: File, category?: string) => {
+    uploadExamImage: (image: File, category?: string, previousUrl?: string) => {
       const formData = new FormData();
       formData.append('image', image);
       if (category) formData.append('category', category);
+      if (previousUrl) formData.append('previousUrl', previousUrl);
       return this.request<any>('/admin/exams/upload-image', {
         method: 'POST',
         body: formData,
       }).then((res) => {
         if (!res.success) throw new Error(res.message || 'Lỗi khi tải ảnh lên');
         return res.data;
+      });
+    },
+
+    deleteExamImage: (url: string) => {
+      return this.request<any>('/admin/exams/delete-image', {
+        method: 'POST',
+        body: JSON.stringify({ url }),
       });
     },
 

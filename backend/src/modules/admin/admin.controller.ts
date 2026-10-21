@@ -452,6 +452,12 @@ export class AdminController {
       const filePath = path.join(uploadDir, filename);
       fs.writeFileSync(filePath, req.file.buffer);
 
+      // Tự động dọn dẹp ảnh cũ nếu đây là thao tác thay thế ảnh (tránh rác bộ nhớ server)
+      const previousUrl = (req.body.previousUrl || req.body.oldUrl || req.query.previousUrl || '').toString().trim();
+      if (previousUrl && previousUrl.startsWith('/uploads/exams/')) {
+        adminService.safeDeleteExamImage(previousUrl);
+      }
+
       const publicUrl = `/uploads/exams/${category || 'speaking'}/${filename}`;
       sendSuccess(
         res,
@@ -462,6 +468,24 @@ export class AdminController {
           mimetype: req.file.mimetype,
         },
         'Tải ảnh lên máy chủ thành công',
+        200
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteExamImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const url = (req.body?.url || req.query?.url || '').toString().trim();
+      if (!url) {
+        throw { statusCode: 400, message: 'Vui lòng cung cấp đường dẫn ảnh cần xóa.' };
+      }
+      const deleted = adminService.safeDeleteExamImage(url);
+      sendSuccess(
+        res,
+        { deleted, url },
+        deleted ? 'Đã xóa ảnh thành công khỏi máy chủ' : 'Ảnh không tồn tại hoặc đã được xóa trước đó',
         200
       );
     } catch (error) {
