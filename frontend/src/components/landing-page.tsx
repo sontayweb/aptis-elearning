@@ -69,7 +69,7 @@ export function LandingPage() {
   const [activeFeatureTab, setActiveFeatureTab] = useState<number>(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // ── Database Dynamic Pricing Plans State
+  // ── Danh sách gói cước động 100% từ Database (Admin cấu hình bao nhiêu gói thì hiển thị bấy nhiêu)
   const [dbPlans, setDbPlans] = useState<any[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
 
@@ -77,13 +77,15 @@ export function LandingPage() {
   const [selectedFeedbackIndex, setSelectedFeedbackIndex] = useState<number | null>(null);
   const [feedbackViewCount, setFeedbackViewCount] = useState<number>(12);
 
-  // Nạp danh sách bảng giá động từ database
+  // Nạp toàn bộ danh sách gói cước động từ database
   useEffect(() => {
     async function loadPricingPlans() {
       try {
         const res = await api.payment.getPlans();
-        if (res.success && res.data && res.data.length > 0) {
-          setDbPlans(res.data);
+        if (res.success && res.data && Array.isArray(res.data)) {
+          // Lấy tất cả các gói đang mở bán trong database (is_active !== false)
+          const activePlans = res.data.filter((p: any) => p.is_active !== false);
+          setDbPlans(activePlans);
         }
       } catch (err) {
         console.error("Lỗi tải bảng giá từ database:", err);
@@ -1282,7 +1284,7 @@ export function LandingPage() {
         )}
 
         {/* ====================================================
-            10. PRICING PREVIEW ("Bảng giá luyện thi")
+            10. PRICING PREVIEW ("Bảng Gói Học Phí Linh Hoạt")
             ==================================================== */}
         <section className="py-16 md:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
@@ -1290,146 +1292,169 @@ export function LandingPage() {
               BẢNG GIÁ ƯU ĐÃI
             </span>
             <h2 className="font-heading text-lg sm:text-2xl font-extrabold text-foreground">
-              Đầu tư một lần — <span className="text-primary">Đỗ Aptis chắc chắn</span>
+              Bảng Gói Học Phí <span className="text-primary">Linh Hoạt</span>
             </h2>
             <p className="text-xs text-muted-foreground">
-              Chọn gói học phù hợp với quỹ thời gian và mục tiêu điểm số của bạn.
+              Thời hạn và hạn ngạch chấm AI sẽ được tự động cộng dồn nếu bạn đang có gói VIP sẵn.
             </p>
           </div>
 
-          {(() => {
-            // Lấy thông tin gói từ database động
-            const freePlan = dbPlans.find((p) => p.code === "FREE" || p.price_vnd === 0);
-            const vipPlan =
-              dbPlans.find((p) => p.code === "VIP_1M" || (p.price_vnd > 0 && p.price_vnd <= 250000)) ||
-              dbPlans.find((p) => p.price_vnd > 0);
+          {/* Grid hiển thị TOÀN BỘ các gói từ Database */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            {dbPlans.map((plan: any, idx: number) => {
+              const isFree = plan.price_vnd === 0;
+              const isPopular = plan.code === "VIP_3M";
+              const isTop = plan.code === "PREMIER_6M";
 
-            const freeName = freePlan?.name || "GÓI TRẢI NGHIỆM";
-            const freePrice = freePlan ? (freePlan.price_vnd === 0 ? "0đ" : `${freePlan.price_vnd.toLocaleString("vi-VN")}đ`) : "0đ";
-            const freeDesc = freePlan?.description || "Phù hợp để làm quen với cấu trúc bài thi Aptis trên máy tính.";
+              const badgeText =
+                plan.code === "PREMIER_6M"
+                  ? "👑 CAO CẤP NHẤT"
+                  : plan.code === "VIP_3M"
+                  ? "🔥 PHỔ BIẾN NHẤT"
+                  : plan.code === "VIP_1M"
+                  ? "TIẾT KIỆM 40%"
+                  : undefined;
 
-            const vipName = vipPlan?.name || "GÓI VIP PRO TRỌN GÓI";
-            const vipPrice = vipPlan?.price_vnd ? `${vipPlan.price_vnd.toLocaleString("vi-VN")}đ` : "199.000đ";
-            const vipOrigPrice = vipPlan?.original_price_vnd ? `${vipPlan.original_price_vnd.toLocaleString("vi-VN")}đ` : "499.000đ";
-            const vipDesc = vipPlan?.description || "Mở khóa toàn bộ 870+ đề và công nghệ AI chấm không giới hạn.";
+              const durationText =
+                plan.duration_days > 365
+                  ? "Thời hạn: Vĩnh viễn"
+                  : `Thời hạn: ${plan.duration_days} ngày (~${Math.round(plan.duration_days / 30)} tháng)`;
 
-            return (
-              <div className="grid grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto gap-6 items-stretch">
-                {/* Gói Trải Nghiệm (Free Tier từ DB) */}
-                <div className="p-8 rounded-3xl border border-border bg-card shadow-sm flex flex-col justify-between space-y-6">
-                  <div className="space-y-4">
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-muted text-muted-foreground inline-block">
-                      {freeName}
-                    </span>
-                    <div className="font-heading text-2xl font-extrabold text-foreground">
-                      {freePrice} <span className="text-xs font-normal text-muted-foreground">/ Miễn phí</span>
+              return (
+                <div
+                  key={plan.id || plan.code || idx}
+                  className={`relative p-6 sm:p-7 rounded-3xl flex flex-col justify-between space-y-6 transition-all ${
+                    isPopular
+                      ? "border-2 border-primary bg-gradient-to-b from-primary/5 via-card to-card shadow-xl lg:-translate-y-2"
+                      : isTop
+                      ? "border-2 border-amber-500/80 bg-gradient-to-b from-amber-500/5 via-card to-card shadow-lg"
+                      : "border border-border bg-card shadow-sm hover:shadow-md hover:border-primary/40"
+                  }`}
+                >
+                  {/* Badge */}
+                  {badgeText && (
+                    <div
+                      className={`absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-white font-extrabold text-[10px] uppercase tracking-wider shadow-sm whitespace-nowrap ${
+                        isPopular
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-600"
+                          : isTop
+                          ? "bg-gradient-to-r from-amber-500 to-orange-500"
+                          : "bg-emerald-600"
+                      }`}
+                    >
+                      {badgeText}
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {freeDesc}
-                    </p>
-                    <div className="space-y-2.5 pt-2 text-xs text-foreground">
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Thi thử 2 đề Full Test miễn phí</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Luyện tập các part Reading cơ bản</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>{freePlan?.ai_grading_limit ? `${freePlan.ai_grading_limit} lượt chấm AI Speaking & Writing` : "3 lượt chấm AI Speaking & Writing"}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Link
-                    href="/thi-thu"
-                    className="w-full text-center py-3 rounded-xl border border-border bg-muted/50 hover:bg-muted font-bold text-xs text-foreground transition-all"
-                  >
-                    Bắt đầu học miễn phí
-                  </Link>
-                </div>
-
-                {/* Gói VIP PRO (Động từ DB + Sự kiện) */}
-                <div className="relative p-8 rounded-3xl border-2 border-primary bg-gradient-to-b from-primary/5 via-card to-card shadow-xl flex flex-col justify-between space-y-6">
-                  <div
-                    className="absolute -top-3.5 right-6 px-3 py-0.5 rounded-full text-white font-extrabold text-[10px] uppercase tracking-wider shadow-sm"
-                    style={{
-                      background: config.enabled
-                        ? `linear-gradient(90deg, ${config.primaryColor}, ${config.accentColor || config.primaryColor})`
-                        : "linear-gradient(to right, #F59E0B, #EA580C)",
-                    }}
-                  >
-                    {config.enabled ? `${config.icon} ƯU ĐÃI ${config.name?.toUpperCase() || config.badge.toUpperCase()}` : "💐 ƯU ĐÃI 20/10 & 8/3"}
-                  </div>
+                  )}
 
                   <div className="space-y-4">
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary/10 text-primary inline-flex items-center gap-1">
-                      <Crown className="w-3.5 h-3.5" />
-                      {vipName}
-                    </span>
-                    <div className="font-heading text-2xl font-extrabold text-foreground">
-                      {vipPrice}{" "}
-                      <span className="text-xs font-normal line-through text-muted-foreground">
-                        {vipOrigPrice}
-                      </span>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-muted text-muted-foreground uppercase text-[10px]">
+                          {plan.code}
+                        </span>
+                        <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                          Đang mở bán
+                        </span>
+                      </div>
+                      <h3 className="font-heading font-extrabold text-sm sm:text-base text-foreground mt-2">
+                        {plan.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {durationText}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {vipDesc}
-                    </p>
-                    <div className="space-y-2.5 pt-2 text-xs text-foreground">
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-primary font-bold shrink-0" />
-                        <span><strong>Mở khóa trọn bộ 870+ đề thi thật</strong></span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-primary font-bold shrink-0" />
-                        <span><strong>Không giới hạn lượt chấm AI Speaking & Writing</strong></span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-primary font-bold shrink-0" />
-                        <span><strong>Bộ đề Key Dự Đoán ưu tiên sát kỳ thi</strong></span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-primary font-bold shrink-0" />
-                        <span>Hỗ trợ giải đáp thắc mắc 24/7 từ đội ngũ Admin</span>
-                      </div>
 
-                      {config.enabled ? (
-                        <div
-                          className="flex items-center gap-2 p-2 rounded-xl text-xs font-semibold animate-in fade-in"
-                          style={{
-                            backgroundColor: `${config.primaryColor}15`,
-                            color: config.primaryColor,
-                          }}
-                        >
-                          <span className="text-base">{config.icon}</span>
-                          <span>
-                            <strong>Đặc quyền {config.name}:</strong> Nhân đôi quyền lợi chấm AI & quà tặng
+                    {/* Giá niêm yết */}
+                    <div className="pt-1 border-t border-border/50">
+                      <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
+                        Giá niêm yết (VNĐ)
+                      </div>
+                      <div className="font-heading text-2xl font-extrabold text-foreground mt-0.5">
+                        {isFree ? (
+                          <span className="text-emerald-600">0 đ <span className="text-xs font-normal text-muted-foreground">(Miễn phí)</span></span>
+                        ) : (
+                          <span>{plan.price_vnd?.toLocaleString("vi-VN")} đ</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Quota AI & GV */}
+                    <div className="grid grid-cols-2 gap-2 text-[11px] py-2 px-3 rounded-xl bg-muted/40 border border-border/50">
+                      <div>
+                        <span className="text-muted-foreground block text-[10px]">Quota chấm AI:</span>
+                        <span className="font-bold text-foreground">
+                          {plan.ai_quota !== undefined ? `${plan.ai_quota} lượt` : "Không giới hạn"}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-[10px]">Quota GV chấm:</span>
+                        <span className="font-bold text-foreground">
+                          {plan.teacher_quota !== undefined ? `${plan.teacher_quota} bài` : "0 bài"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Quyền lợi nổi bật lấy 100% từ plan.features */}
+                    <div className="space-y-2 pt-1 text-xs text-foreground">
+                      <div className="text-[10.5px] font-bold text-muted-foreground uppercase tracking-wider">
+                        Quyền lợi nổi bật:
+                      </div>
+                      {plan.features && Array.isArray(plan.features) && plan.features.map((feat: string, fIdx: number) => (
+                        <div key={fIdx} className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                          <span className="text-[11.5px] leading-relaxed text-foreground/90">
+                            {feat}
                           </span>
                         </div>
-                      ) : (
-                        <div className="flex items-center gap-2 p-2 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-600 animate-in fade-in">
-                          <span className="text-base">💐</span>
-                          <span>
-                            <strong>Đặc quyền Phụ nữ Việt Nam 💐:</strong> Nhân đôi quyền lợi chấm AI & quà tặng
-                          </span>
-                        </div>
-                      )}
+                      ))}
                     </div>
                   </div>
 
-                  <Link
-                    href="/pricing"
-                    className="w-full text-center py-3 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-extrabold text-xs shadow-md shadow-blue-500/25 hover:brightness-110 active:scale-95 transition-all"
-                  >
-                    Nâng cấp VIP PRO ngay
-                  </Link>
+                  {/* Nút hành động */}
+                  <div className="pt-4 border-t border-border/60">
+                    {isFree ? (
+                      <Link
+                        href="/thi-thu"
+                        className="w-full block text-center py-2.5 sm:py-3 rounded-xl border border-border bg-muted/60 hover:bg-muted font-bold text-xs text-foreground transition-all"
+                      >
+                        Bắt đầu miễn phí
+                      </Link>
+                    ) : (
+                      <Link
+                        href={`/pricing?plan=${plan.code}`}
+                        className={`w-full block text-center py-2.5 sm:py-3 rounded-xl font-extrabold text-xs shadow-md transition-all active:scale-95 ${
+                          isPopular
+                            ? "bg-gradient-to-r from-primary to-blue-600 text-white shadow-primary/25 hover:brightness-110"
+                            : isTop
+                            ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-500/25 hover:brightness-110"
+                            : "bg-primary text-white hover:bg-primary/90"
+                        }`}
+                      >
+                        Nâng cấp ngay
+                      </Link>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })()}
+              );
+            })}
+          </div>
+
+          {/* Dòng ghi chú Event Banner nếu có */}
+          {config.enabled && (
+            <div
+              className="mt-8 max-w-xl mx-auto flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-semibold text-center animate-in fade-in shadow-xs"
+              style={{
+                backgroundColor: `${config.primaryColor}12`,
+                color: config.primaryColor,
+                border: `1px solid ${config.primaryColor}30`,
+              }}
+            >
+              <span className="text-base">{config.icon}</span>
+              <span>
+                <strong>Đặc quyền {config.name}:</strong> Nhân đôi quyền lợi chấm AI & quà tặng khi đăng ký bất kỳ gói VIP nào!
+              </span>
+            </div>
+          )}
         </section>
 
         {/* ====================================================
