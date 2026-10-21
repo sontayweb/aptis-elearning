@@ -977,7 +977,12 @@ export default function AdminExamsPage() {
           {/* View Mode Tabs */}
           <div className="flex items-center gap-1 p-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
             <button
-              onClick={() => setViewMode("EXAMS")}
+              onClick={() => {
+                if (searchQuestionTerm.trim() && !searchTermExams.trim()) {
+                  setSearchTermExams(searchQuestionTerm.trim());
+                }
+                setViewMode("EXAMS");
+              }}
               className={`px-3 py-1.5 rounded-lg text-[11px] font-heading font-bold transition-all flex items-center gap-1.5 ${
                 viewMode === "EXAMS"
                   ? "bg-blue-600 text-white shadow-xs"
@@ -991,7 +996,12 @@ export default function AdminExamsPage() {
               </span>
             </button>
             <button
-              onClick={() => setViewMode("QUESTIONS")}
+              onClick={() => {
+                if (searchTermExams.trim() && !searchQuestionTerm.trim()) {
+                  setSearchQuestionTerm(searchTermExams.trim());
+                }
+                setViewMode("QUESTIONS");
+              }}
               className={`px-3 py-1.5 rounded-lg text-[11px] font-heading font-bold transition-all flex items-center gap-1.5 ${
                 viewMode === "QUESTIONS"
                   ? "bg-violet-600 text-white shadow-xs"
@@ -1287,53 +1297,80 @@ export default function AdminExamsPage() {
       {viewMode === "EXAMS" && (
         <div className="space-y-4">
           {/* Secondary Search & Hot Filter Strip */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
-            <div className="relative flex-1 w-full">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={searchTermExams}
-                onChange={(e) => setSearchTermExams(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && fetchExams()}
-                placeholder="Tìm theo tên đề thi, mô tả... (Gõ từ khóa rồi nhấn Enter)"
-                className="w-full pl-9 pr-8 py-2 rounded-xl text-xs bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-              />
-              {searchTermExams && (
+          <div className="space-y-2.5">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+              <div className="relative flex-1 w-full">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchTermExams}
+                  onChange={(e) => setSearchTermExams(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && fetchExams()}
+                  placeholder="Tìm theo tên đề thi, bài đọc, hoặc bất kỳ câu hỏi nào... (Gõ từ khóa rồi nhấn Enter)"
+                  className="w-full pl-9 pr-8 py-2 rounded-xl text-xs bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+                {searchTermExams && (
+                  <button
+                    onClick={() => {
+                      setSearchTermExams("");
+                      fetchExams();
+                    }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <select
+                  value={hotFilter}
+                  onChange={(e) => setHotFilter(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500/20 shrink-0"
+                  title="Lọc theo độ hot của đề"
+                >
+                  <option value="ALL">🔥 Mọi mức độ Hot</option>
+                  <option value="HOT_ALL">⭐ Có gắn sao</option>
+                  <option value="HOT_3">🔥 3⭐ Đề tủ (Hay ra)</option>
+                  <option value="HOT_2">⭐⭐ 2⭐ Đề hot</option>
+                  <option value="HOT_1">⭐ 1⭐ Ôn tập</option>
+                  <option value="HOT_0">⚪ Chưa gán sao</option>
+                </select>
+
+                <button
+                  onClick={fetchExams}
+                  className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-heading font-semibold shadow-xs transition-colors flex items-center gap-1.5 shrink-0"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  <span>Tìm kiếm</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Smart Banner: Gợi ý tìm & sửa trực tiếp câu hỏi nếu có từ khóa */}
+            {searchTermExams.trim() && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 px-4 py-2.5 bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800/60 rounded-xl text-xs text-violet-900 dark:text-violet-200 shadow-xs animate-in fade-in">
+                <div className="flex items-center gap-2">
+                  <span className="p-1 rounded-md bg-violet-100 dark:bg-violet-900/60 text-violet-700 dark:text-violet-300">
+                    <Search className="w-3.5 h-3.5" />
+                  </span>
+                  <span>
+                    Bạn đang tìm nội dung câu hỏi/bài đọc: <strong className="font-mono text-violet-800 dark:text-violet-100">&quot;{searchTermExams.trim()}&quot;</strong>?
+                  </span>
+                </div>
                 <button
                   onClick={() => {
-                    setSearchTermExams("");
-                    fetchExams();
+                    setSearchQuestionTerm(searchTermExams.trim());
+                    setViewMode("QUESTIONS");
+                    setPageQuestions(1);
                   }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                  className="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-heading font-bold text-xs shrink-0 transition-colors flex items-center justify-center gap-1.5 shadow-xs"
                 >
-                  <X className="w-3 h-3" />
+                  <span>Chuyển sang Ngân hàng câu hỏi để sửa trực tiếp câu này</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <select
-                value={hotFilter}
-                onChange={(e) => setHotFilter(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500/20 shrink-0"
-                title="Lọc theo độ hot của đề"
-              >
-                <option value="ALL">🔥 Mọi mức độ Hot</option>
-                <option value="HOT_ALL">⭐ Có gắn sao</option>
-                <option value="HOT_3">🔥 3⭐ Đề tủ (Hay ra)</option>
-                <option value="HOT_2">⭐⭐ 2⭐ Đề hot</option>
-                <option value="HOT_1">⭐ 1⭐ Ôn tập</option>
-                <option value="HOT_0">⚪ Chưa gán sao</option>
-              </select>
-
-              <button
-                onClick={fetchExams}
-                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-heading font-semibold shadow-xs transition-colors flex items-center gap-1.5 shrink-0"
-              >
-                <Search className="w-3.5 h-3.5" />
-                <span>Tìm kiếm</span>
-              </button>
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Exams Grid Table */}

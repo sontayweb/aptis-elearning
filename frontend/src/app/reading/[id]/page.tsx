@@ -1873,9 +1873,9 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
 
         // 3. Nếu vẫn chưa match được, thử tách theo 4 đoạn văn cách nhau bởi 2 dấu xuống dòng (\n\n)
         if (!matches || matches.length < 4) {
-          const paragraphs = cleanText.split(/\n\s*\n/).map((s) => s.trim()).filter((s) => s.length > 30);
+          const paragraphs = cleanText.split(/\n\s*\n/).map((s: string) => s.trim()).filter((s: string) => s.length > 30);
           if (paragraphs.length >= 4) {
-            matches = paragraphs.slice(0, 4).map((para, idx) => {
+            matches = paragraphs.slice(0, 4).map((para: string, idx: number) => {
               const letter = String.fromCharCode(65 + idx);
               return [para, letter, para];
             });

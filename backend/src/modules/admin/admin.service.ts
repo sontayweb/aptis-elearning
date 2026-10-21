@@ -1006,9 +1006,31 @@ export class AdminService {
       where.skill = skill;
     }
     if (search && search.trim()) {
+      const term = search.trim();
       where.OR = [
-        { title: { contains: search.trim(), mode: 'insensitive' } },
-        { description: { contains: search.trim(), mode: 'insensitive' } },
+        { title: { contains: term, mode: 'insensitive' } },
+        { description: { contains: term, mode: 'insensitive' } },
+        {
+          parts: {
+            some: {
+              OR: [
+                { title: { contains: term, mode: 'insensitive' } },
+                { passage_text: { contains: term, mode: 'insensitive' } },
+                {
+                  questions: {
+                    some: {
+                      OR: [
+                        { prompt: { contains: term, mode: 'insensitive' } },
+                        { explanation: { contains: term, mode: 'insensitive' } },
+                        { correct_answer: { contains: term, mode: 'insensitive' } },
+                      ],
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
       ];
     }
     if (partNumber) {
