@@ -541,12 +541,16 @@ export default function SpeakingPracticePage() {
                       ? rawTitle
                       : `${examNumStr} — ${rawTitle}`;
                   }
+                  if (activeTab === "p1") {
+                    return examNumStr; // Rút gọn Part 1 chỉ để số đề
+                  }
+                  if (activeTab === "p2") {
+                    return examNumStr; // Rút gọn Part 2 chỉ để số đề
+                  }
                   if (!isGenericTopic) {
                     return `${examNumStr} — ${topicName}`;
                   }
                   const partDefaults: Record<string, string> = {
-                    p1: "Personal Information",
-                    p2: "Picture Description",
                     p3: "Two Pictures Comparison",
                     p4: "Experience & Opinion",
                   };
@@ -558,23 +562,15 @@ export default function SpeakingPracticePage() {
                     return "Full Speaking · 4 Parts liên tục (12 phút)";
                   }
                   if (activeTab === "p1") {
-                    return exam.totalParts === 4
-                      ? "Trích từ đề Full Test · Part 1 (30s/câu)"
-                      : "Part 1 · Phỏng vấn cá nhân (3 câu · 30s/câu)";
+                    return "Part 1 · Phỏng vấn cá nhân (3 câu · 30s/câu)";
                   }
                   if (activeTab === "p2") {
-                    return exam.totalParts === 4
-                      ? "Trích từ đề Full Test · Part 2 (45s/câu)"
-                      : "Part 2 · Miêu tả tranh & Quan điểm (45s/câu)";
+                    return "Part 2 · Tranh trọng điểm & Miêu tả (45s/câu)";
                   }
                   if (activeTab === "p3") {
-                    return exam.totalParts === 4
-                      ? "Trích từ đề Full Test · Part 3 (45s/câu)"
-                      : "Part 3 · So sánh 2 bức tranh (45s/câu)";
+                    return "Part 3 · So sánh 2 bức tranh (45s/câu)";
                   }
-                  return exam.totalParts === 4
-                    ? "Trích từ đề Full Test · Part 4 (Chuẩn bị 1p · Nói 2p)"
-                    : "Part 4 · Thuyết trình chủ đề (Chuẩn bị 1p · Nói 2p)";
+                  return "Part 4 · Thuyết trình chủ đề (Chuẩn bị 1p · Nói 2p)";
                 })();
 
                 const targetUrl = `/speaking/${exam.id}${tabInfo.partQuery}`;
@@ -606,6 +602,14 @@ export default function SpeakingPracticePage() {
                               PRO
                             </span>
                           )}
+
+                          {/* Badge Tranh trọng điểm cho Part 2 */}
+                          {activeTab === "p2" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-extrabold text-[10px] border border-emerald-500/30">
+                              ☘️ Tranh trọng điểm Part 2
+                            </span>
+                          )}
+
                           {exam.hotLevel === 3 ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-600 dark:text-rose-400 font-extrabold text-[10px] animate-pulse border border-rose-500/30">
                               <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />

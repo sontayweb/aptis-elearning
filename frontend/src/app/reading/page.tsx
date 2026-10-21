@@ -509,10 +509,12 @@ export default function ReadingPracticePage() {
               {/* CARD 2..N: Practice Exam Cards */}
               {filteredExams.map((exam, idx) => {
                 const targetUrl = `/reading/${exam.id}${tabInfo.partQuery}`;
-                const displayTitle = exam.title || (() => {
-                  const numStr = idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`;
+                const numStr = idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`;
+
+                // Rút gọn tiêu đề tối giản theo yêu cầu
+                const displayTitle = (() => {
                   if (activeTab === "full") return `Đề ${numStr} — Full Reading · 4 Parts`;
-                  if (activeTab === "p1") return `Đề ${numStr} - Reading Part 1 (Sentence Comprehension)`;
+                  if (activeTab === "p1") return `Đề ${numStr}`;
                   if (activeTab === "p2") {
                     const topic = READING_PART2_TOPICS[idx % READING_PART2_TOPICS.length];
                     return `Đề ${numStr} - ${topic.title}`;
@@ -547,41 +549,49 @@ export default function ReadingPracticePage() {
                             </span>
                           )}
 
-                          {/* Stickers đánh giá mức độ ưu tiên: ★★★★★ Hay ra | VIP | Đề tủ | Mới cập nhật */}
+                          {/* Stickers đánh giá mức độ ưu tiên bằng cỏ ☘️ theo đúng tài liệu đề hot */}
                           {(() => {
-                            const mod = idx % 4;
-                            if (exam.hotLevel === 3 || mod === 0) {
-                              return (
-                                <span className="px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-700 dark:text-rose-300 font-extrabold text-[10px] inline-flex items-center gap-1 border border-rose-500/30">
-                                  <Star className="w-3 h-3 fill-rose-500 text-rose-500" />
-                                  ★★★★★ Hay ra
-                                </span>
-                              );
-                            } else if (exam.hotLevel === 2 || mod === 1) {
-                              return (
-                                <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] inline-flex items-center gap-1 border border-amber-500/30">
-                                  <Flame className="w-3 h-3 fill-amber-500 text-amber-500" />
-                                  Đề tủ
-                                </span>
-                              );
-                            } else if (mod === 2) {
-                              return (
-                                <span className="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 font-extrabold text-[10px] inline-flex items-center gap-1 border border-purple-500/30">
-                                  <Sparkles className="w-3 h-3 text-purple-600" />
-                                  VIP
-                                </span>
-                              );
+                            let sticker = "";
+                            let isKey = false;
+                            if (activeTab === "p2") {
+                              const t = READING_PART2_TOPICS[idx % READING_PART2_TOPICS.length];
+                              sticker = t?.sticker || "☘️☘️☘️ Hay ra";
+                              isKey = Boolean(t?.isKey);
+                            } else if (activeTab === "p3") {
+                              const t = READING_PART3_TOPICS[idx % READING_PART3_TOPICS.length];
+                              sticker = t?.sticker || "☘️☘️☘️ Hay ra";
+                              isKey = Boolean(t?.isKey);
+                            } else if (activeTab === "p4") {
+                              const t = READING_PART4_TOPICS[idx % READING_PART4_TOPICS.length];
+                              sticker = t?.sticker || "☘️☘️☘️☘️☘️ Cực hot";
+                              isKey = Boolean(t?.isKey);
+                            } else if (activeTab === "p1") {
+                              sticker = idx < 8 ? "☘️☘️☘️☘️☘️ Trọng điểm" : "★★★★★ Hay ra";
+                              isKey = idx < 8;
                             } else {
-                              return (
-                                <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] inline-flex items-center gap-1 border border-emerald-500/30">
-                                  Mới cập nhật
-                                </span>
-                              );
+                              sticker = idx % 3 === 0 ? "☘️☘️☘️☘️☘️ Cực hot" : idx % 3 === 1 ? "Đề tủ" : "Mới cập nhật";
+                              isKey = idx % 3 === 0;
                             }
+
+                            return (
+                              <span
+                                className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${
+                                  sticker.includes("☘️☘️☘️☘️☘️")
+                                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 shadow-xs"
+                                    : sticker.includes("☘️☘️☘️☘️")
+                                    ? "bg-teal-500/15 text-teal-700 dark:text-teal-300 border-teal-500/40"
+                                    : sticker.includes("☘️☘️☘️")
+                                    ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/40"
+                                    : "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/40"
+                                }`}
+                              >
+                                {sticker}
+                              </span>
+                            );
                           })()}
                         </div>
 
-                        {/* Top Right Trophy / CEFR Badge (chuẩn web gốc Aptis) */}
+                        {/* Top Right Trophy / CEFR Badge */}
                         <div>
                           {exam.bestCefr || (exam.status === "completed" && (exam.bestScore || exam.bestScoreNumber)) ? (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 font-bold text-xs border border-amber-500/25 shadow-2xs">

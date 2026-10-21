@@ -33,6 +33,9 @@ import {
   Users,
   FileText,
   AlignLeft,
+  Languages,
+  ExternalLink,
+  Globe,
 } from "lucide-react";
 
 // Sample Sentence Cohesion data for Part 2
@@ -304,7 +307,7 @@ function ReadingMarathonContent() {
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0 self-start sm:self-center">
-                  6 bộ đề tách câu lẻ
+                  19 bộ đề tách câu lẻ (Full Part 1)
                 </span>
               </div>
 
@@ -319,10 +322,13 @@ function ReadingMarathonContent() {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
-                              Bộ đề #{set.id}
+                              {set.title}
                             </span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
-                              {set.keyWords.join(" · ")}
+                            <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                              {set.sticker || "☘️☘️☘️☘️☘️ Đề trọng điểm"}
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                              Từ khóa: {set.keyWords.join(", ")}
                             </span>
                           </div>
                           <h3 className="text-base font-heading font-extrabold text-foreground mt-1">
@@ -334,9 +340,10 @@ function ReadingMarathonContent() {
                           <button
                             type="button"
                             onClick={() => toggleTranslation(set.id)}
-                            className="px-3 py-1.5 rounded-xl border border-border bg-muted/40 hover:bg-muted font-bold text-xs text-foreground transition-all"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-muted/40 hover:bg-muted font-bold text-xs text-foreground transition-all"
                           >
-                            {hasTranslation ? "Ẩn dịch nghĩa" : "Dịch nghĩa song ngữ"}
+                            <Languages className="w-3.5 h-3.5 text-primary" />
+                            <span>{hasTranslation ? "Ẩn dịch nghĩa" : "Dịch nghĩa song ngữ"}</span>
                           </button>
                           <button
                             type="button"
@@ -353,11 +360,25 @@ function ReadingMarathonContent() {
                         {set.questions.map((q) => {
                           const userAns = answers[q.id];
                           const isCorrect = userAns === q.correctAnswer;
+                          const googleTranslateUrl = `https://translate.google.com/?sl=en&tl=vi&text=${encodeURIComponent(q.fullSentence)}&op=translate`;
 
                           return (
                             <div key={q.id} className="p-4 rounded-xl bg-muted/20 border border-border space-y-3">
-                              <div className="text-xs font-medium text-foreground leading-relaxed">
-                                {q.prompt}
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="text-xs font-semibold text-foreground leading-relaxed">
+                                  {q.prompt}
+                                </div>
+                                <a
+                                  href={googleTranslateUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Mở Google Dịch câu này"
+                                  className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline font-bold shrink-0 p-1 rounded-md bg-primary/5 hover:bg-primary/10"
+                                >
+                                  <Globe className="w-3 h-3" />
+                                  <span>GG Dịch</span>
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                </a>
                               </div>
 
                               <div className="grid grid-cols-3 gap-2">
@@ -389,9 +410,9 @@ function ReadingMarathonContent() {
                               </div>
 
                               {hasTranslation && q.translation && (
-                                <p className="text-[11px] text-muted-foreground italic border-t border-border/40 pt-2">
-                                  <strong>Dịch:</strong> {q.translation}
-                                </p>
+                                <div className="text-[11.5px] text-muted-foreground border-t border-border/40 pt-2 flex items-center justify-between gap-2">
+                                  <span><strong>Bản dịch:</strong> {q.translation}</span>
+                                </div>
                               )}
                             </div>
                           );

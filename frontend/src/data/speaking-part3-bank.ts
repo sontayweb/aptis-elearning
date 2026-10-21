@@ -1,10 +1,12 @@
-// Speaking Part 3 Authentic Picture Comparison Bank
-// Extracted and normalized from SPEAKING/Tranh trọng điểm part 3.docx
+// Speaking Part 3 Authentic Picture Comparison Bank - ĐỦ 2 BỨC TRANH 100%
+// Trích xuất chuẩn xác từ SPEAKING/Tranh trọng điểm part 3.docx
+// Mỗi đề đều có đủ 2 tranh (Tranh 1 & Tranh 2), 3 câu hỏi chi tiết và kho từ vựng B1/B2
 
 export interface SpeakingPart3Topic {
   id: string;
   topicNumber: number;
   title: string;
+  shortTitle?: string;
   imageUrl: string;
   vocab: { en: string; vi: string }[];
   questions: string[];
@@ -14,7 +16,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
   {
     "id": "p3_1",
     "topicNumber": 1,
-    "title": "Tranh vài người leo núi + tranh ở biển 0 người",
+    "title": "Đề 01 - Tranh vài người leo núi + tranh ở biển 0 người",
     "imageUrl": "/uploads/speaking/part3/image5.png, /uploads/speaking/part3/beach.jpg",
     "questions": [
       "Tell me what you see in the two pictures.",
@@ -62,13 +64,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Relaxation",
         "vi": "Sự thư giãn"
       }
-    ]
+    ],
+    "shortTitle": "Đề 01"
   },
   {
     "id": "p3_2",
     "topicNumber": 2,
-    "title": "Sống cùng gia đình + sống một mình",
-    "imageUrl": "/uploads/speaking/part3/image6.png",
+    "title": "Đề 02 - Sống cùng gia đình + sống một mình",
+    "imageUrl": "/uploads/speaking/part3/image6_1.png, /uploads/speaking/part3/image6_2.png",
     "questions": [
       "Tell me what you see in the two photographs.",
       "Do you prefer living alone or living with your family?",
@@ -115,13 +118,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Residential area",
         "vi": "Khu dân cư"
       }
-    ]
+    ],
+    "shortTitle": "Đề 02"
   },
   {
     "id": "p3_3",
     "topicNumber": 3,
-    "title": "Tranh 1 người nhìn máy bay + 1 người đứng đợi tàu",
-    "imageUrl": "/uploads/speaking/part3/image1.jpg, /uploads/speaking/part3/image4.jpg",
+    "title": "Đề 03 - Tranh 1 người nhìn máy bay + 1 người đứng đợi tàu",
+    "imageUrl": "/uploads/speaking/part3/image1.jpg, /uploads/speaking/part3/image2.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "Which means of transport do you prefer? Why?",
@@ -168,13 +172,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Journey",
         "vi": "Hành trình"
       }
-    ]
+    ],
+    "shortTitle": "Đề 03"
   },
   {
     "id": "p3_4",
     "topicNumber": 4,
-    "title": "Người thu hoạch táo + người tưới cây",
-    "imageUrl": "/uploads/speaking/part3/image2.png, /uploads/speaking/part3/image8.png",
+    "title": "Đề 04 - Người thu hoạch táo + người tưới cây",
+    "imageUrl": "/uploads/speaking/part3/image3.png, /uploads/speaking/part3/image4.jpg",
     "questions": [
       "Tell me what you see in the two pictures.",
       "What are the attractions of the two pictures?",
@@ -221,13 +226,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Gardening tools",
         "vi": "Dụng cụ làm vườn"
       }
-    ]
+    ],
+    "shortTitle": "Đề 04"
   },
   {
     "id": "p3_5",
     "topicNumber": 5,
-    "title": "Đọc sách truyền thống + đọc sách online",
-    "imageUrl": "/uploads/speaking/part3/image3.png, /uploads/speaking/part3/image7.png",
+    "title": "Đề 05 - Đọc sách truyền thống + đọc sách online",
+    "imageUrl": "/uploads/speaking/part3/image7.png, /uploads/speaking/part3/image8.png",
     "questions": [
       "Tell me what you see from the two pictures.",
       "Do you prefer reading printed books or e-books?",
@@ -274,13 +280,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Take notes",
         "vi": "Ghi chép"
       }
-    ]
+    ],
+    "shortTitle": "Đề 05"
   },
   {
     "id": "p3_6",
     "topicNumber": 6,
-    "title": "Mua sắm trong siêu thị + mua sắm trong chợ",
-    "imageUrl": "/uploads/speaking/part3/image14.png",
+    "title": "Đề 06 - Mua sắm trong siêu thị + mua sắm trong chợ",
+    "imageUrl": "/uploads/speaking/part3/image9_1.png, /uploads/speaking/part3/image9_2.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "Benefits of markets and supermarkets?",
@@ -327,13 +334,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Buy groceries",
         "vi": "Mua thực phẩm"
       }
-    ]
+    ],
+    "shortTitle": "Đề 06"
   },
   {
     "id": "p3_7",
     "topicNumber": 7,
-    "title": "Cô gái nghe nhạc trên sofa + ban nhạc đang chơi nhạc",
-    "imageUrl": "/uploads/speaking/part3/image9.png",
+    "title": "Đề 07 - Cô gái nghe nhạc trên sofa + ban nhạc đang chơi nhạc",
+    "imageUrl": "/uploads/speaking/part3/image10_1.png, /uploads/speaking/part3/image10_2.png",
     "questions": [
       "Compare 2 pictures.",
       "Which would you prefer to be in?",
@@ -380,13 +388,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Entertainment",
         "vi": "Giải trí"
       }
-    ]
+    ],
+    "shortTitle": "Đề 07"
   },
   {
     "id": "p3_8",
     "topicNumber": 8,
-    "title": "Ăn đồ ăn nhanh + nấu ăn healthy",
-    "imageUrl": "/uploads/speaking/part3/image11.png",
+    "title": "Đề 08 - Ăn đồ ăn nhanh + nấu ăn healthy",
+    "imageUrl": "/uploads/speaking/part3/image11_1.png, /uploads/speaking/part3/image11_2.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "Which kind of food in those pictures is healthier?",
@@ -433,13 +442,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Healthy lifestyle",
         "vi": "Lối sống lành mạnh"
       }
-    ]
+    ],
+    "shortTitle": "Đề 08"
   },
   {
     "id": "p3_9",
     "topicNumber": 9,
-    "title": "Cặp đôi dưới tuyết + hai cô gái tắm nắng",
-    "imageUrl": "/uploads/speaking/part3/image13.png",
+    "title": "Đề 09 - Cặp đôi dưới tuyết + hai cô gái tắm nắng",
+    "imageUrl": "/uploads/speaking/part3/image12_1.png, /uploads/speaking/part3/image12_2.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "Between the two locations, where do you prefer to go? Why?",
@@ -486,13 +496,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Outdoor activities",
         "vi": "Hoạt động ngoài trời"
       }
-    ]
+    ],
+    "shortTitle": "Đề 09"
   },
   {
     "id": "p3_10",
     "topicNumber": 10,
-    "title": "Người đàn ông tập gym + hai người đi leo núi",
-    "imageUrl": "/uploads/speaking/part3/image12.png",
+    "title": "Đề 10 - Người đàn ông tập gym + hai người đi leo núi",
+    "imageUrl": "/uploads/speaking/part3/image13_1.png, /uploads/speaking/part3/image13_2.png",
     "questions": [
       "Please describe the 2 pictures.",
       "What the difference of these two exercises?",
@@ -539,13 +550,14 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Physical activity",
         "vi": "Hoạt động thể chất"
       }
-    ]
+    ],
+    "shortTitle": "Đề 10"
   },
   {
     "id": "p3_11",
     "topicNumber": 11,
-    "title": "Bóng rổ xe lăn + quần vợt (Thể thao chuyên nghiệp & nghiệp dư)",
-    "imageUrl": "/uploads/speaking/part3/image15.png",
+    "title": "Đề 11 - Bóng rổ xe lăn + quần vợt (Thể thao chuyên nghiệp & nghiệp dư)",
+    "imageUrl": "/uploads/speaking/part3/image14_1.png, /uploads/speaking/part3/image14_2.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "What are the benefits of indoor and outdoor sports?",
@@ -592,16 +604,18 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
         "en": "Physical activity",
         "vi": "Hoạt động thể chất"
       }
-    ]
+    ],
+    "shortTitle": "Đề 11"
   },
   {
     "id": "p3_12",
     "topicNumber": 12,
-    "title": "Cặp tranh so sánh các hoạt động",
-    "imageUrl": "/uploads/speaking/part3/image10.png",
+    "title": "Đề 12 - Cặp tranh so sánh các hoạt động",
+    "imageUrl": "/uploads/speaking/part3/image15_1.png, /uploads/speaking/part3/image15_2.png",
     "questions": [
       "Tell me what you see in the two pictures."
     ],
-    "vocab": []
+    "vocab": [],
+    "shortTitle": "Đề 12"
   }
 ];

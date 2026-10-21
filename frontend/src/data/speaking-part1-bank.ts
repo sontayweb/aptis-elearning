@@ -1,4 +1,4 @@
-// Speaking Part 1 Authentic Question Bank
+// Speaking Part 1 Authentic Question Bank - Rút gọn tiêu đề chỉ để số đề
 // Extracted from SPEAKING/Tổng hợp đề part 1.docx
 
 export interface SpeakingPart1QuestionItem {
@@ -11,6 +11,7 @@ export interface SpeakingPart1QuestionItem {
 export interface SpeakingPart1Unit {
   id: string;
   title: string;
+  rawTitle?: string;
   goal?: string;
   questions: SpeakingPart1QuestionItem[];
 }
@@ -18,7 +19,7 @@ export interface SpeakingPart1Unit {
 export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   {
     "id": "unit_intro",
-    "title": "Chủ đề khởi động & Bản thân (Essential Starters)",
+    "title": "Đề 01",
     "goal": "Làm quen phản xạ trả lời ngắn 30s các chủ đề quen thuộc",
     "questions": [
       {
@@ -297,11 +298,12 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
         "prompt": "Describe the way you went to the exam room.",
         "sampleAnswer": ""
       }
-    ]
+    ],
+    "rawTitle": "Chủ đề khởi động & Bản thân (Essential Starters)"
   },
   {
     "id": "unit_2",
-    "title": "UNIT 1: PERSONAL INFORMATION",
+    "title": "Đề 02",
     "goal": "Giới thiệu bản thân, gia đình, bạn bè và thói quen bằng ngôn ngữ linh hoạt.",
     "questions": [
       {
@@ -334,11 +336,12 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
         "prompt": "Please describe your typical day.",
         "sampleAnswer": "On a typical weekday, I start fairly early because I prefer having enough time to prepare without rushing. During the morning and afternoon, I concentrate on my main responsibilities, which take up most of the day. I plan my schedule carefully so that I can stay productive without feeling overwhelmed. In the evening, I have dinner, take a short break, and finish anything that still needs attention. The routine is quite predictable, but it helps me lead a balanced and organised life."
       }
-    ]
+    ],
+    "rawTitle": "UNIT 1: PERSONAL INFORMATION"
   },
   {
     "id": "unit_3",
-    "title": "UNIT 2: DAILY ROUTINES AND FREE TIME",
+    "title": "Đề 03",
     "goal": "Mô tả thói quen, thời gian rảnh và cảm xúc bằng các chi tiết cụ thể.",
     "questions": [
       {
@@ -371,11 +374,12 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
         "prompt": "When do you usually feel tired? When do you usually feel stressed?",
         "sampleAnswer": "I notice that I feel most tired after a particularly busy day or when I have been concentrating for hours without a proper break. A lack of sleep affects me as well, especially if I stay up late for several nights in a row. At those times, it becomes harder to focus and work efficiently. To recover, I rest briefly, drink enough water, and go to bed earlier. Since adopting a more consistent routine, I have noticed a clear improvement in my energy levels."
       }
-    ]
+    ],
+    "rawTitle": "UNIT 2: DAILY ROUTINES AND FREE TIME"
   },
   {
     "id": "unit_4",
-    "title": "UNIT 3: MEMORIES AND EXPERIENCES",
+    "title": "Đề 04",
     "goal": "Kể lại trải nghiệm trong quá khứ với trình tự rõ ràng và cảm xúc phù hợp.",
     "questions": [
       {
@@ -414,11 +418,12 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
         "prompt": "Tell me about a useful skill you have learned.",
         "sampleAnswer": "Learning to manage my time effectively has been one of the most useful skills I have developed. In the past, I often tried to complete several tasks at once, which reduced the quality of my work. Gradually, I began setting priorities, creating realistic schedules, and taking short breaks between demanding activities. As a result, I now finish tasks more efficiently and feel less stressed. This skill has improved both my work and personal life, and I am sure it will remain valuable in the future."
       }
-    ]
+    ],
+    "rawTitle": "UNIT 3: MEMORIES AND EXPERIENCES"
   },
   {
     "id": "unit_5",
-    "title": "UNIT 4: HOME, ROOMS AND PLACES",
+    "title": "Đề 05",
     "goal": "Mô tả không gian và địa điểm, đồng thời giải thích lý do hoặc đánh giá cá nhân.",
     "questions": [
       {
@@ -451,11 +456,12 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
         "prompt": "What is the best way to travel around your country?",
         "sampleAnswer": "There is no single form of transport that is best for every journey around my country. For short distances, travelling by car or motorbike can be convenient because it offers flexibility and makes stopping easy. For longer trips, trains or coaches are often more comfortable and allow passengers to rest. Flying saves time, although it usually costs more. Overall, combining different forms of transport is the most practical solution because it provides a reasonable balance between cost, comfort, convenience, and travel time."
       }
-    ]
+    ],
+    "rawTitle": "UNIT 4: HOME, ROOMS AND PLACES"
   },
   {
     "id": "unit_6",
-    "title": "UNIT 5: TRAVEL AND LEISURE",
+    "title": "Đề 06",
     "goal": "Trình bày sở thích du lịch, phương tiện và kế hoạch trong tương lai.",
     "questions": [
       {
@@ -494,11 +500,12 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
         "prompt": "How do you usually travel on a normal day?",
         "sampleAnswer": "For everyday travel, I choose the form of transport that best suits the distance and conditions. I prefer walking to nearby places because it is free and provides gentle exercise. For longer journeys, I normally use public transport or travel by car, depending on the weather and traffic. Before leaving, I check the route and allow some extra time for delays. Planning ahead makes daily travel more efficient and helps me arrive punctually without feeling under unnecessary pressure."
       }
-    ]
+    ],
+    "rawTitle": "UNIT 5: TRAVEL AND LEISURE"
   },
   {
     "id": "unit_7",
-    "title": "UNIT 6: WEATHER, SEASONS AND CLOTHING",
+    "title": "Đề 07",
     "goal": "Mô tả thời tiết, mùa và trang phục bằng từ ngữ tự nhiên.",
     "questions": [
       {
@@ -537,11 +544,12 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
         "prompt": "What do you usually do on a rainy day?",
         "sampleAnswer": "Wet days usually give me a reason to slow down and spend more time indoors. I often use the opportunity to complete household tasks, read, watch a film, or prepare for the week ahead. The sound of rain creates a peaceful atmosphere, which can make quiet activities more enjoyable. When I need to travel, I check the forecast and leave extra time because traffic may be slower. Although rain is sometimes inconvenient, a calm day at home can be surprisingly restorative."
       }
-    ]
+    ],
+    "rawTitle": "UNIT 6: WEATHER, SEASONS AND CLOTHING"
   },
   {
     "id": "unit_8",
-    "title": "UNIT 7: FOOD, CULTURE AND ENTERTAINMENT",
+    "title": "Đề 08",
     "goal": "Nói về ẩm thực, văn hóa, thể thao và giải trí với quan điểm rõ ràng.",
     "questions": [
       {
@@ -574,11 +582,12 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
         "prompt": "What is your favourite book from your country?",
         "sampleAnswer": "One book from my country that I particularly enjoy is a modern coming-of-age novel about family relationships and personal choices. I first read it several years ago, but its main message has stayed with me. The language is expressive without being unnecessarily difficult, and the characters feel convincing because they make both wise and poor decisions. Whenever I return to the story, I notice a new detail. I value the book because it is entertaining while also offering insight into local culture and values."
       }
-    ]
+    ],
+    "rawTitle": "UNIT 7: FOOD, CULTURE AND ENTERTAINMENT"
   },
   {
     "id": "unit_9",
-    "title": "UNIT 8: LEARNING, TECHNOLOGY AND FUTURE PLANS",
+    "title": "Đề 09",
     "goal": "Thảo luận việc học, công nghệ, mua sắm và định hướng tương lai.",
     "questions": [
       {
@@ -617,10 +626,7 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
         "prompt": "What are your plans for the future?",
         "sampleAnswer": "Over the next few years, I would like to expand my knowledge and become more skilled and independent. One of my main goals is to improve my communication skills, particularly in English, because this could open up a wider range of opportunities. I also hope to look after my physical and mental well-being and manage my time more effectively. Although I cannot predict every detail, I believe that setting realistic goals and making steady progress will help me build a stable, rewarding, and fulfilling future."
       }
-    ]
+    ],
+    "rawTitle": "UNIT 8: LEARNING, TECHNOLOGY AND FUTURE PLANS"
   }
 ];
-
-export const SPEAKING_PART1_ALL_QUESTIONS: SpeakingPart1QuestionItem[] = SPEAKING_PART1_UNITS.flatMap(
-  (u) => u.questions
-);
