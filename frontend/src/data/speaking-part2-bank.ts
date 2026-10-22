@@ -11,6 +11,8 @@ export interface SpeakingPart2Topic {
   topicNumber: number;
   title: string;
   rawTitle?: string;
+  originalDescription?: string;
+  category?: string;
   sticker?: string;
   isKey?: boolean;
   imageUrl: string;

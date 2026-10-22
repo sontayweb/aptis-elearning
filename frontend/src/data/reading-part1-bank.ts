@@ -1,5 +1,6 @@
-// Reading Part 1 Authentic Question Bank - 19 Đề Chuẩn British Council
-// Tối giản tiêu đề chỉ để lại số đề, tích hợp bản dịch hỗ trợ học viên
+// Reading Part 1 Authentic Question Bank
+// Extracted and synchronized from READING/Part 1.docx
+// Format: Simplified Title (e.g. 'Đề 01', 'Đề 02') without verbose suffixes
 
 export interface ReadingPart1Question {
   id: string;
@@ -17,7 +18,8 @@ export interface ReadingPart1Set {
   setNumber: number;
   title: string;
   keyWords: string[];
-  sticker: string;
+  sticker: "★★★★★ Hay ra" | "VIP" | "Đề tủ" | "Mới cập nhật" | string;
+  cloverLevel?: number; // 1 to 6 clovers (☘️)
   questions: ReadingPart1Question[];
 }
 
@@ -33,7 +35,7 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "cake",
       "watched"
     ],
-    "sticker": "☘️☘️☘️☘️☘️ Đề trọng điểm",
+    "sticker": "★★★★★ Hay ra",
     "questions": [
       {
         "id": "p1_q_1_1",
@@ -43,9 +45,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "translation": "Tôi nhìn thấy một vài chiếc cửa sổ trong một cửa hàng",
         "targetWord": "window",
         "options": [
+          "table",
           "house",
-          "window",
-          "table"
+          "window"
         ],
         "correctAnswer": "window"
       },
@@ -58,24 +60,24 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "targetWord": "buy",
         "options": [
           "house",
-          "buy",
-          "table"
+          "table",
+          "buy"
         ],
         "correctAnswer": "buy"
       },
       {
         "id": "p1_q_1_3",
         "qNumber": 3,
-        "prompt": "I [gap] some food at the market",
+        "prompt": "I buy some food at the [gap]",
         "fullSentence": "I buy some food at the market",
         "translation": "Tôi mua một ít đồ ăn ở chợ",
-        "targetWord": "buy",
+        "targetWord": "market",
         "options": [
           "house",
-          "buy",
+          "market",
           "table"
         ],
-        "correctAnswer": "buy"
+        "correctAnswer": "market"
       },
       {
         "id": "p1_q_1_4",
@@ -85,9 +87,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "translation": "Tôi đã ăn bánh",
         "targetWord": "cake",
         "options": [
-          "house",
           "cake",
-          "table"
+          "table",
+          "house"
         ],
         "correctAnswer": "cake"
       },
@@ -99,188 +101,19 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "translation": "Tôi đã xem một chương trình trên TV",
         "targetWord": "watched",
         "options": [
-          "house",
+          "table",
           "watched",
-          "table"
+          "house"
         ],
         "correctAnswer": "watched"
       }
-    ]
+    ],
+    "cloverLevel": 5
   },
   {
     "id": "reading_p1_set_2",
     "setNumber": 2,
     "title": "Đề 02",
-    "keyWords": [
-      "station",
-      "stops",
-      "green",
-      "dinner",
-      "films"
-    ],
-    "sticker": "☘️☘️☘️☘️☘️ Đề trọng điểm",
-    "questions": [
-      {
-        "id": "p1_q_2_1",
-        "qNumber": 1,
-        "prompt": "Tomorrow I have to go to the main bus [gap] to meet my cousin.",
-        "fullSentence": "Tomorrow I have to go to the main bus station to meet my cousin.",
-        "translation": "Câu hỏi 1 trong đề 02",
-        "targetWord": "station",
-        "options": [
-          "station",
-          "airport",
-          "supermarket"
-        ],
-        "correctAnswer": "station"
-      },
-      {
-        "id": "p1_q_2_2",
-        "qNumber": 2,
-        "prompt": "Luckily, one of the bus [gap] is very close to my house.",
-        "fullSentence": "Luckily, one of the bus stops is very close to my house.",
-        "translation": "Câu hỏi 2 trong đề 02",
-        "targetWord": "stops",
-        "options": [
-          "stops",
-          "bikes",
-          "cars"
-        ],
-        "correctAnswer": "stops"
-      },
-      {
-        "id": "p1_q_2_3",
-        "qNumber": 3,
-        "prompt": "My house is easy to find – it’s [gap] and stands out from the others.",
-        "fullSentence": "My house is easy to find – it’s green and stands out from the others.",
-        "translation": "Câu hỏi 3 trong đề 02",
-        "targetWord": "green",
-        "options": [
-          "green",
-          "expensive",
-          "tall"
-        ],
-        "correctAnswer": "green"
-      },
-      {
-        "id": "p1_q_2_4",
-        "qNumber": 4,
-        "prompt": "This evening I’ll make some eggs for [gap] because it’s quick and simple.",
-        "fullSentence": "This evening I’ll make some eggs for dinner because it’s quick and simple.",
-        "translation": "Câu hỏi 4 trong đề 02",
-        "targetWord": "dinner",
-        "options": [
-          "dinner",
-          "homework",
-          "football"
-        ],
-        "correctAnswer": "dinner"
-      },
-      {
-        "id": "p1_q_2_5",
-        "qNumber": 5,
-        "prompt": "After that, we can relax and watch some [gap] together on TV.",
-        "fullSentence": "After that, we can relax and watch some films together on TV.",
-        "translation": "Câu hỏi 5 trong đề 02",
-        "targetWord": "films",
-        "options": [
-          "apples",
-          "films",
-          "chairs"
-        ],
-        "correctAnswer": "films"
-      }
-    ]
-  },
-  {
-    "id": "reading_p1_set_3",
-    "setNumber": 3,
-    "title": "Đề 03",
-    "keyWords": [
-      "station",
-      "stops",
-      "green",
-      "dinner",
-      "films"
-    ],
-    "sticker": "☘️☘️☘️☘️☘️ Đề trọng điểm",
-    "questions": [
-      {
-        "id": "p1_q_3_1",
-        "qNumber": 1,
-        "prompt": "I take the bus to the main [gap]",
-        "fullSentence": "I take the bus to the main station",
-        "translation": "Câu hỏi 1 trong đề 03",
-        "targetWord": "station",
-        "options": [
-          "house",
-          "station",
-          "table"
-        ],
-        "correctAnswer": "station"
-      },
-      {
-        "id": "p1_q_3_2",
-        "qNumber": 2,
-        "prompt": "The bus [gap] are near my house",
-        "fullSentence": "The bus stops are near my house",
-        "translation": "Câu hỏi 2 trong đề 03",
-        "targetWord": "stops",
-        "options": [
-          "house",
-          "stops",
-          "table"
-        ],
-        "correctAnswer": "stops"
-      },
-      {
-        "id": "p1_q_3_3",
-        "qNumber": 3,
-        "prompt": "My house is [gap] and you can easily recognize by the color",
-        "fullSentence": "My house is green and you can easily recognize by the color",
-        "translation": "Câu hỏi 3 trong đề 03",
-        "targetWord": "green",
-        "options": [
-          "house",
-          "green",
-          "table"
-        ],
-        "correctAnswer": "green"
-      },
-      {
-        "id": "p1_q_3_4",
-        "qNumber": 4,
-        "prompt": "I cook egg for a quick [gap]",
-        "fullSentence": "I cook egg for a quick dinner",
-        "translation": "Câu hỏi 4 trong đề 03",
-        "targetWord": "dinner",
-        "options": [
-          "house",
-          "dinner",
-          "table"
-        ],
-        "correctAnswer": "dinner"
-      },
-      {
-        "id": "p1_q_3_5",
-        "qNumber": 5,
-        "prompt": "After dinner, we will watch movies on TV",
-        "fullSentence": "After dinner, we will watch movies on TV",
-        "translation": "Câu hỏi 5 trong đề 03",
-        "targetWord": "films",
-        "options": [
-          "house",
-          "films",
-          "table"
-        ],
-        "correctAnswer": "films"
-      }
-    ]
-  },
-  {
-    "id": "reading_p1_set_4",
-    "setNumber": 4,
-    "title": "Đề 04",
     "keyWords": [
       "Visit",
       "room",
@@ -288,10 +121,10 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "train",
       "speak"
     ],
-    "sticker": "☘️☘️☘️☘️☘️ Đề trọng điểm",
+    "sticker": "★★★★★ Hay ra",
     "questions": [
       {
-        "id": "p1_q_4_1",
+        "id": "p1_q_2_1",
         "qNumber": 1,
         "prompt": "I went to the museum to [gap] the new art exhibition",
         "fullSentence": "I went to the museum to visit the new art exhibition",
@@ -305,25 +138,23 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "Visit"
       },
       {
-        "id": "p1_q_4_2",
+        "id": "p1_q_2_2",
         "qNumber": 2,
         "prompt": "There was a big tree in the middle of the [gap]",
         "fullSentence": "There was a big tree in the middle of the room",
-        "translation": "Tôi đi thăm ( visit) phòng (room) bạn vào mùa hè nên rất nóng (hot) phải đi tàu (train) và nói chuyện (speak) với mọi người.",
         "targetWord": "room",
         "options": [
-          "house",
           "room",
-          "table"
+          "table",
+          "house"
         ],
         "correctAnswer": "room"
       },
       {
-        "id": "p1_q_4_3",
+        "id": "p1_q_2_3",
         "qNumber": 3,
         "prompt": "The weather was very [gap] that day",
         "fullSentence": "The weather was very hot that day",
-        "translation": "Tôi đi thăm ( visit) phòng (room) bạn vào mùa hè nên rất nóng (hot) phải đi tàu (train) và nói chuyện (speak) với mọi người.",
         "targetWord": "hot",
         "options": [
           "house",
@@ -333,39 +164,39 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "hot"
       },
       {
-        "id": "p1_q_4_4",
+        "id": "p1_q_2_4",
         "qNumber": 4,
         "prompt": "On the way home, I look the [gap]",
         "fullSentence": "On the way home, I look the train",
-        "translation": "Tôi đi thăm ( visit) phòng (room) bạn vào mùa hè nên rất nóng (hot) phải đi tàu (train) và nói chuyện (speak) với mọi người.",
         "targetWord": "train",
         "options": [
-          "house",
           "train",
-          "table"
+          "table",
+          "house"
         ],
         "correctAnswer": "train"
       },
       {
-        "id": "p1_q_4_5",
+        "id": "p1_q_2_5",
         "qNumber": 5,
         "prompt": "At the museum, I could [gap] with a tour guide about history",
         "fullSentence": "At the museum, I could speak with a tour guide about history",
-        "translation": "Tôi đi thăm ( visit) phòng (room) bạn vào mùa hè nên rất nóng (hot) phải đi tàu (train) và nói chuyện (speak) với mọi người.",
+        "translation": "ĐỀ 5: Visit - Shops - Red - Dinner - Watch ( mới )",
         "targetWord": "speak",
         "options": [
-          "house",
           "speak",
-          "table"
+          "table",
+          "house"
         ],
         "correctAnswer": "speak"
       }
-    ]
+    ],
+    "cloverLevel": 5
   },
   {
-    "id": "reading_p1_set_5",
-    "setNumber": 5,
-    "title": "Đề 05",
+    "id": "reading_p1_set_3",
+    "setNumber": 3,
+    "title": "Đề 03",
     "keyWords": [
       "Visit",
       "Shops",
@@ -373,10 +204,10 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "Dinner",
       "Watch"
     ],
-    "sticker": "☘️☘️☘️☘️☘️ Đề trọng điểm",
+    "sticker": "★★★★★ Hay ra",
     "questions": [
       {
-        "id": "p1_q_5_1",
+        "id": "p1_q_3_1",
         "qNumber": 1,
         "prompt": "They book a flight to [gap] their relatives abroad.",
         "fullSentence": "They book a flight to visit their relatives abroad.",
@@ -384,41 +215,41 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "targetWord": "Visit",
         "options": [
           "house",
-          "Visit",
-          "table"
+          "table",
+          "Visit"
         ],
         "correctAnswer": "Visit"
       },
       {
-        "id": "p1_q_5_2",
+        "id": "p1_q_3_2",
         "qNumber": 2,
         "prompt": "The airport has many [gap] selling souvenirs.",
         "fullSentence": "The airport has many shops selling souvenirs.",
         "translation": "Sân bay có nhiều cửa hàng bán đồ lưu niệm.",
         "targetWord": "Shops",
         "options": [
-          "house",
           "Shops",
-          "table"
+          "table",
+          "house"
         ],
         "correctAnswer": "Shops"
       },
       {
-        "id": "p1_q_5_3",
+        "id": "p1_q_3_3",
         "qNumber": 3,
         "prompt": "Their luggage is [gap], making it easy to find at the terminal.",
         "fullSentence": "Their luggage is red, making it easy to find at the terminal.",
         "translation": "Hành lý của họ màu đỏ, rất dễ tìm thấy tại nhà ga.",
         "targetWord": "Red",
         "options": [
+          "table",
           "house",
-          "Red",
-          "table"
+          "Red"
         ],
         "correctAnswer": "Red"
       },
       {
-        "id": "p1_q_5_4",
+        "id": "p1_q_3_4",
         "qNumber": 4,
         "prompt": "For [gap], they try local street food with spicy flavor",
         "fullSentence": "For dinner, they try local street food with spicy flavor",
@@ -426,13 +257,13 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "targetWord": "Dinner",
         "options": [
           "house",
-          "Dinner",
-          "table"
+          "table",
+          "Dinner"
         ],
         "correctAnswer": "Dinner"
       },
       {
-        "id": "p1_q_5_5",
+        "id": "p1_q_3_5",
         "qNumber": 5,
         "prompt": "At night, they [gap] a performance of traditional dance.",
         "fullSentence": "At night, they watch a performance of traditional dance.",
@@ -445,12 +276,13 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         ],
         "correctAnswer": "Watch"
       }
-    ]
+    ],
+    "cloverLevel": 5
   },
   {
-    "id": "reading_p1_set_6",
-    "setNumber": 6,
-    "title": "Đề 06",
+    "id": "reading_p1_set_4",
+    "setNumber": 4,
+    "title": "Đề 04",
     "keyWords": [
       "Home",
       "Customers",
@@ -458,10 +290,10 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "Prepare",
       "Watch"
     ],
-    "sticker": "☘️☘️☘️☘️☘️ Đề trọng điểm",
+    "sticker": "★★★★★ Hay ra",
     "questions": [
       {
-        "id": "p1_q_6_1",
+        "id": "p1_q_4_1",
         "qNumber": 1,
         "prompt": "She uses her laptop to work from [gap] every day.",
         "fullSentence": "She uses her laptop to work from home every day.",
@@ -469,73 +301,74 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "targetWord": "Home",
         "options": [
           "house",
-          "Home",
-          "table"
+          "table",
+          "Home"
         ],
         "correctAnswer": "Home"
       },
       {
-        "id": "p1_q_6_2",
+        "id": "p1_q_4_2",
         "qNumber": 2,
         "prompt": "The café has free Wi-Fi for all [gap].",
         "fullSentence": "The café has free Wi-Fi for all customers.",
         "translation": "Quán cà phê có Wi-Fi miễn phí cho tất cả khách hàng.",
         "targetWord": "Customers",
         "options": [
-          "house",
           "Customers",
+          "house",
           "table"
         ],
         "correctAnswer": "Customers"
       },
       {
-        "id": "p1_q_6_3",
+        "id": "p1_q_4_3",
         "qNumber": 3,
         "prompt": "Her phone case is yellow, making it [gap] to spot.",
         "fullSentence": "Her phone case is yellow, making it easy to spot.",
         "translation": "Ốp lưng điện thoại của cô ấy màu vàng, rất dễ nhận biết.",
         "targetWord": "Easy",
         "options": [
-          "house",
+          "table",
           "Easy",
-          "table"
+          "house"
         ],
         "correctAnswer": "Easy"
       },
       {
-        "id": "p1_q_6_4",
+        "id": "p1_q_4_4",
         "qNumber": 4,
         "prompt": "For snacks, they [gap] popcorn and fruit smoothies.",
         "fullSentence": "For snacks, they prepare popcorn and fruit smoothies.",
         "translation": "Về đồ ăn nhẹ, họ chuẩn bị bỏng ngô và sinh tố trái cây.",
         "targetWord": "Prepare",
         "options": [
-          "house",
           "Prepare",
+          "house",
           "table"
         ],
         "correctAnswer": "Prepare"
       },
       {
-        "id": "p1_q_6_5",
+        "id": "p1_q_4_5",
         "qNumber": 5,
         "prompt": "On weekends, they [gap] videos on their smart TV",
         "fullSentence": "On weekends, they watch videos on their smart TV",
         "translation": "Vào cuối tuần, họ xem video trên TV thông minh.",
         "targetWord": "Watch",
         "options": [
-          "house",
+          "table",
           "Watch",
-          "table"
+          "house"
         ],
         "correctAnswer": "Watch"
       }
-    ]
+    ],
+    "cloverLevel": 5
   },
   {
-    "id": "reading_p1_set_7",
-    "setNumber": 7,
-    "title": "Đề 07",
+    "id": "reading_p1_set_5",
+    "setNumber": 5,
+    "title": "Đề 05",
     "keyWords": [
       "Park",
       "classes",
@@ -543,24 +376,24 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "breakfast",
       "meditation"
     ],
-    "sticker": "☘️☘️☘️☘️☘️ Đề trọng điểm",
+    "sticker": "Đề tủ",
     "questions": [
       {
-        "id": "p1_q_7_1",
+        "id": "p1_q_5_1",
         "qNumber": 1,
         "prompt": "She jogs in the [gap] every morning to stay fit",
         "fullSentence": "She jogs in the park every morning to stay fit",
         "translation": "Cô ấy chạy bộ trong công viên mỗi sáng để giữ dáng",
         "targetWord": "Park",
         "options": [
-          "house",
+          "table",
           "Park",
-          "table"
+          "house"
         ],
         "correctAnswer": "Park"
       },
       {
-        "id": "p1_q_7_2",
+        "id": "p1_q_5_2",
         "qNumber": 2,
         "prompt": "The gym offers free [gap] for yoga and pilates",
         "fullSentence": "The gym offers free classes for yoga and pilates",
@@ -574,7 +407,7 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "classes"
       },
       {
-        "id": "p1_q_7_3",
+        "id": "p1_q_5_3",
         "qNumber": 3,
         "prompt": "Her water bottle is [gap], easy to spot during workout",
         "fullSentence": "Her water bottle is silver, easy to spot during workout",
@@ -588,39 +421,40 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "silver"
       },
       {
-        "id": "p1_q_7_4",
+        "id": "p1_q_5_4",
         "qNumber": 4,
         "prompt": "For [gap], she blends a smoothie with berries and spinach",
         "fullSentence": "For breakfast, she blends a smoothie with berries and spinach",
         "translation": "Bữa sáng cô ấy xay sinh tố với các loại quả mọng và rau bina",
         "targetWord": "breakfast",
         "options": [
-          "house",
+          "table",
           "breakfast",
-          "table"
+          "house"
         ],
         "correctAnswer": "breakfast"
       },
       {
-        "id": "p1_q_7_5",
+        "id": "p1_q_5_5",
         "qNumber": 5,
         "prompt": "After exercising they relax with a [gap] session at home",
         "fullSentence": "After exercising they relax with a meditation session at home",
         "translation": "Sau khi luyện tập họ thư giãn với một buổi thiền tại nhà",
         "targetWord": "meditation",
         "options": [
-          "house",
           "meditation",
-          "table"
+          "table",
+          "house"
         ],
         "correctAnswer": "meditation"
       }
-    ]
+    ],
+    "cloverLevel": 4
   },
   {
-    "id": "reading_p1_set_8",
-    "setNumber": 8,
-    "title": "Đề 08",
+    "id": "reading_p1_set_6",
+    "setNumber": 6,
+    "title": "Đề 06",
     "keyWords": [
       "Near",
       "Small",
@@ -628,10 +462,10 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "Shop",
       "Talk"
     ],
-    "sticker": "☘️☘️☘️☘️☘️ Đề trọng điểm",
+    "sticker": "Đề tủ",
     "questions": [
       {
-        "id": "p1_q_8_1",
+        "id": "p1_q_6_1",
         "qNumber": 1,
         "prompt": "My new house is [gap] my job",
         "fullSentence": "My new house is near my job",
@@ -639,13 +473,13 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "targetWord": "Near",
         "options": [
           "house",
-          "Near",
-          "table"
+          "table",
+          "Near"
         ],
         "correctAnswer": "Near"
       },
       {
-        "id": "p1_q_8_2",
+        "id": "p1_q_6_2",
         "qNumber": 2,
         "prompt": "My house is really beautiful and has a [gap] garden",
         "fullSentence": "My house is really beautiful and has a small garden",
@@ -659,21 +493,21 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "Small"
       },
       {
-        "id": "p1_q_8_3",
+        "id": "p1_q_6_3",
         "qNumber": 3,
         "prompt": "It has a kitchen, and I really [gap] it.",
         "fullSentence": "It has a kitchen, and I really like it.",
         "translation": "Nhà tôi có bếp và tôi rất thích nó.",
         "targetWord": "Like",
         "options": [
-          "house",
+          "table",
           "Like",
-          "table"
+          "house"
         ],
         "correctAnswer": "Like"
       },
       {
-        "id": "p1_q_8_4",
+        "id": "p1_q_6_4",
         "qNumber": 4,
         "prompt": "I work in a [gap] in town, I sell clothes.",
         "fullSentence": "I work in a shop in town, I sell clothes.",
@@ -687,25 +521,26 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "Shop"
       },
       {
-        "id": "p1_q_8_5",
+        "id": "p1_q_6_5",
         "qNumber": 5,
-        "prompt": "I meet many people everyday, I [gap] to talk to them.",
+        "prompt": "I meet many people everyday, I like to [gap] to them.",
         "fullSentence": "I meet many people everyday, I like to talk to them.",
         "translation": "Tôi gặp rất nhiều người mỗi ngày, tôi thích trò chuyện với họ.",
-        "targetWord": "Like",
+        "targetWord": "Talk",
         "options": [
+          "Talk",
           "house",
-          "Like",
           "table"
         ],
-        "correctAnswer": "Like"
+        "correctAnswer": "Talk"
       }
-    ]
+    ],
+    "cloverLevel": 4
   },
   {
-    "id": "reading_p1_set_9",
-    "setNumber": 9,
-    "title": "Đề 09",
+    "id": "reading_p1_set_7",
+    "setNumber": 7,
+    "title": "Đề 07",
     "keyWords": [
       "Clear",
       "sun",
@@ -713,10 +548,10 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "working",
       "read"
     ],
-    "sticker": "★★★★★ Hay ra",
+    "sticker": "Đề tủ",
     "questions": [
       {
-        "id": "p1_q_9_1",
+        "id": "p1_q_7_1",
         "qNumber": 1,
         "prompt": "The water is [gap]",
         "fullSentence": "The water is clear",
@@ -724,55 +559,55 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "targetWord": "Clear",
         "options": [
           "house",
-          "Clear",
-          "table"
+          "table",
+          "Clear"
         ],
         "correctAnswer": "Clear"
       },
       {
-        "id": "p1_q_9_2",
+        "id": "p1_q_7_2",
         "qNumber": 2,
         "prompt": "The [gap] is out",
         "fullSentence": "The sun is out",
         "translation": "Mặt trời đang chiếu sáng",
         "targetWord": "sun",
         "options": [
-          "house",
           "sun",
+          "house",
           "table"
         ],
         "correctAnswer": "sun"
       },
       {
-        "id": "p1_q_9_3",
+        "id": "p1_q_7_3",
         "qNumber": 3,
         "prompt": "I have an [gap] holiday",
         "fullSentence": "I have an enjoyable holiday",
         "translation": "Tôi có một kỳ nghỉ thú vị",
         "targetWord": "enjoyable",
         "options": [
+          "table",
           "house",
-          "enjoyable",
-          "table"
+          "enjoyable"
         ],
         "correctAnswer": "enjoyable"
       },
       {
-        "id": "p1_q_9_4",
+        "id": "p1_q_7_4",
         "qNumber": 4,
         "prompt": "After [gap] so hard",
         "fullSentence": "After working so hard",
-        "translation": "Nước biển trong sạch (clear) dưới ánh mặt trời (sun) giúp kì nghỉ thêm thú vị (enjoyable) sau giờ làm việc (working) cho chúng ta và đọc (read) tài liệu",
+        "translation": "Sau khi làm việc chăm chỉ",
         "targetWord": "working",
         "options": [
-          "house",
           "working",
-          "table"
+          "table",
+          "house"
         ],
         "correctAnswer": "working"
       },
       {
-        "id": "p1_q_9_5",
+        "id": "p1_q_7_5",
         "qNumber": 5,
         "prompt": "I hope to [gap] your letter",
         "fullSentence": "I hope to read your letter",
@@ -780,17 +615,18 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "targetWord": "read",
         "options": [
           "house",
-          "read",
-          "table"
+          "table",
+          "read"
         ],
         "correctAnswer": "read"
       }
-    ]
+    ],
+    "cloverLevel": 4
   },
   {
-    "id": "reading_p1_set_10",
-    "setNumber": 10,
-    "title": "Đề 10",
+    "id": "reading_p1_set_8",
+    "setNumber": 8,
+    "title": "Đề 08",
     "keyWords": [
       "just",
       "too",
@@ -798,24 +634,24 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "some",
       "give"
     ],
-    "sticker": "★★★★★ Hay ra",
+    "sticker": "Đề tủ",
     "questions": [
       {
-        "id": "p1_q_10_1",
+        "id": "p1_q_8_1",
         "qNumber": 1,
         "prompt": "It is [gap] what I like",
         "fullSentence": "It is just what I like",
         "translation": "Đây chính là thứ tôi thích nhất",
         "targetWord": "just",
         "options": [
-          "house",
           "just",
-          "table"
+          "table",
+          "house"
         ],
         "correctAnswer": "just"
       },
       {
-        "id": "p1_q_10_2",
+        "id": "p1_q_8_2",
         "qNumber": 2,
         "prompt": "And it is the perfect color,[gap]",
         "fullSentence": "And it is the perfect color,too",
@@ -829,53 +665,54 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "too"
       },
       {
-        "id": "p1_q_10_3",
+        "id": "p1_q_8_3",
         "qNumber": 3,
-        "prompt": "I am going [gap] wear it [gap] my birthday party",
+        "prompt": "I am going [gap] wear it to my birthday party",
         "fullSentence": "I am going to wear it to my birthday party",
         "translation": "Tôi sẽ mặc nó đến bữa tiệc sinh nhật của mình",
         "targetWord": "to",
         "options": [
           "house",
-          "to",
-          "table"
+          "table",
+          "to"
         ],
         "correctAnswer": "to"
       },
       {
-        "id": "p1_q_10_4",
+        "id": "p1_q_8_4",
         "qNumber": 4,
         "prompt": "I will save you [gap] cake",
         "fullSentence": "I will save you some cake",
         "translation": "Tôi sẽ giữ lại một số bánh cho bạn",
         "targetWord": "some",
         "options": [
+          "table",
           "house",
-          "some",
-          "table"
+          "some"
         ],
         "correctAnswer": "some"
       },
       {
-        "id": "p1_q_10_5",
+        "id": "p1_q_8_5",
         "qNumber": 5,
-        "prompt": "Give my love [gap] everyone",
+        "prompt": "[gap] my love to everyone",
         "fullSentence": "Give my love to everyone",
         "translation": "Gửi tình yêu của tôi đến tất cả mọi ng",
-        "targetWord": "to",
+        "targetWord": "give",
         "options": [
+          "table",
           "house",
-          "to",
-          "table"
+          "give"
         ],
-        "correctAnswer": "to"
+        "correctAnswer": "give"
       }
-    ]
+    ],
+    "cloverLevel": 4
   },
   {
-    "id": "reading_p1_set_11",
-    "setNumber": 11,
-    "title": "Đề 11",
+    "id": "reading_p1_set_9",
+    "setNumber": 9,
+    "title": "Đề 09",
     "keyWords": [
       "miss",
       "called",
@@ -883,10 +720,10 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "meet",
       "dinner"
     ],
-    "sticker": "★★★★★ Hay ra",
+    "sticker": "Mới cập nhật",
     "questions": [
       {
-        "id": "p1_q_11_1",
+        "id": "p1_q_9_1",
         "qNumber": 1,
         "prompt": "I imagine you don’t want to [gap] this",
         "fullSentence": "I imagine you don’t want to miss this",
@@ -894,41 +731,41 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "targetWord": "miss",
         "options": [
           "house",
-          "miss",
-          "table"
+          "table",
+          "miss"
         ],
         "correctAnswer": "miss"
       },
       {
-        "id": "p1_q_11_2",
+        "id": "p1_q_9_2",
         "qNumber": 2,
         "prompt": "I [gap] you earlier but you were not home.",
         "fullSentence": "I called you earlier but you were not home.",
         "translation": "Tôi đã gọi cho bạn trc đó nhưng bạn không ở nhà",
         "targetWord": "called",
         "options": [
+          "table",
           "house",
-          "called",
-          "table"
+          "called"
         ],
         "correctAnswer": "called"
       },
       {
-        "id": "p1_q_11_3",
+        "id": "p1_q_9_3",
         "qNumber": 3,
         "prompt": "Can you be [gap] before 7pm?",
         "fullSentence": "Can you be ready before 7pm?",
         "translation": "Bạn có thể sẵn sàng trước 7h tối ko",
         "targetWord": "ready",
         "options": [
-          "house",
+          "table",
           "ready",
-          "table"
+          "house"
         ],
         "correctAnswer": "ready"
       },
       {
-        "id": "p1_q_11_4",
+        "id": "p1_q_9_4",
         "qNumber": 4,
         "prompt": "I can [gap] you at your place then.",
         "fullSentence": "I can meet you at your place then.",
@@ -942,25 +779,26 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "meet"
       },
       {
-        "id": "p1_q_11_5",
+        "id": "p1_q_9_5",
         "qNumber": 5,
         "prompt": "Don't have too much [gap] because we're going to eat cake.",
         "fullSentence": "Don't have too much dinner because we're going to eat cake.",
         "translation": "Đừng ăn tối quá nhiều vì chúng ta sẽ ăn bánh",
         "targetWord": "dinner",
         "options": [
-          "house",
+          "table",
           "dinner",
-          "table"
+          "house"
         ],
         "correctAnswer": "dinner"
       }
-    ]
+    ],
+    "cloverLevel": 3
   },
   {
-    "id": "reading_p1_set_12",
-    "setNumber": 12,
-    "title": "Đề 12",
+    "id": "reading_p1_set_10",
+    "setNumber": 10,
+    "title": "Đề 10",
     "keyWords": [
       "friendly",
       "first",
@@ -968,10 +806,10 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "speak",
       "together"
     ],
-    "sticker": "★★★★★ Hay ra",
+    "sticker": "VIP",
     "questions": [
       {
-        "id": "p1_q_12_1",
+        "id": "p1_q_10_1",
         "qNumber": 1,
         "prompt": "Everyone is [gap]",
         "fullSentence": "Everyone is friendly",
@@ -985,60 +823,233 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "friendly"
       },
       {
-        "id": "p1_q_12_2",
+        "id": "p1_q_10_2",
         "qNumber": 2,
-        "prompt": "I can [gap] to my class",
+        "prompt": "I can walk to my class [gap]",
         "fullSentence": "I can walk to my class",
         "translation": "Tôi gặp cô ấy lần đầu tiên",
-        "targetWord": "walk",
-        "options": [
-          "house",
-          "walk",
-          "table"
-        ],
-        "correctAnswer": "walk"
-      },
-      {
-        "id": "p1_q_12_3",
-        "qNumber": 3,
-        "prompt": "I meet her for the [gap] time",
-        "fullSentence": "I meet her for the first time",
-        "translation": "Tôi có thể đi bộ đến lớp học của mình",
         "targetWord": "first",
         "options": [
+          "table",
           "house",
-          "first",
-          "table"
+          "first"
         ],
         "correctAnswer": "first"
       },
       {
-        "id": "p1_q_12_4",
+        "id": "p1_q_10_3",
+        "qNumber": 3,
+        "prompt": "I meet her for the first time [gap]",
+        "fullSentence": "I meet her for the first time",
+        "translation": "Tôi có thể đi bộ đến lớp học của mình",
+        "targetWord": "walk",
+        "options": [
+          "walk",
+          "table",
+          "house"
+        ],
+        "correctAnswer": "walk"
+      },
+      {
+        "id": "p1_q_10_4",
         "qNumber": 4,
         "prompt": "She can [gap] 5 languages",
         "fullSentence": "She can speak 5 languages",
         "translation": "Cô ấy có thể nói 5 thứ tiếng",
         "targetWord": "speak",
         "options": [
+          "table",
           "house",
-          "speak",
-          "table"
+          "speak"
         ],
         "correctAnswer": "speak"
       },
       {
-        "id": "p1_q_12_5",
+        "id": "p1_q_10_5",
         "qNumber": 5,
         "prompt": "We eat dinner [gap]",
         "fullSentence": "We eat dinner together",
         "translation": "Chúng tôi ăn tối cùng nhau",
         "targetWord": "together",
         "options": [
-          "house",
+          "table",
           "together",
-          "table"
+          "house"
         ],
         "correctAnswer": "together"
+      }
+    ],
+    "cloverLevel": 3
+  },
+  {
+    "id": "reading_p1_set_11",
+    "setNumber": 11,
+    "title": "Đề 11",
+    "keyWords": [
+      "balance",
+      "statement",
+      "think",
+      "slowly",
+      "before"
+    ],
+    "sticker": "Mới cập nhật",
+    "questions": [
+      {
+        "id": "p1_q_11_1",
+        "qNumber": 1,
+        "prompt": "The budget doesn’t [gap]",
+        "fullSentence": "The budget doesn’t balance",
+        "translation": "Ngân sách không cân bằng",
+        "targetWord": "balance",
+        "options": [
+          "balance",
+          "table",
+          "house"
+        ],
+        "correctAnswer": "balance"
+      },
+      {
+        "id": "p1_q_11_2",
+        "qNumber": 2,
+        "prompt": "Could you get the financial [gap]?",
+        "fullSentence": "Could you get the financial statement?",
+        "translation": "Bạn có thể lấy báo cáo tài chính ko?",
+        "targetWord": "statement",
+        "options": [
+          "table",
+          "statement",
+          "house"
+        ],
+        "correctAnswer": "statement"
+      },
+      {
+        "id": "p1_q_11_3",
+        "qNumber": 3,
+        "prompt": "I [gap] it will help",
+        "fullSentence": "I think it will help",
+        "translation": "Tôi nghĩ nó sẽ có ích",
+        "targetWord": "think",
+        "options": [
+          "think",
+          "table",
+          "house"
+        ],
+        "correctAnswer": "think"
+      },
+      {
+        "id": "p1_q_11_4",
+        "qNumber": 4,
+        "prompt": "Read the information [gap] not quickly",
+        "fullSentence": "Read the information slowly not quickly",
+        "translation": "Đọc thông tin chậm rãi chứ không phải nhanh chóng",
+        "targetWord": "slowly",
+        "options": [
+          "table",
+          "slowly",
+          "house"
+        ],
+        "correctAnswer": "slowly"
+      },
+      {
+        "id": "p1_q_11_5",
+        "qNumber": 5,
+        "prompt": "Send me the results [gap] you go home not after",
+        "fullSentence": "Send me the results before you go home not after",
+        "translation": "Gửi cho tôi kết quả trước khi bạn về nhà chứ không phải sau",
+        "targetWord": "before",
+        "options": [
+          "table",
+          "before",
+          "house"
+        ],
+        "correctAnswer": "before"
+      }
+    ],
+    "cloverLevel": 3
+  },
+  {
+    "id": "reading_p1_set_12",
+    "setNumber": 12,
+    "title": "Đề 12",
+    "keyWords": [
+      "station",
+      "stops",
+      "green",
+      "dinner",
+      "films"
+    ],
+    "sticker": "★★★★★ Hay ra",
+    "cloverLevel": 5,
+    "questions": [
+      {
+        "id": "p1_q_12_1",
+        "qNumber": 1,
+        "prompt": "Tomorrow I have to go to the main bus [gap] to meet my friend",
+        "fullSentence": "Tomorrow I have to go to the main bus station to meet my friend",
+        "translation": "Ngày mai tôi phải đến bến xe buýt chính để gặp bạn",
+        "targetWord": "station",
+        "options": [
+          "airport",
+          "station",
+          "supermarket"
+        ],
+        "correctAnswer": "station"
+      },
+      {
+        "id": "p1_q_12_2",
+        "qNumber": 2,
+        "prompt": "Luckily, one of the bus [gap] is very close to my house",
+        "fullSentence": "Luckily, one of the bus stops is very close to my house",
+        "translation": "May mắn thay, một trong những điểm dừng xe buýt rất gần nhà tôi",
+        "targetWord": "stops",
+        "options": [
+          "bikes",
+          "stops",
+          "cars"
+        ],
+        "correctAnswer": "stops"
+      },
+      {
+        "id": "p1_q_12_3",
+        "qNumber": 3,
+        "prompt": "My house is easy to find – it’s [gap] and stands out from the others",
+        "fullSentence": "My house is easy to find – it’s green and stands out from the others",
+        "translation": "Nhà tôi rất dễ tìm - nó màu xanh lá cây và nổi bật so với những nhà khác",
+        "targetWord": "green",
+        "options": [
+          "green",
+          "expensive",
+          "tall"
+        ],
+        "correctAnswer": "green"
+      },
+      {
+        "id": "p1_q_12_4",
+        "qNumber": 4,
+        "prompt": "This evening I’ll make some eggs for [gap] because I am busy",
+        "fullSentence": "This evening I’ll make some eggs for dinner because I am busy",
+        "translation": "Tối nay tôi sẽ làm một vài quả trứng cho bữa tối vì tôi bận",
+        "targetWord": "dinner",
+        "options": [
+          "homework",
+          "dinner",
+          "football"
+        ],
+        "correctAnswer": "dinner"
+      },
+      {
+        "id": "p1_q_12_5",
+        "qNumber": 5,
+        "prompt": "After that, we can sit down and watch our favorite [gap] together",
+        "fullSentence": "After that, we can sit down and watch our favorite films together",
+        "translation": "Sau đó, chúng tôi có thể ngồi lại và cùng nhau xem những bộ phim yêu thích",
+        "targetWord": "films",
+        "options": [
+          "films",
+          "music",
+          "games"
+        ],
+        "correctAnswer": "films"
       }
     ]
   },
@@ -1053,14 +1064,15 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "people",
       "visit"
     ],
-    "sticker": "★★★★★ Hay ra",
+    "sticker": "Đề tủ",
+    "cloverLevel": 4,
     "questions": [
       {
         "id": "p1_q_13_1",
         "qNumber": 1,
-        "prompt": "I live in a house [gap] the park.",
-        "fullSentence": "I live in a house near the park.",
-        "translation": "Câu hỏi 1 trong đề 13",
+        "prompt": "I live in a house [gap] the park",
+        "fullSentence": "I live in a house near the park",
+        "translation": "Tôi sống trong một ngôi nhà gần công viên",
         "targetWord": "near",
         "options": [
           "table",
@@ -1072,9 +1084,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       {
         "id": "p1_q_13_2",
         "qNumber": 2,
-        "prompt": "My house has a kitchen but it is very [gap].",
-        "fullSentence": "My house has a kitchen but it is very small.",
-        "translation": "Câu hỏi 2 trong đề 13",
+        "prompt": "My house has a kitchen but it is very [gap]",
+        "fullSentence": "My house has a kitchen but it is very small",
+        "translation": "Nhà tôi có bếp nhưng rất nhỏ",
         "targetWord": "small",
         "options": [
           "red",
@@ -1086,9 +1098,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       {
         "id": "p1_q_13_3",
         "qNumber": 3,
-        "prompt": "I work at a [gap] to sell the clothes.",
-        "fullSentence": "I work at a shop to sell the clothes.",
-        "translation": "Câu hỏi 3 trong đề 13",
+        "prompt": "I work at a [gap] to sell the clothes",
+        "fullSentence": "I work at a shop to sell the clothes",
+        "translation": "Tôi làm việc ở một cửa hàng bán quần áo",
         "targetWord": "shop",
         "options": [
           "window",
@@ -1100,9 +1112,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       {
         "id": "p1_q_13_4",
         "qNumber": 4,
-        "prompt": "I can meet many [gap] and want to talk to them.",
-        "fullSentence": "I can meet many people and want to talk to them.",
-        "translation": "Câu hỏi 4 trong đề 13",
+        "prompt": "I can meet many [gap] and want to talk to them",
+        "fullSentence": "I can meet many people and want to talk to them",
+        "translation": "Tôi có thể gặp nhiều người và muốn nói chuyện với họ",
         "targetWord": "people",
         "options": [
           "animals",
@@ -1114,9 +1126,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       {
         "id": "p1_q_13_5",
         "qNumber": 5,
-        "prompt": "I am going to [gap] my hometown.",
-        "fullSentence": "I am going to visit my hometown.",
-        "translation": "Câu hỏi 5 trong đề 13",
+        "prompt": "I am going to [gap] my hometown next week",
+        "fullSentence": "I am going to visit my hometown next week",
+        "translation": "Tôi dự định sẽ về thăm quê vào tuần tới",
         "targetWord": "visit",
         "options": [
           "talk",
@@ -1138,19 +1150,20 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "good",
       "food"
     ],
-    "sticker": "★★★★★ Hay ra",
+    "sticker": "VIP",
+    "cloverLevel": 4,
     "questions": [
       {
         "id": "p1_q_14_1",
         "qNumber": 1,
         "prompt": "I get up early in the [gap] and I go running",
         "fullSentence": "I get up early in the morning and I go running",
-        "translation": "Tôi dậy sớm và đi chạy bộ",
+        "translation": "Tôi dậy sớm vào buổi sáng và đi chạy bộ",
         "targetWord": "morning",
         "options": [
-          "house",
+          "night",
           "morning",
-          "table"
+          "afternoon"
         ],
         "correctAnswer": "morning"
       },
@@ -1162,9 +1175,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "translation": "Bạn bè tôi đến tập thể dục cùng tôi",
         "targetWord": "friends",
         "options": [
-          "house",
+          "enemies",
           "friends",
-          "table"
+          "strangers"
         ],
         "correctAnswer": "friends"
       },
@@ -1176,9 +1189,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "translation": "Tôi để xe ở nhà và đi bộ",
         "targetWord": "leave",
         "options": [
-          "house",
+          "sell",
           "leave",
-          "table"
+          "drive"
         ],
         "correctAnswer": "leave"
       },
@@ -1190,9 +1203,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "translation": "Tập thể dục rất tốt cho cơ thể tôi",
         "targetWord": "good",
         "options": [
-          "house",
+          "bad",
           "good",
-          "table"
+          "tired"
         ],
         "correctAnswer": "good"
       },
@@ -1204,9 +1217,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "translation": "Tôi thường uống nhiều nước và ăn thực phẩm lành mạnh",
         "targetWord": "food",
         "options": [
-          "house",
+          "smoke",
           "food",
-          "table"
+          "sugar"
         ],
         "correctAnswer": "food"
       }
@@ -1217,91 +1230,6 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
     "setNumber": 15,
     "title": "Đề 15",
     "keyWords": [
-      "balance",
-      "statement",
-      "think",
-      "slowly",
-      "before"
-    ],
-    "sticker": "★★★★★ Hay ra",
-    "questions": [
-      {
-        "id": "p1_q_15_1",
-        "qNumber": 1,
-        "prompt": "The budget doesn’t [gap]",
-        "fullSentence": "The budget doesn’t balance",
-        "translation": "Hãy cân bằng (balance) mọi thứ và tuyên bố (statement) suy nghĩ (think) của bạn về sống chậm (slowly) trước (before) tất cả mọi người",
-        "targetWord": "balance",
-        "options": [
-          "house",
-          "balance",
-          "table"
-        ],
-        "correctAnswer": "balance"
-      },
-      {
-        "id": "p1_q_15_2",
-        "qNumber": 2,
-        "prompt": "Could you get the financial [gap]?",
-        "fullSentence": "Could you get the financial statement?",
-        "translation": "Bạn có thể lấy báo cáo tài chính ko?",
-        "targetWord": "statement",
-        "options": [
-          "house",
-          "statement",
-          "table"
-        ],
-        "correctAnswer": "statement"
-      },
-      {
-        "id": "p1_q_15_3",
-        "qNumber": 3,
-        "prompt": "I [gap] it will help",
-        "fullSentence": "I think it will help",
-        "translation": "Tôi nghĩ nó sẽ có ích",
-        "targetWord": "think",
-        "options": [
-          "house",
-          "think",
-          "table"
-        ],
-        "correctAnswer": "think"
-      },
-      {
-        "id": "p1_q_15_4",
-        "qNumber": 4,
-        "prompt": "Read the information [gap] not quickly",
-        "fullSentence": "Read the information slowly not quickly",
-        "translation": "Hãy cân bằng (balance) mọi thứ và tuyên bố (statement) suy nghĩ (think) của bạn về sống chậm (slowly) trước (before) tất cả mọi người",
-        "targetWord": "slowly",
-        "options": [
-          "house",
-          "slowly",
-          "table"
-        ],
-        "correctAnswer": "slowly"
-      },
-      {
-        "id": "p1_q_15_5",
-        "qNumber": 5,
-        "prompt": "Send me the results [gap] you go home not after",
-        "fullSentence": "Send me the results before you go home not after",
-        "translation": "Gửi cho tôi kết quả trước khi bạn về nhà chứ không phải sau",
-        "targetWord": "before",
-        "options": [
-          "house",
-          "before",
-          "table"
-        ],
-        "correctAnswer": "before"
-      }
-    ]
-  },
-  {
-    "id": "reading_p1_set_16",
-    "setNumber": 16,
-    "title": "Đề 16",
-    "keyWords": [
       "bicycle",
       "tall",
       "trees",
@@ -1309,71 +1237,73 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "meditation"
     ],
     "sticker": "★★★★★ Hay ra",
+    "cloverLevel": 4,
     "questions": [
       {
-        "id": "p1_q_16_1",
+        "id": "p1_q_15_1",
         "qNumber": 1,
-        "prompt": "I go to school by board /plane/ [gap]",
-        "fullSentence": "I go to school by board /plane/ bicycle",
-        "translation": "Câu hỏi 1 trong đề 16",
+        "prompt": "I go to school by [gap]",
+        "fullSentence": "I go to school by bicycle",
+        "translation": "Tôi đi học bằng xe đạp",
         "targetWord": "bicycle",
         "options": [
-          "house",
-          "bicycle",
-          "table"
+          "board",
+          "plane",
+          "bicycle"
         ],
         "correctAnswer": "bicycle"
       },
       {
-        "id": "p1_q_16_2",
+        "id": "p1_q_15_2",
         "qNumber": 2,
-        "prompt": "The buildings in my city are very hate /[gap] /busy",
-        "fullSentence": "The buildings in my city are very hate /tall /busy",
-        "translation": "Câu hỏi 2 trong đề 16",
+        "prompt": "The buildings in my city are very [gap]",
+        "fullSentence": "The buildings in my city are very tall",
+        "translation": "Những tòa nhà trong thành phố tôi rất cao",
         "targetWord": "tall",
         "options": [
-          "house",
+          "hate",
           "tall",
-          "table"
+          "busy"
         ],
         "correctAnswer": "tall"
       },
       {
-        "id": "p1_q_16_3",
+        "id": "p1_q_15_3",
         "qNumber": 3,
-        "prompt": "There are many green lands/ tea/ [gap] near my home.",
-        "fullSentence": "There are many green lands/ tea/ trees near my home.",
-        "translation": "Câu hỏi 3 trong đề 16",
+        "prompt": "There are many green [gap] near my home",
+        "fullSentence": "There are many green trees near my home",
+        "translation": "Có rất nhiều cây xanh gần nhà tôi",
         "targetWord": "trees",
         "options": [
-          "house",
-          "trees",
-          "table"
+          "lands",
+          "tea",
+          "trees"
         ],
         "correctAnswer": "trees"
       },
       {
-        "id": "p1_q_16_4",
+        "id": "p1_q_15_4",
         "qNumber": 4,
-        "prompt": "I eat [gap]/ lunch /dinner with my family every morning.",
-        "fullSentence": "I eat breakfast/ lunch /dinner with my family every morning.",
-        "translation": "Câu hỏi 4 trong đề 16",
+        "prompt": "I eat [gap] with my family every morning",
+        "fullSentence": "I eat breakfast with my family every morning",
+        "translation": "Tôi ăn sáng cùng gia đình mỗi sáng",
         "targetWord": "breakfast",
         "options": [
-          "house",
           "breakfast",
-          "table"
+          "lunch",
+          "dinner"
         ],
         "correctAnswer": "breakfast"
       },
       {
-        "id": "p1_q_16_5",
+        "id": "p1_q_15_5",
         "qNumber": 5,
-        "prompt": "I do make/ [gap] to feel relaxed.",
-        "fullSentence": "I do make/ meditation to feel relaxed.",
-        "translation": "Câu hỏi 5 trong đề 16",
+        "prompt": "I do [gap] to feel relaxed",
+        "fullSentence": "I do meditation to feel relaxed",
+        "translation": "Tôi tập thiền để cảm thấy thư giãn",
         "targetWord": "meditation",
         "options": [
+          "make",
           "meditation",
           "exercise"
         ],
@@ -1382,9 +1312,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
     ]
   },
   {
-    "id": "reading_p1_set_17",
-    "setNumber": 17,
-    "title": "Đề 17",
+    "id": "reading_p1_set_16",
+    "setNumber": 16,
+    "title": "Đề 16",
     "keyWords": [
       "farm",
       "excited",
@@ -1392,84 +1322,85 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "street",
       "drink"
     ],
-    "sticker": "★★★★★ Hay ra",
+    "sticker": "Đề tủ",
+    "cloverLevel": 3,
     "questions": [
       {
-        "id": "p1_q_17_1",
+        "id": "p1_q_16_1",
         "qNumber": 1,
-        "prompt": "My uncle works on a [gap]/ factory/ office .",
-        "fullSentence": "My uncle works on a farm/ factory/ office .",
-        "translation": "Câu hỏi 1 trong đề 17",
+        "prompt": "My uncle works on a [gap]",
+        "fullSentence": "My uncle works on a farm",
+        "translation": "Chú tôi làm việc trong một nông trại",
         "targetWord": "farm",
         "options": [
-          "house",
           "farm",
-          "table"
+          "factory",
+          "office"
         ],
         "correctAnswer": "farm"
       },
       {
-        "id": "p1_q_17_2",
+        "id": "p1_q_16_2",
         "qNumber": 2,
-        "prompt": "The children were very bored/ [gap]/ tired about the trip.",
-        "fullSentence": "The children were very bored/ excited/ tired about the trip.",
-        "translation": "Câu hỏi 2 trong đề 17",
+        "prompt": "The children were very [gap] about the trip",
+        "fullSentence": "The children were very excited about the trip",
+        "translation": "Bọn trẻ rất hào hứng về chuyến đi",
         "targetWord": "excited",
         "options": [
-          "house",
+          "bored",
           "excited",
-          "table"
+          "tired"
         ],
         "correctAnswer": "excited"
       },
       {
-        "id": "p1_q_17_3",
+        "id": "p1_q_16_3",
         "qNumber": 3,
-        "prompt": "Turn right/ [gap]/ back at the next corner.",
-        "fullSentence": "Turn right/ left/ back at the next corner.",
-        "translation": "Câu hỏi 3 trong đề 17",
+        "prompt": "Turn [gap] at the next corner",
+        "fullSentence": "Turn left at the next corner",
+        "translation": "Rẽ trái ở góc ngã rẽ tiếp theo",
         "targetWord": "left",
         "options": [
-          "house",
+          "right",
           "left",
-          "table"
+          "back"
         ],
         "correctAnswer": "left"
       },
       {
-        "id": "p1_q_17_4",
+        "id": "p1_q_16_4",
         "qNumber": 4,
-        "prompt": "We walked along the river/ [gap]/ mountain to the park.",
-        "fullSentence": "We walked along the river/ street/ mountain to the park.",
-        "translation": "Câu hỏi 4 trong đề 17",
+        "prompt": "We walked along the [gap] to the park",
+        "fullSentence": "We walked along the street to the park",
+        "translation": "Chúng tôi đi dọc theo con đường đến công viên",
         "targetWord": "street",
         "options": [
-          "house",
+          "river",
           "street",
-          "table"
+          "mountain"
         ],
         "correctAnswer": "street"
       },
       {
-        "id": "p1_q_17_5",
+        "id": "p1_q_16_5",
         "qNumber": 5,
-        "prompt": "I usually eat/ [gap]/ cook milk in the morning.",
-        "fullSentence": "I usually eat/ drink/ cook milk in the morning.",
-        "translation": "Câu hỏi 5 trong đề 17",
+        "prompt": "I usually [gap] milk in the morning",
+        "fullSentence": "I usually drink milk in the morning",
+        "translation": "Tôi thường uống sữa vào buổi sáng",
         "targetWord": "drink",
         "options": [
-          "house",
+          "eat",
           "drink",
-          "table"
+          "cook"
         ],
         "correctAnswer": "drink"
       }
     ]
   },
   {
-    "id": "reading_p1_set_18",
-    "setNumber": 18,
-    "title": "Đề 18",
+    "id": "reading_p1_set_17",
+    "setNumber": 17,
+    "title": "Đề 17",
     "keyWords": [
       "country",
       "clean",
@@ -1477,14 +1408,15 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "other",
       "words"
     ],
-    "sticker": "★★★★★ Hay ra",
+    "sticker": "VIP",
+    "cloverLevel": 3,
     "questions": [
       {
-        "id": "p1_q_18_1",
+        "id": "p1_q_17_1",
         "qNumber": 1,
-        "prompt": "I want to travel to the [gap] this summer.",
-        "fullSentence": "I want to travel to the country this summer.",
-        "translation": "Câu hỏi 1 trong đề 18",
+        "prompt": "I want to travel to the [gap] this summer",
+        "fullSentence": "I want to travel to the country this summer",
+        "translation": "Tôi muốn về miền quê du lịch vào mùa hè này",
         "targetWord": "country",
         "options": [
           "country",
@@ -1494,11 +1426,11 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "country"
       },
       {
-        "id": "p1_q_18_2",
+        "id": "p1_q_17_2",
         "qNumber": 2,
-        "prompt": "Please keep your room [gap].",
-        "fullSentence": "Please keep your room clean.",
-        "translation": "Câu hỏi 2 trong đề 18",
+        "prompt": "Please keep your room [gap]",
+        "fullSentence": "Please keep your room clean",
+        "translation": "Xin vui lòng giữ phòng của bạn sạch sẽ",
         "targetWord": "clean",
         "options": [
           "dirty",
@@ -1508,11 +1440,11 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "clean"
       },
       {
-        "id": "p1_q_18_3",
+        "id": "p1_q_17_3",
         "qNumber": 3,
-        "prompt": "We have English [gap] on Monday.",
-        "fullSentence": "We have English class on Monday.",
-        "translation": "Câu hỏi 3 trong đề 18",
+        "prompt": "We have English [gap] on Monday",
+        "fullSentence": "We have English class on Monday",
+        "translation": "Chúng tôi có tiết học tiếng Anh vào thứ Hai",
         "targetWord": "class",
         "options": [
           "class",
@@ -1522,11 +1454,11 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "class"
       },
       {
-        "id": "p1_q_18_4",
+        "id": "p1_q_17_4",
         "qNumber": 4,
-        "prompt": "I like helping [gap] people.",
-        "fullSentence": "I like helping other people.",
-        "translation": "Câu hỏi 4 trong đề 18",
+        "prompt": "I like helping [gap] people",
+        "fullSentence": "I like helping other people",
+        "translation": "Tôi thích giúp đỡ những người khác",
         "targetWord": "other",
         "options": [
           "myself",
@@ -1536,11 +1468,11 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "other"
       },
       {
-        "id": "p1_q_18_5",
+        "id": "p1_q_17_5",
         "qNumber": 5,
         "prompt": "Can you spell these [gap] for me?",
         "fullSentence": "Can you spell these words for me?",
-        "translation": "Câu hỏi 5 trong đề 18",
+        "translation": "Bạn có thể đánh vần những từ này giúp tôi được không?",
         "targetWord": "words",
         "options": [
           "numbers",
@@ -1552,9 +1484,9 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
     ]
   },
   {
-    "id": "reading_p1_set_19",
-    "setNumber": 19,
-    "title": "Đề 19",
+    "id": "reading_p1_set_18",
+    "setNumber": 18,
+    "title": "Đề 18",
     "keyWords": [
       "small",
       "stay",
@@ -1562,14 +1494,15 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
       "trees",
       "old"
     ],
-    "sticker": "★★★★★ Hay ra",
+    "sticker": "Mới cập nhật",
+    "cloverLevel": 3,
     "questions": [
       {
-        "id": "p1_q_19_1",
+        "id": "p1_q_18_1",
         "qNumber": 1,
-        "prompt": "My bedroom is very [gap] .",
-        "fullSentence": "My bedroom is very small .",
-        "translation": "Câu hỏi 1 trong đề 19",
+        "prompt": "My bedroom is very [gap]",
+        "fullSentence": "My bedroom is very small",
+        "translation": "Phòng ngủ của tôi rất nhỏ gọn",
         "targetWord": "small",
         "options": [
           "big",
@@ -1579,11 +1512,11 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "small"
       },
       {
-        "id": "p1_q_19_2",
+        "id": "p1_q_18_2",
         "qNumber": 2,
-        "prompt": "We usually [gap] at a hotel on vacation.",
-        "fullSentence": "We usually stay at a hotel on vacation.",
-        "translation": "Câu hỏi 2 trong đề 19",
+        "prompt": "We usually [gap] at a hotel on vacation",
+        "fullSentence": "We usually stay at a hotel on vacation",
+        "translation": "Chúng tôi thường ở khách sạn vào kỳ nghỉ",
         "targetWord": "stay",
         "options": [
           "stay",
@@ -1593,11 +1526,11 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "stay"
       },
       {
-        "id": "p1_q_19_3",
+        "id": "p1_q_18_3",
         "qNumber": 3,
-        "prompt": "There are many flowers in the [gap] .",
-        "fullSentence": "There are many flowers in the garden .",
-        "translation": "Câu hỏi 3 trong đề 19",
+        "prompt": "There are many flowers in the [gap]",
+        "fullSentence": "There are many flowers in the garden",
+        "translation": "Có rất nhiều hoa trong khu vườn",
         "targetWord": "garden",
         "options": [
           "kitchen",
@@ -1607,11 +1540,11 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "garden"
       },
       {
-        "id": "p1_q_19_4",
+        "id": "p1_q_18_4",
         "qNumber": 4,
-        "prompt": "Some [gap] near my home are very tall.",
-        "fullSentence": "Some trees near my home are very tall.",
-        "translation": "Câu hỏi 4 trong đề 19",
+        "prompt": "Some [gap] near my home are very tall",
+        "fullSentence": "Some trees near my home are very tall",
+        "translation": "Một số cây gần nhà tôi rất cao lớn",
         "targetWord": "trees",
         "options": [
           "houses",
@@ -1621,11 +1554,11 @@ export const READING_PART1_SETS: ReadingPart1Set[] = [
         "correctAnswer": "trees"
       },
       {
-        "id": "p1_q_19_5",
+        "id": "p1_q_18_5",
         "qNumber": 5,
-        "prompt": "My grandfather is very [gap] but still strong.",
-        "fullSentence": "My grandfather is very old but still strong.",
-        "translation": "Câu hỏi 5 trong đề 19",
+        "prompt": "My grandfather is very [gap] but still strong",
+        "fullSentence": "My grandfather is very old but still strong",
+        "translation": "Ông tôi đã cao tuổi nhưng vẫn còn rất khỏe mạnh",
         "targetWord": "old",
         "options": [
           "young",

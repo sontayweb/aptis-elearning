@@ -582,16 +582,21 @@ function SpeakingMarathonContent() {
                         />
                         <div className="absolute top-2.5 left-2.5">
                           <span className="px-2 py-0.5 rounded-md bg-black/70 text-white font-bold text-[10px] backdrop-blur-xs">
-                            Tranh 0{topic.topicNumber}
+                            Tranh {topic.topicNumber < 10 ? `0${topic.topicNumber}` : topic.topicNumber}
                           </span>
                         </div>
                       </div>
 
                       {/* Title & Questions */}
                       <div className="p-4 space-y-3">
-                        <h3 className="font-heading font-bold text-sm text-foreground">
-                          {topic.title}
-                        </h3>
+                        <div className="flex items-center justify-between gap-2">
+                          <h3 className="font-heading font-bold text-sm text-foreground">
+                            {topic.title}
+                          </h3>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                            Tranh trọng điểm Part 2
+                          </span>
+                        </div>
 
                         {/* 3 Questions */}
                         <div className="space-y-1.5">

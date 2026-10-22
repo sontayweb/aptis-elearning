@@ -7,7 +7,9 @@ export interface ReadingTopicItem {
   title: string;
   sticker: string;
   hotLevel?: number;
+  cloverLevel?: number;
   isKey?: boolean;
+  originalTopic?: string;
 }
 
 export const READING_PART2_TOPICS: ReadingTopicItem[] = [
