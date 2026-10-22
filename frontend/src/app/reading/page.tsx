@@ -537,6 +537,7 @@ export default function ReadingPracticePage() {
 
               {/* CARD 2..N: Practice Exam Cards */}
               {filteredExams.map((exam, idx) => {
+                const targetUrl = `/reading/${exam.id}${tabInfo.partQuery}`;
                 const numStr = (exam as any).originalIdx !== undefined
                   ? ((exam as any).originalIdx + 1 < 10 ? `0${(exam as any).originalIdx + 1}` : `${(exam as any).originalIdx + 1}`)
                   : (idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`);

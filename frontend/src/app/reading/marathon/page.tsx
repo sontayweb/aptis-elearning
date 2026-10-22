@@ -39,6 +39,8 @@ import {
   ExternalLink,
   Globe,
 } from "lucide-react";
+import { ReadingGoogleTranslateModal } from "@/components/reading-google-translate";
+import { getCloverConfig } from "@/lib/clover-utils";
 
 // Sample Sentence Cohesion data for Part 2
 const PART2_COHESION_DEMO = [
@@ -92,6 +94,7 @@ function ReadingMarathonContent() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [showResults, setShowResults] = useState<Record<string, boolean>>({});
   const [showTranslations, setShowTranslations] = useState<Record<string, boolean>>({});
+  const [isTranslateOpen, setIsTranslateOpen] = useState(false);
 
   // Part 2 Cohesion order state (Đầy đủ 27 bộ đề thi)
   const [cohesionOrder, setCohesionOrder] = useState<Record<number, string[]>>(() => {
@@ -213,16 +216,27 @@ function ReadingMarathonContent() {
               </div>
             </div>
 
-            {/* Quick search */}
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm từ khóa, đề tài đọc..."
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
-              />
+            {/* Quick search & Google Translate */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:w-64">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Tìm từ khóa, đề tài đọc..."
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsTranslateOpen(true)}
+                className="h-9 px-3.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 cursor-pointer"
+                title="Tra cứu từ vựng & dịch câu bằng Google Dịch"
+              >
+                <Languages className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span className="hidden sm:inline">Google Dịch</span>
+              </button>
             </div>
           </div>
 
@@ -705,6 +719,10 @@ function ReadingMarathonContent() {
         </div>
       </main>
 
+      <ReadingGoogleTranslateModal
+        isOpen={isTranslateOpen}
+        onClose={() => setIsTranslateOpen(false)}
+      />
       <Footer />
       <FloatingActions />
     </div>
