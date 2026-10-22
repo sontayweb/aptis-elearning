@@ -261,10 +261,10 @@ export default function SpeakingPracticePage() {
         };
       case "p2":
         return {
-          title: "Part 2 – Describe, express opinion and explain",
+          title: "Tranh trọng điểm Part 2 – Describe, express opinion and explain",
           desc: "Miêu tả một bức tranh trong 45 giây và trả lời 2 câu hỏi mở rộng về chủ đề liên quan.",
-          subDesc: "Nhãn ưu tiên là các đề hay thi vào gần đây — Ưu tiên cao là đề nên luyện trước.",
-          badge: "Part 2",
+          subDesc: "Danh mục Tranh trọng điểm Part 2 – Các đề trọng tâm xuất hiện liên tục trong đề thi thật.",
+          badge: "Tranh trọng điểm Part 2",
           partQuery: "?part=2",
           marathonText: "Tranh Trọng Điểm & Từ Vựng Part 2",
           marathonDesc: "Bộ 25 tranh thi thật kèm bảng từ vựng song ngữ và 3 câu hỏi chi tiết theo từng tranh",
@@ -541,6 +541,12 @@ export default function SpeakingPracticePage() {
                       ? rawTitle
                       : `${examNumStr} — ${rawTitle}`;
                   }
+                  if (activeTab === "p1") {
+                    return examNumStr;
+                  }
+                  if (activeTab === "p2") {
+                    return examNumStr;
+                  }
                   if (!isGenericTopic) {
                     return `${examNumStr} — ${topicName}`;
                   }
@@ -563,9 +569,7 @@ export default function SpeakingPracticePage() {
                       : "Part 1 · Phỏng vấn cá nhân (3 câu · 30s/câu)";
                   }
                   if (activeTab === "p2") {
-                    return exam.totalParts === 4
-                      ? "Trích từ đề Full Test · Part 2 (45s/câu)"
-                      : "Part 2 · Miêu tả tranh & Quan điểm (45s/câu)";
+                    return "Tranh trọng điểm Part 2 · Miêu tả tranh (45s/câu)";
                   }
                   if (activeTab === "p3") {
                     return exam.totalParts === 4

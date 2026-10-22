@@ -18,7 +18,7 @@ export interface SpeakingPart1Unit {
 export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   {
     "id": "unit_intro",
-    "title": "Chủ đề khởi động & Bản thân (Essential Starters)",
+    "title": "Đề 01",
     "goal": "Làm quen phản xạ trả lời ngắn 30s các chủ đề quen thuộc",
     "questions": [
       {
@@ -301,7 +301,7 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   },
   {
     "id": "unit_2",
-    "title": "UNIT 1: PERSONAL INFORMATION",
+    "title": "Đề 02",
     "goal": "Giới thiệu bản thân, gia đình, bạn bè và thói quen bằng ngôn ngữ linh hoạt.",
     "questions": [
       {
@@ -338,7 +338,7 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   },
   {
     "id": "unit_3",
-    "title": "UNIT 2: DAILY ROUTINES AND FREE TIME",
+    "title": "Đề 03",
     "goal": "Mô tả thói quen, thời gian rảnh và cảm xúc bằng các chi tiết cụ thể.",
     "questions": [
       {
@@ -375,7 +375,7 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   },
   {
     "id": "unit_4",
-    "title": "UNIT 3: MEMORIES AND EXPERIENCES",
+    "title": "Đề 04",
     "goal": "Kể lại trải nghiệm trong quá khứ với trình tự rõ ràng và cảm xúc phù hợp.",
     "questions": [
       {
@@ -418,7 +418,7 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   },
   {
     "id": "unit_5",
-    "title": "UNIT 4: HOME, ROOMS AND PLACES",
+    "title": "Đề 05",
     "goal": "Mô tả không gian và địa điểm, đồng thời giải thích lý do hoặc đánh giá cá nhân.",
     "questions": [
       {
@@ -455,7 +455,7 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   },
   {
     "id": "unit_6",
-    "title": "UNIT 5: TRAVEL AND LEISURE",
+    "title": "Đề 06",
     "goal": "Trình bày sở thích du lịch, phương tiện và kế hoạch trong tương lai.",
     "questions": [
       {
@@ -498,7 +498,7 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   },
   {
     "id": "unit_7",
-    "title": "UNIT 6: WEATHER, SEASONS AND CLOTHING",
+    "title": "Đề 07",
     "goal": "Mô tả thời tiết, mùa và trang phục bằng từ ngữ tự nhiên.",
     "questions": [
       {
@@ -541,7 +541,7 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   },
   {
     "id": "unit_8",
-    "title": "UNIT 7: FOOD, CULTURE AND ENTERTAINMENT",
+    "title": "Đề 08",
     "goal": "Nói về ẩm thực, văn hóa, thể thao và giải trí với quan điểm rõ ràng.",
     "questions": [
       {
@@ -578,7 +578,7 @@ export const SPEAKING_PART1_UNITS: SpeakingPart1Unit[] = [
   },
   {
     "id": "unit_9",
-    "title": "UNIT 8: LEARNING, TECHNOLOGY AND FUTURE PLANS",
+    "title": "Đề 09",
     "goal": "Thảo luận việc học, công nghệ, mua sắm và định hướng tương lai.",
     "questions": [
       {

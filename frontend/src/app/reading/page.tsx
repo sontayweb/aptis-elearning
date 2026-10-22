@@ -29,7 +29,10 @@ import {
   Zap,
   Flame,
   Star,
+  Languages,
 } from "lucide-react";
+import { getCloverConfig } from "@/lib/clover-utils";
+import { ReadingGoogleTranslateModal } from "@/components/reading-google-translate";
 
 interface ReadingExam {
   id: string;
@@ -68,6 +71,7 @@ export default function ReadingPracticePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
+  const [isTranslateOpen, setIsTranslateOpen] = useState(false);
 
   const loadExams = async () => {
     try {
@@ -204,19 +208,35 @@ export default function ReadingPracticePage() {
   });
 
   // 2. Lọc tiếp theo search, status, priority từ currentTabExams
-  const filteredExams = currentTabExams.filter((e) => {
-    const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" ? true : e.status === filterStatus;
-    const matchesPriority =
-      filterPriority === "all"
-        ? true
-        : filterPriority === "high"
-        ? e.priority === "HIGH"
-        : filterPriority === "medium"
-        ? e.priority === "MEDIUM"
-        : e.priority === "LOW";
-    return matchesSearch && matchesStatus && matchesPriority;
-  }).sort((a, b) => (b.hotLevel || 0) - (a.hotLevel || 0));
+  const filteredExams = currentTabExams
+    .map((e, idx) => {
+      let cloverLevel = e.hotLevel || 2;
+      if (activeTab === "p2") {
+        const topic = READING_PART2_TOPICS[idx % READING_PART2_TOPICS.length];
+        cloverLevel = topic?.cloverLevel || cloverLevel;
+      } else if (activeTab === "p3") {
+        const topic = READING_PART3_TOPICS[idx % READING_PART3_TOPICS.length];
+        cloverLevel = topic?.cloverLevel || cloverLevel;
+      } else if (activeTab === "p4") {
+        const topic = READING_PART4_TOPICS[idx % READING_PART4_TOPICS.length];
+        cloverLevel = topic?.cloverLevel || cloverLevel;
+      }
+      return { ...e, computedClover: cloverLevel, originalIdx: idx };
+    })
+    .filter((e) => {
+      const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = filterStatus === "all" ? true : e.status === filterStatus;
+      const matchesPriority =
+        filterPriority === "all"
+          ? true
+          : filterPriority === "high"
+          ? e.computedClover >= 5
+          : filterPriority === "medium"
+          ? e.computedClover === 4
+          : e.computedClover <= 3;
+      return matchesSearch && matchesStatus && matchesPriority;
+    })
+    .sort((a, b) => (b.computedClover || 0) - (a.computedClover || 0));
 
   // Dynamic naming based on activeTab
   const getTabInfo = () => {
@@ -293,16 +313,27 @@ export default function ReadingPracticePage() {
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
         <section className="section-container py-6 md:py-8">
-          {/* Search Box */}
-          <div className="relative mb-6">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex w-full rounded-xl border border-input px-3 py-2 text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-sm"
-              placeholder="Tìm kiếm bộ đề Reading..."
-            />
+          {/* Search Box & Quick Google Translate Tool */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex w-full rounded-xl border border-input px-3 py-2 text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-sm"
+                placeholder="Tìm kiếm bộ đề Reading..."
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsTranslateOpen(true)}
+              className="h-11 px-4 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 font-bold text-xs flex items-center gap-2 transition-all shadow-xs shrink-0 cursor-pointer"
+              title="Tra cứu từ vựng & dịch câu bằng Google Dịch"
+            >
+              <Languages className="w-4 h-4" />
+              <span className="hidden sm:inline">Google Dịch</span>
+            </button>
           </div>
 
           {/* Top 5 Part Tabs matching aptiskytich.vn */}
@@ -356,17 +387,15 @@ export default function ReadingPracticePage() {
 
           {/* Sub Filters - Rows */}
           <div className="space-y-2.5 mb-8 text-xs">
-            {/* Row 1: Lọc ưu tiên (for Full Part, Part 2+3, Part 4) */}
-            {(activeTab === "full" || activeTab === "p2" || activeTab === "p3") && (
+            {/* Row 1: Lọc ưu tiên theo Độ Hot ☘️ (Clover Level) */}
+            {(activeTab === "full" || activeTab === "p2" || activeTab === "p3" || activeTab === "p4") && (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-muted-foreground font-semibold w-24">Lọc ưu tiên:</span>
+                <span className="text-muted-foreground font-semibold w-24">Độ Hot ☘️:</span>
                 {[
                   { id: "all", label: `Tất cả (${currentTabExams.length})` },
-                  { id: "high", label: `Ưu tiên cao (${currentTabExams.filter((e) => e.priority === "HIGH").length})` },
-                  { id: "medium", label: `Ưu tiên vừa (${currentTabExams.filter((e) => e.priority === "MEDIUM").length})` },
-                  ...(activeTab === "p2" || activeTab === "p3"
-                    ? [{ id: "low", label: `Ưu tiên thấp (${currentTabExams.filter((e) => e.priority === "LOW").length})` }]
-                    : []),
+                  { id: "high", label: "☘️☘️☘️☘️☘️ Siêu Hot" },
+                  { id: "medium", label: "☘️☘️☘️☘️ Hay ra" },
+                  { id: "low", label: "☘️☘️ - ☘️☘️☘️ Thường gặp" },
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -510,19 +539,25 @@ export default function ReadingPracticePage() {
               {filteredExams.map((exam, idx) => {
                 const targetUrl = `/reading/${exam.id}${tabInfo.partQuery}`;
                 const displayTitle = exam.title || (() => {
-                  const numStr = idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`;
+                  const numStr = (exam as any).originalIdx !== undefined
+                    ? ((exam as any).originalIdx + 1 < 10 ? `0${(exam as any).originalIdx + 1}` : `${(exam as any).originalIdx + 1}`)
+                    : (idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`);
+
                   if (activeTab === "full") return `Đề ${numStr} — Full Reading · 4 Parts`;
-                  if (activeTab === "p1") return `Đề ${numStr} - Reading Part 1 (Sentence Comprehension)`;
+                  if (activeTab === "p1") return `Đề ${numStr}`;
                   if (activeTab === "p2") {
-                    const topic = READING_PART2_TOPICS[idx % READING_PART2_TOPICS.length];
-                    return `Đề ${numStr} - ${topic.title}`;
+                    const topicIdx = (exam as any).originalIdx !== undefined ? (exam as any).originalIdx : idx;
+                    const topic = READING_PART2_TOPICS[topicIdx % READING_PART2_TOPICS.length];
+                    return `Đề ${numStr} — ${topic?.title || "Text Cohesion"}`;
                   }
                   if (activeTab === "p3") {
-                    const topic = READING_PART3_TOPICS[idx % READING_PART3_TOPICS.length];
-                    return `Đề ${numStr} - ${topic.title}`;
+                    const topicIdx = (exam as any).originalIdx !== undefined ? (exam as any).originalIdx : idx;
+                    const topic = READING_PART3_TOPICS[topicIdx % READING_PART3_TOPICS.length];
+                    return `Đề ${numStr} — ${topic?.title || "Opinion Matching"}`;
                   }
-                  const topic = READING_PART4_TOPICS[idx % READING_PART4_TOPICS.length];
-                  return `Đề ${numStr} - ${topic.title}`;
+                  const topicIdx = (exam as any).originalIdx !== undefined ? (exam as any).originalIdx : idx;
+                  const topic = READING_PART4_TOPICS[topicIdx % READING_PART4_TOPICS.length];
+                  return `Đề ${numStr} — ${topic?.title || "Long Reading"}`;
                 })();
 
                 return (
@@ -547,37 +582,19 @@ export default function ReadingPracticePage() {
                             </span>
                           )}
 
-                          {/* Stickers đánh giá mức độ ưu tiên: ★★★★★ Hay ra | VIP | Đề tủ | Mới cập nhật */}
+                          {/* Stickers đánh giá mức độ ưu tiên theo chuẩn Clover ☘️ */}
                           {(() => {
-                            const mod = idx % 4;
-                            if (exam.hotLevel === 3 || mod === 0) {
-                              return (
-                                <span className="px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-700 dark:text-rose-300 font-extrabold text-[10px] inline-flex items-center gap-1 border border-rose-500/30">
-                                  <Star className="w-3 h-3 fill-rose-500 text-rose-500" />
-                                  ★★★★★ Hay ra
-                                </span>
-                              );
-                            } else if (exam.hotLevel === 2 || mod === 1) {
-                              return (
-                                <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] inline-flex items-center gap-1 border border-amber-500/30">
-                                  <Flame className="w-3 h-3 fill-amber-500 text-amber-500" />
-                                  Đề tủ
-                                </span>
-                              );
-                            } else if (mod === 2) {
-                              return (
-                                <span className="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 font-extrabold text-[10px] inline-flex items-center gap-1 border border-purple-500/30">
-                                  <Sparkles className="w-3 h-3 text-purple-600" />
-                                  VIP
-                                </span>
-                              );
-                            } else {
-                              return (
-                                <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] inline-flex items-center gap-1 border border-emerald-500/30">
-                                  Mới cập nhật
-                                </span>
-                              );
-                            }
+                            const cloverLvl = (exam as any).computedClover || exam.hotLevel || 2;
+                            const cfg = getCloverConfig(cloverLvl);
+                            return (
+                              <span
+                                className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
+                                title={cfg.label}
+                              >
+                                <span>{cfg.symbol}</span>
+                                <span>{cfg.shortLabel}</span>
+                              </span>
+                            );
                           })()}
                         </div>
 
@@ -663,6 +680,10 @@ export default function ReadingPracticePage() {
           const tabKey = (`p${pIdx + 1}` as "p1" | "p2" | "p3" | "p4");
           setActiveTab(tabKey);
         }}
+      />
+      <ReadingGoogleTranslateModal
+        isOpen={isTranslateOpen}
+        onClose={() => setIsTranslateOpen(false)}
       />
     </div>
   );

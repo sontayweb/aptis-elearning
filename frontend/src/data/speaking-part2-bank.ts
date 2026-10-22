@@ -1,5 +1,6 @@
 // Speaking Part 2 Authentic Question & Picture Bank
 // Extracted and normalized from SPEAKING/Tranh trọng điểm part 2.docx
+// Format: Title simplified to 'Đề 01', 'Đề 02'... categorized as 'Tranh trọng điểm Part 2'
 
 export interface SpeakingVocabItem {
   en: string;
@@ -10,6 +11,8 @@ export interface SpeakingPart2Topic {
   id: string;
   topicNumber: number;
   title: string;
+  originalDescription?: string;
+  category?: string;
   imageUrl: string;
   vocab: SpeakingVocabItem[];
   questions: string[];
@@ -19,7 +22,7 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
   {
     "id": "p2_1",
     "topicNumber": 1,
-    "title": "Nhóm người trong phòng họp",
+    "title": "Đề 01",
     "imageUrl": "/uploads/speaking/part2/image15.png",
     "questions": [
       "Describe the picture.",
@@ -67,12 +70,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "face mask",
         "vi": "khẩu trang"
       }
-    ]
+    ],
+    "originalDescription": "Nhóm người trong phòng họp",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_2",
     "topicNumber": 2,
-    "title": "Hai vợ chồng ở phòng khách",
+    "title": "Đề 02",
     "imageUrl": "/uploads/speaking/part2/image22.png",
     "questions": [
       "Describe the picture.",
@@ -120,12 +125,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "relax",
         "vi": "thư giãn"
       }
-    ]
+    ],
+    "originalDescription": "Hai vợ chồng ở phòng khách",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_3",
     "topicNumber": 3,
-    "title": "Cô gái đi siêu thị",
+    "title": "Đề 03",
     "imageUrl": "/uploads/speaking/part2/image18.png",
     "questions": [
       "Describe the picture.",
@@ -213,12 +220,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "together",
         "vi": "cùng nhau"
       }
-    ]
+    ],
+    "originalDescription": "Cô gái đi siêu thị",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_4",
     "topicNumber": 4,
-    "title": "Gia đình trong phòng bếp",
+    "title": "Đề 04",
     "imageUrl": "/uploads/speaking/part2/image9.png",
     "questions": [
       "Describe the picture.",
@@ -266,24 +275,28 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "comfortable",
         "vi": "thoải mái"
       }
-    ]
+    ],
+    "originalDescription": "Gia đình trong phòng bếp",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_5",
     "topicNumber": 5,
-    "title": "Nhóm người trên xe khách",
+    "title": "Đề 05",
     "imageUrl": "/uploads/speaking/part2/image10.png",
     "questions": [
       "Describe the picture.",
       "Tell me about the last time you traveled with a group.",
       "What are the benefits of traveling with a group?"
     ],
-    "vocab": []
+    "vocab": [],
+    "originalDescription": "Nhóm người trên xe khách",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_6",
     "topicNumber": 6,
-    "title": "Hai mẹ con đang cưỡi ngựa",
+    "title": "Đề 06",
     "imageUrl": "/uploads/speaking/part2/image16.png",
     "questions": [
       "Describe the picture.",
@@ -331,12 +344,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Outdoor activity",
         "vi": "Hoạt động ngoài trời"
       }
-    ]
+    ],
+    "originalDescription": "Hai mẹ con đang cưỡi ngựa",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_7",
     "topicNumber": 7,
-    "title": "Gia đình trên ô tô",
+    "title": "Đề 07",
     "imageUrl": "/uploads/speaking/part2/image23.png",
     "questions": [
       "Describe the picture.",
@@ -384,12 +399,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Family trip",
         "vi": "Chuyến đi gia đình"
       }
-    ]
+    ],
+    "originalDescription": "Gia đình trên ô tô",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_8",
     "topicNumber": 8,
-    "title": "Nhóm bạn ở nhà hàng",
+    "title": "Đề 08",
     "imageUrl": "/uploads/speaking/part2/image11.png",
     "questions": [
       "Describe the picture.",
@@ -437,12 +454,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Enjoy a meal",
         "vi": "Thưởng thức bữa ăn"
       }
-    ]
+    ],
+    "originalDescription": "Nhóm bạn ở nhà hàng",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_9",
     "topicNumber": 9,
-    "title": "Hai vợ chồng đang dọn nhà",
+    "title": "Đề 09",
     "imageUrl": "/uploads/speaking/part2/image12.png",
     "questions": [
       "Describe the picture.",
@@ -490,12 +509,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Work together",
         "vi": "Làm việc cùng nhau"
       }
-    ]
+    ],
+    "originalDescription": "Hai vợ chồng đang dọn nhà",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_10",
     "topicNumber": 10,
-    "title": "Gia đình chơi ở công viên",
+    "title": "Đề 10",
     "imageUrl": "/uploads/speaking/part2/image7.png",
     "questions": [
       "Describe the picture.",
@@ -543,12 +564,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Have fun",
         "vi": "Vui chơi / tận hưởng"
       }
-    ]
+    ],
+    "originalDescription": "Gia đình chơi ở công viên",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_11",
     "topicNumber": 11,
-    "title": "Nhóm người leo núi",
+    "title": "Đề 11",
     "imageUrl": "/uploads/speaking/part2/image2.png",
     "questions": [
       "Describe the picture.",
@@ -596,12 +619,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Adventure",
         "vi": "Cuộc phiêu lưu"
       }
-    ]
+    ],
+    "originalDescription": "Nhóm người leo núi",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_12",
     "topicNumber": 12,
-    "title": "Hai bố con ăn sáng",
+    "title": "Đề 12",
     "imageUrl": "/uploads/speaking/part2/image24.png",
     "questions": [
       "Describe the picture.",
@@ -649,12 +674,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Family time",
         "vi": "Thời gian bên gia đình"
       }
-    ]
+    ],
+    "originalDescription": "Hai bố con ăn sáng",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_13",
     "topicNumber": 13,
-    "title": "Người phụ nữ trên xe bus",
+    "title": "Đề 13",
     "imageUrl": "/uploads/speaking/part2/image6.png",
     "questions": [
       "Describe the picture.",
@@ -702,12 +729,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Public transportation",
         "vi": "Giao thông công cộng"
       }
-    ]
+    ],
+    "originalDescription": "Người phụ nữ trên xe bus",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_14",
     "topicNumber": 14,
-    "title": "Người đàn ông đọc báo",
+    "title": "Đề 14",
     "imageUrl": "/uploads/speaking/part2/image19.png",
     "questions": [
       "Describe the picture.",
@@ -755,12 +784,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Analyze data",
         "vi": "Phân tích dữ liệu"
       }
-    ]
+    ],
+    "originalDescription": "Người đàn ông đọc báo",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_15",
     "topicNumber": 15,
-    "title": "Người qua đường đông đúc",
+    "title": "Đề 15",
     "imageUrl": "/uploads/speaking/part2/image13.png",
     "questions": [
       "Describe the picture.",
@@ -808,12 +839,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Busy",
         "vi": "Nhộn nhịp / đông đúc"
       }
-    ]
+    ],
+    "originalDescription": "Người qua đường đông đúc",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_16",
     "topicNumber": 16,
-    "title": "Người thuyết trình trước cuộc họp",
+    "title": "Đề 16",
     "imageUrl": "/uploads/speaking/part2/image4.png",
     "questions": [
       "Describe the picture.",
@@ -861,12 +894,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Teamwork",
         "vi": "Làm việc nhóm"
       }
-    ]
+    ],
+    "originalDescription": "Người thuyết trình trước cuộc họp",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_17",
     "topicNumber": 17,
-    "title": "Hai vợ chồng treo tranh",
+    "title": "Đề 17",
     "imageUrl": "/uploads/speaking/part2/image3.png",
     "questions": [
       "Describe the picture.",
@@ -914,12 +949,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Arrange",
         "vi": "Sắp xếp"
       }
-    ]
+    ],
+    "originalDescription": "Hai vợ chồng treo tranh",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_18",
     "topicNumber": 18,
-    "title": "Hai bố con chơi với nhau",
+    "title": "Đề 18",
     "imageUrl": "/uploads/speaking/part2/image14.png",
     "questions": [
       "Describe the picture.",
@@ -967,12 +1004,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Spend time together",
         "vi": "Dành thời gian bên nhau"
       }
-    ]
+    ],
+    "originalDescription": "Hai bố con chơi với nhau",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_19",
     "topicNumber": 19,
-    "title": "Nhóm người ở rạp chiếu phim",
+    "title": "Đề 19",
     "imageUrl": "/uploads/speaking/part2/image1.png",
     "questions": [
       "Describe the picture.",
@@ -1020,12 +1059,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Entertainment",
         "vi": "Giải trí"
       }
-    ]
+    ],
+    "originalDescription": "Nhóm người ở rạp chiếu phim",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_20",
     "topicNumber": 20,
-    "title": "Cô giáo đang dạy học",
+    "title": "Đề 20",
     "imageUrl": "/uploads/speaking/part2/image17.png",
     "questions": [
       "Describe the picture.",
@@ -1073,12 +1114,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Pay attention",
         "vi": "Chú ý / tập trung"
       }
-    ]
+    ],
+    "originalDescription": "Cô giáo đang dạy học",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_21",
     "topicNumber": 21,
-    "title": "Nhóm người ở nhà hàng",
+    "title": "Đề 21",
     "imageUrl": "/uploads/speaking/part2/image8.png",
     "questions": [
       "Describe the picture.",
@@ -1126,12 +1169,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Enjoy a meal",
         "vi": "Thưởng thức bữa ăn"
       }
-    ]
+    ],
+    "originalDescription": "Nhóm người ở nhà hàng",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_22",
     "topicNumber": 22,
-    "title": "Gia đình đang sử dụng máy tính",
+    "title": "Đề 22",
     "imageUrl": "/uploads/speaking/part2/image21.png",
     "questions": [
       "Describe the picture.",
@@ -1179,12 +1224,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Spend time together",
         "vi": "Dành thời gian bên nhau"
       }
-    ]
+    ],
+    "originalDescription": "Gia đình đang sử dụng máy tính",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_23",
     "topicNumber": 23,
-    "title": "Nhóm trẻ nấu ăn trong bếp",
+    "title": "Đề 23",
     "imageUrl": "/uploads/speaking/part2/image5.png",
     "questions": [
       "Describe the picture.",
@@ -1232,12 +1279,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Work together",
         "vi": "Cùng nhau làm việc"
       }
-    ]
+    ],
+    "originalDescription": "Nhóm trẻ nấu ăn trong bếp",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_24",
     "topicNumber": 24,
-    "title": "Cô gái ngồi trên thuyền ngắm cảnh",
+    "title": "Đề 24",
     "imageUrl": "/uploads/speaking/part2/image20.png",
     "questions": [
       "Describe the picture.",
@@ -1285,12 +1334,14 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Enjoy the view",
         "vi": "Thưởng thức khung cảnh"
       }
-    ]
+    ],
+    "originalDescription": "Cô gái ngồi trên thuyền ngắm cảnh",
+    "category": "Tranh trọng điểm Part 2"
   },
   {
     "id": "p2_25",
     "topicNumber": 25,
-    "title": "Người đàn ông đang đứng đợi tàu",
+    "title": "Đề 25",
     "imageUrl": "/uploads/speaking/part2/image25.png",
     "questions": [
       "Describe the picture.",
@@ -1338,6 +1389,8 @@ export const SPEAKING_PART2_BANK: SpeakingPart2Topic[] = [
         "en": "Catch a train",
         "vi": "Bắt tàu / đón tàu"
       }
-    ]
+    ],
+    "originalDescription": "Người đàn ông đang đứng đợi tàu",
+    "category": "Tranh trọng điểm Part 2"
   }
 ];

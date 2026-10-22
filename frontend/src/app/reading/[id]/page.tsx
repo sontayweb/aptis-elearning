@@ -30,9 +30,11 @@ import {
   Menu,
   Info,
   ArrowUp,
+  Languages,
 } from "lucide-react";
 import { ReadingSentenceOrder } from "@/components/reading-components";
 import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
+import { ReadingGoogleTranslateModal } from "@/components/reading-google-translate";
 
 import {
   type Part1Gap,
@@ -116,6 +118,16 @@ function ReadingExamRunner() {
     x: number;
     y: number;
   } | null>(null);
+  const [isTranslateOpen, setIsTranslateOpen] = useState(false);
+  const [translateText, setTranslateText] = useState("");
+
+  const handleOpenTranslate = (customText?: string) => {
+    if (typeof window !== "undefined") {
+      const selected = window.getSelection()?.toString().trim();
+      setTranslateText(customText || selected || "");
+    }
+    setIsTranslateOpen(true);
+  };
 
   const handleTextSelection = (targetId: string) => {
     if (typeof window === "undefined") return;
@@ -706,7 +718,7 @@ function ReadingExamRunner() {
   const currentStage = stages[activeStage] || stages[0];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none">
+    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
       {/* 1. TOP HEADER PHÒNG THI CHUẨN */}
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
@@ -741,6 +753,15 @@ function ReadingExamRunner() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => handleOpenTranslate()}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-xs font-bold transition-colors cursor-pointer"
+            title="Tra từ điển & dịch câu bằng Google Dịch"
+          >
+            <Languages className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Google Dịch</span>
+          </button>
           <Link
             href="/reading"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -1355,6 +1376,19 @@ function ReadingExamRunner() {
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-xs" />
                 <span>Từ khóa</span>
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const text = selectionMenu.selectedText;
+                  setSelectionMenu(null);
+                  handleOpenTranslate(text);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-900 dark:text-blue-200 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Dịch câu này bằng Google Dịch"
+              >
+                <Languages className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Dịch nhanh</span>
+              </button>
               <div className="w-px h-4 bg-border/60 mx-0.5" />
               <button
                 type="button"
@@ -1700,6 +1734,11 @@ function ReadingExamRunner() {
           </div>
         </div>
       )}
+      <ReadingGoogleTranslateModal
+        isOpen={isTranslateOpen}
+        onClose={() => setIsTranslateOpen(false)}
+        initialText={translateText}
+      />
     </div>
   );
 }

@@ -33,7 +33,10 @@ import {
   Users,
   FileText,
   AlignLeft,
+  Languages,
 } from "lucide-react";
+import { ReadingGoogleTranslateModal } from "@/components/reading-google-translate";
+import { getCloverConfig } from "@/lib/clover-utils";
 
 // Sample Sentence Cohesion data for Part 2
 const PART2_COHESION_DEMO = [
@@ -87,6 +90,7 @@ function ReadingMarathonContent() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [showResults, setShowResults] = useState<Record<string, boolean>>({});
   const [showTranslations, setShowTranslations] = useState<Record<string, boolean>>({});
+  const [isTranslateOpen, setIsTranslateOpen] = useState(false);
 
   // Part 2 Cohesion order state
   const [cohesionOrder, setCohesionOrder] = useState<Record<number, string[]>>(() => {
@@ -181,16 +185,27 @@ function ReadingMarathonContent() {
               </div>
             </div>
 
-            {/* Quick search */}
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm từ khóa, đề tài đọc..."
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
-              />
+            {/* Quick search & Google Dịch */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:w-72">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Tìm từ khóa, đề tài đọc..."
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsTranslateOpen(true)}
+                className="h-9 px-3.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 cursor-pointer"
+                title="Tra cứu từ vựng & dịch câu bằng Google Dịch"
+              >
+                <Languages className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Google Dịch</span>
+              </button>
             </div>
           </div>
 
@@ -215,7 +230,7 @@ function ReadingMarathonContent() {
                 Sentence Comprehension
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                30+ câu điền từ ngắn có dịch
+                {READING_PART1_SETS.length} bộ đề điền từ có dịch
               </p>
             </button>
 
@@ -238,7 +253,7 @@ function ReadingMarathonContent() {
                 Text Cohesion
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                12 bộ đề sắp xếp trật tự câu
+                {READING_PART2_TOPICS.length} bộ đề sắp xếp trật tự câu
               </p>
             </button>
 
@@ -261,7 +276,7 @@ function ReadingMarathonContent() {
                 Opinion Matching
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                12 bộ đề nối ý kiến 4 nhân vật
+                {READING_PART3_TOPICS.length} bộ đề nối ý kiến 4 nhân vật
               </p>
             </button>
 
@@ -284,7 +299,7 @@ function ReadingMarathonContent() {
                 Long Reading Headings
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                Đọc văn bản dài chọn 7 tiêu đề
+                {READING_PART4_TOPICS.length} bài đọc dài chọn 7 tiêu đề
               </p>
             </button>
           </div>
@@ -304,7 +319,7 @@ function ReadingMarathonContent() {
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0 self-start sm:self-center">
-                  6 bộ đề tách câu lẻ
+                  {READING_PART1_SETS.length} bộ đề sát đề thi thực tế
                 </span>
               </div>
 
@@ -429,7 +444,7 @@ function ReadingMarathonContent() {
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0 self-start sm:self-center">
-                  12 bộ chủ đề sát đề thi
+                  {READING_PART2_TOPICS.length} bộ đề sát đề thi thực tế
                 </span>
               </div>
 
@@ -525,6 +540,61 @@ function ReadingMarathonContent() {
                   );
                 })}
               </div>
+
+              {/* Ngân hàng 19 đề Part 2 + 3 Text Cohesion phân theo cấp độ Clover */}
+              <div className="pt-6 border-t border-border/60 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-heading font-black text-sm text-foreground">
+                      Tổng Hợp {READING_PART2_TOPICS.length} Đề Sắp Xếp Trật Tự Câu (Part 2 + 3) Theo Độ Hot ☘️
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      Đã phân bổ chính xác theo 4 cấp độ ưu tiên ra thi (5☘️, 4☘️, 3☘️, 2☘️) từ tài liệu British Council
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                  {READING_PART2_TOPICS.map((topic) => {
+                    const cfg = getCloverConfig(topic.cloverLevel || 3);
+                    return (
+                      <div
+                        key={topic.id}
+                        className="p-4 rounded-xl border border-border bg-card hover:border-primary/50 shadow-xs flex flex-col justify-between gap-3 transition-all"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className="text-[10px] font-bold text-primary">
+                              Đề #{topic.id < 10 ? `0${topic.id}` : topic.id}
+                            </span>
+                            <span
+                              className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
+                              title={cfg.label}
+                            >
+                              <span>{cfg.symbol}</span>
+                              <span>{cfg.shortLabel}</span>
+                            </span>
+                          </div>
+                          <h4 className="font-heading font-bold text-xs sm:text-sm text-foreground">
+                            {topic.title}
+                          </h4>
+                        </div>
+
+                        <div className="pt-2 border-t border-border/40 flex items-center justify-between text-xs">
+                          <span className="text-[11px] text-muted-foreground">6 câu logic</span>
+                          <Link
+                            href={`/reading/00000000-0000-0000-0000-000000000001?part=2`}
+                            className="px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-bold text-[11px] transition-all inline-flex items-center gap-1"
+                          >
+                            <span>Luyện đề</span>
+                            <ArrowLeft className="w-3 h-3 rotate-180" />
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
 
@@ -555,9 +625,18 @@ function ReadingMarathonContent() {
                         <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
                           Đề {topic.id}
                         </span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                          {topic.sticker}
-                        </span>
+                        {(() => {
+                          const cfg = getCloverConfig(topic.cloverLevel || 3);
+                          return (
+                            <span
+                              className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
+                              title={cfg.label}
+                            >
+                              <span>{cfg.symbol}</span>
+                              <span>{cfg.shortLabel}</span>
+                            </span>
+                          );
+                        })()}
                       </div>
                       <h4 className="font-heading font-bold text-sm text-foreground truncate max-w-[200px]">
                         {topic.title}
@@ -614,9 +693,18 @@ function ReadingMarathonContent() {
                         <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
                           Bài {topic.id}
                         </span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                          {topic.sticker}
-                        </span>
+                        {(() => {
+                          const cfg = getCloverConfig(topic.cloverLevel || 3);
+                          return (
+                            <span
+                              className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
+                              title={cfg.label}
+                            >
+                              <span>{cfg.symbol}</span>
+                              <span>{cfg.shortLabel}</span>
+                            </span>
+                          );
+                        })()}
                       </div>
                       <h4 className="font-heading font-bold text-sm text-foreground truncate max-w-[200px]">
                         {topic.title}
@@ -648,6 +736,10 @@ function ReadingMarathonContent() {
         </div>
       </main>
 
+      <ReadingGoogleTranslateModal
+        isOpen={isTranslateOpen}
+        onClose={() => setIsTranslateOpen(false)}
+      />
       <Footer />
       <FloatingActions />
     </div>
