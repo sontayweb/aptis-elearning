@@ -77,7 +77,7 @@ export default function ReadingPracticePage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.exams.getAll({ skill: "READING", limit: 200 });
+      const res = await api.exams.getAll({ skill: "READING", limit: 500 });
       if (res.success && Array.isArray(res.data)) {
         setExams(
           res.data.map((exam: any, idx: number) => {
@@ -183,43 +183,80 @@ export default function ReadingPracticePage() {
     };
   }, []);
 
-  // 1. Danh sách đề thi thuộc Tab hiện tại (Tab Full Part, Part 1, Part 2+3, Part 4, Part 5)
+  // 1. Danh sách đề thi thuộc Tab hiện tại (Tab Full Part, Part 1, Part 2, Part 3, Part 4)
   const currentTabExams = exams.filter((e) => {
     if (activeTab === "full") {
       return e.title.includes("Full Reading") || e.totalParts === 4;
     } else if (activeTab === "p1") {
       // Part 1: Sentence comprehension
       if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
-      return e.title.includes("Reading Part 1") || e.partTitle?.includes("Part 1");
+      return (
+        e.title.includes("Reading Part 1") ||
+        e.title.includes("PART1") ||
+        /^(?:Đề|Test|Exam)\s*\d+$/i.test(e.title.trim()) ||
+        e.partTitle?.includes("Part 1") ||
+        e.parts?.includes("Part 1")
+      );
     } else if (activeTab === "p2") {
       // Part 2: Text cohesion (sắp xếp câu)
       if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
-      return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Text Cohesion") || e.partTitle?.includes("Cohesion");
+      return (
+        e.partTitle?.includes("Part 2") ||
+        e.partTitle?.includes("Text Cohesion") ||
+        e.partTitle?.includes("Cohesion") ||
+        e.title.includes("Part 2") ||
+        e.title.includes("PART2") ||
+        READING_PART2_TOPICS.some((t) =>
+          e.title.toLowerCase().includes(t.title.toLowerCase())
+        )
+      );
     } else if (activeTab === "p3") {
-      // Part 4: Opinion matching (nối ý kiến)
+      // Part 3: Opinion matching (nối ý kiến)
       if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
-      return e.partTitle?.includes("Opinion") || (e.partTitle?.includes("Part 4") && !e.partTitle?.includes("Long")) || (e.partTitle?.includes("Part 3") && !e.partTitle?.includes("Cohesion"));
+      return (
+        e.partTitle?.includes("Opinion") ||
+        (e.partTitle?.includes("Part 4") && !e.partTitle?.includes("Long")) ||
+        (e.partTitle?.includes("Part 3") && !e.partTitle?.includes("Cohesion")) ||
+        e.title.includes("Part 3") ||
+        READING_PART3_TOPICS.some((t) =>
+          e.title.toLowerCase().includes(t.title.toLowerCase())
+        )
+      );
     } else if (activeTab === "p4") {
-      // Part 5: Long reading (đọc bài dài & nối heading)
+      // Part 4: Long reading (đọc bài dài & nối heading)
       if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
-      return e.partTitle?.includes("Long") || e.partTitle?.includes("Part 5") || (e.partTitle?.includes("Part 4") && e.partTitle?.includes("Long"));
+      return (
+        e.partTitle?.includes("Long") ||
+        e.partTitle?.includes("Part 5") ||
+        (e.partTitle?.includes("Part 4") && e.partTitle?.includes("Long")) ||
+        READING_PART4_TOPICS.some((t) =>
+          e.title.toLowerCase().includes(t.title.toLowerCase())
+        )
+      );
     }
     return true;
   });
 
-  // 2. Lọc tiếp theo search, status, priority từ currentTabExams
+  // 2. Lọc tiếp theo search, status, priority và sắp xếp theo ☘️ từ cao xuống thấp
   const filteredExams = currentTabExams
     .map((e, idx) => {
-      let cloverLevel = e.hotLevel || 2;
-      if (activeTab === "p2") {
-        const topic = READING_PART2_TOPICS[idx % READING_PART2_TOPICS.length];
-        cloverLevel = topic?.cloverLevel || cloverLevel;
-      } else if (activeTab === "p3") {
-        const topic = READING_PART3_TOPICS[idx % READING_PART3_TOPICS.length];
-        cloverLevel = topic?.cloverLevel || cloverLevel;
-      } else if (activeTab === "p4") {
-        const topic = READING_PART4_TOPICS[idx % READING_PART4_TOPICS.length];
-        cloverLevel = topic?.cloverLevel || cloverLevel;
+      let cloverLevel = e.hotLevel || 0;
+      if (cloverLevel === 0) {
+        const bank =
+          activeTab === "p2"
+            ? READING_PART2_TOPICS
+            : activeTab === "p3"
+            ? READING_PART3_TOPICS
+            : activeTab === "p4"
+            ? READING_PART4_TOPICS
+            : [];
+        const matched = bank.find((t) =>
+          e.title.toLowerCase().includes(t.title.toLowerCase()) ||
+          t.title.toLowerCase().includes(e.title.toLowerCase())
+        );
+        if (matched && (matched.hotLevel || matched.cloverLevel)) {
+          cloverLevel = matched.hotLevel || matched.cloverLevel || 0;
+        }
       }
       return { ...e, computedClover: cloverLevel, originalIdx: idx };
     })
@@ -236,7 +273,16 @@ export default function ReadingPracticePage() {
           : e.computedClover <= 3;
       return matchesSearch && matchesStatus && matchesPriority;
     })
-    .sort((a, b) => (b.computedClover || 0) - (a.computedClover || 0));
+    .sort((a, b) => {
+      // Ưu tiên sắp xếp theo số ☘️ từ cao xuống thấp (5 ➔ 4 ➔ 3 ➔ 2 ➔ 1 ➔ 0)
+      const cloverDiff = (b.computedClover || 0) - (a.computedClover || 0);
+      if (cloverDiff !== 0) return cloverDiff;
+      // Nếu cùng mức ☘️, sắp xếp tự nhiên theo số thứ tự đề
+      const numA = (a.title.match(/(?:Đề|Test|Exam)\s*0*(\d+)/i) || [])[1];
+      const numB = (b.title.match(/(?:Đề|Test|Exam)\s*0*(\d+)/i) || [])[1];
+      if (numA && numB) return Number(numA) - Number(numB);
+      return a.title.localeCompare(b.title, "vi");
+    });
 
   // Dynamic naming based on activeTab
   const getTabInfo = () => {
@@ -542,23 +588,53 @@ export default function ReadingPracticePage() {
                   ? ((exam as any).originalIdx + 1 < 10 ? `0${(exam as any).originalIdx + 1}` : `${(exam as any).originalIdx + 1}`)
                   : (idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`);
 
-                // Rút gọn tiêu đề tối giản theo yêu cầu
-                const displayTitle = exam.title || (() => {
-                  if (activeTab === "full") return `Đề ${numStr} — Full Reading · 4 Parts`;
-                  if (activeTab === "p1") return `Đề ${numStr}`;
-                  if (activeTab === "p2") {
-                    const topicIdx = (exam as any).originalIdx !== undefined ? (exam as any).originalIdx : idx;
-                    const topic = READING_PART2_TOPICS[topicIdx % READING_PART2_TOPICS.length];
-                    return `Đề ${numStr} — ${topic?.title || "Text Cohesion"}`;
+                // Trích xuất số đề và tối giản tiêu đề theo yêu cầu
+                const numMatch = exam.title.match(/(?:Đề|Test|Exam)\s*0*(\d+)/i);
+                const rawNum = numMatch ? numMatch[1] : String(idx + 1);
+                const cleanNumStr = `Đề ${rawNum.padStart(2, "0")}`;
+
+                const displayTitle = (() => {
+                  if (activeTab === "full") {
+                    return exam.title.replace(/^Bộ\s*Đề\s*Tủ\s*[-:—–]\s*/i, "").trim();
                   }
-                  if (activeTab === "p3") {
-                    const topicIdx = (exam as any).originalIdx !== undefined ? (exam as any).originalIdx : idx;
-                    const topic = READING_PART3_TOPICS[topicIdx % READING_PART3_TOPICS.length];
-                    return `Đề ${numStr} — ${topic?.title || "Opinion Matching"}`;
+
+                  if (activeTab === "p1") {
+                    // Yêu cầu: lược bỏ - Reading Part 1 (window, buy, market) chỉ để lại số đề
+                    return cleanNumStr;
                   }
-                  const topicIdx = (exam as any).originalIdx !== undefined ? (exam as any).originalIdx : idx;
-                  const topic = READING_PART4_TOPICS[topicIdx % READING_PART4_TOPICS.length];
-                  return `Đề ${numStr} — ${topic?.title || "Long Reading"}`;
+
+                  // Cho p2, p3, p4: lược bỏ tiêu đề cho tối giản
+                  let topicClean = exam.title
+                    .replace(/^(?:Bộ\s*Key\s*READING\s*PART\d+|Reading\s*Part\s*\d+|Reading\s*\d+)\s*[-:—–]\s*/i, "")
+                    .replace(/^(?:Đề|Test|Exam)\s*\d+\s*[-:—–]\s*/i, "")
+                    .replace(/\s*\(\s*(?:key|KEY|\s*mới\s*)\s*\)/i, "")
+                    .replace(/\s*[-:—–]\s*Reading\s*Part\s*\d+.*$/i, "")
+                    .trim();
+
+                  if (
+                    !topicClean ||
+                    /^(?:Đề|Test|Exam)\s*\d+$/i.test(topicClean) ||
+                    /^(?:Reading\s*Part\s*\d+|Key\s*PART\d+)$/i.test(topicClean)
+                  ) {
+                    const bank =
+                      activeTab === "p2"
+                        ? READING_PART2_TOPICS
+                        : activeTab === "p3"
+                        ? READING_PART3_TOPICS
+                        : READING_PART4_TOPICS;
+                    const matchedBank = bank.find((t) =>
+                      exam.title.toLowerCase().includes(t.title.toLowerCase())
+                    );
+                    topicClean =
+                      matchedBank?.title ||
+                      (activeTab === "p2"
+                        ? "Text Cohesion"
+                        : activeTab === "p3"
+                        ? "Opinion Matching"
+                        : "Long Reading");
+                  }
+
+                  return `${cleanNumStr} — ${topicClean}`;
                 })();
 
                 return (

@@ -23,6 +23,7 @@ import {
   Flame,
   Star,
 } from "lucide-react";
+import { getCloverConfig } from "@/lib/clover-utils";
 
 interface SpeakingExam {
   id: string;
@@ -66,7 +67,7 @@ export default function SpeakingPracticePage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.exams.getAll({ skill: "SPEAKING", limit: 350 });
+      const res = await api.exams.getAll({ skill: "SPEAKING", limit: 500 });
       if (res.success && Array.isArray(res.data)) {
         setExams(
           res.data.map((exam: any, idx: number) => {
@@ -200,16 +201,16 @@ export default function SpeakingPracticePage() {
 
     const isSinglePart = e.totalParts === 1;
     if (activeTab === "p1") {
-      if (isSinglePart) return e.partTitle?.includes("Part 1") || e.partTitle?.includes("Personal");
-      return false; // Tránh nhân đôi nếu đã có đề Part 1 chuyên biệt
+      if (isSinglePart) return e.partTitle?.includes("Part 1") || e.partTitle?.includes("Personal") || e.title.includes("Part 1") || e.title.includes("PART 1");
+      return false;
     } else if (activeTab === "p2") {
-      if (isSinglePart) return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Describe");
+      if (isSinglePart) return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Describe") || e.title.includes("Part 2") || e.title.includes("PART 2");
       return false;
     } else if (activeTab === "p3") {
-      if (isSinglePart) return e.partTitle?.includes("Part 3") || e.partTitle?.includes("Compare");
+      if (isSinglePart) return e.partTitle?.includes("Part 3") || e.partTitle?.includes("Compare") || e.title.includes("Part 3") || e.title.includes("PART 3");
       return false;
     } else if (activeTab === "p4") {
-      if (isSinglePart) return e.partTitle?.includes("Part 4") || e.partTitle?.includes("Discussion");
+      if (isSinglePart) return e.partTitle?.includes("Part 4") || e.partTitle?.includes("Discussion") || e.title.includes("Part 4") || e.title.includes("PART 4");
       return false;
     }
     return true;
@@ -532,11 +533,10 @@ export default function SpeakingPracticePage() {
               {filteredExams.map((exam, idx) => {
                 const rawTitle = (exam.title || "").trim();
 
-                // Trích xuất đúng số đề thật từ tiêu đề trong DB (vd: "Đề 04 - ..." -> "Đề 004")
-                const numMatch = rawTitle.match(/^(?:Đề|Test|Exam)\s*0*(\d+)/i);
-                const examNumStr = numMatch
-                  ? `Đề ${numMatch[1].padStart(3, "0")}`
-                  : `Đề ${String(idx + 1).padStart(3, "0")}`;
+                // Trích xuất đúng số đề thật từ tiêu đề trong DB (vd: "Đề 04 - ..." -> "Đề 04")
+                const numMatch = rawTitle.match(/^(?:Đề|Test|Exam)\s*0*(\d+)/i) || rawTitle.match(/(?:Đề|Test|Exam)\s*0*(\d+)/i);
+                const rawNum = numMatch ? numMatch[1] : String(idx + 1);
+                const examNumStr = `Đề ${rawNum.padStart(2, "0")}`;
 
                 // Tên chủ đề thật từ database (vd: "Comparing two sports", "Car vs train")
                 let topicName = rawTitle
@@ -554,6 +554,10 @@ export default function SpeakingPracticePage() {
                 const displayTitle = (() => {
                   if (activeTab === "full") {
                     return rawTitle;
+                  }
+                  // Yêu cầu: Part 1 rút ngắn tiêu đề chỉ để lại số đề. Part 2 cũng tương tự chỉ để số đề phần tranh.
+                  if (activeTab === "p1" || activeTab === "p2") {
+                    return examNumStr;
                   }
                   if (!isGenericTopic) {
                     return `${examNumStr} — ${topicName}`;
@@ -620,30 +624,20 @@ export default function SpeakingPracticePage() {
                             </span>
                           )}
 
-                          {exam.hotLevel === 3 ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-600 dark:text-rose-400 font-extrabold text-[10px] animate-pulse border border-rose-500/30">
-                              <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
-                              ĐỀ TỦ KỲ NÀY
-                            </span>
-                          ) : exam.hotLevel === 2 ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] border border-amber-500/30">
-                              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                              ĐỀ HOT
-                            </span>
-                          ) : exam.hotLevel === 1 ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400 font-semibold text-[10px]">
-                              <Star className="w-3 h-3 text-orange-500" />
-                              Trọng tâm
-                            </span>
-                          ) : exam.priority === "HIGH" ? (
-                            <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-[10px]">
-                              Ưu tiên cao
-                            </span>
-                          ) : exam.priority === "MEDIUM" ? (
-                            <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 font-bold text-[10px]">
-                              Ưu tiên vừa
-                            </span>
-                          ) : null}
+                          {/* Stickers đánh giá mức độ ưu tiên theo chuẩn Clover ☘️ */}
+                          {(() => {
+                            const cloverLvl = exam.hotLevel;
+                            if (!cloverLvl || cloverLvl <= 0) return null;
+                            const cfg = getCloverConfig(cloverLvl);
+                            return (
+                              <span
+                                className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
+                                title={`${cloverLvl} Cỏ ☘️`}
+                              >
+                                <span>{cfg.symbol}</span>
+                              </span>
+                            );
+                          })()}
                         </div>
 
                         {/* Top Right Trophy / CEFR Badge (chuẩn web gốc Aptis) */}
