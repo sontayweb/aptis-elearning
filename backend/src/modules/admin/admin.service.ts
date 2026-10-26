@@ -1009,6 +1009,10 @@ export class AdminService {
     if (hotLevel && hotLevel !== 'ALL') {
       if (hotLevel === 'HOT_ALL') {
         where.hot_level = { gt: 0 };
+      } else if (hotLevel === 'HOT_5') {
+        where.hot_level = 5;
+      } else if (hotLevel === 'HOT_4') {
+        where.hot_level = 4;
       } else if (hotLevel === 'HOT_3') {
         where.hot_level = 3;
       } else if (hotLevel === 'HOT_2') {

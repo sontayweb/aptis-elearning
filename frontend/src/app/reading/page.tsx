@@ -585,15 +585,15 @@ export default function ReadingPracticePage() {
 
                           {/* Stickers đánh giá mức độ ưu tiên theo chuẩn Clover ☘️ */}
                           {(() => {
-                            const cloverLvl = (exam as any).computedClover || exam.hotLevel || 2;
+                            const cloverLvl = (exam as any).computedClover || exam.hotLevel;
+                            if (!cloverLvl || cloverLvl <= 0) return null;
                             const cfg = getCloverConfig(cloverLvl);
                             return (
                               <span
                                 className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
-                                title={cfg.label}
+                                title={`${cloverLvl} Cỏ ☘️`}
                               >
                                 <span>{cfg.symbol}</span>
-                                <span>{cfg.shortLabel}</span>
                               </span>
                             );
                           })()}

@@ -33,47 +33,8 @@ interface MockTest {
   forecastTag?: string | null;
 }
 
-const DEFAULT_MOCK_TESTS: MockTest[] = [
-  {
-    id: "de-01",
-    name: "Đề 01 — Full Mock Test · 4 Kỹ Năng",
-    code: "APT-DE01",
-    totalTime: "162 phút",
-    skills: "5 Phần: Speaking, Listening, Reading, Writing, Grammar",
-    difficulty: "B1 - B2 Target",
-    isFree: true,
-    attempts: 420,
-    hotLevel: 3,
-    forecastTag: "Đề tủ 2026",
-  },
-  {
-    id: "de-02",
-    name: "Đề 02 — Full Mock Test · Bứt Phá B2/C",
-    code: "APT-DE02",
-    totalTime: "162 phút",
-    skills: "5 Phần: Speaking, Listening, Reading, Writing, Grammar",
-    difficulty: "B2 - C Target",
-    isFree: false,
-    attempts: 315,
-    hotLevel: 2,
-    forecastTag: "Bộ đề trọng tâm",
-  },
-  {
-    id: "de-03",
-    name: "Đề 03 — Full Mock Test · Đề Thi Thật British Council",
-    code: "APT-DE03",
-    totalTime: "162 phút",
-    skills: "5 Phần: Speaking, Listening, Reading, Writing, Grammar",
-    difficulty: "B1 - B2 Target",
-    isFree: false,
-    attempts: 289,
-    hotLevel: 3,
-    forecastTag: "Cập nhật mới nhất",
-  },
-];
-
 export default function MockExamListPage() {
-  const [tests, setTests] = useState<MockTest[]>(DEFAULT_MOCK_TESTS);
+  const [tests, setTests] = useState<MockTest[]>([]);
   const [roomCode, setRoomCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,11 +65,12 @@ export default function MockExamListPage() {
         }));
         setTests(mapped);
       } else {
-        setTests(DEFAULT_MOCK_TESTS);
+        setTests([]);
       }
     } catch (err: any) {
-      console.warn("Using benchmark mock tests:", err);
-      setTests(DEFAULT_MOCK_TESTS);
+      console.warn("Failed to load mock tests:", err);
+      setError("Không thể tải danh sách đề thi thử từ máy chủ.");
+      setTests([]);
     } finally {
       setLoading(false);
     }
@@ -235,13 +197,12 @@ export default function MockExamListPage() {
                 onClick={() => setHotOnly(!hotOnly)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 border cursor-pointer ${
                   hotOnly
-                    ? "bg-gradient-to-r from-rose-500 to-amber-500 text-white border-transparent shadow-glow-soft scale-102"
-                    : "bg-card border-border text-foreground hover:border-rose-500/50 hover:text-rose-500"
+                    ? "bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-500/20 scale-102"
+                    : "bg-card border-border text-foreground hover:border-emerald-500/50 hover:text-emerald-600"
                 }`}
                 title="Lọc nhanh các đề có mức độ hot cao nhất"
               >
-                <Flame className={`w-3.5 h-3.5 ${hotOnly ? "fill-white text-white" : "text-rose-500 fill-rose-500"}`} />
-                <span>Đề tủ &amp; Đề Hot ({tests.filter((t) => t.hotLevel > 0).length})</span>
+                <span>☘️ Đề Hot ({tests.filter((t) => t.hotLevel > 0).length})</span>
               </button>
             </div>
           </div>
@@ -283,10 +244,10 @@ export default function MockExamListPage() {
               <div
                 key={test.id}
                 className={`group relative rounded-2xl border bg-card p-6 shadow-sm transition-all flex flex-col justify-between hover:shadow-glow-soft ${
-                  test.hotLevel === 3
-                    ? "border-rose-500/50 bg-gradient-to-b from-rose-500/5 via-card to-card hover:border-rose-500"
-                    : test.hotLevel === 2
-                    ? "border-amber-500/40 hover:border-amber-500"
+                  test.hotLevel >= 4
+                    ? "border-emerald-500/50 bg-gradient-to-b from-emerald-500/5 via-card to-card hover:border-emerald-500"
+                    : test.hotLevel >= 2
+                    ? "border-teal-500/40 hover:border-teal-500"
                     : "border-border hover:border-primary/50"
                 }`}
               >
@@ -306,23 +267,10 @@ export default function MockExamListPage() {
                         </span>
                       )}
 
-                      {/* Hot Level Badges */}
-                      {test.hotLevel === 3 && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-2xs">
-                          <Flame className="w-3 h-3 fill-white" />
-                          <span>ĐỀ TỦ KỲ NÀY (3⭐)</span>
-                        </span>
-                      )}
-                      {test.hotLevel === 2 && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                          <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                          <span>ĐỀ HOT (2⭐)</span>
-                        </span>
-                      )}
-                      {test.hotLevel === 1 && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30">
-                          <Star className="w-3 h-3 text-blue-500 fill-blue-500" />
-                          <span>ÔN TRỌNG TÂM</span>
+                      {/* Hot Level Badges: Pure Clovers */}
+                      {test.hotLevel > 0 && (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
+                          {"☘️".repeat(Math.min(5, test.hotLevel))}
                         </span>
                       )}
                     </div>

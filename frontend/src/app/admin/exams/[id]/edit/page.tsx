@@ -66,6 +66,8 @@ interface ExamFull {
   is_published: boolean;
   hot_level?: number;
   hotLevel?: number;
+  forecast_tag?: string | null;
+  forecastTag?: string | null;
   parts: Part[];
 }
 
@@ -86,7 +88,16 @@ export default function ExamEditorPage() {
   const [confirmDelPart, setConfirmDelPart] = useState<Part | null>(null);
   const [confirmDelQ, setConfirmDelQ] = useState<Question | null>(null);
   const [editingExamMeta, setEditingExamMeta] = useState(false);
-  const [examMetaForm, setExamMetaForm] = useState({
+  const [examMetaForm, setExamMetaForm] = useState<{
+    title: string;
+    description: string;
+    skill: string;
+    durationMinutes: number;
+    isPro: boolean;
+    isPublished: boolean;
+    hotLevel: number;
+    forecastTag: string;
+  }>({
     title: "",
     description: "",
     skill: "FULL_TEST",
@@ -94,6 +105,7 @@ export default function ExamEditorPage() {
     isPro: false,
     isPublished: true,
     hotLevel: 0,
+    forecastTag: "",
   });
 
   const getExamTakeUrl = (ex: ExamFull) => {
@@ -161,6 +173,7 @@ export default function ExamEditorPage() {
       isPro: exam.is_pro,
       isPublished: exam.is_published,
       hotLevel: exam.hot_level ?? exam.hotLevel ?? 0,
+      forecastTag: exam.forecast_tag ?? exam.forecastTag ?? "",
     });
     setEditingExamMeta(true);
   };
@@ -177,6 +190,7 @@ export default function ExamEditorPage() {
         isPro: examMetaForm.isPro,
         isPublished: examMetaForm.isPublished,
         hotLevel: Number(examMetaForm.hotLevel || 0),
+        forecastTag: examMetaForm.forecastTag.trim() || null,
       });
       if (res.success) {
         showToast("Đã cập nhật thông tin chung đề thi!");
@@ -529,8 +543,8 @@ export default function ExamEditorPage() {
                 }
               />
             </div>
-            <div className="sm:col-span-2">
-              <label className={lc}>Mức độ Hot / Dự đoán đề tủ (Gắn sao kỳ thi)</label>
+            <div>
+              <label className={lc}>Độ Hot / Đề dự đoán (Số lượng Cỏ ☘️)</label>
               <select
                 className={ic}
                 value={examMetaForm.hotLevel}
@@ -538,11 +552,25 @@ export default function ExamEditorPage() {
                   setExamMetaForm({ ...examMetaForm, hotLevel: Number(e.target.value) })
                 }
               >
-                <option value={0}>⚪ Mặc định (0⭐ - Đề bình thường, không gán sao)</option>
-                <option value={1}>⭐ 1 Sao (Đề ôn tập bổ trợ)</option>
-                <option value={2}>⭐⭐ 2 Sao (Đề Hot - Xuất hiện thường xuyên)</option>
-                <option value={3}>⭐⭐⭐ 🔥 3 Sao (Đề Tủ - Khả năng vào rất cao kỳ này!)</option>
+                <option value={0}>⚪ Không gán (0 ☘️)</option>
+                <option value={1}>☘️ 1 Cỏ</option>
+                <option value={2}>☘️☘️ 2 Cỏ</option>
+                <option value={3}>☘️☘️☘️ 3 Cỏ</option>
+                <option value={4}>☘️☘️☘️☘️ 4 Cỏ</option>
+                <option value={5}>☘️☘️☘️☘️☘️ 5 Cỏ</option>
               </select>
+            </div>
+            <div>
+              <label className={lc}>
+                Ghi chú dự đoán nội bộ <span className="text-[10px] text-slate-400 font-normal">(Chỉ Admin thấy)</span>
+              </label>
+              <input
+                type="text"
+                className={ic}
+                value={examMetaForm.forecastTag}
+                onChange={(e) => setExamMetaForm({ ...examMetaForm, forecastTag: e.target.value })}
+                placeholder="VD: Đợt thi 15/11, Đề tủ B2..."
+              />
             </div>
             <div className="sm:col-span-2 flex items-center gap-6 pt-1">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -600,15 +628,11 @@ export default function ExamEditorPage() {
           { label: "Kỹ năng", value: exam.skill },
           { label: "Thời lượng", value: `${exam.duration_minutes} phút` },
           {
-            label: "Mức độ Hot",
-            value:
-              exam.hot_level === 3 || exam.hotLevel === 3
-                ? "🔥🔥🔥 3⭐ Đề tủ"
-                : exam.hot_level === 2 || exam.hotLevel === 2
-                ? "⭐⭐ 2⭐ Đề Hot"
-                : exam.hot_level === 1 || exam.hotLevel === 1
-                ? "⭐ 1⭐ Ôn tập"
-                : "⚪ Bình thường",
+            label: "Độ Hot ☘️",
+            value: (() => {
+              const lvl = exam.hot_level ?? exam.hotLevel ?? 0;
+              return lvl > 0 ? "☘️".repeat(lvl) : "⚪ Không gán";
+            })(),
           },
           { label: "Số phần", value: String(exam.parts.length) },
           { label: "Tổng câu hỏi", value: String(totalQ) },

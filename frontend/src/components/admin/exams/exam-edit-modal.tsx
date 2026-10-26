@@ -110,18 +110,36 @@ export const ExamEditModal: React.FC<ExamEditModalProps> = ({
 
           <div>
             <label className="block font-heading font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Mức độ Hot / Đề tủ
+              Độ Hot ☘️
             </label>
             <select
               value={form.hotLevel}
               onChange={(e) => setForm({ ...form, hotLevel: Number(e.target.value) })}
-              className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-rose-500 font-sans"
+              className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-sans"
             >
-              <option value={0}>⚪ Mặc định (0⭐ - Bình thường)</option>
-              <option value={1}>⭐ 1 Sao (Đề ôn tập bổ trợ)</option>
-              <option value={2}>⭐⭐ 2 Sao (Đề Hot)</option>
-              <option value={3}>⭐⭐⭐ 🔥 3 Sao (Đề Tủ - Hay ra)</option>
+              <option value={0}>⚪ 0 Cỏ (Đề thường / Chưa gán)</option>
+              <option value={1}>☘️ 1 Cỏ</option>
+              <option value={2}>☘️☘️ 2 Cỏ</option>
+              <option value={3}>☘️☘️☘️ 3 Cỏ</option>
+              <option value={4}>☘️☘️☘️☘️ 4 Cỏ</option>
+              <option value={5}>☘️☘️☘️☘️☘️ 5 Cỏ (Trúng tủ cao nhất)</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block font-heading font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Ghi chú nội bộ / Nguồn đề (Admin only)
+            </label>
+            <input
+              type="text"
+              value={form.forecastTag || ""}
+              onChange={(e) => setForm({ ...form, forecastTag: e.target.value })}
+              placeholder="VD: Đề thi thật BC Hà Nội đợt 20/10, ca sáng..."
+              className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-sans"
+            />
+            <span className="text-[10px] text-slate-400 mt-0.5 block">
+              Ghi chú này chỉ lưu nội bộ cho giáo viên/admin đối soát, không hiển thị ra ngoài học viên.
+            </span>
           </div>
 
           <div className="space-y-2 pt-1">

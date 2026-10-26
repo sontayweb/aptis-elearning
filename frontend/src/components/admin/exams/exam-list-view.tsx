@@ -16,8 +16,6 @@ import {
   Edit2,
   Copy,
   Trash2,
-  Flame,
-  Star,
 } from "lucide-react";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import AdminTableCard from "@/components/admin/admin-table-card";
@@ -117,9 +115,17 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
     }
   };
 
-  // Local sorting
+  // Local sorting: prioritize hotLevel descending (từ 5 Cỏ xuống 0 Cỏ)
   const sortedExams = [...exams].sort((a, b) => {
     const key = sortState.key;
+    if (key === "hotLevel") {
+      const aVal = a.hotLevel ?? 0;
+      const bVal = b.hotLevel ?? 0;
+      if (aVal !== bVal) {
+        return sortState.order === "asc" ? aVal - bVal : bVal - aVal;
+      }
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
     const aVal = a[key] ?? "";
     const bVal = b[key] ?? "";
     if (aVal < bVal) return sortState.order === "asc" ? -1 : 1;
@@ -174,28 +180,40 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
               Bộ lọc Hot:
             </span>
             {[
-              { value: "ALL", label: "🔥 Tất cả mức độ" },
+              { value: "ALL", label: "☘️ Tất cả độ Hot" },
+              {
+                value: "HOT_5",
+                label: "☘️☘️☘️☘️☘️ 5 Cỏ",
+                activeClass:
+                  "bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800 font-bold shadow-xs",
+              },
+              {
+                value: "HOT_4",
+                label: "☘️☘️☘️☘️ 4 Cỏ",
+                activeClass:
+                  "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700 font-bold",
+              },
               {
                 value: "HOT_3",
-                label: "🔥 3⭐ Đề tủ",
+                label: "☘️☘️☘️ 3 Cỏ",
                 activeClass:
-                  "bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 font-bold",
+                  "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-700 font-bold",
               },
               {
                 value: "HOT_2",
-                label: "⭐⭐ 2⭐ Hot",
+                label: "☘️☘️ 2 Cỏ",
                 activeClass:
-                  "bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 font-bold",
+                  "bg-teal-50/70 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800 font-semibold",
               },
               {
                 value: "HOT_1",
-                label: "⭐ 1⭐ Ôn tập",
+                label: "☘️ 1 Cỏ",
                 activeClass:
-                  "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800 font-bold",
+                  "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-semibold",
               },
               {
                 value: "HOT_0",
-                label: "⚪ Chưa gán sao",
+                label: "⚪ Chưa gán",
                 activeClass:
                   "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-bold",
               },
@@ -305,7 +323,7 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
               />
               <SortableHeader
                 field="hotLevel"
-                title="Mức Hot"
+                title="Độ Hot ☘️"
                 currentSort={sortState}
                 onSort={onSort}
                 align="center"
@@ -424,27 +442,21 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
                       <button
                         type="button"
                         onClick={() => onCycleHotLevel(exam)}
-                        className="inline-flex items-center gap-1 rounded-full text-[10px] font-heading font-bold border-transparent transition-all hover:scale-105 active:scale-95"
-                        title="Bấm để đổi nhanh mức độ hot (0⭐ -> 1⭐ -> 2⭐ -> 3⭐)"
+                        className="inline-flex flex-col items-center gap-0.5 rounded-full text-[11px] font-heading font-bold transition-all hover:scale-105 active:scale-95"
+                        title="Bấm để đổi nhanh độ hot (0 ➔ 1 ➔ 2 ➔ 3 ➔ 4 ➔ 5 Cỏ ☘️)"
                       >
-                        {exam.hotLevel === 3 ? (
-                          <span className="inline-flex items-center gap-1 text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 px-2 py-0.5 rounded-full">
-                            <Flame className="w-3 h-3 text-rose-500 fill-rose-500" />
-                            <span>3⭐ Đề tủ</span>
-                          </span>
-                        ) : exam.hotLevel === 2 ? (
-                          <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-2 py-0.5 rounded-full">
-                            <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                            <span>2⭐ Hot</span>
-                          </span>
-                        ) : exam.hotLevel === 1 ? (
-                          <span className="inline-flex items-center gap-1 text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 px-2 py-0.5 rounded-full">
-                            <Star className="w-3 h-3 text-blue-500 fill-blue-500" />
-                            <span>1⭐ Ôn tập</span>
+                        {exam.hotLevel && exam.hotLevel > 0 ? (
+                          <span className="inline-flex items-center gap-1 text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 px-2.5 py-0.5 rounded-full shadow-2xs font-sans tracking-wide">
+                            {"☘️".repeat(exam.hotLevel)}
                           </span>
                         ) : (
-                          <span className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-normal">
-                            + Gán sao
+                          <span className="text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 font-normal">
+                            + Gán cỏ
+                          </span>
+                        )}
+                        {exam.forecastTag && (
+                          <span className="text-[9px] text-slate-400 dark:text-slate-500 max-w-[120px] truncate" title={exam.forecastTag}>
+                            {exam.forecastTag}
                           </span>
                         )}
                       </button>

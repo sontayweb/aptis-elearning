@@ -117,6 +117,7 @@ export interface EditExamFormData {
   isPro: boolean;
   isPublished: boolean;
   hotLevel: number;
+  forecastTag?: string | null;
 }
 
 export interface QuestionEditFormData {

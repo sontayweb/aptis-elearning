@@ -14,9 +14,9 @@ def q(cmd):
 
 print("=== FINAL VERIFICATION ON VPS (103.90.227.117) ===")
 print("1. Hot Exams count (hot_level > 0):", q("SELECT count(*) FROM \\\"Exam\\\" WHERE hot_level > 0;"))
-print("   - 3⭐ Đề Tủ:", q("SELECT count(*) FROM \\\"Exam\\\" WHERE hot_level = 3;"))
-print("   - 2⭐ Đề Hot:", q("SELECT count(*) FROM \\\"Exam\\\" WHERE hot_level = 2;"))
-print("   - 1⭐ Ôn tập:", q("SELECT count(*) FROM \\\"Exam\\\" WHERE hot_level = 1;"))
+print("   - 3☘️ Đề Tủ:", q("SELECT count(*) FROM \\\"Exam\\\" WHERE hot_level = 3;"))
+print("   - 2☘️ Đề Hot:", q("SELECT count(*) FROM \\\"Exam\\\" WHERE hot_level = 2;"))
+print("   - 1☘️ Ôn tập:", q("SELECT count(*) FROM \\\"Exam\\\" WHERE hot_level = 1;"))
 
 print("\n2. Reading Part 1 simplified titles sample:")
 r_p1 = q("SELECT title FROM \\\"Exam\\\" WHERE skill = 'READING' AND title ~* '^Đề [0-9]+$' ORDER BY title LIMIT 10;")

@@ -28,7 +28,7 @@ print("Exams by hot_level:", hot_counts)
 hot_exams = [e for e in exams if e['hot_level'] > 0]
 print(f"\nTotal hot exams (hot_level > 0): {len(hot_exams)}")
 for e in hot_exams:
-    print(f"  - [{e['hot_level']}⭐] {e['title']} ({e['skill']})")
+    print(f"  - [{e['hot_level']}☘️] {e['title']} ({e['skill']})")
 
 # Check Speaking Part 3 image counts:
 sp_p3 = [p for p in parts if p['skill'] == 'SPEAKING' and (p['part_number'] == 3 or 'part 3' in p['title'].lower())]

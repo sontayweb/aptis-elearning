@@ -268,7 +268,7 @@ export default function AdminEventsPage() {
       case "fireworks":
         return "🎆 Pháo hoa & Cờ Tổ quốc (Đại lễ)";
       case "stars":
-        return "⭐ Ngôi sao may mắn & Tên lửa (Mùa thi)";
+        return "☘️ Cỏ may mắn & Tên lửa (Mùa thi)";
       case "hearts":
         return "💖 Trái tim bay bổng (Valentine)";
       case "bat_pumpkin":
@@ -560,7 +560,7 @@ export default function AdminEventsPage() {
                     <option value="roses">🌹 Cánh hoa hồng & Quà tặng (20/10, 8/3)</option>
                     <option value="sunflowers">🌻 Hoa hướng dương & Cử nhân (20/11)</option>
                     <option value="fireworks">🎆 Pháo hoa rực rỡ & Cờ Tổ quốc (Đại lễ)</option>
-                    <option value="stars">⭐ Ngôi sao may mắn & Tên lửa (Mùa thi)</option>
+                    <option value="stars">☘️ Cỏ may mắn & Tên lửa (Mùa thi)</option>
                     <option value="hearts">💖 Trái tim bay bổng & Hộp quà (Valentine)</option>
                     <option value="bat_pumpkin">🎃 Bí ngô, dơi bay & mạng nhện (Halloween)</option>
                     <option value="snowflakes">❄ Hoa tuyết rơi lấp lánh (Giáng sinh)</option>

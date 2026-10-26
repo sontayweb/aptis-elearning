@@ -6,7 +6,6 @@ import { api } from "@/lib/api-client";
 import {
   Sparkles,
   Flame,
-  Star,
   Search,
   RefreshCw,
   Plus,
@@ -51,7 +50,7 @@ export default function AdminKeyDuDoanPage() {
     durationMinutes: 162,
     isPro: false,
     isPublished: true,
-    hotLevel: 3,
+    hotLevel: 5,
   });
   const [editLoading, setEditLoading] = useState(false);
 
@@ -61,7 +60,7 @@ export default function AdminKeyDuDoanPage() {
   const [poolSearch, setPoolSearch] = useState("");
   const [loadingPool, setLoadingPool] = useState(false);
   const [selectedPoolExam, setSelectedPoolExam] = useState<ExamItem | null>(null);
-  const [assignHotLevel, setAssignHotLevel] = useState<number>(3);
+  const [assignHotLevel, setAssignHotLevel] = useState<number>(5);
   const [assignLoading, setAssignLoading] = useState(false);
 
   // Confirm remove from Key
@@ -107,23 +106,23 @@ export default function AdminKeyDuDoanPage() {
     fetchKeyExams();
   }, [fetchKeyExams]);
 
-  // Cycle hot level: 0 -> 1 -> 2 -> 3 -> 0
+  // Cycle hot level: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 0
   const handleCycleHotLevel = async (exam: ExamItem, e: React.MouseEvent) => {
     e.stopPropagation();
     const current = exam.hotLevel ?? 0;
-    const nextLevel = current === 0 ? 1 : current === 1 ? 2 : current === 2 ? 3 : 0;
+    const nextLevel = (current + 1) % 6;
     try {
       const res = await api.admin.updateExam(exam.id, { hotLevel: nextLevel });
       if (res.success) {
         showToast(
           nextLevel === 0
-            ? `Đã gỡ "${exam.title}" khỏi danh mục Đề Key`
-            : `Đã đổi "${exam.title}" thành ${nextLevel}⭐`
+            ? `Đã gỡ "${exam.title}" khỏi danh mục Đề Key (0 ☘️)`
+            : `Đã đổi "${exam.title}" thành ${"☘️".repeat(nextLevel)} (${nextLevel} Cỏ)`
         );
         fetchKeyExams();
       }
     } catch {
-      showToast("Lỗi khi cập nhật mức độ hot");
+      showToast("Lỗi khi cập nhật mức độ Cỏ");
     }
   };
 
@@ -226,7 +225,7 @@ export default function AdminKeyDuDoanPage() {
     try {
       const res = await api.admin.updateExam(selectedPoolExam.id, { hotLevel: assignHotLevel });
       if (res.success) {
-        showToast(`Đã thêm "${selectedPoolExam.title}" vào Đề Key với mức độ ${assignHotLevel}⭐!`);
+        showToast(`Đã thêm "${selectedPoolExam.title}" vào Đề Key với mức độ ${"☘️".repeat(assignHotLevel || 1)}!`);
         setAddModalOpen(false);
         fetchKeyExams();
       } else {
@@ -242,11 +241,11 @@ export default function AdminKeyDuDoanPage() {
   // KPI Calculations
   const stats = useMemo(() => {
     const total = exams.length;
+    const hot5Count = exams.filter((e) => (e.hotLevel ?? 0) === 5).length;
+    const hot4Count = exams.filter((e) => (e.hotLevel ?? 0) === 4).length;
     const hot3Count = exams.filter((e) => (e.hotLevel ?? 0) === 3).length;
-    const hot2Count = exams.filter((e) => (e.hotLevel ?? 0) === 2).length;
-    const hot1Count = exams.filter((e) => (e.hotLevel ?? 0) === 1).length;
     const vipCount = exams.filter((e) => e.isPro).length;
-    return { total, hot3Count, hot2Count, hot1Count, vipCount };
+    return { total, hot5Count, hot4Count, hot3Count, vipCount };
   }, [exams]);
 
   const skillTabs = [
@@ -259,10 +258,12 @@ export default function AdminKeyDuDoanPage() {
   ];
 
   const hotTabs = [
-    { key: "HOT_ALL", label: "Tất cả Đề Key (1⭐-3⭐)", icon: Sparkles },
-    { key: "HOT_3", label: "🔥🔥🔥 3⭐ Đề Tủ", icon: Flame },
-    { key: "HOT_2", label: "⭐⭐ 2⭐ Đề Hot", icon: Star },
-    { key: "HOT_1", label: "⭐ 1⭐ Ôn tập", icon: Star },
+    { key: "HOT_ALL", label: "Tất cả Đề Key (1☘️-5☘️)", icon: Sparkles },
+    { key: "HOT_5", label: "☘️☘️☘️☘️☘️ 5 Cỏ", icon: Sparkles },
+    { key: "HOT_4", label: "☘️☘️☘️☘️ 4 Cỏ", icon: Sparkles },
+    { key: "HOT_3", label: "☘️☘️☘️ 3 Cỏ", icon: Sparkles },
+    { key: "HOT_2", label: "☘️☘️ 2 Cỏ", icon: Sparkles },
+    { key: "HOT_1", label: "☘️ 1 Cỏ", icon: Sparkles },
   ];
 
   return (
@@ -282,7 +283,7 @@ export default function AdminKeyDuDoanPage() {
           label: `${stats.total} Đề Key`,
         }}
         title="Quản lý Đề Key Dự Đoán ☘️"
-        description="Quản lý tập trung các bộ đề có gắn sao, dự đoán trúng tủ cao, đồng bộ trực tiếp với giao diện học viên (/key-du-doan)"
+        description="Quản lý tập trung các bộ đề có gắn cỏ dự đoán ☘️, đồng bộ trực tiếp với giao diện học viên (/key-du-doan)"
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Link
@@ -331,32 +332,32 @@ export default function AdminKeyDuDoanPage() {
           <span className="text-[10px] text-slate-400 mt-1 block">Đang phát hành cho học viên</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-amber-200/80 dark:border-amber-900/40 bg-gradient-to-br from-amber-50/60 to-white dark:from-amber-950/30 dark:to-slate-900 shadow-2xs">
+        <div className="p-4 rounded-2xl border border-emerald-200/80 dark:border-emerald-900/40 bg-gradient-to-br from-emerald-50/60 to-white dark:from-emerald-950/30 dark:to-slate-900 shadow-2xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400">
-              🔥🔥🔥 3⭐ Đề Tủ
+            <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
+              ☘️☘️☘️☘️☘️ 5 Cỏ
             </span>
-            <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 flex items-center justify-center">
+              <Sparkles className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-mono font-black text-emerald-950 dark:text-emerald-100">
+            {stats.hot5Count}
+          </p>
+          <span className="text-[10px] text-slate-400 mt-1 block">Mức độ trúng tủ & ưu tiên tối đa</span>
+        </div>
+
+        <div className="p-4 rounded-2xl border border-teal-200/80 dark:border-teal-900/40 bg-gradient-to-br from-teal-50/60 to-white dark:from-teal-950/30 dark:to-slate-900 shadow-2xs">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-bold text-teal-700 dark:text-teal-400">
+              ☘️☘️☘️☘️ 4 Cỏ
+            </span>
+            <div className="w-7 h-7 rounded-lg bg-teal-100 dark:bg-teal-900/40 text-teal-600 flex items-center justify-center">
               <Flame className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-mono font-black text-amber-950 dark:text-amber-100">
-            {stats.hot3Count}
-          </p>
-          <span className="text-[10px] text-slate-400 mt-1 block">Khả năng trúng cao nhất (&gt;90%)</span>
-        </div>
-
-        <div className="p-4 rounded-2xl border border-orange-200/80 dark:border-orange-900/40 bg-gradient-to-br from-orange-50/60 to-white dark:from-orange-950/30 dark:to-slate-900 shadow-2xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-orange-700 dark:text-orange-400">
-              ⭐⭐ 2⭐ Đề Hot
-            </span>
-            <div className="w-7 h-7 rounded-lg bg-orange-100 dark:bg-orange-900/40 text-orange-600 flex items-center justify-center">
-              <Star className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-mono font-black text-orange-950 dark:text-orange-100">
-            {stats.hot2Count}
+          <p className="text-2xl font-mono font-black text-teal-950 dark:text-teal-100">
+            {stats.hot4Count}
           </p>
           <span className="text-[10px] text-slate-400 mt-1 block">Tần suất xuất hiện thường xuyên</span>
         </div>
@@ -445,7 +446,7 @@ export default function AdminKeyDuDoanPage() {
               </span>
             </div>
             <p className="text-[11px] text-slate-400">
-              Bấm trực tiếp vào cột Mức độ Hot để xoay vòng gán sao (0⭐ ➔ 1⭐ ➔ 2⭐ ➔ 3⭐)
+              Bấm trực tiếp vào cột Mức độ Hot để xoay vòng gán cỏ (0 ➔ 1☘️ ➔ 2☘️ ➔ 3☘️ ➔ 4☘️ ➔ 5☘️)
             </p>
           </div>
         }
@@ -499,27 +500,14 @@ export default function AdminKeyDuDoanPage() {
                       <button
                         onClick={(e) => handleCycleHotLevel(exam, e)}
                         className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 ${
-                          hotLvl === 3
-                            ? "bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-400 shadow-2xs"
-                            : hotLvl === 2
-                            ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-400"
-                            : hotLvl === 1
-                            ? "bg-blue-50 dark:bg-blue-950/40 border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-400"
+                          hotLvl > 0
+                            ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 shadow-2xs"
                             : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400"
                         }`}
-                        title="Click để xoay vòng mức độ Hot"
+                        title="Click để xoay vòng số lượng Cỏ (0-5)"
                       >
-                        {hotLvl === 3 && <Flame className="w-3.5 h-3.5 fill-rose-500" />}
-                        {hotLvl === 2 && <Star className="w-3.5 h-3.5 fill-amber-500" />}
-                        {hotLvl === 1 && <Star className="w-3.5 h-3.5 fill-blue-500" />}
                         <span>
-                          {hotLvl === 3
-                            ? "3⭐ Đề Tủ"
-                            : hotLvl === 2
-                            ? "2⭐ Đề Hot"
-                            : hotLvl === 1
-                            ? "1⭐ Ôn tập"
-                            : "Chưa gán"}
+                          {hotLvl > 0 ? "☘️".repeat(hotLvl) : "⚪ Chưa gán"}
                         </span>
                       </button>
                     </td>
@@ -668,8 +656,8 @@ export default function AdminKeyDuDoanPage() {
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             {item.hotLevel && item.hotLevel > 0 ? (
-                              <span className="text-[10px] text-amber-600 font-bold">
-                                {item.hotLevel}⭐ (Đã gán)
+                              <span className="text-[10px] text-emerald-600 font-bold">
+                                {"☘️".repeat(item.hotLevel)} (Đã gán)
                               </span>
                             ) : null}
                             {isSelected && <Check className="w-4 h-4 text-rose-600" />}
@@ -683,15 +671,17 @@ export default function AdminKeyDuDoanPage() {
               {/* Level Selector */}
               {selectedPoolExam && (
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 space-y-2 border border-slate-200 dark:border-slate-700">
-                  <span className="font-bold text-slate-700 dark:text-slate-300 block">
-                    Chọn mức độ sao cho:{" "}
-                    <span className="text-rose-600">{selectedPoolExam.title}</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-300 block text-xs">
+                    Chọn mức độ Cỏ ☘️ cho:{" "}
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">{selectedPoolExam.title}</span>
                   </span>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-5 gap-2">
                     {[
-                      { level: 3, label: "🔥🔥 3⭐ Đề Tủ", desc: "Trúng tủ cao nhất" },
-                      { level: 2, label: "⭐⭐ 2⭐ Đề Hot", desc: "Xuất hiện đều" },
-                      { level: 1, label: "⭐ 1⭐ Ôn tập", desc: "Bổ trợ thêm" },
+                      { level: 5, label: "5 ☘️", desc: "Tối đa" },
+                      { level: 4, label: "4 ☘️", desc: "Rất hot" },
+                      { level: 3, label: "3 ☘️", desc: "Thường gặp" },
+                      { level: 2, label: "2 ☘️", desc: "Bổ trợ" },
+                      { level: 1, label: "1 ☘️", desc: "Nền tảng" },
                     ].map((opt) => (
                       <button
                         key={opt.level}
@@ -699,12 +689,12 @@ export default function AdminKeyDuDoanPage() {
                         onClick={() => setAssignHotLevel(opt.level)}
                         className={`p-2 rounded-xl border text-center transition-all ${
                           assignHotLevel === opt.level
-                            ? "border-rose-500 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold"
+                            ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold"
                             : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400"
                         }`}
                       >
-                        <div className="text-xs">{opt.label}</div>
-                        <div className="text-[10px] opacity-70">{opt.desc}</div>
+                        <div className="text-xs font-bold">{opt.label}</div>
+                        <div className="text-[9px] opacity-70">{opt.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -746,7 +736,7 @@ export default function AdminKeyDuDoanPage() {
       <ConfirmModal
         isOpen={!!confirmRemoveExam}
         title="Gỡ đề khỏi danh mục Key Dự Đoán"
-        message={`Bạn có chắc muốn gỡ "${confirmRemoveExam?.title}" khỏi phòng Đề Key? Đề thi vẫn được giữ nguyên trong kho đề chung với mức độ 0⭐.`}
+        message={`Bạn có chắc muốn gỡ "${confirmRemoveExam?.title}" khỏi phòng Đề Key? Đề thi vẫn được giữ nguyên trong kho đề chung với mức độ 0 ☘️.`}
         confirmText="Xác nhận gỡ"
         cancelText="Hủy"
         onConfirm={handleConfirmRemove}

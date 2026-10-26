@@ -34,7 +34,7 @@ Nguyen Hoang Hiep`;
     const duration = Date.now() - start;
 
     console.log(`\n🎉 ✅ CHẤM THI THÀNH CÔNG TRONG ${duration}ms!`);
-    console.log(`⭐ Model đã phản hồi & được lưu Sticky: "${result.usedModel}"`);
+    console.log(`☘️ Model đã phản hồi & được lưu Sticky: "${result.usedModel}"`);
     console.log('--------------------------------------------------');
     console.log(`📊 Điểm tổng kết (Score): ${result.score}/50`);
     console.log(`🏆 Bậc quy đổi CEFR: ${result.cefr_level}`);

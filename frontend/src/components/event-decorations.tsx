@@ -306,14 +306,14 @@ export function EventDecorations() {
               animationDuration: `${5 + (i % 2) * 2}s`,
             }}
           >
-            {i % 2 === 0 ? "⭐" : "✨"}
+            {i % 2 === 0 ? "✨" : "🎆"}
           </div>
         ))}
       </div>
     );
   }
 
-  // 8. Exam Season Stars & Rockets (Mùa thi bứt phá & Tựu trường)
+  // 8. Exam Season Clovers & Rockets (Mùa thi may mắn & Tựu trường)
   if (config.decorationType === "stars") {
     return (
       <div
@@ -329,7 +329,7 @@ export function EventDecorations() {
         {[...Array(10)].map((_, i) => (
           <div
             key={i}
-            className="absolute text-indigo-400/80 animate-snow-fall"
+            className="absolute text-emerald-500/80 animate-snow-fall"
             style={{
               left: `${i * 10 + 3}%`,
               top: `-20px`,
@@ -338,7 +338,7 @@ export function EventDecorations() {
               animationDuration: `${4.5 + (i % 3) * 1.5}s`,
             }}
           >
-            {i % 3 === 0 ? "⭐" : i % 3 === 1 ? "✨" : "🎯"}
+            {i % 3 === 0 ? "☘️" : i % 3 === 1 ? "✨" : "🎯"}
           </div>
         ))}
       </div>

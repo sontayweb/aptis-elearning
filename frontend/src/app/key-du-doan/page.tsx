@@ -39,7 +39,7 @@ const DEFAULT_KEY_SETS: KeySet[] = [
     title: "Speaking Part 2 & 4: Describing Group Activities & Memorable Gifts",
     skill: "Speaking",
     updateDate: "Cập nhật hôm nay",
-    matchRate: "92% trúng tủ",
+    matchRate: "☘️☘️☘️☘️☘️",
     topicsCount: 8,
     isUnlocked: true,
     hotTopic: "Bộ câu hỏi về trải nghiệm làm việc nhóm ở quán cafe & món quà ý nghĩa nhất",
@@ -50,7 +50,7 @@ const DEFAULT_KEY_SETS: KeySet[] = [
     title: "Writing Part 4: Sports Club & Music Club Complaints",
     skill: "Writing",
     updateDate: "Cập nhật tuần này",
-    matchRate: "88% trúng tủ",
+    matchRate: "☘️☘️☘️☘️",
     topicsCount: 6,
     isUnlocked: true,
     hotTopic: "Thư thân mật 50 từ và thư trang trọng 150 từ khiếu nại thay đổi lịch sinh hoạt CLB",
@@ -61,7 +61,7 @@ const DEFAULT_KEY_SETS: KeySet[] = [
     title: "Reading Part 4: Architectural Innovations & Climate Science",
     skill: "Reading",
     updateDate: "Cập nhật mới",
-    matchRate: "85% trúng tủ",
+    matchRate: "☘️☘️☘️☘️",
     topicsCount: 5,
     isUnlocked: false,
     hotTopic: "Bài đọc 750 từ ghép tiêu đề đoạn văn chuyên sâu chủ đề môi trường đô thị",
@@ -72,7 +72,7 @@ const DEFAULT_KEY_SETS: KeySet[] = [
     title: "Listening Part 2 & 3: Commuter Discussions & Radio Announcements",
     skill: "Listening",
     updateDate: "Cập nhật mới",
-    matchRate: "87% trúng tủ",
+    matchRate: "☘️☘️☘️",
     topicsCount: 8,
     isUnlocked: false,
     hotTopic: "Đối thoại quan điểm Man/Woman/Both về việc làm từ xa và giao thông công cộng",
@@ -83,7 +83,7 @@ const DEFAULT_KEY_SETS: KeySet[] = [
     title: "Speaking Part 3: Comparing Traditional vs Online Shopping",
     skill: "Speaking",
     updateDate: "Cập nhật mới",
-    matchRate: "90% trúng tủ",
+    matchRate: "☘️☘️☘️☘️☘️",
     topicsCount: 6,
     isUnlocked: false,
     hotTopic: "So sánh 2 bức tranh mua sắm trực tiếp tại chợ truyền thống và mua hàng qua mạng",
@@ -94,7 +94,7 @@ const DEFAULT_KEY_SETS: KeySet[] = [
     title: "Writing Part 2 & 3: Library Membership & Social Forum Posts",
     skill: "Writing",
     updateDate: "Cập nhật mới",
-    matchRate: "84% trúng tủ",
+    matchRate: "☘️☘️☘️",
     topicsCount: 4,
     isUnlocked: false,
     hotTopic: "Điền form thông tin cá nhân và 3 câu hỏi trao đổi nhóm về thói quen đọc sách",
@@ -120,19 +120,25 @@ export default function KeyDuDoanPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.exams.getAll({ source: "KEY", limit: 20 });
+      const res = await api.exams.getAll({ source: "KEY", limit: 30 });
       if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-        const dynamicSets = res.data.map((exam: any) => ({
-          id: exam.id,
-          title: exam.title,
-          skill: exam.skill === "FULL_TEST" ? "Tổng hợp" : (exam.skill || "Key"),
-          updateDate: "Cập nhật mới",
-          matchRate: "85% trúng tủ",
-          topicsCount: exam.totalQuestions || 10,
-          isUnlocked: isVipUser || !exam.isPro,
-          hotTopic: exam.description || "Chủ đề trọng tâm đợt thi này",
-          examId: exam.id,
-        }));
+        const dynamicSets = res.data
+          .map((exam: any) => {
+            const lvl = Math.min(5, Math.max(1, Number(exam.hotLevel || 3)));
+            return {
+              id: exam.id,
+              title: exam.title,
+              skill: exam.skill === "FULL_TEST" ? "Tổng hợp" : (exam.skill || "Key"),
+              updateDate: "Cập nhật mới",
+              matchRate: "☘️".repeat(lvl),
+              cloverLevel: lvl,
+              topicsCount: exam.totalQuestions || 10,
+              isUnlocked: isVipUser || !exam.isPro,
+              hotTopic: exam.description || "Chủ đề trọng tâm đợt thi này",
+              examId: exam.id,
+            };
+          })
+          .sort((a: any, b: any) => b.cloverLevel - a.cloverLevel);
         setKeySets(dynamicSets);
       } else {
         setKeySets(DEFAULT_KEY_SETS);

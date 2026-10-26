@@ -88,7 +88,7 @@ def execute_migration():
 
     print(f"\nFound {len(updates)} exams to update hot_level on VPS!")
     for u in updates[:20]:
-        print(f"  [{u[2]}] '{u[1]}': {u[3]}⭐ -> {u[4]}⭐")
+        print(f"  [{u[2]}] '{u[1]}': {u[3]}☘️ -> {u[4]}☘️")
 
     # Generate SQL batch update
     sql_statements = []
@@ -121,7 +121,7 @@ def execute_migration():
     for row in out_c.strip().split('\n'):
         if row.strip():
             lvl, cnt = row.split('|||')
-            print(f"  hot_level {lvl}⭐: {cnt} đề")
+            print(f"  hot_level {lvl}☘️: {cnt} đề")
 
     ssh.close()
 

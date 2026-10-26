@@ -137,9 +137,8 @@ export default function AdminExamsPage() {
   // KPI Metrics Toggle
   const [showMetrics, setShowMetrics] = useState(false);
 
-  // Sorting
   const [sortState, setSortState] = useState<SortState<ExamSortKey>>({
-    key: "createdAt",
+    key: "hotLevel",
     order: "desc",
   });
 
@@ -313,20 +312,18 @@ export default function AdminExamsPage() {
 
   const handleCycleHotLevel = async (exam: ExamItem) => {
     const current = exam.hotLevel || 0;
-    const nextLevel = (current + 1) % 4;
+    const nextLevel = (current + 1) % 6;
     setExams((prev) =>
       prev.map((e) => (e.id === exam.id ? { ...e, hotLevel: nextLevel } : e))
     );
     try {
       const res = await api.admin.updateExam(exam.id, { hotLevel: nextLevel });
       if (res.success) {
-        const labels = [
-          "Mặc định (Không gán sao)",
-          "1 Sao ⭐ (Ôn tập bổ trợ)",
-          "2 Sao ⭐⭐ (Đề Hot)",
-          "3 Sao ⭐⭐⭐ 🔥 (Đề Tủ - Xác suất vào cao)",
-        ];
-        showToast(`Đã đổi mức độ hot "${exam.title}" -> ${labels[nextLevel]}`);
+        showToast(
+          nextLevel === 0
+            ? `Đã gỡ độ Hot khỏi đề "${exam.title}"`
+            : `Đã đổi "${exam.title}" -> ${"☘️".repeat(nextLevel)} (${nextLevel} Cỏ)`
+        );
       } else {
         fetchExams();
       }
@@ -375,6 +372,7 @@ export default function AdminExamsPage() {
       isPro: exam.isPro,
       isPublished: exam.isPublished,
       hotLevel: exam.hotLevel || 0,
+      forecastTag: exam.forecastTag || "",
     });
   };
 
@@ -390,6 +388,7 @@ export default function AdminExamsPage() {
         isPro: editForm.isPro,
         isPublished: editForm.isPublished,
         hotLevel: Number(editForm.hotLevel || 0),
+        forecastTag: editForm.forecastTag || null,
       });
       if (res.success) {
         showToast(`Đã cập nhật thông tin đề "${editForm.title}" thành công!`);
