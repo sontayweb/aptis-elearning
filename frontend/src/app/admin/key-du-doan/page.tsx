@@ -89,7 +89,7 @@ export default function AdminKeyDuDoanPage() {
         search: debouncedSearch.trim() || undefined,
         hotLevel: hotFilter,
         page: 1,
-        limit: 100,
+        limit: 200,
       });
 
       if (res.success && res.data) {
