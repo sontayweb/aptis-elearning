@@ -223,7 +223,8 @@ export class AdminController {
       const skill = req.query.skill as string | undefined;
       const search = req.query.search as string | undefined;
       const partNumber = req.query.partNumber ? Number(req.query.partNumber) : undefined;
-      const result = await adminService.listExams(page, limit, skill, search, partNumber);
+      const hotLevel = req.query.hotLevel as string | undefined;
+      const result = await adminService.listExams(page, limit, skill, search, partNumber, hotLevel);
       sendSuccess(res, result.exams, 'Lấy danh sách đề thi thành công', 200, {
         total: result.total,
         page: result.page,

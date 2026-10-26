@@ -192,27 +192,30 @@ export default function SpeakingPracticePage() {
     };
   }, []);
 
-  // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
+  // 1. Lọc theo từng Tab chuẩn: Không lặp đúp giữa đề Full và đề Part đơn
   const currentTabExams = exams.filter((e) => {
     if (activeTab === "full") {
-      return e.title.includes("Full Speaking") || e.totalParts === 4;
-    } else if (activeTab === "p1") {
-      if (e.partTitle?.includes("Part 1") || e.partTitle?.includes("Personal")) return true;
       return e.totalParts === 4 || e.title.includes("Full Speaking");
+    }
+
+    const isSinglePart = e.totalParts === 1;
+    if (activeTab === "p1") {
+      if (isSinglePart) return e.partTitle?.includes("Part 1") || e.partTitle?.includes("Personal");
+      return false; // Tránh nhân đôi nếu đã có đề Part 1 chuyên biệt
     } else if (activeTab === "p2") {
-      if (e.partTitle?.includes("Part 2") || e.partTitle?.includes("Describe")) return true;
-      return e.totalParts === 4 || e.title.includes("Full Speaking");
+      if (isSinglePart) return e.partTitle?.includes("Part 2") || e.partTitle?.includes("Describe");
+      return false;
     } else if (activeTab === "p3") {
-      if (e.partTitle?.includes("Part 3") || e.partTitle?.includes("Compare")) return true;
-      return e.totalParts === 4 || e.title.includes("Full Speaking");
+      if (isSinglePart) return e.partTitle?.includes("Part 3") || e.partTitle?.includes("Compare");
+      return false;
     } else if (activeTab === "p4") {
-      if (e.partTitle?.includes("Part 4") || e.partTitle?.includes("Discussion")) return true;
-      return e.totalParts === 4 || e.title.includes("Full Speaking");
+      if (isSinglePart) return e.partTitle?.includes("Part 4") || e.partTitle?.includes("Discussion");
+      return false;
     }
     return true;
   });
 
-  // 2. Lọc tiếp theo search, status, priority, source từ currentTabExams
+  // 2. Lọc tiếp theo search, status, priority, source và sắp xếp chuẩn theo số đề thật
   const filteredExams = currentTabExams.filter((e) => {
     const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
@@ -231,7 +234,13 @@ export default function SpeakingPracticePage() {
         : e.priority === "LOW";
     const matchesSource = filterSource === "all" || filterSource === "web" ? true : false;
     return matchesSearch && matchesStatus && matchesPriority && matchesSource;
-  }).sort((a, b) => (b.hotLevel || 0) - (a.hotLevel || 0));
+  }).sort((a, b) => {
+    // Sắp xếp tự nhiên theo đúng số đề gốc: Đề 01 -> Đề 02 -> ... -> Đề 26
+    const numA = (a.title.match(/^(?:Đề|Test|Exam)\s*0*(\d+)/i) || [])[1];
+    const numB = (b.title.match(/^(?:Đề|Test|Exam)\s*0*(\d+)/i) || [])[1];
+    if (numA && numB) return Number(numA) - Number(numB);
+    return a.title.localeCompare(b.title, "vi");
+  });
 
   // Dynamic naming based on activeTab
   const getTabInfo = () => {
@@ -521,10 +530,17 @@ export default function SpeakingPracticePage() {
 
               {/* CARD 2..N: Practice Exam Cards */}
               {filteredExams.map((exam, idx) => {
-                const examNumStr = `Đề ${String(idx + 1).padStart(3, "0")}`;
                 const rawTitle = (exam.title || "").trim();
+
+                // Trích xuất đúng số đề thật từ tiêu đề trong DB (vd: "Đề 04 - ..." -> "Đề 004")
+                const numMatch = rawTitle.match(/^(?:Đề|Test|Exam)\s*0*(\d+)/i);
+                const examNumStr = numMatch
+                  ? `Đề ${numMatch[1].padStart(3, "0")}`
+                  : `Đề ${String(idx + 1).padStart(3, "0")}`;
+
+                // Tên chủ đề thật từ database (vd: "Comparing two sports", "Car vs train")
                 let topicName = rawTitle
-                  .replace(/^Đề\s*\d+\s*[-:—–]\s*/i, "")
+                  .replace(/^(?:Đề|Test|Exam)\s*\d+\s*[-:—–]\s*/i, "")
                   .replace(/^Speaking\s*[-:—–]\s*/i, "")
                   .replace(/\s*[-:—–]\s*Part\s*\d+.*$/i, "")
                   .replace(/—\s*Full Speaking.*$/i, "")
@@ -537,20 +553,14 @@ export default function SpeakingPracticePage() {
 
                 const displayTitle = (() => {
                   if (activeTab === "full") {
-                    return rawTitle.includes("—") || rawTitle.includes("-")
-                      ? rawTitle
-                      : `${examNumStr} — ${rawTitle}`;
-                  }
-                  if (activeTab === "p1") {
-                    return examNumStr; // Rút gọn Part 1 chỉ để số đề
-                  }
-                  if (activeTab === "p2") {
-                    return examNumStr; // Rút gọn Part 2 chỉ để số đề
+                    return rawTitle;
                   }
                   if (!isGenericTopic) {
                     return `${examNumStr} — ${topicName}`;
                   }
                   const partDefaults: Record<string, string> = {
+                    p1: "Personal Information",
+                    p2: "Describing a Picture",
                     p3: "Two Pictures Comparison",
                     p4: "Experience & Opinion",
                   };

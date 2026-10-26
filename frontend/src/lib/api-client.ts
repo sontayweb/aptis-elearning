@@ -658,14 +658,14 @@ class ApiClient {
         body: JSON.stringify(body),
       }),
 
-    getExams: (params?: { page?: number; limit?: number; skill?: string; search?: string; partNumber?: number; hotLevel?: number }) => {
+    getExams: (params?: { page?: number; limit?: number; skill?: string; search?: string; partNumber?: number; hotLevel?: number | string }) => {
       const query = new URLSearchParams();
       if (params?.page) query.append('page', params.page.toString());
       if (params?.limit) query.append('limit', params.limit.toString());
       if (params?.skill && params.skill !== 'ALL') query.append('skill', params.skill);
       if (params?.search && params.search.trim()) query.append('search', params.search.trim());
       if (params?.partNumber) query.append('partNumber', params.partNumber.toString());
-      if (params?.hotLevel !== undefined) query.append('hotLevel', params.hotLevel.toString());
+      if (params?.hotLevel !== undefined && params.hotLevel !== 'ALL') query.append('hotLevel', params.hotLevel.toString());
       const qs = query.toString();
       return this.request(`/admin/exams${qs ? `?${qs}` : ''}`);
     },

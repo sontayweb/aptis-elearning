@@ -998,31 +998,111 @@ export class AdminService {
     limit: number = 50,
     skill?: string,
     search?: string,
-    partNumber?: number
+    partNumber?: number,
+    hotLevel?: string
   ) {
     const skip = (page - 1) * limit;
     const where: any = {};
     if (skill && skill !== 'ALL') {
       where.skill = skill;
     }
-    if (search && search.trim()) {
-      const term = search.trim();
+    if (hotLevel && hotLevel !== 'ALL') {
+      if (hotLevel === 'HOT_ALL') {
+        where.hot_level = { gt: 0 };
+      } else if (hotLevel === 'HOT_3') {
+        where.hot_level = 3;
+      } else if (hotLevel === 'HOT_2') {
+        where.hot_level = 2;
+      } else if (hotLevel === 'HOT_1') {
+        where.hot_level = 1;
+      } else if (hotLevel === 'HOT_0') {
+        where.OR = [{ hot_level: null }, { hot_level: 0 }];
+      }
+    }
+    const rawTerm = search ? search.trim() : "";
+    const uuidMatch = rawTerm.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+    const extractedUuid = uuidMatch ? uuidMatch[0] : null;
+
+    if (extractedUuid) {
+      // 1. Direct exact UUID/Link lookup: Prioritize finding this exact exam regardless of active skill/part filter
       where.OR = [
-        { title: { contains: term, mode: 'insensitive' } },
-        { description: { contains: term, mode: 'insensitive' } },
-        {
+        { id: extractedUuid },
+        { parts: { some: { id: extractedUuid } } },
+        { parts: { some: { questions: { some: { id: extractedUuid } } } } },
+      ];
+    } else {
+      // 2. Standard Filter by Skill
+      if (skill && skill !== 'ALL') {
+        where.skill = skill;
+      }
+
+      // 3. Smart Part Filter (handles both bundled 4-part exams and standalone single-part exams)
+      if (partNumber) {
+        where.parts = {
+          some: {
+            OR: [
+              { part_number: Number(partNumber) },
+              { title: { contains: `Part ${partNumber}`, mode: 'insensitive' } },
+              { title: { contains: `Phần ${partNumber}`, mode: 'insensitive' } },
+              { title: { contains: `Part${partNumber}`, mode: 'insensitive' } },
+            ],
+          },
+        };
+      }
+
+      // 4. Keyword / Topic / Number Search
+      if (rawTerm) {
+        const orConditions: any[] = [];
+
+        orConditions.push(
+          { title: { contains: rawTerm, mode: 'insensitive' } },
+          { description: { contains: rawTerm, mode: 'insensitive' } }
+        );
+
+        // Cleaned term without dashes (handles em-dash '—' vs hyphen '-')
+        const cleaned = rawTerm.replace(/[—–-]/g, ' ').replace(/\s+/g, ' ').trim();
+        if (cleaned !== rawTerm) {
+          orConditions.push({ title: { contains: cleaned, mode: 'insensitive' } });
+        }
+
+        // Exact & word-boundary number match (e.g. "04", "Đề 04", "4" -> matches "Đề 04", "Đề 4 ", "Đề 4 -", etc.)
+        const numMatch = rawTerm.match(/^(?:đề|de|test|exam)?\s*0*(\d+)$/i);
+        if (numMatch && numMatch[1]) {
+          const num = numMatch[1];
+          const paddedNum = num.padStart(2, '0');
+          const padded3 = num.padStart(3, '0');
+          orConditions.push(
+            { title: { contains: `Đề ${paddedNum}`, mode: 'insensitive' } },
+            { title: { contains: `Đề ${padded3}`, mode: 'insensitive' } },
+            { title: { contains: `Đề ${num} `, mode: 'insensitive' } },
+            { title: { contains: `Đề ${num} -`, mode: 'insensitive' } },
+            { title: { contains: `Đề ${num} —`, mode: 'insensitive' } },
+            { title: { contains: `Đề ${num}:`, mode: 'insensitive' } },
+            { title: { equals: `Đề ${num}`, mode: 'insensitive' } }
+          );
+        }
+
+        // Meaningful word tokens
+        const words = rawTerm
+          .split(/[—–\s,]+/)
+          .map(w => w.trim())
+          .filter(w => w.length >= 2 && !/^(đề|the|and|for|part|câu|bài)$/i.test(w));
+
+        // Exact phrase deep search in parts & questions
+        orConditions.push({
           parts: {
             some: {
               OR: [
-                { title: { contains: term, mode: 'insensitive' } },
-                { passage_text: { contains: term, mode: 'insensitive' } },
+                { title: { contains: rawTerm, mode: 'insensitive' } },
+                { passage_text: { contains: rawTerm, mode: 'insensitive' } },
+                { image_url: { contains: rawTerm, mode: 'insensitive' } },
                 {
                   questions: {
                     some: {
                       OR: [
-                        { prompt: { contains: term, mode: 'insensitive' } },
-                        { explanation: { contains: term, mode: 'insensitive' } },
-                        { correct_answer: { contains: term, mode: 'insensitive' } },
+                        { prompt: { contains: rawTerm, mode: 'insensitive' } },
+                        { explanation: { contains: rawTerm, mode: 'insensitive' } },
+                        { correct_answer: { contains: rawTerm, mode: 'insensitive' } },
                       ],
                     },
                   },
@@ -1030,15 +1110,36 @@ export class AdminService {
               ],
             },
           },
-        },
-      ];
-    }
-    if (partNumber) {
-      where.parts = {
-        some: {
-          part_number: Number(partNumber),
-        },
-      };
+        });
+
+        // Multi-word search: all words must match (AND) to prevent returning entire database
+        if (words.length > 1) {
+          orConditions.push({
+            AND: words.map(w => ({
+              OR: [
+                { title: { contains: w, mode: 'insensitive' } },
+                { description: { contains: w, mode: 'insensitive' } },
+                { parts: { some: { title: { contains: w, mode: 'insensitive' } } } },
+                { parts: { some: { passage_text: { contains: w, mode: 'insensitive' } } } },
+                { parts: { some: { questions: { some: { prompt: { contains: w, mode: 'insensitive' } } } } } },
+              ],
+            })),
+          });
+        } else if (words.length === 1) {
+          const w = words[0];
+          orConditions.push(
+            { title: { contains: w, mode: 'insensitive' } },
+            { parts: { some: { title: { contains: w, mode: 'insensitive' } } } }
+          );
+        }
+
+        if (where.OR && Array.isArray(where.OR)) {
+          where.AND = [{ OR: where.OR }, { OR: orConditions }];
+          delete where.OR;
+        } else {
+          where.OR = orConditions;
+        }
+      }
     }
 
     const [exams, total] = await Promise.all([
@@ -1121,7 +1222,12 @@ export class AdminService {
       partWhere.exam = { skill: params.skill };
     }
     if (params.partNumber) {
-      partWhere.part_number = Number(params.partNumber);
+      const pNum = Number(params.partNumber);
+      partWhere.OR = [
+        { part_number: pNum },
+        { title: { contains: `Part ${pNum}`, mode: 'insensitive' } },
+        { title: { contains: `Phần ${pNum}`, mode: 'insensitive' } },
+      ];
     }
     if (Object.keys(partWhere).length > 0) {
       where.part = partWhere;
@@ -1132,29 +1238,98 @@ export class AdminService {
     }
 
     if (params.search && params.search.trim()) {
-      const term = params.search.trim();
-      where.OR = [
-        { prompt: { contains: term, mode: 'insensitive' } },
-        { explanation: { contains: term, mode: 'insensitive' } },
-        { correct_answer: { contains: term, mode: 'insensitive' } },
-        {
-          part: {
-            title: { contains: term, mode: 'insensitive' },
-          },
-        },
-        {
-          part: {
-            passage_text: { contains: term, mode: 'insensitive' },
-          },
-        },
-        {
-          part: {
-            exam: {
-              title: { contains: term, mode: 'insensitive' },
+      const rawTerm = params.search.trim();
+      const uuidMatch = rawTerm.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+      const extractedUuid = uuidMatch ? uuidMatch[0] : null;
+      const orConditions: any[] = [];
+
+      if (extractedUuid) {
+        // Bypass strict part/skill filters if directly searching by UUID/URL
+        delete where.part;
+        orConditions.push(
+          { id: extractedUuid },
+          { part_id: extractedUuid },
+          { part: { exam_id: extractedUuid } }
+        );
+
+        // Check if URL has ?part=N
+        const urlPartMatch = rawTerm.match(/[?&]part=(\d+)/i);
+        if (urlPartMatch) {
+          const pNum = Number(urlPartMatch[1]);
+          orConditions.push({
+            part: {
+              exam_id: extractedUuid,
+              OR: [
+                { part_number: pNum },
+                { title: { contains: `Part ${pNum}`, mode: 'insensitive' } },
+              ],
             },
-          },
-        },
-      ];
+          });
+        }
+      }
+
+      orConditions.push(
+        { prompt: { contains: rawTerm, mode: 'insensitive' } },
+        { explanation: { contains: rawTerm, mode: 'insensitive' } },
+        { correct_answer: { contains: rawTerm, mode: 'insensitive' } },
+        { part: { title: { contains: rawTerm, mode: 'insensitive' } } },
+        { part: { passage_text: { contains: rawTerm, mode: 'insensitive' } } },
+        { part: { image_url: { contains: rawTerm, mode: 'insensitive' } } },
+        { part: { exam: { title: { contains: rawTerm, mode: 'insensitive' } } } }
+      );
+
+      // Smart exam number matching (e.g. "Đề 04", "Đề 4", "Exam 4")
+      const deNumMatch = rawTerm.match(/(?:đề|de|test|exam)\s*0*(\d+)/i);
+      if (deNumMatch) {
+        const num = deNumMatch[1];
+        const padded = num.padStart(2, '0');
+        orConditions.push(
+          { part: { exam: { title: { contains: `Đề ${padded}`, mode: 'insensitive' } } } },
+          { part: { exam: { title: { contains: `Đề ${num}`, mode: 'insensitive' } } } },
+          { part: { exam: { title: { contains: `Exam ${num}`, mode: 'insensitive' } } } }
+        );
+      }
+
+      // Cleaned term without dashes
+      const cleaned = rawTerm.replace(/[—–-]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (cleaned !== rawTerm) {
+        orConditions.push(
+          { prompt: { contains: cleaned, mode: 'insensitive' } },
+          { part: { title: { contains: cleaned, mode: 'insensitive' } } },
+          { part: { exam: { title: { contains: cleaned, mode: 'insensitive' } } } }
+        );
+      }
+
+      // Word tokens
+      const words = rawTerm
+        .split(/[—–\s,]+/)
+        .map(w => w.trim())
+        .filter(w => w.length >= 2 && !/^(đề|the|and|for|part|câu|bài)$/i.test(w));
+
+      if (words.length > 1) {
+        orConditions.push({
+          AND: words.map(w => ({
+            OR: [
+              { prompt: { contains: w, mode: 'insensitive' } },
+              { explanation: { contains: w, mode: 'insensitive' } },
+              { correct_answer: { contains: w, mode: 'insensitive' } },
+              { part: { title: { contains: w, mode: 'insensitive' } } },
+              { part: { passage_text: { contains: w, mode: 'insensitive' } } },
+              { part: { exam: { title: { contains: w, mode: 'insensitive' } } } },
+            ],
+          })),
+        });
+      } else if (words.length === 1) {
+        const w = words[0];
+        orConditions.push(
+          { prompt: { contains: w, mode: 'insensitive' } },
+          { explanation: { contains: w, mode: 'insensitive' } },
+          { part: { title: { contains: w, mode: 'insensitive' } } },
+          { part: { exam: { title: { contains: w, mode: 'insensitive' } } } }
+        );
+      }
+
+      where.OR = orConditions;
     }
 
     const [questions, total] = await Promise.all([

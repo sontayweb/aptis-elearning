@@ -150,6 +150,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           badge: null,
         },
         {
+          title: "Đề Key Dự Đoán ☘️",
+          href: "/admin/key-du-doan",
+          icon: Sparkles,
+          badge: "HOT",
+          badgeColor: "bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-bold",
+        },
+        {
           title: "Kho Từ vựng",
           href: "/admin/vocabulary",
           icon: BookMarked,
