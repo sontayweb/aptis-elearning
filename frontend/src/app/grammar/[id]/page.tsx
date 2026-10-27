@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
+import { ExamExitConfirmModal } from "@/components/exam-exit-confirm-modal";
 import {
   Clock,
   CheckCircle2,
@@ -33,6 +34,7 @@ export default function GrammarExamRunner() {
   const params = useParams();
   const router = useRouter();
   const examId = params.id as string;
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [examTitle, setExamTitle] = useState<string>("Grammar & Vocabulary");
@@ -329,13 +331,20 @@ export default function GrammarExamRunner() {
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border shadow-xs">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <Link
-              href="/grammar"
+            <button
+              type="button"
+              onClick={() => {
+                if (isSubmitted) {
+                  router.push("/grammar");
+                } else {
+                  setShowExitConfirm(true);
+                }
+              }}
               className="p-2 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0 cursor-pointer"
               title="Quay lại danh sách"
             >
               <ArrowLeft className="w-4 h-4" />
-            </Link>
+            </button>
             <div className="min-w-0">
               <span className="text-[10px] font-bold text-primary tracking-wider uppercase block">
                 GRAMMAR &amp; VOCABULARY PRACTICE
@@ -947,6 +956,19 @@ export default function GrammarExamRunner() {
           </div>
         </div>
       )}
+
+      <ExamExitConfirmModal
+        isOpen={showExitConfirm}
+        title="Rời khỏi bài thi Grammar?"
+        message="Bạn đang trong quá trình làm bài thi Ngữ pháp & Từ vựng. Nếu quay lại lúc này, bài thi chưa nộp sẽ không được lưu điểm. Bạn có chắc chắn muốn rời khỏi không?"
+        confirmText="Xác nhận rời khỏi"
+        cancelText="Tiếp tục làm bài"
+        onConfirm={() => {
+          setShowExitConfirm(false);
+          router.push("/grammar");
+        }}
+        onCancel={() => setShowExitConfirm(false)}
+      />
     </div>
   );
 }

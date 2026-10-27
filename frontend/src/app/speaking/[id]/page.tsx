@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useAudioRecorder } from "@/hooks/use-audio-recorder";
 import { api } from "@/lib/api-client";
+import { ExamExitConfirmModal } from "@/components/exam-exit-confirm-modal";
 import {
   Mic,
   MicOff,
@@ -770,9 +771,11 @@ function detectSpeakingPartNumber(p: any, examTitle?: string, fallbackPart?: num
 }
 
 function SpeakingExamRunnerContent() {
+  const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
   const examId = (params.id as string) || "";
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // Đọc query param ?part=p1 | p2 | p3 | p4
   const partParam = searchParams.get("part")?.toLowerCase() || "";
@@ -1567,13 +1570,20 @@ function SpeakingExamRunnerContent() {
       {/* 1. TOP HEADER PHÒNG THI CHUẨN */}
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
-          <Link
-            href="/speaking"
-            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground"
+          <button
+            type="button"
+            onClick={() => {
+              if (isSubmitted || isReviewMode || stage === "finished") {
+                router.push("/speaking");
+              } else {
+                setShowExitConfirm(true);
+              }
+            }}
+            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer"
             title="Quay lại danh sách đề"
           >
             <ArrowLeft className="w-4 h-4" />
-          </Link>
+          </button>
           <div className="flex flex-col">
             <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
               Speaking Practice
@@ -3030,7 +3040,19 @@ function SpeakingExamRunnerContent() {
         Ghi chú: Bản layout cũ với thanh pill đếm câu lớn và cột AI grading bên phải
         đã được tích hợp thu gọn vào luồng chuẩn theo 5 screenshot của đề bài.
         Toàn bộ logic chấm AI, whisper upload, Web Audio beep vẫn hoạt động 100%.
-      */}
+      {/* Modal xác nhận rời khỏi bài thi Speaking */}
+      <ExamExitConfirmModal
+        isOpen={showExitConfirm}
+        title="Rời khỏi bài thi Speaking?"
+        message="Bạn đang trong quá trình luyện nói Speaking. Nếu quay lại lúc này, các đoạn ghi âm chưa nộp chấm sẽ không được lưu điểm. Bạn có chắc chắn muốn rời khỏi không?"
+        confirmText="Xác nhận rời khỏi"
+        cancelText="Tiếp tục làm bài"
+        onConfirm={() => {
+          setShowExitConfirm(false);
+          router.push("/speaking");
+        }}
+        onCancel={() => setShowExitConfirm(false)}
+      />
     </div>
   );
 }

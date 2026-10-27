@@ -48,8 +48,27 @@ export default function GrammarPracticePage() {
     Boolean(user?.user_subscriptions?.length);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "not_started" | "completed">("all");
-  const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium">("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | "not_started" | "completed">(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("grammar_filter_status");
+      if (saved && ["all", "not_started", "completed"].includes(saved)) return saved as any;
+    }
+    return "all";
+  });
+  const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium">(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("grammar_filter_priority");
+      if (saved && ["all", "high", "medium"].includes(saved)) return saved as any;
+    }
+    return "all";
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("grammar_filter_status", filterStatus);
+      sessionStorage.setItem("grammar_filter_priority", filterPriority);
+    }
+  }, [filterStatus, filterPriority]);
   const [exams, setExams] = useState<GrammarExam[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

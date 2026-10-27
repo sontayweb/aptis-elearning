@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api-client";
+import { ExamExitConfirmModal } from "@/components/exam-exit-confirm-modal";
 import { useAudioRecorder } from "@/hooks/use-audio-recorder";
 import { useExamTimer } from "@/hooks/use-exam-timer";
 import {
@@ -308,10 +309,12 @@ function SpeakingRecorder({
    MAIN EXAM ROOM
    ==================================================== */
 export default function OfficialMockExamRoom() {
+  const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
   const { user, isAuthenticated } = useAuth();
   const testId = params.id as string;
+  const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
   const partParam = searchParams?.get("part");
   const modeParam = searchParams?.get("mode");
   const submissionIdParam = searchParams?.get("submissionId");
@@ -2537,13 +2540,20 @@ export default function OfficialMockExamRoom() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-exam-surface/95 backdrop-blur border-b border-exam-border">
         <div className="max-w-6xl mx-auto px-4 h-12 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <Link
-              href="/thi-thu"
-              className="p-1.5 rounded-lg hover:bg-exam-border/40 text-exam-text-muted hover:text-exam-text transition-colors shrink-0"
-              title="Quay lại danh sách"
+            <button
+              type="button"
+              onClick={() => {
+                if (isFinished || reviewMode) {
+                  router.push("/thi-thu");
+                } else {
+                  setShowExitConfirmModal(true);
+                }
+              }}
+              className="p-1.5 rounded-lg hover:bg-exam-border/40 text-exam-text-muted hover:text-exam-text transition-colors shrink-0 cursor-pointer"
+              title="Quay lại danh sách đề thi"
             >
               <ArrowLeft className="w-4 h-4" />
-            </Link>
+            </button>
             <span className="text-xs font-bold text-exam-text truncate hidden sm:block">
               {examData?.title || "Bài thi Aptis"}
             </span>
@@ -2573,14 +2583,21 @@ export default function OfficialMockExamRoom() {
             <div className="text-xs text-exam-text-muted hidden sm:block shrink-0">
               {answeredCount}/{questions.length} câu
             </div>
-            <Link
-              href="/thi-thu"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-exam-border text-xs font-semibold text-exam-text-muted hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
+            <button
+              type="button"
+              onClick={() => {
+                if (isFinished || reviewMode) {
+                  router.push("/thi-thu");
+                } else {
+                  setShowExitConfirmModal(true);
+                }
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-exam-border text-xs font-semibold text-exam-text-muted hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors cursor-pointer"
               title="Thoát bài thi"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Thoát</span>
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -3553,6 +3570,20 @@ export default function OfficialMockExamRoom() {
           </div>
         </div>
       )}
+
+      {/* Modal Xác nhận rời khỏi bài thi khi đang làm dở */}
+      <ExamExitConfirmModal
+        isOpen={showExitConfirmModal}
+        title="Rời khỏi phòng thi?"
+        message="Bạn đang trong quá trình làm bài thi thử. Nếu quay lại danh sách lúc này, bài làm chưa nộp sẽ không được chấm điểm. Bạn có chắc chắn muốn rời khỏi không?"
+        confirmText="Xác nhận rời khỏi"
+        cancelText="Tiếp tục làm bài"
+        onConfirm={() => {
+          setShowExitConfirmModal(false);
+          router.push("/thi-thu");
+        }}
+        onCancel={() => setShowExitConfirmModal(false)}
+      />
     </div>
   );
 }

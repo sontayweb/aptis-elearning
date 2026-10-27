@@ -38,6 +38,7 @@ import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { AuthModal } from "@/components/auth-modal";
 import { GoLivePromoBanner } from "@/components/golive-promo-banner";
+import { CourseClassBanner } from "@/components/course-class-banner";
 import { useEventTheme } from "@/contexts/event-theme-context";
 
 // 41 ảnh feedback học viên thật từ thư mục /ảnh feedback (đã copy vào /public/feedback)
@@ -1282,6 +1283,13 @@ export function LandingPage() {
             </div>
           </div>
         )}
+
+        {/* ====================================================
+            9.5. LỊCH KHAI GIẢNG LỚP ONLINE APTIS ESOL B2
+            ==================================================== */}
+        <section className="py-10 md:py-14 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+          <CourseClassBanner />
+        </section>
 
         {/* ====================================================
             10. PRICING PREVIEW ("Bảng Gói Học Phí Linh Hoạt")

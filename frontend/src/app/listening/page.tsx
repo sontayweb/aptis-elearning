@@ -53,7 +53,27 @@ export default function ListeningPracticePage() {
     user?.role === "TEACHER" ||
     Boolean(user?.subscription) ||
     Boolean(user?.user_subscriptions?.length);
-  const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
+  const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">(() => {
+    if (typeof window !== "undefined") {
+      const urlTab = new URLSearchParams(window.location.search).get("tab");
+      if (urlTab && ["full", "p1", "p2", "p3", "p4"].includes(urlTab)) return urlTab as any;
+      const saved = sessionStorage.getItem("listening_active_tab");
+      if (saved && ["full", "p1", "p2", "p3", "p4"].includes(saved)) return saved as any;
+    }
+    return "full";
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("listening_active_tab", activeTab);
+      try {
+        const url = new URL(window.location.href);
+        if (activeTab !== "full") url.searchParams.set("tab", activeTab);
+        else url.searchParams.delete("tab");
+        window.history.replaceState({}, "", url.toString());
+      } catch {}
+    }
+  }, [activeTab]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "not_started" | "completed">("all");
