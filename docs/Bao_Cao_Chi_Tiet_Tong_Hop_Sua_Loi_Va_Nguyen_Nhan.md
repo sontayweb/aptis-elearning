@@ -14,7 +14,7 @@
    - [2.2. Kỹ năng Nói (Speaking)](#22-kỹ-năng-nói-speaking)
    - [2.3. Kỹ năng Viết (Writing)](#23-kỹ-năng-viết-writing)
    - [2.4. Kỹ năng Nghe (Listening)](#24-kỹ-năng-nghe-listening)
-   - [2.5. Phòng Thi Thử 162 Phút (Mock Exam)](#25-phòng-thi-thử-162-phút-mock-exam)
+   - [2.5. Phòng Thi Thử 162 Phút (Full Simulation Exam Room — 100% Database Thật)](#25-phòng-thi-thử-162-phút-full-simulation-exam-room--100-dữ-liệu-database-thật)
 3. [Bảng Đối Chiếu Hiện Trạng Trước và Sau Khi Sửa (Before vs After)](#3-bảng-đối-chiếu-hiện-trạng-trước-và-sau-khi-sửa-before-vs-after)
 4. [Kiểm Thử Bố Cục & Đảm Bảo Giao Diện Không Bị Nhảy (UI Stability)](#4-kiểm-thử-bố-cục--đảm-bảo-giao-diện-không-bị-nhảy-ui-stability)
 5. [Quy Chuẩn Duy Trì & Phòng Ngừa Lỗi Tái Diễn](#5-quy-chuẩn-duy-trì--phòng-ngừa-lỗi-tái-diễn)
@@ -162,15 +162,17 @@ graph TD
 
 ---
 
-### 2.5. PHÒNG THI THỬ 162 PHÚT (MOCK EXAM)
+### 2.5. PHÒNG THI THỬ 162 PHÚT (FULL SIMULATION EXAM ROOM — 100% DỮ LIỆU DATABASE THẬT)
+
+*(Lưu ý: "Mock Exam" là thuật ngữ tiếng Anh quốc tế của "Kỳ Thi Thử", hệ thống hoàn toàn KHÔNG dùng dữ liệu giả/hardcode mà kết nối 100% vào cơ sở dữ liệu PostgreSQL thật)*
 
 - **Đường dẫn**: `/thi-thu`
-- **Kiểm tra thực tế**:
-  1. Giao diện trang chủ thi thử hiển thị rõ bộ lọc Full Test, Reading, Listening, Writing, Speaking.
-  2. Truy cập đề *Đề Thi Thử Aptis ESOL Full Test Chuẩn Hội Đồng Anh 01*:
-     - Đồng hồ đếm ngược 162 phút hoạt động chính xác.
-     - Thanh điều hướng kỹ năng (Skills Switcher) chuyển đổi nhanh, không tải lại trang.
-     - Cơ chế tự động lưu (Auto-save) chạy êm ngầm.
+- **Kiểm tra thực tế kết nối CSDL**:
+  1. Giao diện trang chủ thi thử gọi trực tiếp `api.exams.getAll()`, hiển thị bộ lọc Full Test, Reading, Listening, Writing, Speaking.
+  2. Truy cập đề *Đề Thi Thử Aptis ESOL Full Test Chuẩn Hội Đồng Anh 01* (gọi `api.exams.getQuestions(id)` nạp toàn bộ câu hỏi từ DB):
+     - Đồng hồ đếm ngược 162 phút hoạt động chính xác theo trường `duration_minutes` của đề thi.
+     - Thanh điều hướng kỹ năng (Skills Switcher) chuyển đổi nhanh giữa các phần thi Speaking, Listening, Reading, Writing, Grammar.
+     - Cơ chế tự động lưu (Auto-save) chạy êm ngầm lưu bài làm vào DB.
      - Hộp thoại xác nhận thoát thi (`Exit Confirm Modal`) cảnh báo đúng quy chuẩn khi học viên nhấn thoát.
 
 ---

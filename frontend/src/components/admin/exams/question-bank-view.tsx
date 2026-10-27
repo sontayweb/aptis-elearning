@@ -243,33 +243,62 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                 )}
 
                 {/* Part Illustration Image (Speaking / Reading) */}
-                {q.part.imageUrl && (
-                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={q.part.imageUrl}
-                      alt="Part illustration"
-                      className="h-16 w-24 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs shrink-0"
-                    />
-                    <div className="min-w-0 flex-1 text-xs">
-                      <span className="font-heading font-bold text-slate-800 dark:text-slate-200 block text-[11px] mb-0.5">
-                        🖼️ Tranh ảnh minh họa ({q.part.title}):
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 truncate block">
-                        {q.part.imageUrl}
-                      </span>
-                      <a
-                        href={q.part.imageUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[10px] text-purple-600 dark:text-purple-400 hover:underline inline-flex items-center gap-1 mt-0.5 font-semibold"
-                      >
-                        <span>Xem ảnh gốc</span>
-                        <ExternalLink className="w-2.5 h-2.5" />
-                      </a>
+                {(() => {
+                  if (!q.part.imageUrl) return null;
+                  const partImages = q.part.imageUrl
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                  if (partImages.length === 0) return null;
+
+                  return (
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800">
+                      {/* Image Thumbnails */}
+                      <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                        {partImages.map((imgSrc, imgIdx) => (
+                          <div key={imgIdx} className="relative group">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={imgSrc}
+                              alt={`Tranh minh họa ${imgIdx + 1}`}
+                              className="h-16 w-24 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs shrink-0 bg-slate-100 dark:bg-slate-900"
+                            />
+                            {partImages.length > 1 && (
+                              <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/70 text-white text-[9px] font-bold rounded shadow-xs">
+                                #{imgIdx + 1}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="min-w-0 flex-1 text-xs">
+                        <span className="font-heading font-bold text-slate-800 dark:text-slate-200 block text-[11px] mb-0.5">
+                          🖼️ Tranh ảnh minh họa ({q.part.title})
+                          {partImages.length > 1 && (
+                            <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-bold rounded bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
+                              Cặp 2 tranh đối chiếu
+                            </span>
+                          )}:
+                        </span>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
+                          {partImages.map((imgSrc, imgIdx) => (
+                            <a
+                              key={imgIdx}
+                              href={imgSrc}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[10px] text-purple-600 dark:text-purple-400 hover:underline inline-flex items-center gap-1 font-semibold"
+                            >
+                              <span>{partImages.length > 1 ? `Xem tranh ${imgIdx + 1}` : "Xem ảnh gốc"}</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* Question Prompt */}
                 <div className="text-xs font-heading font-semibold text-slate-900 dark:text-white leading-relaxed">
