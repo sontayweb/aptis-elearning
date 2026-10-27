@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
+import { ExamExitConfirmModal } from "@/components/exam-exit-confirm-modal";
 import {
   Headphones,
   Clock,
@@ -114,6 +115,7 @@ function ListeningExamRunnerContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const examId = (params.id as string) || "";
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // Chọn bộ đề benchmark phù hợp dựa trên ID đề (để không bị trùng đề)
   const initialBenchmark =
@@ -1611,12 +1613,20 @@ function ListeningExamRunnerContent() {
       {/* 1. TOP HEADER */}
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
-          <Link
-            href="/listening"
-            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground"
+          <button
+            type="button"
+            onClick={() => {
+              if (results) {
+                router.push("/listening");
+              } else {
+                setShowExitConfirm(true);
+              }
+            }}
+            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer"
+            title="Quay lại danh sách đề"
           >
             <ArrowLeft className="w-4 h-4" />
-          </Link>
+          </button>
           <div className="flex flex-col">
             <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
               Listening Practice
@@ -2637,6 +2647,18 @@ function ListeningExamRunnerContent() {
           </div>
         </div>
       )}
+      <ExamExitConfirmModal
+        isOpen={showExitConfirm}
+        title="Rời khỏi bài thi Listening?"
+        message="Bạn đang trong quá trình làm bài nghe. Nếu quay lại lúc này, bài thi chưa nộp sẽ không được lưu điểm. Bạn có chắc chắn muốn rời khỏi không?"
+        confirmText="Xác nhận rời khỏi"
+        cancelText="Tiếp tục làm bài"
+        onConfirm={() => {
+          setShowExitConfirm(false);
+          router.push("/listening");
+        }}
+        onCancel={() => setShowExitConfirm(false)}
+      />
     </div>
   );
 }

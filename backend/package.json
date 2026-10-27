@@ -17,8 +17,12 @@
     "test:listening": "node ./node_modules/tsx/dist/cli.mjs src/tools/test-listening-skill.ts",
     "test:writing": "node ./node_modules/tsx/dist/cli.mjs src/tools/test-writing-skill.ts",
     "test:e2e": "node ./node_modules/tsx/dist/cli.mjs src/tools/test-e2e-full-flow.ts",
-    "test:all-skills": "node ./node_modules/tsx/dist/cli.mjs src/tools/test-all-skills-runner.ts",
-    "import:exams": "node ./node_modules/tsx/dist/cli.mjs src/tools/import-exams-cli.ts"
+    "import:exams": "node ./node_modules/tsx/dist/cli.mjs src/tools/import-exams-cli.ts",
+    "db:status": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts status",
+    "db:backup": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts backup",
+    "db:backup:sql": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts backup:sql",
+    "db:backup:json": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts backup:json",
+    "db:restore": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts restore"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

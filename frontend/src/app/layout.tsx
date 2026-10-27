@@ -72,6 +72,7 @@ import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { EventDecorations } from "@/components/event-decorations";
 import { PwaRegister } from "@/components/pwa-register";
 import { SelectionTranslator } from "@/components/selection-translator";
+import { CoursePromoPopup } from "@/components/course-promo-popup";
 
 export default function RootLayout({
   children,
@@ -130,6 +131,7 @@ export default function RootLayout({
               <EventDecorations />
               <MobileBottomNav />
               <PwaRegister />
+              <CoursePromoPopup />
             </AuthProvider>
           </SiteSettingsProvider>
         </EventThemeProvider>

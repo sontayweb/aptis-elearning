@@ -815,6 +815,27 @@ class ApiClient {
         method: 'PATCH',
         body: JSON.stringify(body),
       }),
+
+    backups: {
+      getStats: () => this.request<any>('/admin/backups/stats'),
+      list: () => this.request<any>('/admin/backups'),
+      create: (type: 'full' | 'sql' | 'json' = 'full', retentionCount = 10) =>
+        this.request<any>('/admin/backups', {
+          method: 'POST',
+          body: JSON.stringify({ type, retentionCount }),
+        }),
+      restore: (filename: string) =>
+        this.request<any>('/admin/backups/restore', {
+          method: 'POST',
+          body: JSON.stringify({ filename }),
+        }),
+      delete: (filename: string) =>
+        this.request<any>(`/admin/backups/${encodeURIComponent(filename)}`, {
+          method: 'DELETE',
+        }),
+      getDownloadUrl: (filename: string) =>
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/admin/backups/${encodeURIComponent(filename)}/download`,
+    },
   };
 
   // ==========================================

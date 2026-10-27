@@ -41,20 +41,82 @@ import { ExamJsonModal } from "@/components/admin/exams/exam-json-modal";
 import { ExamCreateWizardModal } from "@/components/admin/exams/exam-create-wizard-modal";
 
 export default function AdminExamsPage() {
-  // ── View Mode: "EXAMS" vs "QUESTIONS"
-  const [viewMode, setViewMode] = useState<"EXAMS" | "QUESTIONS">("EXAMS");
+  // ── View Mode: "EXAMS" vs "QUESTIONS" (Lưu và khôi phục khi quay lại)
+  const [viewMode, setViewMode] = useState<"EXAMS" | "QUESTIONS">(() => {
+    if (typeof window !== "undefined") {
+      const urlView = new URLSearchParams(window.location.search).get("view");
+      if (urlView === "EXAMS" || urlView === "QUESTIONS") return urlView;
+      const saved = sessionStorage.getItem("admin_exams_view_mode");
+      if (saved === "EXAMS" || saved === "QUESTIONS") return saved;
+    }
+    return "EXAMS";
+  });
 
   // ── Shared Filter State
-  const [skillFilter, setSkillFilter] = useState("ALL");
-  const [partFilter, setPartFilter] = useState<number | null>(null);
+  const [skillFilter, setSkillFilter] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const urlSkill = new URLSearchParams(window.location.search).get("skill");
+      if (urlSkill) return urlSkill;
+      const saved = sessionStorage.getItem("admin_exams_skill_filter");
+      if (saved) return saved;
+    }
+    return "ALL";
+  });
+  const [partFilter, setPartFilter] = useState<number | null>(() => {
+    if (typeof window !== "undefined") {
+      const urlPart = new URLSearchParams(window.location.search).get("part");
+      if (urlPart !== null && urlPart !== "") return Number(urlPart);
+      const saved = sessionStorage.getItem("admin_exams_part_filter");
+      if (saved && saved !== "null" && saved !== "") return Number(saved);
+    }
+    return null;
+  });
 
   // ── Exams State
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loadingExams, setLoadingExams] = useState(true);
   const [searchTermExams, setSearchTermExams] = useState("");
   const [debouncedSearchExams, setDebouncedSearchExams] = useState("");
-  const [hotFilter, setHotFilter] = useState<string>("ALL");
-  const [pageExams, setPageExams] = useState(1);
+  const [hotFilter, setHotFilter] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const urlHot = new URLSearchParams(window.location.search).get("hot");
+      if (urlHot) return urlHot;
+      const saved = sessionStorage.getItem("admin_exams_hot_filter");
+      if (saved) return saved;
+    }
+    return "ALL";
+  });
+  const [pageExams, setPageExams] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("admin_exams_page");
+      if (saved && Number(saved) > 0) return Number(saved);
+    }
+    return 1;
+  });
+
+  // Tự động lưu bộ lọc vào sessionStorage & URL
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("admin_exams_view_mode", viewMode);
+      sessionStorage.setItem("admin_exams_skill_filter", skillFilter);
+      sessionStorage.setItem("admin_exams_part_filter", partFilter !== null ? String(partFilter) : "");
+      sessionStorage.setItem("admin_exams_hot_filter", hotFilter);
+      sessionStorage.setItem("admin_exams_page", String(pageExams));
+
+      try {
+        const url = new URL(window.location.href);
+        if (skillFilter !== "ALL") url.searchParams.set("skill", skillFilter);
+        else url.searchParams.delete("skill");
+        if (partFilter !== null) url.searchParams.set("part", String(partFilter));
+        else url.searchParams.delete("part");
+        if (viewMode !== "EXAMS") url.searchParams.set("view", viewMode);
+        else url.searchParams.delete("view");
+        if (hotFilter !== "ALL") url.searchParams.set("hot", hotFilter);
+        else url.searchParams.delete("hot");
+        window.history.replaceState({}, "", url.toString());
+      } catch {}
+    }
+  }, [viewMode, skillFilter, partFilter, hotFilter, pageExams]);
   const [pageSizeExams, setPageSizeExams] = useState(15);
   const [totalPagesExams, setTotalPagesExams] = useState(1);
   const [totalCountExams, setTotalCountExams] = useState(0);

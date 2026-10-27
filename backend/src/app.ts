@@ -20,6 +20,7 @@ import notificationRoutes from './modules/notifications/notification.routes';
 import courseRoutes from './modules/courses/course.routes';
 import settingsRoutes from './modules/settings/settings.routes';
 import ingestionRoutes from './modules/ingestion/ingestion.routes';
+import backupRoutes from './modules/backup/backup.routes';
 import { errorHandler } from './middlewares/error.handler';
 
 const app = express();
@@ -70,6 +71,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/ingest', ingestionRoutes);
+app.use('/api/admin/backups', backupRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/notifications', notificationRoutes);
 

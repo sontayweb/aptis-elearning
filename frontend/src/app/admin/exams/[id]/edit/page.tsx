@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
 import {
@@ -82,6 +82,8 @@ export default function ExamEditorPage() {
   const [editingPart, setEditingPart] = useState<string | null>(null);
   const [partForm, setPartForm] = useState<Record<string, string>>({});
   const [editingQuestion, setEditingQuestion] = useState<string | null>(null);
+  const router = useRouter();
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [addingQPartId, setAddingQPartId] = useState<string | null>(null);
   const [addingPart, setAddingPart] = useState(false);
   const [newPartTitle, setNewPartTitle] = useState("");
@@ -401,12 +403,14 @@ export default function ExamEditorPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link
-            href="/admin/exams"
-            className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+          <button
+            type="button"
+            onClick={() => setShowBackConfirm(true)}
+            className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors cursor-pointer"
+            title="Quay lại danh sách đề thi"
           >
             <ArrowLeft className="w-4 h-4" />
-          </Link>
+          </button>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-base font-heading font-extrabold text-slate-900 dark:text-white">
@@ -926,6 +930,21 @@ export default function ExamEditorPage() {
         cancelText="Hủy"
         onConfirm={doDeleteQ}
         onCancel={() => setConfirmDelQ(null)}
+      />
+
+      {/* Modal xác nhận quay lại danh sách đề thi */}
+      <ConfirmModal
+        isOpen={showBackConfirm}
+        title="Quay lại danh sách đề thi?"
+        message="Bạn có chắc chắn muốn quay lại danh sách đề thi? Các thiết lập và bộ lọc của bạn trong trang danh sách sẽ được giữ nguyên."
+        confirmText="Quay lại danh sách"
+        cancelText="Tiếp tục chỉnh sửa"
+        type="warning"
+        onConfirm={() => {
+          setShowBackConfirm(false);
+          router.push("/admin/exams");
+        }}
+        onCancel={() => setShowBackConfirm(false)}
       />
     </div>
   );

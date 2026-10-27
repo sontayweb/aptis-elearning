@@ -34,6 +34,7 @@ import {
   Zap,
   Sun,
   Moon,
+  Database,
 } from "lucide-react";
 import { useEventTheme } from "@/contexts/event-theme-context";
 import AdminTutorialModal from "@/components/admin/admin-tutorial-modal";
@@ -188,6 +189,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           title: "Sự kiện & Giao diện",
           href: "/admin/events",
           icon: Sparkles,
+          badge: null,
+        },
+        {
+          title: "Sao lưu CSDL",
+          href: "/admin/database-backup",
+          icon: Database,
           badge: null,
         },
       ],

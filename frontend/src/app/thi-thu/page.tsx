@@ -38,8 +38,52 @@ export default function MockExamListPage() {
   const [roomCode, setRoomCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedSkill, setSelectedSkill] = useState<string>("ALL");
-  const [hotOnly, setHotOnly] = useState(false);
+  // Khôi phục bộ lọc từ URL hoặc sessionStorage để khi quay lại vẫn giữ đúng tab đã chọn
+  const [selectedSkill, setSelectedSkill] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const urlSkill = new URLSearchParams(window.location.search).get("skill");
+      if (urlSkill && ["ALL", "FULL_TEST", "READING", "LISTENING", "WRITING", "SPEAKING"].includes(urlSkill)) {
+        return urlSkill;
+      }
+      const saved = sessionStorage.getItem("thi_thu_selected_skill");
+      if (saved && ["ALL", "FULL_TEST", "READING", "LISTENING", "WRITING", "SPEAKING"].includes(saved)) {
+        return saved;
+      }
+    }
+    return "ALL";
+  });
+
+  const [hotOnly, setHotOnly] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const urlHot = new URLSearchParams(window.location.search).get("hot");
+      if (urlHot === "true") return true;
+      return sessionStorage.getItem("thi_thu_hot_only") === "true";
+    }
+    return false;
+  });
+
+  // Tự động lưu bộ lọc vào sessionStorage & URL
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("thi_thu_selected_skill", selectedSkill);
+      sessionStorage.setItem("thi_thu_hot_only", String(hotOnly));
+
+      try {
+        const url = new URL(window.location.href);
+        if (selectedSkill !== "ALL") {
+          url.searchParams.set("skill", selectedSkill);
+        } else {
+          url.searchParams.delete("skill");
+        }
+        if (hotOnly) {
+          url.searchParams.set("hot", "true");
+        } else {
+          url.searchParams.delete("hot");
+        }
+        window.history.replaceState({}, "", url.toString());
+      } catch {}
+    }
+  }, [selectedSkill, hotOnly]);
 
   const loadExams = async () => {
     try {
