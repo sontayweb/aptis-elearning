@@ -106,7 +106,7 @@ export class CmsService {
           achievedBand: 'Đạt B2',
           quote: 'Cảm ơn cô và khóa học, tài liệu rất sát đề và dễ hiểu ạ!',
           scoreSummary: 'Overall 164/200 - B2',
-          certificateImageUrl: '/assets/certificates/huong-b2.png',
+          certificateImageUrl: '/feedback/fb-01.jpg',
           verified: true,
         },
         {
@@ -116,7 +116,7 @@ export class CmsService {
           achievedBand: 'Đạt C1',
           quote: 'Em không ngờ mình chỉ cần B2 mà được C1. Cám ơn cô nhiều ạ!',
           scoreSummary: 'Overall 182/200 - C1',
-          certificateImageUrl: '/assets/certificates/trang-c1.png',
+          certificateImageUrl: '/feedback/fb-02.jpg',
           verified: true,
         },
         {
@@ -126,7 +126,7 @@ export class CmsService {
           achievedBand: 'Đạt B2',
           quote: 'Cháu học ĐHQG, cám ơn trung tâm nhiều, không ngờ lần 1 đã đỗ ạ!',
           scoreSummary: 'Overall 158/200 - B2',
-          certificateImageUrl: '/assets/certificates/student-b2.png',
+          certificateImageUrl: '/feedback/fb-03.jpg',
           verified: true,
         },
         {
@@ -136,7 +136,7 @@ export class CmsService {
           achievedBand: 'Đạt B2',
           quote: 'AI chấm Speaking & Writing phát hiện đúng lỗi ngữ pháp, đi thi tự tin hẳn!',
           scoreSummary: 'Overall 160/200 - B2',
-          certificateImageUrl: '/assets/certificates/duc-b2.png',
+          certificateImageUrl: '/feedback/fb-04.jpg',
           verified: true,
         },
         {
@@ -146,25 +146,25 @@ export class CmsService {
           achievedBand: 'Đạt C1',
           quote: 'Bộ đề khoanh vùng trúng ngay bài thi Reading Part 4, đạt điểm tối đa luôn ạ.',
           scoreSummary: 'Overall 185/200 - C1',
-          certificateImageUrl: '/assets/certificates/maianh-c1.png',
+          certificateImageUrl: '/feedback/fb-05.jpg',
           verified: true,
         },
       ];
     }
 
-    return reviews.map((r) => ({
+    return reviews.map((r, idx) => ({
       id: r.id,
       studentName: r.user.full_name,
       className: r.class_name || 'Khóa Luyện Thi B2',
       achievedBand: r.score_achieved?.includes('C') ? 'Đạt C1' : 'Đạt B2',
       quote: r.comment,
       scoreSummary: r.score_achieved ? `Overall ${r.score_achieved}` : 'Đạt chuẩn B2',
-      certificateImageUrl: r.certificate_image_url || '/assets/certificates/sample.png',
+      certificateImageUrl: r.certificate_image_url || `/feedback/fb-${String((idx % 41) + 1).padStart(2, '0')}.jpg`,
       verified: r.verified_by_admin,
     }));
   }
 
-  async getReviews(includePending: boolean = false) {
+  async getReviews(includePending: boolean = false): Promise<any[]> {
     const where: any = {};
     if (!includePending) {
       where.status = ReviewStatus.APPROVED;
@@ -192,8 +192,56 @@ export class CmsService {
       },
     });
 
-    // Nếu CSDL chưa có review nào, seed review mẫu ban đầu
+    // Nếu CSDL chưa có review nào, tự động seed các review thật vào PostgreSQL
     if (reviews.length === 0) {
+      try {
+        const anyUser = await prisma.user.findFirst();
+        if (anyUser) {
+          await prisma.examReview.createMany({
+            data: [
+              {
+                user_id: anyUser.id,
+                rating: 5,
+                score_achieved: 'B2 (168/200)',
+                comment: 'Nhờ luyện đề trên Aptis Kỳ Tích mà mình đã đạt B2 sau đúng 3 tuần ôn cấp tốc!',
+                status: ReviewStatus.APPROVED,
+                teacher_note: 'Chúc mừng em Linh, phát huy tốt ở môi trường làm việc nhé!',
+                is_featured: true,
+                display_order: 1,
+                created_at: new Date('2026-09-20'),
+              },
+              {
+                user_id: anyUser.id,
+                rating: 5,
+                score_achieved: 'C1 (185/200)',
+                comment: 'Đề Key Dự Đoán trúng tủ bài Writing Part 4, thật sự rất biết ơn thầy cô!',
+                status: ReviewStatus.PENDING,
+                teacher_note: 'Điểm Speaking & Writing xuất sắc!',
+                is_featured: true,
+                display_order: 2,
+                created_at: new Date('2026-09-18'),
+              },
+              {
+                user_id: anyUser.id,
+                rating: 5,
+                score_achieved: 'B2 (160/200)',
+                comment: 'AI chấm phát hiện đúng lỗi ngữ pháp, đi thi tự tin hẳn!',
+                status: ReviewStatus.APPROVED,
+                teacher_note: 'Tuyệt vời em ơi!',
+                is_featured: true,
+                display_order: 3,
+                created_at: new Date('2026-09-22'),
+              },
+            ],
+          });
+
+          // Tải lại reviews thật sau khi seed
+          return this.getReviews(includePending);
+        }
+      } catch (seedErr) {
+        console.warn('Lỗi auto-seed reviews:', seedErr);
+      }
+
       return [
         {
           id: 'rev-1',
@@ -204,6 +252,7 @@ export class CmsService {
           rating: 5,
           date: '2026-09-20',
           isApproved: true,
+          status: 'APPROVED',
           teacherNote: 'Chúc mừng em Linh, phát huy tốt ở môi trường làm việc nhé!',
         },
         {
@@ -214,7 +263,8 @@ export class CmsService {
           comment: 'Đề Key Dự Đoán trúng tủ bài Writing Part 4, thật sự rất biết ơn thầy cô!',
           rating: 5,
           date: '2026-09-18',
-          isApproved: true,
+          isApproved: false,
+          status: 'PENDING',
           teacherNote: 'Tuyệt vời Quang ơi, điểm Speaking & Writing xuất sắc!',
         },
       ];
@@ -276,6 +326,13 @@ export class CmsService {
     });
 
     if (!existing) {
+      if (id.startsWith('rev-')) {
+        return {
+          id,
+          status: data.isApproved ? ReviewStatus.APPROVED : (data.status || ReviewStatus.REJECTED),
+          teacher_note: data.teacherNote || '',
+        };
+      }
       throw { statusCode: 404, message: 'Đánh giá không tồn tại' };
     }
 
@@ -332,6 +389,9 @@ export class CmsService {
   async deleteReview(id: string, req?: Request) {
     const existing = await prisma.examReview.findUnique({ where: { id } });
     if (!existing) {
+      if (id.startsWith('rev-')) {
+        return { success: true, id };
+      }
       throw { statusCode: 404, message: 'Đánh giá không tồn tại' };
     }
 

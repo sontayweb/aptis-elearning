@@ -52,12 +52,12 @@ export default function AdminReviewsPage() {
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const res = await api.cms.getReviews();
+      const res = await api.cms.getReviews(true);
       if (res.success && res.data) {
         const initial = res.data.map((r: any) => ({
           ...r,
-          isApproved: r.isApproved !== undefined ? r.isApproved : true,
-          teacherNote: r.teacherNote || "",
+          isApproved: r.status ? r.status === "APPROVED" : (r.isApproved !== undefined ? r.isApproved : true),
+          teacherNote: r.teacherNote || r.teacher_note || "",
         }));
         setReviews(initial);
       }

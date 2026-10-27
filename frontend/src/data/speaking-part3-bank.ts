@@ -125,7 +125,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_3",
     "topicNumber": 3,
     "title": "Đề 03 - Tranh 1 người nhìn máy bay + 1 người đứng đợi tàu",
-    "imageUrl": "/uploads/speaking/part3/image1.jpg, /uploads/speaking/part3/image2.png",
+    "imageUrl": "/uploads/speaking/part3/image1.jpg, /uploads/speaking/part3/image4.jpg",
     "questions": [
       "Tell me what you see in the two pictures.",
       "Which means of transport do you prefer? Why?",
@@ -179,7 +179,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_4",
     "topicNumber": 4,
     "title": "Đề 04 - Người thu hoạch táo + người tưới cây",
-    "imageUrl": "/uploads/speaking/part3/image3.png, /uploads/speaking/part3/image4.jpg",
+    "imageUrl": "/uploads/speaking/part3/image2.png, /uploads/speaking/part3/image8.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "What are the attractions of the two pictures?",
@@ -233,7 +233,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_5",
     "topicNumber": 5,
     "title": "Đề 05 - Đọc sách truyền thống + đọc sách online",
-    "imageUrl": "/uploads/speaking/part3/image7.png, /uploads/speaking/part3/image8.png",
+    "imageUrl": "/uploads/speaking/part3/image3.png, /uploads/speaking/part3/image7.png",
     "questions": [
       "Tell me what you see from the two pictures.",
       "Do you prefer reading printed books or e-books?",
@@ -287,7 +287,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_6",
     "topicNumber": 6,
     "title": "Đề 06 - Mua sắm trong siêu thị + mua sắm trong chợ",
-    "imageUrl": "/uploads/speaking/part3/image9_1.png, /uploads/speaking/part3/image9_2.png",
+    "imageUrl": "/uploads/speaking/part3/image14_1.png, /uploads/speaking/part3/image14_2.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "Benefits of markets and supermarkets?",
@@ -341,7 +341,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_7",
     "topicNumber": 7,
     "title": "Đề 07 - Cô gái nghe nhạc trên sofa + ban nhạc đang chơi nhạc",
-    "imageUrl": "/uploads/speaking/part3/image10_1.png, /uploads/speaking/part3/image10_2.png",
+    "imageUrl": "/uploads/speaking/part3/image9_1.png, /uploads/speaking/part3/image9_2.png",
     "questions": [
       "Compare 2 pictures.",
       "Which would you prefer to be in?",
@@ -449,7 +449,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_9",
     "topicNumber": 9,
     "title": "Đề 09 - Cặp đôi dưới tuyết + hai cô gái tắm nắng",
-    "imageUrl": "/uploads/speaking/part3/image12_1.png, /uploads/speaking/part3/image12_2.png",
+    "imageUrl": "/uploads/speaking/part3/image13_1.png, /uploads/speaking/part3/image13_2.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "Between the two locations, where do you prefer to go? Why?",
@@ -503,7 +503,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_10",
     "topicNumber": 10,
     "title": "Đề 10 - Người đàn ông tập gym + hai người đi leo núi",
-    "imageUrl": "/uploads/speaking/part3/image13_1.png, /uploads/speaking/part3/image13_2.png",
+    "imageUrl": "/uploads/speaking/part3/image12_1.png, /uploads/speaking/part3/image12_2.png",
     "questions": [
       "Please describe the 2 pictures.",
       "What the difference of these two exercises?",
@@ -557,7 +557,7 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
     "id": "p3_11",
     "topicNumber": 11,
     "title": "Đề 11 - Bóng rổ xe lăn + quần vợt (Thể thao chuyên nghiệp & nghiệp dư)",
-    "imageUrl": "/uploads/speaking/part3/image14_1.png, /uploads/speaking/part3/image14_2.png",
+    "imageUrl": "/uploads/speaking/part3/image15_1.png, /uploads/speaking/part3/image15_2.png",
     "questions": [
       "Tell me what you see in the two pictures.",
       "What are the benefits of indoor and outdoor sports?",
@@ -610,12 +610,55 @@ export const SPEAKING_PART3_BANK: SpeakingPart3Topic[] = [
   {
     "id": "p3_12",
     "topicNumber": 12,
-    "title": "Đề 12 - Cặp tranh so sánh các hoạt động",
-    "imageUrl": "/uploads/speaking/part3/image15_1.png, /uploads/speaking/part3/image15_2.png",
+    "title": "Đề 12 - Trẻ em tham gia hoạt động ngoài trời + thăm bảo tàng nghệ thuật",
+    "imageUrl": "/uploads/speaking/part3/image10_1.png, /uploads/speaking/part3/image10_2.png",
     "questions": [
-      "Tell me what you see in the two pictures."
+      "Tell me what you see in the two pictures.",
+      "What are the benefits of each activity for children?",
+      "Do you think schools should organize more outdoor activities or cultural trips to museums for students? Why?"
     ],
-    "vocab": [],
+    "vocab": [
+      {
+        "en": "Adventure park",
+        "vi": "Công viên mạo hiểm"
+      },
+      {
+        "en": "Ropes course",
+        "vi": "Đu dây vượt chướng ngại"
+      },
+      {
+        "en": "Climbing",
+        "vi": "Leo trèo"
+      },
+      {
+        "en": "Outdoor activity",
+        "vi": "Hoạt động ngoài trời"
+      },
+      {
+        "en": "Art museum",
+        "vi": "Bảo tàng nghệ thuật"
+      },
+      {
+        "en": "Exhibition",
+        "vi": "Triển lãm nghệ thuật"
+      },
+      {
+        "en": "Tour guide",
+        "vi": "Hướng dẫn viên du lịch"
+      },
+      {
+        "en": "Cultural heritage",
+        "vi": "Di sản văn hóa"
+      },
+      {
+        "en": "Physical fitness",
+        "vi": "Thể lực / rèn luyện thân thể"
+      },
+      {
+        "en": "Creativity",
+        "vi": "Sức sáng tạo"
+      }
+    ],
     "shortTitle": "Đề 12"
   }
 ];

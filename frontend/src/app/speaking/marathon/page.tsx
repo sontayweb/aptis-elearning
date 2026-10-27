@@ -753,7 +753,7 @@ function SpeakingMarathonContent() {
                         })()}
                         <div className="absolute top-2.5 left-2.5 z-10">
                           <span className="px-2 py-0.5 rounded-md bg-purple-700/90 text-white font-bold text-[10px] backdrop-blur-xs shadow-xs">
-                            Cặp Tranh 0{topic.topicNumber}
+                            Cặp Tranh {topic.topicNumber < 10 ? `0${topic.topicNumber}` : topic.topicNumber}
                           </span>
                         </div>
                       </div>
