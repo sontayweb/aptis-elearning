@@ -339,17 +339,16 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
           <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
             <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-bold text-xs">
               <Lock className="w-3.5 h-3.5 text-amber-500" />
-              <span>Câu mở đầu cố định (Vị trí số 1 - Khóa không thể di chuyển):</span>
+              <span>Câu mở đầu cố định (Tùy chọn - nếu để trống sẽ là bài sắp xếp cả 5 câu):</span>
             </div>
             <textarea
               rows={2}
               className={ic + " resize-none font-medium bg-amber-50/40 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/60"}
-              placeholder="VD: I decided to try a new café located at the end of the street."
+              placeholder="VD: Để trống nếu muốn cả 5 câu đều kéo thả tự do."
               value={sentenceOrderData.fixedSentence}
               onChange={(e) =>
                 setSentenceOrderData({ ...sentenceOrderData, fixedSentence: e.target.value })
               }
-              required
             />
           </div>
 

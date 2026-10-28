@@ -141,10 +141,10 @@ interface SentenceItem {
 }
 
 interface SentenceOrderProps {
-  fixedSentence?: string;
+  fixedSentence?: string | null;
   title?: string;
   sentences: SentenceItem[];
-  currentOrder?: string[]; // array of sentence IDs placed in slots 2, 3, 4, 5
+  currentOrder?: string[]; // array of sentence IDs placed in slots
   onChangeOrder: (newOrder: string[]) => void;
   isReviewMode?: boolean;
   correctOrder?: string[];
@@ -159,25 +159,31 @@ export function ReadingSentenceOrder({
   isReviewMode = false,
   correctOrder = [],
 }: SentenceOrderProps) {
-  // 4 target slots for positions 2, 3, 4, 5
-  const [slots, setSlots] = useState<(SentenceItem | null)[]>([null, null, null, null]);
+  const hasFixed = Boolean(fixedSentence && fixedSentence.trim());
+  const totalSlotsCount = hasFixed ? 4 : 5;
+
+  // target slots
+  const [slots, setSlots] = useState<(SentenceItem | null)[]>(() =>
+    Array(totalSlotsCount).fill(null)
+  );
 
   // Synchronize state from currentOrder
   useEffect(() => {
     const map = new Map(sentences.map((s) => [s.id, s]));
-    const newSlots: (SentenceItem | null)[] = [null, null, null, null];
+    const newSlots: (SentenceItem | null)[] = Array(totalSlotsCount).fill(null);
     if (Array.isArray(currentOrder) && currentOrder.length > 0) {
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < totalSlotsCount; i++) {
         if (currentOrder[i] && map.has(currentOrder[i])) {
           newSlots[i] = map.get(currentOrder[i])!;
         }
       }
     }
     setSlots((prev) => {
+      if (prev.length !== newSlots.length) return newSlots;
       const isSame = prev.every((p, idx) => p?.id === newSlots[idx]?.id);
       return isSame ? prev : newSlots;
     });
-  }, [sentences, currentOrder]);
+  }, [sentences, currentOrder, totalSlotsCount]);
 
   // Unplaced sentences in the pool
   const placedIds = new Set(slots.filter(Boolean).map((s) => s!.id));
@@ -199,7 +205,7 @@ export function ReadingSentenceOrder({
     } else {
       // If full, replace last slot
       const next = [...slots];
-      next[3] = item;
+      next[slots.length - 1] = item;
       notifyChange(next);
     }
   };
@@ -239,16 +245,16 @@ export function ReadingSentenceOrder({
 
   const handleReset = () => {
     if (isReviewMode) return;
-    const empty = [null, null, null, null];
+    const empty = Array(totalSlotsCount).fill(null);
     notifyChange(empty);
   };
 
   return (
     <div className="space-y-4">
-      {/* 2-Column Grid matching aptiskytich.vn */}
+      {/* 2-Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         {/* =========================================
-            LEFT COLUMN: Slots 1 (Fixed) + Slots 2 - 5
+            LEFT COLUMN: Slots (1 to 5)
             ========================================= */}
         <div className="space-y-3">
           <div className="flex items-center justify-between pb-1">
@@ -271,20 +277,21 @@ export function ReadingSentenceOrder({
             )}
           </div>
 
-          {/* Slot 1: Fixed Sentence (Cố định) */}
-          <div className="flex items-start gap-3">
-            <span className="w-6 pt-3 text-center text-sm font-semibold text-exam-text-muted select-none">
-              1
-            </span>
-            <div className="flex-1 p-4 rounded-2xl border border-exam-border/80 bg-exam-bg/40 text-sm font-medium text-exam-text leading-relaxed select-none">
-              {fixedSentence || "Sentence 1 is fixed here."}
+          {/* Slot 1: Fixed Sentence (Chỉ hiển thị nếu đề có câu cố định) */}
+          {hasFixed && (
+            <div className="flex items-start gap-3">
+              <span className="w-6 pt-3 text-center text-sm font-semibold text-exam-text-muted select-none">
+                1
+              </span>
+              <div className="flex-1 p-4 rounded-2xl border border-exam-border/80 bg-exam-bg/40 text-sm font-medium text-exam-text leading-relaxed select-none">
+                {fixedSentence}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Slots 2, 3, 4, 5 */}
-          {[0, 1, 2, 3].map((slotIdx) => {
-            const slotNumber = slotIdx + 2;
-            const placed = slots[slotIdx];
+          {/* Draggable Slots */}
+          {slots.map((placed, slotIdx) => {
+            const slotNumber = hasFixed ? slotIdx + 2 : slotIdx + 1;
             const expectedId = correctOrder[slotIdx];
             const isCorrect = isReviewMode && placed && expectedId && placed.id === expectedId;
 
@@ -312,7 +319,7 @@ export function ReadingSentenceOrder({
                           : "border-rose-500 bg-rose-50/30 dark:bg-rose-950/20"
                         : "border-primary/40 bg-exam-surface hover:border-red-500 cursor-pointer"
                     }`}
-                    title={isReviewMode ? undefined : "Bấm để gỡ câu này"}
+                    title={isReviewMode ? undefined : "Bấm để gỡ câu này về danh sách bên phải hoặc kéo thả đổi vị trí"}
                   >
                     {!isReviewMode && (
                       <GripVertical className="w-4 h-4 text-primary shrink-0 mt-0.5 group-hover:text-red-500 transition-colors" />
@@ -350,7 +357,7 @@ export function ReadingSentenceOrder({
                         : "border-exam-border bg-exam-bg/20 hover:border-primary/60 hover:bg-exam-bg/40 text-exam-text-muted/60 cursor-pointer"
                     }`}
                   >
-                    <span>{isReviewMode ? "Chưa xếp câu vào vị trí này" : "Kéo câu vào đây hoặc bấm câu bên phải"}</span>
+                    <span>{isReviewMode ? "Chưa xếp câu vào vị trí này" : `Kéo câu vào ô vị trí ${slotNumber} hoặc bấm câu bên phải`}</span>
                   </div>
                 )}
               </div>
@@ -371,21 +378,24 @@ export function ReadingSentenceOrder({
                 </h4>
               </div>
 
-              <div className="p-3.5 rounded-xl border border-border bg-muted/20 text-xs text-foreground/80 leading-relaxed">
-                <span className="font-bold text-primary mr-1.5">[1]</span>
-                <span>{fixedSentence}</span>
-              </div>
+              {hasFixed && (
+                <div className="p-3.5 rounded-xl border border-border bg-muted/20 text-xs text-foreground/80 leading-relaxed">
+                  <span className="font-bold text-primary mr-1.5">[1]</span>
+                  <span>{fixedSentence}</span>
+                </div>
+              )}
 
               {correctOrder.map((corId, cIdx) => {
                 const sItem = sentences.find((s) => s.id === corId);
                 if (!sItem) return null;
+                const num = hasFixed ? cIdx + 2 : cIdx + 1;
                 return (
                   <div
                     key={corId}
                     className="p-3.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/20 dark:bg-emerald-950/20 text-xs text-foreground leading-relaxed flex items-start gap-2"
                   >
                     <span className="font-extrabold text-emerald-600 dark:text-emerald-400 shrink-0">
-                      [{cIdx + 2}]
+                      [{num}]
                     </span>
                     <span className="font-medium">{sItem.text}</span>
                   </div>
@@ -401,7 +411,7 @@ export function ReadingSentenceOrder({
 
               {unplacedSentences.length === 0 ? (
                 <div className="p-6 rounded-2xl border border-dashed border-emerald-500/40 bg-emerald-500/5 text-center text-emerald-600 text-xs font-semibold">
-                  ✓ Đã xếp đủ 4 câu vào các vị trí 2, 3, 4, 5!
+                  ✓ Đã xếp đủ cả {totalSlotsCount} câu vào các vị trí!
                 </div>
               ) : (
                 unplacedSentences.map((item) => (

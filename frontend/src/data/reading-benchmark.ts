@@ -8,7 +8,7 @@ export interface Part1Gap {
 export interface Part2Story {
   id: string;
   title: string;
-  fixedSentence: string;
+  fixedSentence?: string | null;
   sentences: { id: string; text: string }[];
   correctOrder: string[];
 }

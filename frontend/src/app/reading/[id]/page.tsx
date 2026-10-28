@@ -864,7 +864,7 @@ function ReadingExamRunner() {
 
     const calculatedPartScores: { name: string; score: number; maxScore: number; correct: number; total: number }[] = [];
 
-    // 1. Part 1 Score
+    // 1. Part 1 Score: 2.0 điểm / câu, tổng 10 điểm
     let p1Correct = 0;
     if (examData.part1.gaps.length > 0) {
       examData.part1.gaps.forEach((g) => {
@@ -872,8 +872,10 @@ function ReadingExamRunner() {
           p1Correct++;
         }
       });
-      const p1Max = activePartsCount === 1 ? 50 : 7;
-      const p1Score = (p1Correct / examData.part1.gaps.length) * p1Max;
+      const p1Max = activePartsCount === 1 ? 50 : 10;
+      const p1Score = activePartsCount === 1 
+        ? (p1Correct / examData.part1.gaps.length) * 50 
+        : p1Correct * 2.0;
       calculatedPartScores.push({
         name: "Part 1 – Sentence comprehension",
         score: Math.round(p1Score * 10) / 10,
@@ -883,7 +885,7 @@ function ReadingExamRunner() {
       });
     }
 
-    // 2. Part 2 Score
+    // 2. Part 2 Score: Mỗi câu đúng vị trí được 1 điểm, tổng 10 điểm (2 đoạn x 5 câu)
     let p2CorrectMatches = 0;
     let p2TotalMatches = 0;
     if (examData.part2.stories.length > 0) {
@@ -895,8 +897,10 @@ function ReadingExamRunner() {
           if (corOrder[idx] === item) p2CorrectMatches++;
         });
       });
-      const p2Max = activePartsCount === 1 ? 50 : 17;
-      const p2Score = p2TotalMatches > 0 ? (p2CorrectMatches / p2TotalMatches) * p2Max : 0;
+      const p2Max = activePartsCount === 1 ? 50 : 10;
+      const p2Score = activePartsCount === 1 
+        ? (p2TotalMatches > 0 ? (p2CorrectMatches / p2TotalMatches) * 50 : 0)
+        : p2CorrectMatches * 1.0;
       calculatedPartScores.push({
         name: "Part 2 – Text cohesion",
         score: Math.round(p2Score * 10) / 10,
@@ -2090,11 +2094,13 @@ function ReadingExamRunner() {
                       Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length ===
                       examData.part1.gaps.length;
                   } else if (stg.stageKey === "p2-1") {
-                    const stId = examData.part2.stories[0]?.id;
-                    isComplete = !!(stId && p2Orders[stId] && p2Orders[stId].filter(Boolean).length === 4);
+                    const st = examData.part2.stories[0];
+                    const targetLen = st?.sentences?.length || 5;
+                    isComplete = !!(st?.id && p2Orders[st.id] && p2Orders[st.id].filter(Boolean).length === targetLen);
                   } else if (stg.stageKey === "p2-2") {
-                    const stId = examData.part2.stories[1]?.id;
-                    isComplete = !!(stId && p2Orders[stId] && p2Orders[stId].filter(Boolean).length === 4);
+                    const st = examData.part2.stories[1];
+                    const targetLen = st?.sentences?.length || 5;
+                    isComplete = !!(st?.id && p2Orders[st.id] && p2Orders[st.id].filter(Boolean).length === targetLen);
                   } else if (stg.stageKey === "p3") {
                     isComplete =
                       Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length ===
@@ -2529,9 +2535,9 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
             stories.push({
               id: String(q.id),
               title: q.prompt && q.prompt !== "Put the sentences in the correct order." ? q.prompt : `Đoạn văn ${idx + 1}`,
-              fixedSentence: rawArr.length === 5 ? rawArr[0] : "Sentence 1 is fixed.",
-              sentences: (rawArr.length === 5 ? rawArr.slice(1) : rawArr).map((text, sIdx) => ({ id: `s${sIdx + 2}`, text })),
-              correctOrder: (rawArr.length === 5 ? rawArr.slice(1) : rawArr).map((_, sIdx) => `s${sIdx + 2}`),
+              fixedSentence: null,
+              sentences: rawArr.map((text, sIdx) => ({ id: `s${sIdx + 1}`, text })),
+              correctOrder: rawArr.map((_, sIdx) => `s${sIdx + 1}`),
             });
             return;
           }
@@ -2551,7 +2557,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
         stories.push({
           id: String(q.id),
           title: optsObj.title || q.prompt || `Đoạn văn ${idx + 1}`,
-          fixedSentence: optsObj.fixedSentence || "Sentence 1 is fixed here.",
+          fixedSentence: optsObj.fixedSentence || null,
           sentences: optsObj.sentences || [],
           correctOrder: corArr.length > 0 ? corArr : (optsObj.sentences || []).map((s: any) => s.id),
         });
