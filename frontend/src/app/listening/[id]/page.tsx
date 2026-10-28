@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, useRef, useCallback } from "react";
+import { useState, useEffect, Suspense, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
@@ -117,6 +117,17 @@ function ListeningExamRunnerContent() {
   const examId = (params.id as string) || "";
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
+  // Review Mode URL parameters
+  const submissionIdParam = searchParams ? searchParams.get("submissionId") : null;
+  const modeParam = searchParams ? searchParams.get("mode") : null;
+  const isReviewUrl = modeParam === "review" && Boolean(submissionIdParam);
+
+  const [isReviewMode, setIsReviewMode] = useState(isReviewUrl);
+  const [onlyShowWrong, setOnlyShowWrong] = useState(false);
+  const [reviewFilterPart, setReviewFilterPart] = useState<"all" | 1 | 2 | 3 | 4>("all");
+  const [isRestarting, setIsRestarting] = useState(false);
+  const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Chọn bộ đề benchmark phù hợp dựa trên ID đề (để không bị trùng đề)
   const initialBenchmark =
     examId.includes("2") || examId.includes("02")
@@ -172,69 +183,31 @@ function ListeningExamRunnerContent() {
   const [copiedTrans, setCopiedTrans] = useState(false);
 
   // Dynamic Stage definitions based on actually loaded questions in examData
-  const listeningStages: Array<{
-    id: string;
-    partNum: 1 | 2 | 3 | 4;
-    subIndex: number;
-    title: string;
-    label: string;
-    audioUrl?: string;
-  }> = [];
+  const listeningStages = useMemo(() => {
+    const stages: Array<{
+      id: string;
+      partNum: 1 | 2 | 3 | 4;
+      subIndex: number;
+      title: string;
+      label: string;
+      audioUrl?: string;
+    }> = [];
 
-  // Part 1 questions
-  examData.part1.forEach((q, idx) => {
-    listeningStages.push({
-      id: `p1_${idx}`,
-      partNum: 1,
-      subIndex: idx,
-      title: `Part 1 — Câu ${idx + 1}`,
-      label: `Câu ${idx + 1}`,
-      audioUrl: q.audioUrl || audioUrlMap[idx],
+    // Part 1 questions
+    examData.part1.forEach((q, idx) => {
+      stages.push({
+        id: `p1_${idx}`,
+        partNum: 1,
+        subIndex: idx,
+        title: `Part 1 — Câu ${idx + 1}`,
+        label: `Câu ${idx + 1}`,
+        audioUrl: q.audioUrl || audioUrlMap[idx],
+      });
     });
-  });
 
-  // Part 2
-  if (examData.part2.speakers && examData.part2.speakers.length > 0) {
-    listeningStages.push({
-      id: "p2",
-      partNum: 2,
-      subIndex: 0,
-      title: "Part 2 — Matching Info (4 Speakers)",
-      label: "Part 2: 4 Speakers",
-      audioUrl: (examData.part2 as any).audioUrl || audioUrlMap[13],
-    });
-  }
-
-  // Part 3
-  if (examData.part3.opinions && examData.part3.opinions.length > 0) {
-    listeningStages.push({
-      id: "p3",
-      partNum: 3,
-      subIndex: 0,
-      title: "Part 3 — Short Conversations (Opinions)",
-      label: "Part 3: Opinions",
-      audioUrl: (examData.part3 as any).audioUrl || audioUrlMap[14],
-    });
-  }
-
-  // Part 4
-  examData.part4.forEach((rec, idx) => {
-    listeningStages.push({
-      id: `p4_${idx}`,
-      partNum: 4,
-      subIndex: idx,
-      title: `Part 4 — Bài thuyết trình ${idx + 1}`,
-      label: `Part 4: Rec ${idx + 1}`,
-      audioUrl: rec.audioUrl || audioUrlMap[15 + idx],
-    });
-  });
-
-  if (listeningStages.length === 0) {
-    const isP2 = examData.title.toLowerCase().includes("part 2") || (examData.part2 as any)?.speakers?.length > 0;
-    const isP3 = examData.title.toLowerCase().includes("part 3") || (examData.part3 as any)?.opinions?.length > 0;
-    const isP4 = examData.title.toLowerCase().includes("part 4") || examData.part4.length > 0;
-    if (isP2) {
-      listeningStages.push({
+    // Part 2
+    if (examData.part2.speakers && examData.part2.speakers.length > 0) {
+      stages.push({
         id: "p2",
         partNum: 2,
         subIndex: 0,
@@ -242,8 +215,11 @@ function ListeningExamRunnerContent() {
         label: "Part 2: 4 Speakers",
         audioUrl: (examData.part2 as any).audioUrl || audioUrlMap[13],
       });
-    } else if (isP3) {
-      listeningStages.push({
+    }
+
+    // Part 3
+    if (examData.part3.opinions && examData.part3.opinions.length > 0) {
+      stages.push({
         id: "p3",
         partNum: 3,
         subIndex: 0,
@@ -251,25 +227,64 @@ function ListeningExamRunnerContent() {
         label: "Part 3: Opinions",
         audioUrl: (examData.part3 as any).audioUrl || audioUrlMap[14],
       });
-    } else if (isP4) {
-      listeningStages.push({
-        id: "p4_0",
-        partNum: 4,
-        subIndex: 0,
-        title: "Part 4 — Bài thuyết trình 1",
-        label: "Part 4: Rec 1",
-        audioUrl: audioUrlMap[15],
-      });
-    } else {
-      listeningStages.push({
-        id: "p1_0",
-        partNum: 1,
-        subIndex: 0,
-        title: "Part 1 — Câu 1",
-        label: "Câu 1",
-      });
     }
-  }
+
+    // Part 4
+    examData.part4.forEach((rec, idx) => {
+      stages.push({
+        id: `p4_${idx}`,
+        partNum: 4,
+        subIndex: idx,
+        title: `Part 4 — Bài thuyết trình ${idx + 1}`,
+        label: `Part 4: Rec ${idx + 1}`,
+        audioUrl: rec.audioUrl || audioUrlMap[15 + idx],
+      });
+    });
+
+    if (stages.length === 0) {
+      const isP2 = examData.title.toLowerCase().includes("part 2") || (examData.part2 as any)?.speakers?.length > 0;
+      const isP3 = examData.title.toLowerCase().includes("part 3") || (examData.part3 as any)?.opinions?.length > 0;
+      const isP4 = examData.title.toLowerCase().includes("part 4") || examData.part4.length > 0;
+      if (isP2) {
+        stages.push({
+          id: "p2",
+          partNum: 2,
+          subIndex: 0,
+          title: "Part 2 — Matching Info (4 Speakers)",
+          label: "Part 2: 4 Speakers",
+          audioUrl: (examData.part2 as any).audioUrl || audioUrlMap[13],
+        });
+      } else if (isP3) {
+        stages.push({
+          id: "p3",
+          partNum: 3,
+          subIndex: 0,
+          title: "Part 3 — Short Conversations (Opinions)",
+          label: "Part 3: Opinions",
+          audioUrl: (examData.part3 as any).audioUrl || audioUrlMap[14],
+        });
+      } else if (isP4) {
+        stages.push({
+          id: "p4_0",
+          partNum: 4,
+          subIndex: 0,
+          title: "Part 4 — Bài thuyết trình 1",
+          label: "Part 4: Rec 1",
+          audioUrl: audioUrlMap[15],
+        });
+      } else {
+        stages.push({
+          id: "p1_0",
+          partNum: 1,
+          subIndex: 0,
+          title: "Part 1 — Câu 1",
+          label: "Câu 1",
+        });
+      }
+    }
+
+    return stages;
+  }, [examData, audioUrlMap]);
 
   const safeStageIndex = activeStage < listeningStages.length ? activeStage : 0;
   const currentStage = listeningStages[safeStageIndex] || listeningStages[0];
@@ -318,11 +333,16 @@ function ListeningExamRunnerContent() {
     return null;
   };
 
-  // Tự động nhảy tới Part nếu URL có ?part=p1 / p2 / p3 / p4 / 1 / 2 / 3 / 4
+  // Flag ghi nhớ đã nhảy tới Part theo query param (tránh bị reset về Câu 1 khi học viên bấm Next)
+  const hasHandledPartParam = useRef<string | null>(null);
+
+  // Tự động nhảy tới Part nếu URL có ?part=p1 / p2 / p3 / p4 / 1 / 2 / 3 / 4 khi khởi tạo
   useEffect(() => {
     if (!searchParams || listeningStages.length === 0) return;
     const p = searchParams.get("part")?.toLowerCase();
     if (!p) return;
+    if (hasHandledPartParam.current === p) return;
+
     let targetPart: 1 | 2 | 3 | 4 | null = null;
     if (p === "p1" || p === "1" || p === "part1") targetPart = 1;
     else if (p === "p2" || p === "2" || p === "part2") targetPart = 2;
@@ -331,7 +351,10 @@ function ListeningExamRunnerContent() {
 
     if (targetPart !== null) {
       const idx = listeningStages.findIndex((s) => s.partNum === targetPart);
-      if (idx !== -1) setActiveStage(idx);
+      if (idx !== -1) {
+        setActiveStage(idx);
+        hasHandledPartParam.current = p;
+      }
     }
   }, [searchParams, listeningStages]);
 
@@ -384,7 +407,7 @@ function ListeningExamRunnerContent() {
     }
   }, [p1Answers, p2Answers, p3Answers, p4Answers, examId, isSubmitted]);
 
-  // 3. Cảnh báo beforeunload chống vô tình F5/thoát trang khi đang thi
+  // 3. Cảnh báo beforeunload & popstate chống vô tình F5/thoát trang khi đang thi
   useEffect(() => {
     if (isSubmitted) return;
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -393,6 +416,21 @@ function ListeningExamRunnerContent() {
       return e.returnValue;
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Bắt phím Back của trình duyệt để hiển thị modal xác nhận
+    if (typeof window !== "undefined") {
+      window.history.pushState(null, "", window.location.href);
+      const handlePopState = () => {
+        setShowExitConfirm(true);
+        window.history.pushState(null, "", window.location.href);
+      };
+      window.addEventListener("popstate", handlePopState);
+      return () => {
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        window.removeEventListener("popstate", handlePopState);
+      };
+    }
+
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isSubmitted]);
 
@@ -516,7 +554,65 @@ function ListeningExamRunnerContent() {
         typeof window !== "undefined"
           ? localStorage.getItem("accessToken") || localStorage.getItem("token")
           : null;
-      if (!token || !examId || submissionId) return;
+      if (!token || !examId) return;
+
+      // 4a. Khôi phục từ Lịch sử làm bài khi có ?mode=review&submissionId=...
+      if (isReviewUrl && submissionIdParam) {
+        try {
+          const res = await api.submissions.getResult(submissionIdParam);
+          if (res.success && res.data) {
+            const sub = res.data;
+            setSubmissionId(sub.id || submissionIdParam);
+            setIsReviewMode(true);
+            setIsSubmitted(false);
+
+            if (sub.answers && Array.isArray(sub.answers)) {
+              const p1: Record<number, string> = {};
+              const p2: Record<number, string> = {};
+              const p3: Record<number, any> = {};
+              const p4: Record<string, string> = {};
+
+              sub.answers.forEach((ans: any) => {
+                const qId = ans.question_id || ans.questionId;
+                const opt = ans.selected_option || ans.selectedOption;
+                if (!opt) return;
+
+                // Match câu hỏi Part 1
+                examData.part1.forEach((item, idx) => {
+                  if (item.id === qId) p1[idx] = opt;
+                });
+                // Match câu hỏi Part 2
+                examData.part2.speakers.forEach((spk, idx) => {
+                  if (spk.id === qId) p2[idx] = opt;
+                });
+                // Match câu hỏi Part 3
+                examData.part3.opinions.forEach((opn, idx) => {
+                  if (opn.id === qId) p3[idx] = opt;
+                });
+                // Match câu hỏi Part 4
+                examData.part4.forEach((rec, recIdx) => {
+                  rec.questions.forEach((q, qIdx) => {
+                    if (q.id === qId) {
+                      p4[`${recIdx}_${qIdx}`] = opt;
+                    }
+                  });
+                });
+              });
+
+              setP1Answers(p1);
+              setP2Answers(p2);
+              setP3Answers(p3);
+              setP4Answers(p4);
+            }
+          }
+        } catch (e) {
+          console.warn("Lỗi khi tải kết quả xem lại listening:", e);
+        }
+        return;
+      }
+
+      // 4b. Khởi tạo phiên thi bình thường hoặc khôi phục phiên đang thi
+      if (submissionId) return;
       try {
         const res = await api.submissions.start(examId);
         if (res.success && res.data) {
@@ -549,9 +645,11 @@ function ListeningExamRunnerContent() {
                   examData.part3.opinions.forEach((opn, idx) => {
                     if (opn.id === qId) p3[idx] = ans.selectedOption;
                   });
-                  examData.part4.forEach((rec) => {
+                  examData.part4.forEach((rec, recIdx) => {
                     rec.questions.forEach((q, qIdx) => {
-                      if (q.id === qId) p4[`${rec.recNum}_${qIdx}`] = ans.selectedOption;
+                      if (q.id === qId) {
+                        p4[`${recIdx}_${qIdx}`] = ans.selectedOption;
+                      }
                     });
                   });
                 }
@@ -569,7 +667,7 @@ function ListeningExamRunnerContent() {
       }
     }
     initSubmission();
-  }, [examId, submissionId, examData]);
+  }, [examId, submissionId, isReviewUrl, submissionIdParam, examData]);
 
   // Load đề thi từ backend với bộ parser đầy đủ
   useEffect(() => {
@@ -1306,6 +1404,159 @@ function ListeningExamRunnerContent() {
 
   const results = calculateResults();
 
+  // Helper tính kết quả từng stage/câu hỏi phục vụ Mục lục xem lại
+  const getStageResult = (stageIdx: number) => {
+    const stage = listeningStages[stageIdx];
+    if (!stage) return { isCorrect: false, score: 0, total: 1, label: `Câu ${stageIdx + 1}` };
+
+    if (stage.partNum === 1) {
+      const q = examData.part1[stage.subIndex];
+      const ans = p1Answers[stage.subIndex];
+      const isCorrect = Boolean(ans && q && ans.toLowerCase() === q.correctAnswer.toLowerCase());
+      return { isCorrect, score: isCorrect ? 1 : 0, total: 1, label: `Câu ${stage.subIndex + 1}` };
+    } else if (stage.partNum === 2) {
+      let cor = 0;
+      examData.part2.speakers.forEach((s, idx) => {
+        if (p2Answers[idx] && s.correctAnswer && p2Answers[idx].toLowerCase() === s.correctAnswer.toLowerCase()) cor++;
+      });
+      const total = examData.part2.speakers.length || 4;
+      return { isCorrect: cor === total && total > 0, score: cor, total, label: "Part 2" };
+    } else if (stage.partNum === 3) {
+      let cor = 0;
+      examData.part3.opinions.forEach((o, idx) => {
+        if (p3Answers[idx] && o.correctAnswer && p3Answers[idx].toLowerCase() === o.correctAnswer.toLowerCase()) cor++;
+      });
+      const total = examData.part3.opinions.length || 4;
+      return { isCorrect: cor === total && total > 0, score: cor, total, label: "Part 3" };
+    } else {
+      const rec = examData.part4[stage.subIndex];
+      let cor = 0;
+      const total = rec?.questions?.length || 2;
+      rec?.questions?.forEach((q, qIdx) => {
+        const k = `${stage.subIndex}_${qIdx}`;
+        if (p4Answers[k] && q.correctAnswer && p4Answers[k].toLowerCase() === q.correctAnswer.toLowerCase()) cor++;
+      });
+      return { isCorrect: cor === total && total > 0, score: cor, total, label: `P4.${stage.subIndex + 1}` };
+    }
+  };
+
+  // Tự động lưu nháp (Autosave ngầm) lên backend
+  const performAutosave = useCallback(async (answers: { p1: any; p2: any; p3: any; p4: any }) => {
+    if (!submissionId || isSubmitted || isReviewMode) return;
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") || localStorage.getItem("token") : null;
+    if (!token) return;
+
+    const answersPayload: any[] = [];
+    examData.part1.forEach((q: any, idx: number) => {
+      if (q.id && answers.p1[idx]) {
+        answersPayload.push({ questionId: String(q.id), selectedOption: answers.p1[idx] });
+      }
+    });
+    examData.part2.speakers.forEach((s: any, idx: number) => {
+      if (s.id && answers.p2[idx]) {
+        answersPayload.push({ questionId: String(s.id), selectedOption: answers.p2[idx] });
+      }
+    });
+    examData.part3.opinions.forEach((o: any, idx: number) => {
+      if (o.id && answers.p3[idx]) {
+        answersPayload.push({ questionId: String(o.id), selectedOption: answers.p3[idx] });
+      }
+    });
+    examData.part4.forEach((rec: any, recIdx: number) => {
+      rec.questions.forEach((q: any, qIdx: number) => {
+        const k = `${recIdx}_${qIdx}`;
+        if (q.id && answers.p4[k]) {
+          answersPayload.push({ questionId: String(q.id), selectedOption: answers.p4[k] });
+        }
+      });
+    });
+
+    if (answersPayload.length === 0) return;
+
+    try {
+      setSyncStatus("saving");
+      await api.submissions.autosave(submissionId, answersPayload);
+      setSyncStatus("saved");
+      setLastSavedAt(new Date());
+      setTimeout(() => setSyncStatus("idle"), 2500);
+    } catch (e) {
+      console.warn("Autosave listening error:", e);
+      setSyncStatus("error");
+    }
+  }, [submissionId, isSubmitted, isReviewMode, examData]);
+
+  const scheduleAutosave = useCallback((nextAnswers: { p1: any; p2: any; p3: any; p4: any }) => {
+    if (autosaveTimeoutRef.current) clearTimeout(autosaveTimeoutRef.current);
+    autosaveTimeoutRef.current = setTimeout(() => {
+      performAutosave(nextAnswers);
+    }, 2500);
+  }, [performAutosave]);
+
+  // Handlers chọn đáp án có gắn autosave
+  const handleP1Answer = (idx: number, opt: string) => {
+    if (isReviewMode) return;
+    const next = { ...p1Answers, [idx]: opt };
+    setP1Answers(next);
+    scheduleAutosave({ p1: next, p2: p2Answers, p3: p3Answers, p4: p4Answers });
+  };
+
+  const handleP2Answer = (idx: number, opt: string) => {
+    if (isReviewMode) return;
+    const next = { ...p2Answers, [idx]: opt };
+    setP2Answers(next);
+    scheduleAutosave({ p1: p1Answers, p2: next, p3: p3Answers, p4: p4Answers });
+  };
+
+  const handleP3Answer = (idx: number, opt: "Man" | "Woman" | "Both") => {
+    if (isReviewMode) return;
+    const next = { ...p3Answers, [idx]: opt };
+    setP3Answers(next);
+    scheduleAutosave({ p1: p1Answers, p2: p2Answers, p3: next, p4: p4Answers });
+  };
+
+  const handleP4Answer = (key: string, opt: string) => {
+    if (isReviewMode) return;
+    const next = { ...p4Answers, [key]: opt };
+    setP4Answers(next);
+    scheduleAutosave({ p1: p1Answers, p2: p2Answers, p3: p3Answers, p4: next });
+  };
+
+  // Làm lại bài thi từ đầu (Tạo phòng thi mới 100% thời gian trên server)
+  const handleRestartExam = async () => {
+    try {
+      setIsRestarting(true);
+      if (typeof window !== "undefined" && examId) {
+        try {
+          localStorage.removeItem(`aptis_draft_listening_${examId}`);
+        } catch {}
+      }
+      setP1Answers({});
+      setP2Answers({});
+      setP3Answers({});
+      setP4Answers({});
+      setPlayCounts({});
+      setActiveStage(0);
+      setIsSubmitted(false);
+      setIsReviewMode(false);
+
+      const res = await api.submissions.start(examId, true);
+      if (res.success && res.data) {
+        setSubmissionId(res.data.submissionId || res.data.id);
+        if (res.data.serverTimeRemaining !== undefined) {
+          setTimeLeft(res.data.serverTimeRemaining);
+        } else {
+          setTimeLeft((examData.durationMinutes || 40) * 60);
+        }
+      }
+      router.replace(`/listening/${examId}`);
+    } catch (e) {
+      console.error("Lỗi làm lại bài thi:", e);
+      alert("Không thể khởi tạo lại bài thi. Vui lòng thử lại!");
+    } finally {
+      setIsRestarting(false);
+    }
+  };
+
   const handleFinalSubmit = async () => {
     setIsSubmitted(true);
     if (typeof window !== "undefined" && examId) {
@@ -1420,7 +1671,7 @@ function ListeningExamRunnerContent() {
   // =========================================================================
   // MÀN HÌNH KẾT QUẢ LISTENING (CHUẨN ẢNH 5 THEO DESIGN SYSTEM CỦA MÌNH)
   // =========================================================================
-  if (isSubmitted) {
+  if (isSubmitted && !isReviewMode) {
     return (
       <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
         {/* Header Bar */}
@@ -1483,15 +1734,15 @@ function ListeningExamRunnerContent() {
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <Link
                   href="/listening"
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors"
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors cursor-pointer"
                 >
                   ← Thoát
                 </Link>
 
                 <button
                   type="button"
-                  onClick={() => setIsSubmitted(false)}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+                  onClick={() => setIsReviewMode(true)}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span>Xem lại từng câu →</span>
@@ -1499,19 +1750,15 @@ function ListeningExamRunnerContent() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setP1Answers({});
-                    setP2Answers({});
-                    setP3Answers({});
-                    setP4Answers({});
-                    setPlayCounts({});
-                    setActiveStage(0);
-                    setTimeLeft(40 * 60);
-                    setIsSubmitted(false);
-                  }}
-                  className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+                  onClick={handleRestartExam}
+                  disabled={isRestarting}
+                  className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
+                  {isRestarting ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  )}
                   <span>Làm lại</span>
                 </button>
               </div>
@@ -1616,20 +1863,22 @@ function ListeningExamRunnerContent() {
           <button
             type="button"
             onClick={() => {
-              if (results) {
+              if (isReviewMode) {
+                router.push("/history");
+              } else if (isSubmitted) {
                 router.push("/listening");
               } else {
                 setShowExitConfirm(true);
               }
             }}
             className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer"
-            title="Quay lại danh sách đề"
+            title={isReviewMode ? "Quay lại lịch sử" : "Quay lại danh sách đề"}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex flex-col">
             <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-              Listening Practice
+              {isReviewMode ? "Chế độ xem lại bài thi" : "Listening Practice"}
             </span>
             <span className="text-sm md:text-base font-bold text-foreground">
               {currentMeta.partName}
@@ -1637,31 +1886,50 @@ function ListeningExamRunnerContent() {
           </div>
         </div>
 
-        {/* Căn giữa: Đồng hồ đếm ngược & Sync status */}
+        {/* Căn giữa: Đồng hồ đếm ngược & Sync status / Review mode score */}
         <div className="flex items-center gap-2.5">
-          <ExamSyncStatus
-            status={syncStatus}
-            lastSavedAt={lastSavedAt}
-            isResumed={isResumedSession}
-          />
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-            <Clock className="w-4 h-4" />
-            <span>{formatTime(timeLeft)}</span>
-          </div>
+          {isReviewMode ? (
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300 font-bold text-xs">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Điểm: {results.totalScore}/50 ({results.totalCorrect}/{results.totalQuestionsInExam} đúng)</span>
+            </div>
+          ) : (
+            <>
+              <ExamSyncStatus
+                status={syncStatus}
+                lastSavedAt={lastSavedAt}
+                isResumed={isResumedSession}
+              />
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+                <Clock className="w-4 h-4" />
+                <span>{formatTime(timeLeft)}</span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/listening"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          <button
+            type="button"
+            onClick={() => {
+              if (isReviewMode) {
+                router.push("/history");
+              } else if (isSubmitted) {
+                router.push("/listening");
+              } else {
+                setShowExitConfirm(true);
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            title={isReviewMode ? "Quay lại lịch sử" : "Thoát về danh sách đề"}
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Thoát</span>
-          </Link>
+            <span>{isReviewMode ? "Lịch sử" : "Thoát"}</span>
+          </button>
         </div>
       </header>
 
-      {isResumedSession && !resumedBannerDismissed && (
+      {isResumedSession && !resumedBannerDismissed && !isReviewMode && (
         <ExamRecoveryBanner
           remainingSeconds={timeLeft}
           answersCount={
@@ -1675,9 +1943,10 @@ function ListeningExamRunnerContent() {
       )}
 
       {/* 2. MAIN WORKSPACE */}
-      <main className="flex-1 py-6 px-3 md:px-6 pb-24">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Card Context & Header Banner */}
+      <main className={`flex-1 py-6 px-3 md:px-6 ${isReviewMode ? "pb-12" : "pb-24"}`}>
+        <div className={`mx-auto ${isReviewMode ? "max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" : "max-w-4xl space-y-6"}`}>
+          <div className={`${isReviewMode ? "lg:col-span-8 space-y-6" : "space-y-6"}`}>
+            {/* Card Context & Header Banner */}
           <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 border-b border-border pb-4">
               <div className="space-y-1.5 max-w-xl">
@@ -1953,8 +2222,6 @@ function ListeningExamRunnerContent() {
               })()}
             </div>
           </div>
-
-          {/* 3. PART CONTENT CHUẨN WITH SMOOTH TRANSITION */}
           <div key={`listening-stage-wrap-${activeStage}`} className="part-transition space-y-5">
           {/* =========================================================================
               PART 1: CÂU HỎI TRẮC NGHIỆM A, B, C
@@ -1962,42 +2229,116 @@ function ListeningExamRunnerContent() {
           {currentStage.partNum === 1 && (() => {
             const q = examData.part1[currentStage.subIndex];
             if (!q) return null;
+            const userChoice = p1Answers[currentStage.subIndex];
+            const isCor = Boolean(userChoice && userChoice.toLowerCase() === q.correctAnswer.toLowerCase());
+
             return (
               <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
-                <h3 className="text-sm md:text-base font-medium text-foreground leading-relaxed">
-                  {q.prompt}
-                </h3>
+                <div className="flex items-center justify-between gap-2 border-b border-border/50 pb-3">
+                  <h3 className="text-sm md:text-base font-semibold text-foreground leading-relaxed">
+                    {q.prompt}
+                  </h3>
+                  {isReviewMode && (
+                    <span
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 shrink-0 ${
+                        isCor
+                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                          : "bg-red-500/15 text-red-700 dark:text-red-300 border border-red-500/30"
+                      }`}
+                    >
+                      {isCor ? (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Đúng (+1)</span>
+                        </>
+                      ) : (
+                        <>
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          <span>Sai (0 đ)</span>
+                        </>
+                      )}
+                    </span>
+                  )}
+                </div>
 
                 <div className="space-y-3">
                   {q.options.map((opt, optIdx) => {
-                    const isSelected = p1Answers[currentStage.subIndex] === opt;
+                    const isSelected = userChoice === opt;
+                    const isCorrectAnswer = opt.toLowerCase() === q.correctAnswer.toLowerCase();
+
+                    let optionStyle = "border-border bg-background hover:border-primary/40 text-foreground";
+                    if (isReviewMode) {
+                      if (isCorrectAnswer) {
+                        optionStyle = "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs";
+                      } else if (isSelected && !isCorrectAnswer) {
+                        optionStyle = "border-red-500 bg-red-500/10 text-red-700 dark:text-red-300 font-bold shadow-xs";
+                      } else {
+                        optionStyle = "border-border/60 bg-muted/20 text-muted-foreground opacity-75";
+                      }
+                    } else if (isSelected) {
+                      optionStyle = "border-primary bg-primary/10 text-primary font-bold shadow-sm";
+                    }
+
                     return (
                       <button
                         key={optIdx}
                         type="button"
-                        onClick={() =>
-                          setP1Answers((prev) => ({
-                            ...prev,
-                            [currentStage.subIndex]: opt,
-                          }))
-                        }
-                        className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between ${
-                          isSelected
-                            ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                            : "border-border bg-background hover:border-primary/40 text-foreground"
+                        disabled={isReviewMode}
+                        onClick={() => handleP1Answer(currentStage.subIndex, opt)}
+                        className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between ${optionStyle} ${
+                          isReviewMode ? "cursor-default" : "cursor-pointer"
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="w-7 h-7 rounded-lg border border-border flex items-center justify-center font-bold text-xs bg-muted/40">
+                          <span
+                            className={`w-7 h-7 rounded-lg border flex items-center justify-center font-bold text-xs ${
+                              isReviewMode && isCorrectAnswer
+                                ? "bg-emerald-500 text-white border-emerald-600"
+                                : isReviewMode && isSelected && !isCorrectAnswer
+                                ? "bg-red-500 text-white border-red-600"
+                                : "bg-muted/40 border-border"
+                            }`}
+                          >
                             {String.fromCharCode(65 + optIdx)}
                           </span>
                           <span className="text-sm md:text-base font-normal">{opt}</span>
                         </div>
-                        {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
+                        {isReviewMode ? (
+                          isCorrectAnswer ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          ) : isSelected ? (
+                            <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                          ) : null
+                        ) : (
+                          isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />
+                        )}
                       </button>
                     );
                   })}
                 </div>
+
+                {/* Review Mode Explanation Box */}
+                {isReviewMode && (
+                  <div className="mt-4 p-4 rounded-xl bg-muted/30 border border-border/80 space-y-2 text-xs">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <span className="font-semibold text-muted-foreground">
+                        Bạn đã chọn:{" "}
+                        <strong className={isCor ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>
+                          {userChoice || "(Bỏ trống)"}
+                        </strong>
+                      </span>
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                        Đáp án chuẩn: <strong>{q.correctAnswer}</strong>
+                      </span>
+                    </div>
+                    {q.explanation && (
+                      <div className="text-muted-foreground leading-relaxed pt-2 border-t border-border/50">
+                        <span className="font-bold text-foreground">Giải thích: </span>
+                        {q.explanation}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -2020,34 +2361,67 @@ function ListeningExamRunnerContent() {
               </div>
 
               <div className="space-y-4">
-                {examData.part2.speakers.map((spk, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl border border-border bg-background flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <span className="font-bold text-sm text-primary w-28 shrink-0">
-                      {spk.speaker}
-                    </span>
+                {examData.part2.speakers.map((spk, idx) => {
+                  const userChoice = p2Answers[idx];
+                  const isCor = Boolean(userChoice && spk.correctAnswer && userChoice.toLowerCase() === spk.correctAnswer.toLowerCase());
 
-                    <select
-                      value={p2Answers[idx] || ""}
-                      onChange={(e) =>
-                        setP2Answers((prev) => ({
-                          ...prev,
-                          [idx]: e.target.value,
-                        }))
-                      }
-                      className="flex-1 p-2.5 rounded-lg border border-input bg-card text-foreground text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans cursor-pointer"
+                  return (
+                    <div
+                      key={idx}
+                      className={`p-4 rounded-xl border bg-background flex flex-col gap-3 ${
+                        isReviewMode
+                          ? isCor
+                            ? "border-emerald-500/50 bg-emerald-500/5"
+                            : "border-red-500/50 bg-red-500/5"
+                          : "border-border"
+                      }`}
                     >
-                      <option value="">-- Chọn thông tin phù hợp --</option>
-                      {(examData.part2.options || []).map((opt, oIdx) => (
-                        <option key={oIdx} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5">
+                          <span className="font-bold text-sm text-primary w-28 shrink-0">
+                            {spk.speaker}
+                          </span>
+                          {isReviewMode && (
+                            <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${
+                              isCor
+                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                                : "bg-red-500/20 text-red-700 dark:text-red-300"
+                            }`}>
+                              {isCor ? "Đúng (+1)" : "Sai (0 đ)"}
+                            </span>
+                          )}
+                        </div>
+
+                        <select
+                          disabled={isReviewMode}
+                          value={p2Answers[idx] || ""}
+                          onChange={(e) => handleP2Answer(idx, e.target.value)}
+                          className="flex-1 p-2.5 rounded-lg border border-input bg-card text-foreground text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans cursor-pointer disabled:opacity-85"
+                        >
+                          <option value="">-- Chọn thông tin phù hợp --</option>
+                          {(examData.part2.options || []).map((opt, oIdx) => (
+                            <option key={oIdx} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {isReviewMode && (
+                        <div className="text-xs space-y-1 pt-2 border-t border-border/50 text-muted-foreground">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span>Bạn chọn: <strong className={isCor ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>{userChoice || "(Chưa chọn)"}</strong></span>
+                            <span>•</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Đáp án chuẩn: <strong>{spk.correctAnswer}</strong></span>
+                          </div>
+                          {spk.explanation && (
+                            <p className="italic text-[11px] pt-1">{spk.explanation}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -2076,32 +2450,66 @@ function ListeningExamRunnerContent() {
               </h4>
 
               <div className="space-y-4">
-                {examData.part3.opinions.map((op, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl border border-border bg-background flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <span className="text-xs md:text-sm text-foreground flex-1 leading-relaxed">
-                      {op.statement}
-                    </span>
+                {examData.part3.opinions.map((op, idx) => {
+                  const userChoice = p3Answers[idx];
+                  const isCor = Boolean(userChoice && op.correctAnswer && userChoice.toLowerCase() === op.correctAnswer.toLowerCase());
 
-                    <select
-                      value={p3Answers[idx] || ""}
-                      onChange={(e) =>
-                        setP3Answers((prev) => ({
-                          ...prev,
-                          [idx]: e.target.value as any,
-                        }))
-                      }
-                      className="w-full sm:w-40 p-2.5 rounded-lg border border-input bg-card text-foreground text-xs md:text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans cursor-pointer shrink-0"
+                  return (
+                    <div
+                      key={idx}
+                      className={`p-4 rounded-xl border bg-background flex flex-col gap-3 ${
+                        isReviewMode
+                          ? isCor
+                            ? "border-emerald-500/50 bg-emerald-500/5"
+                            : "border-red-500/50 bg-red-500/5"
+                          : "border-border"
+                      }`}
                     >
-                      <option value="">-- Chọn --</option>
-                      <option value="Man">Man</option>
-                      <option value="Woman">Woman</option>
-                      <option value="Both">Both</option>
-                    </select>
-                  </div>
-                ))}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <span className="text-xs md:text-sm text-foreground flex-1 leading-relaxed">
+                          {op.statement}
+                        </span>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          {isReviewMode && (
+                            <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${
+                              isCor
+                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                                : "bg-red-500/20 text-red-700 dark:text-red-300"
+                            }`}>
+                              {isCor ? "Đúng (+1)" : "Sai (0 đ)"}
+                            </span>
+                          )}
+
+                          <select
+                            disabled={isReviewMode}
+                            value={p3Answers[idx] || ""}
+                            onChange={(e) => handleP3Answer(idx, e.target.value as any)}
+                            className="w-full sm:w-40 p-2.5 rounded-lg border border-input bg-card text-foreground text-xs md:text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans cursor-pointer disabled:opacity-85"
+                          >
+                            <option value="">-- Chọn --</option>
+                            <option value="Man">Man</option>
+                            <option value="Woman">Woman</option>
+                            <option value="Both">Both</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {isReviewMode && (
+                        <div className="text-xs space-y-1 pt-2 border-t border-border/50 text-muted-foreground">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span>Bạn chọn: <strong className={isCor ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>{userChoice || "(Chưa chọn)"}</strong></span>
+                            <span>•</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Đáp án chuẩn: <strong>{op.correctAnswer}</strong></span>
+                          </div>
+                          {op.explanation && (
+                            <p className="italic text-[11px] pt-1">{op.explanation}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -2113,6 +2521,7 @@ function ListeningExamRunnerContent() {
             const rec = examData.part4[currentStage.subIndex];
             if (!rec || !rec.questions) return null;
             const recIdx = currentStage.subIndex;
+
             return (
               <div className="space-y-6">
                 <div className="bg-card rounded-2xl border border-border p-5 shadow-sm flex items-center justify-between gap-3">
@@ -2131,46 +2540,116 @@ function ListeningExamRunnerContent() {
                 {rec.questions.map((q, qIdx) => {
                   const answerKey = `${recIdx}_${qIdx}`;
                   const selected = p4Answers[answerKey];
+                  const isCor = Boolean(selected && selected.toLowerCase() === q.correctAnswer.toLowerCase());
 
                   return (
                     <div
                       key={qIdx}
                       className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4"
                     >
-                      <h3 className="text-sm md:text-base font-semibold text-foreground leading-relaxed">
-                        {q.prompt}
-                      </h3>
+                      <div className="flex items-center justify-between gap-2 border-b border-border/50 pb-3">
+                        <h3 className="text-sm md:text-base font-semibold text-foreground leading-relaxed">
+                          {q.prompt}
+                        </h3>
+                        {isReviewMode && (
+                          <span
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 shrink-0 ${
+                              isCor
+                                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
+                                : "bg-red-500/15 text-red-700 dark:text-red-300 border border-red-500/30"
+                            }`}
+                          >
+                            {isCor ? (
+                              <>
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                <span>Đúng (+1)</span>
+                              </>
+                            ) : (
+                              <>
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                <span>Sai (0 đ)</span>
+                              </>
+                            )}
+                          </span>
+                        )}
+                      </div>
 
                       <div className="space-y-3">
                         {q.options.map((opt, optIdx) => {
                           const isSelected = selected === opt;
+                          const isCorrectAnswer = opt.toLowerCase() === q.correctAnswer.toLowerCase();
+
+                          let optionStyle = "border-border bg-background hover:border-primary/40 text-foreground";
+                          if (isReviewMode) {
+                            if (isCorrectAnswer) {
+                              optionStyle = "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs";
+                            } else if (isSelected && !isCorrectAnswer) {
+                              optionStyle = "border-red-500 bg-red-500/10 text-red-700 dark:text-red-300 font-bold shadow-xs";
+                            } else {
+                              optionStyle = "border-border/60 bg-muted/20 text-muted-foreground opacity-75";
+                            }
+                          } else if (isSelected) {
+                            optionStyle = "border-primary bg-primary/10 text-primary font-bold shadow-sm";
+                          }
+
                           return (
                             <button
                               key={optIdx}
                               type="button"
-                              onClick={() =>
-                                setP4Answers((prev) => ({
-                                  ...prev,
-                                  [answerKey]: opt,
-                                }))
-                              }
-                              className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between ${
-                                isSelected
-                                  ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                                  : "border-border bg-background hover:border-primary/40 text-foreground"
+                              disabled={isReviewMode}
+                              onClick={() => handleP4Answer(answerKey, opt)}
+                              className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between ${optionStyle} ${
+                                isReviewMode ? "cursor-default" : "cursor-pointer"
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <span className="w-7 h-7 rounded-lg border border-border flex items-center justify-center font-bold text-xs bg-muted/40">
+                                <span
+                                  className={`w-7 h-7 rounded-lg border flex items-center justify-center font-bold text-xs ${
+                                    isReviewMode && isCorrectAnswer
+                                      ? "bg-emerald-500 text-white border-emerald-600"
+                                      : isReviewMode && isSelected && !isCorrectAnswer
+                                      ? "bg-red-500 text-white border-red-600"
+                                      : "bg-muted/40 border-border"
+                                  }`}
+                                >
                                   {String.fromCharCode(65 + optIdx)}
                                 </span>
                                 <span className="text-xs md:text-sm font-normal">{opt}</span>
                               </div>
-                              {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
+                              {isReviewMode ? (
+                                isCorrectAnswer ? (
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                ) : isSelected ? (
+                                  <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                ) : null
+                              ) : (
+                                isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />
+                              )}
                             </button>
                           );
                         })}
                       </div>
+
+                      {isReviewMode && (
+                        <div className="mt-3 p-3.5 rounded-xl bg-muted/30 border border-border/80 space-y-1.5 text-xs">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span>
+                              Bạn đã chọn:{" "}
+                              <strong className={isCor ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>
+                                {selected || "(Bỏ trống)"}
+                              </strong>
+                            </span>
+                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                              Đáp án chuẩn: <strong>{q.correctAnswer}</strong>
+                            </span>
+                          </div>
+                          {q.explanation && (
+                            <div className="text-muted-foreground italic pt-1 border-t border-border/50">
+                              {q.explanation}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -2179,135 +2658,284 @@ function ListeningExamRunnerContent() {
           })()}
           </div>
         </div>
+
+        {/* CỘT PHẢI: MỤC LỤC XEM LẠI CHUẨN DESIGN SYSTEM KHI Ở REVIEW MODE */}
+        {isReviewMode && (
+          <aside className="lg:col-span-4">
+            <div className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-4 sticky top-20">
+              {/* Header */}
+              <div className="border-b border-border pb-3">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-heading font-black text-base text-foreground flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span>Mục lục xem lại</span>
+                  </h3>
+                  <span className="text-xs font-mono font-bold text-primary px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                    {results.totalScore}/50 điểm
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      {results.totalCorrect} đúng
+                    </span>
+                    <span>•</span>
+                    <span className="text-red-600 dark:text-red-400 font-bold flex items-center gap-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {results.totalQuestionsInExam - results.totalCorrect} sai
+                    </span>
+                  </div>
+                  <span className="font-bold text-accent">Band {results.cefr}</span>
+                </div>
+              </div>
+
+              {/* Filter Checkbox */}
+              <div className="flex items-center justify-between bg-muted/40 p-2.5 rounded-xl border border-border/60">
+                <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={onlyShowWrong}
+                    onChange={(e) => setOnlyShowWrong(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary w-4 h-4"
+                  />
+                  <span>Chỉ hiện câu sai</span>
+                </label>
+                {onlyShowWrong && (
+                  <span className="text-[11px] text-red-600 dark:text-red-400 font-bold">
+                    {results.totalQuestionsInExam - results.totalCorrect} câu
+                  </span>
+                )}
+              </div>
+
+              {/* Part Filter Tabs */}
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 text-xs">
+                {[
+                  { id: "all", label: `Tất cả (${listeningStages.length})` },
+                  { id: 1, label: `Part 1 (${listeningStages.filter((s) => s.partNum === 1).length})` },
+                  { id: 2, label: `Part 2` },
+                  { id: 3, label: `Part 3` },
+                  { id: 4, label: `Part 4` },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setReviewFilterPart(tab.id as any)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0 transition-colors cursor-pointer ${
+                      reviewFilterPart === tab.id
+                        ? "bg-primary text-primary-foreground shadow-xs"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Question Grid Pills */}
+              <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2 max-h-[46vh] overflow-y-auto p-1">
+                {listeningStages
+                  .map((stage, idx) => ({ stage, idx, res: getStageResult(idx) }))
+                  .filter(({ stage, res }) => {
+                    if (reviewFilterPart !== "all" && stage.partNum !== reviewFilterPart) return false;
+                    if (onlyShowWrong && res.isCorrect) return false;
+                    return true;
+                  })
+                  .map(({ stage, idx, res }) => {
+                    const isCurrent = activeStage === idx;
+                    return (
+                      <button
+                        key={stage.id}
+                        type="button"
+                        onClick={() => setActiveStage(idx)}
+                        className={`p-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer border ${
+                          res.isCorrect
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/35 hover:bg-emerald-500/25"
+                            : "bg-red-500/15 text-red-700 dark:text-red-300 border-red-500/35 hover:bg-red-500/25"
+                        } ${
+                          isCurrent
+                            ? "ring-2 ring-primary ring-offset-2 ring-offset-background font-black shadow-sm"
+                            : ""
+                        }`}
+                        title={`${stage.label}: ${res.isCorrect ? "Đúng" : "Sai"}`}
+                      >
+                        <div className="flex items-center gap-1">
+                          {res.isCorrect ? (
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                          ) : (
+                            <X className="w-3 h-3 text-red-600 dark:text-red-400" />
+                          )}
+                          <span className="truncate">{res.label}</span>
+                        </div>
+                        {res.total && res.total > 1 && (
+                          <span className="text-[10px] opacity-80">
+                            {res.score}/{res.total}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+              </div>
+
+              {/* Actions */}
+              <div className="border-t border-border pt-3 space-y-2">
+                <button
+                  type="button"
+                  onClick={handleRestartExam}
+                  disabled={isRestarting}
+                  className="w-full tech-btn py-2.5 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isRestarting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <RotateCcw className="w-4 h-4" />
+                  )}
+                  <span>Làm lại đề này</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push("/history")}
+                  className="w-full py-2 px-4 rounded-xl border border-border text-xs font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Quay lại lịch sử làm bài</span>
+                </button>
+              </div>
+            </div>
+          </aside>
+        )}
+      </div>
       </main>
 
-      {/* 4. BOTTOM BAR CHUẨN */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
-        {/* Left: Hiện đáp án & Báo lỗi */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowSampleAnswers(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Hiện đáp án</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setShowReportModal(true);
-              setReportSent(false);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer"
-          >
-            <Flag className="w-3.5 h-3.5" />
-            <span>Báo lỗi</span>
-          </button>
-        </div>
-
-        {/* Center: Quick Part Question Pills & Navigation Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Glass Dock bọc dãy câu hỏi */}
-          <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm">
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[42vw] sm:max-w-[44vw] md:max-w-[50vw] lg:max-w-[56vw] py-0.5 px-0.5">
-              {listeningStages
-                .map((stage, idx) => ({ stage, idx }))
-                .filter(({ stage }) => stage.partNum === currentStage.partNum)
-                .map(({ stage, idx }) => {
-                  const isCurrent = activeStage === idx;
-                  let isAnswered = false;
-                  if (stage.partNum === 1) {
-                    isAnswered = !!p1Answers[stage.subIndex];
-                  } else if (stage.partNum === 2) {
-                    isAnswered = Object.keys(p2Answers).length > 0;
-                  } else if (stage.partNum === 3) {
-                    isAnswered = Object.keys(p3Answers).length > 0;
-                  } else if (stage.partNum === 4) {
-                    const part4KeyPrefix = `p4-${stage.subIndex}-`;
-                    isAnswered = Object.keys(p4Answers).some((k) => k.startsWith(part4KeyPrefix));
-                  }
-
-                  return (
-                    <button
-                      key={stage.id}
-                      id={`stage-pill-${idx}`}
-                      type="button"
-                      onClick={() => setActiveStage(idx)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
-                        isCurrent
-                          ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
-                          : isAnswered
-                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
-                          : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
-                      }`}
-                      title={stage.label}
-                    >
-                      {isAnswered && !isCurrent && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      )}
-                      <span>{stage.label}</span>
-                    </button>
-                  );
-                })}
-            </div>
-
-            <div className="h-4 w-px bg-border/70 shrink-0 mx-0.5 hidden sm:block" />
-
+      {/* 4. BOTTOM BAR CHUẨN (CHỈ HIỂN THỊ KHI ĐANG THI, ẨN KHI Ở REVIEW MODE) */}
+      {!isReviewMode && (
+        <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
+          {/* Left: Hiện đáp án & Báo lỗi */}
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setShowDrawer(true)}
-              className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0"
-              title="Danh sách tất cả câu hỏi"
-              aria-label="Danh sách tất cả câu hỏi"
+              onClick={() => setShowSampleAnswers(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors"
             >
-              <Menu className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <Eye className="w-3.5 h-3.5" />
+              <span>Hiện đáp án</span>
             </button>
 
             <button
               type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0 hidden sm:flex"
-              title="Cuộn lên đầu trang"
-              aria-label="Cuộn lên đầu trang"
+              onClick={() => {
+                setShowReportModal(true);
+                setReportSent(false);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer"
             >
-              <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <Flag className="w-3.5 h-3.5" />
+              <span>Báo lỗi</span>
             </button>
           </div>
-        </div>
 
-        {/* Right: Previous & Next / Submit */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            disabled={activeStage === 0}
-            onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
-            className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors"
-          >
-            ← Previous
-          </button>
+          {/* Center: Quick Part Question Pills & Navigation Controls */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Glass Dock bọc dãy câu hỏi */}
+            <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm">
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[42vw] sm:max-w-[44vw] md:max-w-[50vw] lg:max-w-[56vw] py-0.5 px-0.5">
+                {listeningStages
+                  .map((stage, idx) => ({ stage, idx }))
+                  .filter(({ stage }) => stage.partNum === currentStage.partNum)
+                  .map(({ stage, idx }) => {
+                    const isCurrent = activeStage === idx;
+                    let isAnswered = false;
+                    if (stage.partNum === 1) {
+                      isAnswered = !!p1Answers[stage.subIndex];
+                    } else if (stage.partNum === 2) {
+                      isAnswered = Object.keys(p2Answers).length > 0;
+                    } else if (stage.partNum === 3) {
+                      isAnswered = Object.keys(p3Answers).length > 0;
+                    } else if (stage.partNum === 4) {
+                      const recPrefix = `${stage.subIndex}_`;
+                      isAnswered = Object.keys(p4Answers).some((k) => k.startsWith(recPrefix));
+                    }
 
-          {activeStage < listeningStages.length - 1 ? (
+                    return (
+                      <button
+                        key={stage.id}
+                        id={`stage-pill-${idx}`}
+                        type="button"
+                        onClick={() => setActiveStage(idx)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
+                          isCurrent
+                            ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
+                            : isAnswered
+                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
+                            : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
+                        }`}
+                        title={stage.label}
+                      >
+                        {isAnswered && !isCurrent && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                        )}
+                        <span>{stage.label}</span>
+                      </button>
+                    );
+                  })}
+              </div>
+
+              <div className="h-4 w-px bg-border/70 shrink-0 mx-0.5 hidden sm:block" />
+
+              <button
+                type="button"
+                onClick={() => setShowDrawer(true)}
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0"
+                title="Danh sách tất cả câu hỏi"
+                aria-label="Danh sách tất cả câu hỏi"
+              >
+                <Menu className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0 hidden sm:flex"
+                title="Cuộn lên đầu trang"
+                aria-label="Cuộn lên đầu trang"
+              >
+                <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Right: Previous & Next / Submit */}
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setActiveStage((p) => Math.min(listeningStages.length - 1, p + 1))}
-              className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1"
+              disabled={activeStage === 0}
+              onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
+              className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors"
             >
-              <span>Next</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              ← Previous
             </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleFinalSubmit}
-              className="tech-btn px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all"
-            >
-              Nộp bài
-            </button>
-          )}
-        </div>
-      </footer>
+
+            {activeStage < listeningStages.length - 1 ? (
+              <button
+                type="button"
+                onClick={() => setActiveStage((p) => Math.min(listeningStages.length - 1, p + 1))}
+                className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1"
+              >
+                <span>Next</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleFinalSubmit}
+                className="tech-btn px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all"
+              >
+                Nộp bài
+              </button>
+            )}
+          </div>
+        </footer>
+      )}
 
       {/* MODAL HIỆN ĐÁP ÁN */}
       {showSampleAnswers && (

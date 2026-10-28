@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Check, GripVertical, ChevronUp, ChevronDown, RotateCcw, AlertCircle } from "lucide-react";
+import { Check, X, GripVertical, ChevronUp, ChevronDown, RotateCcw, AlertCircle } from "lucide-react";
 
 /* =========================================================
    1. GAP FILL COMPONENT (Part 1 - Ảnh 1 chuẩn aptiskytich.vn)
@@ -146,6 +146,8 @@ interface SentenceOrderProps {
   sentences: SentenceItem[];
   currentOrder?: string[]; // array of sentence IDs placed in slots 2, 3, 4, 5
   onChangeOrder: (newOrder: string[]) => void;
+  isReviewMode?: boolean;
+  correctOrder?: string[];
 }
 
 export function ReadingSentenceOrder({
@@ -154,6 +156,8 @@ export function ReadingSentenceOrder({
   sentences = [],
   currentOrder = [],
   onChangeOrder,
+  isReviewMode = false,
+  correctOrder = [],
 }: SentenceOrderProps) {
   // 4 target slots for positions 2, 3, 4, 5
   const [slots, setSlots] = useState<(SentenceItem | null)[]>([null, null, null, null]);
@@ -234,6 +238,7 @@ export function ReadingSentenceOrder({
   };
 
   const handleReset = () => {
+    if (isReviewMode) return;
     const empty = [null, null, null, null];
     notifyChange(empty);
   };
@@ -250,14 +255,19 @@ export function ReadingSentenceOrder({
             <h3 className="text-base font-extrabold text-exam-text">
               {title || "Text Cohesion"}
             </h3>
-            {slots.some(Boolean) && (
+            {!isReviewMode && slots.some(Boolean) && (
               <button
                 type="button"
                 onClick={handleReset}
-                className="inline-flex items-center gap-1 text-xs text-exam-text-muted hover:text-primary transition-colors"
+                className="inline-flex items-center gap-1 text-xs text-exam-text-muted hover:text-primary transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" /> Đặt lại ban đầu
               </button>
+            )}
+            {isReviewMode && (
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
+                Thứ tự bài làm của bạn
+              </span>
             )}
           </div>
 
@@ -275,13 +285,15 @@ export function ReadingSentenceOrder({
           {[0, 1, 2, 3].map((slotIdx) => {
             const slotNumber = slotIdx + 2;
             const placed = slots[slotIdx];
+            const expectedId = correctOrder[slotIdx];
+            const isCorrect = isReviewMode && placed && expectedId && placed.id === expectedId;
 
             return (
               <div
                 key={slotIdx}
                 className="flex items-start gap-3"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handleDropOnSlot(slotIdx)}
+                onDragOver={(e) => !isReviewMode && e.preventDefault()}
+                onDrop={() => !isReviewMode && handleDropOnSlot(slotIdx)}
               >
                 <span className="w-6 pt-3 text-center text-sm font-semibold text-exam-text-muted select-none">
                   {slotNumber}
@@ -290,31 +302,55 @@ export function ReadingSentenceOrder({
                 {placed ? (
                   /* Filled Slot Card */
                   <div
-                    draggable
-                    onDragStart={() => handleDragStart("slot", placed.id, slotIdx)}
-                    onClick={() => handleRemoveFromSlot(slotIdx)}
-                    className="flex-1 p-3.5 rounded-2xl border-2 border-primary/40 bg-exam-surface hover:border-red-500 shadow-sm flex items-start gap-2.5 cursor-pointer transition-all group"
-                    title="Bấm để đưa câu này trở lại danh sách bên phải hoặc kéo thả để đổi vị trí"
+                    draggable={!isReviewMode}
+                    onDragStart={() => !isReviewMode && handleDragStart("slot", placed.id, slotIdx)}
+                    onClick={() => !isReviewMode && handleRemoveFromSlot(slotIdx)}
+                    className={`flex-1 p-3.5 rounded-2xl border-2 shadow-sm flex items-start gap-2.5 transition-all group ${
+                      isReviewMode
+                        ? isCorrect
+                          ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/20"
+                          : "border-rose-500 bg-rose-50/30 dark:bg-rose-950/20"
+                        : "border-primary/40 bg-exam-surface hover:border-red-500 cursor-pointer"
+                    }`}
+                    title={isReviewMode ? undefined : "Bấm để gỡ câu này"}
                   >
-                    <GripVertical className="w-4 h-4 text-primary shrink-0 mt-0.5 group-hover:text-red-500 transition-colors" />
+                    {!isReviewMode && (
+                      <GripVertical className="w-4 h-4 text-primary shrink-0 mt-0.5 group-hover:text-red-500 transition-colors" />
+                    )}
                     <p className="flex-1 text-sm text-exam-text font-medium leading-relaxed select-none">
                       {placed.text}
                     </p>
-                    <span className="text-[10px] text-exam-text-muted group-hover:text-red-500 transition-colors shrink-0 pt-0.5">
-                      ✕ gỡ
-                    </span>
+                    {isReviewMode ? (
+                      isCorrect ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 shrink-0 pt-0.5">
+                          <Check className="w-3.5 h-3.5" /> Đúng
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 shrink-0 pt-0.5">
+                          <X className="w-3.5 h-3.5" /> Sai
+                        </span>
+                      )
+                    ) : (
+                      <span className="text-[10px] text-exam-text-muted group-hover:text-red-500 transition-colors shrink-0 pt-0.5">
+                        ✕ gỡ
+                      </span>
+                    )}
                   </div>
                 ) : (
                   /* Empty Dashed Slot */
                   <div
                     onClick={() => {
-                      if (unplacedSentences.length > 0) {
+                      if (!isReviewMode && unplacedSentences.length > 0) {
                         handleSelectFromPool(unplacedSentences[0]);
                       }
                     }}
-                    className="flex-1 min-h-[58px] rounded-2xl border-2 border-dashed border-exam-border bg-exam-bg/20 hover:border-primary/60 hover:bg-exam-bg/40 flex items-center justify-center text-xs text-exam-text-muted/60 transition-all cursor-pointer"
+                    className={`flex-1 min-h-[58px] rounded-2xl border-2 border-dashed flex items-center justify-center text-xs transition-all ${
+                      isReviewMode
+                        ? "border-rose-300 dark:border-rose-800 bg-rose-50/10 text-rose-500"
+                        : "border-exam-border bg-exam-bg/20 hover:border-primary/60 hover:bg-exam-bg/40 text-exam-text-muted/60 cursor-pointer"
+                    }`}
                   >
-                    <span>Kéo câu vào đây hoặc bấm câu bên phải</span>
+                    <span>{isReviewMode ? "Chưa xếp câu vào vị trí này" : "Kéo câu vào đây hoặc bấm câu bên phải"}</span>
                   </div>
                 )}
               </div>
@@ -323,34 +359,68 @@ export function ReadingSentenceOrder({
         </div>
 
         {/* =========================================
-            RIGHT COLUMN: Available Sentences Pool
+            RIGHT COLUMN: Available Pool or Review Answers
             ========================================= */}
         <div className="space-y-3 pt-6 lg:pt-8 lg:border-l lg:border-exam-border/40 lg:pl-6">
-          <div className="flex items-center justify-between text-xs text-exam-text-muted font-medium mb-1">
-            <span>Danh sách các câu (bấm hoặc kéo sang trái):</span>
-            <span>{unplacedSentences.length} câu còn lại</span>
-          </div>
+          {isReviewMode ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 pb-1">
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <h4 className="text-sm font-bold text-foreground">
+                  Đáp án chuẩn (Mạch văn hoàn chỉnh):
+                </h4>
+              </div>
 
-          {unplacedSentences.length === 0 ? (
-            <div className="p-6 rounded-2xl border border-dashed border-emerald-500/40 bg-emerald-500/5 text-center text-emerald-600 text-xs font-semibold">
-              ✓ Đã xếp đủ 4 câu vào các vị trí 2, 3, 4, 5!
+              <div className="p-3.5 rounded-xl border border-border bg-muted/20 text-xs text-foreground/80 leading-relaxed">
+                <span className="font-bold text-primary mr-1.5">[1]</span>
+                <span>{fixedSentence}</span>
+              </div>
+
+              {correctOrder.map((corId, cIdx) => {
+                const sItem = sentences.find((s) => s.id === corId);
+                if (!sItem) return null;
+                return (
+                  <div
+                    key={corId}
+                    className="p-3.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/20 dark:bg-emerald-950/20 text-xs text-foreground leading-relaxed flex items-start gap-2"
+                  >
+                    <span className="font-extrabold text-emerald-600 dark:text-emerald-400 shrink-0">
+                      [{cIdx + 2}]
+                    </span>
+                    <span className="font-medium">{sItem.text}</span>
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            unplacedSentences.map((item) => (
-              <div
-                key={item.id}
-                draggable
-                onDragStart={() => handleDragStart("pool", item.id)}
-                onClick={() => handleSelectFromPool(item)}
-                className="p-3.5 rounded-2xl border border-exam-border bg-exam-surface hover:border-primary hover:shadow-md shadow-sm flex items-start gap-2.5 cursor-pointer active:scale-[0.99] transition-all group"
-                title="Bấm để tự động điền vào ô trống tiếp theo hoặc kéo thả trực tiếp"
-              >
-                <GripVertical className="w-4 h-4 text-exam-text-muted/60 shrink-0 mt-0.5 group-hover:text-primary transition-colors" />
-                <p className="flex-1 text-sm text-exam-text font-medium leading-relaxed select-none">
-                  {item.text}
-                </p>
+            <>
+              <div className="flex items-center justify-between text-xs text-exam-text-muted font-medium mb-1">
+                <span>Danh sách các câu (bấm hoặc kéo sang trái):</span>
+                <span>{unplacedSentences.length} câu còn lại</span>
               </div>
-            ))
+
+              {unplacedSentences.length === 0 ? (
+                <div className="p-6 rounded-2xl border border-dashed border-emerald-500/40 bg-emerald-500/5 text-center text-emerald-600 text-xs font-semibold">
+                  ✓ Đã xếp đủ 4 câu vào các vị trí 2, 3, 4, 5!
+                </div>
+              ) : (
+                unplacedSentences.map((item) => (
+                  <div
+                    key={item.id}
+                    draggable
+                    onDragStart={() => handleDragStart("pool", item.id)}
+                    onClick={() => handleSelectFromPool(item)}
+                    className="p-3.5 rounded-2xl border border-exam-border bg-exam-surface hover:border-primary hover:shadow-md shadow-sm flex items-start gap-2.5 cursor-pointer active:scale-[0.99] transition-all group"
+                    title="Bấm để tự động điền vào ô trống tiếp theo hoặc kéo thả trực tiếp"
+                  >
+                    <GripVertical className="w-4 h-4 text-exam-text-muted/60 shrink-0 mt-0.5 group-hover:text-primary transition-colors" />
+                    <p className="flex-1 text-sm text-exam-text font-medium leading-relaxed select-none">
+                      {item.text}
+                    </p>
+                  </div>
+                ))
+              )}
+            </>
           )}
         </div>
       </div>

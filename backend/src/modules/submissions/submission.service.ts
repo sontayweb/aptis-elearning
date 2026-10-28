@@ -346,6 +346,18 @@ export class SubmissionService {
 
       maxTotalScore += q.max_score;
 
+      // Không chấm trắc nghiệm cho bài viết (Writing) hoặc bài nói (Speaking) vì sẽ do AI hoặc Giảng viên chấm
+      const isSubjectiveQuestion =
+        submission.exam.skill === 'WRITING' ||
+        submission.exam.skill === 'SPEAKING' ||
+        q.question_type === QuestionType.ESSAY ||
+        q.question_type === QuestionType.SPEAKING_AUDIO ||
+        q.question_type === QuestionType.SHORT_TEXT;
+
+      if (isSubjectiveQuestion) {
+        continue;
+      }
+
       const userChoice = ans.selected_option || ans.text_answer || '';
       const { score } = gradeObjectiveQuestion(
         q.question_type,

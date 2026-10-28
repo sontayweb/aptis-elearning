@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useAudioRecorder } from "@/hooks/use-audio-recorder";
 import { api } from "@/lib/api-client";
+import { useAuth } from "@/contexts/auth-context";
 import { ExamExitConfirmModal } from "@/components/exam-exit-confirm-modal";
 import {
   Mic,
@@ -37,6 +38,7 @@ import {
   ChevronDown,
   Star,
   Flame,
+  Loader2,
 } from "lucide-react";
 
 export interface SpeakingQuestion {
@@ -778,7 +780,20 @@ function SpeakingExamRunnerContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const examId = (params.id as string) || "";
+  const submissionIdParam = searchParams.get("submissionId") || "";
+  const modeParam = searchParams.get("mode") || "";
+  const isReviewUrl = modeParam === "review" && Boolean(submissionIdParam);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [isRestarting, setIsRestarting] = useState(false);
+  const isStartingSubmissionRef = useRef(false);
+
+  const { user } = useAuth();
+  const userAiQuota =
+    user?.activeSubscription?.aiQuotaLeft ??
+    user?.subscription?.aiQuotaLeft ??
+    user?.user_subscriptions?.[0]?.ai_quota_left ??
+    (user?.ai_quotas ? Math.max(0, user.ai_quotas.total_quota - user.ai_quotas.used_quota) : undefined);
+  const aiQuota = userAiQuota !== undefined ? userAiQuota : 5;
 
   // Đọc query param ?part=p1 | p2 | p3 | p4
   const partParam = searchParams.get("part")?.toLowerCase() || "";
@@ -1026,14 +1041,98 @@ function SpeakingExamRunnerContent() {
     }
   }, [examId, targetPart]);
 
-  // Tạo phiên thi (submission) khi vào phòng Speaking
+  // Tạo phiên thi (submission) khi vào phòng Speaking hoặc Khôi phục bài cũ để Xem lại (Review Mode)
   useEffect(() => {
     async function initSpeakingSubmission() {
       const token =
         typeof window !== "undefined"
           ? localStorage.getItem("accessToken") || localStorage.getItem("token")
           : null;
-      if (!token || !examId || questions.length === 0 || submissionId) return;
+      if (!token || !examId || questions.length === 0 || isStartingSubmissionRef.current) return;
+
+      // NHÁNH 1: XEM LẠI TỪ LỊCH SỬ (/history) VỚI submissionId & mode=review
+      if (isReviewUrl && submissionIdParam) {
+        isStartingSubmissionRef.current = true;
+        try {
+          setLoading(true);
+          const res = await api.submissions.getResult(submissionIdParam);
+          if (res.success && res.data) {
+            const sub = res.data;
+            setSubmissionId(submissionIdParam);
+            setIsReviewMode(true);
+            setIsSubmitted(true);
+            setStage("finished");
+
+            // Phục hồi audio, duration, aiResult vào recordedData
+            const restoredRecords: Record<number, any> = {};
+            questions.forEach((q, idx) => {
+              const foundAns = (sub.answers || []).find(
+                (a: any) => String(a.question_id || a.questionId) === String(q.id)
+              );
+              if (foundAns) {
+                const aiResultObj =
+                  foundAns.ai_score !== undefined || foundAns.ai_band
+                    ? {
+                        score: foundAns.ai_score ?? 0,
+                        band: foundAns.ai_band ?? (sub.cefrBand || "B1"),
+                        pronunciation: foundAns.pronunciation_score ?? 0,
+                        fluency: foundAns.fluency_score ?? 0,
+                        grammar: foundAns.grammar_score ?? 0,
+                        vocabulary: foundAns.vocabulary_score ?? 0,
+                        transcript: foundAns.transcript || foundAns.text_answer || "",
+                        feedback: foundAns.ai_feedback
+                          ? [foundAns.ai_feedback]
+                          : sub.teacherNotes
+                          ? [sub.teacherNotes]
+                          : [],
+                        detailedFeedback: [],
+                        strengths: [],
+                        upgrades: [],
+                      }
+                    : sub.score !== undefined
+                    ? {
+                        score: sub.score,
+                        band: sub.cefrBand || "B1",
+                        pronunciation: 0,
+                        fluency: 0,
+                        grammar: 0,
+                        vocabulary: 0,
+                        transcript: foundAns.transcript || "",
+                        feedback: sub.teacherNotes ? [sub.teacherNotes] : [],
+                        detailedFeedback: [],
+                        strengths: [],
+                        upgrades: [],
+                      }
+                    : null;
+
+                restoredRecords[idx] = {
+                  audioUrl: foundAns.audio_url || foundAns.audioUrl || null,
+                  duration: foundAns.audio_duration || foundAns.audioDuration || 30,
+                  prepNotes: "",
+                  aiResult: aiResultObj,
+                  isCompleted: true,
+                };
+              }
+            });
+
+            if (Object.keys(restoredRecords).length > 0) {
+              setRecordedData(restoredRecords);
+              if (restoredRecords[0]?.aiResult) {
+                setAiResult(restoredRecords[0].aiResult);
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Lỗi nạp bài thi Speaking cũ:", err);
+        } finally {
+          setLoading(false);
+        }
+        return;
+      }
+
+      // NHÁNH 2: BẮT ĐẦU PHIÊN THI MỚI / TIẾP TỤC BÀI ĐANG LÀM
+      if (submissionId) return;
+      isStartingSubmissionRef.current = true;
       try {
         const res = await api.submissions.start(examId);
         if (res.success && res.data) {
@@ -1044,7 +1143,22 @@ function SpeakingExamRunnerContent() {
       }
     }
     initSpeakingSubmission();
-  }, [examId, questions.length]);
+  }, [examId, questions.length, isReviewUrl, submissionIdParam]);
+
+  // Làm lại bài thi Speaking mới (forceNew = true)
+  const handleRestartExam = async () => {
+    try {
+      setIsRestarting(true);
+      await api.submissions.start(examId, true);
+      router.push(`/speaking/${examId}`);
+      router.refresh();
+    } catch (err) {
+      console.error("Lỗi khi tạo lượt thi Speaking mới:", err);
+      router.push(`/speaking/${examId}`);
+    } finally {
+      setIsRestarting(false);
+    }
+  };
 
   const currentQ = questions[currentIndex] || null;
   const completedCount = Object.values(recordedData).filter((r) => r.isCompleted).length;
@@ -1130,11 +1244,11 @@ function SpeakingExamRunnerContent() {
 
       const record = recordedData[index];
 
-      if (record?.isCompleted && record.audioUrl) {
+      if (isReviewMode || (record?.isCompleted && record.audioUrl)) {
         setStage("finished");
         setTimer(0);
-        setPrepNotes(record.prepNotes || "");
-        setAiResult(record.aiResult || null);
+        setPrepNotes(record?.prepNotes || "");
+        setAiResult(record?.aiResult || null);
       } else {
         resetRecording();
         setAiResult(null);
@@ -1629,16 +1743,45 @@ function SpeakingExamRunnerContent() {
           </div>
         )}
 
-        {/* Bên phải: Nút Thoát */}
+        {/* Bên phải: Chế độ Xem lại & Nút Thoát */}
         <div className="flex items-center gap-2">
-          <Link
-            href="/speaking"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          {isReviewMode && (
+            <>
+              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 font-bold text-xs">
+                <Eye className="w-3.5 h-3.5" />
+                Xem lại bài thi
+              </span>
+              <button
+                type="button"
+                onClick={handleRestartExam}
+                disabled={isRestarting}
+                className="tech-btn px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {isRestarting ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <RotateCcw className="w-3.5 h-3.5" />
+                )}
+                <span>Làm lại đề mới</span>
+              </button>
+            </>
+          )}
+
+          <button
+            type="button"
+            onClick={() => {
+              if (isSubmitted || isReviewMode || stage === "finished") {
+                router.push("/speaking");
+              } else {
+                setShowExitConfirm(true);
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
             title="Thoát về danh sách đề"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Thoát</span>
-          </Link>
+          </button>
         </div>
       </header>
 
@@ -2787,7 +2930,7 @@ function SpeakingExamRunnerContent() {
           <div className="flex items-center gap-2">
             <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
               <Sparkles className="w-3 h-3 text-primary" />
-              <span>Còn 5 lượt chấm AI</span>
+              <span>Còn {aiQuota} lượt chấm AI</span>
             </div>
           </div>
         </div>
@@ -2975,16 +3118,16 @@ function SpeakingExamRunnerContent() {
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsCompletedModalOpen(false);
-                    setRecordedData({});
-                    setCurrentIndex(0);
-                    initQuestionState(0);
-                  }}
-                  className="py-2.5 rounded-xl border border-border hover:bg-muted font-bold text-xs text-foreground transition-colors flex items-center justify-center gap-1.5"
+                  onClick={handleRestartExam}
+                  disabled={isRestarting}
+                  className="py-2.5 rounded-xl border border-border hover:bg-muted font-bold text-xs text-foreground transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Luyện tập lại</span>
+                  {isRestarting ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  )}
+                  <span>Làm lại đề mới</span>
                 </button>
 
                 <Link

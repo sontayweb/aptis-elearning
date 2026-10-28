@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
@@ -71,6 +71,10 @@ function ReadingExamRunner() {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const examId = (params.id as string) || "reading-01";
   const partParam = searchParams.get("part"); // "1" | "2" | "4" | "5" | null
+  const modeParam = searchParams.get("mode"); // "review" | null
+  const submissionIdParam = searchParams.get("submissionId");
+
+  const [isReviewMode, setIsReviewMode] = useState(modeParam === "review");
 
   const { isAuthenticated, user } = useAuth();
 
@@ -235,6 +239,83 @@ function ReadingExamRunner() {
             initialP2Orders[st.id] = [];
           });
           setP2Orders(initialP2Orders);
+
+          // Nếu có submissionId & mode=review, tải bài nộp cũ để review
+          if (submissionIdParam) {
+            try {
+              const subRes = await api.submissions.getResult(submissionIdParam);
+              if (subRes.success && subRes.data) {
+                const sub = subRes.data;
+                setSubmissionId(submissionIdParam);
+                if (sub.total_score != null) setResultScore(Math.round(sub.total_score * 10) / 10);
+                if (sub.cefr_level) setCefrBand(sub.cefr_level);
+
+                const loadedP1: Record<string, string> = {};
+                const loadedP2: Record<string, string[]> = {};
+                const loadedP3: Record<string, string> = {};
+                const loadedP4: Record<string, string> = {};
+
+                (sub.answers || []).forEach((ans: any) => {
+                  const qId = String(ans.question_id || ans.questionId);
+                  const opt = ans.selected_option || ans.selectedOption || ans.text_answer || ans.textAnswer || "";
+                  if (parsed.part1.gaps.some((g) => g.id === qId)) {
+                    loadedP1[qId] = opt;
+                  } else if (parsed.part2.stories.some((s) => s.id === qId)) {
+                    try {
+                      loadedP2[qId] = JSON.parse(opt);
+                    } catch {
+                      loadedP2[qId] = [];
+                    }
+                  } else if (parsed.part3.questions.some((q) => q.id === qId)) {
+                    loadedP3[qId] = opt;
+                  } else if (parsed.part4.paragraphs.some((p) => p.id === qId)) {
+                    loadedP4[qId] = opt;
+                  }
+                });
+
+                setP1Answers(loadedP1);
+                if (Object.keys(loadedP2).length > 0) {
+                  setP2Orders((prev) => ({ ...prev, ...loadedP2 }));
+                }
+                setP3Answers(loadedP3);
+                setP4Answers(loadedP4);
+
+                // Tính toán điểm chi tiết từng phần từ bài nộp
+                const calculatedPartScores: { name: string; score: number; maxScore: number; correct: number; total: number }[] = [];
+                const activePartsCount =
+                  (parsed.part1.gaps.length > 0 ? 1 : 0) +
+                  (parsed.part2.stories.length > 0 ? 1 : 0) +
+                  (parsed.part3.questions.length > 0 ? 1 : 0) +
+                  (parsed.part4.paragraphs.length > 0 ? 1 : 0);
+
+                if (parsed.part1.gaps.length > 0) {
+                  let p1Correct = 0;
+                  parsed.part1.gaps.forEach((g) => {
+                    if (loadedP1[g.id] && loadedP1[g.id].toLowerCase() === g.correctAnswer.toLowerCase()) {
+                      p1Correct++;
+                    }
+                  });
+                  const p1Max = activePartsCount === 1 ? 50 : 7;
+                  const p1Score = (p1Correct / parsed.part1.gaps.length) * p1Max;
+                  calculatedPartScores.push({
+                    name: "Part 1 – Sentence comprehension",
+                    score: Math.round(p1Score * 10) / 10,
+                    maxScore: p1Max,
+                    correct: p1Correct,
+                    total: parsed.part1.gaps.length,
+                  });
+                }
+                setPartScores(calculatedPartScores);
+
+                if (modeParam === "review") {
+                  setIsReviewMode(true);
+                  setIsSubmitted(false);
+                }
+              }
+            } catch (err) {
+              console.warn("Could not load submission for review:", err);
+            }
+          }
         } else {
           // Xử lý khi yêu cầu quyền VIP / PRO
           const msg = res.message || "";
@@ -268,7 +349,7 @@ function ReadingExamRunner() {
     }
 
     loadReadingExam();
-  }, [examId]);
+  }, [examId, submissionIdParam, modeParam]);
 
   // Dynamic Stage list for navigation based on actually loaded questions
   const stages = useMemo(() => {
@@ -332,7 +413,9 @@ function ReadingExamRunner() {
     return list;
   }, [examData]);
 
-  // Adjust activeStage if URL contains ?part=
+  const hasHandledPartParam = useRef<string | null>(null);
+
+  // Adjust activeStage if URL contains ?part= (chỉ chạy 1 lần khi khởi tạo)
   useEffect(() => {
     if (stages.length === 0) return;
     if (stages.length === 1) {
@@ -341,6 +424,8 @@ function ReadingExamRunner() {
     }
     if (!partParam) return;
     const p = partParam.toLowerCase();
+    if (hasHandledPartParam.current === p) return;
+
     const targetKey =
       p === "1" || p === "p1" || p === "part1"
         ? "p1"
@@ -355,7 +440,10 @@ function ReadingExamRunner() {
         : null;
     if (targetKey) {
       const idx = stages.findIndex((s) => s.stageKey === targetKey);
-      if (idx !== -1) setActiveStage(idx);
+      if (idx !== -1) {
+        setActiveStage(idx);
+        hasHandledPartParam.current = p;
+      }
     }
   }, [partParam, stages]);
 
@@ -370,7 +458,7 @@ function ReadingExamRunner() {
 
   // 2. Countdown Timer
   useEffect(() => {
-    if (isSubmitted || loading) return;
+    if (isSubmitted || loading || isReviewMode) return;
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -382,11 +470,11 @@ function ReadingExamRunner() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isSubmitted, loading]);
+  }, [isSubmitted, loading, isReviewMode]);
 
   // 3. Khôi phục bản nháp LocalStorage ngay khi vào phòng thi Reading (Zero-latency recovery)
   useEffect(() => {
-    if (typeof window === "undefined" || !examId || isSubmitted) return;
+    if (typeof window === "undefined" || !examId || isSubmitted || isReviewMode || modeParam === "review") return;
     try {
       const raw = localStorage.getItem(`aptis_draft_reading_${examId}`);
       if (raw) {
@@ -405,11 +493,11 @@ function ReadingExamRunner() {
         }
       }
     } catch {}
-  }, [examId, isSubmitted]);
+  }, [examId, isSubmitted, isReviewMode, modeParam]);
 
   // 4. Tự động ghi bản nháp vào LocalStorage khi câu trả lời thay đổi
   useEffect(() => {
-    if (typeof window === "undefined" || !examId || isSubmitted) return;
+    if (typeof window === "undefined" || !examId || isSubmitted || isReviewMode || modeParam === "review") return;
     const hasAnswers =
       Object.keys(p1Answers).length > 0 ||
       Object.keys(p2Orders).length > 0 ||
@@ -430,11 +518,11 @@ function ReadingExamRunner() {
         );
       } catch {}
     }
-  }, [p1Answers, p2Orders, p3Answers, p4Answers, examId, isSubmitted]);
+  }, [p1Answers, p2Orders, p3Answers, p4Answers, examId, isSubmitted, isReviewMode, modeParam]);
 
   // 5. Cảnh báo beforeunload chống vô tình F5/thoát trang khi đang thi
   useEffect(() => {
-    if (isSubmitted) return;
+    if (isSubmitted || isReviewMode) return;
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "Bạn đang làm bài thi Reading. Rời khỏi trang có thể làm gián đoạn bài làm!";
@@ -442,13 +530,13 @@ function ReadingExamRunner() {
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [isSubmitted]);
+  }, [isSubmitted, isReviewMode]);
 
   // 6. Khởi tạo / Khôi phục Database Submission từ máy chủ
   useEffect(() => {
     async function initSubmission() {
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-      if (!token || !examId || submissionId) return;
+      if (!token || !examId || submissionId || isReviewMode || modeParam === "review" || submissionIdParam) return;
       try {
         const res = await api.submissions.start(examId);
         if (res.success && res.data) {
@@ -750,15 +838,35 @@ function ReadingExamRunner() {
 
         {/* Căn giữa: Đồng hồ đếm ngược & Sync status */}
         <div className="flex items-center gap-2.5">
-          <ExamSyncStatus
-            status={syncStatus}
-            lastSavedAt={lastSavedAt}
-            isResumed={isResumedSession}
-          />
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-            <Clock className="w-4 h-4" />
-            <span>{formatTime(timeLeft)}</span>
-          </div>
+          {isReviewMode ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-xs">
+                <Eye className="w-3.5 h-3.5" />
+                <span>Chế độ xem lại bài làm</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsSubmitted(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold hover:bg-primary/20 transition-colors cursor-pointer"
+                title="Bấm để xem lại bảng điểm tổng quan"
+              >
+                <Award className="w-3.5 h-3.5" />
+                <span>Báo cáo điểm</span>
+              </button>
+            </div>
+          ) : (
+            <>
+              <ExamSyncStatus
+                status={syncStatus}
+                lastSavedAt={lastSavedAt}
+                isResumed={isResumedSession}
+              />
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+                <Clock className="w-4 h-4" />
+                <span>{formatTime(timeLeft)}</span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -771,13 +879,21 @@ function ReadingExamRunner() {
             <Languages className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Google Dịch</span>
           </button>
-          <Link
-            href="/reading"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          <button
+            type="button"
+            onClick={() => {
+              if (isSubmitted) {
+                router.push("/reading");
+              } else {
+                setShowExitConfirm(true);
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            title="Thoát về danh sách đề"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Thoát</span>
-          </Link>
+          </button>
         </div>
       </header>
 
@@ -865,6 +981,20 @@ function ReadingExamRunner() {
                     type="button"
                     onClick={() => {
                       setIsSubmitted(false);
+                      setIsReviewMode(true);
+                      setActiveStage(0);
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-brand-brown transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Xem lại chi tiết bài làm</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSubmitted(false);
+                      setIsReviewMode(false);
                       setP1Answers({});
                       setP3Answers({});
                       setP4Answers({});
@@ -876,20 +1006,22 @@ function ReadingExamRunner() {
                       setTimeLeft(examData.durationMinutes * 60);
                       setActiveStage(0);
                     }}
-                    className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors flex items-center gap-1.5"
+                    className="px-4 py-2.5 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Làm lại đề này</span>
                   </button>
+
                   <Link
                     href="/history"
-                    className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors"
+                    className="px-4 py-2.5 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors cursor-pointer"
                   >
                     Lịch sử làm bài
                   </Link>
+
                   <Link
                     href="/reading"
-                    className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-brand-brown transition-colors"
+                    className="px-4 py-2.5 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors cursor-pointer"
                   >
                     Về danh sách đề Reading
                   </Link>
@@ -1021,11 +1153,18 @@ function ReadingExamRunner() {
                           }
 
                           const userVal = p1Answers[gap.id] || "";
+                          const isCorrect = userVal && userVal.toLowerCase() === gap.correctAnswer.toLowerCase();
 
                           return (
                             <div
                               key={gap.id}
-                              className="p-4 md:p-5 rounded-2xl border border-border bg-card hover:border-primary/50 transition-all flex flex-wrap items-center gap-3 text-sm md:text-base leading-relaxed shadow-2xs"
+                              className={`p-4 md:p-5 rounded-2xl border transition-all flex flex-wrap items-center gap-3 text-sm md:text-base leading-relaxed shadow-2xs ${
+                                isReviewMode
+                                  ? isCorrect
+                                    ? "border-emerald-300 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/20"
+                                    : "border-rose-300 dark:border-rose-800 bg-rose-50/30 dark:bg-rose-950/20"
+                                  : "border-border bg-card hover:border-primary/50"
+                              }`}
                             >
                               <span className="font-extrabold text-xs text-primary bg-primary/10 px-2.5 py-1 rounded-lg shrink-0">
                                 Câu {gIdx + 1}
@@ -1033,16 +1172,21 @@ function ReadingExamRunner() {
                               <span>{beforeGap}</span>
                               <select
                                 value={userVal}
+                                disabled={isReviewMode}
                                 onChange={(e) =>
                                   setP1Answers((prev) => ({
                                     ...prev,
                                     [gap.id]: e.target.value,
                                   }))
                                 }
-                                className={`px-3 py-1.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer outline-none shadow-2xs ${
-                                  userVal
-                                    ? "border-primary bg-primary/10 text-primary font-bold"
-                                    : "border-border bg-background text-muted-foreground hover:border-primary/60"
+                                className={`px-3 py-1.5 rounded-xl border text-sm font-semibold transition-all outline-none shadow-2xs ${
+                                  isReviewMode
+                                    ? isCorrect
+                                      ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 font-bold"
+                                      : "border-rose-400 bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 font-bold"
+                                    : userVal
+                                    ? "border-primary bg-primary/10 text-primary font-bold cursor-pointer"
+                                    : "border-border bg-background text-muted-foreground hover:border-primary/60 cursor-pointer"
                                 }`}
                               >
                                 <option value="">— Chọn từ khuyết —</option>
@@ -1053,6 +1197,27 @@ function ReadingExamRunner() {
                                 ))}
                               </select>
                               <span>{afterGap}</span>
+
+                              {/* Review Mode Answer Feedback */}
+                              {isReviewMode && (
+                                <div className="w-full flex items-center gap-2 pt-2 border-t border-border/50 text-xs">
+                                  {userVal ? (
+                                    isCorrect ? (
+                                      <span className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400">
+                                        <Check className="w-3.5 h-3.5" /> Bạn đã chọn đúng
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center gap-1.5 font-bold text-rose-600 dark:text-rose-400">
+                                        <X className="w-3.5 h-3.5" /> Bạn chọn: <span className="line-through">{userVal}</span> · Đáp án đúng: <strong className="text-emerald-600 dark:text-emerald-400 font-mono text-sm underline">{gap.correctAnswer}</strong>
+                                      </span>
+                                    )
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400">
+                                      <AlertCircle className="w-3.5 h-3.5" /> Chưa chọn đáp án · Đáp án đúng: <strong className="text-emerald-600 dark:text-emerald-400 font-mono text-sm underline">{gap.correctAnswer}</strong>
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -1076,6 +1241,8 @@ function ReadingExamRunner() {
                         fixedSentence={story.fixedSentence}
                         sentences={story.sentences}
                         currentOrder={currentOrder}
+                        isReviewMode={isReviewMode}
+                        correctOrder={story.correctOrder}
                         onChangeOrder={(newOrder) =>
                           setP2Orders((prev) => ({
                             ...prev,
@@ -1101,6 +1268,8 @@ function ReadingExamRunner() {
                         fixedSentence={story.fixedSentence}
                         sentences={story.sentences}
                         currentOrder={currentOrder}
+                        isReviewMode={isReviewMode}
+                        correctOrder={story.correctOrder}
                         onChangeOrder={(newOrder) =>
                           setP2Orders((prev) => ({
                             ...prev,
@@ -1167,19 +1336,47 @@ function ReadingExamRunner() {
                         </h4>
                         {examData.part3.questions.map((q, qIdx) => {
                           const userVal = p3Answers[q.id];
+                          const isCorrect = userVal && userVal.toLowerCase() === q.correctAnswer.toLowerCase();
 
                           return (
                             <div
                               key={q.id}
-                              className="p-4 rounded-xl border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                              className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs ${
+                                isReviewMode
+                                  ? isCorrect
+                                    ? "border-emerald-300 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/20"
+                                    : "border-rose-300 dark:border-rose-800 bg-rose-50/30 dark:bg-rose-950/20"
+                                  : "border-border bg-card"
+                              }`}
                             >
                               <div className="flex items-start gap-2.5">
                                 <span className="font-bold text-xs text-primary bg-primary/10 px-2 py-0.5 rounded mt-0.5">
                                   {qIdx + 1}
                                 </span>
-                                <p className="text-xs md:text-sm font-semibold text-foreground">
-                                  {q.prompt}
-                                </p>
+                                <div>
+                                  <p className="text-xs md:text-sm font-semibold text-foreground">
+                                    {q.prompt}
+                                  </p>
+                                  {isReviewMode && (
+                                    <div className="pt-1.5 text-xs">
+                                      {userVal ? (
+                                        isCorrect ? (
+                                          <span className="text-emerald-600 dark:text-emerald-400 font-bold inline-flex items-center gap-1">
+                                            <Check className="w-3.5 h-3.5" /> Bạn chọn đúng ({q.correctAnswer})
+                                          </span>
+                                        ) : (
+                                          <span className="text-rose-600 dark:text-rose-400 font-bold inline-flex items-center gap-1.5">
+                                            <X className="w-3.5 h-3.5" /> Bạn chọn: {userVal} · Đáp án đúng: <strong className="text-emerald-600 dark:text-emerald-400 underline">{q.correctAnswer}</strong>
+                                          </span>
+                                        )
+                                      ) : (
+                                        <span className="text-amber-600 dark:text-amber-400 font-bold inline-flex items-center gap-1.5">
+                                          Chưa trả lời · Đáp án đúng: <strong className="text-emerald-600 dark:text-emerald-400 underline">{q.correctAnswer}</strong>
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
 
                               {/* 4 Pill Options */}
@@ -1190,6 +1387,7 @@ function ReadingExamRunner() {
                                     <button
                                       key={opt}
                                       type="button"
+                                      disabled={isReviewMode}
                                       onClick={() =>
                                         setP3Answers((prev) => ({
                                           ...prev,
@@ -1198,7 +1396,11 @@ function ReadingExamRunner() {
                                       }
                                       className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                                         isSelected
-                                          ? "bg-primary text-primary-foreground shadow-xs scale-105"
+                                          ? isReviewMode
+                                            ? isCorrect
+                                              ? "bg-emerald-600 text-white shadow-xs"
+                                              : "bg-rose-600 text-white shadow-xs"
+                                            : "bg-primary text-primary-foreground shadow-xs scale-105"
                                           : "border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                                       }`}
                                     >
@@ -1264,11 +1466,18 @@ function ReadingExamRunner() {
                       <div className="space-y-5">
                         {examData.part4.paragraphs.map((p) => {
                           const userVal = p4Answers[p.id] || "";
+                          const isCorrect = userVal && userVal.toLowerCase() === p.correctHeading.toLowerCase();
 
                           return (
                             <div
                               key={p.id}
-                              className="p-5 rounded-xl border border-border bg-card space-y-3 shadow-2xs"
+                              className={`p-5 rounded-xl border space-y-3 shadow-2xs ${
+                                isReviewMode
+                                  ? isCorrect
+                                    ? "border-emerald-300 dark:border-emerald-800 bg-emerald-50/20 dark:bg-emerald-950/20"
+                                    : "border-rose-300 dark:border-rose-800 bg-rose-50/20 dark:bg-rose-950/20"
+                                  : "border-border bg-card"
+                              }`}
                             >
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-3">
                                 <span className="font-bold text-xs text-primary bg-primary/10 px-2.5 py-1 rounded-md inline-block">
@@ -1277,16 +1486,21 @@ function ReadingExamRunner() {
 
                                 <select
                                   value={userVal}
+                                  disabled={isReviewMode}
                                   onChange={(e) =>
                                     setP4Answers((prev) => ({
                                       ...prev,
                                       [p.id]: e.target.value,
                                     }))
                                   }
-                                  className={`w-full sm:max-w-md px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer outline-none truncate ${
-                                    userVal
-                                      ? "border-primary bg-primary/10 text-primary"
-                                      : "border-border bg-card text-muted-foreground hover:border-primary/60"
+                                  className={`w-full sm:max-w-md px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all outline-none truncate ${
+                                    isReviewMode
+                                      ? isCorrect
+                                        ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 font-bold"
+                                        : "border-rose-400 bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 font-bold"
+                                      : userVal
+                                      ? "border-primary bg-primary/10 text-primary cursor-pointer"
+                                      : "border-border bg-card text-muted-foreground hover:border-primary/60 cursor-pointer"
                                   }`}
                                 >
                                   <option value="">— Chọn tiêu đề phù hợp —</option>
@@ -1297,6 +1511,26 @@ function ReadingExamRunner() {
                                   ))}
                                 </select>
                               </div>
+
+                              {isReviewMode && (
+                                <div className="text-xs font-semibold pb-1">
+                                  {userVal ? (
+                                    isCorrect ? (
+                                      <span className="text-emerald-600 dark:text-emerald-400 font-bold inline-flex items-center gap-1">
+                                        <Check className="w-3.5 h-3.5" /> Đúng tiêu đề: {p.correctHeading}
+                                      </span>
+                                    ) : (
+                                      <span className="text-rose-600 dark:text-rose-400 font-bold inline-flex items-center gap-1.5">
+                                        <X className="w-3.5 h-3.5" /> Bạn chọn: {userVal} · Tiêu đề đúng: <strong className="text-emerald-600 dark:text-emerald-400 underline">{p.correctHeading}</strong>
+                                      </span>
+                                    )
+                                  ) : (
+                                    <span className="text-amber-600 dark:text-amber-400 font-bold inline-flex items-center gap-1.5">
+                                      Chưa chọn tiêu đề · Tiêu đề đúng: <strong className="text-emerald-600 dark:text-emerald-400 underline">{p.correctHeading}</strong>
+                                    </span>
+                                  )}
+                                </div>
+                              )}
 
                               <p
                                 className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans select-text"
@@ -1530,6 +1764,15 @@ function ReadingExamRunner() {
               >
                 <span>Next</span>
                 <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : isReviewMode ? (
+              <button
+                type="button"
+                onClick={() => setIsSubmitted(true)}
+                className="tech-btn px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <Award className="w-3.5 h-3.5" />
+                <span>Xem báo cáo điểm</span>
               </button>
             ) : (
               <button

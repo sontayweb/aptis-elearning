@@ -222,7 +222,12 @@ ${transcriptText}
 
       if (!question || !part) continue;
 
-      if (question.question_type === QuestionType.ESSAY || question.question_type === QuestionType.SHORT_TEXT) {
+      const isWritingQuestion =
+        question.question_type === QuestionType.ESSAY ||
+        question.question_type === QuestionType.SHORT_TEXT ||
+        submission.exam.skill === ExamSkill.WRITING;
+
+      if (isWritingQuestion) {
         // Chấm bài viết (Writing)
         subjectiveQuestionCount++;
         writingQuestionCount++;
