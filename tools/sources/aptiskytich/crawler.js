@@ -327,7 +327,7 @@ export async function crawl({ prisma = null, saveDb = false } = {}) {
     for (const ex of normalizedExams) {
       const res = await upsertExam(prisma, ex);
       if (res?.status === 'CREATED') inserted++;
-      if (res?.status === 'UPDATED') updated++;
+      if (res?.status && res.status.includes('UPDATED')) updated++;
     }
     console.log(`✅ Hoàn tất nạp DB: Thêm mới ${inserted} đề, Cập nhật ${updated} đề.`);
   }

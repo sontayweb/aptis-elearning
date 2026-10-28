@@ -27,7 +27,8 @@ try:
         env = os.environ.copy()
         env['DATABASE_URL'] = 'postgresql://postgres:12345678@127.0.0.1:5433/aptis_kytich_db?schema=public'
         
-        cmd = ['node', 'tools/sync.js', '--source=aptisacademy', '--db']
+        source = sys.argv[1] if len(sys.argv) > 1 else 'aptisacademy'
+        cmd = ['node', 'tools/sync.js', f'--source={source}', '--db']
         print(f"▶️ Đang chạy lệnh: {' '.join(cmd)}...")
         proc = subprocess.run(cmd, env=env, cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
         print(f"🏁 Tiến trình hoàn tất với Exit Code: {proc.returncode}")

@@ -95,6 +95,17 @@ export function mapSkill(skill) {
 }
 
 export function mapQuestionType(type, skill = '', partNum = 1) {
+  // 1. Kỹ năng Speaking luôn là SPEAKING_AUDIO
+  if (skill === 'SPEAKING') {
+    return 'SPEAKING_AUDIO';
+  }
+
+  // 2. Kỹ năng Writing luôn là SHORT_TEXT (Part 1, 3) hoặc ESSAY (Part 2, 4)
+  if (skill === 'WRITING') {
+    if (partNum === 1 || partNum === 3) return 'SHORT_TEXT';
+    return 'ESSAY';
+  }
+
   const t = String(type || '').toUpperCase();
   if (t === 'GAP_FILL' || t.includes('GAP')) return 'GAP_FILL';
   if (t === 'SENTENCE_ORDER' || t.includes('ORDER')) return 'SENTENCE_ORDER';
@@ -104,16 +115,11 @@ export function mapQuestionType(type, skill = '', partNum = 1) {
   if (t === 'SPEAKING_AUDIO' || t.includes('SPEAK') || t.includes('AUDIO')) return 'SPEAKING_AUDIO';
   if (t === 'MULTIPLE_CHOICE' || t.includes('CHOICE') || t.includes('MCQ')) return 'MULTIPLE_CHOICE';
 
-  // Tự động suy luận thông minh theo chuẩn Aptis CEFR nếu scraper không cung cấp
+  // 3. Tự động suy luận thông minh theo chuẩn Aptis CEFR cho Reading / Listening nếu scraper không cung cấp
   if (skill === 'READING') {
     if (partNum === 1) return 'GAP_FILL';
     if (partNum === 2 || partNum === 3) return 'SENTENCE_ORDER';
     if (partNum === 4) return 'MATCHING';
-  } else if (skill === 'SPEAKING') {
-    return 'SPEAKING_AUDIO';
-  } else if (skill === 'WRITING') {
-    if (partNum === 1 || partNum === 3) return 'SHORT_TEXT';
-    return 'ESSAY';
   } else if (skill === 'LISTENING') {
     if (partNum === 2 || partNum === 3) return 'MATCHING';
     return 'MULTIPLE_CHOICE';
