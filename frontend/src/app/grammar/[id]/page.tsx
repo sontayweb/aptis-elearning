@@ -468,14 +468,16 @@ function GrammarExamRunnerContent() {
             <button
               type="button"
               onClick={() => {
-                if (isSubmitted || isReviewMode) {
+                if (isReviewMode) {
+                  router.push("/history");
+                } else if (isSubmitted) {
                   router.push("/grammar");
                 } else {
                   setShowExitConfirm(true);
                 }
               }}
               className="p-2 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0 cursor-pointer"
-              title="Quay lại danh sách"
+              title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Quay lại danh sách"}
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
@@ -540,17 +542,19 @@ function GrammarExamRunnerContent() {
             <button
               type="button"
               onClick={() => {
-                if (isSubmitted || isReviewMode) {
+                if (isReviewMode) {
+                  router.push("/history");
+                } else if (isSubmitted) {
                   router.push("/grammar");
                 } else {
                   setShowExitConfirm(true);
                 }
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors cursor-pointer"
-              title="Thoát về danh sách đề"
+              title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Thoát về danh sách đề"}
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Thoát</span>
+              <span className="hidden sm:inline">{isReviewMode ? "Về Lịch sử" : "Thoát"}</span>
             </button>
           </div>
         </div>

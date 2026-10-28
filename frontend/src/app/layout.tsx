@@ -15,7 +15,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://aptiskytich.vn"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://aptisesolpremier.com"),
   title: {
     default: "APTIS ESOL PREMIER — Luyện thi Aptis ESOL chuẩn British Council",
     template: "%s | APTIS ESOL PREMIER",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "vi_VN",
-    url: "https://aptiskytich.vn",
+    url: "https://aptisesolpremier.com",
     siteName: "APTIS ESOL PREMIER",
     title: "APTIS ESOL PREMIER — Luyện thi Aptis ESOL chuẩn British Council",
     description: "Nền tảng luyện thi Aptis ESOL chuẩn CEFR — Thi thử miễn phí, AI chấm Speaking & Writing, lộ trình đạt B2 nhanh nhất.",
@@ -74,6 +74,36 @@ import { PwaRegister } from "@/components/pwa-register";
 import { SelectionTranslator } from "@/components/selection-translator";
 import { CoursePromoPopup } from "@/components/course-promo-popup";
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "EducationalOrganization",
+      "@id": "https://aptisesolpremier.com/#organization",
+      "name": "APTIS ESOL PREMIER",
+      "url": "https://aptisesolpremier.com",
+      "logo": "https://aptisesolpremier.com/logo.webp",
+      "description": "Nền tảng luyện thi Aptis ESOL chuẩn CEFR — Thi thử miễn phí, AI chấm Speaking & Writing, lộ trình đạt B2 nhanh nhất.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+84379866596",
+        "contactType": "customer service",
+        "areaServed": "VN",
+        "availableLanguage": ["Vietnamese", "English"],
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://aptisesolpremier.com/#website",
+      "url": "https://aptisesolpremier.com",
+      "name": "APTIS ESOL PREMIER",
+      "publisher": {
+        "@id": "https://aptisesolpremier.com/#organization",
+      },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -87,6 +117,11 @@ export default function RootLayout({
         <link
           href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400..900;1,400..900&display=swap"
           rel="stylesheet"
+        />
+        {/* Schema.org Dữ liệu cấu trúc chuẩn Google SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {/* Chặn triệt để hiện tượng FOUC (chớp nhoáng màu xanh mặc định trước khi hydrate theme) */}
         <script

@@ -4,7 +4,7 @@
  */
 export const SITE_CONFIG = {
   name: "APTIS ESOL PREMIER",
-  domain: "aptiskytich.vn",
+  domain: "aptisesolpremier.com",
 
   // 1. Kênh liên hệ tư vấn & CSKH
   contact: {

@@ -1690,14 +1690,16 @@ function SpeakingExamRunnerContent() {
           <button
             type="button"
             onClick={() => {
-              if (isSubmitted || isReviewMode || stage === "finished") {
+              if (isReviewMode) {
+                router.push("/history");
+              } else if (isSubmitted || stage === "finished") {
                 router.push("/speaking");
               } else {
                 setShowExitConfirm(true);
               }
             }}
             className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer"
-            title="Quay lại danh sách đề"
+            title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Quay lại danh sách đề"}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
@@ -1770,17 +1772,19 @@ function SpeakingExamRunnerContent() {
           <button
             type="button"
             onClick={() => {
-              if (isSubmitted || isReviewMode || stage === "finished") {
+              if (isReviewMode) {
+                router.push("/history");
+              } else if (isSubmitted || stage === "finished") {
                 router.push("/speaking");
               } else {
                 setShowExitConfirm(true);
               }
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-            title="Thoát về danh sách đề"
+            title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Thoát về danh sách đề"}
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Thoát</span>
+            <span>{isReviewMode ? "Về Lịch sử" : "Thoát"}</span>
           </button>
         </div>
       </header>
@@ -2416,10 +2420,136 @@ function SpeakingExamRunnerContent() {
                     )}
                   </div>
                 )}
+
+                {/* Điều hướng câu hỏi khi xem lại bài làm (Review Mode) */}
+                {isReviewMode && (
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <button
+                      type="button"
+                      disabled={currentIndex === 0}
+                      onClick={() => {
+                        handlePrevQuestion();
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Câu trước</span>
+                    </button>
+                    <span className="text-xs font-bold text-muted-foreground">
+                      Câu {currentIndex + 1} / {questions.length} (Part {currentQ.partNumber})
+                    </span>
+                    <button
+                      type="button"
+                      disabled={currentIndex === questions.length - 1}
+                      onClick={() => {
+                        handleNextQuestion();
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="tech-btn px-4 py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 disabled:opacity-40 transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <span>Câu tiếp</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* Right Side: Recording Console Card (Screenshots 1-5) */}
-              <div className="w-full lg:w-72 shrink-0">
+              {/* Right Side: Recording Console Card & Review Table of Contents */}
+              <div className="w-full lg:w-80 shrink-0 space-y-4">
+                {/* Mục lục xem lại chuẩn cho Speaking khi ở Review Mode */}
+                {isReviewMode && (
+                  <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3 sticky top-20">
+                    <div className="flex items-center justify-between border-b border-border pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        <h4 className="font-heading font-black text-xs uppercase tracking-wider text-foreground">
+                          Mục lục xem lại
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 border border-emerald-500/30">
+                        {questions.filter((_, i) => !!recordedData[i]?.audioUrl).length}/{questions.length} câu đã nói
+                      </span>
+                    </div>
+
+                    {/* Danh sách 4 Part */}
+                    <div className="space-y-3 max-h-[42vh] overflow-y-auto pr-0.5">
+                      {[1, 2, 3, 4].map((pNum) => {
+                        const partQuestions = questions
+                          .map((q, idx) => ({ q, idx }))
+                          .filter(({ q }) => q.partNumber === pNum);
+
+                        if (partQuestions.length === 0) return null;
+
+                        return (
+                          <div key={pNum} className="space-y-1.5">
+                            <div className="text-[11px] font-bold text-muted-foreground flex items-center justify-between">
+                              <span>Part {pNum}</span>
+                              <span className="text-[10px] font-normal">
+                                {partQuestions.length} câu
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {partQuestions.map(({ q, idx }) => {
+                                const isCurrent = currentIndex === idx;
+                                const rec = recordedData[idx];
+                                const hasAudio = Boolean(rec?.audioUrl);
+                                const hasAi = Boolean(rec?.aiResult);
+
+                                return (
+                                  <button
+                                    key={q.id || idx}
+                                    type="button"
+                                    onClick={() => {
+                                      setCurrentIndex(idx);
+                                      window.scrollTo({ top: 0, behavior: "smooth" });
+                                    }}
+                                    className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border ${
+                                      isCurrent
+                                        ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary/30 shadow-xs"
+                                        : hasAudio
+                                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25"
+                                        : "bg-muted/40 text-muted-foreground border-border hover:bg-muted"
+                                    }`}
+                                    title={`Câu ${idx + 1}${hasAi ? ` - Điểm AI: ${rec.aiResult.score}/50` : ""}`}
+                                  >
+                                    <span>Câu {idx + 1}</span>
+                                    {hasAi && (
+                                      <span className="text-[10px] opacity-90 font-mono">
+                                        ({rec.aiResult.score})
+                                      </span>
+                                    )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="pt-2 border-t border-border space-y-2">
+                      <button
+                        type="button"
+                        onClick={handleRestartExam}
+                        disabled={isRestarting}
+                        className="w-full tech-btn py-2 px-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Làm lại đề mới</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => router.push("/history")}
+                        className="w-full py-1.5 px-3 rounded-xl border border-border text-xs font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                        <span>Về Lịch sử làm bài</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {/* 1. STAGE: PREPARATION / INSTRUCTIONS (Screenshots 3, 4, 5) */}
                 {stage === "prep" && (
                   <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
@@ -2843,98 +2973,100 @@ function SpeakingExamRunnerContent() {
         </div>
       </main>
 
-      {/* STICKY BOTTOM TOOLBAR (Screenshots 1, 2, 3, 4, 5) */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 shadow-lg">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          {/* Bottom Left: Nháp, Hiện đáp án, Báo lỗi */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsScratchpadOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition-colors"
-            >
-              <FileEdit className="w-3.5 h-3.5 text-primary" />
-              <span>Nháp</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowSampleAnswer(!showSampleAnswer)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
-                showSampleAnswer
-                  ? "border-primary bg-primary text-primary-foreground shadow-xs"
-                  : "border-primary/20 text-primary bg-primary/5 hover:bg-primary/10"
-              }`}
-            >
-              {showSampleAnswer ? (
-                <>
-                  <EyeOff className="w-3.5 h-3.5" />
-                  <span>Ẩn đáp án</span>
-                </>
-              ) : (
-                <>
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Hiện đáp án</span>
-                </>
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsReportOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors"
-            >
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span>Báo lỗi</span>
-            </button>
-          </div>
-
-          {/* Bottom Center: Question navigation */}
-          {questions.length > 0 && (
+      {/* STICKY BOTTOM TOOLBAR (Screenshots 1, 2, 3, 4, 5) - Chỉ hiển thị khi thi, ẩn khi ở Review Mode */}
+      {!isReviewMode && (
+        <footer className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 shadow-lg">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            {/* Bottom Left: Nháp, Hiện đáp án, Báo lỗi */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handlePrevQuestion}
-                disabled={currentIndex === 0}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold disabled:opacity-40"
+                onClick={() => setIsScratchpadOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition-colors"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Câu trước</span>
+                <FileEdit className="w-3.5 h-3.5 text-primary" />
+                <span>Nháp</span>
               </button>
-              <span className="text-xs font-mono text-muted-foreground px-1">
-                {currentIndex + 1} / {questions.length}
-              </span>
-              {currentIndex === questions.length - 1 ? (
-                <button
-                  type="button"
-                  onClick={handleFinishExam}
-                  className="inline-flex items-center gap-1 px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold shadow-xs hover:opacity-95"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{targetPart ? `Hoàn tất Part ${targetPart}` : "Nộp bài thi"}</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleNextQuestion}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90"
-                >
-                  <span className="hidden sm:inline">Câu tiếp</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          )}
 
-          {/* Bottom Right: AI quota indicator */}
-          <div className="flex items-center gap-2">
-            <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
-              <Sparkles className="w-3 h-3 text-primary" />
-              <span>Còn {aiQuota} lượt chấm AI</span>
+              <button
+                type="button"
+                onClick={() => setShowSampleAnswer(!showSampleAnswer)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
+                  showSampleAnswer
+                    ? "border-primary bg-primary text-primary-foreground shadow-xs"
+                    : "border-primary/20 text-primary bg-primary/5 hover:bg-primary/10"
+                }`}
+              >
+                {showSampleAnswer ? (
+                  <>
+                    <EyeOff className="w-3.5 h-3.5" />
+                    <span>Ẩn đáp án</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Hiện đáp án</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsReportOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors"
+              >
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span>Báo lỗi</span>
+              </button>
+            </div>
+
+            {/* Bottom Center: Question navigation */}
+            {questions.length > 0 && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handlePrevQuestion}
+                  disabled={currentIndex === 0}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold disabled:opacity-40"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Câu trước</span>
+                </button>
+                <span className="text-xs font-mono text-muted-foreground px-1">
+                  {currentIndex + 1} / {questions.length}
+                </span>
+                {currentIndex === questions.length - 1 ? (
+                  <button
+                    type="button"
+                    onClick={handleFinishExam}
+                    className="inline-flex items-center gap-1 px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold shadow-xs hover:opacity-95"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>{targetPart ? `Hoàn tất Part ${targetPart}` : "Nộp bài thi"}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleNextQuestion}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90"
+                  >
+                    <span className="hidden sm:inline">Câu tiếp</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Bottom Right: AI quota indicator */}
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+                <Sparkles className="w-3 h-3 text-primary" />
+                <span>Còn {aiQuota} lượt chấm AI</span>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      )}
 
       {/* SCRATCHPAD MODAL (Nháp) */}
       {isScratchpadOpen && (

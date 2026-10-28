@@ -32,6 +32,7 @@ import {
   Info,
   ArrowUp,
   Languages,
+  Loader2,
 } from "lucide-react";
 import { ReadingSentenceOrder } from "@/components/reading-components";
 import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
@@ -113,6 +114,132 @@ function ReadingExamRunner() {
   const [partScores, setPartScores] = useState<
     { name: string; score: number; maxScore: number; correct: number; total: number }[]
   >([]);
+
+  // Review state & helper calculations
+  const [reviewOnlyWrong, setReviewOnlyWrong] = useState(false);
+  const [isRestarting, setIsRestarting] = useState(false);
+
+  const handleRestartExam = useCallback(() => {
+    setIsRestarting(true);
+    setIsSubmitted(false);
+    setIsReviewMode(false);
+    setP1Answers({});
+    setP3Answers({});
+    setP4Answers({});
+    const resetOrders: Record<string, string[]> = {};
+    examData.part2.stories.forEach((st) => {
+      resetOrders[st.id] = st.sentences.map((s) => s.id);
+    });
+    setP2Orders(resetOrders);
+    setTimeLeft(examData.durationMinutes * 60);
+    setActiveStage(0);
+    router.replace(`/reading/${examId}`);
+    setTimeout(() => setIsRestarting(false), 400);
+  }, [examData, examId, router]);
+
+  // Thống kê kết quả chi tiết từng câu hỏi phục vụ Sidebar Mục lục xem lại
+  const readingReviewStats = useMemo(() => {
+    let totalQuestions = 0;
+    let totalCorrect = 0;
+
+    // Part 1
+    const p1Items: Array<{ id: string; label: string; isCorrect: boolean; userAns: string; corAns: string }> = [];
+    examData.part1.gaps.forEach((g, idx) => {
+      const user = p1Answers[g.id] || "";
+      const cor = g.correctAnswer || "";
+      const isCor = Boolean(user && user.toLowerCase() === cor.toLowerCase());
+      p1Items.push({ id: g.id, label: `Câu ${idx + 1}`, isCorrect: isCor, userAns: user, corAns: cor });
+      totalQuestions++;
+      if (isCor) totalCorrect++;
+    });
+
+    // Part 2 stories
+    const p2Stories: Array<{
+      storyId: string;
+      title: string;
+      items: Array<{ id: string; label: string; isCorrect: boolean; sentenceText: string }>;
+      correctCount: number;
+      totalCount: number;
+    }> = [];
+
+    examData.part2.stories.forEach((st, sIdx) => {
+      const userOrder = p2Orders[st.id] || [];
+      const corOrder = st.correctOrder || [];
+      const items: Array<{ id: string; label: string; isCorrect: boolean; sentenceText: string }> = [];
+      let corCount = 0;
+
+      corOrder.forEach((corId, idx) => {
+        const userPlacedId = userOrder[idx];
+        const isCor = userPlacedId === corId;
+        const sentence = st.sentences.find((s) => s.id === (userPlacedId || corId));
+        items.push({
+          id: `${st.id}_slot_${idx}`,
+          label: `Vị trí ${idx + 1}`,
+          isCorrect: isCor,
+          sentenceText: sentence?.text || "",
+        });
+        totalQuestions++;
+        if (isCor) {
+          corCount++;
+          totalCorrect++;
+        }
+      });
+
+      p2Stories.push({
+        storyId: st.id,
+        title: st.title || `Câu chuyện ${sIdx + 1}`,
+        items,
+        correctCount: corCount,
+        totalCount: corOrder.length,
+      });
+    });
+
+    // Part 3
+    const p3Items: Array<{ id: string; label: string; isCorrect: boolean; userAns: string; corAns: string }> = [];
+    examData.part3.questions.forEach((q, idx) => {
+      const user = p3Answers[q.id] || "";
+      const cor = q.correctAnswer || "";
+      const isCor = Boolean(user && user.toLowerCase() === cor.toLowerCase());
+      p3Items.push({ id: q.id, label: `Câu ${idx + 1}`, isCorrect: isCor, userAns: user, corAns: cor });
+      totalQuestions++;
+      if (isCor) totalCorrect++;
+    });
+
+    // Part 4
+    const p4Items: Array<{ id: string; label: string; isCorrect: boolean; userAns: string; corAns: string }> = [];
+    examData.part4.paragraphs.forEach((p, idx) => {
+      const user = p4Answers[p.id] || "";
+      const cor = p.correctHeading || "";
+      const isCor = Boolean(user && user.toLowerCase() === cor.toLowerCase());
+      p4Items.push({ id: p.id, label: `Đoạn ${idx + 1}`, isCorrect: isCor, userAns: user, corAns: cor });
+      totalQuestions++;
+      if (isCor) totalCorrect++;
+    });
+
+    const totalWrong = Math.max(0, totalQuestions - totalCorrect);
+
+    return {
+      totalQuestions,
+      totalCorrect,
+      totalWrong,
+      p1: {
+        items: p1Items,
+        correctCount: p1Items.filter((i) => i.isCorrect).length,
+        totalCount: p1Items.length,
+      },
+      p2: p2Stories,
+      p3: {
+        items: p3Items,
+        correctCount: p3Items.filter((i) => i.isCorrect).length,
+        totalCount: p3Items.length,
+      },
+      p4: {
+        items: p4Items,
+        correctCount: p4Items.filter((i) => i.isCorrect).length,
+        totalCount: p4Items.length,
+      },
+    };
+  }, [examData, p1Answers, p2Orders, p3Answers, p4Answers]);
 
   // Bộ quản lý Highlight cho bài đọc
   const [highlights, setHighlights] = useState<
@@ -288,6 +415,7 @@ function ReadingExamRunner() {
                   (parsed.part3.questions.length > 0 ? 1 : 0) +
                   (parsed.part4.paragraphs.length > 0 ? 1 : 0);
 
+                // 1. Part 1
                 if (parsed.part1.gaps.length > 0) {
                   let p1Correct = 0;
                   parsed.part1.gaps.forEach((g) => {
@@ -305,7 +433,85 @@ function ReadingExamRunner() {
                     total: parsed.part1.gaps.length,
                   });
                 }
+
+                // 2. Part 2
+                if (parsed.part2.stories.length > 0) {
+                  let p2CorrectMatches = 0;
+                  let p2TotalMatches = 0;
+                  parsed.part2.stories.forEach((st) => {
+                    const userOrder = loadedP2[st.id] || [];
+                    const corOrder = st.correctOrder || [];
+                    p2TotalMatches += corOrder.length;
+                    userOrder.forEach((item, idx) => {
+                      if (corOrder[idx] === item) p2CorrectMatches++;
+                    });
+                  });
+                  const p2Max = activePartsCount === 1 ? 50 : 17;
+                  const p2Score = p2TotalMatches > 0 ? (p2CorrectMatches / p2TotalMatches) * p2Max : 0;
+                  calculatedPartScores.push({
+                    name: "Part 2 – Text cohesion",
+                    score: Math.round(p2Score * 10) / 10,
+                    maxScore: p2Max,
+                    correct: p2CorrectMatches,
+                    total: p2TotalMatches,
+                  });
+                }
+
+                // 3. Part 3
+                if (parsed.part3.questions.length > 0) {
+                  let p3Correct = 0;
+                  parsed.part3.questions.forEach((q) => {
+                    if (loadedP3[q.id] && loadedP3[q.id].toLowerCase() === q.correctAnswer.toLowerCase()) {
+                      p3Correct++;
+                    }
+                  });
+                  const p3Max = activePartsCount === 1 ? 50 : 13;
+                  const p3Score = (p3Correct / parsed.part3.questions.length) * p3Max;
+                  calculatedPartScores.push({
+                    name: "Part 3 – Opinion matching",
+                    score: Math.round(p3Score * 10) / 10,
+                    maxScore: p3Max,
+                    correct: p3Correct,
+                    total: parsed.part3.questions.length,
+                  });
+                }
+
+                // 4. Part 4
+                if (parsed.part4.paragraphs.length > 0) {
+                  let p4Correct = 0;
+                  parsed.part4.paragraphs.forEach((p) => {
+                    if (loadedP4[p.id] && loadedP4[p.id].toLowerCase() === p.correctHeading.toLowerCase()) {
+                      p4Correct++;
+                    }
+                  });
+                  const p4Max = activePartsCount === 1 ? 50 : 13;
+                  const p4Score = (p4Correct / parsed.part4.paragraphs.length) * p4Max;
+                  calculatedPartScores.push({
+                    name: "Part 4 – Long reading",
+                    score: Math.round(p4Score * 10) / 10,
+                    maxScore: p4Max,
+                    correct: p4Correct,
+                    total: parsed.part4.paragraphs.length,
+                  });
+                }
+
                 setPartScores(calculatedPartScores);
+
+                if (sub.total_score == null) {
+                  const calculatedSum = Math.min(
+                    50,
+                    Math.round(calculatedPartScores.reduce((sum, item) => sum + item.score, 0))
+                  );
+                  setResultScore(calculatedSum);
+                  let calculatedCefr = "A1";
+                  if (calculatedSum >= 46) calculatedCefr = "C";
+                  else if (calculatedSum >= 38) calculatedCefr = "B2";
+                  else if (calculatedSum >= 26) calculatedCefr = "B1";
+                  else if (calculatedSum >= 16) calculatedCefr = "A2";
+                  else if (calculatedSum > 5) calculatedCefr = "A1";
+                  else calculatedCefr = "A0";
+                  setCefrBand(calculatedCefr);
+                }
 
                 if (modeParam === "review") {
                   setIsReviewMode(true);
@@ -815,14 +1021,16 @@ function ReadingExamRunner() {
           <button
             type="button"
             onClick={() => {
-              if (isSubmitted) {
+              if (isReviewMode) {
+                router.push("/history");
+              } else if (isSubmitted) {
                 router.push("/reading");
               } else {
                 setShowExitConfirm(true);
               }
             }}
             className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer"
-            title="Quay lại danh sách đề"
+            title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Quay lại danh sách đề"}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
@@ -882,17 +1090,19 @@ function ReadingExamRunner() {
           <button
             type="button"
             onClick={() => {
-              if (isSubmitted) {
+              if (isReviewMode) {
+                router.push("/history");
+              } else if (isSubmitted) {
                 router.push("/reading");
               } else {
                 setShowExitConfirm(true);
               }
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-            title="Thoát về danh sách đề"
+            title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Thoát về danh sách đề"}
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Thoát</span>
+            <span>{isReviewMode ? "Về Lịch sử" : "Thoát"}</span>
           </button>
         </div>
       </header>
@@ -906,8 +1116,9 @@ function ReadingExamRunner() {
       )}
 
       {/* 2. MAIN WORKSPACE */}
-      <main className="flex-1 py-6 px-3 md:px-6 pb-28">
-        <div className="max-w-4xl mx-auto space-y-6">
+      <main className={`flex-1 py-6 px-3 md:px-6 ${isReviewMode ? "pb-12" : "pb-28"}`}>
+        <div className={`mx-auto ${isReviewMode && !isSubmitted ? "max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" : "max-w-4xl space-y-6"}`}>
+          <div className={`${isReviewMode && !isSubmitted ? "lg:col-span-8 space-y-6" : "space-y-6"}`}>
 
           {/* Loading State */}
           {loading && (
@@ -992,20 +1203,8 @@ function ReadingExamRunner() {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsSubmitted(false);
-                      setIsReviewMode(false);
-                      setP1Answers({});
-                      setP3Answers({});
-                      setP4Answers({});
-                      const resetOrders: Record<string, string[]> = {};
-                      examData.part2.stories.forEach((st) => {
-                        resetOrders[st.id] = st.sentences.map((s) => s.id);
-                      });
-                      setP2Orders(resetOrders);
-                      setTimeLeft(examData.durationMinutes * 60);
-                      setActiveStage(0);
-                    }}
+                    onClick={handleRestartExam}
+                    disabled={isRestarting}
                     className="px-4 py-2.5 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -1643,11 +1842,220 @@ function ReadingExamRunner() {
               </button>
             </div>
           )}
-        </div>
-      </main>
 
-      {/* 3. STICKY BOTTOM RUNNER BAR CHUẨN */}
-      {!loading && !isSubmitted && (
+          {/* Điều hướng nhanh giữa các phần khi ở Review Mode (trong trang, không bị che bởi bottom bar) */}
+          {isReviewMode && !isSubmitted && !loading && (
+            <div className="flex items-center justify-between pt-5 border-t border-border">
+              <button
+                type="button"
+                disabled={activeStage === 0}
+                onClick={() => {
+                  setActiveStage((p) => Math.max(0, p - 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Phần trước</span>
+              </button>
+              <span className="text-xs font-bold text-muted-foreground">
+                Phần {activeStage + 1} / {stages.length} : {stages[activeStage]?.title}
+              </span>
+              <button
+                type="button"
+                disabled={activeStage === stages.length - 1}
+                onClick={() => {
+                  setActiveStage((p) => Math.min(stages.length - 1, p + 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="tech-btn px-4 py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 disabled:opacity-40 transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Phần kế tiếp</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* CỘT PHẢI: MỤC LỤC XEM LẠI CHUẨN KHI Ở REVIEW MODE */}
+        {isReviewMode && !isSubmitted && !loading && (
+          <aside className="lg:col-span-4">
+            <div className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-4 sticky top-20">
+              {/* Header */}
+              <div className="border-b border-border pb-3">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-heading font-black text-base text-foreground flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span>Mục lục xem lại</span>
+                  </h3>
+                  <span className="text-xs font-mono font-bold text-primary px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                    {resultScore}/50 điểm
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      {readingReviewStats.totalCorrect} đúng
+                    </span>
+                    <span>•</span>
+                    <span className="text-red-600 dark:text-red-400 font-bold flex items-center gap-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {readingReviewStats.totalWrong} sai
+                    </span>
+                  </div>
+                  <span className="font-bold text-primary px-2 py-0.5 rounded-md bg-primary/10">
+                    Band {cefrBand}
+                  </span>
+                </div>
+              </div>
+
+              {/* Filter Checkbox */}
+              <div className="flex items-center justify-between bg-muted/40 p-2.5 rounded-xl border border-border/60">
+                <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={reviewOnlyWrong}
+                    onChange={(e) => setReviewOnlyWrong(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary w-4 h-4"
+                  />
+                  <span>Chỉ hiện phần có câu sai</span>
+                </label>
+                {reviewOnlyWrong && (
+                  <span className="text-[11px] text-red-600 dark:text-red-400 font-bold">
+                    {readingReviewStats.totalWrong} câu sai
+                  </span>
+                )}
+              </div>
+
+              {/* Danh sách các phần thi Reading */}
+              <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
+                {stages.map((stg, stgIdx) => {
+                  const isCurrent = activeStage === stgIdx;
+                  let stgScore = 0;
+                  let stgTotal = 0;
+                  let questionPills: Array<{ id: string; label: string; isCorrect: boolean }> = [];
+
+                  if (stg.stageKey === "p1") {
+                    stgScore = readingReviewStats.p1.correctCount;
+                    stgTotal = readingReviewStats.p1.totalCount;
+                    questionPills = readingReviewStats.p1.items;
+                  } else if (stg.stageKey === "p2-1") {
+                    const st = readingReviewStats.p2[0];
+                    stgScore = st?.correctCount || 0;
+                    stgTotal = st?.totalCount || 4;
+                    questionPills = st?.items || [];
+                  } else if (stg.stageKey === "p2-2") {
+                    const st = readingReviewStats.p2[1];
+                    stgScore = st?.correctCount || 0;
+                    stgTotal = st?.totalCount || 4;
+                    questionPills = st?.items || [];
+                  } else if (stg.stageKey === "p3") {
+                    stgScore = readingReviewStats.p3.correctCount;
+                    stgTotal = readingReviewStats.p3.totalCount;
+                    questionPills = readingReviewStats.p3.items;
+                  } else if (stg.stageKey === "p4") {
+                    stgScore = readingReviewStats.p4.correctCount;
+                    stgTotal = readingReviewStats.p4.totalCount;
+                    questionPills = readingReviewStats.p4.items;
+                  }
+
+                  const isPerfect = stgScore === stgTotal && stgTotal > 0;
+                  if (reviewOnlyWrong && isPerfect) return null;
+
+                  return (
+                    <div
+                      key={stg.stageKey}
+                      onClick={() => {
+                        setActiveStage(stgIdx);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                        isCurrent
+                          ? "bg-primary/10 border-primary ring-2 ring-primary/30 shadow-xs"
+                          : "bg-muted/30 border-border hover:bg-muted/60"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-xs mb-2">
+                        <span className={`font-bold ${isCurrent ? "text-primary" : "text-foreground"}`}>
+                          {stg.title}
+                        </span>
+                        <span
+                          className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                            isPerfect
+                              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                              : "bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30"
+                          }`}
+                        >
+                          {stgScore}/{stgTotal} câu đúng
+                        </span>
+                      </div>
+
+                      {/* Pills danh sách câu trong Part */}
+                      {questionPills.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {questionPills.map((q, qIdx) => (
+                            <span
+                              key={q.id || qIdx}
+                              className={`w-6 h-6 rounded-lg text-[10px] font-bold flex items-center justify-center border transition-all ${
+                                q.isCorrect
+                                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/35"
+                                  : "bg-red-500/15 text-red-700 dark:text-red-300 border-red-500/35"
+                              }`}
+                              title={`${q.label}: ${q.isCorrect ? "Đúng" : "Sai"}`}
+                            >
+                              {qIdx + 1}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Actions */}
+              <div className="border-t border-border pt-3 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setIsSubmitted(true)}
+                  className="w-full py-2.5 px-4 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Award className="w-4 h-4" />
+                  <span>Xem báo cáo điểm tổng quan</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleRestartExam}
+                  disabled={isRestarting}
+                  className="w-full tech-btn py-2.5 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isRestarting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <RotateCcw className="w-4 h-4" />
+                  )}
+                  <span>Làm lại đề này</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => router.push("/history")}
+                  className="w-full py-2 px-4 rounded-xl border border-border text-xs font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Quay lại lịch sử làm bài</span>
+                </button>
+              </div>
+            </div>
+          </aside>
+        )}
+      </div>
+    </main>
+
+    {/* 3. STICKY BOTTOM RUNNER BAR CHUẨN (ẨN KHI REVIEW) */}
+    {!loading && !isSubmitted && !isReviewMode && (
         <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
           {/* Left: Hiện đáp án & Báo lỗi */}
           <div className="flex items-center gap-2">
