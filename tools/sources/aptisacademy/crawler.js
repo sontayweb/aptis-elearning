@@ -541,7 +541,7 @@ export async function crawl({ prisma = null, saveDb = false, downloadMedia = fal
             instructions: q.content || null,
             questions: questions.map(qItem => ({
               question_number: qItem.question_number,
-              question_type: 'MULTIPLE_CHOICE',
+              question_type: pNum === 1 ? 'GAP_FILL' : (pNum === 2 || pNum === 3) ? 'SENTENCE_ORDER' : 'MATCHING',
               prompt: qItem.prompt,
               options: qItem.options,
               correct_answer: Array.isArray(qItem.correctAnswer) ? qItem.correctAnswer.join(', ') : qItem.correctAnswer
