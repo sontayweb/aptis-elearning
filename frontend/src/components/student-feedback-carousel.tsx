@@ -36,6 +36,7 @@ const mockFeedbacks: StudentFeedbackItem[] = [
     achievedBand: "Đạt B2",
     quote: "Cảm ơn cô và khóa học, tài liệu rất sát đề và dễ hiểu ạ!",
     scoreSummary: "Overall 164/200 - B2",
+    certificateImageUrl: "/feedback/fb-01.jpg",
     verified: true,
   },
   {
@@ -45,6 +46,7 @@ const mockFeedbacks: StudentFeedbackItem[] = [
     achievedBand: "Đạt C1",
     quote: "Em không ngờ mình chỉ cần B2 mà được C1. Cám ơn cô nhiều ạ!",
     scoreSummary: "Overall 182/200 - C1",
+    certificateImageUrl: "/feedback/fb-02.jpg",
     verified: true,
   },
   {
@@ -54,6 +56,7 @@ const mockFeedbacks: StudentFeedbackItem[] = [
     achievedBand: "Đạt B2",
     quote: "Cháu học ĐHQG, cám ơn trung tâm nhiều, không ngờ lần 1 đã đỗ ạ!",
     scoreSummary: "Overall 158/200 - B2",
+    certificateImageUrl: "/feedback/fb-03.jpg",
     verified: true,
   },
   {
@@ -63,6 +66,7 @@ const mockFeedbacks: StudentFeedbackItem[] = [
     achievedBand: "Đạt B2",
     quote: "AI chấm Speaking & Writing phát hiện đúng lỗi ngữ pháp, đi thi tự tin hẳn!",
     scoreSummary: "Overall 160/200 - B2",
+    certificateImageUrl: "/feedback/fb-04.jpg",
     verified: true,
   },
   {
@@ -72,6 +76,7 @@ const mockFeedbacks: StudentFeedbackItem[] = [
     achievedBand: "Đạt C1",
     quote: "Bộ đề khoanh vùng trúng ngay bài thi Reading Part 4, đạt điểm tối đa luôn ạ.",
     scoreSummary: "Overall 185/200 - C1",
+    certificateImageUrl: "/feedback/fb-05.jpg",
     verified: true,
   },
 ];

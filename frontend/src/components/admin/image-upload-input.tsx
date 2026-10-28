@@ -268,7 +268,7 @@ export default function ImageUploadInput({
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
               <a
-                href={value}
+                href={value.split(",")[0]?.trim() || value}
                 target="_blank"
                 rel="noreferrer"
                 className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -288,26 +288,51 @@ export default function ImageUploadInput({
           </div>
 
           {/* Image Thumbnail */}
-          <div className="relative rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 p-2 flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={value}
-              alt="Part illustration preview"
-              className="max-h-36 max-w-full rounded-md object-contain shadow-xs"
-              onError={(e) => {
-                // broken image fallback indicator
-                const target = e.currentTarget;
-                target.style.display = "none";
-                const parent = target.parentElement;
-                if (parent) {
-                  const errEl = document.createElement("div");
-                  errEl.className = "py-4 text-center text-rose-500 text-xs font-semibold flex items-center justify-center gap-1.5";
-                  errEl.innerHTML = `<span>⚠️ Không thể tải hình ảnh này (Link bị chặn hoặc không tồn tại)</span>`;
-                  parent.appendChild(errEl);
-                }
-              }}
-            />
-          </div>
+          {(() => {
+            const urls = (value || "").split(",").map((s) => s.trim()).filter(Boolean);
+            if (urls.length > 1) {
+              return (
+                <div className="relative rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 p-2 flex items-center justify-center gap-3 flex-wrap">
+                  {urls.map((u, i) => (
+                    <div key={i} className="relative group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={u}
+                        alt={`Part illustration preview ${i + 1}`}
+                        className="max-h-28 max-w-full rounded-md object-contain shadow-xs border border-slate-200 dark:border-slate-700"
+                      />
+                      <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/70 text-white text-[9px] font-bold rounded">
+                        #{i + 1}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+            return (
+              <div className="relative rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 p-2 flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={urls[0] || value}
+                  alt="Part illustration preview"
+                  className="max-h-36 max-w-full rounded-md object-contain shadow-xs"
+                  onError={(e) => {
+                    // broken image fallback indicator
+                    const target = e.currentTarget;
+                    target.style.display = "none";
+                    const parent = target.parentElement;
+                    if (parent) {
+                      const errEl = document.createElement("div");
+                      errEl.className =
+                        "py-4 text-center text-rose-500 text-xs font-semibold flex items-center justify-center gap-1.5";
+                      errEl.innerHTML = `<span>⚠️ Không thể tải hình ảnh này (Link bị chặn hoặc không tồn tại)</span>`;
+                      parent.appendChild(errEl);
+                    }
+                  }}
+                />
+              </div>
+            );
+          })()}
         </div>
       )}
 

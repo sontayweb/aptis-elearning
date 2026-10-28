@@ -22,7 +22,9 @@
     "db:backup": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts backup",
     "db:backup:sql": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts backup:sql",
     "db:backup:json": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts backup:json",
-    "db:restore": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts restore"
+    "db:restore": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts restore",
+    "db:pull": "python scripts/pull-db-from-vps.py",
+    "db:clean-reading": "node ./node_modules/tsx/dist/cli.mjs scripts/clean-reading-keys-and-add-hot.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

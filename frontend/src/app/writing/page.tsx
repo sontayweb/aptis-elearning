@@ -23,6 +23,7 @@ import {
   Flame,
   Star,
 } from "lucide-react";
+import { getCloverConfig } from "@/lib/clover-utils";
 
 interface WritingExam {
   id: string;
@@ -81,11 +82,21 @@ export default function WritingPracticePage() {
   const [error, setError] = useState<string | null>(null);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
 
+function detectWritingPartNumber(title: string, partTitle?: string | null, totalParts?: number): number {
+  if (totalParts === 4 || /full\s*writing/i.test(title)) return 0;
+  const text = `${title} ${partTitle || ""}`.toLowerCase();
+  if (/part\s*4|key\s*part\s*4|formal.*informal|viết\s*thư/i.test(text)) return 4;
+  if (/part\s*3|key\s*part\s*3|three\s*responses|chat\s*clb|diễn\s*đàn/i.test(text)) return 3;
+  if (/part\s*2|key\s*part\s*2|short\s*text|club\s*form|điền\s*đơn|đoạn\s*văn/i.test(text)) return 2;
+  if (/part\s*1|key\s*part\s*1|word-level|short\s*answer|tin\s*nhắn/i.test(text)) return 1;
+  return 1;
+}
+
   const loadExams = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.exams.getAll({ skill: "WRITING", limit: 350 });
+      const res = await api.exams.getAll({ skill: "WRITING", limit: 600 });
       if (res.success && Array.isArray(res.data)) {
         setExams(
           res.data.map((exam: any, idx: number) => {
@@ -93,7 +104,8 @@ export default function WritingPracticePage() {
             if (exam.userStatus === "COMPLETED") status = "completed";
             else if (exam.userStatus === "IN_PROGRESS") status = "in_progress";
 
-            const isFullWriting = exam.totalParts === 4 || exam.title.includes("Full Writing");
+            const pNum = detectWritingPartNumber(exam.title, exam.partTitle, exam.totalParts);
+            const isFullWriting = pNum === 0;
 
             // Phân bổ tỷ lệ ưu tiên (Cao, Vừa, Thấp)
             let priority: "HIGH" | "MEDIUM" | "LOW" = "HIGH";
@@ -106,25 +118,32 @@ export default function WritingPracticePage() {
               else priority = "LOW";
             }
 
-              const hotLevel = Number(exam.hotLevel ?? exam.hot_level ?? 0);
+            const hotLevel = Number(exam.hotLevel ?? exam.hot_level ?? 0);
 
-              return {
-                id: exam.id,
-                title: exam.title,
-                parts: isFullWriting ? "Full Writing · 4 Parts" : (exam.partTitle || "Writing Part"),
-                totalParts: exam.totalParts || 1,
-                partTitle: exam.partTitle,
-                partNumber: exam.parts?.[0]?.partNumber ?? exam.parts?.[0]?.part_number,
-                questionsCount: exam.totalQuestions || 4,
-                duration: `${exam.durationMinutes || 50} phút`,
-                isFree: !exam.isPro,
-                status,
-                bestScore: exam.bestScore,
-                bestScoreNumber: exam.bestScoreNumber,
-                userAttempts: exam.userAttempts || 0,
-                priority,
-                hotLevel,
-              };
+            const partSubtitles: Record<number, string> = {
+              1: "Part 1 - Word-level Writing (1-5 từ)",
+              2: "Part 2 - Short Text Writing (20-30 từ)",
+              3: "Part 3 - Three Responses (30-40 từ/câu)",
+              4: "Part 4 - Formal & Informal Emails",
+            };
+
+            return {
+              id: exam.id,
+              title: exam.title,
+              parts: isFullWriting ? "Full Writing · 4 Parts (50 phút)" : (exam.partTitle || partSubtitles[pNum] || `Writing Part ${pNum}`),
+              totalParts: isFullWriting ? 4 : 1,
+              partTitle: exam.partTitle,
+              partNumber: pNum,
+              questionsCount: exam.totalQuestions || (pNum === 1 ? 5 : pNum === 2 ? 1 : pNum === 3 ? 3 : 2),
+              duration: `${exam.durationMinutes || (isFullWriting ? 50 : pNum === 1 ? 3 : pNum === 2 ? 7 : pNum === 3 ? 10 : 30)} phút`,
+              isFree: !exam.isPro,
+              status,
+              bestScore: exam.bestScore,
+              bestScoreNumber: exam.bestScoreNumber,
+              userAttempts: exam.userAttempts || 0,
+              priority,
+              hotLevel,
+            };
           })
         );
       } else {
@@ -181,31 +200,21 @@ export default function WritingPracticePage() {
     };
   }, []);
 
-  // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
+  // 1. Lọc theo từng Tab chuẩn: Tách biệt hoàn toàn Full Test và Part 1 / 2 / 3 / 4
   const currentTabExams = exams.filter((e) => {
     if (activeTab === "full") {
-      return e.title.includes("Full Writing") || e.totalParts === 4;
-    } else if (activeTab === "p1") {
-      // Part 1: Word-level Writing (Form thông tin ngắn)
-      if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
-      return e.partNumber === 1 || /part\s*1/i.test(e.partTitle || "") || /part\s*1/i.test(e.title);
-    } else if (activeTab === "p2") {
-      // Part 2: Short Text Writing (Đoạn văn ngắn 20-30 từ)
-      if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
-      return e.partNumber === 2 || /part\s*2/i.test(e.partTitle || "") || /part\s*2/i.test(e.title);
-    } else if (activeTab === "p3") {
-      // Part 3: Three Responses (Chat CLB)
-      if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
-      return e.partNumber === 3 || /part\s*3/i.test(e.partTitle || "") || /part\s*3/i.test(e.title);
-    } else if (activeTab === "p4") {
-      // Part 4: Formal & Informal Emails
-      if (e.totalParts === 4 || e.title.includes("Full Writing")) return false;
-      return e.partNumber === 4 || /part\s*4/i.test(e.partTitle || "") || /part\s*4/i.test(e.title);
+      return e.partNumber === 0 || e.totalParts === 4 || /full\s*writing/i.test(e.title);
     }
+    if (e.partNumber === 0 || e.totalParts === 4 || /full\s*writing/i.test(e.title)) return false;
+
+    if (activeTab === "p1") return e.partNumber === 1;
+    if (activeTab === "p2") return e.partNumber === 2;
+    if (activeTab === "p3") return e.partNumber === 3;
+    if (activeTab === "p4") return e.partNumber === 4;
     return true;
   });
 
-  // 2. Lọc tiếp theo search, status, priority, source từ currentTabExams
+  // 2. Lọc tiếp theo search, status, priority, source và sắp xếp theo Độ Hot (Cỏ ☘️)
   const filteredExams = currentTabExams.filter((e) => {
     const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
@@ -218,13 +227,18 @@ export default function WritingPracticePage() {
       filterPriority === "all"
         ? true
         : filterPriority === "high"
-        ? e.priority === "HIGH"
+        ? (e.hotLevel || 0) >= 3 || e.priority === "HIGH"
         : filterPriority === "medium"
-        ? e.priority === "MEDIUM"
-        : e.priority === "LOW";
+        ? (e.hotLevel || 0) === 2 || e.priority === "MEDIUM"
+        : (e.hotLevel || 0) <= 1 && e.priority === "LOW";
     const matchesSource = filterSource === "all" || filterSource === "web" ? true : false;
     return matchesSearch && matchesStatus && matchesPriority && matchesSource;
-  }).sort((a, b) => (b.hotLevel || 0) - (a.hotLevel || 0));
+  }).sort((a, b) => {
+    // Sắp xếp ưu tiên tuyệt đối theo Độ Hot (Cỏ ☘️) từ cao xuống thấp (6 -> 5 -> 4 -> 3 -> 2 -> 1 -> 0)
+    const hotDiff = (b.hotLevel || 0) - (a.hotLevel || 0);
+    if (hotDiff !== 0) return hotDiff;
+    return a.title.localeCompare(b.title, "vi");
+  });
 
   // Dynamic naming based on activeTab
   const getTabInfo = () => {
@@ -371,15 +385,17 @@ export default function WritingPracticePage() {
 
           {/* Sub Filters - Rows */}
           <div className="space-y-2.5 mb-8 text-xs">
-            {/* Row 1: Lọc ưu tiên */}
+            {/* Row 1: Lọc ưu tiên theo Độ Hot ☘️ */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-muted-foreground font-semibold w-24">Lọc ưu tiên:</span>
+              <span className="text-muted-foreground font-semibold w-24">Độ Hot ☘️:</span>
               {[
                 { id: "all", label: `Tất cả (${currentTabExams.length})` },
-                { id: "high", label: `Ưu tiên cao (${currentTabExams.filter((e) => e.priority === "HIGH").length})` },
-                { id: "medium", label: `Ưu tiên vừa (${currentTabExams.filter((e) => e.priority === "MEDIUM").length})` },
-                ...(currentTabExams.some((e) => e.priority === "LOW")
-                  ? [{ id: "low", label: `Ưu tiên thấp (${currentTabExams.filter((e) => e.priority === "LOW").length})` }]
+                { id: "high", label: `☘️☘️☘️+ Siêu Hot (${currentTabExams.filter((e) => (e.hotLevel || 0) >= 3).length})` },
+                ...(currentTabExams.some((e) => (e.hotLevel || 0) === 2)
+                  ? [{ id: "medium", label: `☘️☘️ Hay ra (${currentTabExams.filter((e) => (e.hotLevel || 0) === 2).length})` }]
+                  : []),
+                ...(currentTabExams.some((e) => (e.hotLevel || 0) === 1)
+                  ? [{ id: "low", label: `☘️ Cơ bản (${currentTabExams.filter((e) => (e.hotLevel || 0) === 1).length})` }]
                   : []),
               ].map((item) => (
                 <button
@@ -528,10 +544,14 @@ export default function WritingPracticePage() {
                   <div
                     key={exam.id}
                     className={`relative rounded-2xl border bg-card hover:border-primary/50 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group ${
-                      exam.hotLevel === 3
+                      exam.hotLevel && exam.hotLevel >= 5
                         ? "border-rose-500/40 shadow-rose-500/5 ring-1 ring-rose-500/20"
-                        : exam.hotLevel === 2
-                        ? "border-amber-500/30"
+                        : exam.hotLevel === 4
+                        ? "border-amber-500/30 ring-1 ring-amber-500/20"
+                        : exam.hotLevel === 3
+                        ? "border-blue-500/30 ring-1 ring-blue-500/20"
+                        : exam.hotLevel && exam.hotLevel > 0
+                        ? "border-emerald-500/30"
                         : "border-border"
                     }`}
                   >
@@ -540,7 +560,7 @@ export default function WritingPracticePage() {
                       <div className="flex items-center justify-between gap-2 mb-3">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="px-2.5 py-0.5 rounded-md bg-muted text-muted-foreground font-bold text-[10px]">
-                            {tabInfo.badge}
+                            {exam.partNumber === 0 ? "Full Part" : `Part ${exam.partNumber}`}
                           </span>
                           {exam.isFree ? (
                             <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
@@ -552,37 +572,19 @@ export default function WritingPracticePage() {
                             </span>
                           )}
 
-                          {/* Stickers đánh giá mức độ ưu tiên: ★★★★★ Hay ra | VIP | Đề tủ | Mới cập nhật */}
+                          {/* Stickers đánh giá mức độ ưu tiên theo chuẩn Clover ☘️ */}
                           {(() => {
-                            const mod = idx % 4;
-                            if (exam.hotLevel === 3 || mod === 0) {
-                              return (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-700 dark:text-rose-300 font-extrabold text-[10px] border border-rose-500/30">
-                                  <Star className="w-3 h-3 fill-rose-500 text-rose-500" />
-                                  ★★★★★ Hay ra
-                                </span>
-                              );
-                            } else if (exam.hotLevel === 2 || mod === 1) {
-                              return (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px] border border-amber-500/30">
-                                  <Flame className="w-3 h-3 fill-amber-500 text-amber-500" />
-                                  Đề tủ
-                                </span>
-                              );
-                            } else if (mod === 2) {
-                              return (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 font-extrabold text-[10px] border border-purple-500/30">
-                                  <Sparkles className="w-3 h-3 text-purple-600" />
-                                  VIP
-                                </span>
-                              );
-                            } else {
-                              return (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] border border-emerald-500/30">
-                                  Mới cập nhật
-                                </span>
-                              );
-                            }
+                            const cloverLvl = exam.hotLevel;
+                            if (!cloverLvl || cloverLvl <= 0) return null;
+                            const cfg = getCloverConfig(cloverLvl);
+                            return (
+                              <span
+                                className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
+                                title={`${cloverLvl} Cỏ ☘️`}
+                              >
+                                <span>{cfg.symbol}</span>
+                              </span>
+                            );
                           })()}
                         </div>
 

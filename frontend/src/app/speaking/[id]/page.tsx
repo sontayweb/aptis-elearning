@@ -675,6 +675,9 @@ function SpeakingAudioPlayer({ src, duration }: SpeakingAudioPlayerProps) {
 function cleanSpeakingImageUrl(url: string | undefined): string | undefined {
   if (!url) return undefined;
   let trimmed = String(url).trim();
+  if (trimmed.includes(",")) {
+    trimmed = trimmed.split(",")[0].trim();
+  }
   if (!trimmed || trimmed === "null" || trimmed === "undefined") return undefined;
 
   // Host CDN Aptis Academy

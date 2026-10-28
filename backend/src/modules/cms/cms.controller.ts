@@ -15,7 +15,8 @@ export class CmsController {
 
   async getReviews(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const reviews = await cmsService.getReviews();
+      const includePending = req.query.all === 'true' || req.query.includePending === 'true';
+      const reviews = await cmsService.getReviews(includePending);
       sendSuccess(res, reviews, 'Lấy danh sách đánh giá thành công', 200);
     } catch (error) {
       next(error);

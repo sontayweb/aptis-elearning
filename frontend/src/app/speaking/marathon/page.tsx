@@ -743,7 +743,7 @@ function SpeakingMarathonContent() {
                             <>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
-                                src={topic.imageUrl}
+                                src={imgs[0] || topic.imageUrl}
                                 alt={topic.title}
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                 loading="lazy"
@@ -753,7 +753,7 @@ function SpeakingMarathonContent() {
                         })()}
                         <div className="absolute top-2.5 left-2.5 z-10">
                           <span className="px-2 py-0.5 rounded-md bg-purple-700/90 text-white font-bold text-[10px] backdrop-blur-xs shadow-xs">
-                            Cặp Tranh 0{topic.topicNumber}
+                            Cặp Tranh {topic.topicNumber < 10 ? `0${topic.topicNumber}` : topic.topicNumber}
                           </span>
                         </div>
                       </div>
@@ -994,7 +994,7 @@ function SpeakingMarathonContent() {
                     <div className="relative aspect-[16/10] max-h-56 rounded-xl overflow-hidden border border-border mx-auto bg-muted/20">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={activeQuestion.imageUrl}
+                        src={imgs[0] || activeQuestion.imageUrl}
                         alt="Prompt"
                         className="w-full h-full object-cover"
                       />
