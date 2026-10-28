@@ -2648,7 +2648,7 @@
   {
     "id": "6957d77ac88028aa29a1bc41",
     "part": "PART3",
-    "title": "Local festivals",
+    "title": "Local Center",
     "audioUrl": "https://files.aptisacademy.com.vn/listening/2026/01/1767364473792_1aca0fd48674bc4b_audiotpa3_q11.mp3",
     "transcript": "<p>[{\"timestamp\":[0,3.32],\"text\":\" Have you heard about the new local center opening next week?\"},{\"timestamp\":[3.32,6.32],\"text\":\" I think it will be a great place for exhibitions,\"},{\"timestamp\":[6.32,8.92],\"text\":\" but you know, I believe exhibitions should be different.\"},{\"timestamp\":[8.92,12.72],\"text\":\" They need to show new ideas, not just the same old things.\"},{\"timestamp\":[12.72,15.2],\"text\":\" - I agree that exhibitions should be interesting,\"},{\"timestamp\":[15.2,18.84],\"text\":\" but I'm not sure they need to be completely different.\"},{\"timestamp\":[18.84,23.16],\"text\":\" Sometimes it's nice to celebrate our traditions,\"},{\"timestamp\":[23.16,26.48],\"text\":\" even if they are losing significance.\"},{\"timestamp\":[26.48,31.96],\"text\":\" Yes, that's true, but if we keep doing the same things, we might forget why those\"},{\"timestamp\":[31.96,33.8],\"text\":\" traditions are important.\"},{\"timestamp\":[33.8,38.64],\"text\":\" The more we change things, the more people will remember them.\"},{\"timestamp\":[38.64,43.6],\"text\":\" I see your point, however, I worry that the local festivals will disappear soon.\"},{\"timestamp\":[43.6,45.68],\"text\":\" If people don't care about them,\"},{\"timestamp\":[45.68,48.2],\"text\":\" they might stop celebrating altogether.\"},{\"timestamp\":[48.2,49.12],\"text\":\" - That's a good point,\"},{\"timestamp\":[49.12,51.4],\"text\":\" but I think we can make the festivals more exciting\"},{\"timestamp\":[51.4,52.36],\"text\":\" to attract people.\"},{\"timestamp\":[52.36,55.16],\"text\":\" We should include activities that everyone can enjoy,\"},{\"timestamp\":[55.16,57.4],\"text\":\" not just the same old custom.\"},{\"timestamp\":[57.4,59.76],\"text\":\" - I understand that, but let's not forget\"},{\"timestamp\":[59.76,63.52],\"text\":\" how important schools are in keeping our traditions alive.\"},{\"timestamp\":[63.52,70.44],\"text\":\" They teach children about our culture and values if schools don't focus on traditions\"},{\"timestamp\":[70.44,72.24],\"text\":\" who will.\"},{\"timestamp\":[72.24,73.24],\"text\":\" That's true.\"},{\"timestamp\":[73.24,76.48],\"text\":\" Schools play a big role, but maybe parents should be the ones in charge of this.\"},{\"timestamp\":[76.48,null],\"text\":\" Keeping traditions is everyone's responsibility, not just schools or the education systems.\"}]</p>",
     "questions": [
@@ -2671,7 +2671,7 @@
         "correctAnswer": "Both"
       },
       {
-        "prompt": "Local festivals will disappear soon in the near future",
+        "prompt": "Local Center will disappear soon in the near future",
         "options": [
           "Man",
           "Woman",

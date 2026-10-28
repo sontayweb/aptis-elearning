@@ -14108,12 +14108,12 @@
             },
             {
               "_id": "6957d77ac88028aa29a1bc41",
-              "title": "Local festivals",
+              "title": "Local Center",
               "timeToDo": "1970-01-01T00:00:00.035Z",
               "description": null,
               "questions": [
                 {
-                  "questionTitle": "Local festivals",
+                  "questionTitle": "Local Center",
                   "content": "Listen to two people discussing potential modifications to the topic above. Read the statements and decide whose opinion matches best: the man's, the woman's, or both. Who expresses which opinion?",
                   "answerList": [
                     {
@@ -14151,7 +14151,7 @@
                       "_id": "6965fd7df7e3d004a0986045"
                     },
                     {
-                      "content": "Local festivals will disappear soon in the near future",
+                      "content": "Local Center will disappear soon in the near future",
                       "correctAnswer": "Woman",
                       "file": null,
                       "answerList": null,

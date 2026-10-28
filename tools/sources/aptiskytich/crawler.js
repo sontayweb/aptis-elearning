@@ -218,7 +218,7 @@ export async function crawl({ prisma = null, saveDb = false } = {}) {
         image_url: setQuestions[0]?.image_url || null,
         questions: setQuestions.map((q, qIdx) => ({
           question_number: q.order_index ?? (qIdx + 1),
-          question_type: q.question_type || 'MULTIPLE_CHOICE',
+          question_type: q.question_type || null,
           prompt: q.question_text || `Câu hỏi ${qIdx + 1}`,
           options: Array.isArray(q.options) ? q.options : [],
           correct_answer: q.correct_answer !== null && q.correct_answer !== undefined ? String(q.correct_answer) : null,

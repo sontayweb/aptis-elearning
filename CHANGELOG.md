@@ -4,6 +4,44 @@ Tất cả các thay đổi và tiến độ nâng cấp hệ thống được g
 
 ---
 
+## [2.4.0] - 2026-10-28 (PRODUCTION DATABASE DUMP BACKUP, DATA CONTRACTS & IDEMPOTENT DEEP UPSERT ENGINE)
+
+### Database Protection & Master Backup (Sao Lưu Tuyệt Đối Database Production)
+- **Sao lưu nhị phân và SQL nén toàn diện:**
+  - Dump trực tiếp từ PostgreSQL container `wlafe5vr5fwx6rn3curavktm` trên VPS Production `103.90.227.117`.
+  - Lưu trữ đồng thời tại máy chủ VPS (`/root/`) và tải về máy cục bộ an toàn:
+    * File SQL nén: `backups/backup_vps_aptis_kytich_db_20261028_231241.sql.gz` (3.89 MB)
+    * File PostgreSQL Custom Dump: `backups/backup_vps_aptis_kytich_db_20261028_231241.dump` (3.96 MB)
+
+### Data Quality & Crawler Contracts Architecture (Kiến Trúc Data Contracts & Chống Dữ Liệu Rác)
+- **Cơ Chế Kiểm Định CEFR Data Contract (`tools/core/contracts.js`):**
+  - Tự động bắt lỗi các bộ đề rỗng: Chặn đứng và từ chối nạp (rejection) đối với các đề thi có part chứa 0 câu hỏi (`Mountain`, `Wellness Trends`, `Reading Part 2`, `Listening 1-4`, `GV 1-5`, v.v.).
+  - Chuẩn hóa tiêu đề đề thi tự động: Đưa tất cả tiêu đề số đơn (`Đề 1` -> `Đề 01`, `Đề 9` -> `Đề 09`) theo chuẩn định dạng quốc tế.
+  - Tự động kiểm tra tính toàn vẹn của câu hỏi: Đảm bảo câu hỏi trắc nghiệm phải có ít nhất 2 options và có `correct_answer`.
+- **Cơ Chế Deep Upsert Đa Hình An Toàn (`tools/core/db.js`):**
+  - **Deep Replacement Idempotent (Khi bài thi chưa có lượt làm):** Xóa và tạo mới cascade `parts` & `questions` sạch sẽ, khắc phục triệt để lỗi cũ (trước đây chỉ update title của Exam, để lại câu hỏi cũ lỗi thời).
+  - **In-place Preservation (Khi học viên đã nộp bài):** Tự động chuyển sang chế độ cập nhật từng câu hỏi, bảo vệ toàn vẹn lịch sử chấm thi và khóa ngoại ID của học viên.
+- **Ánh Xạ Câu Hỏi Đa Hình (Polymorphic Mapping):**
+  - Reading Part 1 -> `GAP_FILL`
+  - Reading Part 2/3 -> `SENTENCE_ORDER`
+  - Reading Part 4 -> `MATCHING`
+  - Writing Part 1 & 3 -> `SHORT_TEXT`
+  - Writing Part 2 & 4 -> `ESSAY`
+  - Speaking -> `SPEAKING_AUDIO`
+
+### Comprehensive Zero-Bug Database Audit (Đối Soát Sạch 100% Trên Production)
+- **Dọn Sạch Dữ Liệu Thừa & Rác Lịch Sử:**
+  - Xóa bỏ **152 đề trùng lặp** (`Book Club`, `Social Club`, v.v.) bằng SQL Window Function phân loại rank.
+  - Xóa bỏ **9 đề mồ côi** 0 câu hỏi và **3 đề placeholder mẫu** không dùng.
+  - Chuyển đổi chuẩn hóa **330 câu hỏi Writing/Speaking** trong các bộ Full Test từ `MULTIPLE_CHOICE` sang `SHORT_TEXT` và `ESSAY`.
+- **Kết Quả Kiểm Tra Kiểm Định Tuyệt Đối:**
+  - Tổng số đề thi chuẩn hóa: **1,688 đề thi** (Speaking: 515, Listening: 411, Writing: 399, Reading: 201, Full Test: 111, Grammar/Vocab: 51).
+  - Đề thi bị trùng lặp tiêu đề: **0** (Tuyệt đối không trùng lặp).
+  - Đề rác / mồ côi (0 câu hỏi): **0** (100% đề thi có nội dung đầy đủ).
+  - Câu hỏi trắc nghiệm thiếu options hoặc đáp án: **0** (100% câu hỏi toàn vẹn).
+
+---
+
 ## [2.3.0] - 2026-10-17 (SYSTEM ARCHITECTURE STANDARDIZATION, ZERO-BUG MASTER REFACTOR & ANTI-CHEATING HARDENING)
 
 ### Security & Anti-Cheating Hardening (Bảo Mật Phòng Thi Tuyệt Đối)

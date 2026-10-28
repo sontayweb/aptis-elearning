@@ -118,15 +118,26 @@ export async function crawl({ prisma = null, saveDb = false, downloadMedia = fal
     for (const skill of skills) {
       for (const part of parts) {
         const fileKey = `${skill}-${part}`;
+        const localFilePath = path.join(centerDir, `${fileKey}.json`);
         const url = `https://aptisacademy.com.vn/data/${center}/${fileKey}.json`;
         try {
-          const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-          if (res.ok) {
-            const items = await res.json();
-            fs.writeFileSync(path.join(centerDir, `${fileKey}.json`), JSON.stringify(items, null, 2));
+          let items = null;
+          try {
+            const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+            if (res.ok) {
+              items = await res.json();
+              fs.writeFileSync(localFilePath, JSON.stringify(items, null, 2));
+            }
+          } catch {}
 
-            if (Array.isArray(items)) {
-              stats.bodeKeyExamsCount += items.length;
+          if (!items && fs.existsSync(localFilePath)) {
+            try {
+              items = JSON.parse(fs.readFileSync(localFilePath, 'utf-8'));
+            } catch {}
+          }
+
+          if (Array.isArray(items)) {
+            stats.bodeKeyExamsCount += items.length;
 
               // Chuẩn hóa và trích xuất dữ liệu
               items.forEach((item, idx) => {
@@ -191,7 +202,6 @@ export async function crawl({ prisma = null, saveDb = false, downloadMedia = fal
                 }));
               });
             }
-          }
         } catch (e) {
           // console.warn(`Không tải được ${url}: ${e.message}`);
         }
