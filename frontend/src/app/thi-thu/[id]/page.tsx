@@ -158,7 +158,10 @@ function AudioPlayer({ src, label }: { src: string; label?: string }) {
 
 function resolveExamImageUrl(rawUrl: string | undefined): string {
   if (!rawUrl) return "";
-  const trimmed = String(rawUrl).trim();
+  let trimmed = String(rawUrl).trim();
+  if (trimmed.includes(",")) {
+    trimmed = trimmed.split(",")[0].trim();
+  }
   if (!trimmed || trimmed === "null" || trimmed === "undefined") return "";
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
   if (trimmed.startsWith("/uploads/") || trimmed.startsWith("uploads/")) {
