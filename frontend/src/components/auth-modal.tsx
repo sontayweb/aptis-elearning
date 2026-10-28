@@ -222,7 +222,7 @@ export function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalPr
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="example@aptiskytich.vn"
+                placeholder="hocvien@aptisesolpremier.com"
                 className="w-full pl-9 pr-3 py-2 text-sm bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>

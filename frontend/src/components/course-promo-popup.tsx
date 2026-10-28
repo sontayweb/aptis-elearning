@@ -412,8 +412,17 @@ export function CoursePromoPopup({
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <CreditCard className="w-3.5 h-3.5" />
-                <span>Thanh toán VietQR</span>
+                {SITE_CONFIG.courseClass.tuitionVnd === 0 ? (
+                  <>
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>Tư vấn &amp; Học phí</span>
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-3.5 h-3.5" />
+                    <span>Thanh toán VietQR</span>
+                  </>
+                )}
               </button>
             </div>
 
@@ -558,7 +567,7 @@ export function CoursePromoPopup({
                         ) : (
                           <>
                             <Send className="w-4 h-4" />
-                            <span>Đăng ký giữ chỗ đợt {selectedBatch.dateStr} (Ưu đãi 1.400.000đ)</span>
+                            <span>Đăng ký giữ chỗ đợt {selectedBatch.dateStr} ({SITE_CONFIG.courseClass.tuitionFormatted})</span>
                           </>
                         )}
                       </button>
@@ -649,92 +658,153 @@ export function CoursePromoPopup({
                   </div>
                 </div>
               ) : (
-                /* TAB 3: THANH TOÁN VIETQR */
-                <div className="space-y-3.5">
-                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-900 dark:text-amber-200">
-                    <strong>Học phí ưu đãi:</strong>{" "}
-                    <span className="text-rose-600 dark:text-rose-400 font-extrabold text-sm">
-                      {SITE_CONFIG.courseClass.tuitionFormatted}
-                    </span>{" "}
-                    (Tiết kiệm 35% so với giá gốc 2.150.000đ khi đăng ký đợt {selectedBatch.dateStr})
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-                    {/* Ảnh mã VietQR */}
-                    <div className="flex flex-col items-center p-3 rounded-2xl border border-border bg-white text-slate-900">
-                      <img
-                        src={`https://img.vietqr.io/image/MB-${SITE_CONFIG.bankAccount.accountNumber}-compact2.png?amount=${SITE_CONFIG.courseClass.tuitionVnd}&addInfo=APTIS%20B2%20${encodeURIComponent(selectedBatch.dateStr)}&accountName=${encodeURIComponent(SITE_CONFIG.bankAccount.accountHolder)}`}
-                        alt="Mã VietQR thanh toán học phí"
-                        className="w-44 h-44 object-contain"
-                        loading="lazy"
-                      />
-                      <span className="text-[10px] font-semibold text-slate-500 mt-1">
-                        Quét mã VietQR bằng app ngân hàng
-                      </span>
+                /* TAB 3: TƯ VẤN HỌC PHÍ & LỘ TRÌNH (HOẶC VIETQR NẾU CÓ GIÁ) */
+                SITE_CONFIG.courseClass.tuitionVnd === 0 || SITE_CONFIG.bankAccount.accountNumber.includes("Liên hệ") ? (
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-500/10 via-primary/5 to-amber-500/10 border border-rose-500/20 text-xs text-foreground">
+                      <div className="flex items-center gap-2 mb-1.5 font-bold text-rose-600 dark:text-rose-400">
+                        <Sparkles className="w-4 h-4 shrink-0" />
+                        <span className="text-sm">Tư vấn lộ trình cá nhân hóa &amp; Nhận học phí ưu đãi</span>
+                      </div>
+                      <p className="text-muted-foreground leading-relaxed text-[11px]">
+                        Học phí khóa học và tài khoản ngân hàng sẽ được giảng viên gửi trực tiếp sau khi tư vấn và đánh giá năng lực đầu vào miễn phí cho bạn.
+                      </p>
                     </div>
 
-                    {/* Chi tiết tài khoản ngân hàng */}
-                    <div className="space-y-2 text-xs">
-                      <div className="p-2.5 rounded-xl bg-muted/40 border border-border">
-                        <span className="text-muted-foreground text-[10px] block">Ngân hàng</span>
-                        <span className="font-bold text-foreground text-xs">{SITE_CONFIG.bankAccount.bankName}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="p-4 rounded-xl border border-border bg-card space-y-2">
+                        <span className="text-[11px] font-bold text-muted-foreground uppercase block">Lộ trình học</span>
+                        <p className="font-heading font-black text-foreground text-sm">
+                          {SITE_CONFIG.courseClass.durationText} · {SITE_CONFIG.courseClass.totalSessions} buổi
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {SITE_CONFIG.courseClass.scheduleDays} ({SITE_CONFIG.courseClass.scheduleTime})
+                        </p>
                       </div>
 
-                      <div className="p-2.5 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
-                        <div>
-                          <span className="text-muted-foreground text-[10px] block">Số tài khoản</span>
-                          <span className="font-mono font-black text-rose-600 dark:text-rose-400 text-sm">
-                            {SITE_CONFIG.bankAccount.accountNumber}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleCopySTK}
-                          className="px-2.5 py-1.5 rounded-lg bg-card hover:bg-muted border border-border text-foreground text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-colors"
+                      <div className="p-4 rounded-xl border border-border bg-card space-y-2">
+                        <span className="text-[11px] font-bold text-muted-foreground uppercase block">Mức học phí</span>
+                        <p className="font-heading font-black text-rose-600 dark:text-rose-400 text-base">
+                          {SITE_CONFIG.courseClass.tuitionFormatted}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          Hỗ trợ trả góp &amp; tặng bộ tài liệu ôn thi độc quyền
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 2 Kênh liên hệ tư vấn viên */}
+                    <div className="p-4 rounded-2xl border border-border bg-muted/30 space-y-3">
+                      <p className="text-xs text-foreground font-semibold">
+                        Liên hệ trực tiếp với Cố vấn đào tạo để giữ chỗ đợt <strong>{selectedBatch.dateStr}</strong>:
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-2.5">
+                        <a
+                          href={zaloContactUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex-1 h-11 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all shadow-sm"
                         >
-                          {copiedSTK ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 text-emerald-500" />
-                              <span className="text-emerald-500">Đã chép</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5" />
-                              <span>Sao chép</span>
-                            </>
-                          )}
-                        </button>
+                          <MessageCircle className="w-4 h-4" />
+                          <span>Nhắn Zalo cố vấn ngay (24/7)</span>
+                        </a>
+                        <a
+                          href={`tel:${supportHotline?.replace(/[^0-9]/g, "") || SITE_CONFIG.contact.defaultZaloPhone}`}
+                          className="h-11 px-4 rounded-xl border border-border bg-card hover:bg-muted text-foreground font-bold text-xs inline-flex items-center justify-center gap-2 transition-colors"
+                        >
+                          <PhoneCall className="w-4 h-4 text-rose-500" />
+                          <span>Hotline: {supportHotline || SITE_CONFIG.contact.defaultHotline}</span>
+                        </a>
                       </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3.5">
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-900 dark:text-amber-200">
+                      <strong>Học phí ưu đãi:</strong>{" "}
+                      <span className="text-rose-600 dark:text-rose-400 font-extrabold text-sm">
+                        {SITE_CONFIG.courseClass.tuitionFormatted}
+                      </span>{" "}
+                      (Đăng ký đợt {selectedBatch.dateStr})
+                    </div>
 
-                      <div className="p-2.5 rounded-xl bg-muted/40 border border-border">
-                        <span className="text-muted-foreground text-[10px] block">Chủ tài khoản</span>
-                        <span className="font-bold text-foreground text-xs">{SITE_CONFIG.bankAccount.accountHolder}</span>
-                      </div>
-
-                      <div className="p-2.5 rounded-xl bg-muted/40 border border-border">
-                        <span className="text-muted-foreground text-[10px] block">Cú pháp chuyển khoản</span>
-                        <span className="font-mono font-bold text-foreground text-xs">
-                          Tên + SĐT + B2 {selectedBatch.dateStr}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                      {/* Ảnh mã VietQR */}
+                      <div className="flex flex-col items-center p-3 rounded-2xl border border-border bg-white text-slate-900">
+                        <img
+                          src={`https://img.vietqr.io/image/MB-${SITE_CONFIG.bankAccount.accountNumber}-compact2.png?amount=${SITE_CONFIG.courseClass.tuitionVnd}&addInfo=APTIS%20B2%20${encodeURIComponent(selectedBatch.dateStr)}&accountName=${encodeURIComponent(SITE_CONFIG.bankAccount.accountHolder)}`}
+                          alt="Mã VietQR thanh toán học phí"
+                          className="w-44 h-44 object-contain"
+                          loading="lazy"
+                        />
+                        <span className="text-[10px] font-semibold text-slate-500 mt-1">
+                          Quét mã VietQR bằng app ngân hàng
                         </span>
                       </div>
+
+                      {/* Chi tiết tài khoản ngân hàng */}
+                      <div className="space-y-2 text-xs">
+                        <div className="p-2.5 rounded-xl bg-muted/40 border border-border">
+                          <span className="text-muted-foreground text-[10px] block">Ngân hàng</span>
+                          <span className="font-bold text-foreground text-xs">{SITE_CONFIG.bankAccount.bankName}</span>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
+                          <div>
+                            <span className="text-muted-foreground text-[10px] block">Số tài khoản</span>
+                            <span className="font-mono font-black text-rose-600 dark:text-rose-400 text-sm">
+                              {SITE_CONFIG.bankAccount.accountNumber}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleCopySTK}
+                            className="px-2.5 py-1.5 rounded-lg bg-card hover:bg-muted border border-border text-foreground text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            {copiedSTK ? (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                                <span className="text-emerald-500">Đã chép</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5" />
+                                <span>Sao chép</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-muted/40 border border-border">
+                          <span className="text-muted-foreground text-[10px] block">Chủ tài khoản</span>
+                          <span className="font-bold text-foreground text-xs">{SITE_CONFIG.bankAccount.accountHolder}</span>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-muted/40 border border-border">
+                          <span className="text-muted-foreground text-[10px] block">Cú pháp chuyển khoản</span>
+                          <span className="font-mono font-bold text-foreground text-xs">
+                            Tên + SĐT + B2 {selectedBatch.dateStr}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-muted/30 border border-border text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
+                      <span className="text-muted-foreground text-[11px]">
+                        Sau khi chuyển khoản, bạn chỉ cần gửi biên lai qua Zalo để trợ giảng xếp lớp ngay:
+                      </span>
+                      <a
+                        href={zaloContactUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shrink-0 transition-colors shadow-sm"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>Xác nhận qua Zalo</span>
+                      </a>
                     </div>
                   </div>
-
-                  <div className="p-3 rounded-xl bg-muted/30 border border-border text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
-                    <span className="text-muted-foreground text-[11px]">
-                      Sau khi chuyển khoản, bạn chỉ cần gửi biên lai qua Zalo để trợ giảng xếp lớp ngay:
-                    </span>
-                    <a
-                      href={zaloContactUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shrink-0 transition-colors shadow-sm"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      <span>Xác nhận qua Zalo</span>
-                    </a>
-                  </div>
-                </div>
+                )
               )}
             </div>
 

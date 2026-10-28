@@ -366,11 +366,11 @@ export function CourseClassBanner() {
               <span className="text-[11px] font-bold uppercase tracking-wider text-white/90">
                 Học phí ưu đãi
               </span>
-              <span className="text-xl sm:text-2xl font-heading font-black tracking-tight leading-tight mt-0.5">
-                1.400.000đ
+              <span className="text-base sm:text-lg font-heading font-black tracking-tight leading-tight mt-0.5 whitespace-nowrap">
+                {SITE_CONFIG.courseClass.tuitionFormatted}
               </span>
               <span className="text-[10px] font-bold text-white/95 mt-1 bg-white/20 px-2 py-0.5 rounded-full">
-                /khóa 11 buổi
+                {SITE_CONFIG.courseClass.durationText}
               </span>
             </div>
 
@@ -695,74 +695,113 @@ export function CourseClassBanner() {
                         </div>
                         <div className="text-right shrink-0">
                           <span className="block text-[10px] font-bold text-muted-foreground uppercase">Học phí</span>
-                          <span className="font-heading font-black text-rose-600 dark:text-rose-400 text-lg">1.400.000đ</span>
+                          <span className="font-heading font-black text-rose-600 dark:text-rose-400 text-base sm:text-lg">
+                            {SITE_CONFIG.courseClass.tuitionFormatted}
+                          </span>
                         </div>
                       </div>
 
-                      {/* Option A: Chuyển khoản */}
+                      {/* Option A: Chuyển khoản hoặc Tư vấn */}
                       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-rose-600 text-white text-[11px] font-black flex items-center justify-center shrink-0">A</div>
-                          <span className="font-bold text-sm text-foreground">Chuyển khoản học phí giữ chỗ</span>
+                          <span className="font-bold text-sm text-foreground">
+                            {SITE_CONFIG.courseClass.tuitionVnd === 0 || SITE_CONFIG.bankAccount.accountNumber.includes("Liên hệ")
+                              ? "Tư vấn lộ trình & Giữ chỗ ưu đãi"
+                              : "Chuyển khoản học phí giữ chỗ"}
+                          </span>
                           <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">Nhanh nhất</span>
                         </div>
 
                         <div className="pl-0 sm:pl-8 space-y-3">
-                          {/* Box VietQR + Thông tin tài khoản */}
-                          <div className="flex flex-col sm:flex-row items-center gap-3.5 p-3 rounded-xl bg-muted/40 border border-border/80">
-                            <div className="w-28 h-28 bg-white p-1.5 rounded-xl border border-border/80 shrink-0 shadow-xs flex items-center justify-center">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={
-                                  SITE_CONFIG.bankAccount.qrImageUrl ||
-                                  `https://img.vietqr.io/image/MB-${SITE_CONFIG.bankAccount.accountNumber}-compact2.png?amount=${SITE_CONFIG.courseClass.tuitionVnd}&addInfo=Aptis%20B2`
-                                }
-                                alt="Mã VietQR chuyển khoản học phí"
-                                className="w-full h-full object-contain"
-                              />
-                            </div>
-
-                            <div className="space-y-1.5 text-xs flex-1 w-full">
-                              <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground text-[11px]">Ngân hàng:</span>
-                                <span className="font-bold text-foreground text-[11px]">{SITE_CONFIG.bankAccount.bankName}</span>
+                          {SITE_CONFIG.courseClass.tuitionVnd === 0 || SITE_CONFIG.bankAccount.accountNumber.includes("Liên hệ") ? (
+                            /* Box Tư vấn học phí & Lộ trình */
+                            <div className="p-3.5 rounded-xl bg-muted/40 border border-border/80 space-y-3">
+                              <div>
+                                <p className="font-bold text-xs text-foreground">Học phí &amp; Tài khoản thanh toán</p>
+                                <p className="text-[11px] text-muted-foreground mt-0.5">
+                                  Giảng viên sẽ đánh giá trình độ miễn phí và gửi mức học phí ưu đãi kèm thông tin chuyển khoản trực tiếp qua Zalo cho bạn.
+                                </p>
                               </div>
-                              <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground text-[11px]">Số tài khoản:</span>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(SITE_CONFIG.bankAccount.accountNumber);
-                                    setCopiedAccount(true);
-                                    setTimeout(() => setCopiedAccount(false), 2000);
-                                  }}
-                                  className="inline-flex items-center gap-1 font-mono font-bold text-primary hover:underline cursor-pointer"
-                                  title="Bấm để copy STK"
+
+                              <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                                <a
+                                  href={zaloContactUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex-1 h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                                 >
-                                  <span>{SITE_CONFIG.bankAccount.accountNumber}</span>
-                                  {copiedAccount ? (
-                                    <Check className="w-3.5 h-3.5 text-emerald-500" />
-                                  ) : (
-                                    <Copy className="w-3.5 h-3.5 opacity-70" />
-                                  )}
-                                </button>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground text-[11px]">Chủ tài khoản:</span>
-                                <span className="font-bold text-foreground text-[11px]">{SITE_CONFIG.bankAccount.accountHolder}</span>
-                              </div>
-                              <div className="flex items-center justify-between border-t border-border/60 pt-1">
-                                <span className="text-muted-foreground text-[11px]">Nội dung CK:</span>
-                                <span className="font-mono font-bold text-rose-600 dark:text-rose-400 text-[11px]">
-                                  Tên + SĐT + B2
-                                </span>
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                  <span>Nhắn Zalo nhận lộ trình &amp; học phí</span>
+                                </a>
+                                <a
+                                  href={`tel:${supportHotline?.replace(/[^0-9]/g, "") || SITE_CONFIG.contact.defaultZaloPhone}`}
+                                  className="h-10 px-4 rounded-xl border border-border bg-card hover:bg-muted text-foreground font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-colors"
+                                >
+                                  <PhoneCall className="w-3.5 h-3.5 text-rose-500" />
+                                  <span>Hotline: {supportHotline || SITE_CONFIG.contact.defaultHotline}</span>
+                                </a>
                               </div>
                             </div>
-                          </div>
+                          ) : (
+                            /* Box VietQR + Thông tin tài khoản */
+                            <>
+                              <div className="flex flex-col sm:flex-row items-center gap-3.5 p-3 rounded-xl bg-muted/40 border border-border/80">
+                                <div className="w-28 h-28 bg-white p-1.5 rounded-xl border border-border/80 shrink-0 shadow-xs flex items-center justify-center">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={
+                                      SITE_CONFIG.bankAccount.qrImageUrl ||
+                                      `https://img.vietqr.io/image/MB-${SITE_CONFIG.bankAccount.accountNumber}-compact2.png?amount=${SITE_CONFIG.courseClass.tuitionVnd}&addInfo=Aptis%20B2`
+                                    }
+                                    alt="Mã VietQR chuyển khoản học phí"
+                                    className="w-full h-full object-contain"
+                                  />
+                                </div>
 
-                          <p className="text-[11px] text-muted-foreground">
-                            Sau khi chuyển khoản, bạn chỉ cần nhắn Zalo gửi biên lai để trợ giảng kích hoạt phòng học ngay lập tức.
-                          </p>
+                                <div className="space-y-1.5 text-xs flex-1 w-full">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground text-[11px]">Ngân hàng:</span>
+                                    <span className="font-bold text-foreground text-[11px]">{SITE_CONFIG.bankAccount.bankName}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground text-[11px]">Số tài khoản:</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(SITE_CONFIG.bankAccount.accountNumber);
+                                        setCopiedAccount(true);
+                                        setTimeout(() => setCopiedAccount(false), 2000);
+                                      }}
+                                      className="inline-flex items-center gap-1 font-mono font-bold text-primary hover:underline cursor-pointer"
+                                      title="Bấm để copy STK"
+                                    >
+                                      <span>{SITE_CONFIG.bankAccount.accountNumber}</span>
+                                      {copiedAccount ? (
+                                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                                      ) : (
+                                        <Copy className="w-3.5 h-3.5 opacity-70" />
+                                      )}
+                                    </button>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground text-[11px]">Chủ tài khoản:</span>
+                                    <span className="font-bold text-foreground text-[11px]">{SITE_CONFIG.bankAccount.accountHolder}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between border-t border-border/60 pt-1">
+                                    <span className="text-muted-foreground text-[11px]">Nội dung CK:</span>
+                                    <span className="font-mono font-bold text-rose-600 dark:text-rose-400 text-[11px]">
+                                      Tên + SĐT + B2
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <p className="text-[11px] text-muted-foreground">
+                                Sau khi chuyển khoản, bạn chỉ cần nhắn Zalo gửi biên lai để trợ giảng kích hoạt phòng học ngay lập tức.
+                              </p>
+                            </>
+                          )}
                         </div>
                       </div>
 
