@@ -12,30 +12,28 @@ export const SITE_CONFIG = {
     defaultZaloUrl: "https://zalo.me/0379866596",
     defaultHotline: "0379 866 596",
     secondaryHotline: "0387 905 990",
-    defaultEmail: "aptiskytich.admin@gmail.com",
-    facebookUrl: "https://www.facebook.com/Aptiskytich",
+    defaultEmail: "aptisonthi@gmail.com",
+    facebookUrl: "https://zalo.me/0379866596",
     consultantName: "Giảng viên Aptis ESOL",
   },
 
-  // 2. Tài khoản ngân hàng nhận học phí & thanh toán
+  // 2. Tài khoản ngân hàng nhận học phí & thanh toán (Cung cấp khi tư vấn trực tiếp)
   bankAccount: {
-    bankName: "MB Bank (Ngân hàng Quân Đội)",
-    accountNumber: "0866950837",
-    accountHolder: "APTIS KY TICH",
-    // Nếu bạn có ảnh QR thật, lưu vào frontend/public/uploads/bank-qr.png rồi điền "/uploads/bank-qr.png"
+    bankName: "Liên hệ tư vấn viên",
+    accountNumber: "Liên hệ tư vấn",
+    accountHolder: "APTIS ESOL PREMIER",
     qrImageUrl: null as string | null,
   },
 
   // 3. Khóa học Online Aptis ESOL B2 (Cố vấn trực tiếp)
   courseClass: {
-    tuitionVnd: 1400000,
-    tuitionFormatted: "1.400.000đ",
-    durationText: "Khóa 11 buổi",
+    tuitionVnd: 0,
+    tuitionFormatted: "Liên hệ tư vấn",
+    durationText: "Lộ trình cá nhân hóa",
     scheduleDays: "Thứ 3 – Thứ 5 – Thứ 7",
     scheduleTime: "20:00 – 21:30",
     totalSessions: 11,
-    // Nếu muốn chốt ngày khai giảng cố định, điền chuỗi "DD/MM" (ví dụ: "20/10").
-    // Nếu để null, hệ thống tự động nhảy các ngày Thứ 3 - Thứ 5 - Thứ 7 của tuần kế tiếp (không bao giờ bị lỗi thời).
+    // Để null: hệ thống tự động nhảy lịch đợt gần nhất
     fixedOpeningDate: null as string | null,
   },
 
