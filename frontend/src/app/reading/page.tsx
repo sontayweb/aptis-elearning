@@ -205,12 +205,14 @@ export default function ReadingPracticePage() {
 
   // 1. Danh sách đề thi thuộc Tab hiện tại (Tab Full Part, Part 1, Part 2, Part 3, Part 4)
   const currentTabExams = exams.filter((e) => {
+    const isFullReading = e.title.includes("Full Reading") || e.totalParts === 4;
+
     if (activeTab === "full") {
-      return e.title.includes("Full Reading") || e.totalParts === 4;
+      return isFullReading;
     } else if (activeTab === "p1") {
       // Part 1: Sentence comprehension
-      if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
       return (
+        isFullReading ||
         e.title.includes("Reading Part 1") ||
         e.title.includes("PART1") ||
         /^(?:Đề|Test|Exam)\s*\d+$/i.test(e.title.trim()) ||
@@ -219,8 +221,8 @@ export default function ReadingPracticePage() {
       );
     } else if (activeTab === "p2") {
       // Part 2: Text cohesion (sắp xếp câu)
-      if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
       return (
+        isFullReading ||
         e.partTitle?.includes("Part 2") ||
         e.partTitle?.includes("Text Cohesion") ||
         e.partTitle?.includes("Cohesion") ||
@@ -232,8 +234,8 @@ export default function ReadingPracticePage() {
       );
     } else if (activeTab === "p3") {
       // Part 3: Opinion matching (nối ý kiến)
-      if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
       return (
+        isFullReading ||
         e.partTitle?.includes("Opinion") ||
         (e.partTitle?.includes("Part 4") && !e.partTitle?.includes("Long")) ||
         (e.partTitle?.includes("Part 3") && !e.partTitle?.includes("Cohesion")) ||
@@ -244,8 +246,8 @@ export default function ReadingPracticePage() {
       );
     } else if (activeTab === "p4") {
       // Part 4: Long reading (đọc bài dài & nối heading)
-      if (e.totalParts === 4 || e.title.includes("Full Reading")) return false;
       return (
+        isFullReading ||
         e.partTitle?.includes("Long") ||
         e.partTitle?.includes("Part 5") ||
         (e.partTitle?.includes("Part 4") && e.partTitle?.includes("Long")) ||
@@ -634,7 +636,8 @@ export default function ReadingPracticePage() {
                   if (
                     !topicClean ||
                     /^(?:Đề|Test|Exam)\s*\d+$/i.test(topicClean) ||
-                    /^(?:Reading\s*Part\s*\d+|Key\s*PART\d+)$/i.test(topicClean)
+                    /^(?:Reading\s*Part\s*\d+|Key\s*PART\d+)$/i.test(topicClean) ||
+                    topicClean.includes("Full Reading")
                   ) {
                     const bank =
                       activeTab === "p2"
