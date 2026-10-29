@@ -159,8 +159,12 @@ export function ReadingSentenceOrder({
   isReviewMode = false,
   correctOrder = [],
 }: SentenceOrderProps) {
-  const hasFixed = Boolean(fixedSentence && fixedSentence.trim());
-  const totalSlotsCount = hasFixed ? 4 : 5;
+  // Loại trừ các text placeholder dummy như 'Sentence 1 is fixed here.'
+  const isDummyFixed = Boolean(fixedSentence && /sentence 1 is fixed/i.test(fixedSentence));
+  // Chỉ coi là có câu cố định nếu có nội dung thực tế VÀ số câu kéo thả <= 4
+  const hasFixed = Boolean(fixedSentence && fixedSentence.trim() && !isDummyFixed && sentences.length <= 4);
+  // Luôn đảm bảo số ô kéo thả bằng đúng số lượng câu cần xếp
+  const totalSlotsCount = sentences.length > 0 ? sentences.length : (hasFixed ? 4 : 5);
 
   // target slots
   const [slots, setSlots] = useState<(SentenceItem | null)[]>(() =>

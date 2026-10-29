@@ -48,6 +48,11 @@ import {
   DEFAULT_READING_TEST,
 } from "@/data/reading-benchmark";
 
+function stripHtml(text: string | null | undefined): string {
+  if (!text) return "";
+  return text.replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim();
+}
+
 export default function ReadingExamPage() {
   return (
     <Suspense
@@ -590,20 +595,27 @@ function ReadingExamRunner() {
         });
       }
     }
-    const isFullExam = examData.part1.gaps.length > 0 && examData.part4.paragraphs.length > 0;
     if (examData.part3.questions.length > 0) {
+      const p3CleanTitle = stripHtml(examData.part3.title)
+        .replace(/^Part\s*\d+\s*–?\s*/i, "")
+        .replace(/^-?\s*gap fill/i, "")
+        .trim();
       list.push({
         stageKey: "p3",
-        title: isFullExam ? "Part 3" : (examData.part3.title?.includes("Part 3") ? "Part 3" : "Part 4"),
-        label: (isFullExam ? "Part 3 – " : "Part 4 – ") + (examData.part3.title?.replace(/^Part\s*\d+\s*–?\s*/i, "") || "Opinion Matching"),
+        title: "Part 3",
+        label: "Part 3 – " + (p3CleanTitle || "Opinion Matching"),
         count: examData.part3.questions.length,
       });
     }
     if (examData.part4.paragraphs.length > 0) {
+      const p4CleanTitle = stripHtml(examData.part4.title)
+        .replace(/^Part\s*\d+\s*–?\s*/i, "")
+        .replace(/^-?\s*gap fill/i, "")
+        .trim();
       list.push({
         stageKey: "p4",
-        title: isFullExam ? "Part 4" : (examData.part4.title?.includes("Part 4") ? "Part 4" : "Part 5"),
-        label: (isFullExam ? "Part 4 – " : "Part 5 – ") + (examData.part4.title?.replace(/^Part\s*\d+\s*–?\s*/i, "") || "Long Reading"),
+        title: "Part 4",
+        label: "Part 4 – " + (p4CleanTitle || "Long Reading"),
         count: examData.part4.paragraphs.length,
       });
     }
@@ -1299,11 +1311,11 @@ function ReadingExamRunner() {
                 </div>
 
                 <p className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans">
-                  {currentStage.stageKey === "p1" && examData.part1.instructions}
-                  {currentStage.stageKey === "p2-1" && examData.part2.instructions}
-                  {currentStage.stageKey === "p2-2" && examData.part2.instructions}
-                  {currentStage.stageKey === "p3" && examData.part3.instructions}
-                  {currentStage.stageKey === "p4" && examData.part4.instructions}
+                  {currentStage.stageKey === "p1" && stripHtml(examData.part1.instructions)}
+                  {currentStage.stageKey === "p2-1" && stripHtml(examData.part2.instructions)}
+                  {currentStage.stageKey === "p2-2" && stripHtml(examData.part2.instructions)}
+                  {currentStage.stageKey === "p3" && stripHtml(examData.part3.instructions)}
+                  {currentStage.stageKey === "p4" && stripHtml(examData.part4.instructions)}
                 </p>
               </div>
 
@@ -1315,21 +1327,14 @@ function ReadingExamRunner() {
                   {/* ============================================================== */}
                   {currentStage.stageKey === "p1" && (
                     <div className="space-y-6">
-                      <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80">
-                        <p className="text-xs md:text-sm text-foreground font-semibold flex items-center gap-1.5">
-                          <Pin className="w-3.5 h-3.5 text-primary shrink-0" />
-                          <span>{examData.part1.instructions}</span>
-                        </p>
-                      </div>
-
                       {/* Example Sentence */}
                       {Boolean(examData.part1.exampleText?.word) && (
                         <div className="p-4 rounded-xl border border-border/70 bg-card/60 flex items-center gap-2 flex-wrap text-sm md:text-base">
-                          <span>{examData.part1.exampleText.prefix}</span>
+                          <span>{stripHtml(examData.part1.exampleText.prefix)}</span>
                           <span className="px-3 py-1 rounded-md border border-border bg-muted/60 text-muted-foreground font-bold text-xs select-none">
-                            {examData.part1.exampleText.word}
+                            {stripHtml(examData.part1.exampleText.word)}
                           </span>
-                          <span>{examData.part1.exampleText.suffix}</span>
+                          <span>{stripHtml(examData.part1.exampleText.suffix)}</span>
                           <span className="text-[11px] text-muted-foreground italic ml-2">
                             (Câu ví dụ mẫu)
                           </span>
@@ -1339,13 +1344,13 @@ function ReadingExamRunner() {
                       {/* Gaps List - Tách rời từng câu riêng biệt, không dính liền */}
                       <div className="space-y-4">
                         {examData.part1.gaps.map((gap, gIdx) => {
-                          const cleanPrompt = gap.prompt || "";
-                          const hasGapMarker = /\[(?:gap|blank|\.\.\.)\]/i.test(cleanPrompt);
+                          const cleanPrompt = stripHtml(gap.prompt);
+                          const hasGapMarker = /\[(?:gap|blank|\.\.\.)\]|tienphongSpace/i.test(cleanPrompt);
                           let beforeGap = cleanPrompt;
                           let afterGap = "";
 
                           if (hasGapMarker) {
-                            const split = cleanPrompt.split(/\[(?:gap|blank|\.\.\.)\]/i);
+                            const split = cleanPrompt.split(/\[(?:gap|blank|\.\.\.)\]|tienphongSpace/i);
                             beforeGap = split[0];
                             afterGap = split[1] || "";
                           } else if (gap.correctAnswer && cleanPrompt.toLowerCase().includes(gap.correctAnswer.toLowerCase())) {
@@ -2515,29 +2520,33 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
             const st1Sentences = rawArr.slice(0, mid);
             const st2Sentences = rawArr.slice(mid);
 
+            const st1HasFixed = st1Sentences.length < 5;
+            const st2HasFixed = st2Sentences.length < 5;
+
             stories.push({
               id: `${q.id}-1`,
               title: q.prompt && q.prompt !== "Put the sentences in the correct order." ? q.prompt : "Đoạn văn 1",
-              fixedSentence: st1Sentences[0] || "Sentence 1 is fixed.",
-              sentences: st1Sentences.slice(1).map((text, sIdx) => ({ id: `s${sIdx + 2}`, text })),
-              correctOrder: st1Sentences.slice(1).map((_, sIdx) => `s${sIdx + 2}`),
+              fixedSentence: st1HasFixed ? st1Sentences[0] : null,
+              sentences: (st1HasFixed ? st1Sentences.slice(1) : st1Sentences).map((text, sIdx) => ({ id: `s${sIdx + (st1HasFixed ? 2 : 1)}`, text })),
+              correctOrder: (st1HasFixed ? st1Sentences.slice(1) : st1Sentences).map((_, sIdx) => `s${sIdx + (st1HasFixed ? 2 : 1)}`),
             });
 
             stories.push({
               id: `${q.id}-2`,
               title: "Đoạn văn 2",
-              fixedSentence: st2Sentences[0] || "Sentence 1 is fixed.",
-              sentences: st2Sentences.slice(1).map((text, sIdx) => ({ id: `s${mid + sIdx + 2}`, text })),
-              correctOrder: st2Sentences.slice(1).map((_, sIdx) => `s${mid + sIdx + 2}`),
+              fixedSentence: st2HasFixed ? st2Sentences[0] : null,
+              sentences: (st2HasFixed ? st2Sentences.slice(1) : st2Sentences).map((text, sIdx) => ({ id: `s${mid + sIdx + (st2HasFixed ? 2 : 1)}`, text })),
+              correctOrder: (st2HasFixed ? st2Sentences.slice(1) : st2Sentences).map((_, sIdx) => `s${mid + sIdx + (st2HasFixed ? 2 : 1)}`),
             });
             return;
           } else if (rawArr.length >= 4) {
+            const hasFixed = rawArr.length < 5;
             stories.push({
               id: String(q.id),
               title: q.prompt && q.prompt !== "Put the sentences in the correct order." ? q.prompt : `Đoạn văn ${idx + 1}`,
-              fixedSentence: null,
-              sentences: rawArr.map((text, sIdx) => ({ id: `s${sIdx + 1}`, text })),
-              correctOrder: rawArr.map((_, sIdx) => `s${sIdx + 1}`),
+              fixedSentence: hasFixed ? rawArr[0] : null,
+              sentences: (hasFixed ? rawArr.slice(1) : rawArr).map((text, sIdx) => ({ id: `s${sIdx + (hasFixed ? 2 : 1)}`, text })),
+              correctOrder: (hasFixed ? rawArr.slice(1) : rawArr).map((_, sIdx) => `s${sIdx + (hasFixed ? 2 : 1)}`),
             });
             return;
           }
@@ -2554,12 +2563,16 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
           }
         }
 
+        const rawSentences = optsObj.sentences || [];
+        const isDummy = Boolean(optsObj.fixedSentence && /sentence 1 is fixed/i.test(optsObj.fixedSentence));
+        const finalFixed = (rawSentences.length >= 5 || isDummy) ? null : (optsObj.fixedSentence || null);
+
         stories.push({
           id: String(q.id),
           title: optsObj.title || q.prompt || `Đoạn văn ${idx + 1}`,
-          fixedSentence: optsObj.fixedSentence || null,
-          sentences: optsObj.sentences || [],
-          correctOrder: corArr.length > 0 ? corArr : (optsObj.sentences || []).map((s: any) => s.id),
+          fixedSentence: finalFixed,
+          sentences: rawSentences,
+          correctOrder: corArr.length > 0 ? corArr : rawSentences.map((s: any) => s.id),
         });
       });
 
@@ -2625,20 +2638,25 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
         }
       }
 
-      const questions: Part3Question[] = (p.questions || []).map((q: any) => {
-        let opts: string[] = ["Person A", "Person B", "Person C", "Person D"];
-        if (Array.isArray(q.options) && q.options.length > 0) opts = q.options;
-        return {
-          id: String(q.id),
-          prompt: q.prompt,
-          options: opts,
-          correctAnswer: String(q.correct_answer || "Person A"),
-        };
-      });
+      const isInstructionQ = (text: string) =>
+        /here is the perspective of four people|read the content and answer the question|choose the correct person/i.test(text);
+
+      const questions: Part3Question[] = (p.questions || [])
+        .filter((q: any) => !isInstructionQ(q.prompt || ""))
+        .map((q: any) => {
+          let opts: string[] = ["Person A", "Person B", "Person C", "Person D"];
+          if (Array.isArray(q.options) && q.options.length > 0) opts = q.options;
+          return {
+            id: String(q.id),
+            prompt: stripHtml(q.prompt),
+            options: opts,
+            correctAnswer: String(q.correct_answer || "Person A"),
+          };
+        });
       if (questions.length > 0) {
         result.part3.questions = questions;
-        if (p.instructions) result.part3.instructions = p.instructions;
-        if (p.title) result.part3.title = p.title;
+        if (p.instructions) result.part3.instructions = stripHtml(p.instructions);
+        if (p.title) result.part3.title = stripHtml(p.title);
       }
     }
 
@@ -2661,8 +2679,8 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
         if (headingsSet.size > 0) {
           result.part4.allHeadings = Array.from(headingsSet);
         }
-        if (p.instructions) result.part4.instructions = p.instructions;
-        result.part4.title = p.passage_text || p.title || "Long reading";
+        if (p.instructions) result.part4.instructions = stripHtml(p.instructions);
+        result.part4.title = stripHtml(p.passage_text || p.title || "Long reading");
       }
     }
   });

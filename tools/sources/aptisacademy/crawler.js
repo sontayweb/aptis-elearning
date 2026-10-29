@@ -512,19 +512,25 @@ export async function crawl({ prisma = null, saveDb = false, downloadMedia = fal
         const pNum = Number(p.replace('part', ''));
         const d = item.data || item;
         const q = d.questions || item.questions?.[0] || {};
-        const title = d.title || `Reading Part ${pNum} - Đề ${idx + 1}`;
+        const cleanRawText = (str) => {
+          if (!str) return '';
+          return str.replace(/tienphongSpace/g, '[gap]').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        };
+
+        let title = d.title || `Reading Part ${pNum} - Đề ${idx + 1}`;
+        title = title.replace(/^Đề\s*\d+\s*[-–:]\s*(Đề\s*\d+)/i, '$1').trim();
 
         const questions = (q.subQuestion && q.subQuestion.length > 0)
           ? q.subQuestion.map((sq, sqIdx) => ({
               question_number: sqIdx + 1,
-              prompt: sq.content || `Câu ${sqIdx + 1}`,
-              options: (sq.answerList || q.answerList || []).map(a => a.content || a),
+              prompt: cleanRawText(sq.content) || `Câu ${sqIdx + 1}`,
+              options: (sq.answerList || q.answerList || []).map(a => cleanRawText(a.content || a)),
               correctAnswer: sq.correctAnswer || null
             }))
           : [{
               question_number: 1,
-              prompt: q.content || 'Đọc và hoàn thành bài tập',
-              options: (q.answerList || []).map(a => a.content || a),
+              prompt: cleanRawText(q.content) || 'Đọc và hoàn thành bài tập',
+              options: (q.answerList || []).map(a => cleanRawText(a.content || a)),
               correctAnswer: q.correctAnswer || null
             }];
 
@@ -533,8 +539,8 @@ export async function crawl({ prisma = null, saveDb = false, downloadMedia = fal
           part: p.toUpperCase(),
           title,
           timeLimitMinutes: d.timeToDo || 35,
-          content: q.content || null,
-          options: q.answerList?.map(a => a.content || a) || [],
+          content: cleanRawText(q.content) || null,
+          options: q.answerList?.map(a => cleanRawText(a.content || a)) || [],
           correctAnswer: q.correctAnswer || null,
           questions
         });
@@ -548,7 +554,7 @@ export async function crawl({ prisma = null, saveDb = false, downloadMedia = fal
           parts: [{
             part_number: pNum,
             title: `Reading Part ${pNum}`,
-            instructions: q.content || null,
+            instructions: cleanRawText(q.content) || null,
             questions: questions.map(qItem => ({
               question_number: qItem.question_number,
               question_type: pNum === 1 ? 'GAP_FILL' : (pNum === 2 || pNum === 3) ? 'SENTENCE_ORDER' : 'MATCHING',
