@@ -1,0 +1,305 @@
+[
+  {
+    "setId": "c4c1a08f-d89b-4db2-b098-504701dd8ea8",
+    "examTitle": "Đề 07 - Reading Part 1",
+    "skill": "reading",
+    "part": "Part 1 - Sentence Comprehension",
+    "qId": "51efafdd-befa-42ca-afe8-a5aa224eb4f2",
+    "questionType": "gap_fill",
+    "questionTextSample": "Take the bus to the main {1}. The bus {2} are near my house. My house is {3} and you can easily recognize it by the color. I cook eggs for a quick {4}...",
+    "optionsType": "Array (0 items)",
+    "optionsSample": [],
+    "correctAnswer": 0,
+    "extraDataKeys": [
+      "gaps",
+      "passage",
+      "instruction"
+    ],
+    "extraData": {
+      "gaps": [
+        {
+          "correct": 0,
+          "options": []
+        },
+        {
+          "correct": 0,
+          "options": [
+            "station",
+            "run",
+            "walk"
+          ]
+        },
+        {
+          "correct": 1,
+          "options": [
+            "color",
+            "stops",
+            "driver"
+          ]
+        },
+        {
+          "correct": 2,
+          "options": [
+            "tall",
+            "fat",
+            "green"
+          ]
+        },
+        {
+          "correct": 0,
+          "options": [
+            "dinner",
+            "homework",
+            "sore"
+          ]
+        },
+        {
+          "correct": 1,
+          "options": [
+            "sing",
+            "movies",
+            "news"
+          ]
+        }
+      ],
+      "passage": "Take the bus to the main {1}. The bus {2} are near my house. My house is {3} and you can easily recognize it by the color. I cook eggs for a quick {4}. After dinner, we will watch {5} on TV.",
+      "instruction": "Choose the word that fits in the gap. The first one is done for you."
+    }
+  },
+  {
+    "setId": "ced685eb-f48c-43ab-851f-ce2c0a419d6e",
+    "examTitle": "Đề 07 - Making films + Family sports day",
+    "skill": "reading",
+    "part": "Part 2 - Text Cohesion",
+    "qId": "a6fd3340-eb85-43d8-b979-ae603cd1b821",
+    "questionType": "text_cohesion",
+    "questionTextSample": "Put the sentences in the correct order....",
+    "optionsType": "Array (10 items)",
+    "optionsSample": [
+      "This lack of money mainly affected the actors, and they did not earn a lot of money.",
+      "In addition to these technical limitations, the film producers also had a limited budget.",
+      "This is because they were all in black and white, and they had no sound.",
+      "Things have changed over time, and some of them now earn millions of dollars for appearing in films."
+    ],
+    "correctAnswer": 0,
+    "extraDataKeys": [
+      "sentences",
+      "instruction",
+      "sectionTitles",
+      "givenSentences"
+    ],
+    "extraData": {
+      "sentences": [
+        {
+          "text": "This lack of money mainly affected the actors, and they did not earn a lot of money.",
+          "correctPosition": 4
+        },
+        {
+          "text": "In addition to these technical limitations, the film producers also had a limited budget.",
+          "correctPosition": 3
+        },
+        {
+          "text": "This is because they were all in black and white, and they had no sound.",
+          "correctPosition": 2
+        },
+        {
+          "text": "Things have changed over time, and some of them now earn millions of dollars for appearing in films.",
+          "correctPosition": 5
+        },
+        {
+          "text": "Films from that period were very different from films of today.",
+          "correctPosition": 1
+        },
+        {
+          "text": "They were all hungry after all of this, so the children had tasty food and drinks with their parents.",
+          "correctPosition": 10
+        },
+        {
+          "text": "After she had received her prize, the children's activities and competitions began.",
+          "correctPosition": 8
+        },
+        {
+          "text": "It started early on Saturday morning with a ten-mile race for adults.",
+          "correctPosition": 6
+        },
+        {
+          "text": "Sixty men and women ran in this, and Ms Kamur won with a very fast time.",
+          "correctPosition": 7
+        },
+        {
+          "text": "These included football, swimming and jumping, and the children had lots of fun.",
+          "correctPosition": 9
+        }
+      ],
+      "instruction": "The sentences below make a complete text. Put them in the correct order.",
+      "sectionTitles": [
+        "Making films",
+        "Family sports day"
+      ],
+      "givenSentences": [
+        "In 1895, the Grand Café in France showed the first ever commercial film.",
+        "Last weekend the weather was good, so the town held a family sports day in the park."
+      ]
+    }
+  },
+  {
+    "setId": "8b613577-6568-4eee-8814-21a30a4d7e9d",
+    "examTitle": "Đề 07 - Games from childhood (2026)",
+    "skill": "reading",
+    "part": "Part 3 - Gap Fill",
+    "qId": "aca860ff-18c9-46ff-b883-875fe8e098e3",
+    "questionType": "opinion_matching",
+    "questionTextSample": "Here is the perspective of four people on the above topic. Please read the content and answer the question....",
+    "optionsType": "Array (4 items)",
+    "optionsSample": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "correctAnswer": 0,
+    "extraDataKeys": [
+      "people",
+      "statements",
+      "instruction"
+    ],
+    "extraData": {
+      "people": [
+        {
+          "name": "Odilia",
+          "text": "When I was a child, I would spend hours playing board games. The rules were straightforward and easy to understand. Now that I have children of my own, I want to distract them from using computers, so I play board games with them. I really struggle with the new ones, though. There are a lot of characters to remember and many choices to make, and I have to think very hard every time we play — even though we laugh a lot while we do it."
+        },
+        {
+          "name": "Chris",
+          "text": "I was very lucky to grow up in a place with good weather. I loved going outside to play with my peers. We just chased each other around. If we had a ball, we would play football, and if we didn't, we would play catch until it got dark. Having had that experience, I find it hard to be alone even now, and some of those children are still my friends today."
+        },
+        {
+          "name": "Jan",
+          "text": "I was unable to go outside much when I was little, and I still don't go out a lot now. I had plenty of books, and the stories really gripped me. My parents wanted me to do art, but I wasn't interested in it at all. There was a library near my house, and I could spend hours there, completely lost in a book. These days I really enjoy playing games, because I get so involved in them."
+        },
+        {
+          "name": "Shelly",
+          "text": "When I was young, I loved going outside to play with my friends. When it rained, which it often did, I would look gloomily out of the window and hope it would stop. On days like that, my mother used to give me books, but I didn't like sitting still and reading. Then she gave me some pencils and paints instead. I realised that I was actually quite good at it, and I couldn't stop drawing for hours."
+        }
+      ],
+      "statements": [
+        {
+          "text": "Who likes modern games?",
+          "correctPerson": 2
+        },
+        {
+          "text": "Who finds their childhood games simpler?",
+          "correctPerson": 0
+        },
+        {
+          "text": "Who preferred reading books when they were a child?",
+          "correctPerson": 2
+        },
+        {
+          "text": "Who wished to be outside more as a child?",
+          "correctPerson": 3
+        },
+        {
+          "text": "Who likes playing with their children?",
+          "correctPerson": 0
+        },
+        {
+          "text": "Who enjoyed doing arts as a child?",
+          "correctPerson": 3
+        },
+        {
+          "text": "Who enjoyed playing with other children in the past?",
+          "correctPerson": 1
+        }
+      ],
+      "instruction": "Four people respond in the comments section of an online magazine article about the games people played as children. Read the texts and then answer the questions below."
+    }
+  },
+  {
+    "setId": "cf4c3915-647d-46da-833d-a2681542326e",
+    "examTitle": "Đề 07 - Mountain (Version 5)",
+    "skill": "reading",
+    "part": "Part 4 - Long Text Comprehension",
+    "qId": "17efa9cc-3703-40f8-ab4b-5debfb7d0b8d",
+    "questionType": "long_reading",
+    "questionTextSample": "Mountain (Version 5)...",
+    "optionsType": "Array (7 items)",
+    "optionsSample": [
+      "A disturbing revelation",
+      "Our changing perspective towards mountains",
+      "A more intimate relationship",
+      "The wrong priority"
+    ],
+    "correctAnswer": 0,
+    "extraDataKeys": [
+      "title",
+      "headings",
+      "paragraphs",
+      "instruction"
+    ],
+    "extraData": {
+      "title": "Mountain (Version 5)",
+      "headings": [
+        {
+          "text": "A disturbing revelation",
+          "paragraphIndex": 5
+        },
+        {
+          "text": "Our changing perspective towards mountains",
+          "paragraphIndex": 1
+        },
+        {
+          "text": "A more intimate relationship",
+          "paragraphIndex": 7
+        },
+        {
+          "text": "The wrong priority",
+          "paragraphIndex": 4
+        },
+        {
+          "text": "Publicising one's achievements",
+          "paragraphIndex": 3
+        },
+        {
+          "text": "A unique sense of achievement",
+          "paragraphIndex": 2
+        },
+        {
+          "text": "A focus on sustainability",
+          "paragraphIndex": 6
+        }
+      ],
+      "paragraphs": [
+        {
+          "text": "It's often thought that mountaineering has never attracted much serious attention - a niche pursuit that only became popular once modern equipment made the peaks accessible. There is clear evidence, however, that people were treating climbing as a demanding sport long before the era of social media. What is different in modern times is that many people now define conquering a mountain as standing on its summit - the particular thrill of being on top of the very thing you have just overcome, with the whole landscape spread out below, rather than relying on the photographs and accounts that other climbers have provided.",
+          "index": 1
+        },
+        {
+          "text": "Climbing a mountain often leads to a profound sense of accomplishment. Because of their very shape, rising steeply to a single point, mountains stand for conquest and struggle, and reaching the top of one carries that meaning with it. But there is more to it than that: it represents not just reaching a physical summit but also conquering personal fears and pushing one's limits, creating memories that last a lifetime. There is also the adrenaline rush that comes with it - the same surge of excitement that draws people to other adventure sports, and one reason why so many climbers return to the mountains long after they have proved whatever they set out to prove.",
+          "index": 2
+        },
+        {
+          "text": "Reaching the summit is no longer enough on its own. Taking a selfie at the top has become almost obligatory - the proof that the climb actually happened, and the means by which everyone else gets to hear about it. What was once a private satisfaction is now something to be posted, timestamped and shared within hours of the descent. This turns personal milestones into public spectacles that can inspire others, though it also raises awkward questions about authenticity: whether the climb was made for its own sake, or for the picture at the end of it.",
+          "index": 3
+        },
+        {
+          "text": "In recent years, some climbers have become more focused on the photograph than on the mountain itself. Only the summit seems to count, as if there were nothing beautiful about the journey up, as if the hours of effort and the shifting landscape were merely an obstacle between the climber and the picture. Warnings go unheeded because nobody wants to turn back empty-handed, and in some cases this obsession with online fame has led to serious accidents. Reaching a major peak now also demands complicated organisation - permits, guides, bottled oxygen, a support team booked months in advance - and all of this can detract from the enjoyment of the climb. Personal image ends up mattering more than safety or responsibility.",
+          "index": 4
+        },
+        {
+          "text": "You might expect the world's highest mountain to be an empty place - so hostile, so far beyond ordinary human endurance that hardly anyone would set foot there. The reality is startling. Photographs from recent seasons show a \"traffic jam\" of climbers on Everest, queuing along a single fixed rope in the death zone, waiting hours for their turn at the top. When a weather window opens, the ascent effectively becomes a race between them, the other climbers and the weather itself. Meanwhile the slopes carry the waste of every season, and what was once a personal challenge has become a commercial race measured in photographs and fame rather than respect for the mountain.",
+          "index": 5
+        },
+        {
+          "text": "The pressure on high-altitude environments has forced a change in how expeditions are run. Authorities in several climbing regions now issue only a limited number of permits each season, and operators are required to lodge a deposit that is returned only once they bring their rubbish back down with them. Some teams organise clean-up climbs, whose purpose is not the summit at all but the removal of equipment and waste abandoned by earlier parties. Behind these measures lies a shift in what counts as a successful trip: protecting the slopes now matters as much as standing on top of them, and a mountain should be left cleaner than it was found.",
+          "index": 6
+        },
+        {
+          "text": "For most people a mountain is something to be conquered - a summit to be reached, a target to be ticked off. The Scottish writer Nan Shepherd saw it differently. She grew up within sight of the Cairngorms and spent a lifetime walking the same range, setting down what she found there in The Living Mountain. She went into the hills rather than up them, returning to the same corries and burns until she knew them the way one comes to know a person rather than a place: to be with the mountain as “one visits a friend with no intention but to be with him”.",
+          "index": 7
+        }
+      ],
+      "instruction": "Read the passage quickly. Choose a heading for each numbered paragraph from the drop-down list."
+    }
+  }
+]

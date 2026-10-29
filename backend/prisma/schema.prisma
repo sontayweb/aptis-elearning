@@ -8,6 +8,10 @@ generator client {
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 // ==========================================
 // 1. ENUMS
 // ==========================================

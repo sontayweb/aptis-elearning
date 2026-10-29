@@ -6,10 +6,10 @@
   "proExamSetsCount": 796,
   "freeExamSetsCount": 77,
   "totalQuestionsCount": 2916,
-  "dictationSetsCount": 670,
-  "dictationSentencesCount": 3852,
-  "showcaseCount": 500,
-  "tipsCount": 56,
+  "dictationSetsCount": 0,
+  "dictationSentencesCount": 0,
+  "showcaseCount": 0,
+  "tipsCount": 0,
   "totalNormalizedExams": 873,
-  "crawledAt": "2026-10-03T15:17:44.160Z"
+  "crawledAt": "2026-10-28T16:38:56.740Z"
 }

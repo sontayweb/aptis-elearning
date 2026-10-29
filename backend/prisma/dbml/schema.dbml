@@ -1,0 +1,667 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id String [pk]
+  email String [unique, not null]
+  password_hash String
+  full_name String [not null]
+  phone_number String
+  avatar_url String
+  role UserRole [not null, default: 'STUDENT']
+  target_band TargetBand [default: 'B2_TARGET']
+  internal_notes String
+  is_active Boolean [not null, default: true]
+  email_verified Boolean [not null, default: false]
+  email_verified_at DateTime
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  subscriptions UserSubscription [not null]
+  submissions ExamSubmission [not null]
+  transactions Transaction [not null]
+  vocab_notebooks VocabNotebook [not null]
+  dictation_progress UserDictationProgress [not null]
+  dictation_attempts UserDictationAttempt [not null]
+  classroom_members ClassroomMember [not null]
+  created_custom_exams Exam [not null]
+  graded_submissions ExamSubmission [not null]
+  audit_logs AuditLog [not null]
+  reviews ExamReview [not null]
+  notifications notifications [not null]
+  course_leads CourseLeadRegistration [not null]
+  promotion_redemptions PromotionRedemption [not null]
+}
+
+Table Exam {
+  id String [pk]
+  title String [not null]
+  description String
+  skill ExamSkill [not null]
+  duration_minutes Int [not null]
+  is_pro Boolean [not null, default: false]
+  is_published Boolean [not null, default: true]
+  hot_level Int [not null, default: 0]
+  forecast_tag String
+  source String [not null, default: 'WEB']
+  creator_id String
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  creator User
+  parts ExamPart [not null]
+  submissions ExamSubmission [not null]
+  reviews ExamReview [not null]
+}
+
+Table ExamPart {
+  id String [pk]
+  exam_id String [not null]
+  part_number Int [not null]
+  title String [not null]
+  instructions String
+  passage_text String
+  audio_url String
+  image_url String
+  created_at DateTime [default: `now()`, not null]
+  exam Exam [not null]
+  questions Question [not null]
+}
+
+Table Question {
+  id String [pk]
+  part_id String [not null]
+  question_number Int [not null]
+  question_type QuestionType [not null]
+  prompt String [not null]
+  options Json
+  correct_answer String
+  explanation String
+  max_score Float [not null, default: 1]
+  created_at DateTime [default: `now()`, not null]
+  part ExamPart [not null]
+  answers SubmissionAnswer [not null]
+  ai_results AiGradingResult [not null]
+}
+
+Table ExamSubmission {
+  id String [pk]
+  user_id String [not null]
+  exam_id String [not null]
+  status SubmissionStatus [not null, default: 'IN_PROGRESS']
+  started_at DateTime [default: `now()`, not null]
+  submitted_at DateTime
+  deadline_at DateTime [not null]
+  last_active_at DateTime [default: `now()`, not null]
+  tab_switch_count Int [not null, default: 0]
+  total_score Float
+  cefr_level String
+  grammar_score Float
+  listening_score Float
+  reading_score Float
+  writing_score Float
+  speaking_score Float
+  graded_by_id String
+  teacher_feedback String
+  graded_at DateTime
+  user User [not null]
+  exam Exam [not null]
+  graded_by User
+  answers SubmissionAnswer [not null]
+  ai_results AiGradingResult [not null]
+}
+
+Table SubmissionAnswer {
+  id String [pk]
+  submission_id String [not null]
+  question_id String [not null]
+  selected_option String
+  text_answer String
+  audio_url String
+  audio_duration Int
+  audio_mime_type String
+  audio_size_bytes Int
+  transcript_text String
+  score Float
+  feedback String
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  submission ExamSubmission [not null]
+  question Question [not null]
+
+  indexes {
+    (submission_id, question_id) [unique]
+  }
+}
+
+Table AiGradingResult {
+  id String [pk]
+  submission_id String [not null]
+  question_id String [not null]
+  skill ExamSkill [not null]
+  model_name String [not null]
+  transcript String
+  score Float [not null]
+  cefr_level String [not null]
+  task_completion Float
+  grammar_score Float
+  vocabulary_score Float
+  fluency_score Float
+  pronunciation Float
+  feedback_summary String [not null]
+  detailed_feedback Json [not null]
+  raw_ai_response Json
+  created_at DateTime [default: `now()`, not null]
+  submission ExamSubmission [not null]
+  question Question [not null]
+}
+
+Table SubscriptionPlan {
+  id String [pk]
+  code PlanType [unique, not null]
+  name String [not null]
+  price_vnd Int [not null]
+  duration_days Int [not null]
+  ai_quota Int [not null]
+  teacher_quota Int [not null]
+  is_active Boolean [not null, default: true]
+  features Json [not null]
+  created_at DateTime [default: `now()`, not null]
+  subscriptions UserSubscription [not null]
+  promotion_codes PromotionCode [not null]
+}
+
+Table UserSubscription {
+  id String [pk]
+  user_id String [not null]
+  plan_id String [not null]
+  start_date DateTime [default: `now()`, not null]
+  end_date DateTime [not null]
+  is_active Boolean [not null, default: true]
+  ai_quota_left Int [not null, default: 0]
+  teacher_quota_left Int [not null, default: 0]
+  transaction_id String
+  user User [not null]
+  plan SubscriptionPlan [not null]
+  redemptions PromotionRedemption [not null]
+}
+
+Table Transaction {
+  id String [pk]
+  user_id String [not null]
+  order_code String [unique, not null]
+  amount Int [not null]
+  status TransactionStatus [not null, default: 'PENDING']
+  payment_method String [not null, default: 'SEPAY_QR']
+  bank_account String
+  bank_name String
+  sepay_ref_id String
+  paid_at DateTime
+  created_at DateTime [default: `now()`, not null]
+  user User [not null]
+}
+
+Table PromotionCode {
+  id String [pk]
+  code String [unique, not null]
+  title String [not null]
+  description String
+  plan_id String [not null]
+  duration_days Int [not null, default: 14]
+  ai_quota Int [not null, default: 20]
+  teacher_quota Int [not null, default: 0]
+  max_uses Int
+  current_uses Int [not null, default: 0]
+  is_active Boolean [not null, default: true]
+  starts_at DateTime [default: `now()`, not null]
+  expires_at DateTime
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  plan SubscriptionPlan [not null]
+  redemptions PromotionRedemption [not null]
+}
+
+Table PromotionRedemption {
+  id String [pk]
+  code_id String [not null]
+  user_id String [not null]
+  subscription_id String [not null]
+  redeemed_at DateTime [default: `now()`, not null]
+  code PromotionCode [not null]
+  user User [not null]
+  subscription UserSubscription [not null]
+
+  indexes {
+    (code_id, user_id) [unique]
+  }
+}
+
+Table DictationLesson {
+  id String [pk]
+  level DictationLevel [not null]
+  title String [not null]
+  order_index Int [not null, default: 0]
+  total_sentences Int [not null, default: 0]
+  is_free Boolean [not null, default: true]
+  created_at DateTime [default: `now()`, not null]
+  sentences DictationSentence [not null]
+  user_progress UserDictationProgress [not null]
+}
+
+Table DictationSentence {
+  id String [pk]
+  lesson_id String [not null]
+  order_index Int [not null, default: 0]
+  audio_url String [not null]
+  transcript String [not null]
+  translation_vi String
+  hints String
+  duration_seconds Float [not null, default: 0]
+  lesson DictationLesson [not null]
+  attempts UserDictationAttempt [not null]
+}
+
+Table UserDictationProgress {
+  id String [pk]
+  user_id String [not null]
+  lesson_id String [not null]
+  completed_sentences Int [not null, default: 0]
+  is_completed Boolean [not null, default: false]
+  updated_at DateTime [not null]
+  user User [not null]
+  lesson DictationLesson [not null]
+
+  indexes {
+    (user_id, lesson_id) [unique]
+  }
+}
+
+Table UserDictationAttempt {
+  id String [pk]
+  user_id String [not null]
+  sentence_id String [not null]
+  mode DictationMode [not null]
+  submitted_text String
+  audio_url String
+  accuracy_rate Float [not null]
+  word_diff_result Json [not null]
+  is_passed Boolean [not null, default: false]
+  created_at DateTime [default: `now()`, not null]
+  user User [not null]
+  sentence DictationSentence [not null]
+}
+
+Table VocabSet {
+  id String [pk]
+  title String [not null]
+  category String [not null]
+  total_words Int [not null, default: 0]
+  is_free Boolean [not null, default: true]
+  created_at DateTime [default: `now()`, not null]
+  words VocabWord [not null]
+}
+
+Table VocabWord {
+  id String [pk]
+  set_id String [not null]
+  word String [not null]
+  phonetic String
+  meaning_vi String [not null]
+  example_sentence String
+  audio_url String
+  cefr_level String [not null, default: 'B1']
+  set VocabSet [not null]
+  notebook_items VocabNotebook [not null]
+}
+
+Table VocabNotebook {
+  id String [pk]
+  user_id String [not null]
+  word_id String [not null]
+  is_memorized Boolean [not null, default: false]
+  created_at DateTime [default: `now()`, not null]
+  user User [not null]
+  word VocabWord [not null]
+
+  indexes {
+    (user_id, word_id) [unique]
+  }
+}
+
+Table Classroom {
+  id String [pk]
+  name String [not null]
+  teacher_id String [not null]
+  class_code String [unique, not null]
+  description String
+  created_at DateTime [default: `now()`, not null]
+  members ClassroomMember [not null]
+}
+
+Table ClassroomMember {
+  id String [pk]
+  classroom_id String [not null]
+  user_id String [not null]
+  joined_at DateTime [default: `now()`, not null]
+  classroom Classroom [not null]
+  user User [not null]
+
+  indexes {
+    (classroom_id, user_id) [unique]
+  }
+}
+
+Table AuditLog {
+  id String [pk]
+  user_id String
+  actor_name String [not null]
+  actor_email String [not null]
+  actor_role String [not null]
+  action AuditAction [not null]
+  entity_type String [not null]
+  entity_id String [not null]
+  description String [not null]
+  old_value Json
+  new_value Json
+  ip_address String
+  user_agent String
+  created_at DateTime [default: `now()`, not null]
+  user User
+}
+
+Table ExamReview {
+  id String [pk]
+  user_id String [not null]
+  exam_id String
+  rating Int [not null, default: 5]
+  score_achieved String
+  comment String [not null]
+  exam_location String
+  exam_date DateTime
+  status ReviewStatus [not null, default: 'PENDING']
+  teacher_note String
+  reward_claimed Boolean [not null, default: false]
+  reward_quota Int [not null, default: 0]
+  class_name String
+  certificate_image_url String
+  is_featured Boolean [not null, default: false]
+  display_order Int [not null, default: 0]
+  verified_by_admin Boolean [not null, default: true]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  user User [not null]
+  exam Exam
+}
+
+Table notifications {
+  id String [pk]
+  user_id String [not null]
+  title String [not null]
+  message String [not null]
+  type NotificationType [not null, default: 'SYSTEM']
+  link String
+  is_read Boolean [not null, default: false]
+  created_at DateTime [default: `now()`, not null]
+  user User [not null]
+}
+
+Table Course {
+  id String [pk]
+  code String [unique, not null]
+  title String [not null]
+  subtitle String
+  target_band TargetBand [not null, default: 'B2_TARGET']
+  format CourseFormat [not null, default: 'ONLINE_LIVE']
+  original_price Int [not null]
+  sale_price Int [not null]
+  discount_percent Int [not null, default: 35]
+  max_students Int [not null, default: 15]
+  features Json [not null]
+  is_active Boolean [not null, default: true]
+  display_order Int [not null, default: 0]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  batches CourseBatch [not null]
+  leads CourseLeadRegistration [not null]
+}
+
+Table CourseBatch {
+  id String [pk]
+  course_id String [not null]
+  batch_code String [not null]
+  display_date String [not null]
+  opening_date DateTime [not null]
+  schedule_time String
+  max_seats Int [not null, default: 15]
+  enrolled_seats Int [not null, default: 0]
+  status BatchStatus [not null, default: 'OPEN']
+  is_hot Boolean [not null, default: false]
+  order_num Int [not null, default: 0]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  course Course [not null]
+  leads CourseLeadRegistration [not null]
+}
+
+Table CourseLeadRegistration {
+  id String [pk]
+  course_id String [not null]
+  batch_id String
+  user_id String
+  full_name String [not null]
+  phone_number String [not null]
+  email String
+  target_band String
+  current_level String
+  note String
+  status LeadConsultationStatus [not null, default: 'PENDING']
+  assigned_admin String
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  course Course [not null]
+  batch CourseBatch
+  user User
+}
+
+Table system_settings {
+  id String [pk]
+  key String [unique, not null]
+  value String [not null]
+  category String [not null, default: 'CONTACT']
+  description String
+  is_public Boolean [not null, default: true]
+  updated_by String
+  updated_at DateTime [not null]
+  created_at DateTime [default: `now()`, not null]
+}
+
+Enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+  SUPER_ADMIN
+}
+
+Enum TargetBand {
+  B1_TARGET
+  B2_TARGET
+  C_TARGET
+}
+
+Enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+Enum ExamSkill {
+  FULL_TEST
+  LISTENING
+  READING
+  WRITING
+  SPEAKING
+  GRAMMAR_VOCABULARY
+}
+
+Enum QuestionType {
+  MULTIPLE_CHOICE
+  GAP_FILL
+  SENTENCE_ORDER
+  MATCHING
+  ESSAY
+  SHORT_TEXT
+  SPEAKING_AUDIO
+}
+
+Enum SubmissionStatus {
+  IN_PROGRESS
+  SUBMITTED
+  PENDING_EVALUATION
+  GRADED
+  CANCELLED
+}
+
+Enum PlanType {
+  FREE
+  VIP_1M
+  VIP_3M
+  PREMIER_6M
+}
+
+Enum NotificationType {
+  SYSTEM
+  EXAM_GRADED
+  VIP_ACTIVATED
+  CLASS_ANNOUNCEMENT
+}
+
+Enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+Enum DictationLevel {
+  FOUNDATION
+  MOMENTUM
+  MASTERY
+}
+
+Enum DictationMode {
+  DICTATION
+  SHADOWING
+  HYBRID
+}
+
+Enum CourseFormat {
+  ONLINE_LIVE
+  OFFLINE
+  HYBRID
+  RECORDED
+}
+
+Enum BatchStatus {
+  UPCOMING
+  OPEN
+  ALMOST_FULL
+  FULL
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+Enum LeadConsultationStatus {
+  PENDING
+  CONTACTED
+  CONSULTING
+  ENROLLED
+  CANCELLED
+}
+
+Enum AuditAction {
+  AUTH_LOGIN
+  AUTH_LOGOUT
+  AUTH_PASSWORD_RESET
+  USER_CREATE
+  USER_STATUS_CHANGE
+  USER_ROLE_CHANGE
+  PAYMENT_WEBHOOK_RECEIVED
+  PAYMENT_MANUAL_RESOLVE
+  EXAM_CREATE
+  EXAM_UPDATE
+  EXAM_DELETE
+  SUBMISSION_GRADE_TEACHER
+  PLAN_UPDATE
+  SYSTEM_SETTING_UPDATE
+  EMAIL_NOTIFICATION_SENT
+}
+
+Ref: Exam.creator_id > User.id [delete: Set Null]
+
+Ref: ExamPart.exam_id > Exam.id [delete: Cascade]
+
+Ref: Question.part_id > ExamPart.id [delete: Cascade]
+
+Ref: ExamSubmission.user_id > User.id [delete: Cascade]
+
+Ref: ExamSubmission.exam_id > Exam.id [delete: Cascade]
+
+Ref: ExamSubmission.graded_by_id > User.id [delete: Cascade]
+
+Ref: SubmissionAnswer.submission_id > ExamSubmission.id [delete: Cascade]
+
+Ref: SubmissionAnswer.question_id > Question.id
+
+Ref: AiGradingResult.submission_id > ExamSubmission.id [delete: Cascade]
+
+Ref: AiGradingResult.question_id > Question.id
+
+Ref: UserSubscription.user_id > User.id [delete: Cascade]
+
+Ref: UserSubscription.plan_id > SubscriptionPlan.id
+
+Ref: Transaction.user_id > User.id [delete: Cascade]
+
+Ref: PromotionCode.plan_id > SubscriptionPlan.id
+
+Ref: PromotionRedemption.code_id > PromotionCode.id [delete: Cascade]
+
+Ref: PromotionRedemption.user_id > User.id [delete: Cascade]
+
+Ref: PromotionRedemption.subscription_id > UserSubscription.id [delete: Cascade]
+
+Ref: DictationSentence.lesson_id > DictationLesson.id [delete: Cascade]
+
+Ref: UserDictationProgress.user_id > User.id [delete: Cascade]
+
+Ref: UserDictationProgress.lesson_id > DictationLesson.id [delete: Cascade]
+
+Ref: UserDictationAttempt.user_id > User.id [delete: Cascade]
+
+Ref: UserDictationAttempt.sentence_id > DictationSentence.id [delete: Cascade]
+
+Ref: VocabWord.set_id > VocabSet.id [delete: Cascade]
+
+Ref: VocabNotebook.user_id > User.id [delete: Cascade]
+
+Ref: VocabNotebook.word_id > VocabWord.id [delete: Cascade]
+
+Ref: ClassroomMember.classroom_id > Classroom.id [delete: Cascade]
+
+Ref: ClassroomMember.user_id > User.id [delete: Cascade]
+
+Ref: AuditLog.user_id > User.id [delete: Set Null]
+
+Ref: ExamReview.user_id > User.id [delete: Cascade]
+
+Ref: ExamReview.exam_id > Exam.id [delete: Set Null]
+
+Ref: notifications.user_id > User.id [delete: Cascade]
+
+Ref: CourseBatch.course_id > Course.id [delete: Cascade]
+
+Ref: CourseLeadRegistration.course_id > Course.id [delete: Cascade]
+
+Ref: CourseLeadRegistration.batch_id > CourseBatch.id [delete: Set Null]
+
+Ref: CourseLeadRegistration.user_id > User.id [delete: Set Null]
