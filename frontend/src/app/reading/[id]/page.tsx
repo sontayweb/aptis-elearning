@@ -120,6 +120,13 @@ function ReadingExamRunner() {
     { name: string; score: number; maxScore: number; correct: number; total: number }[]
   >([]);
 
+  const maxTotalScore = useMemo(() => {
+    if (partScores.length > 0) {
+      return Math.round(partScores.reduce((sum, item) => sum + item.maxScore, 0));
+    }
+    return 50;
+  }, [partScores]);
+
   // Review state & helper calculations
   const [reviewOnlyWrong, setReviewOnlyWrong] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
@@ -420,7 +427,7 @@ function ReadingExamRunner() {
                   (parsed.part3.questions.length > 0 ? 1 : 0) +
                   (parsed.part4.paragraphs.length > 0 ? 1 : 0);
 
-                // 1. Part 1
+                // 1. Part 1: 2.0 điểm / câu, max 10 điểm
                 if (parsed.part1.gaps.length > 0) {
                   let p1Correct = 0;
                   parsed.part1.gaps.forEach((g) => {
@@ -428,8 +435,8 @@ function ReadingExamRunner() {
                       p1Correct++;
                     }
                   });
-                  const p1Max = activePartsCount === 1 ? 50 : 7;
-                  const p1Score = (p1Correct / parsed.part1.gaps.length) * p1Max;
+                  const p1Max = 10;
+                  const p1Score = p1Correct * 2.0;
                   calculatedPartScores.push({
                     name: "Part 1 – Sentence comprehension",
                     score: Math.round(p1Score * 10) / 10,
@@ -439,7 +446,7 @@ function ReadingExamRunner() {
                   });
                 }
 
-                // 2. Part 2
+                // 2. Part 2: 1.0 điểm / câu đúng vị trí, 5 điểm / đoạn, tổng 10 điểm
                 if (parsed.part2.stories.length > 0) {
                   let p2CorrectMatches = 0;
                   let p2TotalMatches = 0;
@@ -451,8 +458,8 @@ function ReadingExamRunner() {
                       if (corOrder[idx] === item) p2CorrectMatches++;
                     });
                   });
-                  const p2Max = activePartsCount === 1 ? 50 : 17;
-                  const p2Score = p2TotalMatches > 0 ? (p2CorrectMatches / p2TotalMatches) * p2Max : 0;
+                  const p2Max = parsed.part2.stories.length * 5;
+                  const p2Score = p2CorrectMatches * 1.0;
                   calculatedPartScores.push({
                     name: "Part 2 – Text cohesion",
                     score: Math.round(p2Score * 10) / 10,
@@ -470,7 +477,7 @@ function ReadingExamRunner() {
                       p3Correct++;
                     }
                   });
-                  const p3Max = activePartsCount === 1 ? 50 : 13;
+                  const p3Max = activePartsCount === 1 ? 14 : 14;
                   const p3Score = (p3Correct / parsed.part3.questions.length) * p3Max;
                   calculatedPartScores.push({
                     name: "Part 3 – Opinion matching",
@@ -489,7 +496,7 @@ function ReadingExamRunner() {
                       p4Correct++;
                     }
                   });
-                  const p4Max = activePartsCount === 1 ? 50 : 13;
+                  const p4Max = activePartsCount === 1 ? 16 : 16;
                   const p4Score = (p4Correct / parsed.part4.paragraphs.length) * p4Max;
                   calculatedPartScores.push({
                     name: "Part 4 – Long reading",
@@ -503,17 +510,20 @@ function ReadingExamRunner() {
                 setPartScores(calculatedPartScores);
 
                 if (sub.total_score == null) {
-                  const calculatedSum = Math.min(
-                    50,
-                    Math.round(calculatedPartScores.reduce((sum, item) => sum + item.score, 0))
+                  const calculatedSum = Math.round(
+                    calculatedPartScores.reduce((sum, item) => sum + item.score, 0)
+                  );
+                  const calculatedMax = Math.round(
+                    calculatedPartScores.reduce((sum, item) => sum + item.maxScore, 0)
                   );
                   setResultScore(calculatedSum);
+                  const scaledCefr = calculatedMax > 0 ? (calculatedSum / calculatedMax) * 50 : calculatedSum;
                   let calculatedCefr = "A1";
-                  if (calculatedSum >= 46) calculatedCefr = "C";
-                  else if (calculatedSum >= 38) calculatedCefr = "B2";
-                  else if (calculatedSum >= 26) calculatedCefr = "B1";
-                  else if (calculatedSum >= 16) calculatedCefr = "A2";
-                  else if (calculatedSum > 5) calculatedCefr = "A1";
+                  if (scaledCefr >= 46) calculatedCefr = "C";
+                  else if (scaledCefr >= 38) calculatedCefr = "B2";
+                  else if (scaledCefr >= 26) calculatedCefr = "B1";
+                  else if (scaledCefr >= 16) calculatedCefr = "A2";
+                  else if (scaledCefr > 5) calculatedCefr = "A1";
                   else calculatedCefr = "A0";
                   setCefrBand(calculatedCefr);
                 }
@@ -892,7 +902,7 @@ function ReadingExamRunner() {
 
     const calculatedPartScores: { name: string; score: number; maxScore: number; correct: number; total: number }[] = [];
 
-    // 1. Part 1 Score: 2.0 điểm / câu, tổng 10 điểm
+    // 1. Part 1 Score: 2.0 điểm / câu, max 10 điểm
     let p1Correct = 0;
     if (examData.part1.gaps.length > 0) {
       examData.part1.gaps.forEach((g) => {
@@ -900,10 +910,8 @@ function ReadingExamRunner() {
           p1Correct++;
         }
       });
-      const p1Max = activePartsCount === 1 ? 50 : 10;
-      const p1Score = activePartsCount === 1 
-        ? (p1Correct / examData.part1.gaps.length) * 50 
-        : p1Correct * 2.0;
+      const p1Max = 10;
+      const p1Score = p1Correct * 2.0;
       calculatedPartScores.push({
         name: "Part 1 – Sentence comprehension",
         score: Math.round(p1Score * 10) / 10,
@@ -913,7 +921,7 @@ function ReadingExamRunner() {
       });
     }
 
-    // 2. Part 2 Score: Mỗi câu đúng vị trí được 1 điểm, tổng 10 điểm (2 đoạn x 5 câu)
+    // 2. Part 2 Score: Mỗi câu đúng vị trí được 1 điểm, 5 điểm / đoạn, tổng 10 điểm
     let p2CorrectMatches = 0;
     let p2TotalMatches = 0;
     if (examData.part2.stories.length > 0) {
@@ -925,10 +933,8 @@ function ReadingExamRunner() {
           if (corOrder[idx] === item) p2CorrectMatches++;
         });
       });
-      const p2Max = activePartsCount === 1 ? 50 : 10;
-      const p2Score = activePartsCount === 1 
-        ? (p2TotalMatches > 0 ? (p2CorrectMatches / p2TotalMatches) * 50 : 0)
-        : p2CorrectMatches * 1.0;
+      const p2Max = examData.part2.stories.length * 5;
+      const p2Score = p2CorrectMatches * 1.0;
       calculatedPartScores.push({
         name: "Part 2 – Text cohesion",
         score: Math.round(p2Score * 10) / 10,
@@ -946,7 +952,7 @@ function ReadingExamRunner() {
           p3Correct++;
         }
       });
-      const p3Max = activePartsCount === 1 ? 50 : 13;
+      const p3Max = activePartsCount === 1 ? 14 : 14;
       const p3Score = (p3Correct / examData.part3.questions.length) * p3Max;
       calculatedPartScores.push({
         name: "Part 3 – Opinion matching",
@@ -965,7 +971,7 @@ function ReadingExamRunner() {
           p4Correct++;
         }
       });
-      const p4Max = activePartsCount === 1 ? 50 : 13;
+      const p4Max = activePartsCount === 1 ? 16 : 16;
       const p4Score = (p4Correct / examData.part4.paragraphs.length) * p4Max;
       calculatedPartScores.push({
         name: "Part 4 – Long reading",
@@ -976,14 +982,16 @@ function ReadingExamRunner() {
       });
     }
 
-    const totalCalculated = Math.min(50, Math.round(calculatedPartScores.reduce((sum, item) => sum + item.score, 0)));
+    const totalCalculated = Math.round(calculatedPartScores.reduce((sum, item) => sum + item.score, 0));
+    const totalMax = Math.round(calculatedPartScores.reduce((sum, item) => sum + item.maxScore, 0));
+    const scaledCefr = totalMax > 0 ? (totalCalculated / totalMax) * 50 : totalCalculated;
 
     let cefr = "A1";
-    if (totalCalculated >= 46) cefr = "C";
-    else if (totalCalculated >= 38) cefr = "B2";
-    else if (totalCalculated >= 26) cefr = "B1";
-    else if (totalCalculated >= 16) cefr = "A2";
-    else if (totalCalculated > 5) cefr = "A1";
+    if (scaledCefr >= 46) cefr = "C";
+    else if (scaledCefr >= 38) cefr = "B2";
+    else if (scaledCefr >= 26) cefr = "B1";
+    else if (scaledCefr >= 16) cefr = "A2";
+    else if (scaledCefr > 5) cefr = "A1";
     else cefr = "A0";
 
     setResultScore(totalCalculated);
@@ -1186,7 +1194,7 @@ function ReadingExamRunner() {
                   </span>
                   <div className="text-5xl font-heading font-black text-primary my-1">{cefrBand}</div>
                   <p className="text-sm font-bold text-foreground">
-                    Điểm số: <span className="text-primary">{resultScore}</span> / 50
+                    Điểm số: <span className="text-primary">{resultScore}</span> / {maxTotalScore}
                   </p>
                 </div>
 
@@ -1914,7 +1922,7 @@ function ReadingExamRunner() {
                     <span>Mục lục xem lại</span>
                   </h3>
                   <span className="text-xs font-mono font-bold text-primary px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20">
-                    {resultScore}/50 điểm
+                    {resultScore}/{maxTotalScore} điểm
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
