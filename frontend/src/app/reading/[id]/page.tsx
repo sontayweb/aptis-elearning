@@ -669,13 +669,17 @@ function ReadingExamRunner() {
     } else if (p === "3" || p === "p3" || p === "part3") {
       targetKey = stages.some((s) => s.stageKey === "p3")
         ? "p3"
-        : stages.some((s) => s.stageKey === "p2-2")
-        ? "p2-2"
-        : "p2-1";
+        : (stages[0]?.stageKey || "p2-1");
     } else if (p === "4" || p === "p4" || p === "part4") {
-      targetKey = stages.some((s) => s.stageKey === "p3") ? "p3" : "p4";
+      targetKey = stages.some((s) => s.stageKey === "p4")
+        ? "p4"
+        : stages.some((s) => s.stageKey === "p3")
+        ? "p3"
+        : (stages[0]?.stageKey || "p1");
     } else if (p === "5" || p === "p5" || p === "part5") {
-      targetKey = "p4";
+      targetKey = stages.some((s) => s.stageKey === "p4")
+        ? "p4"
+        : (stages[0]?.stageKey || "p1");
     }
 
     if (targetKey) {
