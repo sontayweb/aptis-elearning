@@ -1151,20 +1151,54 @@ export class DataSyncService {
             },
           });
 
+          const oldPartMediaMap = new Map<number, { image_url: string | null; audio_url: string | null; passage_text: string | null }>();
+          for (const op of existing.parts || []) {
+            oldPartMediaMap.set(op.part_number, {
+              image_url: op.image_url,
+              audio_url: op.audio_url,
+              passage_text: op.passage_text,
+            });
+          }
+
+          const isValidMediaUrl = (u?: string | null) => {
+            if (!u || typeof u !== 'string') return false;
+            const s = u.trim();
+            return (
+              s.startsWith('/uploads/') ||
+              s.startsWith('uploads/') ||
+              s.startsWith('http://') ||
+              s.startsWith('https://') ||
+              s.startsWith('speaking/') ||
+              s.startsWith('listening/')
+            );
+          };
+
           await tx.examPart.deleteMany({
             where: { exam_id: existing.id },
           });
 
           for (const p of normalizedExam.parts) {
+            const oldMedia = oldPartMediaMap.get(p.part_number);
+            const finalImageUrl = isValidMediaUrl(p.image_url)
+              ? p.image_url
+              : oldMedia && isValidMediaUrl(oldMedia.image_url)
+              ? oldMedia.image_url
+              : p.image_url;
+            const finalAudioUrl = isValidMediaUrl(p.audio_url)
+              ? p.audio_url
+              : oldMedia && isValidMediaUrl(oldMedia.audio_url)
+              ? oldMedia.audio_url
+              : p.audio_url;
+
             await tx.examPart.create({
               data: {
                 exam_id: existing.id,
                 part_number: p.part_number,
                 title: p.title,
                 instructions: p.instructions,
-                passage_text: p.passage_text,
-                audio_url: p.audio_url,
-                image_url: p.image_url,
+                passage_text: p.passage_text || (oldMedia ? oldMedia.passage_text : null),
+                audio_url: finalAudioUrl,
+                image_url: finalImageUrl,
                 questions: {
                   create: p.questions.map((q) => ({
                     question_number: q.question_number,
@@ -1204,17 +1238,41 @@ export class DataSyncService {
           },
         });
 
+        const isValidMediaUrlInPlace = (u?: string | null) => {
+          if (!u || typeof u !== 'string') return false;
+          const s = u.trim();
+          return (
+            s.startsWith('/uploads/') ||
+            s.startsWith('uploads/') ||
+            s.startsWith('http://') ||
+            s.startsWith('https://') ||
+            s.startsWith('speaking/') ||
+            s.startsWith('listening/')
+          );
+        };
+
         for (const newPart of normalizedExam.parts) {
           const matchedPart = existing.parts.find((p) => p.part_number === newPart.part_number);
           if (matchedPart) {
+            const finalImageUrl = isValidMediaUrlInPlace(newPart.image_url)
+              ? newPart.image_url
+              : isValidMediaUrlInPlace(matchedPart.image_url)
+              ? matchedPart.image_url
+              : newPart.image_url;
+            const finalAudioUrl = isValidMediaUrlInPlace(newPart.audio_url)
+              ? newPart.audio_url
+              : isValidMediaUrlInPlace(matchedPart.audio_url)
+              ? matchedPart.audio_url
+              : newPart.audio_url;
+
             await tx.examPart.update({
               where: { id: matchedPart.id },
               data: {
                 title: newPart.title,
                 instructions: newPart.instructions,
-                passage_text: newPart.passage_text,
-                audio_url: newPart.audio_url,
-                image_url: newPart.image_url,
+                passage_text: newPart.passage_text || matchedPart.passage_text,
+                audio_url: finalAudioUrl,
+                image_url: finalImageUrl,
               },
             });
 

@@ -728,10 +728,16 @@ function cleanSpeakingImageUrl(url: string | undefined): string | undefined {
     if (num >= 2 && num <= 15) return `/uploads/speaking/part3/image${num}.png`;
   }
 
-  // Tên file đơn giản cho Part 2 (ví dụ: 1.png, 7.png, 15.png)
-  const numMatch = trimmed.match(/^(\d+)\.png$/i);
+  // Tên file đơn giản cho Part 2 (ví dụ: 1.png, 7.png, 15.png, p2_10.jpg)
+  const numMatch = trimmed.match(/^(?:p2_)?0*(\d+)\.(?:png|jpg|jpeg)$/i);
   if (numMatch) {
-    return `/uploads/speaking/part2/image${numMatch[1]}.png`;
+    const n = Math.min(24, Math.max(1, parseInt(numMatch[1], 10)));
+    return `/uploads/speaking/part2/image${n}.png`;
+  }
+  const p3RawMatch = trimmed.match(/^p3_0*(\d+)_(1|2)\.(?:png|jpg|jpeg)$/i);
+  if (p3RawMatch) {
+    const side = p3RawMatch[2];
+    return side === "2" ? `/uploads/speaking/part3/image4.jpg` : `/uploads/speaking/part3/image1.jpg`;
   }
   if (trimmed.startsWith("Tranh_tr_ng__i_m_part_2_")) {
     return `/uploads/exams/speaking/${trimmed}`;
