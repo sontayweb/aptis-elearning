@@ -66,6 +66,13 @@ export class DataSyncService {
   normalizeExamTitle(title: string): string {
     if (!title) return '';
     let clean = String(title).trim().replace(/\s+/g, ' ');
+    // Khử lặp tiền tố kiểu "Đề 42 - Đề 33 ( Đề mới)" -> "Đề 42 (Đề mới)"
+    clean = clean.replace(
+      /^(Đề\s*\d+)\s*[-–:]\s*[ĐD]ề\s*\d+\s*[:(\s]*(?:Đề\s*)?(?:mới|đề\s*mới)[)\s]*$/i,
+      '$1 (Đề mới)'
+    );
+    // Khử lặp tiền tố kiểu "Đề 22 - Đề 3" -> "Đề 22"
+    clean = clean.replace(/^(Đề\s*\d+)\s*[-–:]\s*[ĐD]ề\s*\d+\s*$/i, '$1');
     clean = clean.replace(/Đề\s+(\d)\b/gi, (_match, num) => `Đề 0${num}`);
     clean = clean.replace(/Test\s+(\d)\b/gi, (_match, num) => `Test 0${num}`);
     return clean;

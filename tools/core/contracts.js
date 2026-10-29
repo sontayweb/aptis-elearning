@@ -29,6 +29,13 @@ export const QUESTION_TYPES = [
 export function normalizeExamTitle(title) {
   if (!title) return '';
   let clean = title.trim().replace(/\s+/g, ' ');
+  // Khử lặp tiền tố kiểu "Đề 42 - Đề 33 ( Đề mới)" -> "Đề 42 (Đề mới)"
+  clean = clean.replace(
+    /^(Đề\s*\d+)\s*[-–:]\s*[ĐD]ề\s*\d+\s*[:(\s]*(?:Đề\s*)?(?:mới|đề\s*mới)[)\s]*$/i,
+    '$1 (Đề mới)'
+  );
+  // Khử lặp tiền tố kiểu "Đề 22 - Đề 3" -> "Đề 22"
+  clean = clean.replace(/^(Đề\s*\d+)\s*[-–:]\s*[ĐD]ề\s*\d+\s*$/i, '$1');
   // Chuẩn hóa "Đề X" -> "Đề 0X"
   clean = clean.replace(/Đề\s+(\d)\b/gi, (match, num) => `Đề 0${num}`);
   clean = clean.replace(/Test\s+(\d)\b/gi, (match, num) => `Test 0${num}`);
