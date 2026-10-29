@@ -210,49 +210,53 @@ export default function ReadingPracticePage() {
     if (activeTab === "full") {
       return isFullReading;
     } else if (activeTab === "p1") {
-      // Part 1: Sentence comprehension
+      // Part 1: Sentence comprehension (chỉ hiện đề lẻ Part 1)
       return (
-        isFullReading ||
-        e.title.includes("Reading Part 1") ||
-        e.title.includes("PART1") ||
-        /^(?:Đề|Test|Exam)\s*\d+$/i.test(e.title.trim()) ||
-        e.partTitle?.includes("Part 1") ||
-        e.parts?.includes("Part 1")
+        !isFullReading && (
+          e.title.includes("Reading Part 1") ||
+          e.title.includes("PART1") ||
+          /^(?:Đề|Test|Exam)\s*\d+$/i.test(e.title.trim()) ||
+          e.partTitle?.includes("Part 1") ||
+          e.parts?.includes("Part 1")
+        )
       );
     } else if (activeTab === "p2") {
-      // Part 2: Text cohesion (sắp xếp câu)
+      // Part 2: Text cohesion (sắp xếp câu) (chỉ hiện đề lẻ Part 2)
       return (
-        isFullReading ||
-        e.partTitle?.includes("Part 2") ||
-        e.partTitle?.includes("Text Cohesion") ||
-        e.partTitle?.includes("Cohesion") ||
-        e.title.includes("Part 2") ||
-        e.title.includes("PART2") ||
-        READING_PART2_TOPICS.some((t) =>
-          e.title.toLowerCase().includes(t.title.toLowerCase())
+        !isFullReading && (
+          e.partTitle?.includes("Part 2") ||
+          e.partTitle?.includes("Text Cohesion") ||
+          e.partTitle?.includes("Cohesion") ||
+          e.title.includes("Part 2") ||
+          e.title.includes("PART2") ||
+          READING_PART2_TOPICS.some((t) =>
+            e.title.toLowerCase().includes(t.title.toLowerCase())
+          )
         )
       );
     } else if (activeTab === "p3") {
-      // Part 3: Opinion matching (nối ý kiến)
+      // Part 3: Opinion matching (nối ý kiến) (chỉ hiện đề lẻ Part 3)
       return (
-        isFullReading ||
-        e.partTitle?.includes("Opinion") ||
-        (e.partTitle?.includes("Part 4") && !e.partTitle?.includes("Long")) ||
-        (e.partTitle?.includes("Part 3") && !e.partTitle?.includes("Cohesion")) ||
-        e.title.includes("Part 3") ||
-        READING_PART3_TOPICS.some((t) =>
-          e.title.toLowerCase().includes(t.title.toLowerCase())
+        !isFullReading && (
+          e.partTitle?.includes("Opinion") ||
+          (e.partTitle?.includes("Part 4") && !e.partTitle?.includes("Long")) ||
+          (e.partTitle?.includes("Part 3") && !e.partTitle?.includes("Cohesion")) ||
+          e.title.includes("Part 3") ||
+          READING_PART3_TOPICS.some((t) =>
+            e.title.toLowerCase().includes(t.title.toLowerCase())
+          )
         )
       );
     } else if (activeTab === "p4") {
-      // Part 4: Long reading (đọc bài dài & nối heading)
+      // Part 4: Long reading (đọc bài dài & nối heading) (chỉ hiện đề lẻ Part 4)
       return (
-        isFullReading ||
-        e.partTitle?.includes("Long") ||
-        e.partTitle?.includes("Part 5") ||
-        (e.partTitle?.includes("Part 4") && e.partTitle?.includes("Long")) ||
-        READING_PART4_TOPICS.some((t) =>
-          e.title.toLowerCase().includes(t.title.toLowerCase())
+        !isFullReading && (
+          e.partTitle?.includes("Long") ||
+          e.partTitle?.includes("Part 5") ||
+          (e.partTitle?.includes("Part 4") && e.partTitle?.includes("Long")) ||
+          READING_PART4_TOPICS.some((t) =>
+            e.title.toLowerCase().includes(t.title.toLowerCase())
+          )
         )
       );
     }

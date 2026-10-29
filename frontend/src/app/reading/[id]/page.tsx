@@ -389,6 +389,37 @@ function ReadingExamRunner() {
                 if (sub.total_score != null) setResultScore(Math.round(sub.total_score * 10) / 10);
                 if (sub.cefr_level) setCefrBand(sub.cefr_level);
 
+                // Nạp lại cấu trúc đề kèm đáp án đúng & giải thích thực tế từ Submission
+                let activeData = parsed;
+                if (sub.exam) {
+                  activeData = parseApiToReadingData(sub.exam);
+                  setExamData(activeData);
+                } else if (sub.answers && Array.isArray(sub.answers)) {
+                  const ansMap = new Map(sub.answers.map((a: any) => [String(a.question_id || a.questionId), a]));
+                  activeData.part1.gaps.forEach((g) => {
+                    const ans: any = ansMap.get(g.id);
+                    if (ans?.correct_answer) g.correctAnswer = ans.correct_answer;
+                  });
+                  activeData.part2.stories.forEach((st) => {
+                    const ans: any = ansMap.get(st.id);
+                    if (ans?.correct_answer) {
+                      try {
+                        const cor = JSON.parse(ans.correct_answer);
+                        if (Array.isArray(cor)) st.correctOrder = cor;
+                      } catch {}
+                    }
+                  });
+                  activeData.part3.questions.forEach((q) => {
+                    const ans: any = ansMap.get(q.id);
+                    if (ans?.correct_answer) q.correctAnswer = ans.correct_answer;
+                  });
+                  activeData.part4.paragraphs.forEach((p) => {
+                    const ans: any = ansMap.get(p.id);
+                    if (ans?.correct_answer) p.correctHeading = ans.correct_answer;
+                  });
+                  setExamData({ ...activeData });
+                }
+
                 const loadedP1: Record<string, string> = {};
                 const loadedP2: Record<string, string[]> = {};
                 const loadedP3: Record<string, string> = {};
@@ -397,17 +428,17 @@ function ReadingExamRunner() {
                 (sub.answers || []).forEach((ans: any) => {
                   const qId = String(ans.question_id || ans.questionId);
                   const opt = ans.selected_option || ans.selectedOption || ans.text_answer || ans.textAnswer || "";
-                  if (parsed.part1.gaps.some((g) => g.id === qId)) {
+                  if (activeData.part1.gaps.some((g) => g.id === qId)) {
                     loadedP1[qId] = opt;
-                  } else if (parsed.part2.stories.some((s) => s.id === qId)) {
+                  } else if (activeData.part2.stories.some((s) => s.id === qId)) {
                     try {
                       loadedP2[qId] = JSON.parse(opt);
                     } catch {
                       loadedP2[qId] = [];
                     }
-                  } else if (parsed.part3.questions.some((q) => q.id === qId)) {
+                  } else if (activeData.part3.questions.some((q) => q.id === qId)) {
                     loadedP3[qId] = opt;
-                  } else if (parsed.part4.paragraphs.some((p) => p.id === qId)) {
+                  } else if (activeData.part4.paragraphs.some((p) => p.id === qId)) {
                     loadedP4[qId] = opt;
                   }
                 });
@@ -422,15 +453,15 @@ function ReadingExamRunner() {
                 // Tính toán điểm chi tiết từng phần từ bài nộp
                 const calculatedPartScores: { name: string; score: number; maxScore: number; correct: number; total: number }[] = [];
                 const activePartsCount =
-                  (parsed.part1.gaps.length > 0 ? 1 : 0) +
-                  (parsed.part2.stories.length > 0 ? 1 : 0) +
-                  (parsed.part3.questions.length > 0 ? 1 : 0) +
-                  (parsed.part4.paragraphs.length > 0 ? 1 : 0);
+                  (activeData.part1.gaps.length > 0 ? 1 : 0) +
+                  (activeData.part2.stories.length > 0 ? 1 : 0) +
+                  (activeData.part3.questions.length > 0 ? 1 : 0) +
+                  (activeData.part4.paragraphs.length > 0 ? 1 : 0);
 
                 // 1. Part 1: 2.0 điểm / câu, max 10 điểm
-                if (parsed.part1.gaps.length > 0) {
+                if (activeData.part1.gaps.length > 0) {
                   let p1Correct = 0;
-                  parsed.part1.gaps.forEach((g) => {
+                  activeData.part1.gaps.forEach((g) => {
                     if (loadedP1[g.id] && loadedP1[g.id].toLowerCase() === g.correctAnswer.toLowerCase()) {
                       p1Correct++;
                     }
@@ -442,15 +473,15 @@ function ReadingExamRunner() {
                     score: Math.round(p1Score * 10) / 10,
                     maxScore: p1Max,
                     correct: p1Correct,
-                    total: parsed.part1.gaps.length,
+                    total: activeData.part1.gaps.length,
                   });
                 }
 
                 // 2. Part 2: 1.0 điểm / câu đúng vị trí, 5 điểm / đoạn, tổng 10 điểm
-                if (parsed.part2.stories.length > 0) {
+                if (activeData.part2.stories.length > 0) {
                   let p2CorrectMatches = 0;
                   let p2TotalMatches = 0;
-                  parsed.part2.stories.forEach((st) => {
+                  activeData.part2.stories.forEach((st) => {
                     const userOrder = loadedP2[st.id] || [];
                     const corOrder = st.correctOrder || [];
                     p2TotalMatches += corOrder.length;
@@ -458,7 +489,7 @@ function ReadingExamRunner() {
                       if (corOrder[idx] === item) p2CorrectMatches++;
                     });
                   });
-                  const p2Max = parsed.part2.stories.length * 5;
+                  const p2Max = activeData.part2.stories.length * 5;
                   const p2Score = p2CorrectMatches * 1.0;
                   calculatedPartScores.push({
                     name: "Part 2 – Text cohesion",
@@ -470,40 +501,40 @@ function ReadingExamRunner() {
                 }
 
                 // 3. Part 3
-                if (parsed.part3.questions.length > 0) {
+                if (activeData.part3.questions.length > 0) {
                   let p3Correct = 0;
-                  parsed.part3.questions.forEach((q) => {
+                  activeData.part3.questions.forEach((q) => {
                     if (loadedP3[q.id] && loadedP3[q.id].toLowerCase() === q.correctAnswer.toLowerCase()) {
                       p3Correct++;
                     }
                   });
                   const p3Max = activePartsCount === 1 ? 14 : 14;
-                  const p3Score = (p3Correct / parsed.part3.questions.length) * p3Max;
+                  const p3Score = (p3Correct / activeData.part3.questions.length) * p3Max;
                   calculatedPartScores.push({
                     name: "Part 3 – Opinion matching",
                     score: Math.round(p3Score * 10) / 10,
                     maxScore: p3Max,
                     correct: p3Correct,
-                    total: parsed.part3.questions.length,
+                    total: activeData.part3.questions.length,
                   });
                 }
 
                 // 4. Part 4
-                if (parsed.part4.paragraphs.length > 0) {
+                if (activeData.part4.paragraphs.length > 0) {
                   let p4Correct = 0;
-                  parsed.part4.paragraphs.forEach((p) => {
+                  activeData.part4.paragraphs.forEach((p) => {
                     if (loadedP4[p.id] && loadedP4[p.id].toLowerCase() === p.correctHeading.toLowerCase()) {
                       p4Correct++;
                     }
                   });
                   const p4Max = activePartsCount === 1 ? 16 : 16;
-                  const p4Score = (p4Correct / parsed.part4.paragraphs.length) * p4Max;
+                  const p4Score = (p4Correct / activeData.part4.paragraphs.length) * p4Max;
                   calculatedPartScores.push({
                     name: "Part 4 – Long reading",
                     score: Math.round(p4Score * 10) / 10,
                     maxScore: p4Max,
                     correct: p4Correct,
-                    total: parsed.part4.paragraphs.length,
+                    total: activeData.part4.paragraphs.length,
                   });
                 }
 
@@ -1047,6 +1078,26 @@ function ReadingExamRunner() {
           await api.submissions.autosave(submissionId, answersPayload);
         }
         await api.submissions.submit(submissionId);
+
+        // Nạp kết quả chính thức từ máy chủ để hiển thị đúng đáp án và thang điểm
+        try {
+          const resultRes = await api.submissions.getResult(submissionId);
+          if (resultRes.success && resultRes.data) {
+            const sub = resultRes.data;
+            if (sub.exam) {
+              const reviewExam = parseApiToReadingData(sub.exam);
+              setExamData(reviewExam);
+            }
+            if (sub.total_score != null) {
+              setResultScore(Math.round(sub.total_score * 10) / 10);
+            }
+            if (sub.cefr_level) {
+              setCefrBand(sub.cefr_level);
+            }
+          }
+        } catch (subErr) {
+          console.warn("Could not reload graded result:", subErr);
+        }
       } catch (err) {
         console.error("Submit reading error:", err);
       }
@@ -2516,7 +2567,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
           id: String(q.id),
           prompt: q.prompt,
           options: opts,
-          correctAnswer: String(q.correct_answer || opts[0] || ""),
+          correctAnswer: String(q.correct_answer || ""),
         };
       });
       if (gaps.length > 0) {
@@ -2678,7 +2729,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
             id: String(q.id),
             prompt: stripHtml(q.prompt),
             options: opts,
-            correctAnswer: String(q.correct_answer || "Person A"),
+            correctAnswer: String(q.correct_answer || ""),
           };
         });
       if (questions.length > 0) {
