@@ -8,6 +8,12 @@ export function getApiBaseUrl(): string {
     return process.env.NEXT_PUBLIC_API_URL;
   }
   if (typeof window !== 'undefined') {
+    if (window.location.hostname.includes('aptisesolpremier.com')) {
+      return 'https://api.aptisesolpremier.com/api';
+    }
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:5000/api';
+    }
     return `${window.location.protocol}//${window.location.hostname}:5000/api`;
   }
   return 'http://localhost:5000/api';
@@ -569,7 +575,7 @@ class ApiClient {
       if (params?.fromDate) query.append('fromDate', params.fromDate);
       if (params?.toDate) query.append('toDate', params.toDate);
       const qs = query.toString();
-      return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/admin/dashboard/export${qs ? `?${qs}` : ''}`;
+      return `${getApiBaseUrl()}/admin/dashboard/export${qs ? `?${qs}` : ''}`;
     },
 
     getUsers: (params?: { search?: string; role?: string; page?: number; limit?: number }) => {
@@ -834,7 +840,7 @@ class ApiClient {
           method: 'DELETE',
         }),
       getDownloadUrl: (filename: string) =>
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/admin/backups/${encodeURIComponent(filename)}/download`,
+        `${getApiBaseUrl()}/admin/backups/${encodeURIComponent(filename)}/download`,
     },
   };
 
