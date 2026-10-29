@@ -173,6 +173,7 @@ export async function upsertExam(prisma, normalizedExam) {
             title: cleanTitle,
             description: normalizedExam.description || existing.description,
             duration_minutes: normalizedExam.duration_minutes || existing.duration_minutes,
+            is_published: normalizedExam.is_published !== undefined ? normalizedExam.is_published : true,
             source: normalizedExam.source || existing.source
           }
         });

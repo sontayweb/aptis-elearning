@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -61,26 +61,22 @@ export default function ReadingPracticePage() {
     user?.role === "TEACHER" ||
     Boolean(user?.subscription) ||
     Boolean(user?.user_subscriptions?.length);
-  const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">(() => {
-    if (typeof window !== "undefined") {
-      const urlTab = new URLSearchParams(window.location.search).get("tab");
-      if (urlTab && ["full", "p1", "p2", "p3", "p4"].includes(urlTab)) return urlTab as any;
-      const saved = sessionStorage.getItem("reading_active_tab");
-      if (saved && ["full", "p1", "p2", "p3", "p4"].includes(saved)) return saved as any;
-    }
-    return "full";
-  });
+  const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
+  const isTabHydrated = useRef(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("reading_active_tab", activeTab);
-      try {
-        const url = new URL(window.location.href);
-        if (activeTab !== "full") url.searchParams.set("tab", activeTab);
-        else url.searchParams.delete("tab");
-        window.history.replaceState({}, "", url.toString());
-      } catch {}
+    if (typeof window === "undefined") return;
+    if (!isTabHydrated.current) {
+      isTabHydrated.current = true;
+      return;
     }
+    sessionStorage.setItem("reading_active_tab", activeTab);
+    try {
+      const url = new URL(window.location.href);
+      if (activeTab !== "full") url.searchParams.set("tab", activeTab);
+      else url.searchParams.delete("tab");
+      window.history.replaceState({}, "", url.toString());
+    } catch {}
   }, [activeTab]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
@@ -175,10 +171,16 @@ export default function ReadingPracticePage() {
       const tabParam = params.get("tab");
       if (tabParam && ["full", "p1", "p2", "p3", "p4"].includes(tabParam)) {
         setActiveTab(tabParam as any);
+        sessionStorage.setItem("reading_active_tab", tabParam);
         setTimeout(() => {
           const el = document.getElementById("practice-sets-section");
           if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 150);
+      } else {
+        const saved = sessionStorage.getItem("reading_active_tab");
+        if (saved && ["full", "p1", "p2", "p3", "p4"].includes(saved)) {
+          setActiveTab(saved as any);
+        }
       }
     };
 
@@ -290,7 +292,7 @@ export default function ReadingPracticePage() {
       const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = filterStatus === "all" ? true : e.status === filterStatus;
       const matchesPriority =
-        filterPriority === "all"
+        activeTab === "p1" || filterPriority === "all"
           ? true
           : filterPriority === "high"
           ? e.computedClover >= 5
@@ -300,10 +302,12 @@ export default function ReadingPracticePage() {
       return matchesSearch && matchesStatus && matchesPriority;
     })
     .sort((a, b) => {
-      // Ưu tiên sắp xếp theo số ☘️ từ cao xuống thấp (5 ➔ 4 ➔ 3 ➔ 2 ➔ 1 ➔ 0)
-      const cloverDiff = (b.computedClover || 0) - (a.computedClover || 0);
-      if (cloverDiff !== 0) return cloverDiff;
-      // Nếu cùng mức ☘️, sắp xếp tự nhiên theo số thứ tự đề
+      // Ưu tiên sắp xếp theo số ☘️ từ cao xuống thấp cho các tab có nhãn ☘️ (trừ Part 1 sắp xếp theo số thứ tự đề 01 -> 52)
+      if (activeTab !== "p1") {
+        const cloverDiff = (b.computedClover || 0) - (a.computedClover || 0);
+        if (cloverDiff !== 0) return cloverDiff;
+      }
+      // Nếu cùng mức ☘️ (hoặc tab Part 1), sắp xếp tự nhiên theo số thứ tự đề
       const numA = (a.title.match(/(?:Đề|Test|Exam)\s*0*(\d+)/i) || [])[1];
       const numB = (b.title.match(/(?:Đề|Test|Exam)\s*0*(\d+)/i) || [])[1];
       if (numA && numB) return Number(numA) - Number(numB);

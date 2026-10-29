@@ -80,20 +80,24 @@ export async function crawl({ prisma = null, saveDb = false, downloadMedia = fal
           if (!p.audio_url && newPart.audio_url) p.audio_url = newPart.audio_url;
           if (!p.passage_text && newPart.passage_text) p.passage_text = newPart.passage_text;
           if (!p.image_url && newPart.image_url) p.image_url = newPart.image_url;
-          p.questions.forEach((q, qIdx) => {
-            const newQ = newPart.questions?.[qIdx];
-            if (newQ) {
-              if ((!q.options || q.options.length === 0) && newQ.options?.length > 0) {
-                q.options = newQ.options;
+          if ((!p.questions || p.questions.length === 0) && newPart.questions?.length > 0) {
+            p.questions = newPart.questions;
+          } else {
+            p.questions.forEach((q, qIdx) => {
+              const newQ = newPart.questions?.[qIdx];
+              if (newQ) {
+                if ((!q.options || q.options.length === 0) && newQ.options?.length > 0) {
+                  q.options = newQ.options;
+                }
+                if (!q.correct_answer && newQ.correct_answer) {
+                  q.correct_answer = newQ.correct_answer;
+                }
+                if (!q.explanation && newQ.explanation) {
+                  q.explanation = newQ.explanation;
+                }
               }
-              if (!q.correct_answer && newQ.correct_answer) {
-                q.correct_answer = newQ.correct_answer;
-              }
-              if (!q.explanation && newQ.explanation) {
-                q.explanation = newQ.explanation;
-              }
-            }
-          });
+            });
+          }
         }
       });
     }
@@ -181,23 +185,41 @@ export async function crawl({ prisma = null, saveDb = false, downloadMedia = fal
                   });
                 });
 
+                const d = item.data || item;
+                const rawQObj = d.questions && !Array.isArray(d.questions) ? d.questions : (item.questions?.[0] || {});
+                const rawSubQuestions = rawQObj.subQuestion || [];
+                const pNum = Number(part.replace('part', ''));
+                const skillUpper = skill.toUpperCase();
+
                 upsertNormalizedExam(normalizeExam({
                   source: 'APTIS_ACADEMY',
                   externalId: item._id || item.id || `${center}_${fileKey}_${idx + 1}`,
-                  title: item.title || `Bộ Key ${skill.toUpperCase()} ${part.toUpperCase()} - Đề ${idx + 1}`,
-                  skill: skill.toUpperCase(),
-                  durationMinutes: 30,
+                  title: d.title || item.title || `Bộ Key ${skillUpper} ${part.toUpperCase()} - Đề ${idx + 1}`,
+                  skill: skillUpper,
+                  durationMinutes: d.timeToDo || 30,
                   parts: [{
-                    part_number: Number(part.replace('part', '')),
-                    title: `Key ${part.toUpperCase()}`,
-                    questions: (item.questions?.[0]?.subQuestion || []).map((sq, qIdx) => ({
-                      question_number: qIdx + 1,
-                      question_type: skill === 'LISTENING' ? 'MULTIPLE_CHOICE' : (skill === 'SPEAKING' ? 'SPEAKING_AUDIO' : 'ESSAY'),
-                      prompt: sq.content || `Câu hỏi ${qIdx + 1}`,
-                      options: (sq.answerList || []).map(a => a.content || a),
-                      correct_answer: sq.correctAnswer || null,
-                      explanation: sq.suggestion || null
-                    }))
+                    part_number: pNum,
+                    title: skillUpper === 'READING' ? `Reading Part ${pNum}` : `Key ${part.toUpperCase()}`,
+                    instructions: rawQObj.content || null,
+                    questions: rawSubQuestions.length > 0
+                      ? rawSubQuestions.map((sq, qIdx) => ({
+                          question_number: qIdx + 1,
+                          question_type: skillUpper === 'LISTENING' ? 'MULTIPLE_CHOICE' : skillUpper === 'READING' ? (pNum === 1 ? 'GAP_FILL' : pNum === 2 ? 'SENTENCE_ORDER' : 'MATCHING') : (skillUpper === 'SPEAKING' ? 'SPEAKING_AUDIO' : 'ESSAY'),
+                          prompt: (sq.content || `Câu hỏi ${qIdx + 1}`).replace(/tienphongSpace/g, '[gap]').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+                          options: (sq.answerList || rawQObj.answerList || []).map(a => String(a.content || a).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()),
+                          correct_answer: sq.correctAnswer || null,
+                          explanation: sq.suggestion || null
+                        }))
+                      : (rawQObj.content || rawQObj.answerList)
+                      ? [{
+                          question_number: 1,
+                          question_type: skillUpper === 'READING' ? (pNum === 2 ? 'SENTENCE_ORDER' : 'MATCHING') : 'ESSAY',
+                          prompt: String(rawQObj.content || 'Đọc và hoàn thành bài tập').replace(/tienphongSpace/g, '[gap]').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+                          options: (rawQObj.answerList || []).map(a => String(a.content || a).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()),
+                          correct_answer: Array.isArray(rawQObj.correctAnswer) ? rawQObj.correctAnswer.join(', ') : (rawQObj.correctAnswer || null),
+                          explanation: rawQObj.suggestion || null
+                        }]
+                      : []
                   }]
                 }));
               });

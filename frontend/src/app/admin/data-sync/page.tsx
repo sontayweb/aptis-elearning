@@ -1247,3 +1247,4 @@ export default function AdminDataSyncPage() {
     </div>
   );
 }
+

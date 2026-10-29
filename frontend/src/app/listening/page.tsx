@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import Link from "next/link";
@@ -54,26 +54,22 @@ export default function ListeningPracticePage() {
     user?.role === "TEACHER" ||
     Boolean(user?.subscription) ||
     Boolean(user?.user_subscriptions?.length);
-  const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">(() => {
-    if (typeof window !== "undefined") {
-      const urlTab = new URLSearchParams(window.location.search).get("tab");
-      if (urlTab && ["full", "p1", "p2", "p3", "p4"].includes(urlTab)) return urlTab as any;
-      const saved = sessionStorage.getItem("listening_active_tab");
-      if (saved && ["full", "p1", "p2", "p3", "p4"].includes(saved)) return saved as any;
-    }
-    return "full";
-  });
+  const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
+  const isTabHydrated = useRef(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("listening_active_tab", activeTab);
-      try {
-        const url = new URL(window.location.href);
-        if (activeTab !== "full") url.searchParams.set("tab", activeTab);
-        else url.searchParams.delete("tab");
-        window.history.replaceState({}, "", url.toString());
-      } catch {}
+    if (typeof window === "undefined") return;
+    if (!isTabHydrated.current) {
+      isTabHydrated.current = true;
+      return;
     }
+    sessionStorage.setItem("listening_active_tab", activeTab);
+    try {
+      const url = new URL(window.location.href);
+      if (activeTab !== "full") url.searchParams.set("tab", activeTab);
+      else url.searchParams.delete("tab");
+      window.history.replaceState({}, "", url.toString());
+    } catch {}
   }, [activeTab]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
@@ -173,10 +169,16 @@ export default function ListeningPracticePage() {
       const tabParam = params.get("tab");
       if (tabParam && ["full", "p1", "p2", "p3", "p4"].includes(tabParam)) {
         setActiveTab(tabParam as any);
+        sessionStorage.setItem("listening_active_tab", tabParam);
         setTimeout(() => {
           const el = document.getElementById("practice-sets-section");
           if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 150);
+      } else {
+        const saved = sessionStorage.getItem("listening_active_tab");
+        if (saved && ["full", "p1", "p2", "p3", "p4"].includes(saved)) {
+          setActiveTab(saved as any);
+        }
       }
     };
 
