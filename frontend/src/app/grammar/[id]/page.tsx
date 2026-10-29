@@ -286,6 +286,33 @@ function GrammarExamRunnerContent() {
             if (Object.keys(loadedSel).length > 0) {
               setSelectedAnswers(loadedSel);
             }
+
+            // Nạp lại đáp án đúng và lời giải thích từ bài thi chính thức
+            if (sub.exam?.parts) {
+              setQuestions((prevQuestions) => {
+                const nextQ = [...prevQuestions];
+                (sub.exam.parts || []).forEach((p: any) => {
+                  (p.questions || []).forEach((q: any) => {
+                    const idx = nextQ.findIndex((item) => String(item.id) === String(q.id));
+                    if (idx >= 0 && q.correct_answer !== undefined && q.correct_answer !== null) {
+                      const corStr = String(q.correct_answer).trim();
+                      const matchIdx = nextQ[idx].options.findIndex(
+                        (opt) => opt.trim().toLowerCase() === corStr.toLowerCase()
+                      );
+                      if (matchIdx >= 0) {
+                        nextQ[idx].correctAnswer = matchIdx;
+                      } else if (/^[A-D]$/i.test(corStr)) {
+                        nextQ[idx].correctAnswer = corStr.toUpperCase().charCodeAt(0) - 65;
+                      } else if (!isNaN(Number(corStr))) {
+                        nextQ[idx].correctAnswer = Number(corStr);
+                      }
+                      if (q.explanation) nextQ[idx].explanation = q.explanation;
+                    }
+                  });
+                });
+                return nextQ;
+              });
+            }
           }
         } catch (err) {
           console.error("Lỗi nạp bài thi Grammar cũ:", err);
@@ -400,6 +427,39 @@ function GrammarExamRunnerContent() {
           await api.submissions.autosave(submissionId, formatted);
         }
         await api.submissions.submit(submissionId);
+        try {
+          const resultRes = await api.submissions.getResult(submissionId);
+          if (resultRes.success && resultRes.data) {
+            const sub = resultRes.data;
+            if (sub.exam?.parts) {
+              setQuestions((prevQuestions) => {
+                const nextQ = [...prevQuestions];
+                (sub.exam.parts || []).forEach((p: any) => {
+                  (p.questions || []).forEach((q: any) => {
+                    const idx = nextQ.findIndex((item) => String(item.id) === String(q.id));
+                    if (idx >= 0 && q.correct_answer !== undefined && q.correct_answer !== null) {
+                      const corStr = String(q.correct_answer).trim();
+                      const matchIdx = nextQ[idx].options.findIndex(
+                        (opt) => opt.trim().toLowerCase() === corStr.toLowerCase()
+                      );
+                      if (matchIdx >= 0) {
+                        nextQ[idx].correctAnswer = matchIdx;
+                      } else if (/^[A-D]$/i.test(corStr)) {
+                        nextQ[idx].correctAnswer = corStr.toUpperCase().charCodeAt(0) - 65;
+                      } else if (!isNaN(Number(corStr))) {
+                        nextQ[idx].correctAnswer = Number(corStr);
+                      }
+                      if (q.explanation) nextQ[idx].explanation = q.explanation;
+                    }
+                  });
+                });
+                return nextQ;
+              });
+            }
+          }
+        } catch (subErr) {
+          console.warn("Could not reload graded grammar result:", subErr);
+        }
       } catch (err) {
         console.error("Grammar submit error:", err);
       }

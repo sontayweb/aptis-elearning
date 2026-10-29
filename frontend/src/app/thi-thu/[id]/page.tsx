@@ -475,10 +475,36 @@ export default function OfficialMockExamRoom() {
                 setIsFinished(true);
                 setReviewMode(true);
                 setStagePhase("exam");
+
+                // Nạp lại đáp án đúng, giải thích và điểm tối đa từ sub.exam
+                if (sub.exam?.parts) {
+                  const examQMap = new Map<string, any>();
+                  (sub.exam.parts || []).forEach((p: any) => {
+                    (p.questions || []).forEach((eq: any) => {
+                      examQMap.set(eq.id, eq);
+                    });
+                  });
+                  flat.forEach((q, idx) => {
+                    const eq = examQMap.get(q.id);
+                    if (eq) {
+                      flat[idx] = {
+                        ...q,
+                        correct_answer: eq.correct_answer !== undefined ? eq.correct_answer : q.correct_answer,
+                        explanation: eq.explanation || q.explanation,
+                        max_score: eq.max_score ?? q.max_score,
+                        partAudioUrl: (eq as any).audio_url || (eq as any).file || q.partAudioUrl,
+                      };
+                    }
+                  });
+                  setQuestions([...flat]);
+                }
+
+                const dynamicMaxScore = flat.reduce((sum: number, q: any) => sum + (q.max_score || 1), 0);
                 setResultData({
                   totalScore: sub.total_score,
+                  maxScore: exam?.skill === "FULL_TEST" ? 200 : (dynamicMaxScore || 50),
                   cefrLevel: sub.cefr_level || "B1",
-                  correctCount: sub.correct_count,
+                  correctCount: sub.correct_count ?? (sub.answers?.filter((a: any) => (a.score || 0) > 0)?.length || 0),
                   totalQuestions: flat.length,
                 });
 
@@ -839,6 +865,38 @@ export default function OfficialMockExamRoom() {
         if (res.success && res.data) {
           finalResult = res.data;
         }
+
+        // Tải lại đáp án chuẩn & giải thích từ kết quả bài nộp
+        const subRes = await api.submissions.getResult(submissionId);
+        if (subRes.success && subRes.data) {
+          const sub = subRes.data;
+          if (sub.exam?.parts) {
+            const examQMap = new Map<string, any>();
+            (sub.exam.parts || []).forEach((p: any) => {
+              (p.questions || []).forEach((eq: any) => {
+                examQMap.set(eq.id, eq);
+              });
+            });
+            setQuestions((prevFlat) =>
+              prevFlat.map((q) => {
+                const eq = examQMap.get(q.id);
+                if (eq) {
+                  return {
+                    ...q,
+                    correct_answer: eq.correct_answer !== undefined ? eq.correct_answer : q.correct_answer,
+                    explanation: eq.explanation || q.explanation,
+                    max_score: eq.max_score ?? q.max_score,
+                    partAudioUrl: (eq as any).audio_url || (eq as any).file || q.partAudioUrl,
+                  };
+                }
+                return q;
+              })
+            );
+          }
+          if (!finalResult) {
+            finalResult = sub;
+          }
+        }
       } catch (e) {
         console.warn("Submit API error, calculating score client-side:", e);
       }
@@ -945,6 +1003,7 @@ export default function OfficialMockExamRoom() {
 
       finalResult = {
         totalScore: normalizedScore,
+        maxScore: examData?.skill === "FULL_TEST" ? 200 : maxPts,
         cefrLevel: cefr,
         correctCount: totalCorrect,
         totalQuestions: questions.length,
@@ -1242,19 +1301,15 @@ export default function OfficialMockExamRoom() {
   // ========================================================
   if (isFinished && !reviewMode) {
     if (examData?.skill === "READING") {
+      const dynamicMaxReadingScore = resultData?.maxScore ?? (questions.reduce((sum: number, q: any) => sum + (q.max_score || 1), 0) || 50);
       return (
         <ReadingResultCard
           totalScore={resultData?.totalScore ?? 0}
-          maxTotalScore={50}
+          maxTotalScore={dynamicMaxReadingScore}
           cefrLevel={resultData?.cefrLevel || "A0"}
           correctCount={resultData?.correctCount ?? answeredCount}
           totalQuestions={resultData?.totalQuestions ?? questions.length}
-          breakdown={resultData?.partBreakdown || [
-            { partNumber: 1, title: "Part 1 – Gap Fill", correctCount: 3, totalCount: 4, score: 6, maxScore: 7 },
-            { partNumber: 2, title: "Part 2 + 3 – Text Cohesion", correctCount: 0, totalCount: 2, score: 0, maxScore: 17 },
-            { partNumber: 4, title: "Part 4 – Opinion Matching", correctCount: 0, totalCount: 7, score: 0, maxScore: 13 },
-            { partNumber: 5, title: "Part 5 – Long Reading", correctCount: 0, totalCount: 7, score: 0, maxScore: 13 },
-          ]}
+          breakdown={resultData?.partBreakdown || []}
           onReview={() => {
             setReviewMode(true);
             setQuestionIdx(0);
@@ -1442,7 +1497,7 @@ export default function OfficialMockExamRoom() {
                     <p className="text-xs text-exam-text-muted">
                       Điểm:{" "}
                       {score !== undefined && score !== null
-                        ? `${Math.round(score)} / 50`
+                        ? `${Math.round(score)} / ${resultData?.maxScore ?? (questions.reduce((sum: number, q: any) => sum + (q.max_score || 1), 0) || 50)}`
                         : "Đang tính"}
                     </p>
                   </div>

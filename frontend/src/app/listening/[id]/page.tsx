@@ -566,6 +566,16 @@ function ListeningExamRunnerContent() {
             setIsReviewMode(true);
             setIsSubmitted(false);
 
+            let activeExam = examData;
+            if (sub.exam) {
+              const parsed = parseApiToListeningData(sub.exam);
+              activeExam = parsed.exam;
+              setExamData(parsed.exam);
+              if (parsed.audioUrls && Object.keys(parsed.audioUrls).length > 0) {
+                setAudioUrlMap((prev) => ({ ...prev, ...parsed.audioUrls }));
+              }
+            }
+
             if (sub.answers && Array.isArray(sub.answers)) {
               const p1: Record<number, string> = {};
               const p2: Record<number, string> = {};
@@ -578,19 +588,19 @@ function ListeningExamRunnerContent() {
                 if (!opt) return;
 
                 // Match câu hỏi Part 1
-                examData.part1.forEach((item, idx) => {
+                activeExam.part1.forEach((item, idx) => {
                   if (item.id === qId) p1[idx] = opt;
                 });
                 // Match câu hỏi Part 2
-                examData.part2.speakers.forEach((spk, idx) => {
+                activeExam.part2.speakers.forEach((spk, idx) => {
                   if (spk.id === qId) p2[idx] = opt;
                 });
                 // Match câu hỏi Part 3
-                examData.part3.opinions.forEach((opn, idx) => {
+                activeExam.part3.opinions.forEach((opn, idx) => {
                   if (opn.id === qId) p3[idx] = opt;
                 });
                 // Match câu hỏi Part 4
-                examData.part4.forEach((rec, recIdx) => {
+                activeExam.part4.forEach((rec, recIdx) => {
                   rec.questions.forEach((q, qIdx) => {
                     if (q.id === qId) {
                       p4[`${recIdx}_${qIdx}`] = opt;
@@ -862,7 +872,7 @@ function ListeningExamRunnerContent() {
               num: q.question_number || idx + 1,
               prompt: q.prompt,
               options: opts,
-              correctAnswer: q.correct_answer || opts[0] || "",
+              correctAnswer: q.correct_answer || "",
               explanation: q.explanation || "Đáp án chuẩn theo đoạn ghi âm đối thoại.",
               audioUrl: resolvedAudio,
               transcript: qTranscript,
@@ -1059,7 +1069,7 @@ function ListeningExamRunnerContent() {
               id: q.id,
               prompt: q.prompt,
               options: opts,
-              correctAnswer: q.correct_answer || opts[0] || "",
+              correctAnswer: q.correct_answer || "",
               explanation: q.explanation || "",
               transcript: q.transcript || "",
             };
@@ -1386,6 +1396,8 @@ function ListeningExamRunnerContent() {
     else if (totalScore >= 18) cefr = "A2";
     else if (totalScore >= 10) cefr = "A1";
 
+    const maxScore = isFullListeningTest ? 50 : (totalQuestionsInExam * 2 > 0 ? totalQuestionsInExam * 2 : 50);
+
     return {
       p1Correct,
       p1Score: isFullListeningTest ? p1Correct * 2 : examData.part1.length > 0 ? Math.round((p1Correct / examData.part1.length) * 50) : 0,
@@ -1397,6 +1409,7 @@ function ListeningExamRunnerContent() {
       p4Score: isFullListeningTest ? p4Correct * 2 : Math.round((p4Correct / Math.max(1, examData.part4.reduce((s, r) => s + r.questions.length, 0))) * 50),
       totalCorrect,
       totalScore,
+      maxScore,
       totalQuestionsInExam,
       cefr,
     };
@@ -1626,6 +1639,20 @@ function ListeningExamRunnerContent() {
           await api.submissions.autosave(subId, answersPayload);
         }
         await api.submissions.submit(subId);
+
+        // Nạp kết quả chính thức từ máy chủ để hiển thị đúng đáp án và điểm
+        try {
+          const resultRes = await api.submissions.getResult(subId);
+          if (resultRes.success && resultRes.data) {
+            const sub = resultRes.data;
+            if (sub.exam) {
+              const parsed = parseApiToListeningData(sub.exam);
+              setExamData(parsed.exam);
+            }
+          }
+        } catch (subErr) {
+          console.warn("Could not reload graded listening result:", subErr);
+        }
       }
     } catch (err) {
       console.warn("Submit listening error:", err);
@@ -1710,7 +1737,7 @@ function ListeningExamRunnerContent() {
               <div className="grid grid-cols-3 gap-3 divide-x divide-border/60 py-2">
                 <div>
                   <div className="text-2xl md:text-3xl font-black text-primary font-mono">
-                    {results.totalScore}/50
+                    {results.totalScore}/{results.maxScore}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">Điểm</div>
                 </div>
@@ -1724,7 +1751,7 @@ function ListeningExamRunnerContent() {
 
                 <div>
                   <div className="text-2xl md:text-3xl font-black text-foreground font-mono">
-                    {results.totalCorrect}/25
+                    {results.totalCorrect}/{results.totalQuestionsInExam}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">Số câu đúng</div>
                 </div>
@@ -1891,7 +1918,7 @@ function ListeningExamRunnerContent() {
           {isReviewMode ? (
             <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300 font-bold text-xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Điểm: {results.totalScore}/50 ({results.totalCorrect}/{results.totalQuestionsInExam} đúng)</span>
+              <span>Điểm: {results.totalScore}/{results.maxScore} ({results.totalCorrect}/{results.totalQuestionsInExam} đúng)</span>
             </div>
           ) : (
             <>
@@ -2671,7 +2698,7 @@ function ListeningExamRunnerContent() {
                     <span>Mục lục xem lại</span>
                   </h3>
                   <span className="text-xs font-mono font-bold text-primary px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20">
-                    {results.totalScore}/50 điểm
+                    {results.totalScore}/{results.maxScore} điểm
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
