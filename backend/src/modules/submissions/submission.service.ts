@@ -569,6 +569,15 @@ export class SubmissionService {
               title: true,
               skill: true,
               duration_minutes: true,
+              parts: {
+                select: {
+                  questions: {
+                    select: {
+                      max_score: true,
+                    },
+                  },
+                },
+              },
             },
           },
           answers: {
@@ -614,7 +623,18 @@ export class SubmissionService {
       const pad = (n: number) => n.toString().padStart(2, '0');
       const dateFormatted = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
-      const maxScale = sub.exam.skill === 'FULL_TEST' ? 200 : 50;
+      let examMaxScore = 0;
+      if ((sub.exam as any).parts && Array.isArray((sub.exam as any).parts)) {
+        for (const p of (sub.exam as any).parts) {
+          if (p.questions && Array.isArray(p.questions)) {
+            for (const q of p.questions) {
+              examMaxScore += q.max_score || 0;
+            }
+          }
+        }
+      }
+      const defaultScale = sub.exam.skill === 'FULL_TEST' ? 200 : 50;
+      const maxScale = examMaxScore > 0 ? Math.round(examMaxScore) : defaultScale;
       const scoreDisplay = isGraded && sub.total_score != null
         ? `${Math.round(sub.total_score)}/${maxScale}`
         : sub.status === SubmissionStatus.IN_PROGRESS
@@ -640,6 +660,7 @@ export class SubmissionService {
         durationSpent: durationStr,
         score: scoreDisplay,
         scoreNumber: sub.total_score ?? 0,
+        maxScore: maxScale,
         band: sub.cefr_level || (isGraded ? 'B2' : 'Đang xử lý'),
         status: sub.status,
         totalQuestions: sub.answers.length,

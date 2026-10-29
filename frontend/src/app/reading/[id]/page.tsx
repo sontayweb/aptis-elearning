@@ -1084,15 +1084,103 @@ function ReadingExamRunner() {
           const resultRes = await api.submissions.getResult(submissionId);
           if (resultRes.success && resultRes.data) {
             const sub = resultRes.data;
+            let activeExam = examData;
             if (sub.exam) {
-              const reviewExam = parseApiToReadingData(sub.exam);
-              setExamData(reviewExam);
+              activeExam = parseApiToReadingData(sub.exam);
+              setExamData(activeExam);
             }
             if (sub.total_score != null) {
               setResultScore(Math.round(sub.total_score * 10) / 10);
             }
             if (sub.cefr_level) {
               setCefrBand(sub.cefr_level);
+            }
+
+            // Tính lại chuẩn xác partScores từ activeExam đã nạp đáp án chuẩn từ máy chủ
+            const updatedPartScores: { name: string; score: number; maxScore: number; correct: number; total: number }[] = [];
+
+            // 1. Part 1
+            if (activeExam.part1.gaps.length > 0) {
+              let p1Cor = 0;
+              activeExam.part1.gaps.forEach((g) => {
+                if (p1Answers[g.id] && p1Answers[g.id].toLowerCase() === g.correctAnswer.toLowerCase()) {
+                  p1Cor++;
+                }
+              });
+              const p1Max = 10;
+              const p1Score = p1Cor * 2.0;
+              updatedPartScores.push({
+                name: "Part 1 – Sentence comprehension",
+                score: Math.round(p1Score * 10) / 10,
+                maxScore: p1Max,
+                correct: p1Cor,
+                total: activeExam.part1.gaps.length,
+              });
+            }
+
+            // 2. Part 2
+            if (activeExam.part2.stories.length > 0) {
+              let p2Cor = 0;
+              let p2Tot = 0;
+              activeExam.part2.stories.forEach((st) => {
+                const userOrder = p2Orders[st.id] || [];
+                const corOrder = st.correctOrder || [];
+                p2Tot += corOrder.length;
+                userOrder.forEach((item, idx) => {
+                  if (corOrder[idx] === item) p2Cor++;
+                });
+              });
+              const p2Max = activeExam.part2.stories.length * 5;
+              const p2Score = p2Cor * 1.0;
+              updatedPartScores.push({
+                name: "Part 2 – Text cohesion",
+                score: Math.round(p2Score * 10) / 10,
+                maxScore: p2Max,
+                correct: p2Cor,
+                total: p2Tot,
+              });
+            }
+
+            // 3. Part 3
+            if (activeExam.part3.questions.length > 0) {
+              let p3Cor = 0;
+              activeExam.part3.questions.forEach((q) => {
+                if (p3Answers[q.id] && p3Answers[q.id].toLowerCase() === q.correctAnswer.toLowerCase()) {
+                  p3Cor++;
+                }
+              });
+              const p3Max = 14;
+              const p3Score = (p3Cor / activeExam.part3.questions.length) * p3Max;
+              updatedPartScores.push({
+                name: "Part 3 – Opinion matching",
+                score: Math.round(p3Score * 10) / 10,
+                maxScore: p3Max,
+                correct: p3Cor,
+                total: activeExam.part3.questions.length,
+              });
+            }
+
+            // 4. Part 4
+            if (activeExam.part4.paragraphs.length > 0) {
+              let p4Cor = 0;
+              activeExam.part4.paragraphs.forEach((p) => {
+                if (p4Answers[p.id] && p4Answers[p.id].toLowerCase() === p.correctHeading.toLowerCase()) {
+                  p4Cor++;
+                }
+              });
+              const p4Max = 16;
+              const p4Score = (p4Cor / activeExam.part4.paragraphs.length) * p4Max;
+              updatedPartScores.push({
+                name: "Part 4 – Long reading",
+                score: Math.round(p4Score * 10) / 10,
+                maxScore: p4Max,
+                correct: p4Cor,
+                total: activeExam.part4.paragraphs.length,
+              });
+            }
+
+            if (updatedPartScores.length > 0) {
+              setPartScores(updatedPartScores);
             }
           }
         } catch (subErr) {
