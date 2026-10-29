@@ -116,11 +116,17 @@ export function CoursePromoPopup({
   const [copiedSTK, setCopiedSTK] = useState(false);
   const [dontShowAgainToday, setDontShowAgainToday] = useState(false);
 
-  // Không hiển thị popup trên các trang quản trị admin hoặc khi đang thi thử trực tiếp
+  // Không hiển thị popup trên các trang quản trị admin hoặc khi đang làm bài / thi thử trực tiếp
   const isAdminOrExamPage =
     pathname?.startsWith("/admin") ||
     pathname?.includes("/take") ||
-    pathname?.includes("/exams/");
+    pathname?.includes("/exams/") ||
+    pathname?.startsWith("/reading/") ||
+    pathname?.startsWith("/listening/") ||
+    pathname?.startsWith("/writing/") ||
+    pathname?.startsWith("/speaking/") ||
+    pathname?.startsWith("/grammar/") ||
+    pathname?.startsWith("/thi-thu/");
 
   // Lắng nghe sự kiện toàn cục để mở popup từ bất cứ nơi đâu
   useEffect(() => {

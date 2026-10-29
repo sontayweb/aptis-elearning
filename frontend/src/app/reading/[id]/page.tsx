@@ -45,8 +45,17 @@ import {
   type Part3Question,
   type Part4Paragraph,
   type ReadingExamData,
-  DEFAULT_READING_TEST,
 } from "@/data/reading-benchmark";
+
+const EMPTY_READING_EXAM: ReadingExamData = {
+  id: "",
+  title: "",
+  durationMinutes: 35,
+  part1: { instructions: "", exampleText: { prefix: "", word: "", suffix: "" }, gaps: [] },
+  part2: { instructions: "", stories: [] },
+  part3: { title: "", instructions: "", reviews: [], questions: [] },
+  part4: { title: "", instructions: "", allHeadings: [], paragraphs: [] },
+};
 
 function stripHtml(text: string | null | undefined): string {
   if (!text) return "";
@@ -88,7 +97,7 @@ function ReadingExamRunner() {
   const [activeStage, setActiveStage] = useState(0);
 
   // Exam Data
-  const [examData, setExamData] = useState<ReadingExamData>(DEFAULT_READING_TEST);
+  const [examData, setExamData] = useState<ReadingExamData>(EMPTY_READING_EXAM);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -511,7 +520,7 @@ function ReadingExamRunner() {
                   const p3Max = activePartsCount === 1 ? 14 : 14;
                   const p3Score = (p3Correct / activeData.part3.questions.length) * p3Max;
                   calculatedPartScores.push({
-                    name: "Part 3 – Opinion matching",
+                    name: "Part 4 – Opinion matching",
                     score: Math.round(p3Score * 10) / 10,
                     maxScore: p3Max,
                     correct: p3Correct,
@@ -519,7 +528,7 @@ function ReadingExamRunner() {
                   });
                 }
 
-                // 4. Part 4
+                // 4. Part 4 (Part 5 - Long reading)
                 if (activeData.part4.paragraphs.length > 0) {
                   let p4Correct = 0;
                   activeData.part4.paragraphs.forEach((p) => {
@@ -530,7 +539,7 @@ function ReadingExamRunner() {
                   const p4Max = activePartsCount === 1 ? 16 : 16;
                   const p4Score = (p4Correct / activeData.part4.paragraphs.length) * p4Max;
                   calculatedPartScores.push({
-                    name: "Part 4 – Long reading",
+                    name: "Part 5 – Long reading",
                     score: Math.round(p4Score * 10) / 10,
                     maxScore: p4Max,
                     correct: p4Correct,
@@ -569,32 +578,12 @@ function ReadingExamRunner() {
             }
           }
         } else {
-          // Xử lý khi yêu cầu quyền VIP / PRO
-          const msg = res.message || "";
-          if (msg.includes("VIP") || msg.includes("PRO") || res.error?.code === "FORBIDDEN") {
-            setError(msg || "Đề thi PRO yêu cầu đăng nhập tài khoản VIP để truy cập");
-            return;
-          }
-          // Dùng benchmark mặc định nếu không tìm thấy đề
-          setExamData(DEFAULT_READING_TEST);
-          const initialP2Orders: Record<string, string[]> = {};
-          DEFAULT_READING_TEST.part2.stories.forEach((st) => {
-            initialP2Orders[st.id] = [];
-          });
-          setP2Orders(initialP2Orders);
+          const msg = res.message || res.error?.message || "Không thể tải đề thi từ máy chủ";
+          setError(msg);
         }
       } catch (err: any) {
-        if (err?.status === 403 || err?.message?.includes("VIP") || err?.message?.includes("PRO")) {
-          setError(err?.message || "Đề thi PRO yêu cầu đăng nhập tài khoản VIP để truy cập");
-          return;
-        }
-        console.warn("Using offline benchmark reading data:", err);
-        setExamData(DEFAULT_READING_TEST);
-        const initialP2Orders: Record<string, string[]> = {};
-        DEFAULT_READING_TEST.part2.stories.forEach((st) => {
-          initialP2Orders[st.id] = [];
-        });
-        setP2Orders(initialP2Orders);
+        console.warn("Error loading reading exam:", err);
+        setError(err?.message || "Không thể tải đề thi từ máy chủ");
       } finally {
         setLoading(false);
       }
@@ -638,37 +627,31 @@ function ReadingExamRunner() {
     }
     if (examData.part3.questions.length > 0) {
       const p3CleanTitle = stripHtml(examData.part3.title)
-        .replace(/^Part\s*\d+\s*–?\s*/i, "")
+        .replace(/^Part\s*\d+\s*[-–—:]?\s*/i, "")
+        .replace(/^[-–—:\s]+/g, "")
         .replace(/^-?\s*gap fill/i, "")
         .trim();
       list.push({
         stageKey: "p3",
-        title: "Part 3",
-        label: "Part 3 – " + (p3CleanTitle || "Opinion Matching"),
+        title: "Part 4",
+        label: "Part 4 – " + (p3CleanTitle || "Opinion Matching"),
         count: examData.part3.questions.length,
       });
     }
     if (examData.part4.paragraphs.length > 0) {
       const p4CleanTitle = stripHtml(examData.part4.title)
-        .replace(/^Part\s*\d+\s*–?\s*/i, "")
+        .replace(/^Part\s*\d+\s*[-–—:]?\s*/i, "")
+        .replace(/^[-–—:\s]+/g, "")
         .replace(/^-?\s*gap fill/i, "")
         .trim();
       list.push({
         stageKey: "p4",
-        title: "Part 4",
-        label: "Part 4 – " + (p4CleanTitle || "Long Reading"),
+        title: "Part 5",
+        label: "Part 5 – " + (p4CleanTitle || "Long Reading"),
         count: examData.part4.paragraphs.length,
       });
     }
 
-    if (list.length === 0) {
-      list.push({
-        stageKey: "p1",
-        title: "Part 1",
-        label: "Part 1 – Gap Fill",
-        count: 0,
-      });
-    }
     return list;
   }, [examData]);
 
@@ -692,25 +675,29 @@ function ReadingExamRunner() {
 
     let targetKey: string | null = null;
     if (p === "1" || p === "p1" || p === "part1") {
-      targetKey = "p1";
+      targetKey = stages.some((s) => s.stageKey === "p1") ? "p1" : stages[0]?.stageKey;
     } else if (p === "2" || p === "p2" || p === "part2" || p === "2-1" || p === "p2-1") {
-      targetKey = "p2-1";
+      targetKey = stages.some((s) => s.stageKey === "p2-1") ? "p2-1" : stages[0]?.stageKey;
     } else if (p === "2-2" || p === "p2-2") {
-      targetKey = "p2-2";
+      targetKey = stages.some((s) => s.stageKey === "p2-2") ? "p2-2" : stages[0]?.stageKey;
     } else if (p === "3" || p === "p3" || p === "part3") {
       targetKey = stages.some((s) => s.stageKey === "p3")
         ? "p3"
-        : (stages[0]?.stageKey || "p2-1");
+        : stages.some((s) => s.stageKey === "p2-2")
+        ? "p2-2"
+        : stages[0]?.stageKey;
     } else if (p === "4" || p === "p4" || p === "part4") {
-      targetKey = stages.some((s) => s.stageKey === "p4")
-        ? "p4"
-        : stages.some((s) => s.stageKey === "p3")
+      // Ưu tiên Part 4 – Opinion matching (p3). Nếu đề lẻ Long reading chỉ có p4 thì chọn p4.
+      targetKey = stages.some((s) => s.stageKey === "p3")
         ? "p3"
-        : (stages[0]?.stageKey || "p1");
+        : stages.some((s) => s.stageKey === "p4")
+        ? "p4"
+        : stages[0]?.stageKey;
     } else if (p === "5" || p === "p5" || p === "part5") {
+      // Part 5 – Long reading (p4)
       targetKey = stages.some((s) => s.stageKey === "p4")
         ? "p4"
-        : (stages[0]?.stageKey || "p1");
+        : stages[0]?.stageKey;
     }
 
     if (targetKey) {
@@ -990,7 +977,7 @@ function ReadingExamRunner() {
       const p3Max = activePartsCount === 1 ? 14 : 14;
       const p3Score = (p3Correct / examData.part3.questions.length) * p3Max;
       calculatedPartScores.push({
-        name: "Part 3 – Opinion matching",
+        name: "Part 4 – Opinion matching",
         score: Math.round(p3Score * 10) / 10,
         maxScore: p3Max,
         correct: p3Correct,
@@ -998,7 +985,7 @@ function ReadingExamRunner() {
       });
     }
 
-    // 4. Part 4 Score
+    // 4. Part 4 Score (Part 5 - Long reading)
     let p4Correct = 0;
     if (examData.part4.paragraphs.length > 0) {
       examData.part4.paragraphs.forEach((p) => {
@@ -1009,7 +996,7 @@ function ReadingExamRunner() {
       const p4Max = activePartsCount === 1 ? 16 : 16;
       const p4Score = (p4Correct / examData.part4.paragraphs.length) * p4Max;
       calculatedPartScores.push({
-        name: "Part 4 – Long reading",
+        name: "Part 5 – Long reading",
         score: Math.round(p4Score * 10) / 10,
         maxScore: p4Max,
         correct: p4Correct,
@@ -1152,7 +1139,7 @@ function ReadingExamRunner() {
               const p3Max = 14;
               const p3Score = (p3Cor / activeExam.part3.questions.length) * p3Max;
               updatedPartScores.push({
-                name: "Part 3 – Opinion matching",
+                name: "Part 4 – Opinion matching",
                 score: Math.round(p3Score * 10) / 10,
                 maxScore: p3Max,
                 correct: p3Cor,
@@ -1160,7 +1147,7 @@ function ReadingExamRunner() {
               });
             }
 
-            // 4. Part 4
+            // 4. Part 4 (Part 5 - Long reading)
             if (activeExam.part4.paragraphs.length > 0) {
               let p4Cor = 0;
               activeExam.part4.paragraphs.forEach((p) => {
@@ -1171,7 +1158,7 @@ function ReadingExamRunner() {
               const p4Max = 16;
               const p4Score = (p4Cor / activeExam.part4.paragraphs.length) * p4Max;
               updatedPartScores.push({
-                name: "Part 4 – Long reading",
+                name: "Part 5 – Long reading",
                 score: Math.round(p4Score * 10) / 10,
                 maxScore: p4Max,
                 correct: p4Cor,
@@ -1663,7 +1650,7 @@ function ReadingExamRunner() {
                       <div className="p-3.5 rounded-xl bg-muted/30 border border-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
                           <span className="text-xs font-bold text-primary block">
-                            {examData.part3.title}
+                            {currentStage.label || examData.part3.title}
                           </span>
                           <p className="text-xs text-foreground">
                             {examData.part3.instructions}
@@ -1800,7 +1787,7 @@ function ReadingExamRunner() {
                         <div className="space-y-1">
                           <span className="text-xs font-bold text-primary flex items-center gap-1.5">
                             <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
-                            <span>{examData.part4.title}</span>
+                            <span>{currentStage.label || examData.part4.title}</span>
                           </span>
                           <p className="text-xs text-foreground">
                             {examData.part4.instructions}
@@ -2630,8 +2617,8 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
     const pNum = p.part_number;
     // Single Source of Truth: Ưu tiên partType chuẩn hóa từ Backend DTO
     const partType = p.partType || 
-      ((p.title && /heading|long|part 5/i.test(p.title)) || p.part_number === 5 || (p.part_number === 4 && (!p.title || !/opinion/i.test(p.title))) ? 'PART_4' :
-       (p.title && /opinion/i.test(p.title)) || p.part_number === 3 ? 'PART_3' :
+      ((p.title && /heading|long|part 5/i.test(p.title)) || p.part_number === 5 || (p.part_number === 4 && (!p.title || !/opinion/i.test(p.title))) || (p.questions && p.questions.some((q: any) => /paragraph\s*\d+/i.test(q.prompt || ""))) ? 'PART_4' :
+       (p.title && /opinion/i.test(p.title)) || p.part_number === 3 || (p.questions && p.questions.some((q: any) => Array.isArray(q.options) && q.options.includes("Person A"))) ? 'PART_3' :
        (p.title && /cohesion|order|part 2/i.test(p.title)) || p.part_number === 2 ? 'PART_2' : 'PART_1');
 
     const isP1 = partType === 'PART_1';

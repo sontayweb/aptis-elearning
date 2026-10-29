@@ -1,0 +1,45 @@
+import paramiko, json, sys
+
+sys.stdout.reconfigure(encoding='utf-8')
+ssh = paramiko.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+ssh.connect('103.90.227.117', port=22, username='root', password='Taovipko0!')
+cmd = 'docker exec 100eba9cfa4d wget -qO- "http://localhost:5000/api/exams/0274ec40-ea8f-405a-9cdd-c56e806a8559/questions"'
+stdin, stdout, stderr = ssh.exec_command(cmd)
+res = stdout.read().decode('utf-8', errors='replace')
+ssh.close()
+err_content = stderr.read().decode('utf-8', errors='replace')
+print('STDOUT len:', len(res), 'STDERR len:', len(err_content))
+print('STDERR:', err_content)
+print('Raw STDOUT:', res[:300])
+if res.strip():
+    data = json.loads(res)
+    print('Success:', data.get('success'))
+    exam = data.get('data', {})
+    print('Exam title:', exam.get('title'))
+    print('is_pro:', exam.get('is_pro'))
+    parts = exam.get('parts', [])
+    print('Num parts:', len(parts))
+    for p in parts:
+        print('Part title:', p.get('title'), 'Part num:', p.get('part_number'))
+        print('Passage text length:', len(p.get('passage_text') or ''))
+        print('Passage text sample:', (p.get('passage_text') or '')[:100])
+        qs = p.get('questions', [])
+        print('Num questions:', len(qs))
+        if qs:
+            print('Q0 prompt:', qs[0].get('prompt'))
+            print('Q0 options:', qs[0].get('options'))
+            print('Q0 correct_answer:', qs[0].get('correct_answer'))
+print('is_pro:', exam.get('is_pro'))
+parts = exam.get('parts', [])
+print('Num parts:', len(parts))
+for p in parts:
+    print('Part title:', p.get('title'), 'Part num:', p.get('part_number'))
+    print('Passage text length:', len(p.get('passage_text') or ''))
+    print('Passage text sample:', (p.get('passage_text') or '')[:100])
+    qs = p.get('questions', [])
+    print('Num questions:', len(qs))
+    if qs:
+        print('Q0 prompt:', qs[0].get('prompt'))
+        print('Q0 options:', qs[0].get('options'))
+        print('Q0 correct_answer:', qs[0].get('correct_answer'))

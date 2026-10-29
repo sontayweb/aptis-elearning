@@ -6,7 +6,7 @@ ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 ssh.connect('103.90.227.117', port=22, username='root', password='Taovipko0!')
 
-cmd = 'docker exec 33d3ddc8d732 grep -rl "Sentence 1 is fixed" /app/.next/'
-stdin, stdout, stderr = ssh.exec_command(cmd)
-print("STDOUT:\n", stdout.read().decode('utf-8', errors='replace'))
+stdin, stdout, stderr = ssh.exec_command("docker exec c1e4e12fb076 ls -la /app/.next/server/app/reading/[id]")
+print("SERVER CHUNKS IN CONTAINER:")
+print(stdout.read().decode('utf-8'))
 ssh.close()

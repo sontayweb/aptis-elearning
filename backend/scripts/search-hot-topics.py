@@ -1,0 +1,41 @@
+import paramiko
+import sys
+import json
+
+sys.stdout.reconfigure(encoding='utf-8')
+ssh = paramiko.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+ssh.connect('103.90.227.117', port=22, username='root', password='Taovipko0!')
+
+sql = """
+SELECT e.id as exam_id, e.title as exam_title, ep.id as part_id, ep.title as part_title, 
+       q.id as q_id, q.question_number, q.prompt, q.max_score, q.options::text as options_text, q.correct_answer
+FROM "Exam" e
+JOIN "ExamPart" ep ON ep.exam_id = e.id
+JOIN "Question" q ON q.part_id = ep.id
+WHERE e.skill = 'READING'
+  AND (
+       q.prompt ILIKE '%film%' OR q.prompt ILIKE '%sport%' OR q.prompt ILIKE '%coffee%'
+    OR q.prompt ILIKE '%singer%' OR q.prompt ILIKE '%project%' OR q.prompt ILIKE '%cafe%'
+    OR e.title ILIKE '%film%' OR e.title ILIKE '%sport%' OR e.title ILIKE '%coffee%'
+    OR e.title ILIKE '%singer%' OR e.title ILIKE '%project%' OR e.title ILIKE '%cafe%'
+    OR e.title ILIKE '%Đề 07%' OR e.title ILIKE '%Đề 09%' OR e.title ILIKE '%Đề 13%'
+    OR e.title ILIKE '%Đề 27%' OR e.title ILIKE '%Đề 29%' OR e.title ILIKE '%Đề 34%'
+    OR e.title ILIKE '%Đề 36%' OR e.title ILIKE '%Đề 37%'
+  )
+ORDER BY e.title, q.question_number;
+"""
+
+sftp = ssh.open_sftp()
+with sftp.file('/tmp/search_hot.sql', 'wb') as f:
+    f.write(sql.encode('utf-8'))
+sftp.close()
+
+cmd = 'docker cp /tmp/search_hot.sql wlafe5vr5fwx6rn3curavktm:/tmp/search_hot.sql && docker exec wlafe5vr5fwx6rn3curavktm psql -U postgres -d aptis_kytich_db -f /tmp/search_hot.sql'
+stdin, stdout, stderr = ssh.exec_command(cmd)
+content = stdout.read().decode('utf-8', errors='replace')
+with open('backend/scripts/hot_topics_found.txt', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f"Dumped {len(content)} bytes to backend/scripts/hot_topics_found.txt")
+ssh.close()
