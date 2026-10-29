@@ -35,6 +35,7 @@ import {
   Sun,
   Moon,
   Database,
+  RefreshCw,
 } from "lucide-react";
 import { useEventTheme } from "@/contexts/event-theme-context";
 import AdminTutorialModal from "@/components/admin/admin-tutorial-modal";
@@ -149,6 +150,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           href: "/admin/exams",
           icon: BookOpen,
           badge: null,
+        },
+        {
+          title: "Đồng bộ & Đối soát Đề",
+          href: "/admin/data-sync",
+          icon: RefreshCw,
+          badge: "NEW",
+          badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono font-bold",
         },
         {
           title: "Kho Từ vựng",

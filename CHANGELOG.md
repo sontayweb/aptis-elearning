@@ -4,6 +4,20 @@ Tất cả các thay đổi và tiến độ nâng cấp hệ thống được g
 
 ---
 
+## [2.4.1] - 2026-10-29 (ADMIN DATA SYNC & AUTOMATED UNIT TEST AUDIT CENTER)
+
+### Tích Hợp Trung Tâm Đồng Bộ & Đối Soát Đề Thi Lên Giao Diện Admin (`/admin/data-sync`)
+- **Backend Module (`backend/src/modules/data-sync/`):**
+  - `GET /api/admin/data-sync/overview`: Thống kê thời gian thực toàn bộ kho đề theo 6 kỹ năng, nguồn đồng bộ (`APTIS_ACADEMY`, `APTIS_KY_TICH`, `WEB`), 7 loại `QuestionType` đa hình và bộ chẩn đoán 4 chỉ tiêu sức khỏe Data Contract (đề rỗng, đề trùng tên, lệch kiểu câu hỏi, câu trắc nghiệm thiếu đáp án).
+  - `POST /api/admin/data-sync/standardize`: Nút 1-Click **Auto-Heal** tự động chuẩn hóa tiêu đề (`Đề 1` -> `Đề 01`), khử trùng lặp đề thi, dọn sạch part rỗng và sửa tự động `QuestionType` đa hình cho Speaking, Writing, Reading ngay trên CSDL kèm ghi nhật ký `AuditLog`.
+  - `POST /api/admin/data-sync/audit`: Tích hợp trực tiếp trình chạy **Unit Test Đối Soát 17 Phân Vùng Kỹ Năng** (Reading Part 1–4, Listening Part 1–4, Writing Part 1–4, Speaking Part 1–4 & Full Test 16 Parts) thông qua `ExamService.getExamQuestions()`.
+  - `POST /api/admin/data-sync/sync-batch`: Hỗ trợ đồng bộ hàng loạt từ kho Snapshot trên máy chủ hoặc tải trực tiếp tệp JSON (`.json` lên đến 30MB) từ máy tính Quản trị viên, tích hợp chế độ kiểm định thử (**Dry-Run**) và **Deep Idempotent Upsert**.
+- **Giao Diện Quản Trị (`/admin/data-sync` & Sidebar Học Vụ):**
+  - Tích hợp 3 phân khu trực quan: **1. Chẩn Đoán & Tự Động Chuẩn Hóa**, **2. Unit Test Đối Soát Từng Part (kèm xuất báo cáo `.md`)**, **3. Đồng Bộ Đề Mới (Deep Upsert Engine)**.
+  - Bổ sung lối tắt nhanh trên Sidebar Quản trị, trang Ngân hàng Đề thi (`/admin/exams`) và thanh tìm kiếm nhanh (`Ctrl + K`).
+
+---
+
 ## [2.4.0] - 2026-10-28 (PRODUCTION DATABASE DUMP BACKUP, DATA CONTRACTS & IDEMPOTENT DEEP UPSERT ENGINE)
 
 ### Database Protection & Master Backup (Sao Lưu Tuyệt Đối Database Production)

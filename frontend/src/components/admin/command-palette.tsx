@@ -16,6 +16,7 @@ import {
   Sparkles,
   Command,
   X,
+  RefreshCw,
 } from "lucide-react";
 
 interface CommandPaletteProps {
@@ -60,6 +61,14 @@ export default function CommandPalette({ isOpen, onClose, onOpenTutorial }: Comm
       subtitle: "Quản lý đề thi 4 kỹ năng Nghe, Đọc, Viết, Nói chuẩn CEFR",
       icon: BookOpen,
       href: "/admin/exams",
+      category: "Trang điều hướng",
+    },
+    {
+      id: "data-sync",
+      title: "Trung tâm Đồng bộ & Đối soát Đề thi",
+      subtitle: "Chuẩn hóa Data Contract, Deep Upsert đa nguồn và chạy Unit Test 5 kỹ năng",
+      icon: RefreshCw,
+      href: "/admin/data-sync",
       category: "Trang điều hướng",
     },
     {

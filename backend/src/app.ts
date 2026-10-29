@@ -21,6 +21,7 @@ import courseRoutes from './modules/courses/course.routes';
 import settingsRoutes from './modules/settings/settings.routes';
 import ingestionRoutes from './modules/ingestion/ingestion.routes';
 import backupRoutes from './modules/backup/backup.routes';
+import dataSyncRoutes from './modules/data-sync/data-sync.routes';
 import { errorHandler } from './middlewares/error.handler';
 
 const app = express();
@@ -36,8 +37,8 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '30mb' }));
+app.use(express.urlencoded({ extended: true, limit: '30mb' }));
 
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
@@ -72,6 +73,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/ingest', ingestionRoutes);
 app.use('/api/admin/backups', backupRoutes);
+app.use('/api/admin/data-sync', dataSyncRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/notifications', notificationRoutes);
 

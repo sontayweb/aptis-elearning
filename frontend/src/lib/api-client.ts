@@ -842,6 +842,30 @@ class ApiClient {
       getDownloadUrl: (filename: string) =>
         `${getApiBaseUrl()}/admin/backups/${encodeURIComponent(filename)}/download`,
     },
+
+    dataSync: {
+      getOverview: () => this.request<any>('/admin/data-sync/overview'),
+      runStandardize: () =>
+        this.request<any>('/admin/data-sync/standardize', {
+          method: 'POST',
+        }),
+      runAudit: (sampleLimit = 35) =>
+        this.request<any>('/admin/data-sync/audit', {
+          method: 'POST',
+          body: JSON.stringify({ sampleLimit }),
+        }),
+      syncBatch: (body: {
+        snapshotId?: 'aptisacademy' | 'aptiskytich';
+        exams?: any[];
+        defaultSource?: string;
+        dryRun?: boolean;
+        limit?: number;
+      }) =>
+        this.request<any>('/admin/data-sync/sync-batch', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        }),
+    },
   };
 
   // ==========================================
