@@ -202,6 +202,25 @@ export async function crawl({ prisma = null, saveDb = false } = {}) {
   // Chuẩn hóa 873 exam sets lẻ
   for (const set of examSets) {
     const setQuestions = questionsBySet.get(set.id) || [];
+    const q0 = setQuestions[0] || {};
+    const extraData = q0.extra_data || {};
+    const rawImg1 = extraData.imageUrl1 || q0.image_url || null;
+    let rawImg2 = extraData.imageUrl2 || null;
+    const partLower = String(set.part || '').toLowerCase();
+    if ((partLower.includes('3') || partLower.includes('compare')) && rawImg1 && !rawImg2 && rawImg1.includes('_1.')) {
+      rawImg2 = rawImg1.replace('_1.', '_2.');
+    }
+    const resolvedImgs = [rawImg1, rawImg2]
+      .filter(Boolean)
+      .map(img => {
+        const s = String(img).trim();
+        if (!s) return null;
+        if (s.startsWith('http://') || s.startsWith('https://') || s.startsWith('/uploads/')) return s;
+        return `https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/${s}`;
+      })
+      .filter(Boolean);
+    const finalImageUrl = resolvedImgs.length > 0 ? resolvedImgs.join(', ') : null;
+
     normalizedExams.push(normalizeExam({
       source: 'APTIS_KYTICH',
       externalId: set.id,
@@ -214,8 +233,8 @@ export async function crawl({ prisma = null, saveDb = false } = {}) {
         part_number: 1,
         title: set.part || `Part 1`,
         instructions: set.description || null,
-        audio_url: setQuestions[0]?.audio_url || null,
-        image_url: setQuestions[0]?.image_url || null,
+        audio_url: q0.audio_url || null,
+        image_url: finalImageUrl,
         questions: setQuestions.map((q, qIdx) => ({
           question_number: q.order_index ?? (qIdx + 1),
           question_type: q.question_type || null,

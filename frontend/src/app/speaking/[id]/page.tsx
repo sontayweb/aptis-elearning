@@ -711,33 +711,9 @@ function cleanSpeakingImageUrl(url: string | undefined): string | undefined {
     return trimmed;
   }
 
-  // Part 3 đề thi (ví dụ: de07_1.png, de11_1.png, de15_1.png, de01_1.png)
-  const deMatch = trimmed.match(/^de0*(\d+)_(1|2)\.png$/i);
-  if (deMatch) {
-    const num = parseInt(deMatch[1], 10);
-    if (num === 1) return `/uploads/speaking/part3/image1.jpg`;
-    if (num === 4) return `/uploads/speaking/part3/image4.jpg`;
-    if (num >= 2 && num <= 15) return `/uploads/speaking/part3/image${num}.png`;
-    return `/uploads/speaking/part3/image${num}.png`;
-  }
-  const deSingleMatch = trimmed.match(/^de0*(\d+)\.png$/i);
-  if (deSingleMatch) {
-    const num = parseInt(deSingleMatch[1], 10);
-    if (num === 1) return `/uploads/speaking/part3/image1.jpg`;
-    if (num === 4) return `/uploads/speaking/part3/image4.jpg`;
-    if (num >= 2 && num <= 15) return `/uploads/speaking/part3/image${num}.png`;
-  }
-
-  // Tên file đơn giản cho Part 2 (ví dụ: 1.png, 7.png, 15.png, p2_10.jpg)
-  const numMatch = trimmed.match(/^(?:p2_)?0*(\d+)\.(?:png|jpg|jpeg)$/i);
-  if (numMatch) {
-    const n = Math.min(24, Math.max(1, parseInt(numMatch[1], 10)));
-    return `/uploads/speaking/part2/image${n}.png`;
-  }
-  const p3RawMatch = trimmed.match(/^p3_0*(\d+)_(1|2)\.(?:png|jpg|jpeg)$/i);
-  if (p3RawMatch) {
-    const side = p3RawMatch[2];
-    return side === "2" ? `/uploads/speaking/part3/image4.jpg` : `/uploads/speaking/part3/image1.jpg`;
+  // Ảnh gốc chuẩn từ kho Aptis Kỳ Tích (ví dụ: de01_1.png, de01_2.png, p2_60.jpg, p3_60_1.jpg, p3_60_2.jpg, 1.png..99.png)
+  if (/^(?:de\d+_[12]|p[234]_\d+(?:_[12]|_v2)?|\d+)\.(?:png|jpg|jpeg|webp)$/i.test(trimmed)) {
+    return `https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/${trimmed}`;
   }
   if (trimmed.startsWith("Tranh_tr_ng__i_m_part_2_")) {
     return `/uploads/exams/speaking/${trimmed}`;

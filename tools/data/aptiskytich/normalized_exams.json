@@ -8020,7 +8020,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/1.png",
         "questions": [
           {
             "question_number": 1,
@@ -8071,7 +8071,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de01_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de01_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de01_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -8122,7 +8122,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_01.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_01.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -8224,7 +8224,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "2.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/2.png",
         "questions": [
           {
             "question_number": 1,
@@ -8275,7 +8275,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de02_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de02_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de02_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -8326,7 +8326,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_02.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_02.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -8428,7 +8428,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "3.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/3.png",
         "questions": [
           {
             "question_number": 1,
@@ -8479,7 +8479,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de03_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de03_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de03_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -8530,7 +8530,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_03_v2.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_03_v2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -8632,7 +8632,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "4.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/4.png",
         "questions": [
           {
             "question_number": 1,
@@ -8683,7 +8683,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de04_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de04_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de04_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -8734,7 +8734,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_04.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_04.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -8836,7 +8836,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "5.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/5.png",
         "questions": [
           {
             "question_number": 1,
@@ -8887,7 +8887,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de05_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de05_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de05_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -8938,7 +8938,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_05.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_05.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -9040,7 +9040,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "6.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/6.png",
         "questions": [
           {
             "question_number": 1,
@@ -9091,7 +9091,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de06_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de06_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de06_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -9142,7 +9142,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_06_v2.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_06_v2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -9244,7 +9244,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "7.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/7.png",
         "questions": [
           {
             "question_number": 1,
@@ -9295,7 +9295,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de07_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de07_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de07_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -9346,7 +9346,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_07.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_07.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -9448,7 +9448,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "8.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/8.png",
         "questions": [
           {
             "question_number": 1,
@@ -9499,7 +9499,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de08_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de08_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de08_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -9550,7 +9550,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_08.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_08.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -9652,7 +9652,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "9.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/9.png",
         "questions": [
           {
             "question_number": 1,
@@ -9703,7 +9703,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de09_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de09_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de09_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -9754,7 +9754,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_09.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_09.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -9856,7 +9856,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "10.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/10.png",
         "questions": [
           {
             "question_number": 1,
@@ -9907,7 +9907,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de10_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de10_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de10_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -9958,7 +9958,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_10.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_10.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -10060,7 +10060,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "11.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/11.png",
         "questions": [
           {
             "question_number": 1,
@@ -10111,7 +10111,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de11_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de11_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de11_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -10162,7 +10162,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_11.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_11.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -10264,7 +10264,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "12.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/12.png",
         "questions": [
           {
             "question_number": 1,
@@ -10315,7 +10315,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de12_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de12_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de12_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -10366,7 +10366,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_12.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_12.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -10468,7 +10468,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "13.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/13.png",
         "questions": [
           {
             "question_number": 1,
@@ -10519,7 +10519,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de13_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de13_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de13_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -10570,7 +10570,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_13.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_13.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -10672,7 +10672,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "14.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/14.png",
         "questions": [
           {
             "question_number": 1,
@@ -10723,7 +10723,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de14_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de14_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de14_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -10774,7 +10774,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_14.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_14.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -10876,7 +10876,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "15.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/15.png",
         "questions": [
           {
             "question_number": 1,
@@ -10927,7 +10927,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de15_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de15_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de15_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -10978,7 +10978,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_15.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_15.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -11080,7 +11080,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "16.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/16.png",
         "questions": [
           {
             "question_number": 1,
@@ -11131,7 +11131,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de16_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de16_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de16_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -11182,7 +11182,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_16.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_16.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -11284,7 +11284,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "17.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/17.png",
         "questions": [
           {
             "question_number": 1,
@@ -11335,7 +11335,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de17_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de17_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de17_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -11386,7 +11386,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_17.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_17.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -11488,7 +11488,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "18.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/18.png",
         "questions": [
           {
             "question_number": 1,
@@ -11539,7 +11539,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de18_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de18_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de18_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -11590,7 +11590,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_18.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_18.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -25450,7 +25450,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "19.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/19.png",
         "questions": [
           {
             "question_number": 1,
@@ -25501,7 +25501,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "20.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/20.png",
         "questions": [
           {
             "question_number": 1,
@@ -25552,7 +25552,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "21.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/21.png",
         "questions": [
           {
             "question_number": 1,
@@ -25603,7 +25603,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "22.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/22.png",
         "questions": [
           {
             "question_number": 1,
@@ -25654,7 +25654,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "23.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/23.png",
         "questions": [
           {
             "question_number": 1,
@@ -25705,7 +25705,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "24.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/24.png",
         "questions": [
           {
             "question_number": 1,
@@ -25756,7 +25756,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "25.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/25.png",
         "questions": [
           {
             "question_number": 1,
@@ -25807,7 +25807,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "26.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/26.png",
         "questions": [
           {
             "question_number": 1,
@@ -25858,7 +25858,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "27.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/27.png",
         "questions": [
           {
             "question_number": 1,
@@ -25909,7 +25909,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "28.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/28.png",
         "questions": [
           {
             "question_number": 1,
@@ -25960,7 +25960,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "29.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/29.png",
         "questions": [
           {
             "question_number": 1,
@@ -26011,7 +26011,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "30.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/30.png",
         "questions": [
           {
             "question_number": 1,
@@ -26062,7 +26062,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "31.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/31.png",
         "questions": [
           {
             "question_number": 1,
@@ -26113,7 +26113,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "32.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/32.png",
         "questions": [
           {
             "question_number": 1,
@@ -26164,7 +26164,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "33.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/33.png",
         "questions": [
           {
             "question_number": 1,
@@ -26215,7 +26215,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "34.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/34.png",
         "questions": [
           {
             "question_number": 1,
@@ -26266,7 +26266,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "35.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/35.png",
         "questions": [
           {
             "question_number": 1,
@@ -26317,7 +26317,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "36.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/36.png",
         "questions": [
           {
             "question_number": 1,
@@ -26368,7 +26368,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "37.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/37.png",
         "questions": [
           {
             "question_number": 1,
@@ -26419,7 +26419,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de19_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de19_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de19_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -26470,7 +26470,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de20_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de20_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de20_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -26521,7 +26521,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de21_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de21_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de21_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -26572,7 +26572,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de22_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de22_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de22_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -26623,7 +26623,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de23_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de23_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de23_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -26674,7 +26674,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de24_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de24_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de24_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -26725,7 +26725,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de25_1.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de25_1.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de25_2.png",
         "questions": [
           {
             "question_number": 1,
@@ -39385,7 +39385,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "farm-work.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/farm-work.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/office-work.png",
         "questions": [
           {
             "question_number": 1,
@@ -39436,7 +39436,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "photos-diary.png",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/photos-diary.png, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/dairy-farm.png",
         "questions": [
           {
             "question_number": 1,
@@ -40025,7 +40025,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "39.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/39.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -40076,7 +40076,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "38.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/38.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42351,7 +42351,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_19.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_19.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42402,7 +42402,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_20.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_20.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42453,7 +42453,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_30.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_30.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42504,7 +42504,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_40.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_40.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42555,7 +42555,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_50.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_50.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42606,7 +42606,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_21.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_21.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42657,7 +42657,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_31.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_31.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42708,7 +42708,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_41.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_41.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42759,7 +42759,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_51.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_51.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42810,7 +42810,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_22.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_22.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42861,7 +42861,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_32.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_32.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42912,7 +42912,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_42.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_42.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -42963,7 +42963,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_52.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_52.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43014,7 +43014,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_23.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_23.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43065,7 +43065,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_33.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_33.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43116,7 +43116,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_43.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_43.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43167,7 +43167,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_53.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_53.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43218,7 +43218,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_24.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_24.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43269,7 +43269,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_34.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_34.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43320,7 +43320,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_44.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_44.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43371,7 +43371,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_25.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_25.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43422,7 +43422,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_45.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_45.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43473,7 +43473,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_35.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_35.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43524,7 +43524,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_26.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_26.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43575,7 +43575,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_46.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_46.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43626,7 +43626,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_27.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_27.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43677,7 +43677,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_47.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_47.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43728,7 +43728,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_28.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_28.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43779,7 +43779,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_48.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_48.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43830,7 +43830,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_29.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_29.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43881,7 +43881,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_49.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_49.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43932,7 +43932,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_36.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_36.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -43983,7 +43983,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_37.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_37.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44034,7 +44034,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_38.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_38.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44085,7 +44085,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_39.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_39.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44136,7 +44136,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_54.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_54.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44187,7 +44187,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_55.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_55.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44238,7 +44238,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_56.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_56.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44289,7 +44289,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_57.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_57.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44340,7 +44340,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_58.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_58.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44391,7 +44391,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_59.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_59.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44493,7 +44493,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_28a.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_28a.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_28b.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44544,7 +44544,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_60.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_60.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44781,7 +44781,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_40.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_40.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44832,7 +44832,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_41.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_41.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44883,7 +44883,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_42_v2.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_42_v2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44934,7 +44934,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_61.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_61.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -44985,7 +44985,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_29_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_29_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_29_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45036,7 +45036,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_30_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_30_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_30_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45087,7 +45087,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_31_v2_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_31_v2_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_31_v2_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45138,7 +45138,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_32_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_32_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_32_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45189,7 +45189,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_33_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_33_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_33_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45240,7 +45240,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_34_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_34_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_34_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45291,7 +45291,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_35_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_35_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_35_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45342,7 +45342,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_36_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_36_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_36_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45393,7 +45393,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_37_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_37_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_37_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45444,7 +45444,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "43.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/43.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45495,7 +45495,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "44.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/44.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45597,7 +45597,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "45.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/45.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45648,7 +45648,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "46.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/46.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45699,7 +45699,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de38_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de38_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de38_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45750,7 +45750,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de39_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de39_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de39_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45801,7 +45801,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de40_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de40_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de40_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45852,7 +45852,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_62.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_62.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45903,7 +45903,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "47.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/47.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -45954,7 +45954,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "48.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/48.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46005,7 +46005,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "49.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/49.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46056,7 +46056,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "50.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/50.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46107,7 +46107,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de41_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de41_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de41_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46380,7 +46380,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de42_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de42_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de42_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46431,7 +46431,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de43_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de43_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de43_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46482,7 +46482,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de45_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de45_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de45_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46533,7 +46533,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de44_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de44_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de44_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46584,7 +46584,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de46_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de46_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de46_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46635,7 +46635,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_51.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_51.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46686,7 +46686,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_52_v2.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_52_v2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46737,7 +46737,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_53.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_53.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46788,7 +46788,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_55.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_55.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46839,7 +46839,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_54.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_54.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46890,7 +46890,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_63.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_63.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -46941,7 +46941,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_64.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_64.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -47178,7 +47178,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de56_uv3.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de56_uv3.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -47229,7 +47229,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de57_uv3.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de57_uv3.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -47280,7 +47280,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de47_1_uv3.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de47_1_uv3.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de47_2_uv3.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -47331,7 +47331,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de48_1_uv3.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de48_1_uv3.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de48_2_uv3.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -47382,7 +47382,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de49_1_uv2.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de49_1_uv2.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de49_2_uv1.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -47661,7 +47661,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de50_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de50_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de50_2.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -47712,7 +47712,7 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "de58.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/de58.jpg",
         "questions": [
           {
             "question_number": 1,
@@ -48224,11 +48224,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_65.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_65.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about a time when you had an interesting conversation with someone.",
             "options": [],
             "correct_answer": "0",
@@ -48237,7 +48237,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How did you feel after the conversation?",
             "options": [],
             "correct_answer": "0",
@@ -48246,7 +48246,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What factors help create a good conversation?",
             "options": [],
             "correct_answer": "0",
@@ -48275,11 +48275,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_66.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_66.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about a time when you lacked motivation to do something.",
             "options": [],
             "correct_answer": "0",
@@ -48288,7 +48288,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How did you deal with that feeling in the end?",
             "options": [],
             "correct_answer": "0",
@@ -48297,7 +48297,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do people lose motivation, and what helps them get it back?",
             "options": [],
             "correct_answer": "0",
@@ -48326,11 +48326,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_67.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_67.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about a time when you had to compare two things before choosing one.",
             "options": [],
             "correct_answer": "0",
@@ -48339,7 +48339,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How did you make your final decision?",
             "options": [],
             "correct_answer": "0",
@@ -48348,7 +48348,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Do you think comparing options carefully always leads to better choices? Why?",
             "options": [],
             "correct_answer": "0",
@@ -48377,11 +48377,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_68.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_68.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about a time when you bought something expensive.",
             "options": [],
             "correct_answer": "0",
@@ -48390,7 +48390,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How did you feel after buying it?",
             "options": [],
             "correct_answer": "0",
@@ -48399,7 +48399,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do people sometimes spend a lot of money on one single thing?",
             "options": [],
             "correct_answer": "0",
@@ -48428,11 +48428,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_60.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_60.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -48441,7 +48441,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why is it important to celebrate small successes?",
             "options": [],
             "correct_answer": "0",
@@ -48450,7 +48450,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Do you prefer working in a team or working alone? Why?",
             "options": [],
             "correct_answer": "0",
@@ -48479,11 +48479,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_61.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_61.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -48492,7 +48492,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What makes a good teacher, in your opinion?",
             "options": [],
             "correct_answer": "0",
@@ -48501,7 +48501,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Do you think students learn better in small classes? Why?",
             "options": [],
             "correct_answer": "0",
@@ -48530,11 +48530,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_62.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_62.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -48543,7 +48543,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why are practical lessons important when learning science?",
             "options": [],
             "correct_answer": "0",
@@ -48552,7 +48552,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Do you think working in a group helps people learn faster? Why?",
             "options": [],
             "correct_answer": "0",
@@ -48581,11 +48581,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_63.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_63.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -48594,7 +48594,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What are the benefits of playing a musical instrument?",
             "options": [],
             "correct_answer": "0",
@@ -48603,7 +48603,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do families spend less time together nowadays?",
             "options": [],
             "correct_answer": "0",
@@ -48632,11 +48632,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_64.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_64.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -48645,7 +48645,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What are the benefits of playing sports with family members?",
             "options": [],
             "correct_answer": "0",
@@ -48654,7 +48654,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why is it important for older people to stay active?",
             "options": [],
             "correct_answer": "0",
@@ -48683,11 +48683,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_51_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_51_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_51_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -48696,7 +48696,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are the situations in the two pictures different?",
             "options": [],
             "correct_answer": "0",
@@ -48705,7 +48705,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What can people do to reduce stress?",
             "options": [],
             "correct_answer": "0",
@@ -48734,11 +48734,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_52_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_52_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_52_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -48747,7 +48747,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are these two ways of keeping memories different?",
             "options": [],
             "correct_answer": "0",
@@ -48756,7 +48756,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why is it important for families to keep memories together?",
             "options": [],
             "correct_answer": "0",
@@ -48785,11 +48785,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_53_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_53_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_53_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -48798,7 +48798,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are these two activities different?",
             "options": [],
             "correct_answer": "0",
@@ -48807,7 +48807,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why is gardening a good hobby for many people?",
             "options": [],
             "correct_answer": "0",
@@ -48836,11 +48836,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_54_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_54_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_54_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -48849,7 +48849,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are these two ways of relaxing different?",
             "options": [],
             "correct_answer": "0",
@@ -48858,7 +48858,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do many young people spend their free time on their phones?",
             "options": [],
             "correct_answer": "0",
@@ -48887,11 +48887,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_55_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_55_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_55_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -48900,7 +48900,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are these two ways of exercising different?",
             "options": [],
             "correct_answer": "0",
@@ -48909,7 +48909,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do some people find it hard to exercise regularly?",
             "options": [],
             "correct_answer": "0",
@@ -48938,11 +48938,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_56_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_56_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_56_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -48951,7 +48951,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are these two situations different?",
             "options": [],
             "correct_answer": "0",
@@ -48960,7 +48960,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do many people feel nervous when speaking in public?",
             "options": [],
             "correct_answer": "0",
@@ -48989,11 +48989,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_65.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_65.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -49002,7 +49002,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do many people enjoy camping with friends?",
             "options": [],
             "correct_answer": "0",
@@ -49011,7 +49011,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What are the benefits of spending time in nature?",
             "options": [],
             "correct_answer": "0",
@@ -49040,11 +49040,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_66.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_66.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -49053,7 +49053,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why should family members share housework?",
             "options": [],
             "correct_answer": "0",
@@ -49062,7 +49062,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Do you think technology makes housework easier? Why?",
             "options": [],
             "correct_answer": "0",
@@ -49091,11 +49091,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_57_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_57_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_57_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -49104,7 +49104,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are these two activities different?",
             "options": [],
             "correct_answer": "0",
@@ -49113,7 +49113,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do many people read fewer books than before?",
             "options": [],
             "correct_answer": "0",
@@ -49142,11 +49142,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_67.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_67.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -49155,7 +49155,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do many people enjoy traveling by boat?",
             "options": [],
             "correct_answer": "0",
@@ -49164,7 +49164,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What are the benefits of traveling alone?",
             "options": [],
             "correct_answer": "0",
@@ -49193,11 +49193,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_69.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_69.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about the first time you talked with a foreigner.",
             "options": [],
             "correct_answer": "0",
@@ -49206,7 +49206,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How did you feel during that conversation?",
             "options": [],
             "correct_answer": "0",
@@ -49215,7 +49215,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why is it useful to talk with people from other countries?",
             "options": [],
             "correct_answer": "0",
@@ -49244,11 +49244,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_70_v2.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_70_v2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about a time when you felt relaxed.",
             "options": [],
             "correct_answer": "0",
@@ -49257,7 +49257,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Do you think it's hard to feel relaxed?",
             "options": [],
             "correct_answer": "0",
@@ -49266,7 +49266,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why is it important to feel relaxed?",
             "options": [],
             "correct_answer": "0",
@@ -49295,11 +49295,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_59_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_59_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_59_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -49308,7 +49308,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are these two sports different?",
             "options": [],
             "correct_answer": "0",
@@ -49317,7 +49317,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why is sport important for people with disabilities?",
             "options": [],
             "correct_answer": "0",
@@ -49346,11 +49346,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_60_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_60_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_60_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -49359,7 +49359,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are these two situations different?",
             "options": [],
             "correct_answer": "0",
@@ -49368,7 +49368,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do many parents want their children to learn music?",
             "options": [],
             "correct_answer": "0",
@@ -49397,11 +49397,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_58_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_58_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_58_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -49410,7 +49410,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How are these two places different?",
             "options": [],
             "correct_answer": "0",
@@ -49419,7 +49419,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do some people prefer living in the countryside?",
             "options": [],
             "correct_answer": "0",
@@ -49448,11 +49448,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_68.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_68.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -49461,7 +49461,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "When was the last time you had a meal with your family?",
             "options": [],
             "correct_answer": "0",
@@ -49470,7 +49470,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why is it important to have family meals together?",
             "options": [],
             "correct_answer": "0",
@@ -49499,11 +49499,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_61_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_61_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_61_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -49512,7 +49512,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Do you prefer monkeys or dolphins?",
             "options": [],
             "correct_answer": "0",
@@ -49521,7 +49521,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What should we do to protect animals?",
             "options": [],
             "correct_answer": "0",
@@ -49677,11 +49677,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_69.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_69.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -49690,7 +49690,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Do you love spending time outside?",
             "options": [],
             "correct_answer": "0",
@@ -49699,7 +49699,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why should people spend time outside?",
             "options": [],
             "correct_answer": "0",
@@ -49837,11 +49837,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p4_71.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p4_71.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about a time when you helped someone.",
             "options": [],
             "correct_answer": "0",
@@ -49850,7 +49850,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "How did you feel about helping them?",
             "options": [],
             "correct_answer": "0",
@@ -49859,7 +49859,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why should we help other people?",
             "options": [],
             "correct_answer": "0",
@@ -50477,11 +50477,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_70.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_70.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -50490,7 +50490,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "When was the last time you travelled with your family or friends?",
             "options": [],
             "correct_answer": "0",
@@ -50499,7 +50499,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do many people prefer to travel with friends?",
             "options": [],
             "correct_answer": "0",
@@ -53868,7 +53868,7 @@
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about your first school.",
             "options": [],
             "correct_answer": "0",
@@ -53877,7 +53877,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about your family.",
             "options": [],
             "correct_answer": "0",
@@ -53886,7 +53886,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about your favourite singer.",
             "options": [],
             "correct_answer": "0",
@@ -53915,11 +53915,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p2_75.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p2_75.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the picture.",
             "options": [],
             "correct_answer": "0",
@@ -53928,7 +53928,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "When was the last time you went for a walk?",
             "options": [],
             "correct_answer": "0",
@@ -53937,7 +53937,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why should people spend time outside?",
             "options": [],
             "correct_answer": "0",
@@ -53966,11 +53966,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_64_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_64_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_64_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -53979,7 +53979,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Which place do you prefer to live in? Why?",
             "options": [],
             "correct_answer": "0",
@@ -53988,7 +53988,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Why do some people move to a new city?",
             "options": [],
             "correct_answer": "0",
@@ -54097,7 +54097,7 @@
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What sport do people like in your country?",
             "options": [],
             "correct_answer": "0",
@@ -54106,7 +54106,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What is the weather like today?",
             "options": [],
             "correct_answer": "0",
@@ -54115,7 +54115,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about one of your friends.",
             "options": [],
             "correct_answer": "0",
@@ -54330,11 +54330,11 @@
         "instructions": null,
         "passage_text": null,
         "audio_url": null,
-        "image_url": "p3_65_1.jpg",
+        "image_url": "https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_65_1.jpg, https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/p3_65_2.jpg",
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Describe the two pictures.",
             "options": [],
             "correct_answer": "0",
@@ -54343,7 +54343,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Which place is better for planting vegetables?",
             "options": [],
             "correct_answer": "0",
@@ -54352,7 +54352,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "What are the benefits of planting vegetables at home?",
             "options": [],
             "correct_answer": "0",
@@ -54611,7 +54611,7 @@
         "questions": [
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about your day.",
             "options": [],
             "correct_answer": "0",
@@ -54620,7 +54620,7 @@
           },
           {
             "question_number": 1,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about a member of your family.",
             "options": [],
             "correct_answer": "0",
@@ -54629,7 +54629,7 @@
           },
           {
             "question_number": 2,
-            "question_type": "MULTIPLE_CHOICE",
+            "question_type": "SPEAKING_AUDIO",
             "prompt": "Tell me about a famous place in your country.",
             "options": [],
             "correct_answer": "0",
