@@ -633,37 +633,53 @@ function ReadingExamRunner() {
 
   const hasHandledPartParam = useRef<string | null>(null);
 
-  // Adjust activeStage if URL contains ?part= (chỉ chạy 1 lần khi khởi tạo)
+  // Adjust activeStage if URL contains ?part= (chỉ chạy sau khi examData thực tế đã tải xong)
   useEffect(() => {
+    if (loading) return;
     if (stages.length === 0) return;
     if (stages.length === 1) {
       setActiveStage(0);
       return;
     }
-    if (!partParam) return;
+    if (!partParam) {
+      setActiveStage(0);
+      return;
+    }
     const p = partParam.toLowerCase();
-    if (hasHandledPartParam.current === p) return;
+    const handleKey = `${examId}_${p}`;
+    if (hasHandledPartParam.current === handleKey) return;
 
-    const targetKey =
-      p === "1" || p === "p1" || p === "part1"
-        ? "p1"
-        : p === "2" || p === "p2" || p === "part2"
-        ? "p2-1"
-        : p === "3" || p === "p3" || p === "part3"
-        ? (stages.some((s) => s.stageKey === "p2-2") ? "p2-2" : "p3")
-        : p === "4" || p === "p4" || p === "part4"
-        ? (stages.some((s) => s.stageKey === "p4") ? "p4" : "p3")
-        : p === "5" || p === "p5" || p === "part5"
-        ? "p4"
-        : null;
+    let targetKey: string | null = null;
+    if (p === "1" || p === "p1" || p === "part1") {
+      targetKey = "p1";
+    } else if (p === "2" || p === "p2" || p === "part2" || p === "2-1" || p === "p2-1") {
+      targetKey = "p2-1";
+    } else if (p === "2-2" || p === "p2-2") {
+      targetKey = "p2-2";
+    } else if (p === "3" || p === "p3" || p === "part3") {
+      targetKey = stages.some((s) => s.stageKey === "p3")
+        ? "p3"
+        : stages.some((s) => s.stageKey === "p2-2")
+        ? "p2-2"
+        : "p2-1";
+    } else if (p === "4" || p === "p4" || p === "part4") {
+      targetKey = stages.some((s) => s.stageKey === "p3") ? "p3" : "p4";
+    } else if (p === "5" || p === "p5" || p === "part5") {
+      targetKey = "p4";
+    }
+
     if (targetKey) {
       const idx = stages.findIndex((s) => s.stageKey === targetKey);
       if (idx !== -1) {
         setActiveStage(idx);
-        hasHandledPartParam.current = p;
+      } else {
+        setActiveStage(0);
       }
+    } else {
+      setActiveStage(0);
     }
-  }, [partParam, stages]);
+    hasHandledPartParam.current = handleKey;
+  }, [loading, partParam, stages, examId]);
 
   // Tự động cuộn pill phần thi đang chọn vào giữa thanh điều hướng
   useEffect(() => {
