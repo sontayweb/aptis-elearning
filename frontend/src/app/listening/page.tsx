@@ -210,8 +210,8 @@ export default function ListeningPracticePage() {
     } else if (activeTab === "p1") {
       return (
         e.totalParts === 1 &&
-        (e.title.includes("Listening Part 1") ||
-          e.partTitle?.includes("Part 1") ||
+        (e.partTitle?.includes("Part 1") ||
+          e.title.includes("Listening Part 1") ||
           e.partTitle?.includes("Information Recognition") ||
           e.partTitle?.includes("Word Recognition"))
       );
@@ -219,18 +219,21 @@ export default function ListeningPracticePage() {
       return (
         e.totalParts === 1 &&
         (e.partTitle?.includes("Part 2") ||
+          e.title.includes("Part 2") ||
           e.partTitle?.includes("Information Matching"))
       );
     } else if (activeTab === "p3") {
       return (
         e.totalParts === 1 &&
         (e.partTitle?.includes("Part 3") ||
-          e.partTitle?.includes("Opinion Matching"))
+          e.title.includes("Part 3") ||
+          (!e.partTitle?.includes("Part 2") && e.partTitle?.includes("Opinion Matching")))
       );
     } else if (activeTab === "p4") {
       return (
         e.totalParts === 1 &&
         (e.partTitle?.includes("Part 4") ||
+          e.title.includes("Part 4") ||
           e.partTitle?.includes("Monologue"))
       );
     }

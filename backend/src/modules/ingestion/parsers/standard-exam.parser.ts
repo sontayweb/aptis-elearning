@@ -9,9 +9,10 @@ export interface ValidatedQuestion {
   questionNumber: number;
   prompt: string;
   questionType: QuestionType;
-  options?: string[];
+  options?: any;
   correctAnswer?: string;
   explanation?: string;
+  maxScore?: number;
 }
 
 export interface ValidatedExamItem {
@@ -19,15 +20,49 @@ export interface ValidatedExamItem {
   title: string;
   skill: ExamSkill;
   partNumber: number;
+  partTitle?: string;
   topic: string;
   instructions?: string;
   passageText?: string;
+  audioUrl?: string;
   imageUrls: string[];
+  isPro?: boolean;
+  isPublished?: boolean;
+  hotLevel?: number;
   vocabulary: { en: string; vi: string }[];
   questions: ValidatedQuestion[];
   isValid: boolean;
   errors: string[];
   warnings: string[];
+}
+
+export function getCanonicalPartTitle(skill: ExamSkill | string, partNumber: number): string {
+  const sk = String(skill).toUpperCase();
+  if (sk === 'LISTENING') {
+    if (partNumber === 1) return 'Part 1 - Information Recognition';
+    if (partNumber === 2) return 'Part 2 - Opinion Matching';
+    if (partNumber === 3) return 'Part 3 - Opinion Matching';
+    return 'Part 4 - Monologue Comprehension';
+  }
+  if (sk === 'READING') {
+    if (partNumber === 1) return 'Part 1 - Gap Fill';
+    if (partNumber === 2) return 'Part 2 - Text Cohesion';
+    if (partNumber === 3) return 'Part 3 - Opinion Matching';
+    return 'Part 4 - Long Text Comprehension';
+  }
+  if (sk === 'WRITING') {
+    if (partNumber === 1) return 'Part 1 - Word-level Writing';
+    if (partNumber === 2) return 'Part 2 - Short Text Writing';
+    if (partNumber === 3) return 'Part 3 - Three Responses';
+    return 'Part 4 - Club Email Writing';
+  }
+  if (sk === 'SPEAKING') {
+    if (partNumber === 1) return 'Part 1 - Personal Information';
+    if (partNumber === 2) return 'Part 2 - Describe & Opinion';
+    if (partNumber === 3) return 'Part 3 - Compare & Explain';
+    return 'Part 4 - Abstract Discussion';
+  }
+  return `Part ${partNumber}`;
 }
 
 export interface StandardValidationResponse {
@@ -203,6 +238,7 @@ export class StandardExamParser {
       let topic = '';
       let passageText = '';
       const questions: ValidatedQuestion[] = [];
+      const sampleMap = new Map<number, string>();
 
       for (const line of block) {
         if (line.includes('[PHẦN THI]:')) {
@@ -218,6 +254,11 @@ export class StandardExamParser {
           topic = line.replace(/.*\[CHỦ ĐỀ\]:\s*/i, '').trim();
         } else if (line.includes('[NGỮ CẢNH]:') || line.includes('[THÔNG BÁO]:')) {
           passageText = line.replace(/.*\[(NGỮ CẢNH|THÔNG BÁO)\]:\s*/i, '').trim();
+        } else if (/\[(ĐÁP ÁN MẪU|BÀI MẪU|SAMPLE|GIẢI THÍCH)\s*(\d+)\]:/i.test(line)) {
+          const m = line.match(/\[(ĐÁP ÁN MẪU|BÀI MẪU|SAMPLE|GIẢI THÍCH)\s*(\d+)\]:\s*(.*)/i);
+          if (m) {
+            sampleMap.set(parseInt(m[2], 10), m[3].trim());
+          }
         } else if (/\[CÂU HỎI \d+\]:/i.test(line)) {
           const qText = line.replace(/.*\[CÂU HỎI \d+\]:\s*/i, '').trim();
           questions.push({
@@ -227,6 +268,12 @@ export class StandardExamParser {
               ? (partNumber === 1 ? QuestionType.SHORT_TEXT : QuestionType.ESSAY)
               : QuestionType.SPEAKING_AUDIO,
           });
+        }
+      }
+
+      for (const q of questions) {
+        if (sampleMap.has(q.questionNumber) && !q.explanation) {
+          q.explanation = sampleMap.get(q.questionNumber);
         }
       }
 
@@ -241,9 +288,15 @@ export class StandardExamParser {
         warnings.push('Không tìm thấy bảng [TỪ VỰNG] 2 cột cho đề này.');
       }
 
-      // Gán hình ảnh
+      // Gán hình ảnh (Part 1 & 4 không bắt buộc ảnh; Part 2 cần 1 ảnh; Part 3 cần 2 ảnh)
       const imageUrls: string[] = [];
-      const requiredImages = isWriting ? 0 : (partNumber === 3 ? 2 : 1);
+      const requiredImages = isWriting
+        ? 0
+        : partNumber === 3
+        ? 2
+        : partNumber === 2
+        ? 1
+        : 0;
 
       for (let imgK = 0; imgK < requiredImages; imgK++) {
         if (mediaFileIndex < mediaFiles.length) {
@@ -274,6 +327,7 @@ export class StandardExamParser {
       }
 
       const isValid = errors.length === 0;
+      const skillEnum = isWriting ? ExamSkill.WRITING : ExamSkill.SPEAKING;
 
       const instructions = isWriting
         ? (partNumber === 1
@@ -283,19 +337,27 @@ export class StandardExamParser {
             : partNumber === 3
             ? 'You are in the club chat room. Write responses to 3 club members (30–40 words each).'
             : 'You received an urgent notice from the club. Write an email to a friend (50 words) and an email to the club president (120–150 words).')
-        : (partNumber === 2
+        : (partNumber === 1
+            ? 'In this part, you are going to answer three personal questions (30 seconds for each response).'
+            : partNumber === 2
             ? 'In this part, you will see a picture. Answer 3 questions (45 seconds each).'
-            : 'Compare the two pictures and answer 3 questions (45 seconds each).');
+            : partNumber === 3
+            ? 'Compare the two pictures and answer 3 questions (45 seconds each).'
+            : 'Answer three abstract questions together in a 2-minute long turn (1 minute preparation).');
 
       validatedExams.push({
         idTemp: `temp_docx_${i + 1}_${Date.now()}`,
-        title: `${isWriting ? 'Writing' : 'Speaking'} Part ${partNumber}: ${topic}`,
-        skill: isWriting ? ExamSkill.WRITING : ExamSkill.SPEAKING,
+        title: `${isWriting ? 'Writing' : 'Speaking'} Part ${partNumber} — ${topic}`,
+        skill: skillEnum,
         partNumber,
+        partTitle: getCanonicalPartTitle(skillEnum, partNumber),
         topic,
         instructions,
-        passageText: passageText || (vocab.length > 0 ? JSON.stringify({ vocabulary: vocab }) : undefined),
+        passageText: passageText || undefined,
         imageUrls,
+        isPublished: true,
+        isPro: false,
+        hotLevel: 0,
         vocabulary: vocab,
         questions,
         isValid,
@@ -318,7 +380,7 @@ export class StandardExamParser {
   }
 
   /**
-   * Phân tích và kiểm định file Excel (.xlsx) chuẩn hóa (Reading / Listening)
+   * Phân tích và kiểm định file Excel (.xlsx) chuẩn hóa (Reading / Listening / Speaking / Writing)
    */
   public parseAndValidateExcel(fileBuffer: Buffer, fileName: string): StandardValidationResponse {
     const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
@@ -348,13 +410,24 @@ export class StandardExamParser {
     const validatedExams: ValidatedExamItem[] = [];
     let examIdx = 1;
 
-    for (const [groupKey, rowList] of groupMap.entries()) {
+    for (const [, rowList] of groupMap.entries()) {
       const firstRow = rowList[0];
-      const skillRaw = (firstRow['Skill'] || 'READING').toString().toUpperCase();
-      const skill = skillRaw === 'LISTENING' ? ExamSkill.LISTENING : ExamSkill.READING;
-      const partNumber = parseInt(firstRow['Part'] || '1', 10);
-      const topic = (firstRow['Topic'] || `Bài thi ${examIdx}`).toString().trim();
-      const passageText = firstRow['Passage_Text'] || firstRow['Passage'] || '';
+      const skillRaw = (firstRow['Skill'] || firstRow['skill'] || 'READING').toString().toUpperCase().trim();
+      const skill: ExamSkill =
+        skillRaw === 'LISTENING'
+          ? ExamSkill.LISTENING
+          : skillRaw === 'WRITING'
+          ? ExamSkill.WRITING
+          : skillRaw === 'SPEAKING'
+          ? ExamSkill.SPEAKING
+          : ExamSkill.READING;
+      const partNumber = parseInt(firstRow['Part'] || firstRow['part'] || '1', 10);
+      const topic = (firstRow['Topic'] || firstRow['topic'] || `Bài thi ${examIdx}`).toString().trim();
+      const passageText = (firstRow['Passage_Text'] || firstRow['Passage'] || '').toString().trim();
+      const audioUrl = (firstRow['Audio_URL'] || firstRow['Audio'] || '').toString().trim();
+      const imageRaw = (firstRow['Image_URL'] || firstRow['Images'] || '').toString().trim();
+      const imageUrls = imageRaw ? imageRaw.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+      const instructions = (firstRow['Instructions'] || '').toString().trim();
 
       const errors: string[] = [];
       const warnings: string[] = [];
@@ -363,50 +436,83 @@ export class StandardExamParser {
       for (let qIdx = 0; qIdx < rowList.length; qIdx++) {
         const r = rowList[qIdx];
         const prompt = (r['Prompt'] || r['Question'] || '').toString().trim();
-        const optA = r['Option_A'] ? r['Option_A'].toString().trim() : '';
-        const optB = r['Option_B'] ? r['Option_B'].toString().trim() : '';
-        const optC = r['Option_C'] ? r['Option_C'].toString().trim() : '';
-        const optD = r['Option_D'] ? r['Option_D'].toString().trim() : '';
-        const correct = (r['Correct_Answer'] || r['Answer'] || '').toString().trim();
-        const explanation = (r['Explanation'] || '').toString().trim();
+        const rawType = (r['Question_Type'] || r['Type'] || '').toString().toUpperCase().trim();
+
+        let qType: QuestionType = QuestionType.MULTIPLE_CHOICE;
+        if (rawType && rawType in QuestionType) {
+          qType = rawType as QuestionType;
+        } else if (skill === ExamSkill.SPEAKING) {
+          qType = QuestionType.SPEAKING_AUDIO;
+        } else if (skill === ExamSkill.WRITING) {
+          qType = partNumber === 1 ? QuestionType.SHORT_TEXT : QuestionType.ESSAY;
+        } else if (skill === ExamSkill.READING) {
+          if (partNumber === 1) qType = QuestionType.GAP_FILL;
+          else if (partNumber === 2) qType = QuestionType.SENTENCE_ORDER;
+          else qType = QuestionType.MATCHING;
+        } else if (skill === ExamSkill.LISTENING) {
+          qType = partNumber === 2 || partNumber === 3 ? QuestionType.MATCHING : QuestionType.MULTIPLE_CHOICE;
+        }
+
+        const optsRaw: string[] = [];
+        for (const col of ['Option_A', 'Option_B', 'Option_C', 'Option_D', 'Option_E', 'Option_F', 'Option_G', 'Option_H', 'Sentence_1', 'Sentence_2', 'Sentence_3', 'Sentence_4', 'Sentence_5', 'Sentence_6']) {
+          if (r[col] !== undefined && r[col] !== null && String(r[col]).trim().length > 0) {
+            optsRaw.push(String(r[col]).trim());
+          }
+        }
+
+        let correct = (r['Correct_Answer'] || r['Answer'] || '').toString().trim();
+        const explanation = (r['Explanation'] || r['Sample_Answer'] || '').toString().trim();
 
         if (!prompt) {
           errors.push(`Hàng ${qIdx + 2}: Thiếu nội dung câu hỏi (Prompt).`);
         }
 
-        const options = [optA, optB, optC, optD].filter((o) => o.length > 0);
-        if (options.length < 2) {
-          errors.push(`Hàng ${qIdx + 2}: Câu hỏi cần ít nhất 2 đáp án lựa chọn (Option A, B...).`);
-        }
-
-        if (!correct) {
-          errors.push(`Hàng ${qIdx + 2}: Thiếu đáp án đúng (Correct_Answer).`);
+        if (qType === QuestionType.SENTENCE_ORDER) {
+          if (optsRaw.length < 4) {
+            errors.push(`Hàng ${qIdx + 2}: Sắp xếp câu (Reading Part 2) cần ít nhất 4–5 câu theo thứ tự đúng trong các cột Option_A..Option_E (hoặc Sentence_1..Sentence_5).`);
+          }
+          if (!correct && optsRaw.length > 0) {
+            correct = JSON.stringify(optsRaw);
+          }
+        } else if (qType === QuestionType.MULTIPLE_CHOICE || qType === QuestionType.GAP_FILL || qType === QuestionType.MATCHING) {
+          if (optsRaw.length < 2) {
+            errors.push(`Hàng ${qIdx + 2}: Câu hỏi cần ít nhất 2 đáp án lựa chọn (Option_A, Option_B...).`);
+          }
+          if (!correct) {
+            errors.push(`Hàng ${qIdx + 2}: Thiếu đáp án đúng (Correct_Answer).`);
+          }
         }
 
         questions.push({
           questionNumber: qIdx + 1,
           prompt,
-          questionType: QuestionType.MULTIPLE_CHOICE,
-          options,
-          correctAnswer: correct,
+          questionType: qType,
+          options: optsRaw.length > 0 ? optsRaw : undefined,
+          correctAnswer: correct || (qType === QuestionType.SPEAKING_AUDIO || qType === QuestionType.ESSAY || qType === QuestionType.SHORT_TEXT ? '0' : ''),
           explanation,
         });
       }
 
-      if (skill === ExamSkill.READING && partNumber >= 2 && !passageText) {
-        warnings.push(`Reading Part ${partNumber} nên có đoạn văn bài đọc (Passage_Text).`);
+      if (skill === ExamSkill.READING && partNumber === 3 && !passageText) {
+        warnings.push('Reading Part 3 (Opinion Matching) nên có đoạn văn 4 người A, B, C, D trong cột Passage_Text.');
       }
 
       const isValid = errors.length === 0;
 
       validatedExams.push({
         idTemp: `temp_excel_${examIdx}_${Date.now()}`,
-        title: `${skill === ExamSkill.READING ? 'Reading' : 'Listening'} Part ${partNumber}: ${topic}`,
+        title: `${skill === ExamSkill.READING ? 'Reading' : skill === ExamSkill.LISTENING ? 'Listening' : skill === ExamSkill.WRITING ? 'Writing' : 'Speaking'} Part ${partNumber} — ${topic}`,
         skill,
         partNumber,
+        partTitle: getCanonicalPartTitle(skill, partNumber),
         topic,
+        instructions: instructions || undefined,
         passageText: passageText || undefined,
-        imageUrls: [],
+        audioUrl: audioUrl || undefined,
+        imageUrls,
+        isPublished: true,
+        isPro: false,
+        hotLevel: 0,
         vocabulary: [],
         questions,
         isValid,
@@ -431,7 +537,7 @@ export class StandardExamParser {
   }
 
   /**
-   * Lưu các đề đã được duyệt vào cơ sở dữ liệu hệ thống
+   * Lưu các đề đã được duyệt vào cơ sở dữ liệu hệ thống theo chuẩn kiến trúc Exam -> ExamPart -> Question
    */
   public async saveExamsToDatabase(exams: ValidatedExamItem[], creatorId?: string) {
     const validExams = exams.filter((e) => e.isValid);
@@ -442,33 +548,60 @@ export class StandardExamParser {
     const createdIds: string[] = [];
 
     for (const item of validExams) {
+      const canonicalPartTitle = item.partTitle || getCanonicalPartTitle(item.skill, item.partNumber);
+      const defaultDuration =
+        item.skill === ExamSkill.SPEAKING
+          ? 12
+          : item.skill === ExamSkill.WRITING
+          ? 50
+          : item.skill === ExamSkill.LISTENING
+          ? 40
+          : 35;
+
       const createdExam = await prisma.exam.create({
         data: {
           title: item.title,
-          description: `Đề thi nhập tự động theo chuẩn Doanh nghiệp. Chủ đề: ${item.topic}`,
+          description: `Chủ đề: ${item.topic} (${canonicalPartTitle})`,
           skill: item.skill,
-          duration_minutes: item.skill === ExamSkill.SPEAKING ? 12 : (item.skill === ExamSkill.WRITING ? 50 : 35),
-          is_published: true,
-          hot_level: 5,
-          forecast_tag: '★★★★★ Hay ra',
-          source: 'WEB_IMPORT',
+          duration_minutes: defaultDuration,
+          is_published: item.isPublished ?? true,
+          is_pro: item.isPro ?? false,
+          hot_level: item.hotLevel ?? 0,
+          forecast_tag: (item.hotLevel ?? 0) >= 4 ? '★★★★★ Hay ra' : null,
+          source: 'WEB',
           creator_id: creatorId || null,
           parts: {
             create: {
-              part_number: item.partNumber,
-              title: item.title,
-              instructions: item.instructions || `Thực hiện bài thi Part ${item.partNumber}`,
+              part_number: 1,
+              title: canonicalPartTitle,
+              instructions: item.instructions || `Complete ${canonicalPartTitle}.`,
               passage_text: item.passageText || null,
-              image_url: item.imageUrls.length > 0 ? item.imageUrls.join(',') : null,
+              audio_url: item.audioUrl || null,
+              image_url: item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls.join(', ') : null,
               questions: {
-                create: item.questions.map((q) => ({
-                  question_number: q.questionNumber,
+                create: item.questions.map((q, idx) => ({
+                  question_number: idx + 1,
                   question_type: q.questionType,
                   prompt: q.prompt,
-                  options: q.options && q.options.length > 0 ? q.options : undefined,
-                  correct_answer: q.correctAnswer || null,
+                  options:
+                    q.options !== undefined && q.options !== null
+                      ? Array.isArray(q.options)
+                        ? q.options.length > 0
+                          ? q.options
+                          : undefined
+                        : q.options
+                      : undefined,
+                  correct_answer: q.correctAnswer || (item.skill === ExamSkill.SPEAKING || item.skill === ExamSkill.WRITING ? '0' : null),
                   explanation: q.explanation || null,
-                  max_score: item.skill === ExamSkill.SPEAKING ? 5.0 : (item.skill === ExamSkill.WRITING ? (item.partNumber === 4 ? 10.0 : 5.0) : 1.0),
+                  max_score:
+                    q.maxScore ??
+                    (item.skill === ExamSkill.SPEAKING
+                      ? 5.0
+                      : item.skill === ExamSkill.WRITING
+                      ? item.partNumber === 4
+                        ? 10.0
+                        : 5.0
+                      : 1.0),
                 })),
               },
             },

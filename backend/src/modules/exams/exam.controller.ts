@@ -20,6 +20,18 @@ export class ExamController {
     }
   }
 
+  async marathon(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const skill = typeof req.query.skill === 'string' ? req.query.skill : undefined;
+      const items = await examService.getMarathonBank(skill);
+      sendSuccess(res, items, 'Lấy ngân hàng đề Marathon thành công', 200, {
+        total: items.length,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async detail(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const examId = req.params.id;

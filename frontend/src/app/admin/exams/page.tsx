@@ -519,15 +519,12 @@ export default function AdminExamsPage() {
   // Actions on Question
   const handleOpenEditQuestion = (q: QuestionItem) => {
     setEditingQuestion(q);
-    let initialOptions: string[] = [];
-    if (Array.isArray(q.options)) {
-      initialOptions = q.options.map((o) => String(o));
-    } else if (typeof q.options === "string") {
+    let initialOptions: any = q.options;
+    if (typeof q.options === "string") {
       try {
-        const parsed = JSON.parse(q.options);
-        if (Array.isArray(parsed)) initialOptions = parsed.map((o) => String(o));
+        initialOptions = JSON.parse(q.options);
       } catch {
-        // ignore
+        initialOptions = [];
       }
     }
 
@@ -542,25 +539,42 @@ export default function AdminExamsPage() {
     });
   };
 
-  const handleSaveQuestion = async () => {
+  const handleSaveQuestion = async (polyData?: any) => {
     if (!editingQuestion) return;
     setSavingQuestion(true);
     try {
+      const payloadPrompt = polyData ? polyData.prompt : questionEditForm.prompt;
+      const payloadNumber = polyData?.question_number
+        ? Number(polyData.question_number)
+        : Number(questionEditForm.questionNumber);
+      const payloadType = polyData
+        ? polyData.question_type
+        : questionEditForm.questionType;
+      const payloadMaxScore = polyData
+        ? Number(polyData.max_score)
+        : Number(questionEditForm.maxScore);
+      const payloadOptions = polyData
+        ? polyData.options
+        : questionEditForm.options;
+      const payloadCorrect = polyData
+        ? polyData.correct_answer
+        : questionEditForm.correctAnswer;
+      const payloadExplanation = polyData
+        ? polyData.explanation
+        : questionEditForm.explanation;
+
       const res = await api.admin.updateQuestion(editingQuestion.id, {
-        prompt: questionEditForm.prompt,
-        questionNumber: Number(questionEditForm.questionNumber),
-        questionType: questionEditForm.questionType,
-        maxScore: Number(questionEditForm.maxScore),
-        options:
-          questionEditForm.options.length > 0
-            ? questionEditForm.options
-            : undefined,
-        correctAnswer: questionEditForm.correctAnswer || undefined,
-        explanation: questionEditForm.explanation || undefined,
+        prompt: payloadPrompt,
+        questionNumber: payloadNumber,
+        questionType: payloadType,
+        maxScore: payloadMaxScore,
+        options: payloadOptions ?? undefined,
+        correctAnswer: payloadCorrect || undefined,
+        explanation: payloadExplanation || undefined,
       });
 
       if (res.success) {
-        showToast(`Đã cập nhật câu hỏi #${questionEditForm.questionNumber} thành công!`);
+        showToast(`Đã cập nhật câu hỏi #${payloadNumber} thành công!`);
         setEditingQuestion(null);
         fetchQuestions();
       } else {
@@ -838,6 +852,7 @@ export default function AdminExamsPage() {
         onSave={handleSaveQuestion}
         onClose={() => setEditingQuestion(null)}
         loading={savingQuestion}
+        onPartUpdated={fetchQuestions}
       />
 
       <ExamPreviewModal

@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { ExamPartImageGallery } from "@/components/exam-part-image-gallery";
-import { QuestionItem } from "./exam.types";
+import { QuestionItem, detectAptisTaskMeta } from "./exam.types";
 
 interface QuestionBankViewProps {
   questions: QuestionItem[];
@@ -111,7 +111,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
     }
   };
 
-  // Helper parse danh sách options
+  // Helper parse danh sách options (hỗ trợ cả mảng chuỗi và object SENTENCE_ORDER)
   const parseOptions = (options: any): string[] => {
     if (Array.isArray(options)) {
       return options.map((o) => String(o));
@@ -120,6 +120,12 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
         const parsed = JSON.parse(options);
         if (Array.isArray(parsed)) return parsed.map((o) => String(o));
       } catch {}
+    } else if (options && typeof options === "object" && !Array.isArray(options)) {
+      const fixed = options.fixedSentence ? [String(options.fixedSentence)] : [];
+      const rest = Array.isArray(options.sentences)
+        ? options.sentences.map((s: any) => String(s?.text || s || ""))
+        : [];
+      return [...fixed, ...rest];
     }
     return [];
   };
@@ -174,10 +180,11 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
               { value: "ALL", label: "Tất cả dạng" },
               { value: "SPEAKING_AUDIO", label: "🎙️ Speaking Audio" },
               { value: "MULTIPLE_CHOICE", label: "🔘 Trắc nghiệm" },
-              { value: "GAP_FILL", label: "✏️ Điền từ" },
+              { value: "GAP_FILL", label: "✏️ Điền từ [gap]" },
+              { value: "SENTENCE_ORDER", label: "🔢 Sắp xếp câu (Reading P2)" },
               { value: "MATCHING", label: "🔗 Nối thông tin" },
-              { value: "ESSAY", label: "📝 Viết luận" },
-              { value: "SHORT_TEXT", label: "📄 Đoạn ngắn" },
+              { value: "ESSAY", label: "📝 Viết luận / Email" },
+              { value: "SHORT_TEXT", label: "📄 Trả lời ngắn" },
             ].map((chip) => {
               const isSelected = questionTypeFilter === chip.value;
               return (
@@ -317,6 +324,13 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                 {questions.map((q) => {
                   const isExpanded = expandedIds.has(q.id);
                   const optionsList = parseOptions(q.options);
+                  const taskMeta = detectAptisTaskMeta(
+                    q.part.exam?.skill,
+                    q.part.partNumber,
+                    q.part.title,
+                    q.questionType
+                  );
+                  const isSentenceOrder = q.questionType === "SENTENCE_ORDER";
 
                   return (
                     <React.Fragment key={q.id}>
@@ -352,8 +366,11 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
 
                         {/* Kỹ năng & Part */}
                         <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-heading font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 whitespace-nowrap">
-                            {q.part.exam?.skill || "EXAM"} · P{q.part.partNumber}
+                          <span
+                            className="px-2 py-0.5 rounded-full text-[10px] font-heading font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 whitespace-nowrap"
+                            title={taskMeta.taskLabel}
+                          >
+                            {q.part.exam?.skill || "EXAM"} · P{taskMeta.logicalPart}
                           </span>
                         </td>
 
@@ -371,6 +388,9 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                               {q.prompt}
                             </span>
                             <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-[9.5px] text-slate-500 font-medium">
+                                {q.part.title}
+                              </span>
                               {q.part.passageText && (
                                 <span className="inline-flex items-center gap-1 text-[9.5px] font-heading text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
                                   <FileText className="w-2.5 h-2.5 text-slate-400" />
@@ -385,7 +405,9 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                               )}
                               {optionsList.length > 0 && (
                                 <span className="text-[9.5px] text-slate-400 font-mono">
-                                  {optionsList.length} lựa chọn
+                                  {isSentenceOrder
+                                    ? `${optionsList.length} câu sắp xếp`
+                                    : `${optionsList.length} lựa chọn`}
                                 </span>
                               )}
                             </div>
@@ -394,7 +416,11 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
 
                         {/* Đáp án chuẩn */}
                         <td className="py-3 px-3">
-                          {q.correctAnswer ? (
+                          {isSentenceOrder && optionsList.length > 0 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-mono font-bold text-[10px]">
+                              🔢 {optionsList.length} câu thứ tự chuẩn
+                            </span>
+                          ) : q.correctAnswer && q.correctAnswer !== "0" ? (
                             <span
                               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-mono font-bold text-[10.5px] max-w-[130px] truncate"
                               title={q.correctAnswer}
@@ -404,7 +430,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                             </span>
                           ) : (
                             <span className="text-slate-400 text-[10px] italic">
-                              Chưa gán
+                              {q.explanation ? "Có bài mẫu" : "Tự luận / Nói"}
                             </span>
                           )}
                         </td>
@@ -541,6 +567,13 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
           {questions.map((q) => {
             const isExpanded = expandedIds.has(q.id);
             const optionsList = parseOptions(q.options);
+            const taskMeta = detectAptisTaskMeta(
+              q.part.exam?.skill,
+              q.part.partNumber,
+              q.part.title,
+              q.questionType
+            );
+            const isSentenceOrder = q.questionType === "SENTENCE_ORDER";
 
             return (
               <div
@@ -562,7 +595,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                     </span>
 
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-heading font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                      {q.part.exam?.skill || "EXAM"} · Part {q.part.partNumber}
+                      {taskMeta.taskLabel}
                     </span>
 
                     <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold">

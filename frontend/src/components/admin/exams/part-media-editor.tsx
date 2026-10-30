@@ -30,20 +30,44 @@ export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
   imageUrl,
   onChange,
 }) => {
-  // Kiểm tra nếu là Speaking Part 3 (so sánh 2 tranh) hoặc chuỗi ảnh có dấu phẩy
-  const isSpeakingPart3 =
-    skill === "SPEAKING" && (partNumber === 3 || partTitle.toLowerCase().includes("part 3") || partTitle.toLowerCase().includes("compare"));
-  const hasMultipleImages = (imageUrl || "").includes(",");
+  // Helper parse danh sách URL ảnh (hỗ trợ cả JSON array '["url1","url2"]' và chuỗi phân tách dấu phẩy)
+  const parseImageUrls = (raw: string | null | undefined): string[] => {
+    if (!raw) return [];
+    const trimmed = raw.trim();
+    if (!trimmed) return [];
+    if (trimmed.startsWith("[")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) {
+          return parsed.map((u) => String(u).trim()).filter(Boolean);
+        }
+      } catch {}
+    }
+    return trimmed
+      .split(",")
+      .map((s) => s.replace(/^[\["']+|[\]"']+$/g, "").trim())
+      .filter(Boolean);
+  };
 
-  const [isDualImageMode, setIsDualImageMode] = useState(isSpeakingPart3 || hasMultipleImages);
+  // Kiểm tra nếu là Speaking Part 3 (so sánh 2 tranh) hoặc có từ 2 ảnh trở lên
+  const parsedInitialImages = parseImageUrls(imageUrl);
+  const isSpeakingPart3 =
+    skill === "SPEAKING" &&
+    (partNumber === 3 ||
+      (partTitle || "").toLowerCase().includes("part 3") ||
+      (partTitle || "").toLowerCase().includes("compare"));
+  const hasMultipleImages = parsedInitialImages.length > 1;
+
+  const [isDualImageMode, setIsDualImageMode] = useState(
+    isSpeakingPart3 || hasMultipleImages
+  );
 
   // Tách 2 ảnh nếu có
-  const images = (imageUrl || "").split(",").map((s) => s.trim()).filter(Boolean);
-  const [img1, setImg1] = useState(images[0] || "");
-  const [img2, setImg2] = useState(images[1] || "");
+  const [img1, setImg1] = useState(parsedInitialImages[0] || "");
+  const [img2, setImg2] = useState(parsedInitialImages[1] || "");
 
   useEffect(() => {
-    const parts = (imageUrl || "").split(",").map((s) => s.trim()).filter(Boolean);
+    const parts = parseImageUrls(imageUrl);
     setImg1(parts[0] || "");
     setImg2(parts[1] || "");
     if (isSpeakingPart3 || parts.length > 1) {
@@ -51,29 +75,33 @@ export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
     }
   }, [imageUrl, isSpeakingPart3]);
 
+  const formatDualOutput = (u1: string, u2: string) => {
+    const list = [u1.trim(), u2.trim()].filter(Boolean);
+    if (list.length === 0) return "";
+    if (list.length === 1) return list[0];
+    return JSON.stringify(list);
+  };
+
   const handleImg1Change = (url: string) => {
     setImg1(url);
     if (isDualImageMode) {
-      const combined = [url, img2].filter(Boolean).join(", ");
-      onChange({ imageUrl: combined });
+      onChange({ imageUrl: formatDualOutput(url, img2) });
     } else {
-      onChange({ imageUrl: url });
+      onChange({ imageUrl: url.trim() });
     }
   };
 
   const handleImg2Change = (url: string) => {
     setImg2(url);
-    const combined = [img1, url].filter(Boolean).join(", ");
-    onChange({ imageUrl: combined });
+    onChange({ imageUrl: formatDualOutput(img1, url) });
   };
 
   const toggleDualMode = (enable: boolean) => {
     setIsDualImageMode(enable);
     if (enable) {
-      const combined = [img1, img2].filter(Boolean).join(", ");
-      onChange({ imageUrl: combined });
+      onChange({ imageUrl: formatDualOutput(img1, img2) });
     } else {
-      onChange({ imageUrl: img1 });
+      onChange({ imageUrl: img1.trim() });
     }
   };
 

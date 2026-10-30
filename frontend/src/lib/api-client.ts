@@ -172,6 +172,9 @@ class ApiClient {
 
     getQuestions: (id: string) => this.request(`/exams/${id}/questions`),
 
+    getMarathon: (skill: string) =>
+      this.request(`/exams/marathon?skill=${encodeURIComponent(skill)}`),
+
     customBuilder: (body: { title: string; skill_types: string[]; duration_minutes: number }) =>
       this.request('/exams/custom-builder', {
         method: 'POST',

@@ -234,6 +234,109 @@ export class ExamService {
     };
   }
 
+  async getMarathonBank(skill?: string) {
+    const where: any = {
+      is_published: true,
+    };
+    if (skill && skill.trim()) {
+      where.skill = skill.trim().toUpperCase();
+    }
+
+    const exams = await prisma.exam.findMany({
+      where,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        skill: true,
+        duration_minutes: true,
+        is_pro: true,
+        hot_level: true,
+        forecast_tag: true,
+        parts: {
+          orderBy: { part_number: 'asc' },
+          select: {
+            id: true,
+            part_number: true,
+            title: true,
+            instructions: true,
+            passage_text: true,
+            audio_url: true,
+            image_url: true,
+            questions: {
+              orderBy: { question_number: 'asc' },
+              select: {
+                id: true,
+                question_number: true,
+                question_type: true,
+                prompt: true,
+                options: true,
+                correct_answer: true,
+                explanation: true,
+                max_score: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const extractNum = (str: string): number => {
+      const m = str.match(/(?:Đề|Test|Exam|Câu|Bài|Tranh|Topic)\s*0*(\d+)/i) || str.match(/(\d+)/);
+      return m ? parseInt(m[1], 10) : 999999;
+    };
+
+    const sortedExams = [...exams].sort((a, b) => {
+      const numA = extractNum(a.title);
+      const numB = extractNum(b.title);
+      if (numA !== numB) return numA - numB;
+      return a.title.localeCompare(b.title, 'vi');
+    });
+
+    // Flatten into part-level marathon items (prioritizing single-part practice exams so there is no duplication with Full Tests, except for GRAMMAR_VOCABULARY)
+    const hasSinglePartExams = sortedExams.some((e) => e.parts.length === 1);
+    const targetExams =
+      hasSinglePartExams && skill?.toUpperCase() !== 'GRAMMAR_VOCABULARY'
+        ? sortedExams.filter((e) => e.parts.length === 1)
+        : sortedExams;
+
+    const items = targetExams.flatMap((exam) =>
+      exam.parts.map((part) => {
+        const m = (part.title || '').match(/Part\s*([1-4])/i);
+        const logicalPart = m ? parseInt(m[1], 10) : part.part_number || 1;
+        return {
+          examId: exam.id,
+          partId: part.id,
+          title: exam.title,
+          description: exam.description,
+          skill: exam.skill,
+          isPro: exam.is_pro,
+          hotLevel: exam.hot_level ?? 0,
+          forecastTag: exam.forecast_tag ?? null,
+          logicalPart,
+          partNumber: part.part_number,
+          partTitle: part.title,
+          instructions: part.instructions,
+          passageText: part.passage_text,
+          audioUrl: part.audio_url,
+          imageUrl: part.image_url,
+          questions: part.questions.map((q) => ({
+            id: q.id,
+            questionNumber: q.question_number,
+            questionType: q.question_type,
+            prompt: q.prompt,
+            options: q.options,
+            correctAnswer: q.correct_answer,
+            explanation: q.explanation,
+            maxScore: q.max_score,
+          })),
+        };
+      })
+    );
+
+    return items;
+  }
+
   private async resolveExam(idOrCode: string) {
     const trimmed = idOrCode.trim();
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed);

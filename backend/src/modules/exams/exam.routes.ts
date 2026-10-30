@@ -6,6 +6,7 @@ const router = Router();
 
 // Public routes (có thể kèm Bearer token để nhận diện userStatus & bestScore)
 router.get('/', optionalAuthGuard, (req, res, next) => examController.list(req, res, next));
+router.get('/marathon', optionalAuthGuard, (req, res, next) => examController.marathon(req, res, next));
 router.get('/:id', optionalAuthGuard, (req, res, next) => examController.detail(req, res, next));
 router.get('/:id/questions', optionalAuthGuard, (req, res, next) => examController.questions(req, res, next));
 
