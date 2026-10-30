@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { api } from "@/lib/api-client";
 import { WRITING_CLUBS_BANK, WritingClubItem } from "@/data/writing-clubs-bank";
 import {
   PenTool,
@@ -29,9 +30,41 @@ import {
   HelpCircle,
   Copy,
   Check,
+  ExternalLink,
+  RefreshCw,
+  Flame,
 } from "lucide-react";
 
-// Additional Part 1 Short Answers Bank
+interface MarathonQuestion {
+  id: string;
+  questionNumber: number;
+  questionType: string;
+  prompt: string;
+  options: any;
+  correctAnswer: string | null;
+  explanation: string | null;
+  maxScore: number;
+}
+
+interface MarathonPartItem {
+  examId: string;
+  partId: string;
+  title: string;
+  description?: string | null;
+  skill: string;
+  isPro: boolean;
+  hotLevel: number;
+  logicalPart: number;
+  partNumber: number;
+  partTitle: string;
+  instructions?: string | null;
+  passageText?: string | null;
+  audioUrl?: string | null;
+  imageUrl?: string | null;
+  questions: MarathonQuestion[];
+}
+
+// Fallback Part 1 Short Answers Bank
 const WRITING_PART1_BANK = [
   {
     id: 1,
@@ -91,6 +124,29 @@ function WritingMarathonContent() {
   const [showSamples, setShowSamples] = useState<Record<string, boolean>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Full DB items
+  const [dbItems, setDbItems] = useState<MarathonPartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load Writing Marathon exams from DB
+  const loadWritingMarathon = async () => {
+    try {
+      setLoading(true);
+      const res = await api.exams.getMarathon("WRITING");
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setDbItems(res.data);
+      }
+    } catch (err) {
+      console.warn("Could not load Writing Marathon from database, fallback to built-in banks:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadWritingMarathon();
+  }, []);
+
   // Helper count words
   const countWords = (text?: string): number => {
     if (!text) return 0;
@@ -103,8 +159,87 @@ function WritingMarathonContent() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Filter Clubs for Part 2, 3, 4
-  const filteredClubs = useMemo(() => {
+  // Group DB items by part
+  const dbPart1Items = useMemo(
+    () => dbItems.filter((i) => i.logicalPart === 1),
+    [dbItems]
+  );
+  const dbPart2Items = useMemo(
+    () => dbItems.filter((i) => i.logicalPart === 2),
+    [dbItems]
+  );
+  const dbPart3Items = useMemo(
+    () => dbItems.filter((i) => i.logicalPart === 3),
+    [dbItems]
+  );
+  const dbPart4Items = useMemo(
+    () => dbItems.filter((i) => i.logicalPart === 4),
+    [dbItems]
+  );
+
+  // Filtered DB items by search
+  const filteredDbP1 = useMemo(() => {
+    if (!searchTerm) return dbPart1Items;
+    const term = searchTerm.toLowerCase();
+    return dbPart1Items.filter(
+      (item) =>
+        item.title.toLowerCase().includes(term) ||
+        (item.description && item.description.toLowerCase().includes(term)) ||
+        item.questions.some(
+          (q) =>
+            q.prompt.toLowerCase().includes(term) ||
+            (q.explanation && q.explanation.toLowerCase().includes(term))
+        )
+    );
+  }, [dbPart1Items, searchTerm]);
+
+  const filteredDbP2 = useMemo(() => {
+    if (!searchTerm) return dbPart2Items;
+    const term = searchTerm.toLowerCase();
+    return dbPart2Items.filter(
+      (item) =>
+        item.title.toLowerCase().includes(term) ||
+        (item.passageText && item.passageText.toLowerCase().includes(term)) ||
+        item.questions.some(
+          (q) =>
+            q.prompt.toLowerCase().includes(term) ||
+            (q.explanation && q.explanation.toLowerCase().includes(term))
+        )
+    );
+  }, [dbPart2Items, searchTerm]);
+
+  const filteredDbP3 = useMemo(() => {
+    if (!searchTerm) return dbPart3Items;
+    const term = searchTerm.toLowerCase();
+    return dbPart3Items.filter(
+      (item) =>
+        item.title.toLowerCase().includes(term) ||
+        (item.passageText && item.passageText.toLowerCase().includes(term)) ||
+        item.questions.some(
+          (q) =>
+            q.prompt.toLowerCase().includes(term) ||
+            (q.explanation && q.explanation.toLowerCase().includes(term))
+        )
+    );
+  }, [dbPart3Items, searchTerm]);
+
+  const filteredDbP4 = useMemo(() => {
+    if (!searchTerm) return dbPart4Items;
+    const term = searchTerm.toLowerCase();
+    return dbPart4Items.filter(
+      (item) =>
+        item.title.toLowerCase().includes(term) ||
+        (item.passageText && item.passageText.toLowerCase().includes(term)) ||
+        item.questions.some(
+          (q) =>
+            q.prompt.toLowerCase().includes(term) ||
+            (q.explanation && q.explanation.toLowerCase().includes(term))
+        )
+    );
+  }, [dbPart4Items, searchTerm]);
+
+  // Fallback items if DB is empty
+  const filteredStaticClubs = useMemo(() => {
     return WRITING_CLUBS_BANK.filter((club) => {
       if (!searchTerm) return true;
       const term = searchTerm.toLowerCase();
@@ -118,8 +253,7 @@ function WritingMarathonContent() {
     });
   }, [searchTerm]);
 
-  // Filter Part 1
-  const filteredP1 = useMemo(() => {
+  const filteredStaticP1 = useMemo(() => {
     return WRITING_PART1_BANK.filter((unit) => {
       if (!searchTerm) return true;
       const term = searchTerm.toLowerCase();
@@ -151,7 +285,7 @@ function WritingMarathonContent() {
                     ∞ Marathon Writing
                   </span>
                   <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
-                    Ngân Hàng Đề Thi Thật CEFR B1–C
+                    Ngân Hàng Toàn Bộ Đề Thi Thật CEFR B1–C
                   </span>
                 </div>
                 <h1 className="text-xl md:text-2xl font-heading font-extrabold text-foreground mt-0.5">
@@ -160,16 +294,27 @@ function WritingMarathonContent() {
               </div>
             </div>
 
-            {/* Quick search */}
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm chủ đề, câu hỏi..."
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
-              />
+            {/* Quick search & refresh */}
+            <div className="flex items-center gap-2">
+              <div className="relative w-full sm:w-72">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Tìm chủ đề, câu hỏi, đề bài..."
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={loadWritingMarathon}
+                className="p-2 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                title="Tải lại từ CSDL"
+              >
+                <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              </button>
             </div>
           </div>
 
@@ -194,7 +339,7 @@ function WritingMarathonContent() {
                 Short Answers
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                20+ câu hỏi tin nhắn ngắn
+                {dbPart1Items.length > 0 ? `${dbPart1Items.length} bộ đề thi thật` : "20+ câu hỏi tin nhắn"}
               </p>
             </button>
 
@@ -217,7 +362,7 @@ function WritingMarathonContent() {
                 Form Filling
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                15+ chủ đề đơn câu lạc bộ
+                {dbPart2Items.length > 0 ? `${dbPart2Items.length} bộ đề CLB` : "15+ chủ đề đơn CLB"}
               </p>
             </button>
 
@@ -240,7 +385,7 @@ function WritingMarathonContent() {
                 Social Interaction
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                Chat diễn đàn 3 thành viên
+                {dbPart3Items.length > 0 ? `${dbPart3Items.length} bộ đề chat 3 TV` : "Chat diễn đàn 3 TV"}
               </p>
             </button>
 
@@ -263,7 +408,7 @@ function WritingMarathonContent() {
                 Formal &amp; Informal
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                Thư bạn (~50) &amp; Quản lý (~150)
+                {dbPart4Items.length > 0 ? `${dbPart4Items.length} bộ đề email` : "Thư bạn (~50) & Quản lý (~150)"}
               </p>
             </button>
           </div>
@@ -279,92 +424,207 @@ function WritingMarathonContent() {
                     Quy tắc ăn trọn điểm Part 1 (Short Answers)
                   </h3>
                   <p className="text-muted-foreground mt-0.5">
-                    Mỗi câu chỉ viết từ <strong>1 đến 5 từ</strong>. Trả lời trực diện, đúng ngữ pháp, không viết câu quá dài tránh bị trừ điểm format.
+                    Mỗi câu chỉ viết từ <strong>1 đến 5 từ</strong>. Trả lời trực diện, đúng chính tả, không viết câu quá dài tránh bị trừ điểm format.
                   </p>
                 </div>
-                <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0 self-start sm:self-center">
-                  Khuyến nghị: 3 phút / 5 câu
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0">
+                    {dbPart1Items.length > 0 ? `Toàn bộ ${dbPart1Items.length} đề thi` : "4 chủ đề mẫu"}
+                  </span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {filteredP1.map((unit) => (
-                  <div key={unit.id} className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
-                    <div className="flex items-center justify-between border-b border-border/60 pb-3">
-                      <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
-                        Chủ đề {unit.id}
-                      </span>
-                      <h4 className="font-heading font-bold text-sm text-foreground">
-                        {unit.topic}
-                      </h4>
-                    </div>
-
-                    <div className="space-y-4">
-                      {unit.questions.map((q, qIdx) => {
-                        const inputKey = `p1_${unit.id}_${qIdx}`;
-                        const userText = userAnswers[inputKey] || "";
-                        const words = countWords(userText);
-                        const isOver = words > 5;
-                        const sampleOpen = showSamples[inputKey];
-
-                        return (
-                          <div key={qIdx} className="p-3.5 rounded-xl bg-muted/30 border border-border/70 space-y-2">
-                            <div className="text-xs font-bold text-foreground flex items-start gap-1.5">
-                              <span className="text-primary font-black shrink-0">{qIdx + 1}.</span>
-                              <span>{q.q}</span>
-                            </div>
-
-                            <div className="space-y-1">
-                              <input
-                                type="text"
-                                value={userText}
-                                onChange={(e) =>
-                                  setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
-                                }
-                                placeholder="Gõ câu trả lời của bạn (1-5 từ)..."
-                                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
-                              />
-
-                              <div className="flex items-center justify-between text-[11px] pt-1">
-                                <span className={isOver ? "text-rose-500 font-bold" : words >= 1 ? "text-emerald-600 font-bold" : "text-muted-foreground"}>
-                                  Số từ: {words}/5 từ {isOver && "(Quá giới hạn 5 từ!)"}
-                                </span>
-
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setShowSamples((prev) => ({ ...prev, [inputKey]: !prev[inputKey] }))
-                                  }
-                                  className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
-                                >
-                                  <Sparkles className="w-3 h-3" />
-                                  <span>{sampleOpen ? "Ẩn câu mẫu" : "Xem câu mẫu B2/C1"}</span>
-                                </button>
-                              </div>
-                            </div>
-
-                            {sampleOpen && (
-                              <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 flex items-center justify-between gap-2 animate-fadeIn">
-                                <div>
-                                  <span className="font-bold">Gợi ý ăn điểm:</span> {q.sample}
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleCopy(inputKey, q.sample)}
-                                  className="text-emerald-700 hover:text-emerald-900 dark:text-emerald-300 p-1"
-                                  title="Sao chép"
-                                >
-                                  {copiedId === inputKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                                </button>
-                              </div>
+              {/* DB Items Rendering */}
+              {dbPart1Items.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {filteredDbP1.map((item, idx) => (
+                    <div key={item.partId || item.examId} className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4 flex flex-col justify-between">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                              Đề #{idx + 1}
+                            </span>
+                            {item.hotLevel >= 2 && (
+                              <span className="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-600 font-bold text-[10px] inline-flex items-center gap-1">
+                                <Flame className="w-3 h-3 fill-rose-500" />
+                                HOT
+                              </span>
                             )}
                           </div>
-                        );
-                      })}
+                          <h4 className="font-heading font-bold text-sm text-foreground truncate max-w-[220px]">
+                            {item.title}
+                          </h4>
+                        </div>
+
+                        <div className="space-y-3.5">
+                          {item.questions.map((q, qIdx) => {
+                            const inputKey = `p1_db_${item.examId}_${q.id}`;
+                            const userText = userAnswers[inputKey] || "";
+                            const words = countWords(userText);
+                            const isOver = words > 5;
+                            const sampleOpen = showSamples[inputKey];
+
+                            return (
+                              <div key={q.id || qIdx} className="p-3.5 rounded-xl bg-muted/30 border border-border/70 space-y-2">
+                                <div className="text-xs font-bold text-foreground flex items-start gap-1.5">
+                                  <span className="text-primary font-black shrink-0">{qIdx + 1}.</span>
+                                  <span>{q.prompt}</span>
+                                </div>
+
+                                <div className="space-y-1">
+                                  <input
+                                    type="text"
+                                    value={userText}
+                                    onChange={(e) =>
+                                      setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
+                                    }
+                                    placeholder="Gõ câu trả lời của bạn (1-5 từ)..."
+                                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                                  />
+
+                                  <div className="flex items-center justify-between text-[11px] pt-1">
+                                    <span
+                                      className={
+                                        isOver
+                                          ? "text-rose-500 font-bold"
+                                          : words >= 1
+                                          ? "text-emerald-600 font-bold"
+                                          : "text-muted-foreground"
+                                      }
+                                    >
+                                      Số từ: {words}/5 từ {isOver && "(Quá giới hạn 5 từ!)"}
+                                    </span>
+
+                                    {q.explanation && (
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setShowSamples((prev) => ({ ...prev, [inputKey]: !prev[inputKey] }))
+                                        }
+                                        className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
+                                      >
+                                        <Sparkles className="w-3 h-3" />
+                                        <span>{sampleOpen ? "Ẩn câu mẫu" : "Xem câu mẫu B2/C1"}</span>
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {sampleOpen && q.explanation && (
+                                  <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 flex items-center justify-between gap-2 animate-fadeIn">
+                                    <div>
+                                      <span className="font-bold">Gợi ý ăn điểm:</span> {q.explanation}
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopy(inputKey, q.explanation!)}
+                                      className="text-emerald-700 hover:text-emerald-900 dark:text-emerald-300 p-1"
+                                      title="Sao chép"
+                                    >
+                                      {copiedId === inputKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="pt-3 mt-4 border-t border-border/50 flex items-center justify-end">
+                        <Link
+                          href={`/writing/${item.examId}?part=p1`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary-glow shadow-xs transition-all"
+                        >
+                          <span>Làm bài trong phòng thi</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                /* Fallback Part 1 Static */
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {filteredStaticP1.map((unit) => (
+                    <div key={unit.id} className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+                      <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                        <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                          Chủ đề {unit.id}
+                        </span>
+                        <h4 className="font-heading font-bold text-sm text-foreground">
+                          {unit.topic}
+                        </h4>
+                      </div>
+
+                      <div className="space-y-4">
+                        {unit.questions.map((q, qIdx) => {
+                          const inputKey = `p1_st_${unit.id}_${qIdx}`;
+                          const userText = userAnswers[inputKey] || "";
+                          const words = countWords(userText);
+                          const isOver = words > 5;
+                          const sampleOpen = showSamples[inputKey];
+
+                          return (
+                            <div key={qIdx} className="p-3.5 rounded-xl bg-muted/30 border border-border/70 space-y-2">
+                              <div className="text-xs font-bold text-foreground flex items-start gap-1.5">
+                                <span className="text-primary font-black shrink-0">{qIdx + 1}.</span>
+                                <span>{q.q}</span>
+                              </div>
+
+                              <div className="space-y-1">
+                                <input
+                                  type="text"
+                                  value={userText}
+                                  onChange={(e) =>
+                                    setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
+                                  }
+                                  placeholder="Gõ câu trả lời của bạn (1-5 từ)..."
+                                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                                />
+
+                                <div className="flex items-center justify-between text-[11px] pt-1">
+                                  <span className={isOver ? "text-rose-500 font-bold" : words >= 1 ? "text-emerald-600 font-bold" : "text-muted-foreground"}>
+                                    Số từ: {words}/5 từ {isOver && "(Quá giới hạn 5 từ!)"}
+                                  </span>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setShowSamples((prev) => ({ ...prev, [inputKey]: !prev[inputKey] }))
+                                    }
+                                    className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <Sparkles className="w-3 h-3" />
+                                    <span>{sampleOpen ? "Ẩn câu mẫu" : "Xem câu mẫu B2/C1"}</span>
+                                  </button>
+                                </div>
+                              </div>
+
+                              {sampleOpen && (
+                                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 flex items-center justify-between gap-2 animate-fadeIn">
+                                  <div>
+                                    <span className="font-bold">Gợi ý ăn điểm:</span> {q.sample}
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopy(inputKey, q.sample)}
+                                    className="text-emerald-700 hover:text-emerald-900 dark:text-emerald-300 p-1"
+                                    title="Sao chép"
+                                  >
+                                    {copiedId === inputKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -382,102 +642,223 @@ function WritingMarathonContent() {
                     Viết đoạn văn ngắn nêu lý do, sở thích tham gia CLB. Độ dài lý tưởng là <strong>23–28 từ</strong>. Viết thành các câu văn hoàn chỉnh, dùng từ nối đơn giản (because, and, so, also).
                   </p>
                 </div>
-                <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0 self-start sm:self-center">
-                  Khuyến nghị: 7 phút / đề
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0">
+                    {dbPart2Items.length > 0 ? `Toàn bộ ${dbPart2Items.length} đề thi CLB` : "15+ chủ đề"}
+                  </span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {filteredClubs.map((club) => {
-                  const inputKey = `p2_club_${club.id}`;
-                  const userText = userAnswers[inputKey] || "";
-                  const words = countWords(userText);
-                  const isValid = words >= 20 && words <= 30;
-                  const sampleOpen = showSamples[inputKey];
+              {/* DB Items Part 2 */}
+              {dbPart2Items.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {filteredDbP2.map((item, idx) => {
+                    const q = item.questions[0];
+                    const inputKey = `p2_db_${item.examId}`;
+                    const userText = userAnswers[inputKey] || "";
+                    const words = countWords(userText);
+                    const isValid = words >= 20 && words <= 30;
+                    const sampleOpen = showSamples[inputKey];
+                    const sampleAnswer =
+                      q?.explanation ||
+                      `I have always had a strong passion for this club. Joining allows me to meet like-minded people, practice regularly, and gain valuable practical experiences.`;
 
-                  const sampleP2 = `I have always had a strong passion for ${club.clubNameEn.toLowerCase()}. Joining this club allows me to meet like-minded people, practice regularly, and gain valuable practical experiences.`;
+                    return (
+                      <div key={item.partId || item.examId} className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4 flex flex-col justify-between">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                                Đề #{idx + 1}
+                              </span>
+                              {item.hotLevel >= 2 && (
+                                <span className="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-600 font-bold text-[10px] inline-flex items-center gap-1">
+                                  <Flame className="w-3 h-3 fill-rose-500" />
+                                  HOT
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="font-heading font-bold text-sm text-foreground truncate max-w-[220px]">
+                              {item.title}
+                            </h4>
+                          </div>
 
-                  return (
-                    <div key={club.id} className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
-                      <div className="flex items-center justify-between border-b border-border/60 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
-                            CLB {club.id}
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                            {club.sticker}
-                          </span>
+                          <div className="p-3.5 rounded-xl bg-muted/30 border border-border/60 text-xs text-foreground space-y-1.5">
+                            <div className="font-black text-primary uppercase text-[10px]">Đề bài điền đơn:</div>
+                            <p className="font-medium leading-relaxed">
+                              {q?.prompt || item.instructions || "Please write 20-30 words explaining your interest in this club."}
+                            </p>
+                            {item.passageText && (
+                              <p className="text-[11px] text-muted-foreground italic border-t border-border/40 pt-1">
+                                {item.passageText}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <textarea
+                              rows={3}
+                              value={userText}
+                              onChange={(e) =>
+                                setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
+                              }
+                              placeholder="Viết đoạn văn ngắn 20-30 từ tại đây..."
+                              className="w-full p-3 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
+                            />
+
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span
+                                className={
+                                  isValid
+                                    ? "text-emerald-600 font-bold"
+                                    : words > 30
+                                    ? "text-rose-500 font-bold"
+                                    : words > 0
+                                    ? "text-amber-600 font-bold"
+                                    : "text-muted-foreground"
+                                }
+                              >
+                                Số từ: {words}/30 từ {isValid && "✓ Chuẩn yêu cầu!"} {words > 30 && "(Vượt quá 30 từ!)"} {words > 0 && words < 20 && "(Chưa đủ 20 từ)"}
+                              </span>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setShowSamples((prev) => ({ ...prev, [inputKey]: !prev[inputKey] }))
+                                }
+                                className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
+                              >
+                                <Sparkles className="w-3 h-3" />
+                                <span>{sampleOpen ? "Ẩn bài mẫu" : "Xem bài mẫu B2"}</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {sampleOpen && (
+                            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
+                              <div className="flex items-center justify-between">
+                                <span className="font-bold">Bài mẫu chuẩn B2 ({countWords(sampleAnswer)} từ):</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(inputKey, sampleAnswer)}
+                                  className="text-emerald-700 hover:text-emerald-900 dark:text-emerald-300 p-1"
+                                  title="Sao chép"
+                                >
+                                  {copiedId === inputKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                </button>
+                              </div>
+                              <p className="italic leading-relaxed">{sampleAnswer}</p>
+                            </div>
+                          )}
                         </div>
-                        <h4 className="font-heading font-bold text-sm text-foreground truncate max-w-[200px]">
-                          {club.clubNameVi}
-                        </h4>
-                      </div>
 
-                      <div className="p-3.5 rounded-xl bg-muted/30 border border-border/60 text-xs text-foreground space-y-1">
-                        <div className="font-black text-primary uppercase text-[10px]">Đề bài điền đơn:</div>
-                        <p className="font-medium">{club.part2.formField}</p>
-                        <p className="text-[11px] text-muted-foreground">{club.part2.description}</p>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <textarea
-                          rows={3}
-                          value={userText}
-                          onChange={(e) =>
-                            setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
-                          }
-                          placeholder="Viết đoạn văn ngắn 20-30 từ tại đây..."
-                          className="w-full p-3 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
-                        />
-
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span
-                            className={
-                              isValid
-                                ? "text-emerald-600 font-bold"
-                                : words > 30
-                                ? "text-rose-500 font-bold"
-                                : words > 0
-                                ? "text-amber-600 font-bold"
-                                : "text-muted-foreground"
-                            }
+                        <div className="pt-3 mt-4 border-t border-border/50 flex items-center justify-end">
+                          <Link
+                            href={`/writing/${item.examId}?part=p2`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary-glow shadow-xs transition-all"
                           >
-                            Số từ: {words}/30 từ {isValid && "✓ Chuẩn yêu cầu!"} {words > 30 && "(Vượt quá 30 từ!)"} {words > 0 && words < 20 && "(Chưa đủ 20 từ)"}
-                          </span>
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setShowSamples((prev) => ({ ...prev, [inputKey]: !prev[inputKey] }))
-                            }
-                            className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
-                          >
-                            <Sparkles className="w-3 h-3" />
-                            <span>{sampleOpen ? "Ẩn bài mẫu" : "Xem bài mẫu B2"}</span>
-                          </button>
+                            <span>Làm bài trong phòng thi</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </Link>
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Fallback Static Part 2 */
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {filteredStaticClubs.map((club) => {
+                    const inputKey = `p2_club_${club.id}`;
+                    const userText = userAnswers[inputKey] || "";
+                    const words = countWords(userText);
+                    const isValid = words >= 20 && words <= 30;
+                    const sampleOpen = showSamples[inputKey];
 
-                      {sampleOpen && (
-                        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold">Bài mẫu chuẩn B2 ({countWords(sampleP2)} từ):</span>
+                    const sampleP2 = `I have always had a strong passion for ${club.clubNameEn.toLowerCase()}. Joining this club allows me to meet like-minded people, practice regularly, and gain valuable practical experiences.`;
+
+                    return (
+                      <div key={club.id} className="rounded-2xl border border-border bg-card p-5 shadow-xs space-y-4">
+                        <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                              CLB {club.id}
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                              {club.sticker}
+                            </span>
+                          </div>
+                          <h4 className="font-heading font-bold text-sm text-foreground truncate max-w-[200px]">
+                            {club.clubNameVi}
+                          </h4>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-muted/30 border border-border/60 text-xs text-foreground space-y-1">
+                          <div className="font-black text-primary uppercase text-[10px]">Đề bài điền đơn:</div>
+                          <p className="font-medium">{club.part2.formField}</p>
+                          <p className="text-[11px] text-muted-foreground">{club.part2.description}</p>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <textarea
+                            rows={3}
+                            value={userText}
+                            onChange={(e) =>
+                              setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
+                            }
+                            placeholder="Viết đoạn văn ngắn 20-30 từ tại đây..."
+                            className="w-full p-3 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
+                          />
+
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span
+                              className={
+                                isValid
+                                  ? "text-emerald-600 font-bold"
+                                  : words > 30
+                                  ? "text-rose-500 font-bold"
+                                  : words > 0
+                                  ? "text-amber-600 font-bold"
+                                  : "text-muted-foreground"
+                              }
+                            >
+                              Số từ: {words}/30 từ {isValid && "✓ Chuẩn yêu cầu!"} {words > 30 && "(Vượt quá 30 từ!)"} {words > 0 && words < 20 && "(Chưa đủ 20 từ)"}
+                            </span>
+
                             <button
                               type="button"
-                              onClick={() => handleCopy(inputKey, sampleP2)}
-                              className="text-emerald-700 hover:text-emerald-900 dark:text-emerald-300 p-1"
-                              title="Sao chép"
+                              onClick={() =>
+                                setShowSamples((prev) => ({ ...prev, [inputKey]: !prev[inputKey] }))
+                              }
+                              className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
                             >
-                              {copiedId === inputKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                              <Sparkles className="w-3 h-3" />
+                              <span>{sampleOpen ? "Ẩn bài mẫu" : "Xem bài mẫu B2"}</span>
                             </button>
                           </div>
-                          <p className="italic leading-relaxed">{sampleP2}</p>
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+
+                        {sampleOpen && (
+                          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold">Bài mẫu chuẩn B2 ({countWords(sampleP2)} từ):</span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(inputKey, sampleP2)}
+                                className="text-emerald-700 hover:text-emerald-900 dark:text-emerald-300 p-1"
+                                title="Sao chép"
+                              >
+                                {copiedId === inputKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                              </button>
+                            </div>
+                            <p className="italic leading-relaxed">{sampleP2}</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
@@ -492,118 +873,247 @@ function WritingMarathonContent() {
                     Quy tắc ăn trọn điểm Part 3 (Social Interaction - 30–40 từ/câu)
                   </h3>
                   <p className="text-muted-foreground mt-0.5">
-                    Hội thoại với 3 thành viên khác nhau. Trả lời đúng trọng tâm câu hỏi của từng người, dùng từ vựng phong phú, liên kết câu tự nhiên.
+                    Hội thoại với 3 thành viên khác nhau trong CLB. Trả lời đúng trọng tâm câu hỏi của từng người, dùng từ vựng phong phú, liên kết câu tự nhiên.
                   </p>
                 </div>
-                <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0 self-start sm:self-center">
-                  Khuyến nghị: 10 phút / 3 câu
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0">
+                    {dbPart3Items.length > 0 ? `Toàn bộ ${dbPart3Items.length} đề thi` : "15+ chủ đề"}
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-6">
-                {filteredClubs.map((club) => (
-                  <div key={club.id} className="rounded-2xl border border-border bg-card p-5 md:p-6 shadow-xs space-y-5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
-                      <div>
+              {/* DB Items Part 3 */}
+              {dbPart3Items.length > 0 ? (
+                <div className="space-y-6">
+                  {filteredDbP3.map((item, idx) => (
+                    <div key={item.partId || item.examId} className="rounded-2xl border border-border bg-card p-5 md:p-6 shadow-xs space-y-5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
                         <div className="flex items-center gap-2">
                           <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
-                            Chủ đề {club.id}
+                            Đề #{idx + 1}
                           </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                            {club.sticker}
-                          </span>
+                          {item.hotLevel >= 2 && (
+                            <span className="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-600 font-bold text-[10px] inline-flex items-center gap-1">
+                              <Flame className="w-3 h-3 fill-rose-500" />
+                              HOT
+                            </span>
+                          )}
+                          <h4 className="font-heading font-black text-base text-foreground">
+                            {item.title}
+                          </h4>
                         </div>
-                        <h4 className="font-heading font-black text-base text-foreground mt-1">
-                          {club.clubNameEn} ({club.clubNameVi})
-                        </h4>
+                        {item.passageText && (
+                          <span className="text-xs text-muted-foreground font-medium">
+                            Bối cảnh: {item.passageText}
+                          </span>
+                        )}
                       </div>
-                      <span className="text-xs text-muted-foreground">{club.part3.context}</span>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {club.part3.questions.map((item, qIdx) => {
-                        const inputKey = `p3_${club.id}_${qIdx}`;
-                        const userText = userAnswers[inputKey] || "";
-                        const words = countWords(userText);
-                        const isValid = words >= 30 && words <= 40;
-                        const sampleOpen = showSamples[inputKey];
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {item.questions.map((q, qIdx) => {
+                          const inputKey = `p3_db_${item.examId}_${q.id}`;
+                          const userText = userAnswers[inputKey] || "";
+                          const words = countWords(userText);
+                          const isValid = words >= 30 && words <= 40;
+                          const sampleOpen = showSamples[inputKey];
+                          const sampleAnswer =
+                            q.explanation ||
+                            `I completely agree with your thoughts. In my opinion, practicing consistently with experienced peers will enhance our skills significantly. That is why this club offers such a wonderful opportunity.`;
 
-                        const sampleAnswer = `Hi ${item.member}, I completely understand your perspective. In my experience, staying consistent and connecting with encouraging peers helps tremendously. That is why joining this vibrant club is an outstanding opportunity for all of us.`;
-
-                        return (
-                          <div key={qIdx} className="p-4 rounded-xl bg-muted/20 border border-border flex flex-col justify-between space-y-3">
-                            <div className="space-y-1.5">
-                              <div className="flex items-center gap-2">
-                                <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">
-                                  {item.member[0]}
-                                </span>
-                                <span className="font-bold text-xs text-foreground">{item.member}</span>
-                              </div>
-                              <p className="text-xs text-muted-foreground font-medium italic">
-                                "{item.question}"
-                              </p>
-                            </div>
-
-                            <div className="space-y-1.5">
-                              <textarea
-                                rows={4}
-                                value={userText}
-                                onChange={(e) =>
-                                  setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
-                                }
-                                placeholder={`Phản hồi cho ${item.member} (30-40 từ)...`}
-                                className="w-full p-2.5 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
-                              />
-
-                              <div className="flex items-center justify-between text-[11px]">
-                                <span
-                                  className={
-                                    isValid
-                                      ? "text-emerald-600 font-bold"
-                                      : words > 40
-                                      ? "text-rose-500 font-bold"
-                                      : words > 0
-                                      ? "text-amber-600 font-bold"
-                                      : "text-muted-foreground"
-                                  }
-                                >
-                                  {words}/40 từ {isValid && "✓ Đạt"} {words > 40 && "(Quá từ)"}
-                                </span>
-
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setShowSamples((prev) => ({ ...prev, [inputKey]: !prev[inputKey] }))
-                                  }
-                                  className="text-[11px] font-bold text-primary hover:underline"
-                                >
-                                  {sampleOpen ? "Ẩn mẫu" : "Xem mẫu B2"}
-                                </button>
-                              </div>
-
-                              {sampleOpen && (
-                                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
-                                  <div className="flex items-center justify-between">
-                                    <span className="font-bold">Mẫu ({countWords(sampleAnswer)} từ):</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleCopy(inputKey, sampleAnswer)}
-                                      className="text-emerald-700 p-0.5"
-                                    >
-                                      {copiedId === inputKey ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                                    </button>
-                                  </div>
-                                  <p className="italic leading-relaxed">{sampleAnswer}</p>
+                          return (
+                            <div key={q.id || qIdx} className="p-4 rounded-xl bg-muted/20 border border-border flex flex-col justify-between space-y-3">
+                              <div className="space-y-1.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">
+                                    {qIdx + 1}
+                                  </span>
+                                  <span className="font-bold text-xs text-foreground">
+                                    Thành viên {qIdx + 1}
+                                  </span>
                                 </div>
-                              )}
+                                <p className="text-xs text-muted-foreground font-medium italic">
+                                  "{q.prompt}"
+                                </p>
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <textarea
+                                  rows={4}
+                                  value={userText}
+                                  onChange={(e) =>
+                                    setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
+                                  }
+                                  placeholder={`Phản hồi thành viên ${qIdx + 1} (30-40 từ)...`}
+                                  className="w-full p-2.5 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
+                                />
+
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span
+                                    className={
+                                      isValid
+                                        ? "text-emerald-600 font-bold"
+                                        : words > 40
+                                        ? "text-rose-500 font-bold"
+                                        : words > 0
+                                        ? "text-amber-600 font-bold"
+                                        : "text-muted-foreground"
+                                    }
+                                  >
+                                    {words}/40 từ {isValid && "✓ Đạt"} {words > 40 && "(Quá từ)"}
+                                  </span>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setShowSamples((prev) => ({ ...prev, [inputKey]: !prev[inputKey] }))
+                                    }
+                                    className="text-[11px] font-bold text-primary hover:underline"
+                                  >
+                                    {sampleOpen ? "Ẩn mẫu" : "Xem mẫu B2"}
+                                  </button>
+                                </div>
+
+                                {sampleOpen && (
+                                  <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-bold">Mẫu ({countWords(sampleAnswer)} từ):</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopy(inputKey, sampleAnswer)}
+                                        className="text-emerald-700 p-0.5"
+                                      >
+                                        {copiedId === inputKey ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                                      </button>
+                                    </div>
+                                    <p className="italic leading-relaxed">{sampleAnswer}</p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
+
+                      <div className="pt-2 border-t border-border/50 flex items-center justify-end">
+                        <Link
+                          href={`/writing/${item.examId}?part=p3`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary-glow shadow-xs transition-all"
+                        >
+                          <span>Làm bài trong phòng thi</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                /* Fallback Static Part 3 */
+                <div className="space-y-6">
+                  {filteredStaticClubs.map((club) => (
+                    <div key={club.id} className="rounded-2xl border border-border bg-card p-5 md:p-6 shadow-xs space-y-5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                              Chủ đề {club.id}
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                              {club.sticker}
+                            </span>
+                          </div>
+                          <h4 className="font-heading font-black text-base text-foreground mt-1">
+                            {club.clubNameEn} ({club.clubNameVi})
+                          </h4>
+                        </div>
+                        <span className="text-xs text-muted-foreground">{club.part3.context}</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {club.part3.questions.map((item, qIdx) => {
+                          const inputKey = `p3_st_${club.id}_${qIdx}`;
+                          const userText = userAnswers[inputKey] || "";
+                          const words = countWords(userText);
+                          const isValid = words >= 30 && words <= 40;
+                          const sampleOpen = showSamples[inputKey];
+
+                          const sampleAnswer = `Hi ${item.member}, I completely understand your perspective. In my experience, staying consistent and connecting with encouraging peers helps tremendously. That is why joining this vibrant club is an outstanding opportunity for all of us.`;
+
+                          return (
+                            <div key={qIdx} className="p-4 rounded-xl bg-muted/20 border border-border flex flex-col justify-between space-y-3">
+                              <div className="space-y-1.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">
+                                    {item.member[0]}
+                                  </span>
+                                  <span className="font-bold text-xs text-foreground">{item.member}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground font-medium italic">
+                                  "{item.question}"
+                                </p>
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <textarea
+                                  rows={4}
+                                  value={userText}
+                                  onChange={(e) =>
+                                    setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
+                                  }
+                                  placeholder={`Phản hồi cho ${item.member} (30-40 từ)...`}
+                                  className="w-full p-2.5 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
+                                />
+
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span
+                                    className={
+                                      isValid
+                                        ? "text-emerald-600 font-bold"
+                                        : words > 40
+                                        ? "text-rose-500 font-bold"
+                                        : words > 0
+                                        ? "text-amber-600 font-bold"
+                                        : "text-muted-foreground"
+                                    }
+                                  >
+                                    {words}/40 từ {isValid && "✓ Đạt"} {words > 40 && "(Quá từ)"}
+                                  </span>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setShowSamples((prev) => ({ ...prev, [inputKey]: !prev[inputKey] }))
+                                    }
+                                    className="text-[11px] font-bold text-primary hover:underline"
+                                  >
+                                    {sampleOpen ? "Ẩn mẫu" : "Xem mẫu B2"}
+                                  </button>
+                                </div>
+
+                                {sampleOpen && (
+                                  <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-bold">Mẫu ({countWords(sampleAnswer)} từ):</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopy(inputKey, sampleAnswer)}
+                                        className="text-emerald-700 p-0.5"
+                                      >
+                                        {copiedId === inputKey ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                                      </button>
+                                    </div>
+                                    <p className="italic leading-relaxed">{sampleAnswer}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -618,189 +1128,369 @@ function WritingMarathonContent() {
                     Quy tắc ăn trọn điểm Part 4 (Formal &amp; Informal Email)
                   </h3>
                   <p className="text-muted-foreground mt-0.5">
-                    1 đề thông báo (Notice). Viết 2 bức thư: <strong>Thư gửi bạn bè (~50 từ, thân mật)</strong> và <strong>Thư gửi Quản lý CLB (120–150 từ, trang trọng)</strong>. Phân biệt rõ ràng từ vựng và cấu trúc Formal vs Informal.
+                    1 đề thông báo (Notice). Viết 2 bức thư: <strong>Thư gửi bạn bè (~50 từ, thân mật)</strong> và <strong>Thư gửi Quản lý CLB (120–150 từ, trang trọng)</strong>. Phân biệt rõ ràng ngữ khí và từ vựng Formal vs Informal.
                   </p>
                 </div>
-                <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0 self-start sm:self-center">
-                  Khuyến nghị: 20 phút / 2 thư
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0">
+                    {dbPart4Items.length > 0 ? `Toàn bộ ${dbPart4Items.length} đề thi Email` : "15+ chủ đề"}
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-8">
-                {filteredClubs.map((club) => {
-                  const friendKey = `p4_friend_${club.id}`;
-                  const managerKey = `p4_manager_${club.id}`;
+              {/* DB Items Part 4 */}
+              {dbPart4Items.length > 0 ? (
+                <div className="space-y-8">
+                  {filteredDbP4.map((item, idx) => {
+                    const q1 = item.questions[0]; // Informal
+                    const q2 = item.questions[1] || item.questions[0]; // Formal
 
-                  const friendText = userAnswers[friendKey] || "";
-                  const managerText = userAnswers[managerKey] || "";
+                    const friendKey = `p4_db_friend_${item.examId}`;
+                    const managerKey = `p4_db_manager_${item.examId}`;
 
-                  const friendWords = countWords(friendText);
-                  const managerWords = countWords(managerText);
+                    const friendText = userAnswers[friendKey] || "";
+                    const managerText = userAnswers[managerKey] || "";
 
-                  const isFriendValid = friendWords >= 45 && friendWords <= 60;
-                  const isManagerValid = managerWords >= 120 && managerWords <= 160;
+                    const friendWords = countWords(friendText);
+                    const managerWords = countWords(managerText);
 
-                  const sampleFriend = `Hi Alex, have you checked the latest notice from our club? I was quite disappointed to hear about the sudden changes. We should definitely meet up this weekend to discuss alternative options and see what we can do next. Let me know your thoughts!`;
+                    const isFriendValid = friendWords >= 45 && friendWords <= 60;
+                    const isManagerValid = managerWords >= 120 && managerWords <= 160;
 
-                  const sampleManager = `Dear Club Manager,
+                    const sampleFriend =
+                      q1?.explanation ||
+                      `Hi Alex, have you checked the latest notice from our club? I was quite surprised to hear about the sudden changes. We should definitely meet up this weekend to discuss alternative options and see what we can do next. Let me know your thoughts!`;
 
-I am writing to express my strong concern regarding the recent announcement about the upcoming schedule and fee adjustments. 
+                    const sampleManager =
+                      q2?.explanation ||
+                      `Dear Club Manager,\n\nI am writing to express my concern regarding the recent announcement about upcoming adjustments. As a dedicated member, I believe this sudden decision will cause significant inconvenience for many participants who rely heavily on regular sessions.\n\nI would like to respectfully suggest that the management board reconsider this policy. Perhaps hosting interactive discussion sessions or adjusting operational schedules could serve as a feasible alternative solution.\n\nThank you very much for your kind consideration. I look forward to hearing your response.\n\nYours sincerely,\nA Concerned Member`;
 
-As an active and dedicated member of the club, I believe this sudden decision will cause significant inconvenience for many participants who rely heavily on our regular sessions. A substantial increase in expenses or reduction in operating hours may unfortunately discourage prospective members from joining and place unnecessary financial burdens on existing ones.
-
-I would like to respectfully suggest that the management board reconsider this policy. Perhaps hosting fundraising events or adjusting weekday operational hours could serve as a more feasible alternative solution.
-
-Thank you very much for your time and kind consideration. I look forward to hearing your response.
-
-Yours sincerely,
-A Concerned Club Member`;
-
-                  return (
-                    <div key={club.id} className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
-                            Chủ đề {club.id}
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                            {club.sticker}
-                          </span>
-                          <h4 className="font-heading font-black text-base text-foreground">
-                            {club.clubNameEn}
-                          </h4>
-                        </div>
-                      </div>
-
-                      {/* Notice Box */}
-                      <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 text-xs space-y-1.5">
-                        <div className="flex items-center gap-2 font-black uppercase text-[11px] text-amber-800 dark:text-amber-300">
-                          <AlertCircle className="w-4 h-4 shrink-0" />
-                          <span>{club.part4.noticeTitle}</span>
-                        </div>
-                        <p className="leading-relaxed">{club.part4.noticeContent}</p>
-                      </div>
-
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* 1. Informal Email */}
-                        <div className="space-y-3 p-4 rounded-xl bg-muted/20 border border-border flex flex-col justify-between">
-                          <div className="space-y-1.5">
-                            <div className="flex items-center justify-between">
-                              <span className="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-700 dark:text-sky-300 font-bold text-[10px] uppercase">
-                                Nhiệm vụ 1: Email Thân Mật (~50 từ)
+                    return (
+                      <div key={item.partId || item.examId} className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                              Đề #{idx + 1}
+                            </span>
+                            {item.hotLevel >= 2 && (
+                              <span className="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-600 font-bold text-[10px] inline-flex items-center gap-1">
+                                <Flame className="w-3 h-3 fill-rose-500" />
+                                HOT
                               </span>
-                            </div>
-                            <p className="text-xs text-muted-foreground font-medium">
-                              {club.part4.friendEmailPrompt}
-                            </p>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <textarea
-                              rows={5}
-                              value={friendText}
-                              onChange={(e) =>
-                                setUserAnswers((prev) => ({ ...prev, [friendKey]: e.target.value }))
-                              }
-                              placeholder="Hi [Name], ..."
-                              className="w-full p-3 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
-                            />
-
-                            <div className="flex items-center justify-between text-[11px]">
-                              <span className={isFriendValid ? "text-emerald-600 font-bold" : "text-muted-foreground"}>
-                                Số từ: {friendWords}/50 từ {isFriendValid && "✓ Chuẩn"}
-                              </span>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setShowSamples((prev) => ({ ...prev, [friendKey]: !prev[friendKey] }))
-                                }
-                                className="text-[11px] font-bold text-primary hover:underline"
-                              >
-                                {showSamples[friendKey] ? "Ẩn mẫu" : "Xem mẫu Informal"}
-                              </button>
-                            </div>
-
-                            {showSamples[friendKey] && (
-                              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
-                                <div className="flex items-center justify-between font-bold">
-                                  <span>Bài mẫu Thân mật ({countWords(sampleFriend)} từ):</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleCopy(friendKey, sampleFriend)}
-                                    className="p-1"
-                                  >
-                                    {copiedId === friendKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                                  </button>
-                                </div>
-                                <p className="italic leading-relaxed">{sampleFriend}</p>
-                              </div>
                             )}
+                            <h4 className="font-heading font-black text-base text-foreground">
+                              {item.title}
+                            </h4>
                           </div>
+
+                          <Link
+                            href={`/writing/${item.examId}?part=p4`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary-glow shadow-xs transition-all self-start sm:self-center"
+                          >
+                            <span>Làm bài trong phòng thi</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </Link>
                         </div>
 
-                        {/* 2. Formal Email */}
-                        <div className="space-y-3 p-4 rounded-xl bg-muted/20 border border-border flex flex-col justify-between">
-                          <div className="space-y-1.5">
-                            <div className="flex items-center justify-between">
-                              <span className="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 font-bold text-[10px] uppercase">
-                                Nhiệm vụ 2: Email Trang Trọng (120–150 từ)
-                              </span>
+                        {/* Notice Box */}
+                        {item.passageText && (
+                          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 text-xs space-y-1.5">
+                            <div className="flex items-center gap-2 font-black uppercase text-[11px] text-amber-800 dark:text-amber-300">
+                              <AlertCircle className="w-4 h-4 shrink-0" />
+                              <span>THÔNG BÁO TỪ CÂU LẠC BỘ (CLUB NOTICE)</span>
                             </div>
-                            <p className="text-xs text-muted-foreground font-medium">
-                              {club.part4.managerEmailPrompt}
-                            </p>
+                            <p className="leading-relaxed whitespace-pre-line">{item.passageText}</p>
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          {/* 1. Informal Email */}
+                          <div className="space-y-3 p-4 rounded-xl bg-muted/20 border border-border flex flex-col justify-between">
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-700 dark:text-sky-300 font-bold text-[10px] uppercase">
+                                  Nhiệm vụ 1: Email Thân Mật (~50 từ)
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground font-medium">
+                                {q1?.prompt || "Viết email cho một người bạn trong câu lạc bộ, bày tỏ cảm nghĩ và đề xuất cách giải quyết (~50 từ)."}
+                              </p>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <textarea
+                                rows={5}
+                                value={friendText}
+                                onChange={(e) =>
+                                  setUserAnswers((prev) => ({ ...prev, [friendKey]: e.target.value }))
+                                }
+                                placeholder="Hi [Name], ..."
+                                className="w-full p-3 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
+                              />
+
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className={isFriendValid ? "text-emerald-600 font-bold" : "text-muted-foreground"}>
+                                  Số từ: {friendWords}/50 từ {isFriendValid && "✓ Chuẩn"}
+                                </span>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setShowSamples((prev) => ({ ...prev, [friendKey]: !prev[friendKey] }))
+                                  }
+                                  className="text-[11px] font-bold text-primary hover:underline"
+                                >
+                                  {showSamples[friendKey] ? "Ẩn mẫu" : "Xem mẫu Informal"}
+                                </button>
+                              </div>
+
+                              {showSamples[friendKey] && (
+                                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
+                                  <div className="flex items-center justify-between font-bold">
+                                    <span>Bài mẫu Thân mật ({countWords(sampleFriend)} từ):</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopy(friendKey, sampleFriend)}
+                                      className="p-1"
+                                    >
+                                      {copiedId === friendKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                    </button>
+                                  </div>
+                                  <p className="italic leading-relaxed whitespace-pre-line">{sampleFriend}</p>
+                                </div>
+                              )}
+                            </div>
                           </div>
 
-                          <div className="space-y-1.5">
-                            <textarea
-                              rows={8}
-                              value={managerText}
-                              onChange={(e) =>
-                                setUserAnswers((prev) => ({ ...prev, [managerKey]: e.target.value }))
-                              }
-                              placeholder="Dear Club Manager, ..."
-                              className="w-full p-3 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
-                            />
-
-                            <div className="flex items-center justify-between text-[11px]">
-                              <span className={isManagerValid ? "text-emerald-600 font-bold" : "text-muted-foreground"}>
-                                Số từ: {managerWords}/120–150 từ {isManagerValid && "✓ Chuẩn"}
-                              </span>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setShowSamples((prev) => ({ ...prev, [managerKey]: !prev[managerKey] }))
-                                }
-                                className="text-[11px] font-bold text-primary hover:underline"
-                              >
-                                {showSamples[managerKey] ? "Ẩn mẫu" : "Xem mẫu Formal B2/C1"}
-                              </button>
+                          {/* 2. Formal Email */}
+                          <div className="space-y-3 p-4 rounded-xl bg-muted/20 border border-border flex flex-col justify-between">
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 font-bold text-[10px] uppercase">
+                                  Nhiệm vụ 2: Email Trang Trọng (120–150 từ)
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground font-medium">
+                                {q2?.prompt || "Viết email trang trọng cho Chủ nhiệm/Quản lý câu lạc bộ, nêu quan điểm và đề xuất phương án (120-150 từ)."}
+                              </p>
                             </div>
 
-                            {showSamples[managerKey] && (
-                              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
-                                <div className="flex items-center justify-between font-bold">
-                                  <span>Bài mẫu Trang trọng ({countWords(sampleManager)} từ):</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleCopy(managerKey, sampleManager)}
-                                    className="p-1"
-                                  >
-                                    {copiedId === managerKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                                  </button>
-                                </div>
-                                <p className="italic leading-relaxed whitespace-pre-line">{sampleManager}</p>
+                            <div className="space-y-1.5">
+                              <textarea
+                                rows={8}
+                                value={managerText}
+                                onChange={(e) =>
+                                  setUserAnswers((prev) => ({ ...prev, [managerKey]: e.target.value }))
+                                }
+                                placeholder="Dear Club Manager, ..."
+                                className="w-full p-3 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
+                              />
+
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className={isManagerValid ? "text-emerald-600 font-bold" : "text-muted-foreground"}>
+                                  Số từ: {managerWords}/120–150 từ {isManagerValid && "✓ Chuẩn"}
+                                </span>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setShowSamples((prev) => ({ ...prev, [managerKey]: !prev[managerKey] }))
+                                  }
+                                  className="text-[11px] font-bold text-primary hover:underline"
+                                >
+                                  {showSamples[managerKey] ? "Ẩn mẫu" : "Xem mẫu Formal B2/C1"}
+                                </button>
                               </div>
-                            )}
+
+                              {showSamples[managerKey] && (
+                                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
+                                  <div className="flex items-center justify-between font-bold">
+                                    <span>Bài mẫu Trang trọng ({countWords(sampleManager)} từ):</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopy(managerKey, sampleManager)}
+                                      className="p-1"
+                                    >
+                                      {copiedId === managerKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                    </button>
+                                  </div>
+                                  <p className="italic leading-relaxed whitespace-pre-line">{sampleManager}</p>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Fallback Static Part 4 */
+                <div className="space-y-8">
+                  {filteredStaticClubs.map((club) => {
+                    const friendKey = `p4_st_friend_${club.id}`;
+                    const managerKey = `p4_st_manager_${club.id}`;
+
+                    const friendText = userAnswers[friendKey] || "";
+                    const managerText = userAnswers[managerKey] || "";
+
+                    const friendWords = countWords(friendText);
+                    const managerWords = countWords(managerText);
+
+                    const isFriendValid = friendWords >= 45 && friendWords <= 60;
+                    const isManagerValid = managerWords >= 120 && managerWords <= 160;
+
+                    const sampleFriend = `Hi Alex, have you checked the latest notice from our club? I was quite disappointed to hear about the sudden changes. We should definitely meet up this weekend to discuss alternative options and see what we can do next. Let me know your thoughts!`;
+
+                    const sampleManager = `Dear Club Manager,\n\nI am writing to express my strong concern regarding the recent announcement about the upcoming schedule and fee adjustments.\n\nAs an active and dedicated member of the club, I believe this sudden decision will cause significant inconvenience for many participants who rely heavily on our regular sessions. A substantial increase in expenses or reduction in operating hours may unfortunately discourage prospective members from joining and place unnecessary financial burdens on existing ones.\n\nI would like to respectfully suggest that the management board reconsider this policy. Perhaps hosting fundraising events or adjusting weekday operational hours could serve as a more feasible alternative solution.\n\nThank you very much for your time and kind consideration. I look forward to hearing your response.\n\nYours sincerely,\nA Concerned Club Member`;
+
+                    return (
+                      <div key={club.id} className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+                              Chủ đề {club.id}
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                              {club.sticker}
+                            </span>
+                            <h4 className="font-heading font-black text-base text-foreground">
+                              {club.clubNameEn}
+                            </h4>
+                          </div>
+                        </div>
+
+                        {/* Notice Box */}
+                        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 text-xs space-y-1.5">
+                          <div className="flex items-center gap-2 font-black uppercase text-[11px] text-amber-800 dark:text-amber-300">
+                            <AlertCircle className="w-4 h-4 shrink-0" />
+                            <span>{club.part4.noticeTitle}</span>
+                          </div>
+                          <p className="leading-relaxed">{club.part4.noticeContent}</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          {/* 1. Informal Email */}
+                          <div className="space-y-3 p-4 rounded-xl bg-muted/20 border border-border flex flex-col justify-between">
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-700 dark:text-sky-300 font-bold text-[10px] uppercase">
+                                  Nhiệm vụ 1: Email Thân Mật (~50 từ)
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground font-medium">
+                                {club.part4.friendEmailPrompt}
+                              </p>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <textarea
+                                rows={5}
+                                value={friendText}
+                                onChange={(e) =>
+                                  setUserAnswers((prev) => ({ ...prev, [friendKey]: e.target.value }))
+                                }
+                                placeholder="Hi [Name], ..."
+                                className="w-full p-3 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
+                              />
+
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className={isFriendValid ? "text-emerald-600 font-bold" : "text-muted-foreground"}>
+                                  Số từ: {friendWords}/50 từ {isFriendValid && "✓ Chuẩn"}
+                                </span>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setShowSamples((prev) => ({ ...prev, [friendKey]: !prev[friendKey] }))
+                                  }
+                                  className="text-[11px] font-bold text-primary hover:underline"
+                                >
+                                  {showSamples[friendKey] ? "Ẩn mẫu" : "Xem mẫu Informal"}
+                                </button>
+                              </div>
+
+                              {showSamples[friendKey] && (
+                                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
+                                  <div className="flex items-center justify-between font-bold">
+                                    <span>Bài mẫu Thân mật ({countWords(sampleFriend)} từ):</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopy(friendKey, sampleFriend)}
+                                      className="p-1"
+                                    >
+                                      {copiedId === friendKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                    </button>
+                                  </div>
+                                  <p className="italic leading-relaxed">{sampleFriend}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 2. Formal Email */}
+                          <div className="space-y-3 p-4 rounded-xl bg-muted/20 border border-border flex flex-col justify-between">
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 font-bold text-[10px] uppercase">
+                                  Nhiệm vụ 2: Email Trang Trọng (120–150 từ)
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground font-medium">
+                                {club.part4.managerEmailPrompt}
+                              </p>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <textarea
+                                rows={8}
+                                value={managerText}
+                                onChange={(e) =>
+                                  setUserAnswers((prev) => ({ ...prev, [managerKey]: e.target.value }))
+                                }
+                                placeholder="Dear Club Manager, ..."
+                                className="w-full p-3 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground resize-none"
+                              />
+
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className={isManagerValid ? "text-emerald-600 font-bold" : "text-muted-foreground"}>
+                                  Số từ: {managerWords}/120–150 từ {isManagerValid && "✓ Chuẩn"}
+                                </span>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setShowSamples((prev) => ({ ...prev, [managerKey]: !prev[managerKey] }))
+                                  }
+                                  className="text-[11px] font-bold text-primary hover:underline"
+                                >
+                                  {showSamples[managerKey] ? "Ẩn mẫu" : "Xem mẫu Formal B2/C1"}
+                                </button>
+                              </div>
+
+                              {showSamples[managerKey] && (
+                                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-fadeIn">
+                                  <div className="flex items-center justify-between font-bold">
+                                    <span>Bài mẫu Trang trọng ({countWords(sampleManager)} từ):</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopy(managerKey, sampleManager)}
+                                      className="p-1"
+                                    >
+                                      {copiedId === managerKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                    </button>
+                                  </div>
+                                  <p className="italic leading-relaxed whitespace-pre-line">{sampleManager}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>

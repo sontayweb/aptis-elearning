@@ -20,6 +20,25 @@ interface PartMediaEditorProps {
   }) => void;
 }
 
+// Helper parse danh sách URL ảnh (hỗ trợ cả JSON array '["url1","url2"]' và chuỗi phân tách dấu phẩy)
+export function parseImageUrls(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  const trimmed = raw.trim();
+  if (!trimmed) return [];
+  if (trimmed.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map((u) => String(u).trim()).filter(Boolean);
+      }
+    } catch {}
+  }
+  return trimmed
+    .split(",")
+    .map((s) => s.replace(/^[\["']+|[\]"']+$/g, "").trim())
+    .filter(Boolean);
+}
+
 export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
   partTitle,
   skill,
@@ -30,24 +49,6 @@ export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
   imageUrl,
   onChange,
 }) => {
-  // Helper parse danh sách URL ảnh (hỗ trợ cả JSON array '["url1","url2"]' và chuỗi phân tách dấu phẩy)
-  const parseImageUrls = (raw: string | null | undefined): string[] => {
-    if (!raw) return [];
-    const trimmed = raw.trim();
-    if (!trimmed) return [];
-    if (trimmed.startsWith("[")) {
-      try {
-        const parsed = JSON.parse(trimmed);
-        if (Array.isArray(parsed)) {
-          return parsed.map((u) => String(u).trim()).filter(Boolean);
-        }
-      } catch {}
-    }
-    return trimmed
-      .split(",")
-      .map((s) => s.replace(/^[\["']+|[\]"']+$/g, "").trim())
-      .filter(Boolean);
-  };
 
   // Kiểm tra nếu là Speaking Part 3 (so sánh 2 tranh) hoặc có từ 2 ảnh trở lên
   const parsedInitialImages = parseImageUrls(imageUrl);

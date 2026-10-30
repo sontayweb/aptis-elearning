@@ -74,9 +74,9 @@ export const QuestionEditModal: React.FC<QuestionEditModalProps> = ({
     try {
       const res = await api.admin.updatePart(question.part.id, {
         title: partTitle.trim() || question.part.title,
-        passage_text: partPassage.trim() || null,
-        audio_url: partAudioUrl.trim() || null,
-        image_url: partImageUrl.trim() || null,
+        passageText: partPassage.trim() || undefined,
+        audioUrl: partAudioUrl.trim() || undefined,
+        imageUrl: partImageUrl.trim() || undefined,
       });
       if (res.success) {
         setPartSavedMsg("✓ Đã lưu ngữ cảnh / tranh / audio của Phần thi!");

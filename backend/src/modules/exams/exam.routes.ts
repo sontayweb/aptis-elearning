@@ -9,6 +9,8 @@ router.get('/', optionalAuthGuard, (req, res, next) => examController.list(req, 
 router.get('/marathon', optionalAuthGuard, (req, res, next) => examController.marathon(req, res, next));
 router.get('/:id', optionalAuthGuard, (req, res, next) => examController.detail(req, res, next));
 router.get('/:id/questions', optionalAuthGuard, (req, res, next) => examController.questions(req, res, next));
+router.post('/:id/grade-guest', optionalAuthGuard, (req, res, next) => examController.gradeGuest(req, res, next));
+router.post('/:id/report-question', optionalAuthGuard, (req, res, next) => examController.reportQuestion(req, res, next));
 
 // Protected routes
 router.post('/custom-builder', authGuard, (req, res, next) =>

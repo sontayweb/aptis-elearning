@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { api } from "@/lib/api-client";
 import { DEFAULT_GRAMMAR_QUESTIONS, Question } from "@/data/grammar-benchmark";
 import {
   SpellCheck,
@@ -25,7 +26,22 @@ import {
   ChevronUp,
   Filter,
   Check,
+  RefreshCw,
+  ExternalLink,
+  Flame,
 } from "lucide-react";
+
+interface MarathonQuestionItem {
+  id: string;
+  examId?: string;
+  examTitle?: string;
+  part: string;
+  type: "grammar" | "vocabulary";
+  prompt: string;
+  options: string[];
+  correctAnswer: number;
+  explanation?: string | null;
+}
 
 function GrammarMarathonContent() {
   const searchParams = useSearchParams();
@@ -35,31 +51,134 @@ function GrammarMarathonContent() {
     initialPart === "vocab" ? "vocab" : "grammar"
   );
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedExamId, setSelectedExamId] = useState<string>("all");
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState<Record<string, boolean>>({});
   const [showExplanations, setShowExplanations] = useState<Record<string, boolean>>({});
 
-  // Filter questions based on currentTab & search
+  // DB items
+  const [dbQuestions, setDbQuestions] = useState<MarathonQuestionItem[]>([]);
+  const [availableExams, setAvailableExams] = useState<{ id: string; title: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load from DB
+  const loadGrammarMarathon = async () => {
+    try {
+      setLoading(true);
+      const res = await api.exams.getMarathon("GRAMMAR_VOCABULARY");
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        const parsedList: MarathonQuestionItem[] = [];
+        const examsMap = new Map<string, string>();
+
+        res.data.forEach((item: any) => {
+          if (item.examId && item.title) {
+            examsMap.set(item.examId, item.title);
+          }
+
+          const isVocab =
+            item.logicalPart === 2 ||
+            (item.partTitle && item.partTitle.toLowerCase().includes("vocab")) ||
+            (item.title && item.title.toLowerCase().includes("vocab"));
+
+          const qType: "grammar" | "vocabulary" = isVocab ? "vocabulary" : "grammar";
+
+          (item.questions || []).forEach((q: any) => {
+            let parsedOpts: string[] = [];
+            if (Array.isArray(q.options)) {
+              parsedOpts = q.options;
+            } else if (typeof q.options === "string") {
+              try {
+                parsedOpts = JSON.parse(q.options);
+              } catch {
+                parsedOpts = [];
+              }
+            }
+
+            let corIdx = 0;
+            if (q.correctAnswer !== undefined && q.correctAnswer !== null) {
+              const corStr = String(q.correctAnswer).trim();
+              const matchIdx = parsedOpts.findIndex(
+                (opt) => opt.trim().toLowerCase() === corStr.toLowerCase()
+              );
+              if (matchIdx >= 0) {
+                corIdx = matchIdx;
+              } else if (/^[A-D]$/i.test(corStr)) {
+                corIdx = corStr.toUpperCase().charCodeAt(0) - 65;
+              } else if (!isNaN(Number(corStr)) && Number(corStr) >= 0 && Number(corStr) < parsedOpts.length) {
+                corIdx = Number(corStr);
+              }
+            }
+
+            parsedList.push({
+              id: q.id,
+              examId: item.examId,
+              examTitle: item.title,
+              part: item.partTitle || (isVocab ? "Part 2 - Vocabulary" : "Part 1 - Grammar"),
+              type: qType,
+              prompt: q.prompt,
+              options: parsedOpts,
+              correctAnswer: corIdx,
+              explanation: q.explanation,
+            });
+          });
+        });
+
+        if (parsedList.length > 0) {
+          setDbQuestions(parsedList);
+          const examsArr = Array.from(examsMap.entries()).map(([id, title]) => ({ id, title }));
+          setAvailableExams(examsArr);
+        }
+      }
+    } catch (err) {
+      console.warn("Could not load Grammar Marathon from database, fallback to built-in bank:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadGrammarMarathon();
+  }, []);
+
+  // Questions source: DB questions if available, else DEFAULT_GRAMMAR_QUESTIONS
+  const allQuestions = useMemo(() => {
+    if (dbQuestions.length > 0) return dbQuestions;
+    return DEFAULT_GRAMMAR_QUESTIONS.map((q) => ({
+      id: String(q.id),
+      examId: "default",
+      examTitle: "Bộ đề tiêu chuẩn",
+      part: q.part,
+      type: q.type as "grammar" | "vocabulary",
+      prompt: q.prompt,
+      options: q.options,
+      correctAnswer: q.correctAnswer,
+      explanation: q.explanation,
+    }));
+  }, [dbQuestions]);
+
+  // Filter questions based on currentTab, exam filter & search
   const filteredQuestions = useMemo(() => {
-    return DEFAULT_GRAMMAR_QUESTIONS.filter((q) => {
+    return allQuestions.filter((q) => {
       const matchType = currentTab === "grammar" ? q.type === "grammar" : q.type === "vocabulary";
       if (!matchType) return false;
+
+      if (selectedExamId !== "all" && q.examId !== selectedExamId) {
+        return false;
+      }
+
       if (!searchTerm) return true;
       const term = searchTerm.toLowerCase();
       return (
         q.prompt.toLowerCase().includes(term) ||
+        (q.examTitle && q.examTitle.toLowerCase().includes(term)) ||
         q.options.some((opt) => opt.toLowerCase().includes(term)) ||
         (q.explanation && q.explanation.toLowerCase().includes(term))
       );
     });
-  }, [currentTab, searchTerm]);
+  }, [allQuestions, currentTab, selectedExamId, searchTerm]);
 
-  const handleSelectOption = (qId: string | number, optIdx: number) => {
-    setSelectedAnswers((prev) => ({ ...prev, [String(qId)]: optIdx }));
-  };
-
-  const handleCheckQuestion = (qId: string | number) => {
-    setShowResults((prev) => ({ ...prev, [String(qId)]: !prev[String(qId)] }));
+  const handleSelectOption = (qId: string, optIdx: number) => {
+    setSelectedAnswers((prev) => ({ ...prev, [qId]: optIdx }));
   };
 
   const handleResetAll = () => {
@@ -71,7 +190,7 @@ function GrammarMarathonContent() {
   // Score calculation
   const totalAnswered = Object.keys(selectedAnswers).length;
   const correctCount = filteredQuestions.filter(
-    (q) => selectedAnswers[String(q.id)] === q.correctAnswer
+    (q) => selectedAnswers[q.id] === q.correctAnswer
   ).length;
 
   return (
@@ -95,7 +214,7 @@ function GrammarMarathonContent() {
                     ∞ Marathon Grammar &amp; Vocab
                   </span>
                   <span className="px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-700 dark:text-rose-300 font-bold text-[10px]">
-                    Ngân Hàng 50 Câu Trắc Nghiệm Có Giải Thích
+                    {dbQuestions.length > 0 ? `Toàn bộ ${dbQuestions.length} câu hỏi CSDL` : "Ngân hàng 50 câu tiêu chuẩn"}
                   </span>
                 </div>
                 <h1 className="text-xl md:text-2xl font-heading font-extrabold text-foreground mt-0.5">
@@ -104,8 +223,23 @@ function GrammarMarathonContent() {
               </div>
             </div>
 
-            {/* Quick search & reset */}
-            <div className="flex items-center gap-2">
+            {/* Quick search, exam picker & reset */}
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              {availableExams.length > 0 && (
+                <select
+                  value={selectedExamId}
+                  onChange={(e) => setSelectedExamId(e.target.value)}
+                  className="px-3 py-2 text-xs rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shrink-0 max-w-[180px] truncate"
+                >
+                  <option value="all">Tất cả {availableExams.length} đề thi</option>
+                  {availableExams.map((ex) => (
+                    <option key={ex.id} value={ex.id}>
+                      {ex.title}
+                    </option>
+                  ))}
+                </select>
+              )}
+
               <div className="relative w-full sm:w-64">
                 <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -116,6 +250,15 @@ function GrammarMarathonContent() {
                   className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
                 />
               </div>
+
+              <button
+                type="button"
+                onClick={loadGrammarMarathon}
+                className="p-2 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                title="Tải lại từ CSDL"
+              >
+                <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              </button>
 
               <button
                 type="button"
@@ -141,15 +284,15 @@ function GrammarMarathonContent() {
             >
               <div className="flex items-center justify-between mb-1">
                 <span className={`text-[10px] font-black uppercase ${currentTab === "grammar" ? "text-primary" : "text-muted-foreground"}`}>
-                  Phần 1 · 25 câu
+                  Phần 1 · Ngữ pháp
                 </span>
                 <SpellCheck className="w-4 h-4 text-primary" />
               </div>
               <div className="font-heading font-bold text-sm text-foreground truncate">
-                Grammar (Ngữ pháp)
+                Grammar Practice
               </div>
               <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                Thì, câu điều kiện, bị động, đảo ngữ
+                {allQuestions.filter((q) => q.type === "grammar").length} câu hỏi thì, câu điều kiện, bị động, đảo ngữ
               </p>
             </button>
 
@@ -164,15 +307,15 @@ function GrammarMarathonContent() {
             >
               <div className="flex items-center justify-between mb-1">
                 <span className={`text-[10px] font-black uppercase ${currentTab === "vocab" ? "text-primary" : "text-muted-foreground"}`}>
-                  Phần 2 · 25 câu
+                  Phần 2 · Từ vựng
                 </span>
                 <BookA className="w-4 h-4 text-primary" />
               </div>
               <div className="font-heading font-bold text-sm text-foreground truncate">
-                Vocabulary (Từ vựng)
+                Vocabulary Practice
               </div>
               <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                Đồng nghĩa, Collocation, Word match
+                {allQuestions.filter((q) => q.type === "vocabulary").length} câu hỏi đồng nghĩa, collocation, word match
               </p>
             </button>
           </div>
@@ -186,7 +329,7 @@ function GrammarMarathonContent() {
                   : "Ngân Hàng Từ Vựng & Cụm Từ Cố Định (Collocations) B1–C"}
               </h3>
               <p className="text-muted-foreground mt-0.5">
-                Bấm vào từng lựa chọn A, B, C để làm bài. Hệ thống kiểm tra tức thì và hiển thị giải thích chi tiết cấu trúc ngữ pháp tương ứng.
+                Bấm vào từng lựa chọn A, B, C để làm bài. Hệ thống kiểm tra tức thì và hiển thị giải thích chi tiết cấu trúc tương ứng.
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
@@ -199,9 +342,9 @@ function GrammarMarathonContent() {
           {/* Question List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {filteredQuestions.map((q, qIndex) => {
-              const qKey = String(q.id);
+              const qKey = q.id;
               const userChoice = selectedAnswers[qKey];
-              const isChecked = showResults[qKey] || userChoice !== undefined;
+              const isChecked = userChoice !== undefined;
               const isCorrect = userChoice === q.correctAnswer;
               const explanationOpen = showExplanations[qKey] || isChecked;
 
@@ -213,30 +356,42 @@ function GrammarMarathonContent() {
                         <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black text-xs">
                           {qIndex + 1}
                         </span>
-                        <span className="text-[11px] font-bold text-muted-foreground">
-                          {q.part}
+                        <span className="text-[11px] font-bold text-muted-foreground truncate max-w-[160px]">
+                          {q.examTitle || q.part}
                         </span>
                       </div>
 
-                      {isChecked && (
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
-                            isCorrect
-                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                              : "bg-rose-500/15 text-rose-700 dark:text-rose-300"
-                          }`}
-                        >
-                          {isCorrect ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                          <span>{isCorrect ? "Chính xác" : "Chưa đúng"}</span>
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {isChecked && (
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
+                              isCorrect
+                                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                                : "bg-rose-500/15 text-rose-700 dark:text-rose-300"
+                            }`}
+                          >
+                            {isCorrect ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                            <span>{isCorrect ? "Chính xác" : "Chưa đúng"}</span>
+                          </span>
+                        )}
+
+                        {q.examId && q.examId !== "default" && (
+                          <Link
+                            href={`/grammar/${q.examId}`}
+                            className="p-1 text-muted-foreground hover:text-primary transition-colors"
+                            title="Làm cả đề thi này trong phòng thi"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </Link>
+                        )}
+                      </div>
                     </div>
 
                     <div className="text-xs sm:text-sm font-heading font-extrabold text-foreground leading-relaxed">
                       {q.prompt}
                     </div>
 
-                    {/* Options A, B, C */}
+                    {/* Options */}
                     <div className="space-y-2">
                       {q.options.map((opt, optIdx) => {
                         const isSelected = userChoice === optIdx;
@@ -282,7 +437,7 @@ function GrammarMarathonContent() {
                       className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
                     >
                       <Sparkles className="w-3 h-3" />
-                      <span>{explanationOpen ? "Ẩn giải thích" : "Xem giải thích ngữ pháp"}</span>
+                      <span>{explanationOpen ? "Ẩn giải thích" : "Xem giải thích chi tiết"}</span>
                     </button>
 
                     {explanationOpen && q.explanation && (

@@ -27,12 +27,13 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
-import { PartMediaEditor } from "@/components/admin/exams/part-media-editor";
+import { PartMediaEditor, parseImageUrls } from "@/components/admin/exams/part-media-editor";
 import {
   PolymorphicQuestionForm,
   PolymorphicQuestionData,
 } from "@/components/admin/exams/polymorphic-question-form";
 import { QuestionCardRow } from "@/components/admin/exams/question-card-row";
+import { detectAptisTaskMeta } from "@/components/admin/exams/exam.types";
 
 interface Question {
   id: string;
@@ -781,6 +782,106 @@ export default function ExamEditorPage() {
             {/* Questions list */}
             {expandedParts[part.id] && editingPart !== part.id && (
               <div className="border-t border-slate-100 dark:border-slate-800 divide-y divide-slate-100/80 dark:divide-slate-800/80">
+                {/* Part Context Bar (Read-only summary with 1-click edit) */}
+                {(() => {
+                  const meta = detectAptisTaskMeta(exam.skill, part.part_number, part.title);
+                  const imgs = parseImageUrls(part.image_url);
+                  const hasContext = Boolean(part.instructions || part.passage_text || part.audio_url || imgs.length > 0);
+
+                  return (
+                    <div className="p-4 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                            {meta.taskLabel}
+                          </span>
+                          <span className="font-heading font-bold text-xs text-slate-800 dark:text-slate-200">
+                            {meta.canonicalPartTitle}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => startEditPart(part)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all shadow-2xs self-start sm:self-auto cursor-pointer"
+                        >
+                          <Edit2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                          <span>Sửa ngữ cảnh phần thi</span>
+                        </button>
+                      </div>
+
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                        {meta.guideText}
+                      </p>
+
+                      {hasContext && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                          {/* Passage or Instructions */}
+                          {(part.instructions || part.passage_text) && (
+                            <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-1.5 text-xs">
+                              {part.instructions && (
+                                <div>
+                                  <span className="font-bold text-[10px] uppercase text-slate-400 block">Hướng dẫn:</span>
+                                  <p className="text-slate-700 dark:text-slate-300">{part.instructions}</p>
+                                </div>
+                              )}
+                              {part.passage_text && (
+                                <div>
+                                  <span className="font-bold text-[10px] uppercase text-blue-600 dark:text-blue-400 block">
+                                    Đoạn văn / Đề bài / Bài đọc (Passage):
+                                  </span>
+                                  <p className="text-slate-700 dark:text-slate-300 whitespace-pre-line line-clamp-4 leading-relaxed font-sans">
+                                    {part.passage_text}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Media: Audio & Images */}
+                          {(part.audio_url || imgs.length > 0) && (
+                            <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-2 text-xs">
+                              {part.audio_url && (
+                                <div className="space-y-1">
+                                  <span className="font-bold text-[10px] uppercase text-sky-600 dark:text-sky-400 flex items-center gap-1">
+                                    <Volume2 className="w-3 h-3" />
+                                    <span>Tệp âm thanh (Audio URL):</span>
+                                  </span>
+                                  <audio controls className="w-full h-8" preload="none" src={part.audio_url}>
+                                    Trình duyệt không hỗ trợ audio
+                                  </audio>
+                                </div>
+                              )}
+
+                              {imgs.length > 0 && (
+                                <div className="space-y-1">
+                                  <span className="font-bold text-[10px] uppercase text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                                    <ImageIcon className="w-3 h-3" />
+                                    <span>Hình ảnh đề thi ({imgs.length} ảnh):</span>
+                                  </span>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    {imgs.map((url: string, iIdx: number) => (
+                                      <a
+                                        key={iIdx}
+                                        href={url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="block relative w-20 h-14 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 hover:opacity-80 transition-opacity"
+                                      >
+                                        <img src={url} alt={`Part image ${iIdx + 1}`} className="w-full h-full object-cover" />
+                                      </a>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+
                 {part.questions.length === 0 && (
                   <div className="px-5 py-6 text-center text-xs text-slate-400 dark:text-slate-500">
                     <HelpCircle className="w-5 h-5 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
@@ -803,6 +904,7 @@ export default function ExamEditorPage() {
                         }}
                         skill={exam.skill}
                         partNumber={part.part_number}
+                        partTitle={part.title}
                         onSave={(qData) => saveQ(q.id, qData)}
                         onCancel={() => setEditingQuestion(null)}
                         saving={saving === `q-${q.id}`}
@@ -833,6 +935,7 @@ export default function ExamEditorPage() {
                       }}
                       skill={exam.skill}
                       partNumber={part.part_number}
+                      partTitle={part.title}
                       onSave={(qData) => doAddQ(part.id, qData)}
                       onCancel={() => setAddingQPartId(null)}
                       saving={saving === `addq-${part.id}`}

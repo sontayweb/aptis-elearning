@@ -118,6 +118,10 @@ export default function ExamSmartImportModal({
   const [isEditingPassage, setIsEditingPassage] = useState(false);
   const [tempPassageText, setTempPassageText] = useState("");
 
+  // Import Mode: File vs JSON
+  const [importMode, setImportMode] = useState<"FILE" | "JSON">("FILE");
+  const [jsonInput, setJsonInput] = useState("");
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -245,6 +249,205 @@ export default function ExamSmartImportModal({
     } finally {
       setIsValidating(false);
     }
+  };
+
+  const handleValidateJson = () => {
+    if (!jsonInput.trim()) {
+      setErrorMsg("Vui lòng dán nội dung JSON để kiểm định.");
+      return;
+    }
+    setErrorMsg(null);
+    try {
+      const parsed = JSON.parse(jsonInput);
+      const rawList = Array.isArray(parsed) ? parsed : [parsed];
+      if (rawList.length === 0) {
+        setErrorMsg("Dữ liệu JSON không chứa đề thi nào.");
+        return;
+      }
+
+      const validatedExams: ValidatedExamItem[] = rawList.map((item: any, idx: number) => {
+        const skill = String(item.skill || "READING").toUpperCase();
+        const partNumber = Number(item.partNumber || 1);
+        const title = item.title || `${skill} Part ${partNumber} (Tạo từ JSON)`;
+        const topic = item.topic || "Chủ đề tự chọn";
+        const passageText = item.passageText || "";
+        const instructions = item.instructions || "";
+        const imageUrls = Array.isArray(item.imageUrls) ? item.imageUrls : [];
+        const vocabulary = Array.isArray(item.vocabulary) ? item.vocabulary : [];
+
+        const questions = (item.questions || []).map((q: any, qIdx: number) => ({
+          questionNumber: q.questionNumber || qIdx + 1,
+          prompt: q.prompt || `Câu hỏi ${qIdx + 1}`,
+          questionType:
+            q.questionType ||
+            (skill === "SPEAKING"
+              ? "SPEAKING_AUDIO"
+              : skill === "WRITING"
+              ? "ESSAY"
+              : partNumber === 2 && skill === "READING"
+              ? "SENTENCE_ORDER"
+              : "MULTIPLE_CHOICE"),
+          options: Array.isArray(q.options) ? q.options : undefined,
+          correctAnswer: q.correctAnswer !== undefined && q.correctAnswer !== null ? String(q.correctAnswer) : undefined,
+          explanation: q.explanation || undefined,
+        }));
+
+        const errors: string[] = [];
+        if (!title.trim()) errors.push("Thiếu tiêu đề đề thi");
+        if (questions.length === 0) errors.push("Đề thi chưa có câu hỏi nào");
+
+        return {
+          idTemp: `json_import_${Date.now()}_${idx}`,
+          title,
+          skill,
+          partNumber,
+          topic,
+          instructions,
+          passageText,
+          imageUrls,
+          vocabulary,
+          questions,
+          isValid: errors.length === 0,
+          errors,
+          warnings: [],
+        };
+      });
+
+      const validIds = new Set<string>();
+      validatedExams.forEach((e) => {
+        if (e.isValid) validIds.add(e.idTemp);
+      });
+
+      setValidationResult({
+        fileName: `Import_JSON_${new Date().toISOString().slice(0, 10)}.json`,
+        fileType: "XLSX",
+        totalFound: validatedExams.length,
+        validCount: validatedExams.filter((e) => e.isValid).length,
+        invalidCount: validatedExams.filter((e) => !e.isValid).length,
+        exams: validatedExams,
+      });
+      setSelectedExamIds(validIds);
+      if (validatedExams.length > 0) {
+        setSelectedExamId(validatedExams[0].idTemp);
+      }
+      setActiveStep(2);
+    } catch (err: any) {
+      setErrorMsg(`Lỗi cú pháp JSON: ${err.message}`);
+    }
+  };
+
+  const handleLoadSampleJson = (type: "reading_p2" | "speaking_p3" | "writing_p4" | "listening_p1") => {
+    let sample: any = [];
+    if (type === "reading_p2") {
+      sample = [
+        {
+          title: "Reading Part 2 - Sustainable Urban Development",
+          skill: "READING",
+          partNumber: 2,
+          topic: "Đô thị xanh và năng lượng sạch",
+          instructions: "Order the 5 sentences to form a coherent text.",
+          questions: [
+            {
+              questionNumber: 1,
+              questionType: "SENTENCE_ORDER",
+              prompt: "Sắp xếp 5 câu sau theo đúng thứ tự logic:",
+              options: [
+                "First, modern cities must invest systematically in electric public transit systems.",
+                "Consequently, metropolitan carbon emissions decrease dramatically within a few years.",
+                "Moreover, public health conditions improve substantially as urban air quality rises.",
+                "In addition, local authorities should establish dedicated bicycle lanes across neighborhoods.",
+                "Finally, these integrated changes transform ordinary cities into healthy sustainable communities."
+              ],
+              explanation: "Câu 1 mở đầu 'First', câu 2 kết quả trực tiếp 'Consequently', câu 3 bổ sung 'Moreover', câu 4 tiếp tục 'In addition', câu 5 kết luận 'Finally'."
+            }
+          ]
+        }
+      ];
+    } else if (type === "speaking_p3") {
+      sample = [
+        {
+          title: "Speaking Part 3 - Urban Living vs Countryside",
+          skill: "SPEAKING",
+          partNumber: 3,
+          topic: "So sánh cuộc sống thành thị và nông thôn",
+          instructions: "Compare the two pictures and answer the 3 questions.",
+          imageUrls: [
+            "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=800",
+            "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800"
+          ],
+          vocabulary: [
+            { en: "pace of life", vi: "nhịp điệu cuộc sống" },
+            { en: "convenience and amenities", vi: "tiện nghi và tiện ích" }
+          ],
+          questions: [
+            {
+              questionNumber: 1,
+              questionType: "SPEAKING_AUDIO",
+              prompt: "Tell me what you see in the two pictures.",
+              explanation: "While the first picture portrays a dynamic bustling city with skyscrapers, the second depicts a tranquil rural setting surrounded by lush greenery."
+            },
+            {
+              questionNumber: 2,
+              questionType: "SPEAKING_AUDIO",
+              prompt: "Which of these two places would you prefer to spend your holiday in?",
+              explanation: "Personally, I find the peaceful countryside much more appealing for a vacation because it offers an escape from daily noise and stress."
+            },
+            {
+              questionNumber: 3,
+              questionType: "SPEAKING_AUDIO",
+              prompt: "Why do you think many people still choose to live in crowded urban centers?",
+              explanation: "Metropolitan centers provide superior employment opportunities, top-tier healthcare, and modern educational infrastructure that rural areas often lack."
+            }
+          ]
+        }
+      ];
+    } else if (type === "writing_p4") {
+      sample = [
+        {
+          title: "Writing Part 4 - Photography Club Exhibition",
+          skill: "WRITING",
+          partNumber: 4,
+          topic: "Thông báo hoãn triển lãm ảnh và tăng phí tham gia",
+          passageText: "Dear Members,\nDue to unexpected maintenance at the city arts gallery, our annual photography exhibition next month has been postponed indefinitely. In addition, the annual membership fee will increase by $30 to cover alternative venue costs.\nBest regards,\nThe Club Committee",
+          questions: [
+            {
+              questionNumber: 1,
+              questionType: "ESSAY",
+              prompt: "Viết email thân mật cho bạn (~50 từ) bày tỏ cảm nghĩ và đề xuất.",
+              explanation: "Hi Alex, have you checked the notice from our photography club? I was quite disappointed to hear about the postponement and the fee increase. We should meet up this weekend to discuss alternative options and see if we can organize an independent showcase. Let me know your thoughts!"
+            },
+            {
+              questionNumber: 2,
+              questionType: "ESSAY",
+              prompt: "Viết email trang trọng cho Chủ nhiệm CLB (120-150 từ) đề xuất giải pháp.",
+              explanation: "Dear Club President,\n\nI am writing to express my concern regarding the recent announcement about postponing our annual exhibition and increasing membership expenses.\n\nAs an active club member, I believe this sudden financial adjustment will cause significant difficulties for many participants who rely heavily on our events. A sharp increase may unfortunately discourage aspiring photographers from joining.\n\nI would like to respectfully suggest exploring alternative community venues or hosting a digital online exhibition instead. This would preserve our hard work without imposing additional burdens on members.\n\nThank you for your consideration.\n\nYours sincerely,\nA Dedicated Member"
+            }
+          ]
+        }
+      ];
+    } else {
+      sample = [
+        {
+          title: "Listening Part 1 - Train Ticket Reservation",
+          skill: "LISTENING",
+          partNumber: 1,
+          topic: "Đặt vé tàu và tìm sân ga",
+          passageText: "Man: Excuse me, does this train go directly to Manchester?\nWoman: No, you need to transfer at Birmingham New Street on platform 3 at 2:15 PM.\nMan: Platform 3 at 2:15 PM? Thank you very much!",
+          questions: [
+            {
+              questionNumber: 1,
+              questionType: "MULTIPLE_CHOICE",
+              prompt: "Where must the passenger change trains?",
+              options: ["London Euston", "Birmingham New Street", "Oxford", "Leeds"],
+              correctAnswer: "Birmingham New Street",
+              explanation: "Người phụ nữ nói rõ: 'You need to transfer at Birmingham New Street'."
+            }
+          ]
+        }
+      ];
+    }
+    setJsonInput(JSON.stringify(sample, null, 2));
+    setErrorMsg(null);
   };
 
   const handleLoadDemo = () => {
@@ -888,140 +1091,247 @@ export default function ExamSmartImportModal({
         {/* STEP 1: DOWNLOAD TEMPLATE & UPLOAD */}
         {activeStep === 1 && (
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* SECTION: TẢI FILE MẪU */}
-            <div>
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                <Download className="w-4 h-4 text-blue-600" />
-                Bước 1: Tải file mẫu tham khảo (nếu chưa có định dạng)
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                {templates.map((tpl, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:border-blue-400 dark:hover:border-blue-600 transition-all flex flex-col justify-between"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                          tpl.fileType === "DOCX"
-                            ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400"
-                            : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
-                        }`}
-                      >
-                        {tpl.fileType === "DOCX" ? (
-                          <FileText className="w-5 h-5" />
-                        ) : (
-                          <FileSpreadsheet className="w-5 h-5" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm text-slate-900 dark:text-white line-clamp-1">
-                          {tpl.name}
-                        </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                          {tpl.description}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-400 font-mono">{tpl.size}</span>
-                      <a
-                        href={tpl.downloadUrl}
-                        download={tpl.fileName}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        Tải mẫu này
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* SECTION: GỢI Ý ĐỊNH DẠNG WORD */}
-            <div className="p-4 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-800/50">
-              <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300 mb-2">
-                <Info className="w-4 h-4 text-blue-600" />
-                Gợi ý định dạng nhanh cho file Word (.docx) Speaking & Writing:
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
-                  <span className="font-bold text-blue-600">=== [ĐỀ MỚI] ===</span>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Đánh dấu bắt đầu một đề thi mới</p>
-                </div>
-                <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
-                  <span className="font-bold text-blue-600">[PHẦN THI]:</span>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Speaking Part 2-3 / Writing Part 1-4</p>
-                </div>
-                <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
-                  <span className="font-bold text-blue-600">[HÌNH ẢNH / NGỮ CẢNH]:</span>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Chèn ảnh (Speaking) hoặc Thông báo (Writing)</p>
-                </div>
-                <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
-                  <span className="font-bold text-blue-600">[TỪ VỰNG]:</span>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Bảng từ vựng song ngữ (Anh - Việt)</p>
-                </div>
-              </div>
-            </div>
-
-            {/* SECTION: DROPZONE UPLOAD */}
-            <div>
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                <UploadCloud className="w-4 h-4 text-blue-600" />
-                Bước 2: Tải file đề thi lên
-              </h4>
-              <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className={`p-8 border-2 border-dashed rounded-2xl text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
-                  isDragging
-                    ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/30 scale-[0.99]"
-                    : "border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50/20"
+            {/* Mode Switcher Tabs */}
+            <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+              <button
+                type="button"
+                onClick={() => setImportMode("FILE")}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  importMode === "FILE"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".docx,.xlsx,.xls"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 flex items-center justify-center shadow-inner">
-                  {isValidating ? (
-                    <RefreshCw className="w-7 h-7 animate-spin" />
-                  ) : (
-                    <UploadCloud className="w-7 h-7" />
-                  )}
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                    {isValidating
-                      ? "Đang phân tích cấu trúc và kiểm định dữ liệu..."
-                      : "Kéo thả file vào đây hoặc bấm để chọn từ máy tính"}
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Hỗ trợ file <span className="font-semibold text-blue-600">.docx</span> (Speaking,
-                    Writing kèm ảnh) và <span className="font-semibold text-emerald-600">.xlsx</span>{" "}
-                    (Reading, Listening)
-                  </p>
-                </div>
-              </div>
+                <UploadCloud className="w-4 h-4" />
+                <span>Tải tệp Word (.docx) / Excel (.xlsx) chuẩn</span>
+              </button>
 
-              {/* DEMO STUDIO BUTTON */}
-              <div className="mt-4 flex items-center justify-center">
-                <button
-                  type="button"
-                  onClick={handleLoadDemo}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 shadow-sm transition-all hover:scale-[1.02]"
-                >
-                  <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  <span>⚡ Trải nghiệm ngay phòng kiểm định với bộ đề mẫu (Demo Studio)</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setImportMode("JSON");
+                  if (!jsonInput) handleLoadSampleJson("reading_p2");
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  importMode === "JSON"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+                <span>Dán JSON Chuẩn (16 Dạng Part / Task)</span>
+              </button>
             </div>
+
+            {importMode === "FILE" ? (
+              <>
+                {/* SECTION: TẢI FILE MẪU */}
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <Download className="w-4 h-4 text-blue-600" />
+                    Bước 1: Tải file mẫu tham khảo (nếu chưa có định dạng)
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                    {templates.map((tpl, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:border-blue-400 dark:hover:border-blue-600 transition-all flex flex-col justify-between"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                              tpl.fileType === "DOCX"
+                                ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400"
+                                : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
+                            }`}
+                          >
+                            {tpl.fileType === "DOCX" ? (
+                              <FileText className="w-5 h-5" />
+                            ) : (
+                              <FileSpreadsheet className="w-5 h-5" />
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-sm text-slate-900 dark:text-white line-clamp-1">
+                              {tpl.name}
+                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                              {tpl.description}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-400 font-mono">{tpl.size}</span>
+                          <a
+                            href={tpl.downloadUrl}
+                            download={tpl.fileName}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            Tải mẫu này
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* SECTION: GỢI Ý ĐỊNH DẠNG WORD */}
+                <div className="p-4 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-800/50">
+                  <div className="flex items-center gap-2 text-xs font-bold text-blue-800 dark:text-blue-300 mb-2">
+                    <Info className="w-4 h-4 text-blue-600" />
+                    Gợi ý định dạng nhanh cho file Word (.docx) Speaking & Writing:
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                      <span className="font-bold text-blue-600">=== [ĐỀ MỚI] ===</span>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Đánh dấu bắt đầu một đề thi mới</p>
+                    </div>
+                    <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                      <span className="font-bold text-blue-600">[PHẦN THI]:</span>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Speaking Part 2-3 / Writing Part 1-4</p>
+                    </div>
+                    <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                      <span className="font-bold text-blue-600">[HÌNH ẢNH / NGỮ CẢNH]:</span>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Chèn ảnh (Speaking) hoặc Thông báo (Writing)</p>
+                    </div>
+                    <div className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                      <span className="font-bold text-blue-600">[TỪ VỰNG]:</span>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Bảng từ vựng song ngữ (Anh - Việt)</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SECTION: DROPZONE UPLOAD */}
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <UploadCloud className="w-4 h-4 text-blue-600" />
+                    Bước 2: Tải file đề thi lên
+                  </h4>
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`p-8 border-2 border-dashed rounded-2xl text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
+                      isDragging
+                        ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/30 scale-[0.99]"
+                        : "border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50/20"
+                    }`}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".docx,.xlsx,.xls"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 flex items-center justify-center shadow-inner">
+                      {isValidating ? (
+                        <RefreshCw className="w-7 h-7 animate-spin" />
+                      ) : (
+                        <UploadCloud className="w-7 h-7" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                        {isValidating
+                          ? "Đang phân tích cấu trúc và kiểm định dữ liệu..."
+                          : "Kéo thả file vào đây hoặc bấm để chọn từ máy tính"}
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        Hỗ trợ file <span className="font-semibold text-blue-600">.docx</span> (Speaking,
+                        Writing kèm ảnh) và <span className="font-semibold text-emerald-600">.xlsx</span>{" "}
+                        (Reading, Listening)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* DEMO STUDIO BUTTON */}
+                  <div className="mt-4 flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={handleLoadDemo}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 shadow-sm transition-all hover:scale-[1.02] cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <span>⚡ Trải nghiệm ngay phòng kiểm định với bộ đề mẫu (Demo Studio)</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* JSON IMPORT TAB */
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-blue-600" />
+                      Dán JSON Cấu Trúc Đề Thi Chuẩn
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Định dạng JSON chuẩn tương thích hoàn toàn 100% với kiến trúc CSDL PostgreSQL (Exam → ExamPart → Question).
+                    </p>
+                  </div>
+
+                  {/* Quick sample buttons */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[11px] font-semibold text-slate-400 mr-1">Mẫu nhanh:</span>
+                    <button
+                      type="button"
+                      onClick={() => handleLoadSampleJson("reading_p2")}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-card hover:bg-muted text-foreground transition-colors cursor-pointer"
+                    >
+                      Reading P2 (Sentence Order)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleLoadSampleJson("speaking_p3")}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-card hover:bg-muted text-foreground transition-colors cursor-pointer"
+                    >
+                      Speaking P3 (Dual Image)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleLoadSampleJson("writing_p4")}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-card hover:bg-muted text-foreground transition-colors cursor-pointer"
+                    >
+                      Writing P4 (Email)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleLoadSampleJson("listening_p1")}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-card hover:bg-muted text-foreground transition-colors cursor-pointer"
+                    >
+                      Listening P1
+                    </button>
+                  </div>
+                </div>
+
+                <textarea
+                  rows={14}
+                  value={jsonInput}
+                  onChange={(e) => setJsonInput(e.target.value)}
+                  placeholder={`[\n  {\n    "title": "Reading Part 2...",\n    "skill": "READING",\n    "partNumber": 2,\n    "topic": "...",\n    "questions": [...]\n  }\n]`}
+                  className="w-full p-4 font-mono text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-900 text-emerald-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-y leading-relaxed"
+                />
+
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-xs text-slate-400">
+                    Hỗ trợ mảng <code>ValidatedExamItem[]</code> hoặc 1 đối tượng đề thi đơn lẻ.
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={handleValidateJson}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-bold text-xs shadow-md transition-all cursor-pointer"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Kiểm định & Soi chi tiết (Preview) →</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1632,8 +1942,27 @@ export default function ExamSmartImportModal({
                               </div>
                             </div>
 
-                            {/* Options if Multiple Choice */}
-                            {q.options && q.options.length > 0 && (
+                            {/* Options: Sentence Order vs Multiple Choice */}
+                            {q.questionType === "SENTENCE_ORDER" ? (
+                              <div className="pl-8 space-y-2">
+                                <div className="text-[11px] font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                                  <Sparkles className="w-3.5 h-3.5" />
+                                  <span>Trật tự 5 câu văn mẫu chuẩn (Thứ tự đúng từ 1 đến 5):</span>
+                                </div>
+                                {Array.isArray(q.options) &&
+                                  q.options.map((sent: string, sIdx: number) => (
+                                    <div
+                                      key={sIdx}
+                                      className="p-2.5 rounded-lg border border-amber-200 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 text-xs flex items-start gap-2.5"
+                                    >
+                                      <span className="w-5 h-5 rounded-md bg-amber-600 text-white font-black text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                                        {sIdx + 1}
+                                      </span>
+                                      <span className="leading-relaxed text-slate-800 dark:text-slate-200">{sent}</span>
+                                    </div>
+                                  ))}
+                              </div>
+                            ) : q.options && q.options.length > 0 ? (
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-8">
                                 {q.options.map((opt, optIdx) => {
                                   const optLetter = String.fromCharCode(65 + optIdx); // A, B, C, D
@@ -1671,16 +2000,20 @@ export default function ExamSmartImportModal({
                                   );
                                 })}
                               </div>
-                            )}
+                            ) : null}
 
-                            {/* Explanation if present */}
+                            {/* Explanation / Model Answer */}
                             {q.explanation && (
-                              <div className="ml-8 p-2.5 rounded-lg bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
-                                <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                                <div>
-                                  <span className="font-bold">Giải thích đáp án: </span>
-                                  {q.explanation}
+                              <div className="ml-8 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-950 dark:text-emerald-200 space-y-1">
+                                <div className="font-bold text-[10px] uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                  <Sparkles className="w-3.5 h-3.5" />
+                                  <span>
+                                    {q.questionType === "SPEAKING_AUDIO" || q.questionType === "ESSAY"
+                                      ? "Bài mẫu chuẩn (Model Sample Answer Aim B1/B2/C):"
+                                      : "Giải thích đáp án chi tiết:"}
+                                  </span>
                                 </div>
+                                <p className="italic leading-relaxed whitespace-pre-line">{q.explanation}</p>
                               </div>
                             )}
                           </div>
