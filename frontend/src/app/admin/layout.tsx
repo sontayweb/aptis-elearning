@@ -152,6 +152,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           badge: null,
         },
         {
+          title: "Gán nhãn Đề Tủ & Chủ đề",
+          href: "/admin/key-du-doan",
+          icon: Sparkles,
+          badge: "HOT",
+          badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono font-bold",
+        },
+        {
           title: "Đồng bộ & Đối soát Đề",
           href: "/admin/data-sync",
           icon: RefreshCw,

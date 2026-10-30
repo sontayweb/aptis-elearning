@@ -69,6 +69,13 @@ router.post('/parts/:partId/questions', (req, res, next) => adminController.addQ
 router.patch('/questions/:questionId', (req, res, next) => adminController.updateQuestion(req, res, next));
 router.delete('/questions/:questionId', (req, res, next) => adminController.deleteQuestion(req, res, next));
 
+// Quản lý Gán nhãn Sao / Cỏ theo Chủ Đề (Topic Tagging & Auto-Propagation)
+router.get('/topic-tags', (req, res, next) => adminController.getTopicRules(req, res, next));
+router.post('/topic-tags/preview-matches', (req, res, next) => adminController.previewTopicMatches(req, res, next));
+router.post('/topic-tags', (req, res, next) => adminController.saveTopicRule(req, res, next));
+router.post('/topic-tags/sync-all', (req, res, next) => adminController.syncAllTopicRules(req, res, next));
+router.delete('/topic-tags/:id', (req, res, next) => adminController.deleteTopicRule(req, res, next));
+
 
 // Quản lý giao dịch SePay
 router.get('/transactions', (req, res, next) =>

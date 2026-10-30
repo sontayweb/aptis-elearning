@@ -896,6 +896,27 @@ class ApiClient {
           body: JSON.stringify(body),
         }),
     },
+
+    // ── Topic Tagging & Auto-Propagation ───────────────────────
+    getTopicRules: () => this.request<any>('/admin/topic-tags'),
+    previewTopicMatches: (body: { keywords: string[]; skill?: string }) =>
+      this.request<any>('/admin/topic-tags/preview-matches', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    saveTopicRule: (body: any) =>
+      this.request<any>('/admin/topic-tags', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    syncAllTopicRules: () =>
+      this.request<any>('/admin/topic-tags/sync-all', {
+        method: 'POST',
+      }),
+    deleteTopicRule: (id: string, resetHot?: boolean) =>
+      this.request<any>(`/admin/topic-tags/${id}?reset=${Boolean(resetHot)}`, {
+        method: 'DELETE',
+      }),
   };
 
   // ==========================================

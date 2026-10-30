@@ -210,7 +210,18 @@ export default function ReadingPracticePage() {
     const isFullReading = e.title.includes("Full Reading") || e.totalParts === 4;
 
     if (activeTab === "full") {
-      return isFullReading;
+      return (
+        isFullReading ||
+        e.partTitle?.includes("Part 2") ||
+        e.partTitle?.includes("Text Cohesion") ||
+        e.partTitle?.includes("Cohesion") ||
+        e.title.includes("Part 2") ||
+        e.title.includes("PART2") ||
+        e.title.includes("Bộ Đề Tủ Part 2") ||
+        READING_PART2_TOPICS.some((t) =>
+          e.title.toLowerCase().includes(t.title.toLowerCase())
+        )
+      );
     } else if (activeTab === "p1") {
       // Part 1: Sentence comprehension (chỉ hiện đề lẻ Part 1)
       return (
@@ -271,7 +282,7 @@ export default function ReadingPracticePage() {
       let cloverLevel = e.hotLevel || 0;
       if (cloverLevel === 0) {
         const bank =
-          activeTab === "p2"
+          activeTab === "p2" || activeTab === "full"
             ? READING_PART2_TOPICS
             : activeTab === "p3"
             ? READING_PART3_TOPICS
@@ -319,9 +330,9 @@ export default function ReadingPracticePage() {
     switch (activeTab) {
       case "full":
         return {
-          title: "Luyện tập full part kỹ năng Reading",
-          desc: "32 bộ đề tổng hợp liên hoàn cả 4 Part của kỹ năng Reading trong 35 phút chuẩn British Council.",
-          badge: "Full Part",
+          title: "Tổng hợp đề thi Reading & Bộ đề tủ Part 2",
+          desc: "Toàn bộ đề thi Full Reading liên hoàn và ngân hàng đề tủ Part 2 Text Cohesion được sắp xếp theo độ hot (☘️) từ cao xuống thấp.",
+          badge: "Full Reading & Đề Tủ Part 2",
           partQuery: "",
           marathonText: "Tạo bộ đề của bạn",
           marathonDesc: "Tự ghép các đề lẻ thành bộ full test hoặc full part của riêng bạn. Dành cho tài khoản Pro.",

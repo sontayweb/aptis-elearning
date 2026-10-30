@@ -16,6 +16,7 @@ import { TransactionStatus } from '@prisma/client';
 import path from 'path';
 import fs from 'fs';
 import { standardExamParser } from '../ingestion/parsers/standard-exam.parser';
+import { topicTaggerService } from './topic-tagger.service';
 
 export class AdminController {
   async listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -497,6 +498,57 @@ export class AdminController {
   // Alias for backward compatibility with import flow
   async uploadImportImage(req: Request, res: Response, next: NextFunction): Promise<void> {
     return this.uploadExamImage(req, res, next);
+  }
+
+  // ── TOPIC TAGGING & AUTO-PROPAGATION ────────────────────────────
+  async getTopicRules(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const rules = await topicTaggerService.getTopicRules();
+      sendSuccess(res, rules, 'Lấy danh sách quy tắc chủ đề thành công');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async previewTopicMatches(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const keywords = req.body?.keywords || (req.query?.keywords ? String(req.query.keywords).split(',') : []);
+      const skill = req.body?.skill || req.query?.skill;
+      const result = await topicTaggerService.previewMatches(keywords, skill as string);
+      sendSuccess(res, result, 'Xem trước danh sách đề thi khớp từ khóa');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async saveTopicRule(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const autoPropagate = Boolean(req.body?.autoPropagate);
+      const result = await topicTaggerService.saveTopicRule(req.body, autoPropagate, req);
+      sendSuccess(res, result, 'Lưu quy tắc chủ đề thành công');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async syncAllTopicRules(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await topicTaggerService.syncAllRules(req);
+      sendSuccess(res, result, 'Đồng bộ toàn bộ quy tắc chủ đề vào Database thành công');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteTopicRule(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const ruleId = req.params.id;
+      const resetHot = req.query?.reset === 'true';
+      const result = await topicTaggerService.deleteTopicRule(ruleId, resetHot, req);
+      sendSuccess(res, result, 'Xóa quy tắc chủ đề thành công');
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
