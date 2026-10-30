@@ -16,14 +16,52 @@ export class SubmissionService {
       : null;
 
     if (!exam) {
+      const aptMockMatch = trimmed.match(/^(?:apt|de|đề|test)[-_\s#]*(\d{1,2})$/i);
+      if (aptMockMatch) {
+        const padded = aptMockMatch[1].padStart(2, '0');
+        exam = await prisma.exam.findFirst({
+          where: {
+            skill: 'FULL_TEST',
+            title: { startsWith: `[APT-${padded}]`, mode: 'insensitive' },
+          },
+        });
+      }
+    }
+
+    if (!exam) {
+      const shortHexMatch = trimmed.match(/^(?:apt[-_\s]?)?([0-9a-f]{6,12})$/i);
+      if (shortHexMatch) {
+        const hexPrefix = shortHexMatch[1].toLowerCase();
+        exam = await prisma.exam.findFirst({
+          where: {
+            id: { startsWith: hexPrefix, mode: 'insensitive' },
+          },
+        });
+      }
+    }
+
+    if (!exam) {
       exam = await prisma.exam.findFirst({
         where: {
           OR: [
             { id: trimmed },
             { title: { contains: trimmed, mode: 'insensitive' } },
+            { description: { contains: trimmed, mode: 'insensitive' } },
           ],
         },
       });
+    }
+
+    if (!exam) {
+      const numCodeMatch = trimmed.match(/^(?:de|đề|test|apt|aptis)?[-_\s#]*(\d{1,3})$/i);
+      if (numCodeMatch) {
+        const padded = numCodeMatch[1].padStart(2, '0');
+        exam = await prisma.exam.findFirst({
+          where: {
+            title: { contains: padded, mode: 'insensitive' },
+          },
+        });
+      }
     }
 
     if (!exam || !exam.is_published) {
@@ -421,6 +459,7 @@ export class SubmissionService {
       if (maxRScore > 0) readingScore = Math.round((rScore / maxRScore) * 50);
       if (maxLScore > 0) listeningScore = Math.round((lScore / maxLScore) * 50);
       if (maxGScore > 0) grammarScore = Math.round((gScore / maxGScore) * 50);
+      totalScore = (readingScore || 0) + (listeningScore || 0);
     }
 
     // Atomic transaction cập nhật điểm từng câu và trạng thái bài nộp

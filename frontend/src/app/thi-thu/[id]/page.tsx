@@ -22,7 +22,7 @@ import {
   Clock, ArrowLeft, ArrowRight, List, Info, LogOut,
   Mic, Volume2, CheckCircle2, Award, Sparkles, X, Loader2,
   StopCircle, Play, AlertTriangle, Upload, Pause, Check, Eye, EyeOff,
-  Headphones, BookOpen, FileText, PenTool, RefreshCw, Flag, RotateCcw, RotateCw, ArrowUp,
+  Headphones, BookOpen, FileText, PenTool, RefreshCw, Flag, RotateCcw, RotateCw, ArrowUp, Lock,
 } from "lucide-react";
 
 /* ====================================================
@@ -358,6 +358,9 @@ export default function OfficialMockExamRoom() {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [micTested, setMicTested] = useState(false);
   const [soundTested, setSoundTested] = useState(false);
+  const [isTestingSound, setIsTestingSound] = useState(false);
+  const [isTestingMic, setIsTestingMic] = useState(false);
+  const [deviceTestError, setDeviceTestError] = useState<string | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error" | "resumed">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [isResumedSession, setIsResumedSession] = useState<boolean>(false);
@@ -368,7 +371,77 @@ export default function OfficialMockExamRoom() {
   const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
   const [reportReason, setReportReason] = useState<string>("Đáp án chưa chính xác");
   const [reportNote, setReportNote] = useState<string>("");
+  const [isReportingQuestion, setIsReportingQuestion] = useState<boolean>(false);
+  const [reportSuccessMsg, setReportSuccessMsg] = useState<string | null>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
+
+  // Kiểm tra Loa / Tai nghe thật bằng Web Audio API
+  const handleTestSound = async () => {
+    if (isTestingSound) return;
+    setIsTestingSound(true);
+    setDeviceTestError(null);
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) {
+        throw new Error("Trình duyệt không hỗ trợ Web Audio API.");
+      }
+      const ctx = new AudioCtx();
+      const notes = [523.25, 659.25, 783.99]; // Hợp âm Đô trưởng (C5 - E5 - G5)
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
+        gain.gain.setValueAtTime(0.001, ctx.currentTime + i * 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + i * 0.18 + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + i * 0.18);
+        osc.stop(ctx.currentTime + i * 0.18 + 0.36);
+      });
+      await new Promise((r) => setTimeout(r, 750));
+      if (ctx.state !== "closed") {
+        await ctx.close().catch(() => {});
+      }
+      setSoundTested(true);
+    } catch (err: any) {
+      setDeviceTestError(err?.message || "Không thể phát âm thanh kiểm tra. Vui lòng kiểm tra loa/tai nghe.");
+    } finally {
+      setIsTestingSound(false);
+    }
+  };
+
+  // Kiểm tra Microphone thật bằng MediaDevices API
+  const handleTestMic = async () => {
+    if (isTestingMic) return;
+    setIsTestingMic(true);
+    setDeviceTestError(null);
+    try {
+      if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+        throw new Error("Trình duyệt không hỗ trợ ghi âm Microphone.");
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      const hasActiveTrack = stream.getAudioTracks().some((t) => t.enabled && t.readyState === "live");
+      await new Promise((r) => setTimeout(r, 600));
+      stream.getTracks().forEach((t) => t.stop());
+      if (!hasActiveTrack) {
+        throw new Error("Không nhận được tín hiệu từ Microphone.");
+      }
+      setMicTested(true);
+    } catch (err: any) {
+      if (err?.name === "NotAllowedError" || err?.name === "PermissionDeniedError") {
+        setDeviceTestError("Bạn đã từ chối quyền Micro. Vui lòng bật quyền Micro trên thanh địa chỉ trình duyệt.");
+      } else if (err?.name === "NotFoundError" || err?.name === "DevicesNotFoundError") {
+        setDeviceTestError("Không tìm thấy thiết bị Microphone. Vui lòng cắm tai nghe/micro rồi thử lại.");
+      } else {
+        setDeviceTestError(err?.message || "Không thể kết nối Microphone.");
+      }
+      setMicTested(false);
+    } finally {
+      setIsTestingMic(false);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -403,13 +476,29 @@ export default function OfficialMockExamRoom() {
     }
   }, []);
 
+  const [proLockedError, setProLockedError] = useState<string | null>(null);
+
   // ---- Load exam questions ----
   useEffect(() => {
     async function load() {
       if (!testId || testId.length < 3) return;
       try {
         setLoading(true);
+        setProLockedError(null);
         const res = await api.exams.getQuestions(testId);
+        if (
+          !res.success &&
+          (res.error?.code === "FORBIDDEN" ||
+            (res as any).requirePro ||
+            res.error?.message?.includes("VIP") ||
+            res.error?.message?.includes("PRO"))
+        ) {
+          setProLockedError(
+            res.error?.message ||
+              "Đề thi thử này được thiết lập quyền riêng tư chỉ mở cho tài khoản VIP PRO."
+          );
+          return;
+        }
         if (res.success && res.data) {
           const exam = res.data as any;
           setExamData(exam);
@@ -442,6 +531,7 @@ export default function OfficialMockExamRoom() {
 
               flat.push({
                 ...q,
+                part_id: q.part_id || part.id,
                 options: opts,
                 partNumber: part.part_number,
                 partTitle: part.title,
@@ -623,9 +713,10 @@ export default function OfficialMockExamRoom() {
   useEffect(() => {
     async function init() {
       if (modeParam === "review" || submissionIdParam) return;
-      if (!isAuthenticated || !testId || questions.length === 0) return;
+      const targetExamId = examData?.id || testId;
+      if (!isAuthenticated || !targetExamId || questions.length === 0) return;
       try {
-        const res = await api.submissions.start(testId);
+        const res = await api.submissions.start(targetExamId);
         if (res.success && res.data) {
           const subData = res.data;
           setSubmissionId(subData.submissionId || subData.id);
@@ -693,7 +784,7 @@ export default function OfficialMockExamRoom() {
     }
     init();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testId, isAuthenticated, questions.length, modeParam, submissionIdParam]);
+  }, [testId, examData?.id, isAuthenticated, questions.length, modeParam, submissionIdParam]);
 
   // ---- Timer ----
   const handleExpired = useCallback(() => {
@@ -743,9 +834,8 @@ export default function OfficialMockExamRoom() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [stagePhase, isFinished]);
 
-  // ---- Autosave ----
-  const doAutosave = useCallback(async () => {
-    if (!submissionId) return;
+  // ---- Chuẩn hóa danh sách câu trả lời ----
+  const buildAnswerPayload = useCallback(() => {
     const payload: any[] = [];
 
     Object.entries(selectedAnswers).forEach(([idxStr, optIdx]) => {
@@ -785,6 +875,13 @@ export default function OfficialMockExamRoom() {
       else payload.push({ questionId: qId, selectedOption: val });
     });
 
+    return payload;
+  }, [selectedAnswers, textAnswers, audioUrls, audioDurations, orderAnswers, matchingAnswers, questions]);
+
+  // ---- Autosave ----
+  const doAutosave = useCallback(async () => {
+    if (!submissionId) return;
+    const payload = buildAnswerPayload();
     if (payload.length === 0) return;
     try {
       setAutoSaveStatus("saving");
@@ -795,7 +892,7 @@ export default function OfficialMockExamRoom() {
     } catch {
       setAutoSaveStatus("error");
     }
-  }, [submissionId, selectedAnswers, textAnswers, audioUrls, audioDurations, questions]);
+  }, [submissionId, buildAnswerPayload]);
 
   // Autosave khi chuyển câu
   useEffect(() => {
@@ -898,11 +995,51 @@ export default function OfficialMockExamRoom() {
           }
         }
       } catch (e) {
-        console.warn("Submit API error, calculating score client-side:", e);
+        console.warn("Submit API error, falling back to guest server grading:", e);
       }
     }
 
-    // Client-side grading fallback (đảm bảo bấm nộp bài luôn luôn có kết quả ngay lập tức)
+    // Nếu người dùng chưa đăng nhập (Guest) hoặc chưa tạo được submissionId -> Chấm chuẩn trên Server qua API gradeGuest
+    if (!finalResult) {
+      try {
+        const payload = buildAnswerPayload();
+        const guestRes = await api.exams.gradeGuest(examData?.id || testId, payload);
+        if (guestRes.success && guestRes.data) {
+          const gData = guestRes.data;
+          if (gData.questionsKeyMap && typeof gData.questionsKeyMap === "object") {
+            setQuestions((prevFlat) =>
+              prevFlat.map((q) => {
+                const keyInfo = gData.questionsKeyMap[q.id];
+                if (keyInfo) {
+                  return {
+                    ...q,
+                    correct_answer: keyInfo.correct_answer ?? q.correct_answer,
+                    explanation: keyInfo.explanation || q.explanation,
+                    max_score: keyInfo.max_score ?? q.max_score,
+                  };
+                }
+                return q;
+              })
+            );
+          }
+          finalResult = {
+            totalScore: gData.totalScore,
+            maxScore: gData.maxScore,
+            cefrLevel: gData.cefrLevel,
+            readingScore: gData.readingScore,
+            listeningScore: gData.listeningScore,
+            grammarScore: gData.grammarScore,
+            correctCount: gData.correctCount,
+            totalQuestions: gData.totalQuestions,
+            partBreakdown: gData.partBreakdown,
+          };
+        }
+      } catch (guestErr) {
+        console.warn("Guest grading API error, calculating score client-side:", guestErr);
+      }
+    }
+
+    // Client-side grading fallback (khi mất mạng hoàn toàn)
     if (!finalResult) {
       let totalPts = 0;
       let maxPts = 0;
@@ -1021,7 +1158,75 @@ export default function OfficialMockExamRoom() {
       setTimeout(pollLatestResult, 8000);
       setTimeout(pollLatestResult, 13000);
     }
-  }, [isSubmitting, isFinished, submissionId, doAutosave, questions, selectedAnswers, textAnswers, matchingAnswers, orderAnswers, examData, pollLatestResult]);
+  }, [isSubmitting, isFinished, submissionId, doAutosave, buildAnswerPayload, questions, selectedAnswers, textAnswers, matchingAnswers, orderAnswers, examData, testId, pollLatestResult]);
+
+  // ---- Làm lại bài thi (Tạo phiên mới sạch sẽ) ----
+  const handleRetryExam = useCallback(async () => {
+    if (typeof window !== "undefined" && testId) {
+      try {
+        localStorage.removeItem(`aptis_mock_draft_${testId}`);
+      } catch {}
+    }
+    setSelectedAnswers({});
+    setTextAnswers({});
+    setAudioUrls({});
+    setAudioDurations({});
+    setMatchingAnswers({});
+    setOrderAnswers({});
+    setFlaggedQuestions({});
+    setResultData(null);
+    setReviewMode(false);
+    setIsFinished(false);
+    setQuestionIdx(0);
+    setStagePhase("exam");
+
+    const defaultSeconds = (examData?.duration_minutes || 162) * 60;
+    setServerTime(defaultSeconds);
+    syncTime(defaultSeconds);
+
+    if (isAuthenticated) {
+      try {
+        const res = await api.submissions.start(examData?.id || testId, true);
+        if (res.success && res.data) {
+          setSubmissionId(res.data.submissionId || res.data.id);
+          if (res.data.serverTimeRemaining !== undefined) {
+            setServerTime(res.data.serverTimeRemaining);
+            syncTime(res.data.serverTimeRemaining);
+          }
+        }
+      } catch {}
+    }
+  }, [examData, isAuthenticated, syncTime, testId]);
+
+  // ---- Gửi báo cáo lỗi câu hỏi lên Server ----
+  const handleSendQuestionReport = async (questionId?: string) => {
+    if (isReportingQuestion) return;
+    setIsReportingQuestion(true);
+    setReportSuccessMsg(null);
+    try {
+      await api.exams.reportQuestion(examData?.id || testId, {
+        questionId,
+        questionNumber: questionIdx + 1,
+        reason: reportReason,
+        note: reportNote,
+      });
+      setReportSuccessMsg("Đã gửi báo cáo lỗi thành công tới Ban chuyên môn Aptis!");
+      setTimeout(() => {
+        setReportModalOpen(false);
+        setReportNote("");
+        setReportSuccessMsg(null);
+      }, 1200);
+    } catch {
+      setReportSuccessMsg("Đã ghi nhận báo cáo của bạn. Cảm ơn bạn đã đóng góp!");
+      setTimeout(() => {
+        setReportModalOpen(false);
+        setReportNote("");
+        setReportSuccessMsg(null);
+      }, 1200);
+    } finally {
+      setIsReportingQuestion(false);
+    }
+  };
 
   // Stage calculation: Nhóm các task thuộc cùng 1 màn hình chuẩn British Council Aptis ESOL
   const getExamStages = useCallback(() => {
@@ -1125,32 +1330,40 @@ export default function OfficialMockExamRoom() {
     const qType = q?.question_type || "";
     const pNum = Number(q?.partNumber || 0);
 
-    if (qType === "SPEAKING_AUDIO" || pTitle.includes("SPEAKING") || pTitle.includes("NÓI") || pTitle.includes("NOI") || (pNum >= 1 && pNum <= 4)) {
+    // Ưu tiên phân loại theo tiêu đề Part hoặc loại câu hỏi trước
+    if (qType === "SPEAKING_AUDIO" || pTitle.includes("SPEAKING") || pTitle.includes("NÓI") || pTitle.includes("NOI")) {
       return { key: "SPEAKING", name: "Speaking", label: "Nói" };
     }
-    if (pTitle.includes("LISTENING") || pTitle.includes("NGHE") || (pNum >= 5 && pNum <= 8)) {
+    if (pTitle.includes("LISTENING") || pTitle.includes("NGHE")) {
       return { key: "LISTENING", name: "Listening", label: "Nghe" };
     }
-    if (pTitle.includes("GRAMMAR") || pTitle.includes("VOCAB") || pTitle.includes("NGỮ PHÁP") || pTitle.includes("TỪ VỰNG") || (pNum >= 9 && pNum <= 14)) {
+    if (pTitle.includes("GRAMMAR") || pTitle.includes("VOCAB") || pTitle.includes("NGỮ PHÁP") || pTitle.includes("TỪ VỰNG")) {
       return { key: "GRAMMAR_VOCABULARY", name: "Grammar & Vocab", label: "Ngữ pháp & Từ vựng" };
     }
-    if (pTitle.includes("READING") || pTitle.includes("ĐỌC") || pTitle.includes("DOC") || (pNum >= 15 && pNum <= 18)) {
+    if (pTitle.includes("READING") || pTitle.includes("ĐỌC") || pTitle.includes("DOC")) {
       return { key: "READING", name: "Reading", label: "Đọc" };
     }
-    if (qType === "WRITING_ESSAY" || pTitle.includes("WRITING") || pTitle.includes("VIẾT") || pTitle.includes("VIET") || (pNum >= 19 && pNum <= 22)) {
+    if (qType === "WRITING_ESSAY" || qType === "ESSAY" || pTitle.includes("WRITING") || pTitle.includes("VIẾT") || pTitle.includes("VIET")) {
       return { key: "WRITING", name: "Writing", label: "Viết" };
     }
+
+    // Fallback theo số thứ tự Part
+    if (pNum >= 1 && pNum <= 4) return { key: "LISTENING", name: "Listening", label: "Nghe" };
+    if (pNum >= 5 && pNum <= 8) return { key: "READING", name: "Reading", label: "Đọc" };
+    if (pNum >= 9 && pNum <= 12) return { key: "WRITING", name: "Writing", label: "Viết" };
+    if (pNum >= 13 && pNum <= 16) return { key: "SPEAKING", name: "Speaking", label: "Nói" };
+
     return { key: "GENERAL", name: "General", label: "Tổng hợp" };
   }, []);
 
   const fullTestSkills = useMemo(() => {
     if (examData?.skill !== "FULL_TEST" || questions.length === 0) return [];
     const skillsOrder = [
-      { key: "SPEAKING", name: "Speaking", label: "Nói" },
       { key: "LISTENING", name: "Listening", label: "Nghe" },
-      { key: "GRAMMAR_VOCABULARY", name: "Grammar & Vocab", label: "Ngữ pháp & Từ vựng" },
       { key: "READING", name: "Reading", label: "Đọc" },
       { key: "WRITING", name: "Writing", label: "Viết" },
+      { key: "SPEAKING", name: "Speaking", label: "Nói" },
+      { key: "GRAMMAR_VOCABULARY", name: "Grammar & Vocab", label: "Ngữ pháp & Từ vựng" },
     ];
 
     return skillsOrder.map((s) => {
@@ -1182,6 +1395,57 @@ export default function OfficialMockExamRoom() {
           <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-exam-text-muted text-sm">Đang tải đề thi...</p>
         </div>
+      </div>
+    );
+  }
+
+  // ========================================================
+  //  RENDER: PRO Locked Screen (Khi đề thi yêu cầu tài khoản VIP PRO)
+  // ========================================================
+  if (proLockedError) {
+    return (
+      <div className="notranslate min-h-screen bg-exam-bg text-exam-text flex flex-col font-sans">
+        <main className="flex-1 flex items-center justify-center px-4 py-16">
+          <div className="bg-exam-surface rounded-2xl border border-exam-border shadow-xl max-w-lg w-full p-8 text-center space-y-5">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center">
+              <Lock className="w-7 h-7" />
+            </div>
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-amber-500">
+                VIP PRO ACCESS REQUIRED
+              </span>
+              <h1 className="text-2xl font-extrabold text-exam-text mt-1">
+                Đề Thi Dành Riêng Cho Tài Khoản VIP PRO
+              </h1>
+              <p className="text-sm text-exam-text-muted mt-2 leading-relaxed">
+                {proLockedError}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+              {!isAuthenticated && (
+                <Link
+                  href="/login"
+                  className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:opacity-95 transition-opacity"
+                >
+                  Đăng nhập tài khoản PRO
+                </Link>
+              )}
+              <Link
+                href="/bang-gia"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-bold text-xs hover:opacity-95 transition-opacity"
+              >
+                Nâng cấp gói VIP PRO
+              </Link>
+              <Link
+                href="/thi-thu"
+                className="px-5 py-2.5 rounded-xl border border-exam-border text-exam-text font-bold text-xs hover:bg-exam-border/30 transition-colors"
+              >
+                Quay lại danh sách đề
+              </Link>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
@@ -1235,6 +1499,26 @@ export default function OfficialMockExamRoom() {
               ))}
             </div>
 
+            {!isAuthenticated && (
+              <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-300 text-xs flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold">Chế độ Khách (Chưa đăng nhập): </span>
+                    <span>
+                      Bạn vẫn có thể làm bài và được chấm điểm trắc nghiệm tức thì. Đăng nhập để lưu lịch sử làm bài và được AI chấm Speaking/Writing.
+                    </span>
+                  </div>
+                </div>
+                <Link
+                  href="/login"
+                  className="px-3 py-1.5 rounded-lg bg-amber-600 text-white font-bold text-xs shrink-0 hover:bg-amber-700 transition-colors"
+                >
+                  Đăng nhập
+                </Link>
+              </div>
+            )}
+
             <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-3">
               <div className="text-xs font-bold uppercase tracking-wider text-exam-text-muted">
                 Kiểm tra thiết bị trước khi vào thi:
@@ -1242,35 +1526,63 @@ export default function OfficialMockExamRoom() {
               <div className="flex flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={() => setSoundTested(true)}
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border text-xs font-semibold transition-all ${
+                  onClick={handleTestSound}
+                  disabled={isTestingSound}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
                     soundTested
                       ? "bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300"
                       : "border-exam-border bg-exam-surface text-exam-text hover:bg-exam-border/40"
                   }`}
                 >
-                  <Volume2 className="w-4 h-4 text-primary" />
-                  <span>{soundTested ? "✓ Âm thanh OK" : "Thử loa / tai nghe"}</span>
+                  {isTestingSound ? (
+                    <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                  ) : (
+                    <Volume2 className="w-4 h-4 text-primary" />
+                  )}
+                  <span>
+                    {isTestingSound
+                      ? "Đang phát âm thanh mẫu..."
+                      : soundTested
+                      ? "✓ Âm thanh OK (Nhấn để nghe lại)"
+                      : "Thử loa / tai nghe"}
+                  </span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setMicTested(true)}
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border text-xs font-semibold transition-all ${
+                  onClick={handleTestMic}
+                  disabled={isTestingMic}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
                     micTested
                       ? "bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300"
                       : "border-exam-border bg-exam-surface text-exam-text hover:bg-exam-border/40"
                   }`}
                 >
-                  <Mic className="w-4 h-4 text-primary" />
-                  <span>{micTested ? "✓ Micro OK" : "Thử micro nói"}</span>
+                  {isTestingMic ? (
+                    <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                  ) : (
+                    <Mic className="w-4 h-4 text-primary" />
+                  )}
+                  <span>
+                    {isTestingMic
+                      ? "Đang kiểm tra Micro..."
+                      : micTested
+                      ? "✓ Micro OK (Đã cấp quyền)"
+                      : "Thử micro nói"}
+                  </span>
                 </button>
               </div>
+              {deviceTestError && (
+                <p className="text-xs text-rose-500 font-medium flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{deviceTestError}</span>
+                </p>
+              )}
             </div>
 
             <button
               type="button"
               onClick={handleNext}
-              className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-base hover:bg-brand-brown transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-base hover:bg-brand-brown transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <Sparkles className="w-5 h-5" />
               Bắt đầu làm bài thi
@@ -1314,14 +1626,7 @@ export default function OfficialMockExamRoom() {
             setReviewMode(true);
             setQuestionIdx(0);
           }}
-          onRetry={() => {
-            setIsFinished(false);
-            setQuestionIdx(0);
-            setSelectedAnswers({});
-            setTextAnswers({});
-            setMatchingAnswers({});
-            setOrderAnswers({});
-          }}
+          onRetry={handleRetryExam}
         />
       );
     }
@@ -1384,16 +1689,16 @@ export default function OfficialMockExamRoom() {
                 ) : (
                   <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-2 text-xs font-bold">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Toàn bộ 5 kỹ năng đã được chấm điểm hoàn tất (AI Certified)</span>
+                    <span>Toàn bộ 4 kỹ năng đã được chấm điểm hoàn tất (AI Certified)</span>
                   </div>
                 )}
 
-                {/* 5 Skills Breakdown Grid */}
+                {/* 4 Skills Breakdown Grid */}
                 <div className="text-left">
                   <div className="text-xs font-bold text-exam-text-muted uppercase tracking-wider mb-2">
                     Điểm chi tiết từng kỹ năng (Thang điểm 0 - 50)
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40">
                       <div className="flex items-center gap-2 text-xs font-semibold text-exam-text-muted">
                         <Headphones className="w-3.5 h-3.5 text-blue-500" /> Listening
@@ -1450,16 +1755,18 @@ export default function OfficialMockExamRoom() {
                       </div>
                     </div>
 
-                    <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40 sm:col-span-2 md:col-span-1">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-exam-text-muted">
-                        <BookOpen className="w-3.5 h-3.5 text-purple-500" /> Grammar & Vocab
+                    {resultData?.grammarScore !== null && resultData?.grammarScore !== undefined && (
+                      <div className="p-3.5 rounded-xl border border-exam-border bg-exam-bg/40 sm:col-span-2 md:col-span-4">
+                        <div className="flex items-center gap-2 text-xs font-semibold text-exam-text-muted">
+                          <BookOpen className="w-3.5 h-3.5 text-purple-500" /> Grammar & Vocab
+                        </div>
+                        <div className="text-2xl font-black text-exam-text mt-1">
+                          {resultData.grammarScore}
+                          <span className="text-xs font-medium text-exam-text-muted"> / 50</span>
+                        </div>
+                        <span className="text-[10px] text-exam-text-muted block mt-0.5">* Điểm điều kiện xếp hạng</span>
                       </div>
-                      <div className="text-2xl font-black text-exam-text mt-1">
-                        {resultData?.grammarScore !== null && resultData?.grammarScore !== undefined ? resultData.grammarScore : 0}
-                        <span className="text-xs font-medium text-exam-text-muted"> / 50</span>
-                      </div>
-                      <span className="text-[10px] text-exam-text-muted block mt-0.5">* Điểm điều kiện xếp hạng</span>
-                    </div>
+                    )}
                   </div>
                 </div>
 
@@ -1527,10 +1834,19 @@ export default function OfficialMockExamRoom() {
                   setReviewMode(true);
                   setQuestionIdx(0);
                 }}
-                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:brightness-110 transition-all flex items-center gap-1.5"
+                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:brightness-110 transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>Xem lại bài làm chi tiết</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleRetryExam}
+                className="px-4 py-2 rounded-xl border border-exam-border text-xs font-bold hover:bg-exam-border/30 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Làm lại đề này</span>
               </button>
 
               <Link
@@ -2553,24 +2869,30 @@ export default function OfficialMockExamRoom() {
                   />
                 </div>
 
+                {reportSuccessMsg && (
+                  <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                    <span>{reportSuccessMsg}</span>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-end gap-2 pt-2 border-t border-exam-border">
                   <button
                     type="button"
                     onClick={() => setReportModalOpen(false)}
+                    disabled={isReportingQuestion}
                     className="px-4 py-2 rounded-xl border border-exam-border text-xs font-bold hover:bg-exam-border/30 transition-colors"
                   >
                     Hủy
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      alert("Cảm ơn bạn! Báo cáo lỗi của bạn đã được tiếp nhận và gửi đến ban chuyên môn Aptis.");
-                      setReportModalOpen(false);
-                      setReportNote("");
-                    }}
-                    className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 shadow-sm transition-all"
+                    disabled={isReportingQuestion || Boolean(reportSuccessMsg)}
+                    onClick={() => handleSendQuestionReport(activeRevQ?.id)}
+                    className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 shadow-sm transition-all disabled:opacity-60 inline-flex items-center gap-1.5"
                   >
-                    Gửi báo cáo
+                    {isReportingQuestion && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{isReportingQuestion ? "Đang gửi..." : "Gửi báo cáo"}</span>
                   </button>
                 </div>
               </div>

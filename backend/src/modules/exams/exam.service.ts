@@ -1,12 +1,50 @@
 import fs from 'fs';
 import path from 'path';
+import { Request } from 'express';
+import { AuditAction, QuestionType } from '@prisma/client';
 import { prisma } from '../../config/database';
 import { ExamFilterInput, CustomExamBuilderInput } from './exam.dto';
-import { assertProAccess } from '../../utils/pro-guard';
+import { assertProAccess, checkProAccess } from '../../utils/pro-guard';
+import { gradeObjectiveQuestion } from '../../utils/scoring-engine';
+import { scoreToCefr } from '../../utils/cefr-engine';
+import { auditService } from '../audit/audit.service';
+import { ensureTwentyFullTestExams } from './fulltest-generator';
 
 export class ExamService {
+  private fullTestsEnsured = false;
+  private ensuringPromise: Promise<void> | null = null;
+
+  private async ensureMockTestsReady() {
+    if (this.fullTestsEnsured) return;
+    if (!this.ensuringPromise) {
+      this.ensuringPromise = ensureTwentyFullTestExams(prisma)
+        .then(() => {
+          this.fullTestsEnsured = true;
+        })
+        .catch((err) => {
+          console.warn('⚠️ Không thể tự động đồng bộ 20 bộ đề Full Test:', err?.message || err);
+        })
+        .finally(() => {
+          this.ensuringPromise = null;
+        });
+    }
+    await this.ensuringPromise;
+  }
+
+  private extractExamCode(exam: { id: string; title: string }): string {
+    const bracketMatch = (exam.title || '').match(/\[(APT-\d{2,3})\]/i);
+    if (bracketMatch) {
+      return bracketMatch[1].toUpperCase();
+    }
+    return `APT-${exam.id.slice(0, 6).toUpperCase()}`;
+  }
+
   async listExams(filter: ExamFilterInput, userId?: string) {
     const { skill, isPro, isHot, hotLevel, source, search, page, limit } = filter;
+    if ((!skill || skill === 'FULL_TEST') && source !== 'KEY' && source !== 'CUSTOM') {
+      await this.ensureMockTestsReady();
+    }
+    const hasProAccess = await checkProAccess(userId);
     const skip = (page - 1) * limit;
 
     const where: any = {
@@ -48,10 +86,13 @@ export class ExamService {
       where.creator_id = userId;
     }
 
-    const orderBy: any = [
-      { hot_level: 'desc' },
-      ...(skill ? [{ title: 'asc' }] : [{ created_at: 'desc' }]),
-    ];
+    const orderBy: any =
+      skill === 'FULL_TEST' && !isHot && hotLevel === undefined
+        ? [{ title: 'asc' }]
+        : [
+            { hot_level: 'desc' },
+            ...(skill ? [{ title: 'asc' }] : [{ created_at: 'desc' }]),
+          ];
 
     const [exams, total] = await Promise.all([
       prisma.exam.findMany({
@@ -201,11 +242,15 @@ export class ExamService {
 
         return {
           id: exam.id,
-          title: exam.title,
+          code: this.extractExamCode(exam),
+          title: exam.title.replace(/^\[APT-\d{2,3}\]\s*/i, ''),
+          rawTitle: exam.title,
           description: exam.description,
           skill: exam.skill,
           durationMinutes: exam.duration_minutes,
           isPro: exam.is_pro,
+          hasProAccess,
+          isLocked: Boolean(exam.is_pro && !hasProAccess),
           hotLevel: exam.hot_level ?? 0,
           forecastTag: exam.forecast_tag ?? null,
           source: exam.source,
@@ -235,22 +280,52 @@ export class ExamService {
   }
 
   private async resolveExam(idOrCode: string) {
+    await this.ensureMockTestsReady();
     const trimmed = idOrCode.trim();
+    const includeSpec = {
+      parts: {
+        orderBy: { part_number: 'asc' as const },
+        include: {
+          _count: { select: { questions: true } },
+        },
+      },
+      _count: { select: { submissions: true } },
+    };
+
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed);
     if (isUuid) {
       const byId = await prisma.exam.findUnique({
         where: { id: trimmed },
-        include: {
-          parts: {
-            orderBy: { part_number: 'asc' },
-            include: {
-              _count: { select: { questions: true } },
-            },
-          },
-          _count: { select: { submissions: true } },
-        },
+        include: includeSpec,
       });
       if (byId) return byId;
+    }
+
+    // Ưu tiên tìm theo Mã bộ đề chuẩn APT-01 .. APT-20 (hoặc DE-01 .. DE-20)
+    const aptMockMatch = trimmed.match(/^(?:apt|de|đề|test)[-_\s#]*(\d{1,2})$/i);
+    if (aptMockMatch) {
+      const padded = aptMockMatch[1].padStart(2, '0');
+      const byAptTag = await prisma.exam.findFirst({
+        where: {
+          skill: 'FULL_TEST',
+          title: { startsWith: `[APT-${padded}]`, mode: 'insensitive' },
+        },
+        include: includeSpec,
+      });
+      if (byAptTag) return byAptTag;
+    }
+
+    // Tìm theo Mã phòng ngắn dạng APT-XXXXXX hoặc 6-12 ký tự hex đầu của UUID
+    const shortHexMatch = trimmed.match(/^(?:apt[-_\s]?)?([0-9a-f]{6,12})$/i);
+    if (shortHexMatch) {
+      const hexPrefix = shortHexMatch[1].toLowerCase();
+      const byPrefix = await prisma.exam.findFirst({
+        where: {
+          id: { startsWith: hexPrefix, mode: 'insensitive' },
+        },
+        include: includeSpec,
+      });
+      if (byPrefix) return byPrefix;
     }
 
     let exam = await prisma.exam.findFirst({
@@ -261,34 +336,19 @@ export class ExamService {
           { description: { contains: trimmed, mode: 'insensitive' } },
         ],
       },
-      include: {
-        parts: {
-          orderBy: { part_number: 'asc' },
-          include: {
-            _count: { select: { questions: true } },
-          },
-        },
-        _count: { select: { submissions: true } },
-      },
+      include: includeSpec,
     });
 
     if (!exam) {
-      const numMatch = trimmed.match(/\d+/);
-      if (numMatch) {
-        const padded = numMatch[0].padStart(2, '0');
+      // Chỉ tìm theo số hiệu đề khi mã nhập dạng DE-1, Đề 01, APT-1, Test 2...
+      const numCodeMatch = trimmed.match(/^(?:de|đề|test|apt|aptis)?[-_\s#]*(\d{1,3})$/i);
+      if (numCodeMatch) {
+        const padded = numCodeMatch[1].padStart(2, '0');
         exam = await prisma.exam.findFirst({
           where: {
             title: { contains: padded, mode: 'insensitive' },
           },
-          include: {
-            parts: {
-              orderBy: { part_number: 'asc' },
-              include: {
-                _count: { select: { questions: true } },
-              },
-            },
-            _count: { select: { submissions: true } },
-          },
+          include: includeSpec,
         });
       }
     }
@@ -302,6 +362,8 @@ export class ExamService {
     if (!exam) {
       throw { statusCode: 404, message: 'Đề thi không tồn tại' };
     }
+
+    const hasProAccess = await checkProAccess(userId);
 
     let userStatus: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' = 'NOT_STARTED';
     let bestScore: string | null = null;
@@ -360,11 +422,15 @@ export class ExamService {
 
     return {
       id: exam.id,
-      title: exam.title,
+      code: this.extractExamCode(exam),
+      title: exam.title.replace(/^\[APT-\d{2,3}\]\s*/i, ''),
+      rawTitle: exam.title,
       description: exam.description,
       skill: exam.skill,
       durationMinutes: exam.duration_minutes,
       isPro: exam.is_pro,
+      hasProAccess,
+      isLocked: Boolean(exam.is_pro && !hasProAccess),
       hotLevel: exam.hot_level ?? 0,
       forecastTag: exam.forecast_tag ?? null,
       source: exam.source,
@@ -377,39 +443,74 @@ export class ExamService {
       })),
       totalQuestions: exam.parts.reduce((sum, p) => sum + p._count.questions, 0),
       attemptCount: exam._count.submissions,
+      userStatus,
+      bestScore,
+      bestScoreNumber,
+      userAttempts,
+      lastAttemptedAt,
       createdAt: exam.created_at,
     };
   }
 
   async getExamQuestions(examId: string, userId?: string) {
+    await this.ensureMockTestsReady();
     const trimmed = examId.trim();
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed);
+    const includeQuestionsSpec = {
+      parts: {
+        orderBy: { part_number: 'asc' as const },
+        include: {
+          questions: {
+            orderBy: { question_number: 'asc' as const },
+            select: {
+              id: true,
+              part_id: true,
+              question_number: true,
+              question_type: true,
+              prompt: true,
+              options: true,
+              correct_answer: true,
+              max_score: true,
+              explanation: true,
+            },
+          },
+        },
+      },
+    };
 
     let exam = isUuid
       ? await prisma.exam.findUnique({
           where: { id: trimmed },
-          include: {
-            parts: {
-              orderBy: { part_number: 'asc' },
-              include: {
-                questions: {
-                  orderBy: { question_number: 'asc' },
-                  select: {
-                    id: true,
-                    question_number: true,
-                    question_type: true,
-                    prompt: true,
-                    options: true,
-                    correct_answer: true,
-                    max_score: true,
-                    explanation: true,
-                  },
-                },
-              },
-            },
-          },
+          include: includeQuestionsSpec,
         })
       : null;
+
+    if (!exam) {
+      const aptMockMatch = trimmed.match(/^(?:apt|de|đề|test)[-_\s#]*(\d{1,2})$/i);
+      if (aptMockMatch) {
+        const padded = aptMockMatch[1].padStart(2, '0');
+        exam = await prisma.exam.findFirst({
+          where: {
+            skill: 'FULL_TEST',
+            title: { startsWith: `[APT-${padded}]`, mode: 'insensitive' },
+          },
+          include: includeQuestionsSpec,
+        });
+      }
+    }
+
+    if (!exam) {
+      const shortHexMatch = trimmed.match(/^(?:apt[-_\s]?)?([0-9a-f]{6,12})$/i);
+      if (shortHexMatch) {
+        const hexPrefix = shortHexMatch[1].toLowerCase();
+        exam = await prisma.exam.findFirst({
+          where: {
+            id: { startsWith: hexPrefix, mode: 'insensitive' },
+          },
+          include: includeQuestionsSpec,
+        });
+      }
+    }
 
     if (!exam) {
       exam = await prisma.exam.findFirst({
@@ -420,57 +521,19 @@ export class ExamService {
             { description: { contains: trimmed, mode: 'insensitive' } },
           ],
         },
-        include: {
-          parts: {
-            orderBy: { part_number: 'asc' },
-            include: {
-              questions: {
-                orderBy: { question_number: 'asc' },
-                select: {
-                  id: true,
-                  question_number: true,
-                  question_type: true,
-                  prompt: true,
-                  options: true,
-                  correct_answer: true,
-                  max_score: true,
-                  explanation: true,
-                },
-              },
-            },
-          },
-        },
+        include: includeQuestionsSpec,
       });
     }
 
     if (!exam) {
-      const numMatch = trimmed.match(/\d+/);
-      if (numMatch) {
-        const padded = numMatch[0].padStart(2, '0');
+      const numCodeMatch = trimmed.match(/^(?:de|đề|test|apt|aptis)?[-_\s#]*(\d{1,3})$/i);
+      if (numCodeMatch) {
+        const padded = numCodeMatch[1].padStart(2, '0');
         exam = await prisma.exam.findFirst({
           where: {
             title: { contains: padded, mode: 'insensitive' },
           },
-          include: {
-            parts: {
-              orderBy: { part_number: 'asc' },
-              include: {
-                questions: {
-                  orderBy: { question_number: 'asc' },
-                  select: {
-                    id: true,
-                    question_number: true,
-                    question_type: true,
-                    prompt: true,
-                    options: true,
-                    correct_answer: true,
-                    max_score: true,
-                    explanation: true,
-                  },
-                },
-              },
-            },
-          },
+          include: includeQuestionsSpec,
         });
       }
     }
@@ -502,8 +565,7 @@ export class ExamService {
     for (const part of exam.parts) {
       const isListeningPart =
         exam.skill === 'LISTENING' ||
-        part.title.toLowerCase().includes('listening') ||
-        (part.part_number <= 4 && exam.skill === 'FULL_TEST' && part.title.toLowerCase().includes('part'));
+        part.title.toLowerCase().includes('listening');
 
       if (isListeningPart) {
         const audioDir = path.resolve(process.env.UPLOAD_DIR || './uploads', 'audio', 'listening');
@@ -517,8 +579,13 @@ export class ExamService {
           }
         }
 
-        // Trích xuất số hiệu đề từ exam.title (vd: "Đề 01", "Đề 07", "Đề 30") hoặc exam.id
-        const numMatch = exam.title.match(/Đề\s*(\d+)/i) || exam.title.match(/Test\s*(\d+)/i) || exam.title.match(/\b(\d+)\b/);
+        // Trích xuất số hiệu đề từ part.title (nếu là Full Test ghép từ Đề XX) hoặc exam.title
+        const partNumMatch = part.title.match(/Đề\s*(\d+)/i);
+        const numMatch =
+          partNumMatch ||
+          exam.title.match(/Đề\s*(\d+)/i) ||
+          exam.title.match(/Test\s*#?(\d+)/i) ||
+          exam.title.match(/\b(\d+)\b/);
         const examNumStr = numMatch ? String(numMatch[1]).padStart(2, '0') : null;
         const examPrefix = examNumStr ? `de${examNumStr}` : null;
 
@@ -918,6 +985,211 @@ export class ExamService {
     });
 
     return customExam;
+  }
+
+  /**
+   * Chấm điểm phía Server cho khách vãng lai (Guest) hoặc phiên thi chưa lưu DB
+   * trả về điểm số chuẩn + đáp án đúng & lời giải để hiển thị ở màn Review
+   */
+  async gradeGuestSubmission(
+    examId: string,
+    answers: Array<{
+      questionId: string;
+      selectedOption?: string | null;
+      textAnswer?: string | null;
+    }>
+  ) {
+    const resolved = await this.resolveExam(examId);
+    if (!resolved) {
+      throw { statusCode: 404, message: 'Đề thi không tồn tại' };
+    }
+
+    const exam = await prisma.exam.findUnique({
+      where: { id: resolved.id },
+      include: {
+        parts: {
+          orderBy: { part_number: 'asc' },
+          include: {
+            questions: {
+              orderBy: { question_number: 'asc' },
+            },
+          },
+        },
+      },
+    });
+
+    if (!exam) {
+      throw { statusCode: 404, message: 'Đề thi không tồn tại' };
+    }
+
+    const answersMap = new Map<string, { selectedOption?: string | null; textAnswer?: string | null }>();
+    for (const ans of answers || []) {
+      if (ans && ans.questionId) {
+        answersMap.set(ans.questionId, ans);
+      }
+    }
+
+    let totalScore = 0;
+    let maxTotalScore = 0;
+    let correctCount = 0;
+    let totalQuestions = 0;
+    let rScore = 0, maxRScore = 0;
+    let lScore = 0, maxLScore = 0;
+    let gScore = 0, maxGScore = 0;
+
+    const partBreakdown: Array<{
+      partNumber: number;
+      title: string;
+      correctCount: number;
+      totalCount: number;
+      score: number;
+      maxScore: number;
+    }> = [];
+
+    const questionsKeyMap: Record<
+      string,
+      { correct_answer: string | null; explanation: string | null; max_score: number }
+    > = {};
+
+    for (const part of exam.parts) {
+      const pTitleLower = (part.title || '').toLowerCase();
+      let pCorrect = 0;
+      let pScore = 0;
+      const pMax = part.questions.reduce((sum, q) => sum + (q.max_score || 1), 0);
+
+      for (const q of part.questions) {
+        totalQuestions++;
+        const qMax = q.max_score || 1;
+        maxTotalScore += qMax;
+
+        questionsKeyMap[q.id] = {
+          correct_answer: q.correct_answer,
+          explanation: q.explanation,
+          max_score: qMax,
+        };
+
+        const isSubjective =
+          exam.skill === 'WRITING' ||
+          exam.skill === 'SPEAKING' ||
+          q.question_type === QuestionType.ESSAY ||
+          q.question_type === QuestionType.SPEAKING_AUDIO ||
+          q.question_type === QuestionType.SHORT_TEXT;
+
+        if (isSubjective) continue;
+
+        if (pTitleLower.includes('reading')) maxRScore += qMax;
+        else if (pTitleLower.includes('listening')) maxLScore += qMax;
+        else if (pTitleLower.includes('grammar') || pTitleLower.includes('vocab')) maxGScore += qMax;
+
+        const userAns = answersMap.get(q.id);
+        if (!userAns) continue;
+
+        const userChoice = userAns.selectedOption || userAns.textAnswer || '';
+        const { score } = gradeObjectiveQuestion(
+          q.question_type,
+          q.correct_answer,
+          userChoice,
+          qMax,
+          q.options
+        );
+
+        if (score > 0) {
+          totalScore += score;
+          pScore += score;
+          pCorrect++;
+          correctCount++;
+
+          if (pTitleLower.includes('reading')) rScore += score;
+          else if (pTitleLower.includes('listening')) lScore += score;
+          else if (pTitleLower.includes('grammar') || pTitleLower.includes('vocab')) gScore += score;
+        }
+      }
+
+      partBreakdown.push({
+        partNumber: part.part_number,
+        title: part.title,
+        correctCount: pCorrect,
+        totalCount: part.questions.length,
+        score: Math.round(pScore * 10) / 10,
+        maxScore: pMax,
+      });
+    }
+
+    const readingScore =
+      exam.skill === 'READING'
+        ? Math.round(totalScore * 10) / 10
+        : maxRScore > 0
+        ? Math.round((rScore / maxRScore) * 50)
+        : undefined;
+    const listeningScore =
+      exam.skill === 'LISTENING'
+        ? Math.round(totalScore * 10) / 10
+        : maxLScore > 0
+        ? Math.round((lScore / maxLScore) * 50)
+        : undefined;
+    const grammarScore =
+      exam.skill === 'GRAMMAR_VOCABULARY'
+        ? Math.round(totalScore * 10) / 10
+        : maxGScore > 0
+        ? Math.round((gScore / maxGScore) * 50)
+        : undefined;
+
+    const finalTotalScore =
+      exam.skill === 'FULL_TEST'
+        ? (readingScore || 0) + (listeningScore || 0)
+        : Math.round(totalScore * 10) / 10;
+
+    const cefrLevel = scoreToCefr(totalScore, maxTotalScore || 50);
+
+    return {
+      totalScore: finalTotalScore,
+      maxScore: exam.skill === 'FULL_TEST' ? 200 : maxTotalScore || 50,
+      cefrLevel,
+      readingScore,
+      listeningScore,
+      grammarScore,
+      correctCount,
+      totalQuestions,
+      partBreakdown,
+      questionsKeyMap,
+    };
+  }
+
+  /**
+   * Lưu báo cáo lỗi câu hỏi từ học viên vào AuditLog để ban chuyên môn xử lý
+   */
+  async reportQuestionIssue(
+    examId: string,
+    payload: {
+      questionId?: string;
+      questionNumber?: number;
+      reason: string;
+      note?: string;
+    },
+    req?: Request
+  ) {
+    const resolved = await this.resolveExam(examId);
+    const targetExamId = resolved?.id || examId;
+    const examTitle = resolved?.title || examId;
+
+    await auditService.record({
+      req,
+      action: AuditAction.EXAM_UPDATE,
+      entityType: 'QUESTION_REPORT',
+      entityId: payload.questionId || targetExamId,
+      description: `Báo lỗi câu hỏi #${payload.questionNumber || '?'} thuộc đề "${examTitle}": ${payload.reason}`,
+      newValue: {
+        examId: targetExamId,
+        examTitle,
+        questionId: payload.questionId || null,
+        questionNumber: payload.questionNumber || null,
+        reason: payload.reason,
+        note: payload.note || '',
+        reportedAt: new Date().toISOString(),
+      },
+    });
+
+    return { reported: true };
   }
 }
 

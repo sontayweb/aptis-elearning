@@ -172,6 +172,33 @@ class ApiClient {
 
     getQuestions: (id: string) => this.request(`/exams/${id}/questions`),
 
+    gradeGuest: (
+      id: string,
+      answers: Array<{
+        questionId: string;
+        selectedOption?: string | null;
+        textAnswer?: string | null;
+      }>
+    ) =>
+      this.request(`/exams/${id}/grade-guest`, {
+        method: 'POST',
+        body: JSON.stringify({ answers }),
+      }),
+
+    reportQuestion: (
+      id: string,
+      body: {
+        questionId?: string;
+        questionNumber?: number;
+        reason: string;
+        note?: string;
+      }
+    ) =>
+      this.request(`/exams/${id}/report-question`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+
     customBuilder: (body: { title: string; skill_types: string[]; duration_minutes: number }) =>
       this.request('/exams/custom-builder', {
         method: 'POST',
