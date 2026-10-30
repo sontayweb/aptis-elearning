@@ -54,7 +54,6 @@ export class ExamService {
     if (source === 'KEY') {
       where.OR = [
         { hot_level: { gt: 0 } },
-        { forecast_tag: { not: null } },
         { source: 'KEY' },
       ];
     } else if (source) {
