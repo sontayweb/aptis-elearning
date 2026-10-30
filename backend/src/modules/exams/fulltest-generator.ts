@@ -694,8 +694,11 @@ const FALLBACK_PARTS: Record<string, Omit<SourcePartWithQuestions, 'id'>> = {
  * - Đề 01 (APT-01): Miễn phí (is_pro = false)
  * - Đề 02 đến Đề 20 (APT-02 .. APT-20): Khóa VIP PRO (is_pro = true)
  */
-export async function ensureTwentyFullTestExams(prisma: PrismaClient): Promise<void> {
-  // Kiểm tra nhanh xem đã có đủ 20 đề [APT-01] .. [APT-20] chưa
+export async function ensureTwentyFullTestExams(
+  prisma: PrismaClient,
+  options?: { forceAll?: boolean }
+): Promise<void> {
+  // Kiểm tra nhanh xem đã có bộ đề [APT-01] .. [APT-20] trong hệ thống chưa
   const existingGenerated = await prisma.exam.findMany({
     where: {
       skill: ExamSkill.FULL_TEST,
@@ -710,8 +713,11 @@ export async function ensureTwentyFullTestExams(prisma: PrismaClient): Promise<v
     },
   });
 
+  // Nếu không phải chế độ forceAll của Admin và hệ thống đã có đề [APT-XX] hoàn chỉnh (>= 16 parts),
+  // giữ nguyên trạng thái hiện tại để tôn trọng các thao tác Xóa / Ẩn / Đổi gói PRO của Admin.
   if (
-    existingGenerated.length >= 20 &&
+    !options?.forceAll &&
+    existingGenerated.length > 0 &&
     existingGenerated.every((e) => e._count.parts >= 16)
   ) {
     return;
@@ -863,13 +869,6 @@ export async function ensureTwentyFullTestExams(prisma: PrismaClient): Promise<v
     });
 
     if (existing && existing._count.parts >= 16) {
-      // Đảm bảo cờ is_pro đúng quy tắc (Đề 01 Free, Đề 02..20 PRO)
-      if (existing.is_pro !== !isFreeDemo) {
-        await prisma.exam.update({
-          where: { id: existing.id },
-          data: { is_pro: !isFreeDemo },
-        });
-      }
       continue;
     }
 
@@ -963,5 +962,187 @@ export async function ensureTwentyFullTestExams(prisma: PrismaClient): Promise<v
       },
     });
   }
+}
+
+/**
+ * Cho phép Quản trị viên (Admin) trộn lại ngẫu nhiên (Re-randomize) bộ 16 Parts
+ * của 1 đề thi thử FULL_TEST bất kỳ từ ngân hàng câu hỏi hiện có.
+ */
+export async function rerandomizeSingleFullTestExam(
+  prisma: PrismaClient,
+  examId: string
+) {
+  const exam = await prisma.exam.findUnique({ where: { id: examId } });
+  if (!exam) {
+    throw { statusCode: 404, message: 'Đề thi không tồn tại' };
+  }
+
+  const skillExams = await prisma.exam.findMany({
+    where: {
+      skill: {
+        in: [
+          ExamSkill.LISTENING,
+          ExamSkill.READING,
+          ExamSkill.WRITING,
+          ExamSkill.SPEAKING,
+        ],
+      },
+      is_published: true,
+    },
+    include: {
+      parts: {
+        orderBy: { part_number: 'asc' },
+        include: {
+          questions: {
+            orderBy: { question_number: 'asc' },
+          },
+        },
+      },
+    },
+  });
+
+  const pools: Record<string, SourcePartWithQuestions[]> = {
+    L_P1: [], L_P2: [], L_P3: [], L_P4: [],
+    R_P1: [], R_P2: [], R_P3: [], R_P4: [],
+    W_P1: [], W_P2: [], W_P3: [], W_P4: [],
+    S_P1: [], S_P2: [], S_P3: [], S_P4: [],
+  };
+
+  for (const ex of skillExams) {
+    for (const p of ex.parts) {
+      if (!p.questions || p.questions.length === 0) continue;
+      const t = (p.title || '').toLowerCase();
+      const item: SourcePartWithQuestions = {
+        id: p.id,
+        part_number: p.part_number,
+        title: p.title,
+        instructions: p.instructions,
+        passage_text: p.passage_text,
+        audio_url: p.audio_url,
+        image_url: p.image_url,
+        examTitle: ex.title,
+        questions: p.questions.map((q) => ({
+          question_number: q.question_number,
+          question_type: q.question_type,
+          prompt: q.prompt,
+          options: q.options,
+          correct_answer: q.correct_answer,
+          explanation: q.explanation,
+          max_score: q.max_score,
+        })),
+      };
+
+      if (ex.skill === ExamSkill.LISTENING) {
+        if (p.part_number === 1 || t.includes('part 1') || t.includes('recognition')) pools.L_P1.push(item);
+        else if (p.part_number === 2 || t.includes('part 2') || t.includes('matching')) pools.L_P2.push(item);
+        else if (p.part_number === 3 || t.includes('part 3') || t.includes('opinion') || t.includes('discussion')) pools.L_P3.push(item);
+        else if (p.part_number === 4 || t.includes('part 4') || t.includes('monologue')) pools.L_P4.push(item);
+      } else if (ex.skill === ExamSkill.READING) {
+        if (t.includes('long') || t.includes('heading') || t.includes('part 5') || p.part_number === 5 || (p.part_number === 4 && !t.includes('opinion'))) {
+          pools.R_P4.push(item);
+        } else if (t.includes('opinion') || t.includes('part 3') || (p.part_number === 3 && ex.parts.length === 4) || (p.part_number === 4 && t.includes('opinion'))) {
+          pools.R_P3.push(item);
+        } else if (t.includes('cohesion') || t.includes('order') || t.includes('part 2') || p.part_number === 2) {
+          pools.R_P2.push(item);
+        } else {
+          pools.R_P1.push(item);
+        }
+      } else if (ex.skill === ExamSkill.WRITING) {
+        if (p.part_number === 1 || t.includes('part 1')) pools.W_P1.push(item);
+        else if (p.part_number === 2 || t.includes('part 2')) pools.W_P2.push(item);
+        else if (p.part_number === 3 || t.includes('part 3')) pools.W_P3.push(item);
+        else if (p.part_number === 4 || t.includes('part 4')) pools.W_P4.push(item);
+      } else if (ex.skill === ExamSkill.SPEAKING) {
+        if (p.part_number === 1 || t.includes('part 1')) pools.S_P1.push(item);
+        else if (p.part_number === 2 || t.includes('part 2')) pools.S_P2.push(item);
+        else if (p.part_number === 3 || t.includes('part 3')) pools.S_P3.push(item);
+        else if (p.part_number === 4 || t.includes('part 4')) pools.S_P4.push(item);
+      }
+    }
+  }
+
+  const pickRandomFromPool = (poolKey: string): Omit<SourcePartWithQuestions, 'id'> => {
+    const list = pools[poolKey] || [];
+    if (list.length > 0) {
+      const idx = Math.floor(Math.random() * list.length);
+      return list[idx];
+    }
+    return FALLBACK_PARTS[poolKey];
+  };
+
+  const l1 = pickRandomFromPool('L_P1');
+  const l2 = pickRandomFromPool('L_P2');
+  const l3 = pickRandomFromPool('L_P3');
+  const l4 = pickRandomFromPool('L_P4');
+
+  const r1 = pickRandomFromPool('R_P1');
+  const r2 = pickRandomFromPool('R_P2');
+  const r3 = pickRandomFromPool('R_P3');
+  const r4 = pickRandomFromPool('R_P4');
+
+  const w1 = pickRandomFromPool('W_P1');
+  const w2 = pickRandomFromPool('W_P2');
+  const w3 = pickRandomFromPool('W_P3');
+  const w4 = pickRandomFromPool('W_P4');
+
+  const s1 = pickRandomFromPool('S_P1');
+  const s2 = pickRandomFromPool('S_P2');
+  const s3 = pickRandomFromPool('S_P3');
+  const s4 = pickRandomFromPool('S_P4');
+
+  const assembledParts = [
+    { num: 1, title: `LISTENING - Part 1 – Word Recognition (${extractSourceDeTag(l1.examTitle)})`, src: l1 },
+    { num: 2, title: `LISTENING - Part 2 – Information Matching (${extractSourceDeTag(l2.examTitle)})`, src: l2 },
+    { num: 3, title: `LISTENING - Part 3 – Opinion Matching (${extractSourceDeTag(l3.examTitle)})`, src: l3 },
+    { num: 4, title: `LISTENING - Part 4 – Monologue Comprehension (${extractSourceDeTag(l4.examTitle)})`, src: l4 },
+
+    { num: 5, title: `READING - Part 1 – Sentence comprehension (${extractSourceDeTag(r1.examTitle)})`, src: r1 },
+    { num: 6, title: `READING - Part 2 – Text cohesion (${extractSourceDeTag(r2.examTitle)})`, src: r2 },
+    { num: 7, title: `READING - Part 3 – Opinion matching (${extractSourceDeTag(r3.examTitle)})`, src: r3 },
+    { num: 8, title: `READING - Part 4 – Long reading (${extractSourceDeTag(r4.examTitle)})`, src: r4 },
+
+    { num: 9, title: `WRITING - Part 1 – Short Answers (${extractSourceDeTag(w1.examTitle)})`, src: w1 },
+    { num: 10, title: `WRITING - Part 2 – Social Media Response (${extractSourceDeTag(w2.examTitle)})`, src: w2 },
+    { num: 11, title: `WRITING - Part 3 – Three Questions (${extractSourceDeTag(w3.examTitle)})`, src: w3 },
+    { num: 12, title: `WRITING - Part 4 – Formal & Informal Email (${extractSourceDeTag(w4.examTitle)})`, src: w4 },
+
+    { num: 13, title: `SPEAKING - Part 1 – Personal Information (${extractSourceDeTag(s1.examTitle)})`, src: s1 },
+    { num: 14, title: `SPEAKING - Part 2 – Describe Picture (${extractSourceDeTag(s2.examTitle)})`, src: s2 },
+    { num: 15, title: `SPEAKING - Part 3 – Compare Two Pictures (${extractSourceDeTag(s3.examTitle)})`, src: s3 },
+    { num: 16, title: `SPEAKING - Part 4 – Abstract Discussion (${extractSourceDeTag(s4.examTitle)})`, src: s4 },
+  ];
+
+  // Xóa các Part cũ của đề này và tạo lại 16 Part mới được random
+  await prisma.examPart.deleteMany({ where: { exam_id: examId } });
+
+  for (const ap of assembledParts) {
+    await prisma.examPart.create({
+      data: {
+        exam_id: examId,
+        part_number: ap.num,
+        title: ap.title,
+        instructions: ap.src.instructions,
+        passage_text: ap.src.passage_text,
+        audio_url: ap.src.audio_url,
+        image_url: ap.src.image_url,
+        questions: {
+          create: ap.src.questions.map((q, qIdx) => ({
+            question_number: q.question_number || qIdx + 1,
+            question_type: q.question_type,
+            prompt: q.prompt,
+            options: q.options ?? undefined,
+            correct_answer: q.correct_answer,
+            explanation: q.explanation,
+            max_score: q.max_score || 1.0,
+          })),
+        },
+      },
+    });
+  }
+
+  return prisma.exam.findUnique({
+    where: { id: examId },
+    include: { parts: { include: { questions: true } } },
+  });
 }
 

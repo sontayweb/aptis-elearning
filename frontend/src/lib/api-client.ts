@@ -725,6 +725,16 @@ class ApiClient {
         method: 'POST',
       }),
 
+    rerandomizeExam: (id: string) =>
+      this.request(`/admin/exams/${id}/rerandomize`, {
+        method: 'POST',
+      }),
+
+    generateFullTestExams: () =>
+      this.request('/admin/exams/generate-fulltests', {
+        method: 'POST',
+      }),
+
     getImportTemplates: () => this.request<any>('/admin/exams/import/templates'),
 
     validateImportExamFile: (file: File) => {

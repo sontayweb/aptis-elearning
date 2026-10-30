@@ -16,6 +16,7 @@ import { Request } from 'express';
 import { grantOrExtendSubscription } from '../../utils/subscription-helper';
 import * as xlsx from 'xlsx';
 import { emailService } from '../email/email.service';
+import { ensureTwentyFullTestExams, rerandomizeSingleFullTestExam } from '../exams/fulltest-generator';
 import fs from 'fs';
 import path from 'path';
 
@@ -349,6 +350,30 @@ export class AdminService {
     });
 
     return { success: true, message: 'Xóa đề thi thành công' };
+  }
+
+  async rerandomizeFullTestExam(examId: string, req?: Request) {
+    const updated = await rerandomizeSingleFullTestExam(prisma, examId);
+    auditService.record({
+      req,
+      action: AuditAction.EXAM_UPDATE,
+      entityType: 'EXAM',
+      entityId: examId,
+      description: `Trộn lại (Re-randomize) bộ 16 Parts cho đề thi thử Full Test: "${updated?.title || examId}"`,
+    });
+    return updated;
+  }
+
+  async generateFullTestExams(req?: Request) {
+    await ensureTwentyFullTestExams(prisma, { forceAll: true });
+    auditService.record({
+      req,
+      action: AuditAction.EXAM_CREATE,
+      entityType: 'EXAM_BATCH',
+      entityId: 'APT_01_20',
+      description: `Khôi phục / Tạo tự động đủ 20 bộ đề thi thử Full Test (APT-01 đến APT-20) từ ngân hàng câu hỏi`,
+    });
+    return { success: true };
   }
 
   async updateExam(examId: string, input: any, req?: Request) {
@@ -1001,6 +1026,9 @@ export class AdminService {
     partNumber?: number,
     hotLevel?: string
   ) {
+    try {
+      await ensureTwentyFullTestExams(prisma);
+    } catch {}
     const skip = (page - 1) * limit;
     const where: any = {};
     if (skill && skill !== 'ALL') {

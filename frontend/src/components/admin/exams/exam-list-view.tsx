@@ -44,6 +44,7 @@ interface ExamListViewProps {
   onTogglePro: (exam: ExamItem) => void;
   onCycleHotLevel: (exam: ExamItem) => void;
   onDuplicateExam: (exam: ExamItem) => void;
+  onRerandomizeExam?: (exam: ExamItem) => void;
   onOpenEdit: (exam: ExamItem) => void;
   onPreviewExam: (exam: ExamItem) => void;
   onDeleteExam: (exam: ExamItem) => void;
@@ -77,6 +78,7 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
   onTogglePro,
   onCycleHotLevel,
   onDuplicateExam,
+  onRerandomizeExam,
   onOpenEdit,
   onPreviewExam,
   onDeleteExam,
@@ -602,6 +604,17 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
                                 <Copy className="w-3.5 h-3.5 text-indigo-500" />
                                 <span>Nhân bản đề thi</span>
                               </button>
+
+                              {exam.skill === "FULL_TEST" && onRerandomizeExam && (
+                                <button
+                                  type="button"
+                                  onClick={() => onRerandomizeExam(exam)}
+                                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors text-left font-medium"
+                                >
+                                  <RefreshCw className="w-3.5 h-3.5 text-amber-500" />
+                                  <span>Trộn lại câu hỏi (Random)</span>
+                                </button>
+                              )}
 
                               <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
 

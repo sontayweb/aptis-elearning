@@ -410,6 +410,36 @@ export default function AdminExamsPage() {
     }
   };
 
+  const handleRerandomizeExam = async (exam: ExamItem) => {
+    try {
+      showToast(`Đang trộn lại ngẫu nhiên 16 Parts cho đề "${exam.title}"...`);
+      const res = await api.admin.rerandomizeExam(exam.id);
+      if (res.success) {
+        showToast(`Đã trộn lại bộ câu hỏi Random mới cho đề "${exam.title}"!`);
+        fetchExams();
+      } else {
+        showToast(res.error?.message || "Không thể trộn lại câu hỏi cho đề thi này");
+      }
+    } catch {
+      showToast("Lỗi kết nối máy chủ");
+    }
+  };
+
+  const handleGenerateFullTests = async () => {
+    try {
+      showToast("Đang tổng hợp đủ 20 bộ đề Full Test (APT-01 đến APT-20)...");
+      const res = await api.admin.generateFullTestExams();
+      if (res.success) {
+        showToast("Đã khởi tạo / khôi phục đủ 20 bộ đề thi thử Full Test!");
+        fetchExams();
+      } else {
+        showToast(res.error?.message || "Không thể tạo bộ đề Full Test");
+      }
+    } catch {
+      showToast("Lỗi kết nối máy chủ");
+    }
+  };
+
   const handleDeleteExam = async () => {
     if (!confirmDeleteExam) return;
     try {
@@ -693,6 +723,15 @@ export default function AdminExamsPage() {
               )}
             </button>
 
+            <button
+              onClick={handleGenerateFullTests}
+              className="px-3.5 py-2 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
+              title="Tự động tạo hoặc khôi phục đủ 20 bộ đề thi thử Full Test (APT-01 đến APT-20) từ ngân hàng câu hỏi"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Khôi phục 20 Đề Full Test</span>
+            </button>
+
             <Link
               href="/admin/data-sync"
               className="px-3.5 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
@@ -784,6 +823,7 @@ export default function AdminExamsPage() {
           onTogglePro={handleTogglePro}
           onCycleHotLevel={handleCycleHotLevel}
           onDuplicateExam={handleDuplicateExam}
+          onRerandomizeExam={handleRerandomizeExam}
           onOpenEdit={handleOpenEdit}
           onPreviewExam={setPreviewExam}
           onDeleteExam={setConfirmDeleteExam}

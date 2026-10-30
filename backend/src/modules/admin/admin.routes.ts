@@ -56,6 +56,8 @@ router.post('/exams', (req, res, next) => adminController.createExam(req, res, n
 router.get('/exams/:id/full', (req, res, next) => adminController.getExamFull(req, res, next));
 router.patch('/exams/:id', (req, res, next) => adminController.updateExam(req, res, next));
 router.post('/exams/:id/duplicate', (req, res, next) => adminController.duplicateExam(req, res, next));
+router.post('/exams/:id/rerandomize', (req, res, next) => adminController.rerandomizeFullTestExam(req, res, next));
+router.post('/exams/generate-fulltests', (req, res, next) => adminController.generateFullTestExams(req, res, next));
 router.delete('/exams/:id', (req, res, next) => adminController.deleteExam(req, res, next));
 
 // Content Editor — Parts

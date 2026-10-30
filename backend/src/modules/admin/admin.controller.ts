@@ -148,6 +148,25 @@ export class AdminController {
     }
   }
 
+  async rerandomizeFullTestExam(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const examId = req.params.id;
+      const updated = await adminService.rerandomizeFullTestExam(examId, req);
+      sendSuccess(res, updated, 'Đã trộn lại ngẫu nhiên bộ 16 Parts mới cho đề thi Full Test', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async generateFullTestExams(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await adminService.generateFullTestExams(req);
+      sendSuccess(res, result, 'Đã khởi tạo / khôi phục đủ 20 bộ đề Full Test (APT-01 đến APT-20)', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async listTransactions(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const page = Number(req.query.page || 1);
