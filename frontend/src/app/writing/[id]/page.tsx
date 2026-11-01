@@ -54,6 +54,7 @@ import {
   WritingReviewSidebar,
   WritingBottomDock,
 } from "@/components/writing/writing-part-cards";
+import { WritingIntroScreen } from "@/components/writing/writing-intro-screen";
 
 function WritingExamRunnerContent() {
   const params = useParams();
@@ -67,6 +68,7 @@ function WritingExamRunnerContent() {
   const modeParam = searchParams?.get("mode");
   const isReviewUrl = modeParam === "review" && Boolean(submissionIdParam);
   const [isReviewMode, setIsReviewMode] = useState(isReviewUrl);
+  const [showIntroScreen, setShowIntroScreen] = useState(!isReviewUrl);
   const [aiEvaluationStatus, setAiEvaluationStatus] = useState<"idle" | "evaluating" | "completed">("idle");
   const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -388,22 +390,23 @@ function WritingExamRunnerContent() {
     }
   }, [currentPartIdx]);
 
-  // Cập nhật lại thời gian theo từng Part khi đổi Part
+  // Khởi tạo tổng thời gian làm bài (50 phút cho đề 4 Part, hoặc thời lượng khuyến nghị nếu đề luyện lẻ 1 Part)
   useEffect(() => {
-    const currentP = parts[currentPartIdx];
-    if (currentP) {
-      setTimeLeft(currentP.recommendedMinutes * 60);
+    if (parts.length > 1) {
+      setTimeLeft(50 * 60);
+    } else if (parts[0]) {
+      setTimeLeft(parts[0].recommendedMinutes * 60);
     }
-  }, [currentPartIdx, parts]);
+  }, [parts]);
 
-  // Timer Countdown
+  // Timer Countdown (chỉ đếm ngược sau khi đã bấm Bắt đầu khỏi màn hình Intro)
   useEffect(() => {
-    if (loading || isPaused || showPart2Result || showAiWaitingScreen) return;
+    if (loading || isPaused || showIntroScreen || showPart2Result || showAiWaitingScreen || isReviewMode) return;
     const timer = setInterval(() => {
       setTimeLeft((t) => (t <= 1 ? 0 : t - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, [loading, isPaused, showPart2Result, showAiWaitingScreen]);
+  }, [loading, isPaused, showIntroScreen, showPart2Result, showAiWaitingScreen, isReviewMode]);
 
   // 1. Phục hồi bản nháp bài viết từ LocalStorage khi vào phòng thi (Zero data loss)
   useEffect(() => {
@@ -627,6 +630,19 @@ function WritingExamRunnerContent() {
     setIsReviewMode(true);
     setAiEvaluationStatus("evaluating");
   };
+
+  // MÀN HÌNH CHUẨN BỊ & QUY CHẾ WRITING TRƯỚC KHI VÀO BÀI (PHẦN II.1)
+  if (!loading && !isReviewMode && showIntroScreen) {
+    const totalMins = parts.length > 1 ? 50 : parts[0]?.recommendedMinutes || 20;
+    return (
+      <WritingIntroScreen
+        title={examTitle}
+        partsCount={parts.length}
+        totalMinutes={totalMins}
+        onStart={() => setShowIntroScreen(false)}
+      />
+    );
+  }
 
   // =========================================================================
   // MÀN HÌNH LÀM BÀI PHÒNG THI (THEO THEME CHUẨN CỦA HỆ THỐNG MÌNH)

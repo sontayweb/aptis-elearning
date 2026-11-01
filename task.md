@@ -121,11 +121,11 @@
 ## ✍️ PHẦN II: WRITING (KỸ NĂNG VIẾT)
 
 ### 1. Trang chuẩn bị trước khi vào bài Writing
-- [ ] 🟡 **[P1 - UI]** Xây dựng **Trang tổng quan & quy chế Writing**:
-  - [ ] Tóm tắt thời gian tổng: 50 phút.
-  - [ ] Tóm tắt 4 Part và hạn mức từ từng phần.
-  - [ ] Cảnh báo: *"Hệ thống sẽ khóa nhập liệu khi chạm ngưỡng từ tối đa. Hãy phân bổ thời gian hợp lý (gợi ý: 20 phút cho Part 4)."*
-  - [ ] Nút `[ Bắt đầu ]` để người dùng chủ động kích hoạt đồng hồ 50 phút.
+- [x] 🟡 **[P1 - UI]** Xây dựng **Trang tổng quan & quy chế Writing** ([`writing-intro-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/writing/writing-intro-screen.tsx)):
+  - [x] Tóm tắt thời gian tổng: 50 phút.
+  - [x] Tóm tắt 4 Part và hạn mức từ từng phần (`10 / 45 / 60 / 75 / 225 từ`).
+  - [x] Cảnh báo: *"Hệ thống sẽ khóa nhập liệu khi chạm ngưỡng từ tối đa. Hãy phân bổ thời gian hợp lý (gợi ý: 20 phút cho Part 4)."*
+  - [x] Nút `[ Bắt đầu ]` / `[ Vào nhanh ]` để người dùng chủ động kích hoạt đồng hồ 50 phút.
 
 ---
 
@@ -145,7 +145,7 @@
   - [x] Hiển thị trực quan:
     - Viền textarea đổi sang màu đỏ cảnh báo: `border-destructive ring-1 ring-destructive`.
     - Bộ đếm từ đổi màu đỏ: `10 / 10 từ (Đã đạt giới hạn tối đa)`.
-- [ ] 🟡 **[P1 - UI]** Gắn **sticker / nhãn phân biệt độ ưu tiên** cho danh sách đề Writing.
+- [x] 🟡 **[P1 - UI]** Gắn **sticker / nhãn phân biệt độ ưu tiên** (`☘️` Cỏ may mắn) cho danh sách đề Writing.
 
 ---
 
@@ -159,7 +159,7 @@
   - [x] Cắt chuỗi an toàn trước khi xử lý: `const safeText = (ans.text_answer || '').slice(0, 3000);`.
   - [x] Đổi cách đếm từ: Dùng regex an toàn `(safeText.match(/\S+/g) || []).length` thay vì gọi `split(/\s+/)` trên chuỗi khổng lồ.
   - [x] Đảm bảo text truyền vào prompt OpenAI/Gemini không vượt quá token context để tránh lỗi 400 hoặc tốn chi phí API.
-- [ ] 🟡 **[P1 - Rate Limiting]** Thêm Rate Limiter cho endpoint `/api/submissions/:id/autosave` để chặn spam bot tự động.
+- [x] 🟡 **[P1 - Rate Limiting]** Thêm `autosaveRateLimiter` (60 requests/phút/user) cho endpoint `PUT /api/submissions/:id/autosave` tại [`rate-limit.middleware.ts`](file:///d:/sontayweb/aptis-elearning/backend/src/middlewares/rate-limit.middleware.ts) và [`submission.routes.ts`](file:///d:/sontayweb/aptis-elearning/backend/src/modules/submissions/submission.routes.ts) để chặn spam bot tự động.
 
 ---
 
@@ -213,10 +213,10 @@
 ## 📖 PHẦN IV: READING (KỸ NĂNG ĐỌC)
 
 ### 1. Trang chuẩn bị trước khi vào bài Reading
-- [ ] 🟡 **[P1 - UI]** Xây dựng **Trang hướng dẫn thao tác Reading**:
-  - [ ] Tóm tắt 5 phần thi & thời gian làm bài (35 phút).
-  - [ ] Hướng dẫn thao tác tương tác: Kéo thả câu ở Part 2, nối ý ở Part 3, highlight dẫn chứng ở Part 4.
-  - [ ] Nút `[ Bắt đầu ]`.
+- [x] 🟡 **[P1 - UI]** Xây dựng **Trang hướng dẫn thao tác Reading** ([`reading-intro-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/reading/reading-intro-screen.tsx)):
+  - [x] Tóm tắt 4 phần thi & thời gian làm bài (35 phút).
+  - [x] Hướng dẫn thao tác tương tác: Chọn từ ở Part 1, kéo thả câu ở Part 2, nối ý ở Part 3, highlight dẫn chứng ở Part 4.
+  - [x] Nút `[ Bắt đầu ]` / `[ Vào nhanh ]`.
 
 ---
 

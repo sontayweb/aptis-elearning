@@ -51,6 +51,7 @@ import {
   ReadingBottomDock,
   ReadingModalsAndDrawer,
 } from "@/components/reading/reading-bottom-dock";
+import { ReadingIntroScreen } from "@/components/reading/reading-intro-screen";
 
 import {
   type Part1Gap,
@@ -104,6 +105,7 @@ function ReadingExamRunner() {
   const submissionIdParam = searchParams.get("submissionId");
 
   const [isReviewMode, setIsReviewMode] = useState(modeParam === "review");
+  const [showIntroScreen, setShowIntroScreen] = useState(modeParam !== "review");
 
   const { isAuthenticated, user } = useAuth();
 
@@ -741,9 +743,9 @@ function ReadingExamRunner() {
     }
   }, [activeStage]);
 
-  // 2. Countdown Timer
+  // 2. Countdown Timer (chỉ đếm ngược sau khi đã bấm Bắt đầu khỏi màn hình Intro)
   useEffect(() => {
-    if (isSubmitted || loading || isReviewMode || isPaused) return;
+    if (isSubmitted || loading || isReviewMode || isPaused || showIntroScreen) return;
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -755,7 +757,7 @@ function ReadingExamRunner() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isSubmitted, loading, isReviewMode, isPaused]);
+  }, [isSubmitted, loading, isReviewMode, isPaused, showIntroScreen]);
 
   // 3. Khôi phục bản nháp LocalStorage ngay khi vào phòng thi Reading (Zero-latency recovery)
   useEffect(() => {
@@ -1201,6 +1203,18 @@ function ReadingExamRunner() {
   }, [examData, p1Answers, p2Orders, p3Answers, p4Answers, submissionId]);
 
   const currentStage = stages[activeStage] || stages[0];
+
+  // MÀN HÌNH HƯỚNG DẪN THAO TÁC READING TRƯỚC KHI VÀO BÀI (PHẦN IV.1)
+  if (!loading && !isReviewMode && !isSubmitted && !error && showIntroScreen) {
+    return (
+      <ReadingIntroScreen
+        title={examData.title}
+        durationMinutes={examData.durationMinutes || 35}
+        stagesCount={stages.length}
+        onStart={() => setShowIntroScreen(false)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
