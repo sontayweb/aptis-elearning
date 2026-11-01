@@ -40,3 +40,26 @@ export const aiGradingRateLimiter = rateLimit({
   },
   skip: () => process.env.NODE_ENV === 'test',
 });
+
+/**
+ * Rate Limiter cho endpoint Autosave bài thi (/api/submissions/:id/autosave)
+ * Giới hạn: 60 requests / 1 phút trên mỗi tài khoản học viên (hoặc IP)
+ * Đảm bảo thoải mái cho cơ chế debounce 3s và chuyển câu, đồng thời chặn đứng bot spam liên tục.
+ */
+export const autosaveRateLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 phút
+  max: 60, // Tối đa 60 lần autosave / phút / học viên
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => String((req as any).user?.id || req.ip || 'anonymous'),
+  handler: (_req, res) => {
+    sendError(
+      res,
+      'Thao tác tự động lưu gửi quá nhanh. Vui lòng tiếp tục làm bài bình thường sau vài giây.',
+      429,
+      { code: 'RATE_LIMIT_AUTOSAVE_EXCEEDED' }
+    );
+  },
+  skip: () => process.env.NODE_ENV === 'test',
+});
+

@@ -14,6 +14,14 @@ import {
   LISTENING_PART4_TOPICS,
 } from "@/data/listening-topics-bank";
 import { getCloverConfig } from "@/lib/clover-utils";
+import { useSkillHubTabSync } from "@/hooks/use-skill-hub";
+import { SkillPartTabs } from "@/components/skills/skill-part-tabs";
+import { SkillFilterBar } from "@/components/skills/skill-filter-bar";
+import {
+  SkillMarathonCard,
+  SkillExamCard,
+  SkillEmptyState,
+} from "@/components/skills/skill-exam-card";
 import {
   Headphones,
   Clock,
@@ -54,23 +62,7 @@ export default function ListeningPracticePage() {
     user?.role === "TEACHER" ||
     Boolean(user?.subscription) ||
     Boolean(user?.user_subscriptions?.length);
-  const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
-  const isTabHydrated = useRef(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!isTabHydrated.current) {
-      isTabHydrated.current = true;
-      return;
-    }
-    sessionStorage.setItem("listening_active_tab", activeTab);
-    try {
-      const url = new URL(window.location.href);
-      if (activeTab !== "full") url.searchParams.set("tab", activeTab);
-      else url.searchParams.delete("tab");
-      window.history.replaceState({}, "", url.toString());
-    } catch {}
-  }, [activeTab]);
+  const { activeTab, setActiveTab, selectTab } = useSkillHubTabSync("listening");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "not_started" | "completed">("all");
@@ -158,49 +150,6 @@ export default function ListeningPracticePage() {
         }
       }
     }).catch(() => {});
-  }, []);
-
-  // Đồng bộ tab từ URL (?tab=p1/p2/p3/p4/full) và lắng nghe sự kiện switch tab từ Guide Modal
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const syncTabFromUrl = () => {
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get("tab");
-      if (tabParam && ["full", "p1", "p2", "p3", "p4"].includes(tabParam)) {
-        setActiveTab(tabParam as any);
-        sessionStorage.setItem("listening_active_tab", tabParam);
-        setTimeout(() => {
-          const el = document.getElementById("practice-sets-section");
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 150);
-      } else {
-        const saved = sessionStorage.getItem("listening_active_tab");
-        if (saved && ["full", "p1", "p2", "p3", "p4"].includes(saved)) {
-          setActiveTab(saved as any);
-        }
-      }
-    };
-
-    syncTabFromUrl();
-
-    const handleSwitchTab = (e: Event) => {
-      const customEvent = e as CustomEvent<{ skill: string; tab: string }>;
-      if (customEvent.detail && (customEvent.detail.skill === "listening" || !customEvent.detail.skill)) {
-        const targetTab = customEvent.detail.tab;
-        if (["full", "p1", "p2", "p3", "p4"].includes(targetTab)) {
-          setActiveTab(targetTab as any);
-        }
-      }
-    };
-
-    window.addEventListener("aptis:switch-skill-tab", handleSwitchTab);
-    window.addEventListener("popstate", syncTabFromUrl);
-
-    return () => {
-      window.removeEventListener("aptis:switch-skill-tab", handleSwitchTab);
-      window.removeEventListener("popstate", syncTabFromUrl);
-    };
   }, []);
 
   // 1. Lọc theo từng Tab chuẩn aptiskytich.vn
@@ -420,115 +369,29 @@ export default function ListeningPracticePage() {
           </div>
 
           {/* Parts Filter Tabs */}
-          <div className="inline-flex items-center justify-center rounded-xl text-muted-foreground w-full h-auto flex-wrap gap-1 bg-muted/50 p-1.5 mb-6">
-            {[
+          <SkillPartTabs
+            activeTab={activeTab}
+            onSelectTab={selectTab}
+            tabs={[
               { id: "full", label: "Full Part", sub: "Tất cả các Part" },
               { id: "p1", label: "P.1", sub: "Word recognition (Câu 1 - 13)" },
               { id: "p2", label: "P.2", sub: "Matching info (Câu 14)" },
               { id: "p3", label: "P.3", sub: "Short conversations (Câu 15)" },
               { id: "p4", label: "P.4", sub: "Monologues (Câu 16 - 17)" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => {
-                  setActiveTab(tab.id as any);
-                  if (typeof window !== "undefined") {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set("tab", tab.id);
-                    window.history.pushState({}, "", url.toString());
-                  }
-                }}
-                className={`inline-flex items-center justify-center rounded-lg px-3 font-medium flex-1 min-w-[120px] text-xs sm:text-sm py-2.5 transition-all ${
-                  activeTab === tab.id
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "hover:text-foreground"
-                }`}
-              >
-                <span className="font-semibold">{tab.label}</span>
-                <span className="hidden lg:inline ml-1 opacity-80">– {tab.sub}</span>
-              </button>
-            ))}
-          </div>
+            ]}
+          />
 
-          {/* 3 Hàng Bộ lọc chuẩn: Ưu tiên, Trạng thái, Nguồn */}
-          <div className="space-y-2.5 mb-8 text-xs">
-            {/* Hàng 1: Lọc ưu tiên theo Độ Hot ☘️ */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-muted-foreground font-semibold w-24">Độ Hot ☘️:</span>
-              {[
-                { id: "all", label: `Tất cả (${currentTabExams.length})` },
-                { id: "high", label: `☘️☘️☘️+ Siêu Hot (${currentTabExams.filter((e) => (e.hotLevel || 0) >= 3).length})` },
-                ...(currentTabExams.some((e) => (e.hotLevel || 0) === 2)
-                  ? [{ id: "medium", label: `☘️☘️ Hay ra (${currentTabExams.filter((e) => (e.hotLevel || 0) === 2).length})` }]
-                  : []),
-                ...(currentTabExams.some((e) => (e.hotLevel || 0) === 1)
-                  ? [{ id: "low", label: `☘️ Cơ bản (${currentTabExams.filter((e) => (e.hotLevel || 0) === 1).length})` }]
-                  : []),
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setFilterPriority(item.id as any)}
-                  className={`px-3 py-1 rounded-full font-bold transition-all ${
-                    filterPriority === item.id
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "border border-border bg-card text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Hàng 2: Trạng thái */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-muted-foreground font-semibold w-24">Trạng thái:</span>
-              {[
-                { id: "all", label: `Tất cả (${currentTabExams.length})` },
-                { id: "not_started", label: `Chưa làm (${currentTabExams.filter((e) => e.status !== "completed").length})` },
-                { id: "completed", label: `Đã làm (${currentTabExams.filter((e) => e.status === "completed").length})` },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setFilterStatus(item.id as any)}
-                  className={`px-3 py-1 rounded-full font-bold transition-all ${
-                    filterStatus === item.id
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "border border-border bg-card text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Hàng 3: Nguồn (ở Full Part) */}
-            {activeTab === "full" && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-muted-foreground font-semibold w-24">Nguồn:</span>
-                {[
-                  { id: "all", label: `Tất cả (${currentTabExams.length})` },
-                  { id: "web", label: `Đề web (${currentTabExams.length})` },
-                  { id: "my", label: `Bộ đề của tôi (0)` },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setFilterSource(item.id as any)}
-                    className={`px-3 py-1 rounded-full font-bold transition-all ${
-                      filterSource === item.id
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "border border-border bg-card text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* 3 Hàng Bộ lọc chuẩn */}
+          <SkillFilterBar
+            exams={currentTabExams}
+            activeTab={activeTab}
+            filterPriority={filterPriority}
+            setFilterPriority={setFilterPriority}
+            filterStatus={filterStatus}
+            setFilterStatus={setFilterStatus}
+            filterSource={filterSource}
+            setFilterSource={setFilterSource}
+          />
 
           {/* Cards Grid */}
           {loading ? (
@@ -554,200 +417,80 @@ export default function ListeningPracticePage() {
               </button>
             </div>
           ) : filteredExams.length === 0 ? (
-            <div className="py-20 text-center border border-dashed border-border rounded-2xl bg-card/50">
-              <Headphones className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-50" />
-              <h3 className="font-heading font-bold text-base text-foreground">Không có đề thi nào</h3>
-              <p className="text-xs text-muted-foreground mt-1">Cơ sở dữ liệu hiện tại chưa có đề thi nào trong danh mục này.</p>
-            </div>
+            <SkillEmptyState
+              icon={<Headphones className="w-10 h-10" />}
+              title="Không có đề thi nào"
+              description="Không tìm thấy đề thi Listening nào khớp với bộ lọc hiện tại."
+              onResetFilters={() => {
+                setSearchTerm("");
+                setFilterPriority("all");
+                setFilterStatus("all");
+              }}
+            />
           ) : (
             <div id="practice-sets-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 scroll-mt-24">
-              {/* CARD 1: Marathon / Custom Card */}
-              <div className="relative rounded-2xl border-2 border-primary/50 bg-card p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    {tabInfo.marathonType === "custom" ? (
-                      <span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px] uppercase">
-                        PRO
-                      </span>
-                    ) : (
-                      <div className="flex items-center gap-1.5">
-                        <span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px]">
-                          ∞ Marathon
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
-                          PRO
-                        </span>
-                      </div>
-                    )}
-                    {tabInfo.marathonType === "marathon" && (
-                      <span className="text-[11px] font-semibold text-muted-foreground">Chưa làm</span>
-                    )}
-                  </div>
+              <SkillMarathonCard
+                marathonType={tabInfo.marathonType}
+                marathonText={tabInfo.marathonText}
+                marathonDesc={tabInfo.marathonDesc}
+                marathonBtn={tabInfo.marathonBtn}
+                marathonUrl={tabInfo.marathonUrl}
+                onActionClick={() => setIsGuideModalOpen(true)}
+              />
 
-                  <h3 className="text-lg font-heading font-extrabold text-foreground mb-2">
-                    {tabInfo.marathonText}
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {tabInfo.marathonDesc}
-                  </p>
-                </div>
+              {filteredExams.map((exam, idx) => {
+                const partBadge =
+                  exam.totalParts === 4 || exam.title.includes("Full Listening")
+                    ? "Full Part"
+                    : activeTab === "p1"
+                    ? "Part 1"
+                    : activeTab === "p2"
+                    ? "Part 2"
+                    : activeTab === "p3"
+                    ? "Part 3"
+                    : activeTab === "p4"
+                    ? "Part 4"
+                    : exam.partTitle?.split(" - ")[0] || exam.partTitle?.split(":")[0] || "Part";
 
-                <div className="pt-6 mt-4 border-t border-border/40">
-                  {tabInfo.marathonUrl ? (
-                    <Link
-                      href={tabInfo.marathonUrl}
-                      className="block w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center cursor-pointer"
-                    >
-                      {tabInfo.marathonBtn}
-                    </Link>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setIsGuideModalOpen(true)}
-                      className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-colors text-center cursor-pointer"
-                    >
-                      {tabInfo.marathonBtn}
-                    </button>
-                  )}
-                </div>
-              </div>
+                const displayTitle = (() => {
+                  if (exam.title) {
+                    if (activeTab === "p1" && exam.title.includes("Listening Part 1")) {
+                      return exam.title.replace("Listening Part 1", "Part 1: Information Recognition");
+                    }
+                    return exam.title;
+                  }
+                  const padded = idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`;
+                  if (activeTab === "full") return `Đề ${padded} — Full Listening · 4 Parts`;
+                  if (activeTab === "p1") return `Đề ${padded} - Part 1: Information Recognition`;
+                  if (activeTab === "p2") {
+                    const item = LISTENING_PART2_TOPICS[idx % LISTENING_PART2_TOPICS.length];
+                    return `Đề ${padded} - ${item.title}`;
+                  }
+                  if (activeTab === "p3") {
+                    const item = LISTENING_PART3_TOPICS[idx % LISTENING_PART3_TOPICS.length];
+                    return `Đề ${padded} - ${item.title}`;
+                  }
+                  const item = LISTENING_PART4_TOPICS[idx % LISTENING_PART4_TOPICS.length];
+                  return `Đề ${padded} - ${item.title}`;
+                })();
 
-              {/* CARD 2..N: Exam Cards */}
-              {filteredExams.map((exam, idx) => (
-                <div
-                  key={exam.id}
-                  className={`relative rounded-2xl border bg-card hover:border-primary/50 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group ${
-                    exam.hotLevel && exam.hotLevel >= 5
-                      ? "border-rose-500/40 shadow-rose-500/5 ring-1 ring-rose-500/20"
-                      : exam.hotLevel === 4
-                      ? "border-amber-500/30 ring-1 ring-amber-500/20"
-                      : exam.hotLevel === 3
-                      ? "border-blue-500/30 ring-1 ring-blue-500/20"
-                      : exam.hotLevel && exam.hotLevel > 0
-                      ? "border-emerald-500/30"
-                      : "border-border"
-                  }`}
-                >
-                  <div>
-                    {/* Badges & Score */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="px-2 py-0.5 rounded-md border border-border bg-muted/50 text-muted-foreground font-bold text-[10px]">
-                          {exam.totalParts === 4 || exam.title.includes("Full Listening")
-                            ? "Full Part"
-                            : activeTab === "p1"
-                            ? "Part 1"
-                            : activeTab === "p2"
-                            ? "Part 2"
-                            : activeTab === "p3"
-                            ? "Part 3"
-                            : activeTab === "p4"
-                            ? "Part 4"
-                            : (exam.partTitle?.split(" - ")[0] || exam.partTitle?.split(":")[0] || "Part")}
-                        </span>
-                        {exam.isFree ? (
-                          <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
-                            FREE
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
-                            PRO
-                          </span>
-                        )}
-
-                        {/* Stickers đánh giá mức độ ưu tiên theo chuẩn Clover ☘️ */}
-                        {(() => {
-                          const cloverLvl = exam.hotLevel;
-                          if (!cloverLvl || cloverLvl <= 0) return null;
-                          const cfg = getCloverConfig(cloverLvl);
-                          return (
-                            <span
-                              className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
-                              title={`${cloverLvl} Cỏ ☘️`}
-                            >
-                              <span>{cfg.symbol}</span>
-                            </span>
-                          );
-                        })()}
-                      </div>
-
-                      {exam.bestScore && (
-                        <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-black text-xs">
-                          🏆 {exam.bestScore}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Dynamic Title with Real Topic Name from Database */}
-                    {(() => {
-                      const displayTitle = (() => {
-                        if (exam.title) {
-                          if (activeTab === "p1" && exam.title.includes("Listening Part 1")) {
-                            return exam.title.replace("Listening Part 1", "Part 1: Information Recognition");
-                          }
-                          return exam.title;
-                        }
-                        const padded = idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`;
-                        if (activeTab === "full") return `Đề ${padded} — Full Listening · 4 Parts`;
-                        if (activeTab === "p1") return `Đề ${padded} - Part 1: Information Recognition`;
-                        if (activeTab === "p2") {
-                          const item = LISTENING_PART2_TOPICS[idx % LISTENING_PART2_TOPICS.length];
-                          return `Đề ${padded} - ${item.title}`;
-                        }
-                        if (activeTab === "p3") {
-                          const item = LISTENING_PART3_TOPICS[idx % LISTENING_PART3_TOPICS.length];
-                          return `Đề ${padded} - ${item.title}`;
-                        }
-                        const item = LISTENING_PART4_TOPICS[idx % LISTENING_PART4_TOPICS.length];
-                        return `Đề ${padded} - ${item.title}`;
-                      })();
-
-                      return (
-                        <div>
-                          <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1 group-hover:text-primary transition-colors">
-                            {displayTitle}
-                          </h3>
-                        </div>
-                      );
-                    })()}
-                    <p className="text-xs text-muted-foreground mb-4">
-                      {exam.parts} · {exam.questionsCount} câu · {exam.duration}
-                    </p>
-
-                    <div className="text-xs">
-                      {exam.status === "completed" ? (
-                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Đã hoàn thành tất cả 4 Part</span>
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">Chưa bắt đầu</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="pt-6 mt-4 border-t border-border/40 flex justify-end">
-                    {exam.isFree || isProOrAdmin ? (
-                      <Link
-                        href={`/listening/${exam.id}${activeTab !== "full" ? `?part=${activeTab}` : ""}`}
-                        className="tech-btn inline-flex items-center justify-center whitespace-nowrap text-xs font-bold h-9 rounded-xl px-4 bg-primary text-primary-foreground hover:bg-primary-glow shadow-sm gap-1 group-hover:gap-2 transition-all"
-                      >
-                        <span>Bắt đầu luyện tập</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => alert("Đề thi Pro. Vui lòng nâng cấp tài khoản để mở khóa!")}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-xs hover:bg-amber-500/10 transition-colors"
-                      >
-                        <Lock className="w-3.5 h-3.5" />
-                        <span>Mở khóa</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
+                return (
+                  <SkillExamCard
+                    key={exam.id}
+                    id={exam.id}
+                    title={displayTitle}
+                    subtitle={`${exam.parts} · ${exam.questionsCount} câu · ${exam.duration}`}
+                    partBadge={partBadge}
+                    isFree={exam.isFree}
+                    isProOrAdmin={isProOrAdmin}
+                    cloverLevel={exam.hotLevel}
+                    trophyText={exam.bestScore}
+                    status={exam.status}
+                    totalParts={4}
+                    targetUrl={`/listening/${exam.id}${activeTab !== "full" ? `?part=${activeTab}` : ""}`}
+                  />
+                );
+              })}
             </div>
           )}
         </section>

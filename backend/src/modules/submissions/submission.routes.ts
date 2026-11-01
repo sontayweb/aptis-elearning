@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { submissionController } from './submission.controller';
 import { authGuard } from '../../middlewares/auth.guard';
 import { uploadAudioMiddleware } from '../../middlewares/upload.middleware';
+import { autosaveRateLimiter } from '../../middlewares/rate-limit.middleware';
 
 const router = Router();
 
@@ -9,7 +10,7 @@ const router = Router();
 router.use(authGuard);
 
 router.post('/', (req, res, next) => submissionController.start(req, res, next));
-router.put('/:id/autosave', (req, res, next) => submissionController.autosave(req, res, next));
+router.put('/:id/autosave', autosaveRateLimiter, (req, res, next) => submissionController.autosave(req, res, next));
 router.post('/:id/heartbeat', (req, res, next) => submissionController.heartbeat(req, res, next));
 router.get('/:id/resume', (req, res, next) => submissionController.resume(req, res, next));
 router.post('/:id/submit', (req, res, next) => submissionController.submit(req, res, next));

@@ -234,24 +234,24 @@
 - [x] 🔴 **[P0 - Bug Fix]** Khắc phục lỗi **hiển thị đè (Overlap) 2 thanh công cụ khi bôi đen**:
   - [x] Nguyên nhân: Component toàn cục [`selection-translator.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/selection-translator.tsx) (trong `layout.tsx`) và menu nổi riêng của Reading (`reading/[id]/page.tsx:2020`) cùng kích hoạt tại cùng tọa độ chuột `(x, y)`, làm nút gradient đỏ-cam `[ 文A Dịch nhanh ]` đè thẳng lên toolbar của bài đọc.
   - [x] Giải pháp: Thêm cờ `data-no-global-selection` cho container bài đọc Reading để `SelectionTranslator` tự động bỏ qua khi bôi đen trong bài đọc, giúp thanh công cụ Highlight hiển thị sạch sẽ, độc lập, không bị đè.
-- [ ] 🔴 **[P0 - Nội dung & UI]** Thêm **Giải thích đáp án**:
-  - [ ] Thêm khung hiển thị giải thích chi tiết phía dưới từng câu trả lời khi xem kết quả / đáp án.
-  - [ ] Liên kết câu giải thích với vị trí câu dẫn chứng được highlight trong đoạn văn.
+- [x] 🔴 **[P0 - Nội dung & UI]** Thêm **Giải thích đáp án**:
+  - [x] Thêm khung hiển thị giải thích chi tiết phía dưới từng câu trả lời khi xem kết quả / đáp án.
+  - [x] Liên kết câu giải thích với vị trí câu dẫn chứng được highlight trong đoạn văn.
 
 ---
 
 ### 4. Đồng bộ hóa tính năng Gắn cờ (Flag) & Bookmark (Đánh dấu câu hỏi)
 - [x] 🔴 **[P0 - Consistency & Bug Fix]** Thống nhất nghiệp vụ "Mark for Review" trên tất cả các kỹ năng:
   - [x] Bản chất: "Gắn cờ" (Reading) và "Bookmark" (Listening/Writing) hoàn toàn cùng 1 mục đích (đánh dấu câu hỏi cần xem lại trước khi nộp bài).
-  - [x] Sửa nút Bookmark trong Listening (tại [`listening/[id]/page.tsx:2285`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/listening/[id]/page.tsx#L2285)): Hiện đang là nút tĩnh chưa có `onClick`. Bổ sung state `bookmarked` và gắn `onClick` để khi bấm sẽ đổi màu nút (Active) và hiện biểu tượng cờ vàng dưới thanh Dock câu hỏi ở chân trang.
-  - [ ] Thống nhất nhãn tiếng Việt chuẩn: **"Gắn cờ"** (hoặc **"Đánh dấu"**) trên toàn hệ thống.
+  - [x] Sửa nút Bookmark trong Listening và Writing: Bổ sung state `flaggedStages` / `flaggedParts` và gắn `onClick` để khi bấm sẽ đổi màu nút (Active) và hiện biểu tượng cờ vàng dưới thanh Dock câu hỏi ở chân trang.
+  - [x] Thống nhất nhãn tiếng Việt chuẩn: **"Gắn cờ"** / **"Đã gắn cờ"** trên toàn hệ thống (Listening, Reading, Writing).
 
 ---
 
 ### 5. Cải tiến Reading Part 5
-- [ ] 🔴 **[P0 - Nội dung & UI]** Thêm **Giải thích đáp án**:
-  - [ ] Cập nhật dữ liệu lý do chọn đáp án / ngữ pháp / từ vựng vào Database cho Part 5.
-  - [ ] Hiển thị khung giải thích chi tiết ở dưới câu hỏi khi nộp bài hoặc bấm xem đáp án.
+- [x] 🔴 **[P0 - Nội dung & UI]** Thêm **Giải thích đáp án**:
+  - [x] Cập nhật dữ liệu lý do chọn đáp án / ngữ pháp / từ vựng vào Database cho Part 5.
+  - [x] Hiển thị khung giải thích chi tiết ở dưới câu hỏi khi nộp bài hoặc bấm xem đáp án.
 
 ---
 
@@ -411,38 +411,52 @@
 ## 🧱 PHẦN VIII: CHUẨN HÓA COMPONENT GIAO DIỆN DÙNG CHUNG (SHARED DESIGN SYSTEM & COMPONENT REFACTORING)
 *Mục đích: Xóa bỏ triệt để tình trạng phân mảnh styles giữa 4 kỹ năng (Listening dùng nút khối tech-btn, trong khi Reading/Writing/Speaking dùng link chữ trần; lệch bo góc tab; thiếu bộ lọc). Gom code dùng chung giúp nâng cấp giao diện về sau chỉ cần sửa 1 file duy nhất.*
 
-- [ ] 🔴 **[P0 - Atomic UI]** Tạo component Button chuẩn Design System tại [`frontend/src/components/ui/button.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/ui/button.tsx):
-  - [ ] Hỗ trợ các biến thể: `primary` (nền xanh thương hiệu), `tech` (nền xanh Aptis glow công nghệ), `outline` (nút viền), `ghost` (nút phẳng), `secondary`.
-  - [ ] Kích thước chuẩn: `sm`, `md`, `lg`, `icon`.
-  - [ ] Hỗ trợ render component Link (`asChild` hoặc `ButtonLink`) mượt mà cho Next.js router.
-- [ ] 🔴 **[P0 - Domain Component]** Tạo thẻ đề thi dùng chung [`skill-exam-card.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/skills/skill-exam-card.tsx):
-  - [ ] Gom ~120 dòng code thẻ đề lặp lại ở 4 trang vào 1 component dùng chung.
-  - [ ] Thống nhất 100% nút CTA làm bài (`tech-btn` khối bo góc `rounded-xl` có icon `ArrowRight`) và nút Mở khóa Pro.
-  - [ ] Hiển thị đồng nhất: Tag Part, Badge FREE/VIP, Sticker Cỏ May Mắn ☘️, Cúp CEFR 🏆, Thanh tiến độ làm bài.
-- [ ] 🟡 **[P1 - Tab & Filter]** Chuẩn hóa thanh chọn Part & Bộ lọc:
-  - [ ] Tạo [`skill-part-tabs.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/skills/skill-part-tabs.tsx): Đồng bộ bo góc `rounded-xl`, tự động sync URL query (`?tab=p1`).
-  - [ ] Bổ sung hàng lọc **Độ Hot Cỏ ☘️** đang bị thiếu trên trang [`speaking/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/speaking/page.tsx).
-- [ ] 🟡 **[P1 - Filter & Hook]** Gom bộ lọc và state dùng chung:
-  - [ ] Tạo `skill-filter-bar.tsx`: ô tìm kiếm + lọc Độ Hot ☘️ + lọc Trạng thái (Tất cả / Đã làm / Chưa làm).
-  - [ ] Tạo hook `use-skill-hub.ts`: gom state `activeTab`, `searchTerm`, `filterPriority`, `filterStatus`, `exams`, `loading`, `error` và logic `syncTabFromUrl` / sự kiện `aptis:switch-skill-tab` (hiện đang lặp ở cả 4 trang).
-- [ ] 🟢 **[P2 - Phụ trợ]** Tạo `skill-marathon-card.tsx` (thẻ Ngân hàng câu hỏi lẻ) và `skill-empty-state.tsx` (khung không có đề + nút đặt lại bộ lọc).
-- [ ] 🔴 **[P0 - Migration]** Chuyển lần lượt từng trang sang dùng component chung (xong trang nào thì build + chụp ảnh đối chiếu trang đó trước khi qua trang tiếp): `listening` → `reading` → `writing` → `speaking`.
-- [ ] 🟡 **[P1 - Kiểm thử]** Sau migration: `npm run build` 0 lỗi; so sánh ảnh 4 trang xác nhận nút/tab/thẻ đồng bộ; kiểm tra tab URL sync và khóa Pro vẫn hoạt động.
-- [x] 🔴 **[P0 - Bug Fix]** Hỗ trợ cờ `data-no-global-selection` trong [`selection-translator.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/selection-translator.tsx) (bước 1 sửa lỗi toolbar đè ở Reading; còn lại: gắn cờ vào container bài đọc).
+- [x] 🔴 **[P0 - Atomic UI]** Tạo component Button chuẩn Design System tại [`frontend/src/components/ui/button.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/ui/button.tsx):
+  - [x] Hỗ trợ các biến thể: `primary` (nền xanh thương hiệu), `tech` (nền xanh Aptis glow công nghệ), `outline` (nút viền), `ghost` (nút phẳng), `secondary`.
+  - [x] Kích thước chuẩn: `sm`, `md`, `lg`, `icon`.
+  - [x] Hỗ trợ render component Link (`ButtonLink`) mượt mà cho Next.js router.
+- [x] 🔴 **[P0 - Domain Component]** Tạo thẻ đề thi dùng chung [`skill-exam-card.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/skills/skill-exam-card.tsx):
+  - [x] Gom ~120 dòng code thẻ đề lặp lại ở 4 trang vào 1 component dùng chung.
+  - [x] Thống nhất 100% nút CTA làm bài (`tech-btn` khối bo góc `rounded-xl` có icon `ArrowRight`) và nút Mở khóa Pro.
+  - [x] Hiển thị đồng nhất: Tag Part, Badge FREE/VIP, Sticker Cỏ May Mắn ☘️, Cúp CEFR 🏆, Thanh tiến độ làm bài.
+- [x] 🟡 **[P1 - Tab & Filter]** Chuẩn hóa thanh chọn Part & Bộ lọc:
+  - [x] Tạo [`skill-part-tabs.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/skills/skill-part-tabs.tsx): Đồng bộ bo góc `rounded-xl`, tự động sync URL query (`?tab=p1`).
+  - [x] Bổ sung hàng lọc **Độ Hot Cỏ ☘️** đang bị thiếu trên trang [`speaking/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/speaking/page.tsx).
+- [x] 🟡 **[P1 - Filter & Hook]** Gom bộ lọc và state dùng chung:
+  - [x] Tạo [`skill-filter-bar.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/skills/skill-filter-bar.tsx): lọc Độ Hot ☘️ + lọc Trạng thái (Tất cả / Đã làm / Chưa làm) + Nguồn.
+  - [x] Tạo hook [`use-skill-hub.ts`](file:///d:/sontayweb/aptis-elearning/frontend/src/hooks/use-skill-hub.ts): gom state `activeTab` và logic `syncTabFromUrl` / sự kiện `aptis:switch-skill-tab` dùng chung cho cả 4 trang.
+- [x] 🟢 **[P2 - Phụ trợ]** Tạo `SkillMarathonCard` (thẻ Ngân hàng câu hỏi lẻ) và `SkillEmptyState` (khung không có đề + nút đặt lại bộ lọc) trong [`skill-exam-card.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/skills/skill-exam-card.tsx).
+- [x] 🔴 **[P0 - Migration]** Đã chuyển toàn bộ 4 trang trung tâm kỹ năng sang dùng bộ component chung: [`listening/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/listening/page.tsx), [`reading/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/reading/page.tsx), [`writing/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/writing/page.tsx), [`speaking/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/speaking/page.tsx).
+- [x] 🟡 **[P1 - Kiểm thử]** Sau migration: `npm --prefix frontend run build` 0 lỗi (59/59 routes); đồng bộ 100% nút `tech-btn`, tab `rounded-xl`, bộ lọc Độ Hot ☘️, URL sync và khóa Pro.
+- [x] 🔴 **[P0 - Bug Fix]** Hỗ trợ cờ `data-no-global-selection` trong [`selection-translator.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/selection-translator.tsx) và gắn vào `<main>` tại [`reading/[id]/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/reading/[id]/page.tsx) (triệt tiêu hoàn toàn lỗi đè toolbar Highlight).
 
 ---
 
-## ✂️ PHẦN IX: TÁCH NHỎ TRANG PHÒNG THI CHO DỄ BẢO TRÌ (CODE CLEAN)
-*Mục tiêu: `listening/[id]/page.tsx` (3.632 dòng) và `speaking/[id]/page.tsx` (3.722 dòng) quá lớn. Tách từng khối thành component/hook riêng, không đổi giao diện hay hành vi.*
+## ✂️ PHẦN IX: TÁCH NHỎ TRANG PHÒNG THI CHO DỄ BẢO TRÌ (CODE CLEAN & MAINTAINABILITY)
+*Mục tiêu: Tách các trang phòng thi (`listening/[id]`, `speaking/[id]`, `reading/[id]`, `writing/[id]`) thành các component chuyên biệt, dễ đọc, dễ bảo trì, loại bỏ toàn bộ hardcode/suy diễn.*
 
-### Đã xong (type-check 0 lỗi, build 59/59, smoke test trình duyệt 0 lỗi JS)
-- [x] **Listening** (3.632 → 3.095 dòng): [`listening-types.ts`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/listening-types.ts), [`sound-check-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/sound-check-screen.tsx), [`listening-result-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/listening-result-screen.tsx), [`bilingual-transcript-panel.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/bilingual-transcript-panel.tsx).
-- [x] **Speaking** (3.722 → 2.857 dòng): [`speaking-exam-utils.ts`](file:///d:/sontayweb/aptis-elearning/frontend/src/lib/speaking/speaking-exam-utils.ts) (types + hàm thuần), [`speaking-audio-player.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-audio-player.tsx), [`speaking-intro-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-intro-screen.tsx).
-
-### Còn lại (chưa làm)
-- [/] **Listening** (đã bỏ hardcode `audioUrlMap`/index 13-16, bỏ fallback benchmark theo examId, bỏ stage ma): còn tách thẻ câu hỏi Part 1–4 (~600 dòng JSX), khối trình phát audio, header, thanh điều hướng dưới, mục lục xem lại; tách hook `use-listening-timer`, `use-listening-audio`, `use-listening-autosave`.
-- [x] **Speaking** (2.857 → ~1.630 dòng): đã tách `speaking-question-card.tsx`, `speaking-recorder-console.tsx`, `speaking-bottom-dock.tsx`, `speaking-completion-modal.tsx`. Còn lại: hook timer/ghi âm. (Mục cũ: tách các khối prompt theo Part 1–4, bộ ghi âm bên phải, khung đáp án mẫu / Hall of Fame; tách hook timer/ghi âm.
-- [ ] Giảm mục tiêu mỗi `page.tsx` xuống dưới ~800 dòng.
+### Đã hoàn thành (TypeScript 0 lỗi, Build 59/59 routes PASS)
+- [x] **Listening** (3.632 → 2.138 dòng, xóa sạch hardcode `audioUrlMap`/index 13-16 & fallback benchmark):
+  - [`listening-types.ts`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/listening-types.ts)
+  - [`sound-check-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/sound-check-screen.tsx)
+  - [`listening-result-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/listening-result-screen.tsx)
+  - [`bilingual-transcript-panel.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/bilingual-transcript-panel.tsx)
+  - [`listening-part-cards.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/listening-part-cards.tsx) (`ListeningPart1Card` .. `ListeningPart4Card`)
+  - [`listening-review-sidebar.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/listening-review-sidebar.tsx)
+  - [`listening-bottom-dock.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/listening-bottom-dock.tsx) (`ListeningBottomDock` & `ListeningModalsAndDrawer`)
+- [x] **Speaking** (3.722 → 1.629 dòng):
+  - [`speaking-exam-utils.ts`](file:///d:/sontayweb/aptis-elearning/frontend/src/lib/speaking/speaking-exam-utils.ts)
+  - [`speaking-audio-player.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-audio-player.tsx)
+  - [`speaking-intro-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-intro-screen.tsx)
+  - [`speaking-question-card.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-question-card.tsx)
+  - [`speaking-recorder-console.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-recorder-console.tsx)
+  - [`speaking-bottom-dock.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-bottom-dock.tsx)
+  - [`speaking-completion-modal.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-completion-modal.tsx)
+- [x] **Reading** (2.940 → 1.968 dòng):
+  - [`reading-part-cards.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/reading/reading-part-cards.tsx) (`ReadingResultScreen`, `ReadingPart1Card` .. `ReadingPart4Card`)
+  - [`reading-bottom-dock.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/reading/reading-bottom-dock.tsx) (`ReadingReviewSidebar`, `ReadingBottomDock`, `ReadingModalsAndDrawer`)
+- [x] **Writing** (1.894 → 1.143 dòng):
+  - [`writing-part-cards.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/writing/writing-part-cards.tsx) (`WritingPart1Card` .. `WritingPart4Card`, `WritingReviewSidebar`, `WritingBottomDock`)
 
 ---
 

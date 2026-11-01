@@ -34,6 +34,17 @@ import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-statu
 import { SoundCheckScreen } from "@/components/listening/sound-check-screen";
 import { ListeningResultScreen } from "@/components/listening/listening-result-screen";
 import { BilingualTranscriptPanel } from "@/components/listening/bilingual-transcript-panel";
+import {
+  ListeningPart1Card,
+  ListeningPart2Card,
+  ListeningPart3Card,
+  ListeningPart4Card,
+} from "@/components/listening/listening-part-cards";
+import { ListeningReviewSidebar } from "@/components/listening/listening-review-sidebar";
+import {
+  ListeningBottomDock,
+  ListeningModalsAndDrawer,
+} from "@/components/listening/listening-bottom-dock";
 import type {
   Part1Item,
   Part2Speaker,
@@ -1874,10 +1885,10 @@ function ListeningExamRunnerContent() {
                       ? "bg-amber-500/15 border-amber-500/40 text-amber-600 dark:text-amber-400"
                       : "border-border text-muted-foreground hover:bg-muted"
                   }`}
-                  title={flaggedStages[activeStage] ? "Bỏ đánh dấu câu này" : "Đánh dấu câu này để xem lại"}
+                  title={flaggedStages[activeStage] ? "Bỏ gắn cờ câu này" : "Gắn cờ câu này để xem lại"}
                 >
                   <Bookmark className={`w-3.5 h-3.5 ${flaggedStages[activeStage] ? "fill-current" : ""}`} />
-                  <span>{flaggedStages[activeStage] ? "Đã đánh dấu" : "Bookmark"}</span>
+                  <span>{flaggedStages[activeStage] ? "Đã gắn cờ" : "Gắn cờ"}</span>
                 </button>
 
                 <button
@@ -1985,1061 +1996,116 @@ function ListeningExamRunnerContent() {
             />
           </div>
           <div key={`listening-stage-wrap-${activeStage}`} className="part-transition space-y-5">
-          {/* =========================================================================
-              PART 1: CÂU HỎI TRẮC NGHIỆM A, B, C
-              ========================================================================= */}
-          {currentStage.partNum === 1 && (() => {
-            const q = examData.part1[currentStage.subIndex];
-            if (!q) return null;
-            const userChoice = p1Answers[currentStage.subIndex];
-            const isCor = Boolean(userChoice && userChoice.toLowerCase() === q.correctAnswer.toLowerCase());
-
-            return (
-              <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
-                <div className="flex items-center justify-between gap-2 border-b border-border/50 pb-3">
-                  <h3 className="text-sm md:text-base font-semibold text-foreground leading-relaxed">
-                    {q.prompt}
-                  </h3>
-                  {isReviewMode && (
-                    <span
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 shrink-0 ${
-                        isCor
-                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                          : "bg-red-500/15 text-red-700 dark:text-red-300 border border-red-500/30"
-                      }`}
-                    >
-                      {isCor ? (
-                        <>
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Đúng (+1)</span>
-                        </>
-                      ) : (
-                        <>
-                          <AlertCircle className="w-3.5 h-3.5" />
-                          <span>Sai (0 đ)</span>
-                        </>
-                      )}
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  {q.options.map((opt, optIdx) => {
-                    const isSelected = userChoice === opt;
-                    const isCorrectAnswer = opt.toLowerCase() === q.correctAnswer.toLowerCase();
-
-                    let optionStyle = "border-border bg-background hover:border-primary/40 text-foreground";
-                    if (isReviewMode) {
-                      if (isCorrectAnswer) {
-                        optionStyle = "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs";
-                      } else if (isSelected && !isCorrectAnswer) {
-                        optionStyle = "border-red-500 bg-red-500/10 text-red-700 dark:text-red-300 font-bold shadow-xs";
-                      } else {
-                        optionStyle = "border-border/60 bg-muted/20 text-muted-foreground opacity-75";
-                      }
-                    } else if (isSelected) {
-                      optionStyle = "border-primary bg-primary/10 text-primary font-bold shadow-sm";
-                    }
-
-                    return (
-                      <button
-                        key={optIdx}
-                        type="button"
-                        disabled={isReviewMode}
-                        onClick={() => handleP1Answer(currentStage.subIndex, opt)}
-                        className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between ${optionStyle} ${
-                          isReviewMode ? "cursor-default" : "cursor-pointer"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`w-7 h-7 rounded-lg border flex items-center justify-center font-bold text-xs ${
-                              isReviewMode && isCorrectAnswer
-                                ? "bg-emerald-500 text-white border-emerald-600"
-                                : isReviewMode && isSelected && !isCorrectAnswer
-                                ? "bg-red-500 text-white border-red-600"
-                                : "bg-muted/40 border-border"
-                            }`}
-                          >
-                            {String.fromCharCode(65 + optIdx)}
-                          </span>
-                          <span className="text-sm md:text-base font-normal">{opt}</span>
-                        </div>
-                        {isReviewMode ? (
-                          isCorrectAnswer ? (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                          ) : isSelected ? (
-                            <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                          ) : null
-                        ) : (
-                          isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Review Mode Explanation Box */}
-                {isReviewMode && (
-                  <div className="mt-4 p-4 rounded-xl bg-muted/30 border border-border/80 space-y-2 text-xs">
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                      <span className="font-semibold text-muted-foreground">
-                        Bạn đã chọn:{" "}
-                        <strong className={isCor ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>
-                          {userChoice || "(Bỏ trống)"}
-                        </strong>
-                      </span>
-                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                        Đáp án chuẩn: <strong>{q.correctAnswer}</strong>
-                      </span>
-                    </div>
-                    {q.explanation && (
-                      <div className="text-muted-foreground leading-relaxed pt-2 border-t border-border/50">
-                        <span className="font-bold text-foreground">Giải thích: </span>
-                        {q.explanation}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-
-          {/* =========================================================================
-              PART 2: SPEAKERS NỐI THÔNG TIN BẰNG DROPDOWN
-              ========================================================================= */}
-          {currentStage.partNum === 2 && examData.part2.speakers && examData.part2.speakers.length > 0 && (
-            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20">
-                    Topic
-                  </span>
-                  <h3 className="text-base font-bold text-foreground">
-                    {examData.part2.topic || "Matching Information"}
-                  </h3>
-                </div>
-                <span className="text-xs text-muted-foreground font-medium">Ghép thông tin tương ứng cho 4 người nói</span>
-              </div>
-
-              <div className="space-y-4">
-                {examData.part2.speakers.map((spk, idx) => {
-                  const userChoice = p2Answers[idx];
-                  const isCor = Boolean(userChoice && spk.correctAnswer && userChoice.toLowerCase() === spk.correctAnswer.toLowerCase());
-
-                  return (
-                    <div
-                      key={idx}
-                      className={`p-4 rounded-xl border bg-background flex flex-col gap-3 ${
-                        isReviewMode
-                          ? isCor
-                            ? "border-emerald-500/50 bg-emerald-500/5"
-                            : "border-red-500/50 bg-red-500/5"
-                          : "border-border"
-                      }`}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-2.5">
-                          <span className="font-bold text-sm text-primary w-28 shrink-0">
-                            {spk.speaker}
-                          </span>
-                          {isReviewMode && (
-                            <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${
-                              isCor
-                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
-                                : "bg-red-500/20 text-red-700 dark:text-red-300"
-                            }`}>
-                              {isCor ? "Đúng (+1)" : "Sai (0 đ)"}
-                            </span>
-                          )}
-                        </div>
-
-                        <select
-                          disabled={isReviewMode}
-                          value={p2Answers[idx] || ""}
-                          onChange={(e) => handleP2Answer(idx, e.target.value)}
-                          className="flex-1 p-2.5 rounded-lg border border-input bg-card text-foreground text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans cursor-pointer disabled:opacity-85"
-                        >
-                          <option value="">-- Chọn thông tin phù hợp --</option>
-                          {(examData.part2.options || []).map((opt, oIdx) => (
-                            <option key={oIdx} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {isReviewMode && (
-                        <div className="text-xs space-y-1 pt-2 border-t border-border/50 text-muted-foreground">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span>Bạn chọn: <strong className={isCor ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>{userChoice || "(Chưa chọn)"}</strong></span>
-                            <span>•</span>
-                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Đáp án chuẩn: <strong>{spk.correctAnswer}</strong></span>
-                          </div>
-                          {spk.explanation && (
-                            <p className="italic text-[11px] pt-1">{spk.explanation}</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+          {/* PART 1 */}
+          {currentStage.partNum === 1 && (
+            <ListeningPart1Card
+              question={examData.part1[currentStage.subIndex]}
+              userChoice={p1Answers[currentStage.subIndex]}
+              isReviewMode={isReviewMode}
+              onAnswer={(opt) => handleP1Answer(currentStage.subIndex, opt)}
+            />
           )}
 
-          {/* =========================================================================
-              PART 3: NHẬN ĐỊNH CHỌN MAN / WOMAN / BOTH
-              ========================================================================= */}
-          {currentStage.partNum === 3 && examData.part3.opinions && examData.part3.opinions.length > 0 && (
-            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20">
-                    Topic
-                  </span>
-                  <h3 className="text-base font-bold text-foreground">
-                    {examData.part3.topic || "Short Conversations & Opinions"}
-                  </h3>
-                </div>
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  🎙️ Đối thoại Man & Woman
-                </span>
-              </div>
-
-              <h4 className="text-xs md:text-sm font-semibold text-muted-foreground">
-                Xác định ai là người đưa ra từng quan điểm dưới đây:
-              </h4>
-
-              <div className="space-y-4">
-                {examData.part3.opinions.map((op, idx) => {
-                  const userChoice = p3Answers[idx];
-                  const isCor = Boolean(userChoice && op.correctAnswer && userChoice.toLowerCase() === op.correctAnswer.toLowerCase());
-
-                  return (
-                    <div
-                      key={idx}
-                      className={`p-4 rounded-xl border bg-background flex flex-col gap-3 ${
-                        isReviewMode
-                          ? isCor
-                            ? "border-emerald-500/50 bg-emerald-500/5"
-                            : "border-red-500/50 bg-red-500/5"
-                          : "border-border"
-                      }`}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <span className="text-xs md:text-sm text-foreground flex-1 leading-relaxed">
-                          {op.statement}
-                        </span>
-
-                        <div className="flex items-center gap-2 shrink-0">
-                          {isReviewMode && (
-                            <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${
-                              isCor
-                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
-                                : "bg-red-500/20 text-red-700 dark:text-red-300"
-                            }`}>
-                              {isCor ? "Đúng (+1)" : "Sai (0 đ)"}
-                            </span>
-                          )}
-
-                          <select
-                            disabled={isReviewMode}
-                            value={p3Answers[idx] || ""}
-                            onChange={(e) => handleP3Answer(idx, e.target.value as any)}
-                            className="w-full sm:w-40 p-2.5 rounded-lg border border-input bg-card text-foreground text-xs md:text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans cursor-pointer disabled:opacity-85"
-                          >
-                            <option value="">-- Chọn --</option>
-                            <option value="Man">Man</option>
-                            <option value="Woman">Woman</option>
-                            <option value="Both">Both</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {isReviewMode && (
-                        <div className="text-xs space-y-1 pt-2 border-t border-border/50 text-muted-foreground">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span>Bạn chọn: <strong className={isCor ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>{userChoice || "(Chưa chọn)"}</strong></span>
-                            <span>•</span>
-                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Đáp án chuẩn: <strong>{op.correctAnswer}</strong></span>
-                          </div>
-                          {op.explanation && (
-                            <p className="italic text-[11px] pt-1">{op.explanation}</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+          {/* PART 2 */}
+          {currentStage.partNum === 2 && (
+            <ListeningPart2Card
+              part2={examData.part2}
+              answers={p2Answers}
+              isReviewMode={isReviewMode}
+              onAnswer={handleP2Answer}
+            />
           )}
 
-          {/* =========================================================================
-              PART 4: RECORDINGS MONOLOGUES (CÂU HỎI TRẮC NGHIỆM)
-              ========================================================================= */}
-          {currentStage.partNum === 4 && (() => {
-            const rec = examData.part4[currentStage.subIndex];
-            if (!rec || !rec.questions) return null;
-            const recIdx = currentStage.subIndex;
+          {/* PART 3 */}
+          {currentStage.partNum === 3 && (
+            <ListeningPart3Card
+              part3={examData.part3}
+              answers={p3Answers}
+              isReviewMode={isReviewMode}
+              onAnswer={handleP3Answer}
+            />
+          )}
 
-            return (
-              <div className="space-y-6">
-                <div className="bg-card rounded-2xl border border-border p-5 shadow-sm flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20">
-                      Topic
-                    </span>
-                    <h3 className="text-sm md:text-base font-bold text-foreground">
-                      {rec.title || `Monologue ${recIdx + 1}`}
-                    </h3>
-                  </div>
-                  <span className="text-xs text-muted-foreground font-medium hidden sm:inline">
-                    Recording {recIdx + 1} of {examData.part4.length}
-                  </span>
-                </div>
-                {rec.questions.map((q, qIdx) => {
-                  const answerKey = `${recIdx}_${qIdx}`;
-                  const selected = p4Answers[answerKey];
-                  const isCor = Boolean(selected && selected.toLowerCase() === q.correctAnswer.toLowerCase());
-
-                  return (
-                    <div
-                      key={qIdx}
-                      className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4"
-                    >
-                      <div className="flex items-center justify-between gap-2 border-b border-border/50 pb-3">
-                        <h3 className="text-sm md:text-base font-semibold text-foreground leading-relaxed">
-                          {q.prompt}
-                        </h3>
-                        {isReviewMode && (
-                          <span
-                            className={`px-2.5 py-1 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 shrink-0 ${
-                              isCor
-                                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                                : "bg-red-500/15 text-red-700 dark:text-red-300 border border-red-500/30"
-                            }`}
-                          >
-                            {isCor ? (
-                              <>
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                <span>Đúng (+1)</span>
-                              </>
-                            ) : (
-                              <>
-                                <AlertCircle className="w-3.5 h-3.5" />
-                                <span>Sai (0 đ)</span>
-                              </>
-                            )}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="space-y-3">
-                        {q.options.map((opt, optIdx) => {
-                          const isSelected = selected === opt;
-                          const isCorrectAnswer = opt.toLowerCase() === q.correctAnswer.toLowerCase();
-
-                          let optionStyle = "border-border bg-background hover:border-primary/40 text-foreground";
-                          if (isReviewMode) {
-                            if (isCorrectAnswer) {
-                              optionStyle = "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold shadow-xs";
-                            } else if (isSelected && !isCorrectAnswer) {
-                              optionStyle = "border-red-500 bg-red-500/10 text-red-700 dark:text-red-300 font-bold shadow-xs";
-                            } else {
-                              optionStyle = "border-border/60 bg-muted/20 text-muted-foreground opacity-75";
-                            }
-                          } else if (isSelected) {
-                            optionStyle = "border-primary bg-primary/10 text-primary font-bold shadow-sm";
-                          }
-
-                          return (
-                            <button
-                              key={optIdx}
-                              type="button"
-                              disabled={isReviewMode}
-                              onClick={() => handleP4Answer(answerKey, opt)}
-                              className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between ${optionStyle} ${
-                                isReviewMode ? "cursor-default" : "cursor-pointer"
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <span
-                                  className={`w-7 h-7 rounded-lg border flex items-center justify-center font-bold text-xs ${
-                                    isReviewMode && isCorrectAnswer
-                                      ? "bg-emerald-500 text-white border-emerald-600"
-                                      : isReviewMode && isSelected && !isCorrectAnswer
-                                      ? "bg-red-500 text-white border-red-600"
-                                      : "bg-muted/40 border-border"
-                                  }`}
-                                >
-                                  {String.fromCharCode(65 + optIdx)}
-                                </span>
-                                <span className="text-xs md:text-sm font-normal">{opt}</span>
-                              </div>
-                              {isReviewMode ? (
-                                isCorrectAnswer ? (
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                ) : isSelected ? (
-                                  <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                                ) : null
-                              ) : (
-                                isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {isReviewMode && (
-                        <div className="mt-3 p-3.5 rounded-xl bg-muted/30 border border-border/80 space-y-1.5 text-xs">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <span>
-                              Bạn đã chọn:{" "}
-                              <strong className={isCor ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>
-                                {selected || "(Bỏ trống)"}
-                              </strong>
-                            </span>
-                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                              Đáp án chuẩn: <strong>{q.correctAnswer}</strong>
-                            </span>
-                          </div>
-                          {q.explanation && (
-                            <div className="text-muted-foreground italic pt-1 border-t border-border/50">
-                              {q.explanation}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
+          {/* PART 4 */}
+          {currentStage.partNum === 4 && (
+            <ListeningPart4Card
+              recording={examData.part4[currentStage.subIndex]}
+              recIdx={currentStage.subIndex}
+              totalRecordings={examData.part4.length}
+              answers={p4Answers}
+              isReviewMode={isReviewMode}
+              onAnswer={handleP4Answer}
+            />
+          )}
           </div>
         </div>
 
         {/* CỘT PHẢI: MỤC LỤC XEM LẠI CHUẨN DESIGN SYSTEM KHI Ở REVIEW MODE */}
         {isReviewMode && (
-          <aside className="lg:col-span-4">
-            <div className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-4 sticky top-20">
-              {/* Header */}
-              <div className="border-b border-border pb-3">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-heading font-black text-base text-foreground flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    <span>Mục lục xem lại</span>
-                  </h3>
-                  <span className="text-xs font-mono font-bold text-primary px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20">
-                    {results.totalScore}/{results.maxScore} điểm
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      {results.totalCorrect} đúng
-                    </span>
-                    <span>•</span>
-                    <span className="text-red-600 dark:text-red-400 font-bold flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      {results.totalQuestionsInExam - results.totalCorrect} sai
-                    </span>
-                  </div>
-                  <span className="font-bold text-accent">Band {results.cefr}</span>
-                </div>
-              </div>
-
-              {/* Filter Checkbox */}
-              <div className="flex items-center justify-between bg-muted/40 p-2.5 rounded-xl border border-border/60">
-                <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={onlyShowWrong}
-                    onChange={(e) => setOnlyShowWrong(e.target.checked)}
-                    className="rounded border-border text-primary focus:ring-primary w-4 h-4"
-                  />
-                  <span>Chỉ hiện câu sai</span>
-                </label>
-                {onlyShowWrong && (
-                  <span className="text-[11px] text-red-600 dark:text-red-400 font-bold">
-                    {results.totalQuestionsInExam - results.totalCorrect} câu
-                  </span>
-                )}
-              </div>
-
-              {/* Part Filter Tabs */}
-              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 text-xs">
-                {[
-                  { id: "all", label: `Tất cả (${listeningStages.length})` },
-                  { id: 1, label: `Part 1 (${listeningStages.filter((s) => s.partNum === 1).length})` },
-                  { id: 2, label: `Part 2` },
-                  { id: 3, label: `Part 3` },
-                  { id: 4, label: `Part 4` },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setReviewFilterPart(tab.id as any)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0 transition-colors cursor-pointer ${
-                      reviewFilterPart === tab.id
-                        ? "bg-primary text-primary-foreground shadow-xs"
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Question Grid Pills */}
-              <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2 max-h-[46vh] overflow-y-auto p-1">
-                {listeningStages
-                  .map((stage, idx) => ({ stage, idx, res: getStageResult(idx) }))
-                  .filter(({ stage, res }) => {
-                    if (reviewFilterPart !== "all" && stage.partNum !== reviewFilterPart) return false;
-                    if (onlyShowWrong && res.isCorrect) return false;
-                    return true;
-                  })
-                  .map(({ stage, idx, res }) => {
-                    const isCurrent = activeStage === idx;
-                    return (
-                      <button
-                        key={stage.id}
-                        type="button"
-                        onClick={() => setActiveStage(idx)}
-                        className={`p-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer border ${
-                          res.isCorrect
-                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/35 hover:bg-emerald-500/25"
-                            : "bg-red-500/15 text-red-700 dark:text-red-300 border-red-500/35 hover:bg-red-500/25"
-                        } ${
-                          isCurrent
-                            ? "ring-2 ring-primary ring-offset-2 ring-offset-background font-black shadow-sm"
-                            : ""
-                        }`}
-                        title={`${stage.label}: ${res.isCorrect ? "Đúng" : "Sai"}`}
-                      >
-                        <div className="flex items-center gap-1">
-                          {res.isCorrect ? (
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                          ) : (
-                            <X className="w-3 h-3 text-red-600 dark:text-red-400" />
-                          )}
-                          <span className="truncate">{res.label}</span>
-                        </div>
-                        {res.total && res.total > 1 && (
-                          <span className="text-[10px] opacity-80">
-                            {res.score}/{res.total}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-              </div>
-
-              {/* Actions */}
-              <div className="border-t border-border pt-3 space-y-2">
-                <button
-                  type="button"
-                  onClick={handleRestartExam}
-                  disabled={isRestarting}
-                  className="w-full tech-btn py-2.5 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  {isRestarting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <RotateCcw className="w-4 h-4" />
-                  )}
-                  <span>Làm lại đề này</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => router.push("/history")}
-                  className="w-full py-2 px-4 rounded-xl border border-border text-xs font-semibold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Quay lại lịch sử làm bài</span>
-                </button>
-              </div>
-            </div>
-          </aside>
+          <ListeningReviewSidebar
+            results={results}
+            onlyShowWrong={onlyShowWrong}
+            setOnlyShowWrong={setOnlyShowWrong}
+            reviewFilterPart={reviewFilterPart}
+            setReviewFilterPart={setReviewFilterPart}
+            listeningStages={listeningStages}
+            activeStage={activeStage}
+            setActiveStage={setActiveStage}
+            getStageResult={getStageResult}
+            handleRestartExam={handleRestartExam}
+            isRestarting={isRestarting}
+            onBackToHistory={() => router.push("/history")}
+          />
         )}
       </div>
       </main>
 
       {/* 4. BOTTOM BAR CHUẨN (CHỈ HIỂN THỊ KHI ĐANG THI, ẨN KHI Ở REVIEW MODE) */}
       {!isReviewMode && (
-        <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
-          {/* Left: Hiện đáp án & Báo lỗi */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowSampleAnswers(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors"
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span>Hiện đáp án</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowReportModal(true);
-                setReportSent(false);
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer"
-            >
-              <Flag className="w-3.5 h-3.5" />
-              <span>Báo lỗi</span>
-            </button>
-          </div>
-
-          {/* Center: Quick Part Question Pills & Navigation Controls */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Glass Dock bọc dãy câu hỏi */}
-            <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm">
-              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[42vw] sm:max-w-[44vw] md:max-w-[50vw] lg:max-w-[56vw] py-0.5 px-0.5">
-                {listeningStages
-                  .map((stage, idx) => ({ stage, idx }))
-                  .filter(({ stage }) => stage.partNum === currentStage.partNum)
-                  .map(({ stage, idx }) => {
-                    const isCurrent = activeStage === idx;
-                    let isAnswered = false;
-                    if (stage.partNum === 1) {
-                      isAnswered = !!p1Answers[stage.subIndex];
-                    } else if (stage.partNum === 2) {
-                      isAnswered = Object.keys(p2Answers).length > 0;
-                    } else if (stage.partNum === 3) {
-                      isAnswered = Object.keys(p3Answers).length > 0;
-                    } else if (stage.partNum === 4) {
-                      const recPrefix = `${stage.subIndex}_`;
-                      isAnswered = Object.keys(p4Answers).some((k) => k.startsWith(recPrefix));
-                    }
-
-                    return (
-                      <button
-                        key={stage.id}
-                        id={`stage-pill-${idx}`}
-                        type="button"
-                        onClick={() => setActiveStage(idx)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
-                          isCurrent
-                            ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
-                            : isAnswered
-                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/35 hover:bg-emerald-500/25"
-                            : "bg-background/80 dark:bg-slate-900/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
-                        }`}
-                        title={stage.label}
-                      >
-                        {isAnswered && !isCurrent && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                        )}
-                        {flaggedStages[idx] && (
-                          <Bookmark className="w-3 h-3 text-amber-500 fill-amber-500 shrink-0" />
-                        )}
-                        <span>{stage.label}</span>
-                      </button>
-                    );
-                  })}
-              </div>
-
-              <div className="h-4 w-px bg-border/70 shrink-0 mx-0.5 hidden sm:block" />
-
-              <button
-                type="button"
-                onClick={() => setShowDrawer(true)}
-                className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0"
-                title="Danh sách tất cả câu hỏi"
-                aria-label="Danh sách tất cả câu hỏi"
-              >
-                <Menu className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center bg-background/80 dark:bg-slate-900/60 hover:bg-primary/10 hover:text-primary text-muted-foreground border border-border/70 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs shrink-0 hidden sm:flex"
-                title="Cuộn lên đầu trang"
-                aria-label="Cuộn lên đầu trang"
-              >
-                <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Right: Previous & Next / Submit */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              disabled={activeStage === 0}
-              onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
-              className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors"
-            >
-              ← Previous
-            </button>
-
-            {activeStage < listeningStages.length - 1 ? (
-              <button
-                type="button"
-                onClick={() => setActiveStage((p) => Math.min(listeningStages.length - 1, p + 1))}
-                className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1"
-              >
-                <span>Next</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleFinalSubmit}
-                className="tech-btn px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all"
-              >
-                Nộp bài
-              </button>
-            )}
-          </div>
-        </footer>
+        <ListeningBottomDock
+          listeningStages={listeningStages}
+          currentStage={currentStage}
+          activeStage={activeStage}
+          setActiveStage={setActiveStage}
+          p1Answers={p1Answers}
+          p2Answers={p2Answers}
+          p3Answers={p3Answers}
+          p4Answers={p4Answers}
+          flaggedStages={flaggedStages}
+          onOpenSampleAnswers={() => setShowSampleAnswers(true)}
+          onOpenReportModal={() => {
+            setShowReportModal(true);
+            setReportSent(false);
+          }}
+          onOpenDrawer={() => setShowDrawer(true)}
+          onFinalSubmit={handleFinalSubmit}
+        />
       )}
 
-      {/* MODAL HIỆN ĐÁP ÁN */}
-      {showSampleAnswers && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-lg p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <span>Đáp án &amp; Giải thích</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowSampleAnswers(false)}
-                className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs leading-relaxed">
-              {currentStage.partNum === 1 && examData.part1[currentStage.subIndex] && (
-                <div className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-2">
-                  <div className="font-semibold text-foreground">
-                    {examData.part1[currentStage.subIndex].prompt}
-                  </div>
-                  <div className="text-primary font-bold">
-                    Đáp án đúng: {examData.part1[currentStage.subIndex].correctAnswer}
-                  </div>
-                  <div className="text-muted-foreground italic">
-                    {examData.part1[currentStage.subIndex].explanation}
-                  </div>
-                </div>
-              )}
-
-              {currentStage.partNum === 2 &&
-                examData.part2.speakers.map((s, idx) => (
-                  <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-1">
-                    <div className="font-bold text-primary">{s.speaker}</div>
-                    <div className="text-foreground font-medium">Đáp án: {s.correctAnswer}</div>
-                    <div className="text-muted-foreground italic text-[11px]">{s.explanation}</div>
-                  </div>
-                ))}
-
-              {currentStage.partNum === 3 &&
-                examData.part3.opinions.map((op, idx) => (
-                  <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-1">
-                    <div className="font-medium text-foreground">{op.statement}</div>
-                    <div className="text-primary font-bold">Đáp án: {op.correctAnswer}</div>
-                    <div className="text-muted-foreground italic text-[11px]">{op.explanation}</div>
-                  </div>
-                ))}
-
-              {currentStage.partNum === 4 &&
-                examData.part4[currentStage.subIndex]?.questions.map((q, idx) => (
-                  <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-1">
-                    <div className="font-medium text-foreground">{q.prompt}</div>
-                    <div className="text-primary font-bold">Đáp án: {q.correctAnswer}</div>
-                    <div className="text-muted-foreground italic text-[11px]">{q.explanation}</div>
-                  </div>
-                ))}
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setShowSampleAnswers(false)}
-                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold"
-              >
-                Đóng
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL BÁO LỖI */}
-      {showReportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-destructive" />
-                <span>Báo lỗi câu hỏi Listening</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowReportModal(false)}
-                className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {reportSent ? (
-              <div className="py-6 text-center space-y-2">
-                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
-                <p className="text-xs font-bold text-foreground">Cảm ơn bạn đã phản hồi!</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Ban chuyên môn sẽ kiểm tra file âm thanh và đề thi trong thời gian sớm nhất.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3 text-xs">
-                <p className="text-muted-foreground">Vui lòng chọn loại lỗi bạn gặp phải:</p>
-                <div className="space-y-2">
-                  {[
-                    "Lỗi âm thanh hoặc audio không phát được",
-                    "Lỗi đáp án hoặc giải thích chưa chuẩn",
-                    "Lỗi nội dung / câu hỏi hiển thị",
-                    "Khác",
-                  ].map((t) => (
-                    <label key={t} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="listeningReportType"
-                        value={t}
-                        checked={reportType === t}
-                        onChange={() => setReportType(t)}
-                        className="text-primary focus:ring-primary"
-                      />
-                      <span className="text-foreground">{t}</span>
-                    </label>
-                  ))}
-                </div>
-                <textarea
-                  value={reportNote}
-                  onChange={(e) => setReportNote(e.target.value)}
-                  placeholder="Mô tả chi tiết vấn đề (tùy chọn)..."
-                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs resize-none h-20 focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <div className="flex justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowReportModal(false)}
-                    className="px-3.5 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setReportSent(true)}
-                    className="px-4 py-1.5 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:opacity-90"
-                  >
-                    Gửi báo lỗi
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* DRAWER DANH SÁCH CÂU HỎI */}
-      {showDrawer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md p-5 rounded-2xl bg-card border border-border shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-border pb-2">
-              <h3 className="font-heading font-bold text-xs uppercase text-muted-foreground tracking-wider">
-                Danh sách bài tập Listening ({listeningStages.length} bài)
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowDrawer(false)}
-                className="p-1 rounded-lg hover:bg-muted text-muted-foreground cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Bộ lọc Tab theo Part */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 text-xs border-b border-border/50">
-              {[
-                { id: "all", label: `Tất cả (${listeningStages.length})` },
-                ...(listeningStages.some((s) => s.partNum === 1)
-                  ? [{ id: "p1", label: `Part 1 (${listeningStages.filter((s) => s.partNum === 1).length})` }]
-                  : []),
-                ...(listeningStages.some((s) => s.partNum === 2)
-                  ? [{ id: "p2", label: `Part 2 (${listeningStages.filter((s) => s.partNum === 2).length})` }]
-                  : []),
-                ...(listeningStages.some((s) => s.partNum === 3)
-                  ? [{ id: "p3", label: `Part 3 (${listeningStages.filter((s) => s.partNum === 3).length})` }]
-                  : []),
-                ...(listeningStages.some((s) => s.partNum === 4)
-                  ? [{ id: "p4", label: `Part 4 (${listeningStages.filter((s) => s.partNum === 4).length})` }]
-                  : []),
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setDrawerTab(tab.id as any)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0 transition-colors cursor-pointer ${
-                    drawerTab === tab.id
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="space-y-3">
-              {/* Part 1 */}
-              {(drawerTab === "all" || drawerTab === "p1") && listeningStages.some((s) => s.partNum === 1) && (
-                <div className="space-y-1.5">
-                  <div className="text-[11px] font-bold text-primary uppercase pt-1 flex items-center justify-between">
-                    <span>Part 1 – Word Recognition ({listeningStages.filter((s) => s.partNum === 1).length} câu)</span>
-                    <span className="text-[10px] text-muted-foreground font-normal">
-                      {Object.keys(p1Answers).length}/{listeningStages.filter((s) => s.partNum === 1).length} đã làm
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-5 gap-1.5">
-                    {listeningStages
-                      .map((stage, idx) => ({ stage, idx }))
-                      .filter(({ stage }) => stage.partNum === 1)
-                      .map(({ stage, idx }) => (
-                        <button
-                          key={stage.id}
-                          type="button"
-                          onClick={() => {
-                            setActiveStage(idx);
-                            setShowDrawer(false);
-                          }}
-                          className={`p-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                            activeStage === idx
-                              ? "bg-primary text-primary-foreground"
-                              : p1Answers[stage.subIndex]
-                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                              : "bg-muted/40 hover:bg-muted text-foreground"
-                          }`}
-                        >
-                          Câu {stage.subIndex + 1}
-                        </button>
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Part 2 */}
-              {(drawerTab === "all" || drawerTab === "p2") && listeningStages.some((s) => s.partNum === 2) && (
-                <div className="space-y-1.5">
-                  <div className="text-[11px] font-bold text-primary uppercase pt-2 flex items-center justify-between">
-                    <span>Part 2 – Matching Info</span>
-                    <span className="text-[10px] text-muted-foreground font-normal">
-                      {Object.keys(p2Answers).length}/{examData.part2.speakers.length || 4} người nói
-                    </span>
-                  </div>
-                  {listeningStages
-                    .map((stage, idx) => ({ stage, idx }))
-                    .filter(({ stage }) => stage.partNum === 2)
-                    .map(({ stage, idx }) => (
-                      <button
-                        key={stage.id}
-                        type="button"
-                        onClick={() => {
-                          setActiveStage(idx);
-                          setShowDrawer(false);
-                        }}
-                        className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors cursor-pointer ${
-                          activeStage === idx
-                            ? "bg-primary text-primary-foreground"
-                            : Object.keys(p2Answers).length === (examData.part2.speakers.length || 4)
-                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                            : "bg-muted/40 hover:bg-muted text-foreground"
-                        }`}
-                      >
-                        {stage.label}: Matching Speakers
-                      </button>
-                    ))}
-                </div>
-              )}
-
-              {/* Part 3 */}
-              {(drawerTab === "all" || drawerTab === "p3") && listeningStages.some((s) => s.partNum === 3) && (
-                <div className="space-y-1.5">
-                  <div className="text-[11px] font-bold text-primary uppercase pt-2 flex items-center justify-between">
-                    <span>Part 3 – Short Conversations</span>
-                    <span className="text-[10px] text-muted-foreground font-normal">
-                      {Object.keys(p3Answers).length}/{examData.part3.opinions.length || 4} quan điểm
-                    </span>
-                  </div>
-                  {listeningStages
-                    .map((stage, idx) => ({ stage, idx }))
-                    .filter(({ stage }) => stage.partNum === 3)
-                    .map(({ stage, idx }) => (
-                      <button
-                        key={stage.id}
-                        type="button"
-                        onClick={() => {
-                          setActiveStage(idx);
-                          setShowDrawer(false);
-                        }}
-                        className={`w-full p-2.5 rounded-lg text-xs font-bold text-left transition-colors cursor-pointer ${
-                          activeStage === idx
-                            ? "bg-primary text-primary-foreground"
-                            : Object.keys(p3Answers).length === (examData.part3.opinions.length || 4)
-                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
-                            : "bg-muted/40 hover:bg-muted text-foreground"
-                        }`}
-                      >
-                        {stage.label}: Opinion Matching (Man / Woman / Both)
-                      </button>
-                    ))}
-                </div>
-              )}
-
-              {/* Part 4 */}
-              {(drawerTab === "all" || drawerTab === "p4") && listeningStages.some((s) => s.partNum === 4) && (
-                <div className="space-y-1.5">
-                  <div className="text-[11px] font-bold text-primary uppercase pt-2">
-                    Part 4 – Monologues ({listeningStages.filter((s) => s.partNum === 4).length} bài thuyết trình)
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {listeningStages
-                      .map((stage, idx) => ({ stage, idx }))
-                      .filter(({ stage }) => stage.partNum === 4)
-                      .map(({ stage, idx }) => (
-                        <button
-                          key={stage.id}
-                          type="button"
-                          onClick={() => {
-                            setActiveStage(idx);
-                            setShowDrawer(false);
-                          }}
-                          className={`p-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                            activeStage === idx
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted/40 hover:bg-muted text-foreground"
-                          }`}
-                        >
-                          {stage.label}
-                        </button>
-                      ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <ListeningModalsAndDrawer
+        showSampleAnswers={showSampleAnswers}
+        setShowSampleAnswers={setShowSampleAnswers}
+        showReportModal={showReportModal}
+        setShowReportModal={setShowReportModal}
+        reportType={reportType}
+        setReportType={setReportType}
+        reportNote={reportNote}
+        setReportNote={setReportNote}
+        reportSent={reportSent}
+        setReportSent={setReportSent}
+        showDrawer={showDrawer}
+        setShowDrawer={setShowDrawer}
+        drawerTab={drawerTab}
+        setDrawerTab={setDrawerTab}
+        listeningStages={listeningStages}
+        currentStage={currentStage}
+        activeStage={activeStage}
+        setActiveStage={setActiveStage}
+        examData={examData}
+        p1Answers={p1Answers}
+        p2Answers={p2Answers}
+        p3Answers={p3Answers}
+      />
       <ExamExitConfirmModal
         isOpen={showExitConfirm}
         title="Rời khỏi bài thi Listening?"

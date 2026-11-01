@@ -24,6 +24,14 @@ import {
   Star,
 } from "lucide-react";
 import { getCloverConfig } from "@/lib/clover-utils";
+import { useSkillHubTabSync } from "@/hooks/use-skill-hub";
+import { SkillPartTabs } from "@/components/skills/skill-part-tabs";
+import { SkillFilterBar } from "@/components/skills/skill-filter-bar";
+import {
+  SkillMarathonCard,
+  SkillExamCard,
+  SkillEmptyState,
+} from "@/components/skills/skill-exam-card";
 
 interface WritingExam {
   id: string;
@@ -51,23 +59,7 @@ export default function WritingPracticePage() {
     user?.role === "TEACHER" ||
     Boolean(user?.subscription) ||
     Boolean(user?.user_subscriptions?.length);
-  const [activeTab, setActiveTab] = useState<"full" | "p1" | "p2" | "p3" | "p4">("full");
-  const isTabHydrated = useRef(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!isTabHydrated.current) {
-      isTabHydrated.current = true;
-      return;
-    }
-    sessionStorage.setItem("writing_active_tab", activeTab);
-    try {
-      const url = new URL(window.location.href);
-      if (activeTab !== "full") url.searchParams.set("tab", activeTab);
-      else url.searchParams.delete("tab");
-      window.history.replaceState({}, "", url.toString());
-    } catch {}
-  }, [activeTab]);
+  const { activeTab, setActiveTab, selectTab } = useSkillHubTabSync("writing");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "not_started" | "completed">("all");
@@ -157,49 +149,6 @@ function detectWritingPartNumber(title: string, partTitle?: string | null, total
 
   useEffect(() => {
     loadExams();
-  }, []);
-
-  // Đồng bộ tab từ URL (?tab=p1/p2/p3/p4/full) và lắng nghe sự kiện switch tab từ Guide Modal
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const syncTabFromUrl = () => {
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get("tab");
-      if (tabParam && ["full", "p1", "p2", "p3", "p4"].includes(tabParam)) {
-        setActiveTab(tabParam as any);
-        sessionStorage.setItem("writing_active_tab", tabParam);
-        setTimeout(() => {
-          const el = document.getElementById("practice-sets-section");
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 150);
-      } else {
-        const saved = sessionStorage.getItem("writing_active_tab");
-        if (saved && ["full", "p1", "p2", "p3", "p4"].includes(saved)) {
-          setActiveTab(saved as any);
-        }
-      }
-    };
-
-    syncTabFromUrl();
-
-    const handleSwitchTab = (e: Event) => {
-      const customEvent = e as CustomEvent<{ skill: string; tab: string }>;
-      if (customEvent.detail && (customEvent.detail.skill === "writing" || !customEvent.detail.skill)) {
-        const targetTab = customEvent.detail.tab;
-        if (["full", "p1", "p2", "p3", "p4"].includes(targetTab)) {
-          setActiveTab(targetTab as any);
-        }
-      }
-    };
-
-    window.addEventListener("aptis:switch-skill-tab", handleSwitchTab);
-    window.addEventListener("popstate", syncTabFromUrl);
-
-    return () => {
-      window.removeEventListener("aptis:switch-skill-tab", handleSwitchTab);
-      window.removeEventListener("popstate", syncTabFromUrl);
-    };
   }, []);
 
   // 1. Lọc theo từng Tab chuẩn: Tách biệt hoàn toàn Full Test và Part 1 / 2 / 3 / 4
@@ -340,35 +289,17 @@ function detectWritingPartNumber(title: string, partTitle?: string | null, total
           </div>
 
           {/* Top 5 Part Tabs matching reading/listening layout */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6">
-            {[
-              { id: "full", label: "Full Part – Tất cả các Part" },
-              { id: "p1", label: "Part 1 – Short answers" },
-              { id: "p2", label: "Part 2 – Club form" },
-              { id: "p3", label: "Part 3 – Social network" },
-              { id: "p4", label: "Part 4 – Formal & Informal" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => {
-                  setActiveTab(tab.id as any);
-                  if (typeof window !== "undefined") {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set("tab", tab.id);
-                    window.history.pushState({}, "", url.toString());
-                  }
-                }}
-                className={`whitespace-nowrap px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
-                  activeTab === tab.id
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          <SkillPartTabs
+            activeTab={activeTab}
+            onSelectTab={selectTab}
+            tabs={[
+              { id: "full", label: "Full Part", sub: "Tất cả các Part" },
+              { id: "p1", label: "Part 1", sub: "Word-level (1–5 từ)" },
+              { id: "p2", label: "Part 2", sub: "Short text (20–30 từ)" },
+              { id: "p3", label: "Part 3", sub: "Three responses (30–40 từ)" },
+              { id: "p4", label: "Part 4", sub: "Formal & informal emails" },
+            ]}
+          />
 
           {/* Header Description */}
           <div className="mb-6 space-y-1">
@@ -386,83 +317,16 @@ function detectWritingPartNumber(title: string, partTitle?: string | null, total
           </div>
 
           {/* Sub Filters - Rows */}
-          <div className="space-y-2.5 mb-8 text-xs">
-            {/* Row 1: Lọc ưu tiên theo Độ Hot ☘️ */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-muted-foreground font-semibold w-24">Độ Hot ☘️:</span>
-              {[
-                { id: "all", label: `Tất cả (${currentTabExams.length})` },
-                { id: "high", label: `☘️☘️☘️+ Siêu Hot (${currentTabExams.filter((e) => (e.hotLevel || 0) >= 3).length})` },
-                ...(currentTabExams.some((e) => (e.hotLevel || 0) === 2)
-                  ? [{ id: "medium", label: `☘️☘️ Hay ra (${currentTabExams.filter((e) => (e.hotLevel || 0) === 2).length})` }]
-                  : []),
-                ...(currentTabExams.some((e) => (e.hotLevel || 0) === 1)
-                  ? [{ id: "low", label: `☘️ Cơ bản (${currentTabExams.filter((e) => (e.hotLevel || 0) === 1).length})` }]
-                  : []),
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setFilterPriority(item.id as any)}
-                  className={`px-3 py-1 rounded-full font-bold transition-all ${
-                    filterPriority === item.id
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "border border-border bg-card text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Row 2: Trạng thái */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-muted-foreground font-semibold w-24">Trạng thái:</span>
-              {[
-                { id: "all", label: `Tất cả (${currentTabExams.length})` },
-                { id: "not_started", label: `Chưa làm (${currentTabExams.filter((e) => e.status !== "completed").length})` },
-                { id: "completed", label: `Đã làm (${currentTabExams.filter((e) => e.status === "completed").length})` },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setFilterStatus(item.id as any)}
-                  className={`px-3 py-1 rounded-full font-bold transition-all ${
-                    filterStatus === item.id
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "border border-border bg-card text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Row 3: Nguồn (khi ở Full Part) */}
-            {activeTab === "full" && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-muted-foreground font-semibold w-24">Nguồn:</span>
-                {[
-                  { id: "all", label: `Tất cả (${currentTabExams.length})` },
-                  { id: "web", label: `Đề web (${currentTabExams.length})` },
-                  { id: "my", label: `Bộ đề của tôi (0)` },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setFilterSource(item.id as any)}
-                    className={`px-3 py-1 rounded-full font-bold transition-all ${
-                      filterSource === item.id
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "border border-border bg-card text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <SkillFilterBar
+            exams={currentTabExams}
+            activeTab={activeTab}
+            filterPriority={filterPriority}
+            setFilterPriority={setFilterPriority}
+            filterStatus={filterStatus}
+            setFilterStatus={setFilterStatus}
+            filterSource={filterSource}
+            setFilterSource={setFilterSource}
+          />
 
           {/* Cards Grid */}
           {loading ? (
@@ -484,163 +348,45 @@ function detectWritingPartNumber(title: string, partTitle?: string | null, total
                 Thử lại
               </button>
             </div>
+          ) : filteredExams.length === 0 ? (
+            <SkillEmptyState
+              icon={<Sparkles className="w-10 h-10" />}
+              title="Không có đề thi nào"
+              description="Không tìm thấy đề thi Writing nào khớp với bộ lọc hiện tại."
+              onResetFilters={() => {
+                setSearchTerm("");
+                setFilterPriority("all");
+                setFilterStatus("all");
+              }}
+            />
           ) : (
             <div id="practice-sets-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 scroll-mt-24">
-              {/* CARD 1: Special Action Card (PRO Custom / Marathon) */}
-              <div className="relative rounded-2xl border-2 border-primary/60 bg-card p-6 flex flex-col justify-between shadow-md hover:shadow-lg transition-all">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    {tabInfo.marathonType === "custom" ? (
-                      <span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px] uppercase">
-                        PRO
-                      </span>
-                    ) : (
-                      <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-bold text-[10px]">
-                          ∞ Marathon
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
-                          PRO
-                        </span>
-                      </div>
-                    )}
-                    {tabInfo.marathonType === "marathon" && (
-                      <span className="text-[11px] font-semibold text-muted-foreground">Chưa làm</span>
-                    )}
-                  </div>
+              <SkillMarathonCard
+                marathonType={tabInfo.marathonType}
+                marathonText={tabInfo.marathonText}
+                marathonDesc={tabInfo.marathonDesc}
+                marathonBtn={tabInfo.marathonBtn}
+                marathonUrl={(tabInfo as any).marathonUrl}
+                onActionClick={() => setIsGuideModalOpen(true)}
+              />
 
-                  <h3 className="text-lg font-heading font-extrabold text-foreground mb-2">
-                    {tabInfo.marathonText}
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {tabInfo.marathonDesc}
-                  </p>
-                </div>
-
-                <div className="pt-6 mt-4 border-t border-border/40">
-                  {(tabInfo as any).marathonUrl ? (
-                    <Link
-                      href={(tabInfo as any).marathonUrl}
-                      className="block w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center cursor-pointer"
-                    >
-                      {tabInfo.marathonBtn}
-                    </Link>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setIsGuideModalOpen(true)}
-                      className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center cursor-pointer"
-                    >
-                      {tabInfo.marathonBtn}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* CARD 2..N: Practice Exam Cards */}
-              {filteredExams.map((exam, idx) => {
+              {filteredExams.map((exam) => {
                 const targetUrl = `/writing/${exam.id}${tabInfo.partQuery}`;
-                const displayTitle = exam.title;
-
                 return (
-                  <div
+                  <SkillExamCard
                     key={exam.id}
-                    className={`relative rounded-2xl border bg-card hover:border-primary/50 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group ${
-                      exam.hotLevel && exam.hotLevel >= 5
-                        ? "border-rose-500/40 shadow-rose-500/5 ring-1 ring-rose-500/20"
-                        : exam.hotLevel === 4
-                        ? "border-amber-500/30 ring-1 ring-amber-500/20"
-                        : exam.hotLevel === 3
-                        ? "border-blue-500/30 ring-1 ring-blue-500/20"
-                        : exam.hotLevel && exam.hotLevel > 0
-                        ? "border-emerald-500/30"
-                        : "border-border"
-                    }`}
-                  >
-                    <div>
-                      {/* Top Badges & Score / Status */}
-                      <div className="flex items-center justify-between gap-2 mb-3">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded-md bg-muted text-muted-foreground font-bold text-[10px]">
-                            {exam.partNumber === 0 ? "Full Part" : `Part ${exam.partNumber}`}
-                          </span>
-                          {exam.isFree ? (
-                            <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
-                              FREE
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
-                              PRO
-                            </span>
-                          )}
-
-                          {/* Stickers đánh giá mức độ ưu tiên theo chuẩn Clover ☘️ */}
-                          {(() => {
-                            const cloverLvl = exam.hotLevel;
-                            if (!cloverLvl || cloverLvl <= 0) return null;
-                            const cfg = getCloverConfig(cloverLvl);
-                            return (
-                              <span
-                                className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
-                                title={`${cloverLvl} Cỏ ☘️`}
-                              >
-                                <span>{cfg.symbol}</span>
-                              </span>
-                            );
-                          })()}
-                        </div>
-
-                        {/* Top Right Trophy / Status */}
-                        <div>
-                          {exam.bestScore ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 font-black text-xs">
-                              🏆 {exam.bestScore}
-                            </span>
-                          ) : exam.status === "completed" ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600">
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Đã làm
-                            </span>
-                          ) : (
-                            <span className="text-[11px] font-semibold text-muted-foreground">
-                              Chưa bắt đầu
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1.5 group-hover:text-primary transition-colors">
-                        {displayTitle}
-                      </h3>
-
-                      {/* Subtitle */}
-                      <p className="text-xs text-muted-foreground mb-2">
-                        {activeTab === "full" ? "Full Writing · 4 Parts (50 phút)" : (exam.parts || "Writing Practice")}
-                      </p>
-                    </div>
-
-                    {/* Bottom Action */}
-                    <div className="pt-6 mt-4 border-t border-border/40 flex items-center justify-end">
-                      {exam.isFree || isProOrAdmin ? (
-                        <Link
-                          href={targetUrl}
-                          className="inline-flex items-center gap-1.5 text-primary hover:text-brand-brown font-extrabold text-xs transition-colors"
-                        >
-                          <span>Luyện tập</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </Link>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => alert("Đề này thuộc gói Pro. Bạn có thể luyện tập đề Free hoàn toàn miễn phí!")}
-                          className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground font-bold text-xs transition-colors"
-                        >
-                          <Lock className="w-3.5 h-3.5" />
-                          <span>Mở khóa</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                    id={exam.id}
+                    title={exam.title}
+                    subtitle={activeTab === "full" ? "Full Writing · 4 Parts (50 phút)" : exam.parts || "Writing Practice"}
+                    partBadge={exam.partNumber === 0 ? "Full Part" : `Part ${exam.partNumber}`}
+                    isFree={exam.isFree}
+                    isProOrAdmin={isProOrAdmin}
+                    cloverLevel={exam.hotLevel}
+                    trophyText={exam.bestScore}
+                    status={exam.status}
+                    totalParts={exam.totalParts || 1}
+                    targetUrl={targetUrl}
+                  />
                 );
               })}
             </div>
