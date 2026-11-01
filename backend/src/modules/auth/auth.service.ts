@@ -334,14 +334,10 @@ export class AuthService {
       },
     });
 
+    const userProfile = await this.getProfile(user.id);
+
     return {
-      user: {
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-        avatar_url: user.avatar_url,
-        role: user.role,
-      },
+      user: userProfile,
       tokens,
     };
   }
