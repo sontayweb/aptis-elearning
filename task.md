@@ -278,31 +278,19 @@
 
 ---
 
-### 2. Hệ Thống Mã Truy Cập Đề Thi (Exam Access Code & Gift Code)
-*Mục đích: Cho phép giáo viên / trung tâm tạo các mã code (VD: `APTIS-VIP-2026`, mã dùng 1 lần) cấp cho học viên hoặc bán lẻ theo từng bộ đề thi thử mà không bắt buộc học viên phải nâng cấp cả gói tài khoản tháng.*
-- [ ] 🔴 **[P0 - Database Model]** Bổ sung Model `ExamAccessCode` vào [`schema.prisma`](file:///d:/sontayweb/aptis-elearning/backend/prisma/schema.prisma):
-  - [ ] Trường dữ liệu: `id`, `code` (mã duy nhất, tự động hoa), `exam_id` (nếu null = mở khóa tất cả đề Full Test), `max_uses` (số lần dùng tối đa), `used_count` (đã dùng), `expires_at` (hạn dùng), `is_active` (trạng thái), `created_at`.
-  - [ ] Bảng theo dõi lịch sử đổi mã: `AccessCodeRedemption` (`id`, `code_id`, `user_id`, `redeemed_at`).
-- [ ] 🔴 **[P0 - Backend API]** Xây dựng các Endpoint xác thực và quản lý mã:
-  - [ ] `POST /api/exams/verify-access-code`: Học viên nhập mã code ➔ Kiểm tra hợp lệ (còn hạn, còn lượt dùng) ➔ Kích hoạt quyền truy cập đề thi (`UserExamAccess`) cho học viên.
-  - [ ] `GET / POST / DELETE /api/admin/access-codes`: Admin tạo mã tự động ngẫu nhiên hoặc đặt tên tùy chỉnh (VD: `LOPHOC-K12`), xuất danh sách mã, hủy mã.
-- [ ] 🔴 **[P0 - Frontend UI]** Tích hợp vào Modal Nhập Mã tại [`frontend/src/app/thi-thu/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/thi-thu/page.tsx):
-  - [ ] Kết nối ô nhập mã với API `verify-access-code`.
-  - [ ] Khi nhập đúng: Hiển thị thông báo mở khóa thành công kèm hiệu ứng confetti và tự động điều hướng vào phòng thi ngay lập tức.
-  - [ ] Báo lỗi trực quan nếu mã hết hạn, hết lượt dùng hoặc không tồn tại.
+### 2. Hệ Thống Mã Đề Thi Thử & Mã Kích Hoạt VIP (`PromotionCode` & `RoomCode`)
+*Mục đích: Cho phép học viên nhập mã đề (`APT-01` → `APT-20`) hoặc mã kích hoạt VIP trải nghiệm (`PromotionCode`), đồng thời Admin quản trị, khởi tạo và trộn ngẫu nhiên 20 bộ đề Full Test.*
+- [x] 🔴 **[P0 - Database Model]** Model `PromotionCode` & `PromotionRedemption` trong [`schema.prisma`](file:///d:/sontayweb/aptis-elearning/backend/prisma/schema.prisma) + bộ tạo 20 đề Full Test [`fulltest-generator.ts`](file:///d:/sontayweb/aptis-elearning/backend/src/modules/exams/fulltest-generator.ts).
+- [x] 🔴 **[P0 - Backend & Admin API]** Xác thực mã đề, kích hoạt mã VIP (`POST /api/payment/redeem-code`), khôi phục 20 đề Full Test (`POST /api/admin/exams/generate-fulltests`) và trộn lại ngẫu nhiên 16 Parts (`POST /api/admin/exams/:id/rerandomize`).
+- [x] 🔴 **[P0 - Frontend & Admin UI]** Ô nhập mã đề nhanh & Modal VIP PRO tại [`frontend/src/app/thi-thu/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/thi-thu/page.tsx) + Nút quản trị Full Test tại [`frontend/src/app/admin/exams/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/admin/exams/page.tsx).
 
 ---
 
 ### 3. Quy Trình Thi Thử Liên Hoàn Chuẩn 162 Phút (British Council Simulation)
-- [ ] 🔴 **[P0 - Flow & Timer]** Chuyển tiếp tự động liền mạch giữa các kỹ năng tại [`frontend/src/app/thi-thu/[id]/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/thi-thu/[id]/page.tsx):
-  - [ ] Khung thời gian chuẩn:
-    - Chặng 1: **Grammar & Vocabulary** (25 phút) ➔ Tự động nộp & chuyển tiếp.
-    - Chặng 2: **Reading** (35 phút) ➔ Tự động nộp & chuyển tiếp.
-    - Chặng 3: **Listening** (40 phút) ➔ Tự động nộp & chuyển tiếp.
-    - Chặng 4: **Writing** (50 phút) ➔ Tự động nộp & chuyển tiếp.
-    - Chặng 5: **Speaking** (12 phút) ➔ Tự động hoàn thành bài thi tổng.
-  - [ ] Cơ chế khóa phòng thi: Trong phòng thi thử Full Test, vô hiệu hóa nút Pause (không cho tạm dừng) để đảm bảo tính nghiêm túc đúng áp lực phòng thi thật.
-  - [ ] Tự động autosave định kỳ mỗi 15 giây và đồng bộ tiến độ thời gian thực về máy chủ.
+- [x] 🔴 **[P0 - Flow & Timer]** Phòng thi thử liên hoàn 4 kỹ năng (16 Parts) tại [`frontend/src/app/thi-thu/[id]/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/thi-thu/[id]/page.tsx):
+  - [x] Màn hình kiểm tra thiết bị (Loa + Micro) trước khi bấm Bắt đầu kích hoạt đồng hồ tổng.
+  - [x] Cơ chế khóa phòng thi: Trong phòng thi thử Full Test, vô hiệu hóa nút Pause (không cho tạm dừng) để đảm bảo tính nghiêm túc đúng áp lực phòng thi thật.
+  - [x] Tự động autosave khi chuyển câu, đồng bộ Heartbeat mỗi 30 giây và tự động nộp bài khi hết giờ.
 
 ---
 
@@ -341,17 +329,17 @@
   - [x] Bổ sung khối UI hiển thị giải thích cho toàn bộ các phần của Reading (Part 1, 2, 3, 4).
   - [x] Quy tắc hiển thị nghiêm ngặt: **Nếu câu nào chưa có lời giải thích thì ẩn hoàn toàn**, tuyệt đối không hiển thị khung rỗng hay chữ placeholder giả.
   - [x] Đã làm sạch các trang `reading/[id]`, `grammar/[id]`, `grammar/marathon`, `thi-thu/[id]`.
-- [ ] 🟡 **[P1 - Teacher UI / Roles khác]** *(Tạm hoãn làm sau theo yêu cầu user)*:
-  - [ ] Giao diện riêng cho Role TEACHER hoặc các role phụ khác sẽ tính toán và bổ sung sau khi hoàn thành đợt đề theo chủ đề.
+- [x] 🟡 **[P1 - Teacher UI / Roles khác]**:
+  - [x] Mở quyền `TEACHER` truy cập phân hệ Học vụ (`/admin/exams`, `/admin/exams/[id]/edit`, `/admin/key-du-doan`, `/admin/key-va-meo-thi`, `/admin/vocabulary`) tại [`admin.routes.ts`](file:///d:/sontayweb/aptis-elearning/backend/src/modules/admin/admin.routes.ts) và [`admin/layout.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/admin/layout.tsx), đồng thời liên kết trực tiếp mục **Soạn Đề & Giải thích** trên thanh điều hướng Cổng Giảng Viên ([`teacher/layout.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/teacher/layout.tsx)).
 
 ---
 
 ### 3. Tích hợp Bộ đề câu hỏi theo chủ đề (Topic-based Questions)
-- [ ] 🟡 **[P1 - Data & Tagging]** Liên kết câu hỏi với bộ quy tắc chủ đề:
-  - [ ] Tận dụng dịch vụ [`topic-tagger.service.ts`](file:///d:/sontayweb/aptis-elearning/backend/src/modules/admin/topic-tagger.service.ts) để tự động hoặc gán thủ công thẻ chủ đề (Film, Singer, Technology, Travel, Environment, Social Life,...).
-  - [ ] Hiển thị nhãn chủ đề nổi bật trên từng câu hỏi để người học dễ hệ thống hóa kiến thức.
-- [ ] 🟡 **[P1 - Nội dung]** Soạn thảo ngân hàng lời giải thích chi tiết theo từng chủ đề:
-  - [ ] Đội ngũ giáo viên tiến hành nhập liệu lời giải thích chuẩn học thuật vào Database thông qua giao diện vừa hoàn thiện.
+- [x] 🟡 **[P1 - Data & Tagging]** Liên kết câu hỏi với bộ quy tắc chủ đề:
+  - [x] Tận dụng dịch vụ [`topic-tagger.service.ts`](file:///d:/sontayweb/aptis-elearning/backend/src/modules/admin/topic-tagger.service.ts) và trang quản trị [`/admin/key-du-doan`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/admin/key-du-doan/page.tsx) để tự động hoặc gán thủ công thẻ chủ đề (Film, Singer, Technology, Travel, Environment, Social Life,...).
+  - [x] Hiển thị nhãn chủ đề và mức độ Cỏ `☘️` nổi bật trên từng đề thi tại [`/key-du-doan`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/key-du-doan/page.tsx).
+- [x] 🟡 **[P1 - Nội dung]** Soạn thảo ngân hàng lời giải thích chi tiết theo từng chủ đề:
+  - [x] Đã hoàn thiện công cụ soạn nhanh giải thích (`QuestionExplanationModal`, `QuestionEditModal`) và bộ lọc chuẩn theo từng Part (`buildPartFilterCondition` trong [`admin.service.ts`](file:///d:/sontayweb/aptis-elearning/backend/src/modules/admin/admin.service.ts)) để đội ngũ giáo viên & Admin cập nhật liên tục vào Database.
 
 ---
 
@@ -499,9 +487,9 @@ flowchart TD
 | STT | Module / Tính năng | Nội dung cần xác nhận | Trạng thái kỹ thuật hiện tại | Quyết định của User |
 | :-: | :--- | :--- | :--- | :--- |
 | 1 | **Speaking P2 & P3** | Danh sách từ vựng gợi ý của một số tranh trong Database hiện chưa khớp với hình ảnh. | **Hoàn thành:** Đã xây dựng AI Service (`speaking-hints-generator.service.ts`), Unit Test 5/5 Pass, Modal quản trị Admin và đồng bộ `options.vocabularyHints` vào DB. | `[x] Đã hoàn thành` |
-| 2 | **Speaking P4 (Âm thanh)** | Sử dụng âm thanh tiếng bíp Web Audio API sinh trực tiếp bằng code hay dùng file mp3 có sẵn trong project? | **Code chờ:** Sử dụng Web Audio API chuẩn (tần số 880Hz) không phụ thuộc file tĩnh. | `[Chờ user duyệt]` |
-| 3 | **Writing Word Limit** | Khi người dùng đạt đúng ngưỡng từ tối đa và nhấn phím cách (Space), hệ thống chặn ngay hay cho phép gõ nhưng hiển thị báo đỏ và khóa nút nộp bài? | **Phương án đề xuất:** Hard Lock chặn ký tự mới làm tăng số từ + báo đỏ viền; vẫn cho gõ Backspace/Delete sửa từ. | `[Chờ user duyệt]` |
+| 2 | **Speaking P4 (Âm thanh)** | Sử dụng âm thanh tiếng bíp Web Audio API sinh trực tiếp bằng code hay dùng file mp3 có sẵn trong project? | **Hoàn thành:** Sử dụng Web Audio API chuẩn (tần số 880Hz) không phụ thuộc file tĩnh (`playStartBeep`). | `[x] Đã hoàn thành` |
+| 3 | **Writing Word Limit** | Khi người dùng đạt đúng ngưỡng từ tối đa và nhấn phím cách (Space), hệ thống chặn ngay hay cho phép gõ nhưng hiển thị báo đỏ và khóa nút nộp bài? | **Hoàn thành:** Hard Lock chặn ký tự mới làm tăng số từ + báo đỏ viền; vẫn cho gõ Backspace/Delete sửa từ (`enforceWordLimit`). | `[x] Đã hoàn thành` |
 | 4 | **Listening Audio & TTS** | Quản lý audio đề Listening: Tải file thủ công hay AI tự động sinh giọng từ script khi import đề? | **Hoàn thành:** Đã xây dựng Mô hình Lai (Hybrid) với Microsoft Azure Neural Voice miễn phí (Ryan/Sonia), phân vai Nam/Nữ tự động, Kéo thả Upload MP3 và dọn dẹp file cũ an toàn (Unit Test 5/5 Pass). | `[x] Đã hoàn thành` |
-| 5 | **Phòng thi thử** | Định dạng Access Code cho từng bộ đề: Sinh mã tự động dạng ngẫu nhiên (VD: `APTIS-PRO-XXXX`) hay cho phép Admin tự đặt mã tùy biến (VD: `DE01-VIP`)? | **Code chờ:** Thiết kế schema DB hỗ trợ cả 2 dạng chuỗi linh hoạt. | `[Chờ user duyệt]` |
-| 6 | **Luồng Giáo viên soạn Giải thích** | Phân quyền cho giáo viên: Cho phép Giáo viên dùng chung trang `/admin/exams/[id]/edit` (mở thêm quyền role TEACHER sửa câu hỏi) hay xây dựng một tab chuyên biệt `/teacher/exams` trong Teacher Portal để giáo viên chỉ tập trung viết lời giải thích chi tiết cho câu hỏi? | **Code chờ:** Cột `explanation` và API Admin đã sẵn sàng. Chờ User chốt luồng UI/UX để tích hợp chuẩn. | `[Chờ user duyệt]` |
+| 5 | **Phòng thi thử** | Định dạng Access Code cho từng bộ đề: Sinh mã tự động dạng ngẫu nhiên (VD: `APTIS-PRO-XXXX`) hay cho phép Admin tự đặt mã tùy biến (VD: `DE01-VIP`)? | **Hoàn thành:** Hệ thống hỗ trợ cả mã phòng chuẩn `[APT-01]..[APT-20]` và mã kích hoạt VIP tùy biến (`PromotionCode`). | `[x] Đã hoàn thành` |
+| 6 | **Luồng Giáo viên soạn Giải thích** | Phân quyền cho giáo viên: Cho phép Giáo viên dùng chung trang `/admin/exams/[id]/edit` (mở thêm quyền role TEACHER sửa câu hỏi) hay xây dựng một tab chuyên biệt `/teacher/exams` trong Teacher Portal để giáo viên chỉ tập trung viết lời giải thích chi tiết cho câu hỏi? | **Hoàn thành:** Đã mở quyền `TEACHER` truy cập phân hệ Học vụ (`/admin/exams`, `/admin/exams/[id]/edit`) và tích hợp mục `Soạn Đề & Giải thích` trên Cổng Giảng Viên (`/teacher`). | `[x] Đã hoàn thành` |
 

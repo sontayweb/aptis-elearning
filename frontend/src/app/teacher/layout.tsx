@@ -15,17 +15,20 @@ import {
   ShieldAlert,
   ArrowLeft,
   Sparkles,
+  BookOpen,
 } from "lucide-react";
 
 export default function TeacherLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, isAuthenticated, logout, quickLogin } = useAuth();
-  const isTeacherOrAdmin = user?.role === "TEACHER" || user?.role === "ADMIN";
+  const isTeacherOrAdmin =
+    user?.role === "TEACHER" || user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
 
   const navigation = [
     { name: "Tổng quan Lớp học", href: "/teacher", icon: LayoutDashboard },
     { name: "Quản lý Lớp học", href: "/teacher/classes", icon: Users },
     { name: "Hàng đợi Chấm thi", href: "/teacher/grading", icon: PenTool },
+    { name: "Soạn Đề & Giải thích", href: "/admin/exams?view=QUESTIONS", icon: BookOpen },
   ];
 
   if (!isAuthenticated || !isTeacherOrAdmin) {

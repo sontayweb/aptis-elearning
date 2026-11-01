@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Image, Volume2, Split, Eye, FileText, Sparkles } from "lucide-react";
 import ImageUploadInput from "@/components/admin/image-upload-input";
 import AudioUploadInput from "@/components/admin/audio-upload-input";
+import { parsePartImages, resolveImageUrl } from "@/lib/media-utils";
 
 interface PartMediaEditorProps {
   partTitle: string;
@@ -21,23 +22,9 @@ interface PartMediaEditorProps {
   }) => void;
 }
 
-// Helper parse danh sách URL ảnh (hỗ trợ cả JSON array '["url1","url2"]' và chuỗi phân tách dấu phẩy)
+// Helper parse danh sách URL ảnh (chuẩn hóa qua parsePartImages / resolveImageUrl)
 export function parseImageUrls(raw: string | null | undefined): string[] {
-  if (!raw) return [];
-  const trimmed = raw.trim();
-  if (!trimmed) return [];
-  if (trimmed.startsWith("[")) {
-    try {
-      const parsed = JSON.parse(trimmed);
-      if (Array.isArray(parsed)) {
-        return parsed.map((u) => String(u).trim()).filter(Boolean);
-      }
-    } catch {}
-  }
-  return trimmed
-    .split(",")
-    .map((s) => s.replace(/^[\["']+|[\]"']+$/g, "").trim())
-    .filter(Boolean);
+  return parsePartImages(raw);
 }
 
 export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
@@ -218,7 +205,7 @@ export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
                 <div className="grid grid-cols-2 gap-3">
                   <div className="relative aspect-video rounded-lg overflow-hidden bg-slate-800 border border-slate-700 flex items-center justify-center">
                     {img1 ? (
-                      <img src={img1} alt="Tranh 1" className="w-full h-full object-cover" />
+                      <img src={resolveImageUrl(img1)} alt="Tranh 1" className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-xs text-slate-500 font-mono">Chưa có ảnh 1</span>
                     )}
@@ -228,7 +215,7 @@ export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
                   </div>
                   <div className="relative aspect-video rounded-lg overflow-hidden bg-slate-800 border border-slate-700 flex items-center justify-center">
                     {img2 ? (
-                      <img src={img2} alt="Tranh 2" className="w-full h-full object-cover" />
+                      <img src={resolveImageUrl(img2)} alt="Tranh 2" className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-xs text-slate-500 font-mono">Chưa có ảnh 2</span>
                     )}

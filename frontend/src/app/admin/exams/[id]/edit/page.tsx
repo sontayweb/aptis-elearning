@@ -37,6 +37,7 @@ import { QuestionCardRow } from "@/components/admin/exams/question-card-row";
 import { QuestionExplanationModal } from "@/components/admin/exams/question-explanation-modal";
 import { SpeakingHintsModal, SpeakingHintsData } from "@/components/admin/exams/speaking-hints-modal";
 import { detectAptisTaskMeta } from "@/components/admin/exams/exam.types";
+import { ExamPartImageGallery } from "@/components/exam-part-image-gallery";
 
 interface Question {
   id: string;
@@ -977,25 +978,11 @@ export default function ExamEditorPage() {
                               )}
 
                               {imgs.length > 0 && (
-                                <div className="space-y-1">
-                                  <span className="font-bold text-[10px] uppercase text-rose-600 dark:text-rose-400 flex items-center gap-1">
-                                    <ImageIcon className="w-3 h-3" />
-                                    <span>Hình ảnh đề thi ({imgs.length} ảnh):</span>
-                                  </span>
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    {imgs.map((url: string, iIdx: number) => (
-                                      <a
-                                        key={iIdx}
-                                        href={url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="block relative w-20 h-14 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 hover:opacity-80 transition-opacity"
-                                      >
-                                        <img src={url} alt={`Part image ${iIdx + 1}`} className="w-full h-full object-cover" />
-                                      </a>
-                                    ))}
-                                  </div>
-                                </div>
+                                <ExamPartImageGallery
+                                  imageUrl={part.image_url}
+                                  title={part.title}
+                                  variant="admin-preview"
+                                />
                               )}
                             </div>
                           )}

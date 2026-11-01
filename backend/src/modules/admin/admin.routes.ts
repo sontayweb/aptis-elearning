@@ -12,29 +12,29 @@ const upload = multer({
 
 const router = Router();
 
-// Toàn bộ Admin API yêu cầu JWT và Role ADMIN
+// Toàn bộ Admin/Academic API yêu cầu JWT và Role ADMIN/SUPER_ADMIN hoặc TEACHER (cho phân hệ Học vụ)
 router.use(authGuard);
-router.use(roleGuard(['ADMIN']));
+router.use(roleGuard(['ADMIN', 'TEACHER']));
 
-// Quản lý người dùng & Tác vụ Hỗ trợ Học viên
-router.get('/users', (req, res, next) => adminController.listUsers(req, res, next));
-router.post('/users', (req, res, next) => adminController.createUser(req, res, next));
-router.post('/users/bulk-import', upload.single('file'), (req, res, next) =>
+// Quản lý người dùng & Tác vụ Hỗ trợ Học viên (Chỉ ADMIN / SUPER_ADMIN)
+router.get('/users', roleGuard(['ADMIN']), (req, res, next) => adminController.listUsers(req, res, next));
+router.post('/users', roleGuard(['ADMIN']), (req, res, next) => adminController.createUser(req, res, next));
+router.post('/users/bulk-import', roleGuard(['ADMIN']), upload.single('file'), (req, res, next) =>
   adminController.bulkImportUsers(req, res, next)
 );
-router.get('/users/:id/summary', (req, res, next) =>
+router.get('/users/:id/summary', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.getUserSummary(req, res, next)
 );
-router.patch('/users/:id/status', (req, res, next) =>
+router.patch('/users/:id/status', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.updateUserStatus(req, res, next)
 );
-router.post('/users/:id/grant-vip', (req, res, next) =>
+router.post('/users/:id/grant-vip', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.grantVip(req, res, next)
 );
-router.post('/users/:id/reset-password', (req, res, next) =>
+router.post('/users/:id/reset-password', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.resetPassword(req, res, next)
 );
-router.post('/users/:id/adjust-quota', (req, res, next) =>
+router.post('/users/:id/adjust-quota', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.adjustQuota(req, res, next)
 );
 
@@ -69,7 +69,7 @@ router.patch('/exams/:id', (req, res, next) => adminController.updateExam(req, r
 router.post('/exams/:id/duplicate', (req, res, next) => adminController.duplicateExam(req, res, next));
 router.post('/exams/:id/rerandomize', (req, res, next) => adminController.rerandomizeFullTestExam(req, res, next));
 router.post('/exams/generate-fulltests', (req, res, next) => adminController.generateFullTestExams(req, res, next));
-router.delete('/exams/:id', (req, res, next) => adminController.deleteExam(req, res, next));
+router.delete('/exams/:id', roleGuard(['ADMIN']), (req, res, next) => adminController.deleteExam(req, res, next));
 
 // Content Editor — Parts
 router.post('/exams/:id/parts', (req, res, next) => adminController.addPart(req, res, next));
@@ -96,26 +96,26 @@ router.post('/topic-tags/sync-all', (req, res, next) => adminController.syncAllT
 router.delete('/topic-tags/:id', (req, res, next) => adminController.deleteTopicRule(req, res, next));
 
 
-// Quản lý giao dịch SePay
-router.get('/transactions', (req, res, next) =>
+// Quản lý giao dịch SePay (Chỉ ADMIN / SUPER_ADMIN)
+router.get('/transactions', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.listTransactions(req, res, next)
 );
-router.post('/transactions/manual', (req, res, next) =>
+router.post('/transactions/manual', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.createManualTransaction(req, res, next)
 );
-router.post('/transactions/:id/resolve', (req, res, next) =>
+router.post('/transactions/:id/resolve', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.resolveTransaction(req, res, next)
 );
 
 // Quản lý gói cước (Plans)
-router.get('/plans', (req, res, next) => adminController.listPlans(req, res, next));
-router.patch('/plans/:id', (req, res, next) => adminController.updatePlan(req, res, next));
+router.get('/plans', roleGuard(['ADMIN']), (req, res, next) => adminController.listPlans(req, res, next));
+router.patch('/plans/:id', roleGuard(['ADMIN']), (req, res, next) => adminController.updatePlan(req, res, next));
 
 // Thống kê Dashboard KPIs & Xuất báo cáo
-router.get('/dashboard/stats', (req, res, next) =>
+router.get('/dashboard/stats', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.getDashboardKPIs(req, res, next)
 );
-router.get('/dashboard/export', (req, res, next) =>
+router.get('/dashboard/export', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.exportDashboardReport(req, res, next)
 );
 

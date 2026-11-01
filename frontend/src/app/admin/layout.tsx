@@ -226,7 +226,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   // Filter nav groups by role (SRS Section 1.2 Persona matrix)
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
+  const isTeacher = user?.role === "TEACHER";
   const filteredNavGroups = navGroups.map((group) => {
+    if (isTeacher) {
+      return group.group === "HỌC VỤ" ? group : null;
+    }
     if (group.group === "HỆ THỐNG" && !isSuperAdmin) {
       return null;
     }
@@ -242,8 +246,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   // Flattened items for matching breadcrumb title
   const allNavItems = filteredNavGroups.flatMap((g) => g.items);
 
-  // Guard Screen if not admin or super admin
-  if (!isAuthenticated || (user?.role !== "ADMIN" && user?.role !== "SUPER_ADMIN")) {
+  // Guard Screen if not admin, super admin, or teacher
+  if (!isAuthenticated || (user?.role !== "ADMIN" && user?.role !== "SUPER_ADMIN" && user?.role !== "TEACHER")) {
     return (
       <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex items-center justify-center p-4">
         <div className="max-w-md w-full rounded-2xl border border-slate-200/90 bg-white p-7 shadow-xl text-center space-y-5">

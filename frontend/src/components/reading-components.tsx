@@ -189,9 +189,61 @@ export function ReadingSentenceOrder({
     });
   }, [sentences, currentOrder, totalSlotsCount]);
 
-  // Unplaced sentences in the pool
+  // Xáo trộn cố định (Deterministic Derangement Shuffle) danh sách câu ở cột phải
+  // Đảm bảo: (1) Giữ nguyên id gốc (s1..s5) để chấm điểm chuẩn 100%,
+  // (2) Không bao giờ hiển thị trùng thứ tự đáp án đúng ban đầu,
+  // (3) Không bị nhảy vị trí khi học viên gỡ câu ra/vào hoặc F5 trang.
+  const shuffledPool = React.useMemo(() => {
+    if (!sentences || sentences.length <= 1) return sentences;
+    const copy = [...sentences];
+
+    const seedStr = `${title || ""}_${sentences.map((s) => `${s.id}:${s.text}`).join("|")}`;
+    let hash = 2166136261;
+    for (let i = 0; i < seedStr.length; i++) {
+      hash ^= seedStr.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    let state = (hash >>> 0) || 123456789;
+    const nextRand = () => {
+      state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+      return state / 4294967296;
+    };
+
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(nextRand() * (i + 1));
+      const tmp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = tmp;
+    }
+
+    const originalIds = sentences.map((s) => s.id).join(",");
+    const targetIds = (
+      correctOrder && correctOrder.length === sentences.length
+        ? correctOrder
+        : sentences.map((s) => s.id)
+    ).join(",");
+    const currentShuffledIds = copy.map((s) => s.id).join(",");
+
+    if (currentShuffledIds === originalIds || currentShuffledIds === targetIds) {
+      const first = copy[0];
+      copy[0] = copy[copy.length - 1];
+      copy[copy.length - 1] = copy[1];
+      copy[1] = first;
+    }
+
+    // Đảm bảo câu đầu tiên không nằm ngay ở vị trí số 1 để tránh bấm tuần tự từ trên xuống
+    if (copy.length >= 3 && copy[0].id === sentences[0].id) {
+      const temp = copy[0];
+      copy[0] = copy[1];
+      copy[1] = temp;
+    }
+
+    return copy;
+  }, [sentences, title, correctOrder]);
+
+  // Unplaced sentences in the pool (hiển thị theo thứ tự đã xáo trộn)
   const placedIds = new Set(slots.filter(Boolean).map((s) => s!.id));
-  const unplacedSentences = sentences.filter((s) => !placedIds.has(s.id));
+  const unplacedSentences = shuffledPool.filter((s) => !placedIds.has(s.id));
 
   const notifyChange = (updatedSlots: (SentenceItem | null)[]) => {
     setSlots(updatedSlots);

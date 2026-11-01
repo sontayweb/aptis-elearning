@@ -113,10 +113,16 @@ class ApiClient {
         { method: 'POST', body: JSON.stringify(body) }
       ),
 
+    googleAuth: (credential: string) =>
+      this.request<{ user: any; tokens: { accessToken: string; refreshToken: string } }>(
+        '/auth/google',
+        { method: 'POST', body: JSON.stringify({ credential }) }
+      ),
+
     getMe: () => this.request('/auth/me', { method: 'GET' }),
 
     forgotPassword: (email: string) =>
-      this.request('/auth/forgot-password', {
+      this.request<{ message: string; resetToken?: string }>('/auth/forgot-password', {
         method: 'POST',
         body: JSON.stringify({ email }),
       }),

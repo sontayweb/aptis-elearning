@@ -88,6 +88,7 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: UserProfile }>;
+  googleLogin: (credential: string) => Promise<{ success: boolean; error?: string; user?: UserProfile }>;
   register: (data: { email: string; password: string; full_name?: string; fullName?: string; phone?: string; phoneNumber?: string }) => Promise<{ success: boolean; error?: string; user?: UserProfile }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -151,6 +152,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {
       success: false,
       error: extractErrorMessage(res, "Đăng nhập không thành công"),
+    };
+  };
+
+  const googleLogin = async (credential: string) => {
+    const res = await api.auth.googleAuth(credential);
+    if (res.success && res.data) {
+      localStorage.setItem("accessToken", res.data.tokens.accessToken);
+      localStorage.setItem("refreshToken", res.data.tokens.refreshToken);
+      const normalized = normalizeUserProfile(res.data.user);
+      setUser(normalized);
+      return { success: true, user: normalized || undefined };
+    }
+    return {
+      success: false,
+      error: extractErrorMessage(res, "Đăng nhập bằng Google không thành công"),
     };
   };
 
@@ -219,6 +235,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         isAuthenticated: !!user,
         login,
+        googleLogin,
         register,
         logout,
         refreshUser,

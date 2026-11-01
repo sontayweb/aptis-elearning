@@ -1112,14 +1112,7 @@ export class AdminService {
       // 3. Smart Part Filter (handles both bundled 4-part exams and standalone single-part exams)
       if (partNumber) {
         where.parts = {
-          some: {
-            OR: [
-              { part_number: Number(partNumber) },
-              { title: { contains: `Part ${partNumber}`, mode: 'insensitive' } },
-              { title: { contains: `Phần ${partNumber}`, mode: 'insensitive' } },
-              { title: { contains: `Part${partNumber}`, mode: 'insensitive' } },
-            ],
-          },
+          some: this.buildPartFilterCondition(Number(partNumber)),
         };
       }
 
@@ -1258,7 +1251,7 @@ export class AdminService {
         attemptsCount: exam._count.submissions,
         parts: exam.parts.map((p) => ({
           id: p.id,
-          partNumber: p.part_number,
+          partNumber: this.resolveLogicalPartNumber(p.part_number, p.title, exam.title),
           title: p.title,
           questionsCount: p._count.questions,
         })),
@@ -1271,6 +1264,73 @@ export class AdminService {
       page,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  /**
+   * Builds a strict Prisma filter for ExamPart by logical Aptis Part (1..4).
+   * Prevents standalone single-part exams (where part_number = 1 in DB, but title says "Part 2/3/4")
+   * from leaking into Part 1 or mismatching sequential part_number rows.
+   */
+  private buildPartFilterCondition(partNumber: number): any {
+    const pNum = Number(partNumber);
+    const otherNums = [1, 2, 3, 4, 5].filter((n) => n !== pNum);
+
+    const otherPartTitlePatterns = otherNums.flatMap((n) => [
+      { title: { contains: `Part ${n}`, mode: 'insensitive' as const } },
+      { title: { contains: `Phần ${n}`, mode: 'insensitive' as const } },
+      { title: { contains: `Part${n}`, mode: 'insensitive' as const } },
+      { exam: { title: { contains: `Part ${n}`, mode: 'insensitive' as const } } },
+      { exam: { title: { contains: `Phần ${n}`, mode: 'insensitive' as const } } },
+    ]);
+
+    return {
+      OR: [
+        { title: { contains: `Part ${pNum}`, mode: 'insensitive' as const } },
+        { title: { contains: `Phần ${pNum}`, mode: 'insensitive' as const } },
+        { title: { contains: `Part${pNum}`, mode: 'insensitive' as const } },
+        {
+          AND: [
+            {
+              OR: [
+                { exam: { title: { contains: `Part ${pNum}`, mode: 'insensitive' as const } } },
+                { exam: { title: { contains: `Phần ${pNum}`, mode: 'insensitive' as const } } },
+              ],
+            },
+            {
+              NOT: {
+                OR: otherNums.flatMap((n) => [
+                  { title: { contains: `Part ${n}`, mode: 'insensitive' as const } },
+                  { title: { contains: `Phần ${n}`, mode: 'insensitive' as const } },
+                  { title: { contains: `Part${n}`, mode: 'insensitive' as const } },
+                ]),
+              },
+            },
+          ],
+        },
+        {
+          AND: [
+            { part_number: pNum },
+            {
+              NOT: {
+                OR: otherPartTitlePatterns,
+              },
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  private resolveLogicalPartNumber(
+    partNumber: number,
+    partTitle?: string | null,
+    examTitle?: string | null
+  ): number {
+    const mPart = (partTitle || '').match(/(?:part|phần)\s*([1-4])/i);
+    if (mPart) return Number(mPart[1]);
+    const mExam = (examTitle || '').match(/(?:part|phần)\s*([1-4])/i);
+    if (mExam) return Number(mExam[1]);
+    return partNumber;
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -1289,21 +1349,18 @@ export class AdminService {
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    const partWhere: any = {};
+    const partConditions: any[] = [];
 
     if (params.skill && params.skill !== 'ALL') {
-      partWhere.exam = { skill: params.skill };
+      partConditions.push({ exam: { skill: params.skill } });
     }
     if (params.partNumber) {
-      const pNum = Number(params.partNumber);
-      partWhere.OR = [
-        { part_number: pNum },
-        { title: { contains: `Part ${pNum}`, mode: 'insensitive' } },
-        { title: { contains: `Phần ${pNum}`, mode: 'insensitive' } },
-      ];
+      partConditions.push(this.buildPartFilterCondition(Number(params.partNumber)));
     }
-    if (Object.keys(partWhere).length > 0) {
-      where.part = partWhere;
+    if (partConditions.length === 1) {
+      where.part = partConditions[0];
+    } else if (partConditions.length > 1) {
+      where.part = { AND: partConditions };
     }
 
     if (params.questionType && params.questionType !== 'ALL') {
@@ -1331,10 +1388,9 @@ export class AdminService {
           const pNum = Number(urlPartMatch[1]);
           orConditions.push({
             part: {
-              exam_id: extractedUuid,
-              OR: [
-                { part_number: pNum },
-                { title: { contains: `Part ${pNum}`, mode: 'insensitive' } },
+              AND: [
+                { exam_id: extractedUuid },
+                this.buildPartFilterCondition(pNum),
               ],
             },
           });
@@ -1449,7 +1505,7 @@ export class AdminService {
       createdAt: q.created_at,
       part: {
         id: q.part.id,
-        partNumber: q.part.part_number,
+        partNumber: this.resolveLogicalPartNumber(q.part.part_number, q.part.title, q.part.exam?.title),
         title: q.part.title,
         passageText: q.part.passage_text,
         audioUrl: q.part.audio_url,

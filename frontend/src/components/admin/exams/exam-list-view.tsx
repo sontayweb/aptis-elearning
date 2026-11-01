@@ -413,16 +413,22 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
                           {exam.parts.map((p) => (
                             <span
                               key={p.id}
-                              className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono border ${
+                              className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono border max-w-full ${
                                 partFilter === p.partNumber
                                   ? "bg-purple-100 dark:bg-purple-950/60 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 font-bold"
                                   : "bg-slate-100/70 dark:bg-slate-800 border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-400"
                               }`}
                               title={`${p.title} (${p.questionsCount} câu hỏi)`}
                             >
-                              <span>P{p.partNumber}</span>
-                              <span className="text-slate-400">·</span>
-                              <span>{p.questionsCount}q</span>
+                              <span className="shrink-0">P{p.partNumber}</span>
+                              {p.title && (exam.parts!.length <= 4 || partFilter === p.partNumber) && (
+                                <>
+                                  <span className="text-slate-400 shrink-0">·</span>
+                                  <span className="font-sans truncate max-w-[180px]">{p.title}</span>
+                                </>
+                              )}
+                              <span className="text-slate-400 shrink-0">·</span>
+                              <span className="shrink-0">{p.questionsCount}q</span>
                             </span>
                           ))}
                         </div>

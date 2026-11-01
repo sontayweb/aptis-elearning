@@ -166,7 +166,7 @@ function ReadingExamRunner() {
     setP4Answers({});
     const resetOrders: Record<string, string[]> = {};
     examData.part2.stories.forEach((st) => {
-      resetOrders[st.id] = st.sentences.map((s) => s.id);
+      resetOrders[st.id] = [];
     });
     setP2Orders(resetOrders);
     setTimeLeft(examData.durationMinutes * 60);
@@ -911,7 +911,7 @@ function ReadingExamRunner() {
     if (!story) return;
     setP2Orders((prev) => ({
       ...prev,
-      [storyId]: story.sentences.map((s) => s.id),
+      [storyId]: [],
     }));
   };
 

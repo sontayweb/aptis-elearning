@@ -54,12 +54,42 @@ export function resolveImageUrl(rawUrl?: string | null): string {
   if (url.includes(",")) {
     url = url.split(",")[0].trim();
   }
+  url = url.replace(/^[\["']+|[\]"']+$/g, "").trim();
 
   if (!url || url === "null" || url === "undefined") return "";
+
+  // Xử lý link cũ aptiskey.com chuyển sang assets nội bộ
+  if (url.includes("aptiskey.com/images/speaking/part2/")) {
+    const filename = url.split("/").pop() || "";
+    const num = filename.replace(/\D/g, "");
+    if (num) return `/uploads/speaking/part2/image${num}.png`;
+  }
+  if (url.includes("aptiskey.com/images/speaking/part3/")) {
+    const filename = url.split("/").pop() || "";
+    const num = filename.replace(/\D/g, "");
+    if (num) {
+      if (num === "1" || num === "4") return `/uploads/speaking/part3/image${num}.jpg`;
+      return `/uploads/speaking/part3/image${num}.png`;
+    }
+  }
+
+  // Link thư mục speaking/ CDN (kể cả khi bị gắn nhầm dấu "/" ở đầu như "/speaking/...")
+  if (url.startsWith("speaking/") || url.startsWith("/speaking/")) {
+    const cleanPath = url.replace(/^\/+/, "");
+    return `https://files.aptisacademy.com.vn/${cleanPath}`;
+  }
 
   // Link ngoài hoặc CDN đầy đủ
   if (url.startsWith("http://") || url.startsWith("https://")) {
     return url;
+  }
+
+  // Chuẩn hóa image1.png / image4.png trong part3 sang .jpg đúng tên file thực tế
+  if (url === "/uploads/speaking/part3/image1.png" || url === "uploads/speaking/part3/image1.png") {
+    return "/uploads/speaking/part3/image1.jpg";
+  }
+  if (url === "/uploads/speaking/part3/image4.png" || url === "uploads/speaking/part3/image4.png") {
+    return "/uploads/speaking/part3/image4.jpg";
   }
 
   // Link upload nội bộ
@@ -67,9 +97,12 @@ export function resolveImageUrl(rawUrl?: string | null): string {
     return url.startsWith("/") ? url : `/${url}`;
   }
 
-  // Link thư mục speaking/ CDN
-  if (url.startsWith("speaking/")) {
-    return `https://files.aptisacademy.com.vn/${url}`;
+  // Ảnh gốc chuẩn từ kho Aptis Kỳ Tích (ví dụ: de01_1.png, de01_2.png, p2_60.jpg, p3_60_1.jpg, 1.png..99.png)
+  if (/^(?:de\d+_[12]|p[234]_\d+(?:_[12]|_v2)?|\d+)\.(?:png|jpg|jpeg|webp)$/i.test(url)) {
+    return `https://bacoamhbatqpxatrrflz.supabase.co/storage/v1/object/public/exam-images/${url}`;
+  }
+  if (url.startsWith("Tranh_tr_ng__i_m_part_2_") || url.startsWith("Tranh_tr_ng__i_m_part_3_")) {
+    return `/uploads/exams/speaking/${url}`;
   }
 
   // Mặc định thêm slash đầu nếu là đường dẫn tĩnh
