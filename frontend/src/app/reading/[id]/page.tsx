@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/auth-context";
 import { ExamExitConfirmModal } from "@/components/exam-exit-confirm-modal";
 import {
   Clock,
+  Play,
+  Pause,
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
@@ -103,6 +105,7 @@ function ReadingExamRunner() {
 
   // Time & Submission State
   const [timeLeft, setTimeLeft] = useState(35 * 60);
+  const [isPaused, setIsPaused] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
@@ -728,7 +731,7 @@ function ReadingExamRunner() {
 
   // 2. Countdown Timer
   useEffect(() => {
-    if (isSubmitted || loading || isReviewMode) return;
+    if (isSubmitted || loading || isReviewMode || isPaused) return;
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -740,7 +743,7 @@ function ReadingExamRunner() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isSubmitted, loading, isReviewMode]);
+  }, [isSubmitted, loading, isReviewMode, isPaused]);
 
   // 3. Khôi phục bản nháp LocalStorage ngay khi vào phòng thi Reading (Zero-latency recovery)
   useEffect(() => {
@@ -1243,9 +1246,23 @@ function ReadingExamRunner() {
                 lastSavedAt={lastSavedAt}
                 isResumed={isResumedSession}
               />
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-                <Clock className="w-4 h-4" />
-                <span>{formatTime(timeLeft)}</span>
+              <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
+                  <Clock className="w-4 h-4" />
+                  <span>{formatTime(timeLeft)}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPaused((prev) => !prev)}
+                  className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
+                    isPaused
+                      ? "bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  }`}
+                  title={isPaused ? "Tiếp tục làm bài (Resume)" : "Tạm dừng làm bài (Pause)"}
+                >
+                  {isPaused ? <Play className="w-4 h-4 fill-current" /> : <Pause className="w-4 h-4" />}
+                </button>
               </div>
             </>
           )}
@@ -1290,7 +1307,7 @@ function ReadingExamRunner() {
       )}
 
       {/* 2. MAIN WORKSPACE */}
-      <main className={`flex-1 py-6 px-3 md:px-6 ${isReviewMode ? "pb-12" : "pb-28"}`}>
+      <main className={`flex-1 py-6 px-3 md:px-6 ${isReviewMode ? "pb-12" : "pb-28"}`} data-no-global-selection="true">
         <div className={`mx-auto ${isReviewMode && !isSubmitted ? "max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" : "max-w-4xl space-y-6"}`}>
           <div className={`${isReviewMode && !isSubmitted ? "lg:col-span-8 space-y-6" : "space-y-6"}`}>
 
@@ -1448,6 +1465,19 @@ function ReadingExamRunner() {
                   </div>
 
                   <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setIsPaused((prev) => !prev)}
+                      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-colors cursor-pointer ${
+                        isPaused
+                          ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                          : "border-border text-muted-foreground hover:bg-muted"
+                      }`}
+                      title={isPaused ? "Tiếp tục làm bài" : "Tạm dừng làm bài"}
+                    >
+                      {isPaused ? <Play className="w-3.5 h-3.5 fill-current" /> : <Pause className="w-3.5 h-3.5" />}
+                      <span>{isPaused ? "Tiếp tục" : "Tạm dừng"}</span>
+                    </button>
                     <button
                       type="button"
                       onClick={() =>
@@ -2026,10 +2056,10 @@ function ReadingExamRunner() {
                 type="button"
                 onClick={() => addHighlight("yellow")}
                 className="px-2.5 py-1 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 text-amber-900 dark:text-amber-200 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
-                title="Đánh dấu đoạn văn dẫn chứng (Màu vàng)"
+                title="Đánh dấu đoạn văn Highlight (Màu vàng)"
               >
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0 shadow-xs" />
-                <span>Dẫn chứng</span>
+                <span>Highlight</span>
               </button>
               <button
                 type="button"

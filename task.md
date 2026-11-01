@@ -221,19 +221,19 @@
 ---
 
 ### 2. Điều khiển thời gian làm bài (Pause / Resume cho Reading)
-- [ ] 🔴 **[P0 - Feature]** Bổ sung nút **Pause / Resume** thời gian làm bài tại [`frontend/src/app/reading/[id]/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/reading/[id]/page.tsx):
-  - [ ] Thêm state `isPaused` và gắn vào timer `useEffect`: Đóng băng đồng hồ 35 phút khi học viên nhấn Tạm dừng.
-  - [ ] Thêm nút bấm điều khiển `[ ⏸ Tạm dừng / ▶ Tiếp tục ]` cạnh đồng hồ thời gian trên Header bar (hoặc cạnh nút Gắn cờ).
-  - [ ] Đồng bộ hóa cơ chế tạm dừng như Speaking, Listening và Writing.
+- [x] 🔴 **[P0 - Feature]** Bổ sung nút **Pause / Resume** thời gian làm bài tại [`frontend/src/app/reading/[id]/page.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/reading/[id]/page.tsx):
+  - [x] Thêm state `isPaused` và gắn vào timer `useEffect`: Đóng băng đồng hồ 35 phút khi học viên nhấn Tạm dừng.
+  - [x] Thêm nút bấm điều khiển `[ ⏸ Tạm dừng / ▶ Tiếp tục ]` cạnh đồng hồ thời gian trên Header bar (hoặc cạnh nút Gắn cờ).
+  - [x] Đồng bộ hóa cơ chế tạm dừng như Speaking, Listening và Writing.
 
 ---
 
 ### 3. Cải tiến Reading Part 4 & Sửa lỗi hiển thị đè (Overlap) Toolbar
-- [ ] 🔴 **[P0 - UX/UI]** Đổi tên nhãn thao tác:
-  - [ ] Đổi chữ `[ ● Dẫn chứng ]` trên thanh công cụ bôi đen thành **`[ 🖍️ Highlight ]`** (Màu vàng highlight trực quan).
-- [ ] 🔴 **[P0 - Bug Fix]** Khắc phục lỗi **hiển thị đè (Overlap) 2 thanh công cụ khi bôi đen**:
-  - [ ] Nguyên nhân: Component toàn cục [`selection-translator.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/selection-translator.tsx) (trong `layout.tsx`) và menu nổi riêng của Reading (`reading/[id]/page.tsx:2020`) cùng kích hoạt tại cùng tọa độ chuột `(x, y)`, làm nút gradient đỏ-cam `[ 文A Dịch nhanh ]` đè thẳng lên toolbar của bài đọc.
-  - [ ] Giải pháp: Thêm cờ `data-no-global-selection` cho container bài đọc Reading để `SelectionTranslator` tự động bỏ qua khi bôi đen trong bài đọc, giúp thanh công cụ Highlight hiển thị sạch sẽ, độc lập, không bị đè.
+- [x] 🔴 **[P0 - UX/UI]** Đổi tên nhãn thao tác:
+  - [x] Đổi chữ `[ ● Dẫn chứng ]` trên thanh công cụ bôi đen thành **`[ 🖍️ Highlight ]`** (Màu vàng highlight trực quan).
+- [x] 🔴 **[P0 - Bug Fix]** Khắc phục lỗi **hiển thị đè (Overlap) 2 thanh công cụ khi bôi đen**:
+  - [x] Nguyên nhân: Component toàn cục [`selection-translator.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/selection-translator.tsx) (trong `layout.tsx`) và menu nổi riêng của Reading (`reading/[id]/page.tsx:2020`) cùng kích hoạt tại cùng tọa độ chuột `(x, y)`, làm nút gradient đỏ-cam `[ 文A Dịch nhanh ]` đè thẳng lên toolbar của bài đọc.
+  - [x] Giải pháp: Thêm cờ `data-no-global-selection` cho container bài đọc Reading để `SelectionTranslator` tự động bỏ qua khi bôi đen trong bài đọc, giúp thanh công cụ Highlight hiển thị sạch sẽ, độc lập, không bị đè.
 - [ ] 🔴 **[P0 - Nội dung & UI]** Thêm **Giải thích đáp án**:
   - [ ] Thêm khung hiển thị giải thích chi tiết phía dưới từng câu trả lời khi xem kết quả / đáp án.
   - [ ] Liên kết câu giải thích với vị trí câu dẫn chứng được highlight trong đoạn văn.
@@ -241,9 +241,9 @@
 ---
 
 ### 4. Đồng bộ hóa tính năng Gắn cờ (Flag) & Bookmark (Đánh dấu câu hỏi)
-- [ ] 🔴 **[P0 - Consistency & Bug Fix]** Thống nhất nghiệp vụ "Mark for Review" trên tất cả các kỹ năng:
-  - [ ] Bản chất: "Gắn cờ" (Reading) và "Bookmark" (Listening/Writing) hoàn toàn cùng 1 mục đích (đánh dấu câu hỏi cần xem lại trước khi nộp bài).
-  - [ ] Sửa nút Bookmark trong Listening (tại [`listening/[id]/page.tsx:2285`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/listening/[id]/page.tsx#L2285)): Hiện đang là nút tĩnh chưa có `onClick`. Bổ sung state `bookmarked` và gắn `onClick` để khi bấm sẽ đổi màu nút (Active) và hiện biểu tượng cờ vàng dưới thanh Dock câu hỏi ở chân trang.
+- [x] 🔴 **[P0 - Consistency & Bug Fix]** Thống nhất nghiệp vụ "Mark for Review" trên tất cả các kỹ năng:
+  - [x] Bản chất: "Gắn cờ" (Reading) và "Bookmark" (Listening/Writing) hoàn toàn cùng 1 mục đích (đánh dấu câu hỏi cần xem lại trước khi nộp bài).
+  - [x] Sửa nút Bookmark trong Listening (tại [`listening/[id]/page.tsx:2285`](file:///d:/sontayweb/aptis-elearning/frontend/src/app/listening/[id]/page.tsx#L2285)): Hiện đang là nút tĩnh chưa có `onClick`. Bổ sung state `bookmarked` và gắn `onClick` để khi bấm sẽ đổi màu nút (Active) và hiện biểu tượng cờ vàng dưới thanh Dock câu hỏi ở chân trang.
   - [ ] Thống nhất nhãn tiếng Việt chuẩn: **"Gắn cờ"** (hoặc **"Đánh dấu"**) trên toàn hệ thống.
 
 ---
@@ -429,6 +429,20 @@
 - [ ] 🔴 **[P0 - Migration]** Chuyển lần lượt từng trang sang dùng component chung (xong trang nào thì build + chụp ảnh đối chiếu trang đó trước khi qua trang tiếp): `listening` → `reading` → `writing` → `speaking`.
 - [ ] 🟡 **[P1 - Kiểm thử]** Sau migration: `npm run build` 0 lỗi; so sánh ảnh 4 trang xác nhận nút/tab/thẻ đồng bộ; kiểm tra tab URL sync và khóa Pro vẫn hoạt động.
 - [x] 🔴 **[P0 - Bug Fix]** Hỗ trợ cờ `data-no-global-selection` trong [`selection-translator.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/selection-translator.tsx) (bước 1 sửa lỗi toolbar đè ở Reading; còn lại: gắn cờ vào container bài đọc).
+
+---
+
+## ✂️ PHẦN IX: TÁCH NHỎ TRANG PHÒNG THI CHO DỄ BẢO TRÌ (CODE CLEAN)
+*Mục tiêu: `listening/[id]/page.tsx` (3.632 dòng) và `speaking/[id]/page.tsx` (3.722 dòng) quá lớn. Tách từng khối thành component/hook riêng, không đổi giao diện hay hành vi.*
+
+### Đã xong (type-check 0 lỗi, build 59/59, smoke test trình duyệt 0 lỗi JS)
+- [x] **Listening** (3.632 → 3.095 dòng): [`listening-types.ts`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/listening-types.ts), [`sound-check-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/sound-check-screen.tsx), [`listening-result-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/listening-result-screen.tsx), [`bilingual-transcript-panel.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/listening/bilingual-transcript-panel.tsx).
+- [x] **Speaking** (3.722 → 2.857 dòng): [`speaking-exam-utils.ts`](file:///d:/sontayweb/aptis-elearning/frontend/src/lib/speaking/speaking-exam-utils.ts) (types + hàm thuần), [`speaking-audio-player.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-audio-player.tsx), [`speaking-intro-screen.tsx`](file:///d:/sontayweb/aptis-elearning/frontend/src/components/speaking/speaking-intro-screen.tsx).
+
+### Còn lại (chưa làm)
+- [/] **Listening** (đã bỏ hardcode `audioUrlMap`/index 13-16, bỏ fallback benchmark theo examId, bỏ stage ma): còn tách thẻ câu hỏi Part 1–4 (~600 dòng JSX), khối trình phát audio, header, thanh điều hướng dưới, mục lục xem lại; tách hook `use-listening-timer`, `use-listening-audio`, `use-listening-autosave`.
+- [x] **Speaking** (2.857 → ~1.630 dòng): đã tách `speaking-question-card.tsx`, `speaking-recorder-console.tsx`, `speaking-bottom-dock.tsx`, `speaking-completion-modal.tsx`. Còn lại: hook timer/ghi âm. (Mục cũ: tách các khối prompt theo Part 1–4, bộ ghi âm bên phải, khung đáp án mẫu / Hall of Fame; tách hook timer/ghi âm.
+- [ ] Giảm mục tiêu mỗi `page.tsx` xuống dưới ~800 dòng.
 
 ---
 

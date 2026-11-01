@@ -74,20 +74,23 @@ export function SelectionTranslator() {
       return;
     }
 
-    const anchorNode = selection.anchorNode;
-    if (anchorNode) {
-      const parentEl = anchorNode.nodeType === Node.TEXT_NODE ? anchorNode.parentElement : (anchorNode as HTMLElement);
-      if (
-        parentEl?.closest("input") ||
-        parentEl?.closest("textarea") ||
-        parentEl?.closest("[contenteditable='true']") ||
-        parentEl?.closest("[data-no-global-selection]")
-      ) {
-        return;
-      }
+    const range = selection.getRangeAt(0);
+    const commonAncestor = range.commonAncestorContainer;
+    const ancestorEl =
+      commonAncestor.nodeType === Node.TEXT_NODE
+        ? commonAncestor.parentElement
+        : (commonAncestor as HTMLElement);
+
+    if (
+      ancestorEl?.closest("input") ||
+      ancestorEl?.closest("textarea") ||
+      ancestorEl?.closest("[contenteditable='true']") ||
+      ancestorEl?.closest("[data-no-global-selection]")
+    ) {
+      if (!showPopover) setShowTrigger(false);
+      return;
     }
 
-    const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
     if (rect.width === 0 && rect.height === 0) return;
 

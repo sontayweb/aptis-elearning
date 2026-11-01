@@ -24,22 +24,16 @@ import {
   ArrowUp,
   LogOut,
   X,
-  Trophy,
   Sparkles,
-  FileText,
-  Languages,
   RefreshCw,
   Loader2,
-  Copy,
   Check,
-  VolumeX,
-  Volume1,
-  ChevronDown,
 } from "lucide-react";
 import { DEFAULT_LISTENING_TEST, DEFAULT_LISTENING_TEST_2 } from "@/data/listening-benchmark";
 import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
 import { SoundCheckScreen } from "@/components/listening/sound-check-screen";
 import { ListeningResultScreen } from "@/components/listening/listening-result-screen";
+import { BilingualTranscriptPanel } from "@/components/listening/bilingual-transcript-panel";
 import type {
   Part1Item,
   Part2Speaker,
@@ -98,12 +92,12 @@ function ListeningExamRunnerContent() {
   const [playCounts, setPlayCounts] = useState<Record<number, number>>({});
   const [playbackProgress, setPlaybackProgress] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
-  const [audioUrlMap, setAudioUrlMap] = useState<Record<number, string>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Timer & UI states
   const [timeLeft, setTimeLeft] = useState(40 * 60);
   const [isPaused, setIsPaused] = useState(false);
+  const [flaggedStages, setFlaggedStages] = useState<Record<number, boolean>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showSampleAnswers, setShowSampleAnswers] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
@@ -152,7 +146,7 @@ function ListeningExamRunnerContent() {
         subIndex: idx,
         title: `Part 1 — Câu ${idx + 1}`,
         label: `Câu ${idx + 1}`,
-        audioUrl: q.audioUrl || audioUrlMap[idx],
+        audioUrl: q.audioUrl,
       });
     });
 
@@ -164,7 +158,7 @@ function ListeningExamRunnerContent() {
         subIndex: 0,
         title: "Part 2 — Matching Info (4 Speakers)",
         label: "Part 2: 4 Speakers",
-        audioUrl: (examData.part2 as any).audioUrl || audioUrlMap[13],
+        audioUrl: examData.part2.audioUrl,
       });
     }
 
@@ -176,7 +170,7 @@ function ListeningExamRunnerContent() {
         subIndex: 0,
         title: "Part 3 — Short Conversations (Opinions)",
         label: "Part 3: Opinions",
-        audioUrl: (examData.part3 as any).audioUrl || audioUrlMap[14],
+        audioUrl: examData.part3.audioUrl,
       });
     }
 
@@ -188,54 +182,12 @@ function ListeningExamRunnerContent() {
         subIndex: idx,
         title: `Part 4 — Bài thuyết trình ${idx + 1}`,
         label: `Part 4: Rec ${idx + 1}`,
-        audioUrl: rec.audioUrl || audioUrlMap[15 + idx],
+        audioUrl: rec.audioUrl,
       });
     });
 
-    if (stages.length === 0) {
-      const isP2 = examData.title.toLowerCase().includes("part 2") || (examData.part2 as any)?.speakers?.length > 0;
-      const isP3 = examData.title.toLowerCase().includes("part 3") || (examData.part3 as any)?.opinions?.length > 0;
-      const isP4 = examData.title.toLowerCase().includes("part 4") || examData.part4.length > 0;
-      if (isP2) {
-        stages.push({
-          id: "p2",
-          partNum: 2,
-          subIndex: 0,
-          title: "Part 2 — Matching Info (4 Speakers)",
-          label: "Part 2: 4 Speakers",
-          audioUrl: (examData.part2 as any).audioUrl || audioUrlMap[13],
-        });
-      } else if (isP3) {
-        stages.push({
-          id: "p3",
-          partNum: 3,
-          subIndex: 0,
-          title: "Part 3 — Short Conversations (Opinions)",
-          label: "Part 3: Opinions",
-          audioUrl: (examData.part3 as any).audioUrl || audioUrlMap[14],
-        });
-      } else if (isP4) {
-        stages.push({
-          id: "p4_0",
-          partNum: 4,
-          subIndex: 0,
-          title: "Part 4 — Bài thuyết trình 1",
-          label: "Part 4: Rec 1",
-          audioUrl: audioUrlMap[15],
-        });
-      } else {
-        stages.push({
-          id: "p1_0",
-          partNum: 1,
-          subIndex: 0,
-          title: "Part 1 — Câu 1",
-          label: "Câu 1",
-        });
-      }
-    }
-
     return stages;
-  }, [examData, audioUrlMap]);
+  }, [examData]);
 
   const safeStageIndex = activeStage < listeningStages.length ? activeStage : 0;
   const currentStage = listeningStages[safeStageIndex] || listeningStages[0];
@@ -520,11 +472,8 @@ function ListeningExamRunnerContent() {
             let activeExam = examData;
             if (sub.exam) {
               const parsed = parseApiToListeningData(sub.exam);
-              activeExam = parsed.exam;
-              setExamData(parsed.exam);
-              if (parsed.audioUrls && Object.keys(parsed.audioUrls).length > 0) {
-                setAudioUrlMap((prev) => ({ ...prev, ...parsed.audioUrls }));
-              }
+              activeExam = parsed;
+              setExamData(parsed);
             }
 
             if (sub.answers && Array.isArray(sub.answers)) {
@@ -635,28 +584,34 @@ function ListeningExamRunnerContent() {
     async function load() {
       try {
         setLoading(true);
+        setError(null);
         const res = await api.exams.getQuestions(examId);
         if (res.success && res.data) {
           const apiExam = res.data;
           const parsed = parseApiToListeningData(apiExam);
-          setExamData(parsed.exam);
-          setAudioUrlMap(parsed.audioUrls);
+          setExamData(parsed);
           setTimeLeft((apiExam.duration_minutes || 40) * 60);
+          if (
+            parsed.part1.length === 0 &&
+            (!parsed.part2.speakers || parsed.part2.speakers.length === 0) &&
+            (!parsed.part3.opinions || parsed.part3.opinions.length === 0) &&
+            parsed.part4.length === 0
+          ) {
+            setError("Đề thi này chưa có câu hỏi nào được xuất bản.");
+          }
         } else {
-          // Dùng benchmark tương ứng nếu backend chưa có đủ câu hỏi
-          const fallback =
-            examId.includes("2") || examId.includes("02")
-              ? DEFAULT_LISTENING_TEST_2
-              : DEFAULT_LISTENING_TEST;
-          setExamData(fallback);
+          if (examId === "benchmark" || examId.startsWith("demo")) {
+            setExamData(examId === "demo-2" ? DEFAULT_LISTENING_TEST_2 : DEFAULT_LISTENING_TEST);
+          } else {
+            setError(res.message || "Không thể tải nội dung bài thi từ cơ sở dữ liệu.");
+          }
         }
-      } catch (err) {
-        console.warn("Using offline benchmark listening exam:", err);
-        const fallback =
-          examId.includes("2") || examId.includes("02")
-            ? DEFAULT_LISTENING_TEST_2
-            : DEFAULT_LISTENING_TEST;
-        setExamData(fallback);
+      } catch (err: any) {
+        if (examId === "benchmark" || examId.startsWith("demo")) {
+          setExamData(examId === "demo-2" ? DEFAULT_LISTENING_TEST_2 : DEFAULT_LISTENING_TEST);
+        } else {
+          setError(err?.message || "Lỗi kết nối khi tải nội dung bài thi Listening.");
+        }
       } finally {
         setLoading(false);
       }
@@ -749,19 +704,19 @@ function ListeningExamRunnerContent() {
 
 
   // Parser dữ liệu từ Backend sang format hiển thị của Listening
-  function parseApiToListeningData(apiData: any) {
+  function parseApiToListeningData(apiData: any): ListeningExamData {
     const parts = apiData.parts || [];
     const isSinglePart = parts.length === 1;
 
-    const result = {
+    const result: ListeningExamData = {
       title: apiData.title || "Bài thi Listening",
       durationMinutes: apiData.duration_minutes || (isSinglePart ? 15 : 40),
-      part1: [] as any[],
+      part1: [],
       part2: {
         topic: "Workplace & Daily Life",
         instructions: "Four employees share their views. Match each speaker to their statement.",
-        options: [] as string[],
-        speakers: [] as any[],
+        options: [],
+        speakers: [],
         passageText: "",
         translationText: "",
         audioUrl: "",
@@ -771,13 +726,11 @@ function ListeningExamRunnerContent() {
         instructions: "Who expresses which opinion? Select Man, Woman, or Both.",
         passageText: "",
         translationText: "",
-        opinions: [] as any[],
+        opinions: [],
         audioUrl: "",
       },
-      part4: [] as any[],
+      part4: [],
     };
-
-    const audioUrls: Record<number, string> = {};
 
     parts.forEach((p: any) => {
       const pTitle = (p.title || "").toLowerCase();
@@ -813,7 +766,6 @@ function ListeningExamRunnerContent() {
             const resolvedAudio = rawAudio && !rawAudio.startsWith("http") && !rawAudio.startsWith("/")
               ? `/uploads/audio/listening/${rawAudio}`
               : rawAudio;
-            if (resolvedAudio) audioUrls[idx] = resolvedAudio;
             const qTranscript = extractTranscriptFromExplanation(
               q.explanation,
               q.transcript || q.suggestion || q.passage_text
@@ -844,17 +796,16 @@ function ListeningExamRunnerContent() {
           p.passage_text || p.transcript || p2Candidate?.transcript || p.suggestion
         );
         if (p2Script) {
-          (result.part2 as any).passageText = p2Script;
+          result.part2.passageText = p2Script;
           (result.part2 as any).transcript = p2Script;
         }
-        if (p.translation_text || p.passage_translation) (result.part2 as any).translationText = p.translation_text || p.passage_translation;
+        if (p.translation_text || p.passage_translation) result.part2.translationText = p.translation_text || p.passage_translation;
         const p2RawAudio = p.audio_url || (p as any).file || "";
         const resolvedP2Audio = p2RawAudio && !p2RawAudio.startsWith("http") && !p2RawAudio.startsWith("/")
           ? `/uploads/audio/listening/${p2RawAudio}`
           : p2RawAudio;
         if (resolvedP2Audio) {
-          (result.part2 as any).audioUrl = resolvedP2Audio;
-          audioUrls[13] = resolvedP2Audio;
+          result.part2.audioUrl = resolvedP2Audio;
         }
 
         if (questions.length > 0) {
@@ -873,7 +824,6 @@ function ListeningExamRunnerContent() {
             .map((o) => o.trim())
             .filter((o) => o && !/sẽ có thêm|gây nhiễu|đáp án nhiễu/i.test(o) && !/^[0-9a-f-]{30,}$/i.test(o));
 
-          // Thu thập toàn bộ văn bản từ explanation, suggestion, passage_text, instructions, title để bóc tách đáp án
           const allSourceText = [
             ...questions.map((q: any) => q.explanation || ""),
             p.suggestion || "",
@@ -890,7 +840,6 @@ function ListeningExamRunnerContent() {
 
           const explAnswerMap: Record<string, string> = {};
 
-          // Dạng A: / A. / A - / Speaker A:
           const letterMatches = cleanText.matchAll(/(?:Speaker\s*)?([A-D])\s*[:.\-=–]\s*([^\n\r]+)/gi);
           for (const m of letterMatches) {
             const letter = m[1].toUpperCase();
@@ -900,7 +849,6 @@ function ListeningExamRunnerContent() {
             }
           }
 
-          // Dạng 1. / 2. / 3. / 4.
           const numMatches = cleanText.matchAll(/(?:^|\n)\s*([1-4])\s*[:.\-=–]\s*([^\n\r]+)/gi);
           const numToLetter: Record<string, string> = { "1": "A", "2": "B", "3": "C", "4": "D" };
           for (const m of numMatches) {
@@ -911,7 +859,6 @@ function ListeningExamRunnerContent() {
             }
           }
 
-          // Khớp với extractedOptions để chuẩn hóa chính xác hoa/thường và khoảng trắng
           for (const [letter, val] of Object.entries(explAnswerMap)) {
             const matchedOpt = extractedOptions.find(
               (o) =>
@@ -931,7 +878,8 @@ function ListeningExamRunnerContent() {
             if (/^\d+$/.test(ans)) {
               const num = Number(ans);
               if (extractedOptions[num]) ans = extractedOptions[num];
-            } else if (ans.length > 20 || /^[0-9a-f-]{30,}$/i.test(ans) || !ans) {
+            } else if (!ans || /^[0-9a-f-]{30,}$/i.test(ans)) {
+              // Chỉ fallback khi ans trống hoặc là raw UUID chưa được resolve
               if (explAnswerMap[letter]) ans = explAnswerMap[letter];
               else if (extractedOptions[idx]) ans = extractedOptions[idx];
             }
@@ -970,24 +918,28 @@ function ListeningExamRunnerContent() {
           p.passage_text || p.transcript || p3Candidate?.transcript || p.suggestion
         );
         if (p3Script) {
-          (result.part3 as any).passageText = p3Script;
+          result.part3.passageText = p3Script;
           (result.part3 as any).transcript = p3Script;
         }
-        if (p.translation_text || p.passage_translation) (result.part3 as any).translationText = p.translation_text || p.passage_translation;
+        if (p.translation_text || p.passage_translation) result.part3.translationText = p.translation_text || p.passage_translation;
         const p3RawAudio = p.audio_url || (p as any).file || "";
         const resolvedP3Audio = p3RawAudio && !p3RawAudio.startsWith("http") && !p3RawAudio.startsWith("/")
           ? `/uploads/audio/listening/${p3RawAudio}`
           : p3RawAudio;
         if (resolvedP3Audio) {
-          (result.part3 as any).audioUrl = resolvedP3Audio;
-          audioUrls[14] = resolvedP3Audio;
+          result.part3.audioUrl = resolvedP3Audio;
         }
         if (questions.length > 0) {
           const opList = questions.map((q: any) => {
             let cor: "Man" | "Woman" | "Both" = "Both";
-            const corStr = String(q.correct_answer || "").toLowerCase();
-            if (corStr.includes("man") && !corStr.includes("woman")) cor = "Man";
-            else if (corStr.includes("woman")) cor = "Woman";
+            const corStr = String(q.correct_answer || "").trim().toLowerCase();
+            if (corStr === "man" || corStr === "0" || corStr === "a" || (corStr.includes("man") && !corStr.includes("woman"))) {
+              cor = "Man";
+            } else if (corStr === "woman" || corStr === "1" || corStr === "b" || corStr.includes("woman")) {
+              cor = "Woman";
+            } else if (corStr === "both" || corStr === "2" || corStr === "c" || corStr.includes("both")) {
+              cor = "Both";
+            }
             return {
               id: q.id,
               statement: q.prompt,
@@ -1028,10 +980,16 @@ function ListeningExamRunnerContent() {
 
           const recordings: any[] = [];
           if (qList.length > 2) {
-            const p4RawAudio = p.audio_url || (p as any).file || "";
-            const resolvedP4Audio = p4RawAudio && !p4RawAudio.startsWith("http") && !p4RawAudio.startsWith("/")
-              ? `/uploads/audio/listening/${p4RawAudio}`
-              : p4RawAudio;
+            const rawRec1Audio = questions[0]?.audio_url || questions[0]?.audioUrl || p.audio_url || (p as any).file || "";
+            const resolvedRec1Audio = rawRec1Audio && !rawRec1Audio.startsWith("http") && !rawRec1Audio.startsWith("/")
+              ? `/uploads/audio/listening/${rawRec1Audio}`
+              : rawRec1Audio;
+
+            const rawRec2Audio = questions[2]?.audio_url || questions[2]?.audioUrl || questions[1]?.audio_url || rawRec1Audio;
+            const resolvedRec2Audio = rawRec2Audio && !rawRec2Audio.startsWith("http") && !rawRec2Audio.startsWith("/")
+              ? `/uploads/audio/listening/${rawRec2Audio}`
+              : rawRec2Audio;
+
             const q1Candidate = questions.slice(0, 2).find((q: any) => q.explanation || q.transcript);
             const q2Candidate = questions.slice(2, 4).find((q: any) => q.explanation || q.transcript);
             const p4Script1 = extractTranscriptFromExplanation(
@@ -1048,7 +1006,7 @@ function ListeningExamRunnerContent() {
               passageText: p4Script1,
               transcript: p4Script1,
               translationText: p.translation_text || p.passage_translation || "",
-              audioUrl: resolvedP4Audio,
+              audioUrl: resolvedRec1Audio,
               questions: qList.slice(0, 2),
             });
             recordings.push({
@@ -1057,31 +1015,30 @@ function ListeningExamRunnerContent() {
               passageText: p4Script2 || p4Script1,
               transcript: p4Script2 || p4Script1,
               translationText: p.translation_text || p.passage_translation || "",
-              audioUrl: resolvedP4Audio,
+              audioUrl: resolvedRec2Audio,
               questions: qList.slice(2, 4),
             });
-            if (resolvedP4Audio) {
-              audioUrls[15] = resolvedP4Audio;
-              audioUrls[16] = resolvedP4Audio;
-            }
           } else {
+            const rawAudio = p.audio_url || (p as any).file || "";
+            const resolvedAudio = rawAudio && !rawAudio.startsWith("http") && !rawAudio.startsWith("/")
+              ? `/uploads/audio/listening/${rawAudio}`
+              : rawAudio;
             recordings.push({
               recNum: 1,
               title: `${p4BaseTopic} (Recording 1)`,
               passageText: p.passage_text || "",
               transcript: p.transcript || p.passage_text || "",
               translationText: p.translation_text || p.passage_translation || "",
-              audioUrl: p.audio_url || "",
+              audioUrl: resolvedAudio,
               questions: qList,
             });
-            if (p.audio_url) audioUrls[15] = p.audio_url;
           }
           result.part4 = recordings;
         }
       }
     });
 
-    return { exam: result, audioUrls };
+    return result;
   }
 
   
@@ -1352,7 +1309,7 @@ function ListeningExamRunnerContent() {
     };
 
     // Bắt đầu phát âm thanh
-    const targetAudioSrc = currentStage?.audioUrl || audioUrlMap[activeStage];
+    const targetAudioSrc = currentStage?.audioUrl;
 
     if (targetAudioSrc && audioRef.current) {
       audioRef.current.src = targetAudioSrc;
@@ -1688,7 +1645,7 @@ function ListeningExamRunnerContent() {
             const sub = resultRes.data;
             if (sub.exam) {
               const parsed = parseApiToListeningData(sub.exam);
-              setExamData(parsed.exam);
+              setExamData(parsed);
             }
           }
         } catch (subErr) {
@@ -1906,10 +1863,21 @@ function ListeningExamRunnerContent() {
               <div className="flex items-center gap-3 self-end md:self-auto shrink-0">
                 <button
                   type="button"
-                  className="flex items-center gap-1 px-3 py-1 rounded-xl border border-border text-xs text-muted-foreground hover:bg-muted font-medium transition-colors"
+                  onClick={() =>
+                    setFlaggedStages((prev) => ({
+                      ...prev,
+                      [activeStage]: !prev[activeStage],
+                    }))
+                  }
+                  className={`flex items-center gap-1 px-3 py-1 rounded-xl border text-xs font-medium transition-colors cursor-pointer ${
+                    flaggedStages[activeStage]
+                      ? "bg-amber-500/15 border-amber-500/40 text-amber-600 dark:text-amber-400"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  }`}
+                  title={flaggedStages[activeStage] ? "Bỏ đánh dấu câu này" : "Đánh dấu câu này để xem lại"}
                 >
-                  <Bookmark className="w-3.5 h-3.5" />
-                  <span>Bookmark</span>
+                  <Bookmark className={`w-3.5 h-3.5 ${flaggedStages[activeStage] ? "fill-current" : ""}`} />
+                  <span>{flaggedStages[activeStage] ? "Đã đánh dấu" : "Bookmark"}</span>
                 </button>
 
                 <button
@@ -1966,7 +1934,7 @@ function ListeningExamRunnerContent() {
                       )}
                     </span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">
-                      {audioUrlMap[activeStage] ? "Audio HD" : "Audio British AI"}
+                      {currentStage?.audioUrl ? "Audio HD" : "Audio British AI"}
                     </span>
                   </div>
                   <span>Đã nghe: <strong>{playCounts[activeStage] || 0}/2</strong> lần</span>
@@ -2002,172 +1970,19 @@ function ListeningExamRunnerContent() {
               </div>
             </div>
 
-            {/* Script & Bản dịch song ngữ chuẩn 2 Tab: [ 🇬🇧 Transcript ] & [ 🇻🇳 Bản dịch TV ] */}
-            <div className="pt-3 border-t border-border/50">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <button
-                  type="button"
-                  id="toggle-bilingual-btn" onClick={() => setShowBilingualBox((v) => !v)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    showBilingualBox
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border"
-                  }`}
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>{showBilingualBox ? "Ẩn Transcript & Dịch TV" : "Xem Transcript & Dịch TV"}</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showBilingualBox ? "rotate-180" : ""}`} />
-                </button>
-
-                {!isReviewMode && (
-                  <span className="text-[11px] text-muted-foreground italic hidden sm:inline">
-                    💡 Nên nghe và làm bài trước khi mở transcript để rèn phản xạ thi thật
-                  </span>
-                )}
-              </div>
-
-              {/* Bảng hiển thị 2 Tab chuẩn responsive */}
-              {showBilingualBox && (() => {
-                const bilingual = getCurrentBilingualData();
-                if (!bilingual) return null;
-                const stageKey = `stage_${activeStage}`;
-                const activeTranslation =
-                  bilingual.translation || translationCache[stageKey];
-
-                return (
-                  <div className="mt-3 rounded-xl border border-border bg-card overflow-hidden shadow-xs">
-                    {/* Tab Bar */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 px-3 pt-2 bg-muted/40 border-b border-border">
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          id="tab-bilingual-en" onClick={() => setBilingualTab("en")}
-                          className={`px-3 py-1.5 rounded-t-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border-t border-x -mb-[1px] ${
-                            bilingualTab === "en"
-                              ? "bg-card text-primary border-border border-b-card shadow-xs"
-                              : "bg-transparent text-muted-foreground hover:text-foreground border-transparent"
-                          }`}
-                        >
-                          <span>🇬🇧 Transcript tiếng Anh</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          id="tab-bilingual-vi" onClick={() => {
-                            setBilingualTab("vi");
-                            if (!translationCache[stageKey]) {
-                              fetchBilingualTranslation(activeStage);
-                            }
-                          }}
-                          className={`px-3 py-1.5 rounded-t-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border-t border-x -mb-[1px] ${
-                            bilingualTab === "vi"
-                              ? "bg-card text-amber-600 dark:text-amber-400 border-border border-b-card shadow-xs"
-                              : "bg-transparent text-muted-foreground hover:text-foreground border-transparent"
-                          }`}
-                        >
-                          <span>🇻🇳 Bản dịch Tiếng Việt</span>
-                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9.5px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                            <Sparkles className="w-2.5 h-2.5" />
-                            AI
-                          </span>
-                        </button>
-                      </div>
-
-                      {/* Quick copy / refresh actions */}
-                      <div className="flex items-center gap-1 pb-1">
-                        {bilingualTab === "en" && bilingual.script && (
-                          <button
-                            type="button"
-                            onClick={() => handleCopyTranslation(bilingual.script)}
-                            className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer"
-                            title="Sao chép transcript tiếng Anh"
-                          >
-                            {copiedTrans ? (
-                              <>
-                                <Check className="w-3 h-3 text-emerald-500" />
-                                <span className="text-emerald-500 font-medium">Đã chép</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3 h-3" />
-                                <span className="hidden sm:inline">Sao chép</span>
-                              </>
-                            )}
-                          </button>
-                        )}
-
-                        {bilingualTab === "vi" && (
-                          <>
-                            {activeTranslation && (
-                              <button
-                                type="button"
-                                onClick={() => handleCopyTranslation(activeTranslation)}
-                                className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer"
-                                title="Sao chép bản dịch"
-                              >
-                                {copiedTrans ? (
-                                  <>
-                                    <Check className="w-3 h-3 text-emerald-500" />
-                                    <span className="text-emerald-500 font-medium">Đã chép</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Copy className="w-3 h-3" />
-                                    <span className="hidden sm:inline">Sao chép</span>
-                                  </>
-                                )}
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              disabled={isTranslating}
-                              onClick={() => fetchBilingualTranslation(activeStage, true)}
-                              className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1 rounded hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer"
-                              title="Làm mới bản dịch AI"
-                            >
-                              <RotateCcw className={`w-3 h-3 ${isTranslating ? "animate-spin" : ""}`} />
-                              <span className="hidden sm:inline">Dịch lại</span>
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Tab Content Body */}
-                    <div className="p-4 bg-card">
-                      {bilingualTab === "en" ? (
-                        <div className="text-foreground leading-relaxed whitespace-pre-line font-mono text-[12px] max-h-64 overflow-y-auto select-text">
-                          {bilingual.script || "Đang cập nhật lời thoại cho câu hỏi này."}
-                        </div>
-                      ) : (
-                        <div className="text-foreground leading-relaxed whitespace-pre-line text-[12px] max-h-64 overflow-y-auto select-text">
-                          {activeTranslation ? (
-                            activeTranslation
-                          ) : isTranslating ? (
-                            <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
-                              <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-                              <span className="text-xs font-medium">Đang tạo bản dịch tiếng Việt bằng AI...</span>
-                            </div>
-                          ) : (
-                            <div className="flex flex-col items-center justify-center py-6 gap-2.5 text-muted-foreground text-center">
-                              <span className="text-xs">Đang cập nhật bản dịch tiếng Việt cho câu này...</span>
-                              <button
-                                type="button"
-                                onClick={() => fetchBilingualTranslation(activeStage, true)}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors cursor-pointer"
-                              >
-                                <Sparkles className="w-3.5 h-3.5" />
-                                <span>Dịch ngay bằng AI</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
+            <BilingualTranscriptPanel
+              isOpen={showBilingualBox}
+              onToggle={() => setShowBilingualBox((v) => !v)}
+              isReviewMode={isReviewMode}
+              bilingual={getCurrentBilingualData()}
+              cachedTranslation={translationCache[`stage_${activeStage}`]}
+              tab={bilingualTab}
+              onTabChange={setBilingualTab}
+              isTranslating={isTranslating}
+              copied={copiedTrans}
+              onCopy={handleCopyTranslation}
+              onRequestTranslation={(force) => fetchBilingualTranslation(activeStage, force)}
+            />
           </div>
           <div key={`listening-stage-wrap-${activeStage}`} className="part-transition space-y-5">
           {/* =========================================================================
@@ -2820,6 +2635,9 @@ function ListeningExamRunnerContent() {
                       >
                         {isAnswered && !isCurrent && (
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                        )}
+                        {flaggedStages[idx] && (
+                          <Bookmark className="w-3 h-3 text-amber-500 fill-amber-500 shrink-0" />
                         )}
                         <span>{stage.label}</span>
                       </button>
