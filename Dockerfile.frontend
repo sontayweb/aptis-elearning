@@ -11,6 +11,10 @@ COPY frontend/ .
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=1536"
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_API_URL=https://api.aptisesolpremier.com/api
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=686564345536-iddvjvle0bprc5uga1ogaqcicrdha4ls.apps.googleusercontent.com
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
 # Build Next.js production bundle
 RUN npm run build

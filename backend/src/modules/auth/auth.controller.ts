@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { authService } from './auth.service';
+import { authService, EFFECTIVE_GOOGLE_CLIENT_ID } from './auth.service';
 import {
   registerSchema,
   loginSchema,
@@ -15,6 +15,13 @@ import { sendSuccess } from '../../utils/api-response';
 import { AuthenticatedRequest } from '../../middlewares/auth.guard';
 
 export class AuthController {
+  async getGoogleConfig(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      sendSuccess(res, { clientId: EFFECTIVE_GOOGLE_CLIENT_ID }, 'Cấu hình Google OAuth', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const validatedData = registerSchema.parse(req.body);

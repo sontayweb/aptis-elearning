@@ -113,6 +113,9 @@ class ApiClient {
         { method: 'POST', body: JSON.stringify(body) }
       ),
 
+    googleConfig: () =>
+      this.request<{ clientId: string }>('/auth/google-config', { method: 'GET' }),
+
     googleAuth: (credential: string) =>
       this.request<{ user: any; tokens: { accessToken: string; refreshToken: string } }>(
         '/auth/google',

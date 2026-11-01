@@ -9,8 +9,16 @@ import { AuditAction, TargetBand } from '@prisma/client';
 import { Request } from 'express';
 import { emailService } from '../email/email.service';
 
-const googleClient = process.env.GOOGLE_CLIENT_ID
-  ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+const DEFAULT_GOOGLE_CLIENT_ID =
+  '686564345536-iddvjvle0bprc5uga1ogaqcicrdha4ls.apps.googleusercontent.com';
+
+export const EFFECTIVE_GOOGLE_CLIENT_ID =
+  process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID !== 'mock-google-client-id'
+    ? process.env.GOOGLE_CLIENT_ID
+    : DEFAULT_GOOGLE_CLIENT_ID;
+
+const googleClient = EFFECTIVE_GOOGLE_CLIENT_ID
+  ? new OAuth2Client(EFFECTIVE_GOOGLE_CLIENT_ID)
   : null;
 
 export class AuthService {
@@ -246,11 +254,11 @@ export class AuthService {
     let fullName: string;
     let avatarUrl: string | null = null;
 
-    if (googleClient && process.env.GOOGLE_CLIENT_ID) {
+    if (googleClient && EFFECTIVE_GOOGLE_CLIENT_ID) {
       try {
         const ticket = await googleClient.verifyIdToken({
           idToken: credential,
-          audience: process.env.GOOGLE_CLIENT_ID,
+          audience: EFFECTIVE_GOOGLE_CLIENT_ID,
         });
         const payload = ticket.getPayload();
         if (!payload || !payload.email) {

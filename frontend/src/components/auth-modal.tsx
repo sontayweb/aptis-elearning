@@ -41,10 +41,23 @@ export function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalPr
   const [mounted, setMounted] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement | null>(null);
 
-  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+  const [googleClientId, setGoogleClientId] = useState(
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      "686564345536-iddvjvle0bprc5uga1ogaqcicrdha4ls.apps.googleusercontent.com"
+  );
 
   useEffect(() => {
     setMounted(true);
+    if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+      api.auth
+        .googleConfig()
+        .then((res) => {
+          if (res.data?.clientId) {
+            setGoogleClientId(res.data.clientId);
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
