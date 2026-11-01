@@ -39,5 +39,8 @@ router.get('/classrooms', teacherOnly, (req, res, next) =>
 router.get('/classrooms/:id/members', teacherOnly, (req, res, next) =>
   teacherController.getClassroomMembers(req, res, next)
 );
+router.patch('/questions/:id/explanation', teacherOnly, (req, res, next) =>
+  teacherController.updateQuestionExplanation(req, res, next)
+);
 
 export default router;

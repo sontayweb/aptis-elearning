@@ -269,7 +269,7 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
       question_type: qType,
       options: finalOptions,
       correct_answer: finalCorrectAnswer.trim() || (undefined as any),
-      explanation: explanation.trim() || (undefined as any),
+      explanation: explanation.trim(),
       max_score: Number(maxScore),
     });
   };
@@ -730,9 +730,9 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
 
           <div>
             <label className={lc}>Lời giải thích từ vựng / ngữ pháp (Explanation)</label>
-            <input
-              type="text"
-              className={ic}
+            <textarea
+              rows={3}
+              className={ic + " font-sans leading-relaxed resize-y"}
               placeholder="Giải thích ngữ pháp / nghĩa của từ tại sao chọn đáp án này..."
               value={explanation}
               onChange={(e) => setExplanation(e.target.value)}
@@ -902,9 +902,9 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
 
           <div>
             <label className={lc}>Dẫn chứng trong bài đọc / bài nghe (Explanation)</label>
-            <input
-              type="text"
-              className={ic}
+            <textarea
+              rows={3}
+              className={ic + " font-sans leading-relaxed resize-y"}
               placeholder="Trích dẫn câu chứa thông tin đối chiếu trong đoạn văn / transcript..."
               value={explanation}
               onChange={(e) => setExplanation(e.target.value)}

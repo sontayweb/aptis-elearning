@@ -26,12 +26,16 @@ interface QuestionCardRowProps {
     max_score: number;
   };
   onEdit: () => void;
+  onEditExplanation?: () => void;
+  onEditSpeakingHints?: () => void;
   onDelete: () => void;
 }
 
 export const QuestionCardRow: React.FC<QuestionCardRowProps> = ({
   question: q,
   onEdit,
+  onEditExplanation,
+  onEditSpeakingHints,
   onDelete,
 }) => {
   const isSentenceOrder = q.question_type === "SENTENCE_ORDER";
@@ -141,6 +145,29 @@ export const QuestionCardRow: React.FC<QuestionCardRowProps> = ({
                 <Check className="w-3 h-3 stroke-[2.5]" /> Đáp án: {q.correct_answer}
               </span>
             )}
+
+          {/* Explanation indicator badge for Admin/SuperAdmin */}
+          {q.explanation && q.explanation.trim() ? (
+            <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Có giải thích
+            </span>
+          ) : (
+            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 px-2 py-0.5 rounded-md flex items-center gap-1">
+              Chưa có giải thích
+            </span>
+          )}
+
+          {/* Speaking Vocabulary Hints Badge */}
+          {isSpeaking && (q.options?.vocabularyHints ? (
+            <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800/60 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+              Có gợi ý tranh ({q.options.vocabularyHints.keywords?.length || 0} từ)
+            </span>
+          ) : (
+            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 px-2 py-0.5 rounded-md flex items-center gap-1">
+              Chưa có gợi ý tranh
+            </span>
+          ))}
         </div>
 
         {/* Prompt Title */}
@@ -276,6 +303,40 @@ export const QuestionCardRow: React.FC<QuestionCardRowProps> = ({
 
       {/* Action buttons */}
       <div className="flex items-center gap-1.5 shrink-0">
+        {onEditExplanation && (
+          <button
+            type="button"
+            onClick={onEditExplanation}
+            className={`px-2.5 py-1.5 rounded-xl border text-[11px] font-heading font-bold flex items-center gap-1 transition-all cursor-pointer ${
+              q.explanation && q.explanation.trim()
+                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/60 hover:bg-amber-500 hover:text-white hover:border-amber-500"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-amber-500 hover:text-white hover:border-amber-500"
+            }`}
+            title="Nhập hoặc chỉnh sửa lời giải thích cho câu hỏi này"
+          >
+            <Sparkles className="w-3 h-3 text-amber-500" />
+            <span className="hidden sm:inline">
+              {q.explanation && q.explanation.trim() ? "Giải thích" : "Thêm giải thích"}
+            </span>
+          </button>
+        )}
+        {onEditSpeakingHints && (
+          <button
+            type="button"
+            onClick={onEditSpeakingHints}
+            className={`px-2.5 py-1.5 rounded-xl border text-[11px] font-heading font-bold flex items-center gap-1 transition-all cursor-pointer ${
+              q.options?.vocabularyHints
+                ? "bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/60 hover:bg-purple-600 hover:text-white"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-purple-600 hover:text-white"
+            }`}
+            title="Quản lý gợi ý từ vựng, collocations & cấu trúc ăn điểm Part 2 / 3"
+          >
+            <Sparkles className="w-3 h-3 text-purple-500" />
+            <span className="hidden sm:inline">
+              {q.options?.vocabularyHints ? "Gợi ý tranh" : "Thêm gợi ý tranh"}
+            </span>
+          </button>
+        )}
         <button
           type="button"
           onClick={onEdit}

@@ -24,6 +24,11 @@ export const joinClassroomSchema = z.object({
   classCode: z.string().min(3, 'Mã lớp không hợp lệ'),
 });
 
+export const updateQuestionExplanationSchema = z.object({
+  explanation: z.string().max(5000, 'Lời giải thích không vượt quá 5,000 ký tự'),
+});
+
 export type GradeSubmissionInput = z.infer<typeof gradeSubmissionSchema>;
 export type CreateClassroomInput = z.infer<typeof createClassroomSchema>;
 export type JoinClassroomInput = z.infer<typeof joinClassroomSchema>;
+export type UpdateQuestionExplanationInput = z.infer<typeof updateQuestionExplanationSchema>;

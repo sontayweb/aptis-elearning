@@ -80,7 +80,8 @@ export function SelectionTranslator() {
       if (
         parentEl?.closest("input") ||
         parentEl?.closest("textarea") ||
-        parentEl?.closest("[contenteditable='true']")
+        parentEl?.closest("[contenteditable='true']") ||
+        parentEl?.closest("[data-no-global-selection]")
       ) {
         return;
       }

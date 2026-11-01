@@ -315,6 +315,20 @@ export class TeacherService {
       },
     }));
   }
+
+  async updateQuestionExplanation(questionId: string, explanation: string) {
+    const question = await prisma.question.findUnique({
+      where: { id: questionId },
+    });
+    if (!question) {
+      throw { statusCode: 404, message: 'Câu hỏi không tồn tại' };
+    }
+    const cleanExp = explanation.trim();
+    return prisma.question.update({
+      where: { id: questionId },
+      data: { explanation: cleanExp.length > 0 ? cleanExp : null },
+    });
+  }
 }
 
 export const teacherService = new TeacherService();

@@ -6,15 +6,21 @@ export const startSubmissionSchema = z.object({
 });
 
 export const autosaveAnswerSchema = z.object({
-  answers: z.array(
-    z.object({
-      questionId: z.string().uuid(),
-      selectedOption: z.string().nullable().optional(),
-      textAnswer: z.string().nullable().optional(),
-      audioUrl: z.string().nullable().optional(),
-      audioDuration: z.number().nullable().optional(),
-    })
-  ),
+  answers: z
+    .array(
+      z.object({
+        questionId: z.string().uuid(),
+        selectedOption: z.string().max(50, 'Lựa chọn không hợp lệ').nullable().optional(),
+        textAnswer: z
+          .string()
+          .max(3000, 'Bài viết vượt quá giới hạn 3,000 ký tự cho phép')
+          .nullable()
+          .optional(),
+        audioUrl: z.string().max(1000).nullable().optional(),
+        audioDuration: z.number().max(600).nullable().optional(),
+      })
+    )
+    .max(50, 'Không được gửi quá 50 câu trả lời trong một lần autosave'),
 });
 
 export const heartbeatSchema = z.object({

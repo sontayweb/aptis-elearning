@@ -56,6 +56,13 @@ export interface SpeakingQuestion {
   subQuestions?: string[];
   topic?: string;
   vocabulary?: Array<{ en: string; vi: string }>;
+  vocabularyHints?: {
+    keywords: string[];
+    startingPhrases: string[];
+    linkingPhrases: string[];
+    image1Prompt?: string;
+    image2Prompt?: string;
+  };
 }
 
 // Helper phân tích danh sách từ vựng gợi ý từ passage_text hoặc suggestion
@@ -791,11 +798,22 @@ function SpeakingExamRunnerContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Màn hình chuẩn bị thiết bị (Onboarding / Device Check)
+  const [isIntroStep, setIsIntroStep] = useState(true);
+  const [introSubStep, setIntroSubStep] = useState<"check" | "instructions">("check");
+  const [micTested, setMicTested] = useState(false);
+  const [soundTested, setSoundTested] = useState(false);
+  const [isTestingSound, setIsTestingSound] = useState(false);
+  const [isTestingMic, setIsTestingMic] = useState(false);
+  const [deviceTestError, setDeviceTestError] = useState<string | null>(null);
+
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [stage, setStage] = useState<"prep" | "speaking" | "finished">("prep");
+  // State Machine: "ready" (Chờ người dùng) -> "prep" (Chuẩn bị) -> "speaking" (Nói) -> "finished" (Hoàn thành)
+  const [stage, setStage] = useState<"ready" | "prep" | "speaking" | "finished">("ready");
   const [timer, setTimer] = useState(0);
   const [prepNotes, setPrepNotes] = useState("");
   const [isPrepPaused, setIsPrepPaused] = useState(false);
+  const [isSpeakingPaused, setIsSpeakingPaused] = useState(false);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
 
@@ -851,6 +869,7 @@ function SpeakingExamRunnerContent() {
 
   const {
     isRecording,
+    isPaused: isMicPaused,
     recordingDuration,
     audioUrl,
     audioBlob,
@@ -860,6 +879,8 @@ function SpeakingExamRunnerContent() {
     isUploading,
     requestPermission,
     startRecording,
+    pauseRecording,
+    resumeRecording,
     stopRecording,
     resetRecording,
     uploadRecording,
@@ -964,6 +985,9 @@ function SpeakingExamRunnerContent() {
             qList.forEach((q: any) => {
               const rawExp = (q.explanation || "").trim();
               const hasVn = isVietnameseText(rawExp);
+              const partVocabHints =
+                q.options?.vocabularyHints ||
+                qList.find((item: any) => item.options?.vocabularyHints)?.options?.vocabularyHints;
 
               loaded.push({
                 id: q.id,
@@ -979,6 +1003,7 @@ function SpeakingExamRunnerContent() {
                 guidanceNote: hasVn ? rawExp : undefined,
                 topic: p.title ? p.title.replace(/^Part\s*\d+\s*[-:]*\s*/i, "").trim() : undefined,
                 vocabulary: partVocab.length > 0 ? partVocab : undefined,
+                vocabularyHints: partVocabHints,
               });
             });
           }
@@ -1189,6 +1214,19 @@ function SpeakingExamRunnerContent() {
   // Gợi ý từ vựng & Collocations bên cạnh tranh (Part 2 & Part 3)
   const vocabHints = useMemo(() => {
     if (!currentQ) return { keywords: [], startingPhrases: [], linkingPhrases: [] };
+    // Ưu tiên cao nhất: Dữ liệu AI / Giáo viên đã biên soạn và lưu trong cơ sở dữ liệu
+    if (
+      currentQ.vocabularyHints &&
+      Array.isArray(currentQ.vocabularyHints.keywords) &&
+      currentQ.vocabularyHints.keywords.length > 0
+    ) {
+      return {
+        keywords: currentQ.vocabularyHints.keywords,
+        startingPhrases: currentQ.vocabularyHints.startingPhrases || [],
+        linkingPhrases: currentQ.vocabularyHints.linkingPhrases || [],
+      };
+    }
+    // Fallback: Tự động phân tích theo topic & prompt
     return resolveSpeakingVocabularyHints(currentQ.prompt, currentQ.topic, currentQ.partNumber);
   }, [currentQ]);
 
@@ -1237,14 +1275,19 @@ function SpeakingExamRunnerContent() {
         setUploadedUrl(null);
         setPrepNotes("");
         setIsPrepPaused(false);
+        setIsSpeakingPaused(false);
 
-        if (q.prepTime > 0) {
-          setStage("prep");
-          setTimer(q.prepTime);
-        } else {
-          setStage("prep");
-          setTimer(5);
-        }
+        // Mặc định ở trạng thái "ready", học viên chủ động đọc đề & từ vựng, không tự ép đếm giờ!
+        setStage("ready");
+        const defaultPrep =
+          q.prepTime > 0
+            ? q.prepTime
+            : q.partNumber === 4
+            ? 60
+            : q.partNumber === 2 || q.partNumber === 3
+            ? 12
+            : 5;
+        setTimer(defaultPrep);
       }
     },
     [questions, recordedData, resetRecording]
@@ -1259,7 +1302,7 @@ function SpeakingExamRunnerContent() {
   // Bộ đếm thời gian tự động (Prep -> Speaking -> Finished)
   useEffect(() => {
     if (timerRef.current) clearInterval(timerRef.current);
-    if (!currentQ || isReviewMode) return;
+    if (!currentQ || isReviewMode || stage === "ready" || stage === "finished") return;
 
     if (stage === "prep") {
       if (timer > 0) {
@@ -1272,17 +1315,26 @@ function SpeakingExamRunnerContent() {
         // Hết thời gian chuẩn bị -> Bíp & Tự động ghi âm
         playStartBeep();
         setIsPrepPaused(false);
+        setIsSpeakingPaused(false);
         setStage("speaking");
-        setTimer(currentQ.speakTime);
+        const sTime =
+          currentQ.speakTime ||
+          (currentQ.partNumber === 4
+            ? 120
+            : currentQ.partNumber === 1
+            ? 30
+            : 45);
+        setTimer(sTime);
         startRecording();
       }
     } else if (stage === "speaking") {
-      if (timer > 0 && isRecording) {
+      if (timer > 0 && isRecording && !isSpeakingPaused && !isMicPaused) {
         timerRef.current = setInterval(() => {
           setTimer((t) => t - 1);
         }, 1000);
       } else if (timer === 0 && isRecording) {
         // Hết thời gian nói -> Dừng ghi âm tự động & Lưu tức thì
+        setIsSpeakingPaused(false);
         stopRecording().then((res) => {
           if (res && res.url) {
             setRecordedData((prev) => ({
@@ -1305,7 +1357,20 @@ function SpeakingExamRunnerContent() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [stage, timer, isRecording, isPrepPaused, currentQ, startRecording, stopRecording, isReviewMode, currentIndex, prepNotes]);
+  }, [
+    stage,
+    timer,
+    isRecording,
+    isPrepPaused,
+    isSpeakingPaused,
+    isMicPaused,
+    currentQ,
+    startRecording,
+    stopRecording,
+    isReviewMode,
+    currentIndex,
+    prepNotes,
+  ]);
 
   // Chọn câu hỏi từ danh sách
   const selectQuestion = async (index: number) => {
@@ -1330,20 +1395,75 @@ function SpeakingExamRunnerContent() {
     setCurrentIndex(index);
   };
 
-  // Nút Thí sinh muốn nói luôn, bỏ qua thời gian chuẩn bị
+  // Nút Bắt đầu: Chạy đồng hồ chuẩn bị
+  const handleStartPrep = () => {
+    if (!currentQ) return;
+    if (timerRef.current) clearInterval(timerRef.current);
+    setIsPrepPaused(false);
+    setIsSpeakingPaused(false);
+    const pTime =
+      currentQ.prepTime > 0
+        ? currentQ.prepTime
+        : currentQ.partNumber === 4
+        ? 60
+        : currentQ.partNumber === 2 || currentQ.partNumber === 3
+        ? 12
+        : 5;
+    setTimer(pTime);
+    setStage("prep");
+  };
+
+  // Nút Sẵn sàng: Thí sinh muốn nói luôn, bỏ qua thời gian chuẩn bị
   const handleStartSpeakingNow = async () => {
     if (!currentQ) return;
     if (timerRef.current) clearInterval(timerRef.current);
     setIsPrepPaused(false);
+    setIsSpeakingPaused(false);
     playStartBeep();
     setStage("speaking");
-    setTimer(currentQ.speakTime);
+    const sTime =
+      currentQ.speakTime ||
+      (currentQ.partNumber === 4
+        ? 120
+        : currentQ.partNumber === 1
+        ? 30
+        : 45);
+    setTimer(sTime);
     await startRecording();
   };
 
-  // Nút Finish Recording (Thí sinh nộp câu nói sớm)
+  // Tạm dừng / Tiếp tục ghi âm khi đang nói
+  const handleToggleSpeakingPause = () => {
+    if (isSpeakingPaused || isMicPaused) {
+      resumeRecording();
+      setIsSpeakingPaused(false);
+    } else {
+      pauseRecording();
+      setIsSpeakingPaused(true);
+    }
+  };
+
+  // Nút Thu lại: Làm lại từ đầu câu này
+  const handleRetakeSpeaking = async () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    await stopRecording();
+    resetRecording();
+    setIsPrepPaused(false);
+    setIsSpeakingPaused(false);
+    const pTime =
+      currentQ?.prepTime > 0
+        ? currentQ.prepTime
+        : currentQ?.partNumber === 4
+        ? 60
+        : 12;
+    setTimer(pTime);
+    setStage("ready");
+  };
+
+  // Nút Hoàn thành (Thí sinh nộp câu nói sớm)
   const handleStopSpeakingEarly = async () => {
     if (timerRef.current) clearInterval(timerRef.current);
+    setIsSpeakingPaused(false);
     const res = await stopRecording();
     if (res && res.url) {
       setRecordedData((prev) => ({
@@ -1384,6 +1504,46 @@ function SpeakingExamRunnerContent() {
           })
         );
       } catch {}
+    }
+  };
+
+  // Kiểm tra âm thanh (Loa / Tai nghe) bằng Web Audio API tiếng bíp
+  const handleTestSound = async () => {
+    if (isTestingSound) return;
+    setIsTestingSound(true);
+    setDeviceTestError(null);
+    try {
+      playStartBeep();
+      await new Promise((r) => setTimeout(r, 600));
+      setSoundTested(true);
+    } catch (err: any) {
+      setDeviceTestError(
+        err?.message ||
+          "Không thể phát âm thanh kiểm tra. Vui lòng kiểm tra loa/tai nghe."
+      );
+    } finally {
+      setIsTestingSound(false);
+    }
+  };
+
+  // Kiểm tra Microphone bằng MediaDevices API
+  const handleTestMic = async () => {
+    if (isTestingMic) return;
+    setIsTestingMic(true);
+    setDeviceTestError(null);
+    try {
+      const ok = await requestPermission();
+      if (!ok) {
+        throw new Error(
+          "Không thể kết nối Microphone. Vui lòng cấp quyền Micro trên trình duyệt."
+        );
+      }
+      setMicTested(true);
+    } catch (err: any) {
+      setDeviceTestError(err?.message || "Lỗi kiểm tra microphone");
+      setMicTested(false);
+    } finally {
+      setIsTestingMic(false);
     }
   };
 
@@ -1878,7 +2038,179 @@ function SpeakingExamRunnerContent() {
 
           {/* Main Question Body & Right Recorder */}
           {!loading && !error && currentQ && (
-            <div className="flex flex-col lg:flex-row items-start gap-6">
+            isIntroStep && !isReviewMode ? (
+              <div className="max-w-2xl mx-auto space-y-6 py-4">
+                {introSubStep === "check" ? (
+                  <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm space-y-6">
+                    <div className="space-y-1 text-center md:text-left">
+                      <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                        Aptis General Practice Test
+                      </span>
+                      <h1 className="text-xl md:text-2xl font-black font-heading text-foreground">
+                        Speaking Practice Test
+                      </h1>
+                      <p className="text-xs md:text-sm text-muted-foreground font-medium">
+                        {examTitle}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-center">
+                      <div className="p-3.5 rounded-xl border border-border bg-muted/30">
+                        <div className="text-[10px] text-muted-foreground uppercase font-bold">Số câu hỏi</div>
+                        <div className="text-base font-extrabold text-foreground mt-0.5">{questions.length} câu (4 Phần)</div>
+                      </div>
+                      <div className="p-3.5 rounded-xl border border-border bg-muted/30">
+                        <div className="text-[10px] text-muted-foreground uppercase font-bold">Thời gian làm bài</div>
+                        <div className="text-base font-extrabold text-foreground mt-0.5">~12 phút</div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 pt-2 border-t border-border/70">
+                      <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        Kiểm tra thiết bị trước khi vào thi:
+                      </h2>
+
+                      {/* Card 1: Microphone */}
+                      <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-foreground flex items-center gap-2">
+                            <Mic className="w-4 h-4 text-primary" />
+                            Kiểm tra Microphone
+                          </span>
+                          {micTested && (
+                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              Microphone sẵn sàng!
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleTestMic}
+                          disabled={isTestingMic}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                            micTested
+                              ? "bg-emerald-500/10 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20"
+                              : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
+                          }`}
+                        >
+                          {isTestingMic ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Mic className="w-3.5 h-3.5" />
+                          )}
+                          <span>{micTested ? "Kiểm tra lại micro" : "Kiểm tra microphone"}</span>
+                        </button>
+                      </div>
+
+                      {/* Card 2: Âm thanh / Tiếng bíp */}
+                      <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-foreground flex items-center gap-2">
+                            <Volume2 className="w-4 h-4 text-primary" />
+                            Kiểm tra âm thanh
+                          </span>
+                          {soundTested && (
+                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              Đã phát tiếng bíp
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Bấm để nghe thử tiếng bíp. Trong bài thi, tiếng bíp báo hiệu bạn bắt đầu nói.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleTestSound}
+                          disabled={isTestingSound}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                            soundTested
+                              ? "bg-emerald-500/10 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20"
+                              : "bg-muted hover:bg-muted/80 text-foreground border border-border"
+                          }`}
+                        >
+                          {isTestingSound ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Volume2 className="w-3.5 h-3.5 text-primary" />
+                          )}
+                          <span>{soundTested ? "Nghe lại tiếng bíp" : "Nghe thử tiếng bíp"}</span>
+                        </button>
+                      </div>
+
+                      {deviceTestError && (
+                        <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-xs flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 shrink-0" />
+                          <span>{deviceTestError}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="space-y-2 pt-2 border-t border-border">
+                      <button
+                        type="button"
+                        onClick={() => setIntroSubStep("instructions")}
+                        className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-sm hover:bg-primary/90 flex items-center justify-center gap-2 cursor-pointer transition-all"
+                      >
+                        <span>Start Assessment</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                      <div className="flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => setIsIntroStep(false)}
+                          className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4 cursor-pointer py-1"
+                        >
+                          Vào nhanh (Bỏ qua bước kiểm tra)
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Instructions Step (Matching Screenshot 3) */
+                  <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm space-y-6">
+                    <div className="space-y-1.5 border-b border-border pb-4">
+                      <h2 className="text-xl md:text-2xl font-black font-heading text-foreground">
+                        Aptis General Speaking Test Instructions
+                      </h2>
+                      <p className="text-xs font-bold uppercase tracking-wider text-primary">
+                        Speaking
+                      </p>
+                    </div>
+
+                    <div className="space-y-3 text-xs md:text-sm text-foreground/90 leading-relaxed">
+                      <p>• You will answer some questions about yourself and then do three short speaking tasks.</p>
+                      <p>• Listen to the instructions and speak clearly into your microphone when you hear the signal (beep).</p>
+                      <p>• Each part of the test will appear automatically.</p>
+                      <p>• The test will take about 12 minutes.</p>
+                      <p>• When you click on the &quot;Bắt đầu làm bài&quot; button, the test will begin.</p>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3 pt-4 border-t border-border">
+                      <button
+                        type="button"
+                        onClick={() => setIntroSubStep("check")}
+                        className="px-4 py-2.5 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span>Quay lại</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsIntroStep(false)}
+                        className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-sm hover:bg-primary/90 flex items-center gap-1.5 cursor-pointer transition-all"
+                      >
+                        <span>Bắt đầu làm bài</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col lg:flex-row items-start gap-6">
               {/* Left / Center: Question Prompt Card & Sample Answer */}
               <div className="flex-1 w-full space-y-6">
                 <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-xs space-y-6">
@@ -2532,157 +2864,175 @@ function SpeakingExamRunnerContent() {
                     </div>
                   </div>
                 )}
-                {/* 1. STAGE: PREPARATION / INSTRUCTIONS (Screenshots 3, 4, 5) */}
-                {stage === "prep" && (
-                  <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
-                    {currentQ.partNumber === 4 ? (
-                      <>
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-xs border border-amber-500/30">
-                          <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-                          <span>Chuẩn Bị 1 Phút (Part 4)</span>
-                        </div>
 
-                        {/* Circular Countdown Timer cho 1 Phút Chuẩn Bị */}
-                        <div className="relative w-28 h-28 flex items-center justify-center">
-                          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="42"
-                              stroke="currentColor"
-                              strokeWidth="6"
-                              fill="transparent"
-                              className="text-muted/30"
-                            />
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="42"
-                              stroke="currentColor"
-                              strokeWidth="6"
-                              fill="transparent"
-                              strokeDasharray={264}
-                              strokeDashoffset={264 - (264 * timer) / (currentQ.prepTime || 60)}
-                              strokeLinecap="round"
-                              className="text-amber-500 transition-all duration-1000 ease-linear"
-                            />
-                          </svg>
-                          <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-2xl font-black font-heading text-foreground">
-                              {formatTimerDisplay(timer)}
-                            </span>
-                            <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
-                              {isPrepPaused ? "Đang tạm dừng" : "Đang đếm ngược"}
-                            </span>
-                          </div>
-                        </div>
+                {/* 0. STAGE: READY (Chờ người học chủ động bắt đầu hoặc nói ngay) */}
+                {stage === "ready" && (
+                  <div className="rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col items-center justify-center text-center space-y-5">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                      <Mic className="w-7 h-7" />
+                    </div>
 
-                        {/* Set up thời gian chuẩn bị (Tùy chọn nhanh) */}
-                        <div className="w-full space-y-2 pt-1 border-t border-border/60">
-                          <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
-                            <span>Tùy chỉnh thời gian:</span>
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={() => setIsPrepPaused((p) => !p)}
-                                className="px-2 py-0.5 rounded-md text-[10px] font-bold border border-border bg-muted/50 hover:bg-muted text-foreground flex items-center gap-1 transition-colors"
-                              >
-                                {isPrepPaused ? <Play className="w-3 h-3 text-emerald-500" /> : <Pause className="w-3 h-3 text-amber-500" />}
-                                <span>{isPrepPaused ? "Tiếp tục" : "Tạm dừng"}</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setTimer(60);
-                                  setIsPrepPaused(false);
-                                }}
-                                title="Reset về 60s"
-                                className="p-1 rounded-md text-[10px] font-bold border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors"
-                              >
-                                <RotateCcw className="w-3 h-3 text-primary" />
-                              </button>
-                            </div>
-                          </div>
+                    <div className="space-y-1.5">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-xs">
+                        <Clock className="w-3.5 h-3.5" />
+                        {currentQ.partNumber === 4
+                          ? "Part 4: 1 phút chuẩn bị + 2 phút nói"
+                          : `Part ${currentQ.partNumber}: Chuẩn bị ${currentQ.prepTime || 12}s · Nói ${currentQ.speakTime || 45}s`}
+                      </span>
+                      <h3 className="font-heading font-bold text-sm md:text-base text-foreground pt-1">
+                        Sẵn sàng trả lời câu này?
+                      </h3>
+                      <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
+                        Bạn có thể đọc kỹ đề bài và từ vựng gợi ý trước. Bấm &quot;Bắt đầu&quot; để tính giờ chuẩn bị hoặc &quot;Sẵn sàng&quot; để nói ngay.
+                      </p>
+                    </div>
 
-                          <div className="grid grid-cols-4 gap-1.5">
-                            {[
-                              { label: "60s", val: 60, title: "Chuẩn thi thật British Council" },
-                              { label: "45s", val: 45, title: "Luyện phản xạ nhanh" },
-                              { label: "30s", val: 30, title: "Tăng tốc" },
-                              { label: "15s", val: 15, title: "Thử thách cao" },
-                            ].map((preset) => (
-                              <button
-                                key={preset.val}
-                                type="button"
-                                title={preset.title}
-                                onClick={() => {
-                                  setTimer(preset.val);
-                                  setIsPrepPaused(false);
-                                }}
-                                className={`py-1 rounded-lg text-xs font-bold transition-all border ${
-                                  timer === preset.val
-                                    ? "bg-amber-500 text-white border-amber-500 shadow-xs scale-105"
-                                    : "bg-background border-border text-foreground/80 hover:border-amber-500/50 hover:bg-muted/30"
-                                }`}
-                              >
-                                {preset.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                    <div className="w-full space-y-2 pt-2 border-t border-border">
+                      <button
+                        type="button"
+                        onClick={handleStartPrep}
+                        className="tech-btn w-full py-2.5 rounded-xl border border-border bg-muted/60 hover:bg-muted text-foreground text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <Play className="w-3.5 h-3.5 text-primary" />
+                        <span>Bắt đầu ({currentQ.prepTime || (currentQ.partNumber === 4 ? 60 : 12)}s chuẩn bị)</span>
+                      </button>
 
-                        <button
-                          type="button"
-                          onClick={handleStartSpeakingNow}
-                          className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 flex items-center justify-center gap-1.5 shadow-xs transition-all hover:scale-[1.02]"
-                        >
-                          <Mic className="w-4 h-4" />
-                          <span>Sẵn sàng · Bắt đầu nói (2p)</span>
-                        </button>
-
-                        <p className="text-[11px] text-muted-foreground leading-normal">
-                          💡 Hết 1 phút, máy sẽ tự động phát tiếng bíp và bắt đầu ghi âm 2 phút.
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                          <Volume2 className="w-7 h-7" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <h3 className="font-heading font-bold text-sm text-foreground">
-                            Instructions...
-                          </h3>
-                          <p className="text-xs text-muted-foreground leading-relaxed">
-                            Nghe xong sẽ có tiếng bíp rồi bắt đầu ghi âm
-                          </p>
-                          <p className="text-[11px] font-semibold text-primary">
-                            Đang chuẩn bị... còn {formatTimerDisplay(timer)}
-                          </p>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={handleStartSpeakingNow}
-                          className="tech-btn w-full py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 flex items-center justify-center gap-1.5 shadow-xs"
-                        >
-                          <Mic className="w-3.5 h-3.5" />
-                          <span>Nói ngay (Bỏ qua đếm)</span>
-                        </button>
-                      </>
-                    )}
+                      <button
+                        type="button"
+                        onClick={handleStartSpeakingNow}
+                        className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+                      >
+                        <Mic className="w-3.5 h-3.5" />
+                        <span>Sẵn sàng (Nói ngay)</span>
+                      </button>
+                    </div>
                   </div>
                 )}
 
-                {/* 2. STAGE: ACTIVE RECORDING (Screenshots 1, 2) */}
+                {/* 1. STAGE: PREPARATION (Đang chuẩn bị có đếm ngược) */}
+                {stage === "prep" && (
+                  <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-xs border border-amber-500/30">
+                      <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                      <span>{currentQ.partNumber === 4 ? "Chuẩn Bị 1 Phút (Part 4)" : `Chuẩn Bị Part ${currentQ.partNumber}`}</span>
+                    </div>
+
+                    {/* Circular Countdown Timer */}
+                    <div className="relative w-28 h-28 flex items-center justify-center">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="42"
+                          stroke="currentColor"
+                          strokeWidth="6"
+                          fill="transparent"
+                          className="text-muted/30"
+                        />
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="42"
+                          stroke="currentColor"
+                          strokeWidth="6"
+                          fill="transparent"
+                          strokeDasharray={264}
+                          strokeDashoffset={264 - (264 * timer) / (currentQ.prepTime || 60)}
+                          strokeLinecap="round"
+                          className="text-amber-500 transition-all duration-1000 ease-linear"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl font-black font-heading text-foreground">
+                          {formatTimerDisplay(timer)}
+                        </span>
+                        <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                          {isPrepPaused ? "Đang tạm dừng" : "Đang chuẩn bị"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Điều khiển Pause / Resume cho TẤT CẢ các Part */}
+                    <div className="w-full space-y-2 pt-1 border-t border-border/60">
+                      <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
+                        <span>Thời gian:</span>
+                        <button
+                          type="button"
+                          onClick={() => setIsPrepPaused((p) => !p)}
+                          className="px-2.5 py-1 rounded-lg text-[11px] font-bold border border-border bg-muted/60 hover:bg-muted text-foreground flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          {isPrepPaused ? (
+                            <>
+                              <Play className="w-3 h-3 text-emerald-500" />
+                              <span>Tiếp tục</span>
+                            </>
+                          ) : (
+                            <>
+                              <Pause className="w-3 h-3 text-amber-500" />
+                              <span>Tạm dừng</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Part 4 Preset Buttons */}
+                      {currentQ.partNumber === 4 && (
+                        <div className="grid grid-cols-4 gap-1.5 pt-1">
+                          {[
+                            { label: "60s", val: 60, title: "Chuẩn thi thật British Council" },
+                            { label: "45s", val: 45, title: "Luyện phản xạ nhanh" },
+                            { label: "30s", val: 30, title: "Tăng tốc" },
+                            { label: "15s", val: 15, title: "Thử thách cao" },
+                          ].map((preset) => (
+                            <button
+                              key={preset.val}
+                              type="button"
+                              title={preset.title}
+                              onClick={() => {
+                                setTimer(preset.val);
+                                setIsPrepPaused(false);
+                              }}
+                              className={`py-1 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                                timer === preset.val
+                                  ? "bg-amber-500 text-white border-amber-500 shadow-xs scale-105"
+                                  : "bg-background border-border text-foreground/80 hover:border-amber-500/50 hover:bg-muted/30"
+                              }`}
+                            >
+                              {preset.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleStartSpeakingNow}
+                      className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                    >
+                      <Mic className="w-4 h-4" />
+                      <span>Sẵn sàng (Nói luôn)</span>
+                    </button>
+
+                    <p className="text-[11px] text-muted-foreground leading-normal">
+                      💡 Hết giờ chuẩn bị, máy sẽ tự động phát tiếng bíp và bắt đầu ghi âm.
+                    </p>
+                  </div>
+                )}
+
+                {/* 2. STAGE: ACTIVE RECORDING (Đang nói có nút Pause + Thu lại + Hoàn thành) */}
                 {stage === "speaking" && (
                   <div className="rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
-                    <span className="text-xs font-bold text-destructive flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-destructive animate-ping" />
-                      Recording...
+                    <span className={`text-xs font-bold flex items-center gap-1.5 ${
+                      isSpeakingPaused || isMicPaused ? "text-amber-500" : "text-destructive"
+                    }`}>
+                      <span className={`w-2 h-2 rounded-full ${
+                        isSpeakingPaused || isMicPaused ? "bg-amber-500" : "bg-destructive animate-ping"
+                      }`} />
+                      {isSpeakingPaused || isMicPaused ? "Đang tạm dừng ghi âm" : "Recording..."}
                     </span>
 
-                    {/* Circular Timer with Red Mic & Countdown Seconds */}
+                    {/* Circular Timer with Mic & Countdown Seconds */}
                     <div className="relative w-28 h-28 flex items-center justify-center">
                       <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                         <circle
@@ -2704,11 +3054,15 @@ function SpeakingExamRunnerContent() {
                           strokeDasharray={264}
                           strokeDashoffset={264 - (264 * timer) / (currentQ.speakTime || 30)}
                           strokeLinecap="round"
-                          className="text-destructive transition-all duration-1000 ease-linear"
+                          className={`${
+                            isSpeakingPaused || isMicPaused ? "text-amber-500" : "text-destructive"
+                          } transition-all duration-1000 ease-linear`}
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <Mic className="w-4 h-4 text-destructive mb-0.5 animate-pulse" />
+                        <Mic className={`w-4 h-4 mb-0.5 ${
+                          isSpeakingPaused || isMicPaused ? "text-amber-500" : "text-destructive animate-pulse"
+                        }`} />
                         <span className="text-2xl font-black font-heading text-foreground">
                           {formatTimerDisplay(timer)}
                         </span>
@@ -2718,12 +3072,14 @@ function SpeakingExamRunnerContent() {
                       </div>
                     </div>
 
-                    {/* Red audio waveform */}
+                    {/* Audio waveform */}
                     <div className="flex items-center justify-center gap-1 h-5 text-destructive">
                       {[12, 20, 35, 18, 28, 42, 24, 38, 16, 30, 22].map((h, i) => (
                         <span
                           key={i}
-                          className="w-1 bg-destructive rounded-full transition-all duration-150"
+                          className={`w-1 rounded-full transition-all duration-150 ${
+                            isSpeakingPaused || isMicPaused ? "bg-muted" : "bg-destructive"
+                          }`}
                           style={{
                             height: `${Math.max(
                               6,
@@ -2734,14 +3090,46 @@ function SpeakingExamRunnerContent() {
                       ))}
                     </div>
 
-                    {/* Finish Recording Button */}
-                    <button
-                      type="button"
-                      onClick={handleStopSpeakingEarly}
-                      className="w-full py-2.5 rounded-xl bg-muted hover:bg-muted/80 text-foreground text-xs font-bold transition-colors border border-border"
-                    >
-                      Finish Recording
-                    </button>
+                    {/* Bộ 3 nút Clean: Tạm dừng / Tiếp tục + Thu lại + Hoàn thành */}
+                    <div className="w-full space-y-2 pt-1 border-t border-border">
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={handleToggleSpeakingPause}
+                          className="py-2 px-3 rounded-xl border border-border bg-muted/60 hover:bg-muted text-foreground text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          {isSpeakingPaused || isMicPaused ? (
+                            <>
+                              <Play className="w-3.5 h-3.5 text-emerald-500" />
+                              <span>Tiếp tục</span>
+                            </>
+                          ) : (
+                            <>
+                              <Pause className="w-3.5 h-3.5 text-amber-500" />
+                              <span>Tạm dừng</span>
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleRetakeSpeaking}
+                          className="py-2 px-3 rounded-xl border border-border bg-muted/60 hover:bg-muted text-foreground text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5 text-primary" />
+                          <span>Thu lại</span>
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleStopSpeakingEarly}
+                        className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold transition-all shadow-xs hover:bg-primary/90 flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>Hoàn thành</span>
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -2951,12 +3339,13 @@ function SpeakingExamRunnerContent() {
                 )}
               </div>
             </div>
-          )}
-        </div>
-      </main>
+          )
+        )}
+      </div>
+    </main>
 
-      {/* STICKY BOTTOM TOOLBAR (Screenshots 1, 2, 3, 4, 5) - Chỉ hiển thị khi thi, ẩn khi ở Review Mode */}
-      {!isReviewMode && (
+    {/* STICKY BOTTOM TOOLBAR (Screenshots 1, 2, 3, 4, 5) - Chỉ hiển thị khi thi, ẩn khi ở Review Mode hoặc Intro */}
+    {!isReviewMode && !isIntroStep && (
         <footer className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 shadow-lg">
           <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
             {/* Bottom Left: Nháp, Hiện đáp án, Báo lỗi */}

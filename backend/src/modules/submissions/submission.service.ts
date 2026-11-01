@@ -298,6 +298,7 @@ export class SubmissionService {
           },
         },
         answers: true,
+        user: { select: { id: true, full_name: true, email: true, role: true } },
       },
     });
 
@@ -344,6 +345,7 @@ export class SubmissionService {
           },
         },
         answers: true,
+        user: { select: { id: true, full_name: true, email: true, role: true } },
       },
     });
 
@@ -514,9 +516,9 @@ export class SubmissionService {
       },
       systemActor: {
         id: userId,
-        name: 'Học viên',
-        email: '',
-        role: 'STUDENT',
+        name: (submission as any).user?.full_name || 'Học viên',
+        email: (submission as any).user?.email || 'guest@aptiskytich.vn',
+        role: (submission as any).user?.role || 'STUDENT',
       },
     }).catch(() => {});
 

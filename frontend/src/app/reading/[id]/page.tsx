@@ -408,6 +408,7 @@ function ReadingExamRunner() {
                   activeData.part1.gaps.forEach((g) => {
                     const ans: any = ansMap.get(g.id);
                     if (ans?.correct_answer) g.correctAnswer = ans.correct_answer;
+                    if (ans?.question?.explanation) g.explanation = ans.question.explanation;
                   });
                   activeData.part2.stories.forEach((st) => {
                     const ans: any = ansMap.get(st.id);
@@ -417,14 +418,17 @@ function ReadingExamRunner() {
                         if (Array.isArray(cor)) st.correctOrder = cor;
                       } catch {}
                     }
+                    if (ans?.question?.explanation) st.explanation = ans.question.explanation;
                   });
                   activeData.part3.questions.forEach((q) => {
                     const ans: any = ansMap.get(q.id);
                     if (ans?.correct_answer) q.correctAnswer = ans.correct_answer;
+                    if (ans?.question?.explanation) q.explanation = ans.question.explanation;
                   });
                   activeData.part4.paragraphs.forEach((p) => {
                     const ans: any = ansMap.get(p.id);
                     if (ans?.correct_answer) p.correctHeading = ans.correct_answer;
+                    if (ans?.question?.explanation) p.explanation = ans.question.explanation;
                   });
                   setExamData({ ...activeData });
                 }
@@ -1580,6 +1584,17 @@ function ReadingExamRunner() {
                                   )}
                                 </div>
                               )}
+
+                              {/* Lời giải thích từ giáo viên (chỉ hiển thị khi có nội dung) */}
+                              {isReviewMode && gap.explanation && gap.explanation.trim() && (
+                                <div className="w-full mt-2 p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs text-foreground/90 space-y-1 animate-in fade-in">
+                                  <div className="flex items-center gap-1.5 font-bold text-primary">
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    <span>Giải thích chi tiết</span>
+                                  </div>
+                                  <p className="leading-relaxed whitespace-pre-wrap">{gap.explanation.trim()}</p>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -1597,21 +1612,32 @@ function ReadingExamRunner() {
                     const currentOrder = p2Orders[story.id] || [];
 
                     return (
-                      <ReadingSentenceOrder
-                        key={story.id}
-                        title={story.title}
-                        fixedSentence={story.fixedSentence}
-                        sentences={story.sentences}
-                        currentOrder={currentOrder}
-                        isReviewMode={isReviewMode}
-                        correctOrder={story.correctOrder}
-                        onChangeOrder={(newOrder) =>
-                          setP2Orders((prev) => ({
-                            ...prev,
-                            [story.id]: newOrder,
-                          }))
-                        }
-                      />
+                      <div className="space-y-4">
+                        <ReadingSentenceOrder
+                          key={story.id}
+                          title={story.title}
+                          fixedSentence={story.fixedSentence}
+                          sentences={story.sentences}
+                          currentOrder={currentOrder}
+                          isReviewMode={isReviewMode}
+                          correctOrder={story.correctOrder}
+                          onChangeOrder={(newOrder) =>
+                            setP2Orders((prev) => ({
+                              ...prev,
+                              [story.id]: newOrder,
+                            }))
+                          }
+                        />
+                        {isReviewMode && story.explanation && story.explanation.trim() && (
+                          <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 text-xs text-foreground/90 space-y-1.5 animate-in fade-in">
+                            <div className="flex items-center gap-1.5 font-bold text-primary">
+                              <Sparkles className="w-3.5 h-3.5" />
+                              <span>Giải thích logic sắp xếp &amp; Từ nối</span>
+                            </div>
+                            <p className="leading-relaxed whitespace-pre-wrap">{story.explanation.trim()}</p>
+                          </div>
+                        )}
+                      </div>
                     );
                   })()}
 
@@ -1624,21 +1650,32 @@ function ReadingExamRunner() {
                     const currentOrder = p2Orders[story.id] || [];
 
                     return (
-                      <ReadingSentenceOrder
-                        key={story.id}
-                        title={story.title}
-                        fixedSentence={story.fixedSentence}
-                        sentences={story.sentences}
-                        currentOrder={currentOrder}
-                        isReviewMode={isReviewMode}
-                        correctOrder={story.correctOrder}
-                        onChangeOrder={(newOrder) =>
-                          setP2Orders((prev) => ({
-                            ...prev,
-                            [story.id]: newOrder,
-                          }))
-                        }
-                      />
+                      <div className="space-y-4">
+                        <ReadingSentenceOrder
+                          key={story.id}
+                          title={story.title}
+                          fixedSentence={story.fixedSentence}
+                          sentences={story.sentences}
+                          currentOrder={currentOrder}
+                          isReviewMode={isReviewMode}
+                          correctOrder={story.correctOrder}
+                          onChangeOrder={(newOrder) =>
+                            setP2Orders((prev) => ({
+                              ...prev,
+                              [story.id]: newOrder,
+                            }))
+                          }
+                        />
+                        {isReviewMode && story.explanation && story.explanation.trim() && (
+                          <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 text-xs text-foreground/90 space-y-1.5 animate-in fade-in">
+                            <div className="flex items-center gap-1.5 font-bold text-primary">
+                              <Sparkles className="w-3.5 h-3.5" />
+                              <span>Giải thích logic sắp xếp &amp; Từ nối</span>
+                            </div>
+                            <p className="leading-relaxed whitespace-pre-wrap">{story.explanation.trim()}</p>
+                          </div>
+                        )}
+                      </div>
                     );
                   })()}
 
@@ -1736,6 +1773,17 @@ function ReadingExamRunner() {
                                           Chưa trả lời · Đáp án đúng: <strong className="text-emerald-600 dark:text-emerald-400 underline">{q.correctAnswer}</strong>
                                         </span>
                                       )}
+                                    </div>
+                                  )}
+
+                                  {/* Lời giải thích / Dẫn chứng (chỉ hiện khi có nội dung) */}
+                                  {isReviewMode && q.explanation && q.explanation.trim() && (
+                                    <div className="mt-2.5 p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs text-foreground/90 space-y-1 animate-in fade-in">
+                                      <div className="flex items-center gap-1.5 font-bold text-primary">
+                                        <Sparkles className="w-3.5 h-3.5" />
+                                        <span>Dẫn chứng &amp; Giải thích</span>
+                                      </div>
+                                      <p className="leading-relaxed whitespace-pre-wrap">{q.explanation.trim()}</p>
                                     </div>
                                   )}
                                 </div>
@@ -1891,6 +1939,17 @@ function ReadingExamRunner() {
                                       Chưa chọn tiêu đề · Tiêu đề đúng: <strong className="text-emerald-600 dark:text-emerald-400 underline">{p.correctHeading}</strong>
                                     </span>
                                   )}
+                                </div>
+                              )}
+
+                              {/* Lời giải thích tiêu đề (chỉ hiện khi có nội dung) */}
+                              {isReviewMode && p.explanation && p.explanation.trim() && (
+                                <div className="mt-2 mb-3 p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs text-foreground/90 space-y-1 animate-in fade-in">
+                                  <div className="flex items-center gap-1.5 font-bold text-primary">
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    <span>Dẫn chứng &amp; Ý chính đoạn văn</span>
+                                  </div>
+                                  <p className="leading-relaxed whitespace-pre-wrap">{p.explanation.trim()}</p>
                                 </div>
                               )}
 
@@ -2643,6 +2702,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
           prompt: q.prompt,
           options: opts,
           correctAnswer: String(q.correct_answer || ""),
+          explanation: q.explanation || null,
         };
       });
       if (gaps.length > 0) {
@@ -2683,6 +2743,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
               fixedSentence: st1HasFixed ? st1Sentences[0] : null,
               sentences: (st1HasFixed ? st1Sentences.slice(1) : st1Sentences).map((text, sIdx) => ({ id: `s${sIdx + (st1HasFixed ? 2 : 1)}`, text })),
               correctOrder: (st1HasFixed ? st1Sentences.slice(1) : st1Sentences).map((_, sIdx) => `s${sIdx + (st1HasFixed ? 2 : 1)}`),
+              explanation: q.explanation || null,
             });
 
             stories.push({
@@ -2691,6 +2752,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
               fixedSentence: st2HasFixed ? st2Sentences[0] : null,
               sentences: (st2HasFixed ? st2Sentences.slice(1) : st2Sentences).map((text, sIdx) => ({ id: `s${mid + sIdx + (st2HasFixed ? 2 : 1)}`, text })),
               correctOrder: (st2HasFixed ? st2Sentences.slice(1) : st2Sentences).map((_, sIdx) => `s${mid + sIdx + (st2HasFixed ? 2 : 1)}`),
+              explanation: q.explanation || null,
             });
             return;
           } else if (rawArr.length >= 4) {
@@ -2701,6 +2763,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
               fixedSentence: hasFixed ? rawArr[0] : null,
               sentences: (hasFixed ? rawArr.slice(1) : rawArr).map((text, sIdx) => ({ id: `s${sIdx + (hasFixed ? 2 : 1)}`, text })),
               correctOrder: (hasFixed ? rawArr.slice(1) : rawArr).map((_, sIdx) => `s${sIdx + (hasFixed ? 2 : 1)}`),
+              explanation: q.explanation || null,
             });
             return;
           }
@@ -2727,6 +2790,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
           fixedSentence: finalFixed,
           sentences: rawSentences,
           correctOrder: corArr.length > 0 ? corArr : rawSentences.map((s: any) => s.id),
+          explanation: q.explanation || null,
         });
       });
 
@@ -2805,6 +2869,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
             prompt: stripHtml(q.prompt),
             options: opts,
             correctAnswer: String(q.correct_answer || ""),
+            explanation: q.explanation || null,
           };
         });
       if (questions.length > 0) {
@@ -2826,6 +2891,7 @@ function parseApiToReadingData(apiData: any): ReadingExamData {
           paragraphNumber: q.question_number || (idx + 1),
           text: q.prompt ? q.prompt.replace(/^Paragraph\s*\d+\s*:\s*/i, "") : "",
           correctHeading: String(q.correct_answer || ""),
+          explanation: q.explanation || null,
         };
       });
       if (paragraphs.length > 0) {

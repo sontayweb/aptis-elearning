@@ -416,6 +416,13 @@ export class AdminService {
       }
     }
 
+    // Dọn dẹp audio cũ nếu người dùng đổi hoặc gỡ audio (tránh rác bộ nhớ server)
+    if (input.audioUrl !== undefined && part.audio_url && part.audio_url !== input.audioUrl) {
+      if (part.audio_url.startsWith('/uploads/audio/')) {
+        this.safeDeleteExamAudio(part.audio_url);
+      }
+    }
+
     const updated = await prisma.examPart.update({
       where: { id: partId },
       data: {
@@ -493,6 +500,11 @@ export class AdminService {
       this.safeDeleteExamImage(part.image_url);
     }
 
+    // Dọn dẹp audio đính kèm nếu có khi xóa part
+    if (part.audio_url && part.audio_url.startsWith('/uploads/audio/')) {
+      this.safeDeleteExamAudio(part.audio_url);
+    }
+
     await prisma.examPart.delete({ where: { id: partId } });
 
     auditService.record({
@@ -535,6 +547,33 @@ export class AdminService {
   }
 
   // ──────────────────────────────────────────────────────────────
+  // FILE STORAGE: Xóa an toàn audio đính kèm đề thi khỏi máy chủ
+  // ──────────────────────────────────────────────────────────────
+  safeDeleteExamAudio(audioUrl?: string | null): boolean {
+    try {
+      if (!audioUrl || typeof audioUrl !== 'string' || !audioUrl.startsWith('/uploads/audio/')) {
+        return false;
+      }
+      const allowedRoot = path.resolve(process.env.UPLOAD_DIR || './uploads', 'audio');
+      const relPath = audioUrl.replace(/^\/?(api\/)?uploads\/?/, '');
+      const fullPath = path.resolve(process.env.UPLOAD_DIR || './uploads', relPath);
+
+      // Chống Path Traversal: Đảm bảo đường dẫn tuyệt đối phải nằm trong thư mục uploads/audio
+      if (!fullPath.startsWith(allowedRoot)) {
+        return false;
+      }
+
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────
   // CONTENT EDITOR: Update a single Question
   // ──────────────────────────────────────────────────────────────
   async updateQuestion(questionId: string, input: any, req?: Request) {
@@ -548,7 +587,9 @@ export class AdminService {
         ...(input.questionType !== undefined && { question_type: input.questionType }),
         ...(input.options !== undefined && { options: input.options }),
         ...(input.correctAnswer !== undefined && { correct_answer: input.correctAnswer }),
-        ...(input.explanation !== undefined && { explanation: input.explanation }),
+        ...(input.explanation !== undefined && {
+          explanation: input.explanation && String(input.explanation).trim() ? String(input.explanation).trim() : null,
+        }),
         ...(input.maxScore !== undefined && { max_score: Number(input.maxScore) }),
         ...(input.questionNumber !== undefined && { question_number: Number(input.questionNumber) }),
       },
@@ -587,7 +628,7 @@ export class AdminService {
         prompt: input.prompt || '',
         options: input.options || undefined,
         correct_answer: input.correctAnswer || null,
-        explanation: input.explanation || null,
+        explanation: input.explanation && String(input.explanation).trim() ? String(input.explanation).trim() : null,
         max_score: Number(input.maxScore || 1.0),
       },
     });

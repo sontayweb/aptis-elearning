@@ -16,7 +16,9 @@ import { TransactionStatus } from '@prisma/client';
 import path from 'path';
 import fs from 'fs';
 import { standardExamParser } from '../ingestion/parsers/standard-exam.parser';
+import { ttsAudioService } from '../ingestion/tts-audio.service';
 import { topicTaggerService } from './topic-tagger.service';
+import { speakingHintsGeneratorService } from './speaking-hints-generator.service';
 
 export class AdminController {
   async listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -355,6 +357,26 @@ export class AdminController {
     }
   }
 
+  async generateSpeakingHints(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const questionId = req.params.questionId;
+      const hints = await speakingHintsGeneratorService.generateForQuestion(questionId);
+      sendSuccess(res, hints, 'Sinh gợi ý Speaking thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async batchGenerateSpeakingHints(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const examId = req.params.examId;
+      const result = await speakingHintsGeneratorService.batchGenerateForExam(examId);
+      sendSuccess(res, result, 'Sinh gợi ý hàng loạt cho đề thi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async validateImportExamFile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.file || !req.file.buffer) {
@@ -498,6 +520,110 @@ export class AdminController {
   // Alias for backward compatibility with import flow
   async uploadImportImage(req: Request, res: Response, next: NextFunction): Promise<void> {
     return this.uploadExamImage(req, res, next);
+  }
+
+  // ── EXAM AUDIO & AI TTS GENERATION ─────────────────────────────
+  async uploadExamAudio(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.file) {
+        throw { statusCode: 400, message: 'Vui lòng đính kèm tệp âm thanh (MP3, WAV, M4A, OGG, WEBM).' };
+      }
+
+      const category = (req.body.category || req.query.category || 'listening')
+        .toString()
+        .replace(/[^a-zA-Z0-9_-]/g, '');
+      const uploadDir = path.resolve(process.env.UPLOAD_DIR || './uploads', 'audio', category || 'listening');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const ext = path.extname(req.file.originalname) || '.mp3';
+      const safeOriginalName = path.basename(req.file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 30);
+      const filename = `audio_${Date.now()}_${safeOriginalName}${ext}`;
+      const filePath = path.join(uploadDir, filename);
+
+      if (req.file.buffer) {
+        fs.writeFileSync(filePath, req.file.buffer);
+      } else if (req.file.path) {
+        fs.copyFileSync(req.file.path, filePath);
+        try { fs.unlinkSync(req.file.path); } catch {}
+      } else {
+        throw { statusCode: 400, message: 'Không thể xử lý tệp âm thanh tải lên.' };
+      }
+
+      // Tự động dọn dẹp audio cũ nếu đây là thao tác thay thế audio (tránh rác bộ nhớ server)
+      const previousUrl = (req.body.previousUrl || req.body.oldUrl || req.query.previousUrl || '').toString().trim();
+      if (previousUrl && previousUrl.startsWith('/uploads/audio/')) {
+        adminService.safeDeleteExamAudio(previousUrl);
+      }
+
+      const publicUrl = `/uploads/audio/${category || 'listening'}/${filename}`;
+      sendSuccess(
+        res,
+        {
+          url: publicUrl,
+          filename,
+          size: req.file.size,
+          mimetype: req.file.mimetype,
+        },
+        'Tải tệp âm thanh lên máy chủ thành công',
+        200
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteExamAudio(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const url = (req.body?.url || req.query?.url || '').toString().trim();
+      if (!url) {
+        throw { statusCode: 400, message: 'Vui lòng cung cấp đường dẫn audio cần xóa.' };
+      }
+      const deleted = adminService.safeDeleteExamAudio(url);
+      sendSuccess(
+        res,
+        { deleted, url },
+        deleted ? 'Đã xóa audio thành công khỏi máy chủ' : 'Audio không tồn tại hoặc đã được xóa trước đó',
+        200
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async generateAudioTts(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { text, voice, prefix, previousUrl } = req.body;
+      const cleanText = (text || '').toString().trim();
+      if (!cleanText) {
+        throw { statusCode: 400, message: 'Vui lòng cung cấp nội dung transcript / kịch bản để sinh giọng nói.' };
+      }
+
+      const safePrefix = (prefix || 'exam_listening').toString().replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 30);
+      const chosenVoice = voice && voice !== 'auto' ? voice : undefined;
+
+      const result = await ttsAudioService.generateSpeech(cleanText, safePrefix, {
+        voice: chosenVoice,
+      });
+
+      // Nếu có previousUrl cũ, dọn dẹp an toàn
+      if (previousUrl && typeof previousUrl === 'string' && previousUrl.startsWith('/uploads/audio/')) {
+        adminService.safeDeleteExamAudio(previousUrl);
+      }
+
+      sendSuccess(
+        res,
+        {
+          url: result.publicUrl,
+          localPath: result.localPath,
+        },
+        'Sinh âm thanh bản ngữ từ kịch bản thành công',
+        200
+      );
+    } catch (error) {
+      next(error);
+    }
   }
 
   // ── TOPIC TAGGING & AUTO-PROPAGATION ────────────────────────────

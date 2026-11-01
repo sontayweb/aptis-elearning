@@ -1,4 +1,4 @@
-import type { ListeningExamData } from "@/app/listening/[id]/page";
+import type { ListeningExamData } from "@/components/listening/listening-types";
 
 // Dữ liệu đề thi chuẩn Listening 4 Parts kèm file âm thanh và transcript bản ngữ
 export const DEFAULT_LISTENING_TEST: ListeningExamData = {

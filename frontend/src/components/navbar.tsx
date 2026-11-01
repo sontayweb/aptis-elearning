@@ -325,14 +325,14 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Đề Key Dự Đoán */}
+          {/* Key và Mẹo thi */}
           <Link
-            className="group flex items-center gap-1 px-2.5 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
-            href="/key-du-doan"
+            className="group flex items-center gap-1.5 px-2.5 py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-colors whitespace-nowrap text-foreground hover:bg-muted"
+            href="/key-va-meo-thi"
             data-discover="true"
           >
-            <Sparkles className="w-3.5 h-3.5 text-accent" />
-            Đề Key Dự Đoán
+            <span className="text-emerald-500">🍀</span>
+            <span>Key và Mẹo thi</span>
           </Link>
 
           {/* Lịch sử học tập */}
@@ -741,11 +741,12 @@ export function Navbar() {
               Dictation & Shadowing
             </Link>
             <Link
-              href="/key-du-doan"
+              href="/key-va-meo-thi"
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors"
+              className="p-2.5 bg-muted/40 hover:bg-muted rounded-lg font-medium transition-colors flex items-center justify-between"
             >
-              Đề Key Dự Đoán
+              <span>Key và Mẹo thi</span>
+              <span className="text-emerald-500">🍀</span>
             </Link>
             <Link
               href="/tai-lieu"

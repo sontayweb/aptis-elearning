@@ -37,10 +37,46 @@ export class AuditService {
       } = params;
 
       // 1. Xác định Người thực hiện (Actor)
-      const userId = (req as any)?.user?.userId || (req as any)?.user?.id || systemActor?.id || null;
-      const actorName = (req as any)?.user?.full_name || (req as any)?.user?.name || systemActor?.name || 'Hệ thống';
-      const actorEmail = (req as any)?.user?.email || systemActor?.email || 'system@aptiskytich.vn';
-      const actorRole = (req as any)?.user?.role || systemActor?.role || 'SYSTEM';
+      let userId = (req as any)?.user?.userId || (req as any)?.user?.id || systemActor?.id || null;
+      let actorName = (req as any)?.user?.full_name || (req as any)?.user?.name || systemActor?.name || null;
+      let actorEmail = (req as any)?.user?.email || systemActor?.email || null;
+      let actorRole = (req as any)?.user?.role || systemActor?.role || null;
+
+      // Nếu có userId mà chưa có thông tin email/name (ví dụ từ worker nộp bài ngầm), tự động tra cứu DB
+      if (userId && (!actorEmail || !actorName || actorName === 'Học viên')) {
+        try {
+          const userRecord = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { full_name: true, email: true, role: true },
+          });
+          if (userRecord) {
+            actorName = userRecord.full_name || actorName || 'Học viên';
+            actorEmail = userRecord.email || actorEmail;
+            actorRole = userRecord.role || actorRole;
+          }
+        } catch {
+          // im lặng bỏ qua nếu lỗi tra cứu tạm thời
+        }
+      }
+
+      // Phân định rõ ràng tránh nhầm lẫn:
+      // - Chưa đăng nhập (Khách vãng lai / Khách thi thử): Ghi nhận là "Khách vãng lai" (guest@aptiskytich.vn, role GUEST)
+      // - Tác vụ nội bộ máy chủ (Cron, AI grading, DB Sync): Ghi nhận là "Hệ thống tự động" (system@aptiskytich.vn, role SYSTEM)
+      if (!actorEmail) {
+        if (!userId && (req || systemActor?.role === 'GUEST' || systemActor?.name?.toLowerCase().includes('khách'))) {
+          actorName = actorName || 'Khách vãng lai';
+          actorEmail = 'guest@aptiskytich.vn';
+          actorRole = actorRole || 'GUEST';
+        } else if (!userId) {
+          actorName = actorName || 'Hệ thống tự động';
+          actorEmail = 'system@aptiskytich.vn';
+          actorRole = actorRole || 'SYSTEM';
+        } else {
+          actorName = actorName || 'Người dùng';
+          actorEmail = 'guest@aptiskytich.vn';
+          actorRole = actorRole || 'STUDENT';
+        }
+      }
 
       // 2. Bóc tách IP và User Agent từ Request
       let ipAddress: string | null = null;

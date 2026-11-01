@@ -25,6 +25,7 @@ import {
   FileText,
   Volume2,
   Image as ImageIcon,
+  Sparkles,
 } from "lucide-react";
 import ConfirmModal from "@/components/admin/confirm-modal";
 import { PartMediaEditor, parseImageUrls } from "@/components/admin/exams/part-media-editor";
@@ -33,6 +34,8 @@ import {
   PolymorphicQuestionData,
 } from "@/components/admin/exams/polymorphic-question-form";
 import { QuestionCardRow } from "@/components/admin/exams/question-card-row";
+import { QuestionExplanationModal } from "@/components/admin/exams/question-explanation-modal";
+import { SpeakingHintsModal, SpeakingHintsData } from "@/components/admin/exams/speaking-hints-modal";
 import { detectAptisTaskMeta } from "@/components/admin/exams/exam.types";
 
 interface Question {
@@ -83,6 +86,15 @@ export default function ExamEditorPage() {
   const [editingPart, setEditingPart] = useState<string | null>(null);
   const [partForm, setPartForm] = useState<Record<string, string>>({});
   const [editingQuestion, setEditingQuestion] = useState<string | null>(null);
+  const [explanationTarget, setExplanationTarget] = useState<{
+    question: Question;
+    partTitle: string;
+  } | null>(null);
+  const [speakingHintsTarget, setSpeakingHintsTarget] = useState<{
+    question: Question;
+    part: Part;
+  } | null>(null);
+  const [batchGeneratingHints, setBatchGeneratingHints] = useState(false);
   const router = useRouter();
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [addingQPartId, setAddingQPartId] = useState<string | null>(null);
@@ -308,6 +320,100 @@ export default function ExamEditorPage() {
     }
   };
 
+  const handleSaveExplanation = async (questionId: string, newExplanation: string) => {
+    const cleanExp = newExplanation.trim();
+    try {
+      const res = await api.admin.updateQuestion(questionId, {
+        explanation: cleanExp,
+      });
+      if (res.success) {
+        showToast("Đã lưu lời giải thích thành công!");
+        setExam((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            parts: prev.parts.map((p) => ({
+              ...p,
+              questions: p.questions.map((q) =>
+                q.id === questionId ? { ...q, explanation: cleanExp || null } : q
+              ),
+            })),
+          };
+        });
+        setExplanationTarget((prev) =>
+          prev && prev.question.id === questionId
+            ? {
+                ...prev,
+                question: { ...prev.question, explanation: cleanExp || null },
+              }
+            : prev
+        );
+      } else {
+        showToast(res.error?.message || "Lỗi khi lưu giải thích", "err");
+        throw new Error(res.error?.message || "Lỗi khi lưu");
+      }
+    } catch (err: any) {
+      if (err?.message) throw err;
+      showToast("Lỗi kết nối máy chủ", "err");
+      throw new Error("Lỗi kết nối");
+    }
+  };
+
+  const handleSaveSpeakingHints = async (hints: SpeakingHintsData) => {
+    if (!speakingHintsTarget) return;
+    const qId = speakingHintsTarget.question.id;
+    const currentOpt = (speakingHintsTarget.question.options as any) || {};
+    const newOptions = {
+      ...currentOpt,
+      vocabularyHints: hints,
+    };
+    try {
+      const res = await api.admin.updateQuestion(qId, {
+        options: newOptions,
+      });
+      if (res.success) {
+        showToast("Đã lưu gợi ý tranh Speaking thành công!");
+        setExam((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            parts: prev.parts.map((p) => ({
+              ...p,
+              questions: p.questions.map((q) =>
+                q.id === qId ? { ...q, options: newOptions } : q
+              ),
+            })),
+          };
+        });
+      } else {
+        showToast(res.error?.message || "Lỗi khi lưu gợi ý", "err");
+        throw new Error(res.error?.message || "Lỗi khi lưu");
+      }
+    } catch (err: any) {
+      if (err?.message) throw err;
+      showToast("Lỗi kết nối máy chủ", "err");
+      throw new Error("Lỗi kết nối");
+    }
+  };
+
+  const handleBatchGenerateHints = async () => {
+    if (!examId) return;
+    setBatchGeneratingHints(true);
+    try {
+      const res = await api.admin.batchGenerateSpeakingHints(examId);
+      if (res.success) {
+        showToast(`Đã tự động sinh và lưu gợi ý cho ${res.data?.updatedCount || 0} phần thi!`);
+        load();
+      } else {
+        showToast(res.error?.message || "Lỗi khi sinh gợi ý hàng loạt", "err");
+      }
+    } catch {
+      showToast("Lỗi kết nối máy chủ", "err");
+    } finally {
+      setBatchGeneratingHints(false);
+    }
+  };
+
   const doAddQ = async (partId: string, qData: PolymorphicQuestionData) => {
     setSaving(`addq-${partId}`);
     try {
@@ -458,6 +564,23 @@ export default function ExamEditorPage() {
             <Play className="w-3.5 h-3.5" />
             <span>Làm bài thử (Giao diện học viên)</span>
           </Link>
+
+          {exam.skill === "SPEAKING" && (
+            <button
+              type="button"
+              onClick={handleBatchGenerateHints}
+              disabled={batchGeneratingHints}
+              className="px-3 py-1.5 rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/40 text-purple-800 dark:text-purple-300 text-xs font-heading font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+              title="Tự động phân tích và sinh gợi ý cho các câu hỏi Part 2 & Part 3 còn thiếu"
+            >
+              {batchGeneratingHints ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              )}
+              <span>{batchGeneratingHints ? "Đang sinh gợi ý..." : "🤖 AI Gợi ý Part 2 & 3"}</span>
+            </button>
+          )}
 
           <button
             onClick={startEditExamMeta}
@@ -914,6 +1037,22 @@ export default function ExamEditorPage() {
                       <QuestionCardRow
                         question={q}
                         onEdit={() => setEditingQuestion(q.id)}
+                        onEditExplanation={() =>
+                          setExplanationTarget({
+                            question: q,
+                            partTitle: part.title,
+                          })
+                        }
+                        onEditSpeakingHints={
+                          exam.skill === "SPEAKING" &&
+                          (part.part_number === 2 || part.part_number === 3)
+                            ? () =>
+                                setSpeakingHintsTarget({
+                                  question: q,
+                                  part: part,
+                                })
+                            : undefined
+                        }
                         onDelete={() => setConfirmDelQ(q)}
                       />
                     )}
@@ -1048,6 +1187,51 @@ export default function ExamEditorPage() {
           router.push("/admin/exams");
         }}
         onCancel={() => setShowBackConfirm(false)}
+      />
+
+      {/* Modal chỉnh sửa giải thích câu hỏi chuyên sâu */}
+      <QuestionExplanationModal
+        isOpen={!!explanationTarget}
+        question={
+          explanationTarget
+            ? {
+                id: explanationTarget.question.id,
+                question_number: explanationTarget.question.question_number,
+                question_type: explanationTarget.question.question_type,
+                prompt: explanationTarget.question.prompt,
+                options: explanationTarget.question.options,
+                correct_answer: explanationTarget.question.correct_answer,
+                explanation: explanationTarget.question.explanation,
+                part_title: explanationTarget.partTitle,
+              }
+            : null
+        }
+        skill={exam?.skill}
+        onClose={() => setExplanationTarget(null)}
+        onSave={handleSaveExplanation}
+      />
+
+      {/* Modal sinh & chỉnh sửa gợi ý tranh / cấu trúc Part 2 & Part 3 */}
+      <SpeakingHintsModal
+        isOpen={!!speakingHintsTarget}
+        questionId={speakingHintsTarget?.question.id || ""}
+        partNumber={(speakingHintsTarget?.part.part_number as 2 | 3) || 3}
+        topicTitle={exam?.title || speakingHintsTarget?.part.title || ""}
+        prompt={speakingHintsTarget?.question.prompt || ""}
+        imageUrl={
+          speakingHintsTarget?.part.image_url
+            ? String(speakingHintsTarget.part.image_url).split(",")[0]?.trim()
+            : undefined
+        }
+        secondImageUrl={
+          speakingHintsTarget?.part.image_url &&
+          String(speakingHintsTarget.part.image_url).split(",").length > 1
+            ? String(speakingHintsTarget.part.image_url).split(",")[1]?.trim()
+            : undefined
+        }
+        initialHints={speakingHintsTarget?.question.options?.vocabularyHints || null}
+        onClose={() => setSpeakingHintsTarget(null)}
+        onSave={handleSaveSpeakingHints}
       />
     </div>
   );

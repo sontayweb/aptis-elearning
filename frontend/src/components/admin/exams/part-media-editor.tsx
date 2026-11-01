@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Image, Volume2, Split, Eye, FileText, Sparkles } from "lucide-react";
 import ImageUploadInput from "@/components/admin/image-upload-input";
+import AudioUploadInput from "@/components/admin/audio-upload-input";
 
 interface PartMediaEditorProps {
   partTitle: string;
@@ -144,25 +145,13 @@ export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
 
       {/* File Audio (Listening) */}
       {(skill === "LISTENING" || skill === "FULL_TEST" || audioUrl) && (
-        <div className="p-3.5 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 space-y-2">
-          <div className="flex items-center gap-2 text-sky-800 dark:text-sky-300 font-bold text-xs">
-            <Volume2 className="w-4 h-4" />
-            <span>Âm thanh Part (Listening Audio)</span>
-          </div>
-          <input
-            type="text"
-            className={ic + " font-mono text-[11px]"}
-            placeholder="https://... /uploads/audio/..."
-            value={audioUrl || ""}
-            onChange={(e) => onChange({ audioUrl: e.target.value })}
-          />
-          {audioUrl && (
-            <div className="mt-1 pt-2 border-t border-sky-100 dark:border-sky-900/40 flex items-center gap-3">
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold shrink-0">Nghe thử:</span>
-              <audio controls className="w-full h-8" src={audioUrl} />
-            </div>
-          )}
-        </div>
+        <AudioUploadInput
+          value={audioUrl}
+          onChange={(newUrl) => onChange({ audioUrl: newUrl })}
+          scriptText={passageText}
+          category="listening"
+          helperText="Tải file MP3 có sẵn từ máy tính hoặc dùng AI sinh giọng đọc Anh - Anh tự động từ kịch bản ở trên."
+        />
       )}
 
       {/* Tranh ảnh minh họa (Speaking & Reading) */}

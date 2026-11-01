@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { adminController } from './admin.controller';
 import { authGuard } from '../../middlewares/auth.guard';
 import { roleGuard } from '../../middlewares/role.guard';
+import { uploadAudioMiddleware } from '../../middlewares/upload.middleware';
 import multer from 'multer';
 
 const upload = multer({
@@ -50,6 +51,16 @@ router.post('/exams/delete-image', (req, res, next) => adminController.deleteExa
 router.post('/exams/import/upload-image', upload.single('image'), (req, res, next) =>
   adminController.uploadExamImage(req, res, next)
 );
+
+// Quản lý Audio & AI Sinh giọng nói cho đề thi Listening
+router.post('/exams/upload-audio', uploadAudioMiddleware.single('audio'), (req, res, next) =>
+  adminController.uploadExamAudio(req, res, next)
+);
+router.delete('/exams/audio', (req, res, next) => adminController.deleteExamAudio(req, res, next));
+router.post('/exams/delete-audio', (req, res, next) => adminController.deleteExamAudio(req, res, next));
+router.post('/exams/generate-audio-tts', (req, res, next) =>
+  adminController.generateAudioTts(req, res, next)
+);
 router.post('/exams/import/confirm', (req, res, next) => adminController.confirmImportExams(req, res, next));
 router.get('/exams', (req, res, next) => adminController.listExams(req, res, next));
 router.post('/exams', (req, res, next) => adminController.createExam(req, res, next));
@@ -68,6 +79,12 @@ router.get('/questions', (req, res, next) => adminController.searchQuestions(req
 router.post('/parts/:partId/questions', (req, res, next) => adminController.addQuestion(req, res, next));
 router.patch('/questions/:questionId', (req, res, next) => adminController.updateQuestion(req, res, next));
 router.delete('/questions/:questionId', (req, res, next) => adminController.deleteQuestion(req, res, next));
+router.post('/questions/:questionId/generate-speaking-hints', (req, res, next) =>
+  adminController.generateSpeakingHints(req, res, next)
+);
+router.post('/exams/:examId/batch-generate-speaking-hints', (req, res, next) =>
+  adminController.batchGenerateSpeakingHints(req, res, next)
+);
 
 // Quản lý Gán nhãn Sao / Cỏ theo Chủ Đề (Topic Tagging & Auto-Propagation)
 router.get('/topic-tags', (req, res, next) => adminController.getTopicRules(req, res, next));

@@ -32,84 +32,25 @@ import {
   Loader2,
   Copy,
   Check,
+  VolumeX,
+  Volume1,
+  ChevronDown,
 } from "lucide-react";
 import { DEFAULT_LISTENING_TEST, DEFAULT_LISTENING_TEST_2 } from "@/data/listening-benchmark";
 import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
+import { SoundCheckScreen } from "@/components/listening/sound-check-screen";
+import { ListeningResultScreen } from "@/components/listening/listening-result-screen";
+import type {
+  Part1Item,
+  Part2Speaker,
+  Part3Opinion,
+  Part4Question,
+  Part4Recording,
+  ListeningExamData,
+} from "@/components/listening/listening-types";
+
 
 // Định nghĩa dữ liệu 4 Parts chuẩn Aptis Listening
-interface Part1Item {
-  id?: string;
-  num: number;
-  prompt: string;
-  options: string[];
-  correctAnswer: string;
-  explanation: string;
-  audioUrl?: string;
-  transcript?: string;
-  translation?: string;
-}
-
-interface Part2Speaker {
-  id?: string;
-  speaker: string;
-  correctAnswer: string;
-  explanation: string;
-}
-
-interface Part3Opinion {
-  id?: string;
-  statement: string;
-  correctAnswer: "Man" | "Woman" | "Both";
-  explanation: string;
-}
-
-interface Part4Question {
-  id?: string;
-  prompt: string;
-  options: string[];
-  correctAnswer: string;
-  explanation: string;
-}
-
-interface Part4Recording {
-  recNum: number;
-  title: string;
-  passageText: string;
-  questions: Part4Question[];
-  audioUrl?: string;
-  translationText?: string;
-}
-
-export interface ListeningExamData {
-  title: string;
-  durationMinutes: number;
-  part1: Part1Item[];
-  part2: {
-    topic?: string;
-    prompt?: string;
-    instructions?: string;
-    options?: string[];
-    speakers: Part2Speaker[];
-    audioUrl?: string;
-    passageText?: string;
-    translationText?: string;
-  };
-  part3: {
-    prompt?: string;
-    topic?: string;
-    instructions?: string;
-    opinions: Part3Opinion[];
-    audioUrl?: string;
-    passageText?: string;
-    translationText?: string;
-  };
-  part4: Part4Recording[];
-}
-
-// DEFAULT_LISTENING_TEST được import từ benchmark dataset chuẩn tại @/data/listening-benchmark
-
-
-
 function ListeningExamRunnerContent() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -173,6 +114,16 @@ function ListeningExamRunnerContent() {
   const [resumedBannerDismissed, setResumedBannerDismissed] = useState(false);
   const [showScript, setShowScript] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
+  // Sound Check & Anti-Autoplay states
+  const [showSoundCheck, setShowSoundCheck] = useState(!isReviewUrl);
+  const [soundTested, setSoundTested] = useState(false);
+  const [isTestingSound, setIsTestingSound] = useState(false);
+  const [checkVolume, setCheckVolume] = useState(0.8);
+  const soundCheckAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Bilingual Tabs & Display states
+  const [showBilingualBox, setShowBilingualBox] = useState(isReviewUrl);
+  const [bilingualTab, setBilingualTab] = useState<"en" | "vi">("en");
   const [drawerTab, setDrawerTab] = useState<"all" | "p1" | "p2" | "p3" | "p4">("all");
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportType, setReportType] = useState("Lỗi âm thanh hoặc audio");
@@ -532,12 +483,12 @@ function ListeningExamRunnerContent() {
 
   // Kích hoạt dịch tự động khi người dùng bật tab dịch hoặc chuyển câu hỏi
   useEffect(() => {
-    if (!showTranslation) return;
+    if ((!showTranslation && !showBilingualBox) || (showBilingualBox && bilingualTab !== "vi")) return;
     const stageKey = `stage_${activeStage}`;
     if (!translationCache[stageKey]) {
       fetchBilingualTranslation(activeStage);
     }
-  }, [showTranslation, activeStage, fetchBilingualTranslation, translationCache]);
+  }, [showTranslation, showBilingualBox, bilingualTab, activeStage, fetchBilingualTranslation, translationCache]);
 
   const handleCopyTranslation = (text: string) => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -1133,14 +1084,102 @@ function ListeningExamRunnerContent() {
     return { exam: result, audioUrls };
   }
 
+  
+  // Dọn dẹp âm thanh kiểm tra khi unmount
+  useEffect(() => {
+    return () => {
+      if (soundCheckAudioRef.current) {
+        soundCheckAudioRef.current.pause();
+        soundCheckAudioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Sound Check playback logic
+  const handleTestSoundCheck = () => {
+    if (isTestingSound) {
+      if (soundCheckAudioRef.current) {
+        soundCheckAudioRef.current.pause();
+        soundCheckAudioRef.current.currentTime = 0;
+      }
+      setIsTestingSound(false);
+      return;
+    }
+
+    try {
+      if (!soundCheckAudioRef.current) {
+        soundCheckAudioRef.current = new Audio("/audio/sound-check.mp3");
+      }
+      const audio = soundCheckAudioRef.current;
+      audio.volume = checkVolume;
+      audio.currentTime = 0;
+      setIsTestingSound(true);
+
+      audio.onended = () => {
+        setIsTestingSound(false);
+        setSoundTested(true);
+      };
+
+      audio.onerror = () => {
+        setIsTestingSound(false);
+        try {
+          const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+          if (AudioContextClass) {
+            const audioCtx = new AudioContextClass();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.value = checkVolume * 0.15;
+            osc.frequency.value = 440;
+            osc.start();
+            setTimeout(() => {
+              osc.stop();
+              setSoundTested(true);
+            }, 600);
+          }
+        } catch (e) {
+          console.warn("Audio fallback failed:", e);
+        }
+      };
+
+      audio.play().catch((err) => {
+        console.warn("Audio play prevented:", err);
+        setIsTestingSound(false);
+      });
+    } catch (err) {
+      console.error("Test sound failed:", err);
+      setIsTestingSound(false);
+    }
+  };
+
+  const handleVolumeChange = (newVol: number) => {
+    setCheckVolume(newVol);
+    if (soundCheckAudioRef.current) {
+      soundCheckAudioRef.current.volume = newVol;
+    }
+    if (audioRef.current) {
+      audioRef.current.volume = newVol;
+    }
+  };
+
+  const handleStartExamFromCheck = () => {
+    if (soundCheckAudioRef.current) {
+      soundCheckAudioRef.current.pause();
+      soundCheckAudioRef.current.currentTime = 0;
+    }
+    setIsTestingSound(false);
+    setShowSoundCheck(false);
+  };
+
   // Timer đếm ngược thời gian phòng thi
   useEffect(() => {
-    if (loading || isPaused || isSubmitted) return;
+    if (loading || isPaused || isSubmitted || showSoundCheck) return;
     const timer = setInterval(() => {
       setTimeLeft((t) => (t <= 1 ? 0 : t - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, [loading, isPaused, isSubmitted]);
+  }, [loading, isPaused, isSubmitted, showSoundCheck]);
 
   // Lấy nội dung văn bản kịch bản cho stage hiện tại (phục vụ SpeechSynthesis khi không có file âm thanh tĩnh)
   const getCurrentStageScript = () => {
@@ -1551,6 +1590,8 @@ function ListeningExamRunnerContent() {
       setActiveStage(0);
       setIsSubmitted(false);
       setIsReviewMode(false);
+      setShowSoundCheck(true);
+      setSoundTested(false);
 
       const res = await api.submissions.start(examId, true);
       if (res.success && res.data) {
@@ -1700,170 +1741,35 @@ function ListeningExamRunnerContent() {
   // =========================================================================
   if (isSubmitted && !isReviewMode) {
     return (
-      <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
-        {/* Header Bar */}
-        <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-3 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">
-              <Headphones className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-                Listening Test
-              </span>
-              <span className="text-sm font-bold text-foreground">
-                Kết quả bài thi Listening
-              </span>
-            </div>
-          </div>
-          <Link
-            href="/listening"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Thoát</span>
-          </Link>
-        </header>
-
-        {/* Content Container */}
-        <main className="flex-1 py-8 px-4">
-          <div className="max-w-2xl mx-auto space-y-5 animate-in fade-in">
-            {/* Card 1: Tổng quan Điểm số */}
-            <div className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm text-center space-y-6">
-              <h2 className="font-heading font-extrabold text-xl text-foreground">
-                Kết quả Listening
-              </h2>
-
-              <div className="grid grid-cols-3 gap-3 divide-x divide-border/60 py-2">
-                <div>
-                  <div className="text-2xl md:text-3xl font-black text-primary font-mono">
-                    {results.totalScore}/{results.maxScore}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Điểm</div>
-                </div>
-
-                <div>
-                  <div className="text-2xl md:text-3xl font-black text-accent font-heading">
-                    {results.cefr}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Trình độ</div>
-                </div>
-
-                <div>
-                  <div className="text-2xl md:text-3xl font-black text-foreground font-mono">
-                    {results.totalCorrect}/{results.totalQuestionsInExam}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Số câu đúng</div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                <Link
-                  href="/listening"
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors cursor-pointer"
-                >
-                  ← Thoát
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => setIsReviewMode(true)}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Xem lại từng câu →</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleRestartExam}
-                  disabled={isRestarting}
-                  className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
-                >
-                  {isRestarting ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  )}
-                  <span>Làm lại</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Card 2: Chi tiết bài làm theo 4 Part */}
-            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
-              <h3 className="font-heading font-bold text-sm text-foreground pb-2 border-b border-border">
-                Chi tiết bài làm
-              </h3>
-
-              <div className="space-y-3.5 text-xs md:text-sm">
-                {/* Part 1 */}
-                <div className="flex items-center justify-between py-1.5 border-b border-border/50">
-                  <span className="font-medium text-foreground">
-                    Part 1 – Word Recognition
-                  </span>
-                  <div className="flex items-center gap-4 text-xs">
-                    <span className="text-muted-foreground">
-                      Số câu đúng: <strong className="text-foreground">{results.p1Correct}/13</strong>
-                    </span>
-                    <span className="font-mono font-bold text-primary">
-                      Điểm: {results.p1Score}/26
-                    </span>
-                  </div>
-                </div>
-
-                {/* Part 2 */}
-                <div className="flex items-center justify-between py-1.5 border-b border-border/50">
-                  <span className="font-medium text-foreground">
-                    Part 2 – Matching Information
-                  </span>
-                  <div className="flex items-center gap-4 text-xs">
-                    <span className="text-muted-foreground">
-                      Số câu đúng: <strong className="text-foreground">{results.p2Correct}/4</strong>
-                    </span>
-                    <span className="font-mono font-bold text-primary">
-                      Điểm: {results.p2Score}/8
-                    </span>
-                  </div>
-                </div>
-
-                {/* Part 3 */}
-                <div className="flex items-center justify-between py-1.5 border-b border-border/50">
-                  <span className="font-medium text-foreground">
-                    Part 3 – Short Conversations
-                  </span>
-                  <div className="flex items-center gap-4 text-xs">
-                    <span className="text-muted-foreground">
-                      Số câu đúng: <strong className="text-foreground">{results.p3Correct}/4</strong>
-                    </span>
-                    <span className="font-mono font-bold text-primary">
-                      Điểm: {results.p3Score}/8
-                    </span>
-                  </div>
-                </div>
-
-                {/* Part 4 */}
-                <div className="flex items-center justify-between py-1.5">
-                  <span className="font-medium text-foreground">
-                    Part 4 – Monologues
-                  </span>
-                  <div className="flex items-center gap-4 text-xs">
-                    <span className="text-muted-foreground">
-                      Số câu đúng: <strong className="text-foreground">{results.p4Correct}/4</strong>
-                    </span>
-                    <span className="font-mono font-bold text-primary">
-                      Điểm: {results.p4Score}/8
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
+      <ListeningResultScreen
+        results={results}
+        isRestarting={isRestarting}
+        onRestart={handleRestartExam}
+        onReview={() => {
+          setIsReviewMode(true);
+          setShowBilingualBox(true);
+        }}
+      />
     );
   }
+
+  // =========================================================================
+  // MÀN HÌNH SOUND CHECK & ONBOARDING (CHỐNG CHẶN AUTOPLAY, KIỂM TRA LOA / TAI NGHE)
+  // =========================================================================
+  if (showSoundCheck && !isReviewMode && !isSubmitted) {
+    return (
+      <SoundCheckScreen
+        title={examData.title}
+        soundTested={soundTested}
+        isTestingSound={isTestingSound}
+        checkVolume={checkVolume}
+        onTestSound={handleTestSoundCheck}
+        onVolumeChange={handleVolumeChange}
+        onStart={handleStartExamFromCheck}
+      />
+    );
+  }
+
 
   // =========================================================================
   // MÀN HÌNH CHỜ TẢI DỮ LIỆU ĐỀ THI
@@ -2096,44 +2002,32 @@ function ListeningExamRunnerContent() {
               </div>
             </div>
 
-            {/* Script & Bản dịch song song (ẩn mặc định, bật tắt tùy chọn) */}
+            {/* Script & Bản dịch song ngữ chuẩn 2 Tab: [ 🇬🇧 Transcript ] & [ 🇻🇳 Bản dịch TV ] */}
             <div className="pt-3 border-t border-border/50">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowScript((v) => !v)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                      showScript
-                        ? "bg-primary text-primary-foreground shadow-xs"
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border"
-                    }`}
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>{showScript ? "Ẩn Audio Script" : "Xem Audio Script"}</span>
-                  </button>
+                <button
+                  type="button"
+                  id="toggle-bilingual-btn" onClick={() => setShowBilingualBox((v) => !v)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    showBilingualBox
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border"
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>{showBilingualBox ? "Ẩn Transcript & Dịch TV" : "Xem Transcript & Dịch TV"}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showBilingualBox ? "rotate-180" : ""}`} />
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setShowTranslation((v) => !v)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                      showTranslation
-                        ? "bg-amber-600 text-white shadow-xs"
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border"
-                    }`}
-                  >
-                    <Languages className="w-3.5 h-3.5" />
-                    <span>{showTranslation ? "Ẩn Bản Dịch TV" : "Xem Bản Dịch TV"}</span>
-                  </button>
-                </div>
-
-                <span className="text-[11px] text-muted-foreground italic hidden sm:inline">
-                  💡 Nên nghe và làm bài trước khi mở script để rèn phản xạ thi thật
-                </span>
+                {!isReviewMode && (
+                  <span className="text-[11px] text-muted-foreground italic hidden sm:inline">
+                    💡 Nên nghe và làm bài trước khi mở transcript để rèn phản xạ thi thật
+                  </span>
+                )}
               </div>
 
-              {/* Bảng hiển thị Song Song (2 cột desktop, cột đơn mobile) */}
-              {(showScript || showTranslation) && (() => {
+              {/* Bảng hiển thị 2 Tab chuẩn responsive */}
+              {showBilingualBox && (() => {
                 const bilingual = getCurrentBilingualData();
                 if (!bilingual) return null;
                 const stageKey = `stage_${activeStage}`;
@@ -2141,106 +2035,132 @@ function ListeningExamRunnerContent() {
                   bilingual.translation || translationCache[stageKey];
 
                 return (
-                  <div className="mt-3 p-4 rounded-xl border border-primary/20 bg-muted/20 space-y-3">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground border-b border-border/60 pb-1.5">
-                      <span className="font-bold text-foreground">{bilingual.title}</span>
-                      <span className="text-[10px] hidden sm:inline">Hiển thị song song hỗ trợ ôn luyện</span>
-                    </div>
+                  <div className="mt-3 rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+                    {/* Tab Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-3 pt-2 bg-muted/40 border-b border-border">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          id="tab-bilingual-en" onClick={() => setBilingualTab("en")}
+                          className={`px-3 py-1.5 rounded-t-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border-t border-x -mb-[1px] ${
+                            bilingualTab === "en"
+                              ? "bg-card text-primary border-border border-b-card shadow-xs"
+                              : "bg-transparent text-muted-foreground hover:text-foreground border-transparent"
+                          }`}
+                        >
+                          <span>🇬🇧 Transcript tiếng Anh</span>
+                        </button>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                      {showScript && (
-                        <div className={!showTranslation ? "md:col-span-2" : ""}>
-                          <div className="flex items-center justify-between gap-1.5 mb-1.5">
-                            <div className="flex items-center gap-1.5 font-bold text-primary text-[11px] uppercase tracking-wide">
-                              <FileText className="w-3.5 h-3.5" />
-                              <span>Script Ghi Âm (Tiếng Anh)</span>
-                            </div>
-                            {bilingual.script && (
-                              <button
-                                type="button"
-                                onClick={() => handleCopyTranslation(bilingual.script)}
-                                className="text-[10.5px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-muted transition-colors cursor-pointer"
-                                title="Sao chép script tiếng Anh"
-                              >
+                        <button
+                          type="button"
+                          id="tab-bilingual-vi" onClick={() => {
+                            setBilingualTab("vi");
+                            if (!translationCache[stageKey]) {
+                              fetchBilingualTranslation(activeStage);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-t-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border-t border-x -mb-[1px] ${
+                            bilingualTab === "vi"
+                              ? "bg-card text-amber-600 dark:text-amber-400 border-border border-b-card shadow-xs"
+                              : "bg-transparent text-muted-foreground hover:text-foreground border-transparent"
+                          }`}
+                        >
+                          <span>🇻🇳 Bản dịch Tiếng Việt</span>
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9.5px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                            <Sparkles className="w-2.5 h-2.5" />
+                            AI
+                          </span>
+                        </button>
+                      </div>
+
+                      {/* Quick copy / refresh actions */}
+                      <div className="flex items-center gap-1 pb-1">
+                        {bilingualTab === "en" && bilingual.script && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopyTranslation(bilingual.script)}
+                            className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer"
+                            title="Sao chép transcript tiếng Anh"
+                          >
+                            {copiedTrans ? (
+                              <>
+                                <Check className="w-3 h-3 text-emerald-500" />
+                                <span className="text-emerald-500 font-medium">Đã chép</span>
+                              </>
+                            ) : (
+                              <>
                                 <Copy className="w-3 h-3" />
                                 <span className="hidden sm:inline">Sao chép</span>
-                              </button>
+                              </>
                             )}
-                          </div>
-                          <div className="p-3 rounded-lg bg-background border border-border text-foreground leading-relaxed whitespace-pre-line font-mono text-[11.5px] max-h-64 overflow-y-auto">
-                            {bilingual.script || "Đang cập nhật script cho phần này."}
-                          </div>
-                        </div>
-                      )}
+                          </button>
+                        )}
 
-                      {showTranslation && (
-                        <div className={!showScript ? "md:col-span-2" : ""}>
-                          <div className="flex items-center justify-between gap-1.5 mb-1.5">
-                            <div className="flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400 text-[11px] uppercase tracking-wide">
-                              <Languages className="w-3.5 h-3.5" />
-                              <span>Bản Dịch Nghĩa (Tiếng Việt)</span>
-                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                <Sparkles className="w-2.5 h-2.5" />
-                                AI Song Ngữ
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-1.5">
-                              {activeTranslation && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleCopyTranslation(activeTranslation)}
-                                  className="text-[10.5px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-muted transition-colors cursor-pointer"
-                                  title="Sao chép bản dịch"
-                                >
-                                  {copiedTrans ? (
-                                    <>
-                                      <Check className="w-3 h-3 text-emerald-500" />
-                                      <span className="text-emerald-500 font-medium">Đã chép</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Copy className="w-3 h-3" />
-                                      <span className="hidden sm:inline">Sao chép</span>
-                                    </>
-                                  )}
-                                </button>
-                              )}
+                        {bilingualTab === "vi" && (
+                          <>
+                            {activeTranslation && (
                               <button
                                 type="button"
-                                disabled={isTranslating}
-                                onClick={() => fetchBilingualTranslation(activeStage, true)}
-                                className="text-[10.5px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer"
-                                title="Làm mới bản dịch AI"
+                                onClick={() => handleCopyTranslation(activeTranslation)}
+                                className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer"
+                                title="Sao chép bản dịch"
                               >
-                                <RotateCcw className={`w-3 h-3 ${isTranslating ? "animate-spin" : ""}`} />
-                                <span className="hidden sm:inline">Dịch lại</span>
+                                {copiedTrans ? (
+                                  <>
+                                    <Check className="w-3 h-3 text-emerald-500" />
+                                    <span className="text-emerald-500 font-medium">Đã chép</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-3 h-3" />
+                                    <span className="hidden sm:inline">Sao chép</span>
+                                  </>
+                                )}
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              disabled={isTranslating}
+                              onClick={() => fetchBilingualTranslation(activeStage, true)}
+                              className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1 rounded hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer"
+                              title="Làm mới bản dịch AI"
+                            >
+                              <RotateCcw className={`w-3 h-3 ${isTranslating ? "animate-spin" : ""}`} />
+                              <span className="hidden sm:inline">Dịch lại</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Tab Content Body */}
+                    <div className="p-4 bg-card">
+                      {bilingualTab === "en" ? (
+                        <div className="text-foreground leading-relaxed whitespace-pre-line font-mono text-[12px] max-h-64 overflow-y-auto select-text">
+                          {bilingual.script || "Đang cập nhật lời thoại cho câu hỏi này."}
+                        </div>
+                      ) : (
+                        <div className="text-foreground leading-relaxed whitespace-pre-line text-[12px] max-h-64 overflow-y-auto select-text">
+                          {activeTranslation ? (
+                            activeTranslation
+                          ) : isTranslating ? (
+                            <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
+                              <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+                              <span className="text-xs font-medium">Đang tạo bản dịch tiếng Việt bằng AI...</span>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center py-6 gap-2.5 text-muted-foreground text-center">
+                              <span className="text-xs">Đang cập nhật bản dịch tiếng Việt cho câu này...</span>
+                              <button
+                                type="button"
+                                onClick={() => fetchBilingualTranslation(activeStage, true)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors cursor-pointer"
+                              >
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span>Dịch ngay bằng AI</span>
                               </button>
                             </div>
-                          </div>
-
-                          <div className="p-3 rounded-lg bg-background border border-border text-foreground leading-relaxed whitespace-pre-line text-[11.5px] max-h-64 overflow-y-auto">
-                            {activeTranslation ? (
-                              activeTranslation
-                            ) : isTranslating ? (
-                              <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
-                                <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-                                <span className="text-[11px] font-medium">Đang tạo bản dịch tiếng Việt bằng AI...</span>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center justify-center py-4 gap-2 text-muted-foreground text-center">
-                                <span className="text-[11px]">Bản dịch nghĩa đang được hoàn thiện.</span>
-                                <button
-                                  type="button"
-                                  onClick={() => fetchBilingualTranslation(activeStage, true)}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors cursor-pointer"
-                                >
-                                  <Sparkles className="w-3.5 h-3.5" />
-                                  <span>Dịch ngay bằng AI</span>
-                                </button>
-                              </div>
-                            )}
-                          </div>
+                          )}
                         </div>
                       )}
                     </div>

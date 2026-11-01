@@ -2722,24 +2722,22 @@ export default function OfficialMockExamRoom() {
                 );
               })()}
 
-              {/* Explanation Card - Chuẩn layout Screenshot 1 */}
+              {/* Explanation Card - Chuẩn layout Screenshot 1 (chỉ hiện khi có explanation) */}
               {hideAnswersReview ? (
                 <div className="p-4 rounded-xl bg-muted/40 border border-exam-border text-center py-5 text-exam-text-muted space-y-1">
                   <EyeOff className="w-5 h-5 mx-auto mb-1 text-primary" />
                   <p className="text-xs font-bold text-exam-text">Đáp án và giải thích đang được ẩn để bạn tự ôn luyện</p>
                   <p className="text-[11px]">Bấm nút &ldquo;Hiện đáp án&rdquo; ở góc dưới bên trái màn hình khi bạn muốn xem chi tiết.</p>
                 </div>
-              ) : (
+              ) : activeRevQ.explanation && activeRevQ.explanation.trim() ? (
                 <div className="p-4 md:p-5 rounded-2xl bg-exam-surface border border-exam-border shadow-sm space-y-3">
                   <div className="flex items-center gap-2 text-xs font-bold text-primary border-b border-exam-border pb-2.5">
                     <Sparkles className="w-4 h-4 text-primary" />
                     <span>Giải thích chi tiết &amp; Phân tích đáp án:</span>
                   </div>
-                  {renderStructuredExplanation(
-                    activeRevQ.explanation || "Câu hỏi kiểm tra kiến thức ngôn ngữ chuẩn theo khung đánh giá Aptis ESOL."
-                  )}
+                  {renderStructuredExplanation(activeRevQ.explanation.trim())}
                 </div>
-              )}
+              ) : null}
 
               {/* Navigation Buttons */}
               <div className="flex items-center justify-between pt-4 border-t border-exam-border">

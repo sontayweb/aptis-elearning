@@ -4,6 +4,7 @@ import {
   gradeSubmissionSchema,
   createClassroomSchema,
   joinClassroomSchema,
+  updateQuestionExplanationSchema,
 } from './teacher.dto';
 import { sendSuccess } from '../../utils/api-response';
 import { AuthenticatedRequest } from '../../middlewares/auth.guard';
@@ -99,6 +100,17 @@ export class TeacherController {
       const userId = req.user!.userId;
       const classrooms = await teacherService.getStudentClassrooms(userId);
       sendSuccess(res, classrooms, 'Lấy danh sách lớp học của bạn thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateQuestionExplanation(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const questionId = req.params.id;
+      const { explanation } = updateQuestionExplanationSchema.parse(req.body);
+      const updated = await teacherService.updateQuestionExplanation(questionId, explanation);
+      sendSuccess(res, updated, 'Cập nhật lời giải thích câu hỏi thành công', 200);
     } catch (error) {
       next(error);
     }

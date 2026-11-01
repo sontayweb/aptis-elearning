@@ -584,6 +584,11 @@ class ApiClient {
     getMyClassrooms: () => this.request<any[]>('/teacher/classrooms/my'),
     getClassroomMembers: (classroomId: string) =>
       this.request(`/teacher/classrooms/${classroomId}/members`),
+    updateQuestionExplanation: (questionId: string, explanation: string) =>
+      this.request(`/teacher/questions/${questionId}/explanation`, {
+        method: 'PATCH',
+        body: JSON.stringify({ explanation }),
+      }),
   };
 
   // ==========================================
@@ -769,6 +774,37 @@ class ApiClient {
       });
     },
 
+    uploadExamAudio: (audio: File, category?: string, previousUrl?: string) => {
+      const formData = new FormData();
+      formData.append('audio', audio);
+      if (category) formData.append('category', category);
+      if (previousUrl) formData.append('previousUrl', previousUrl);
+      return this.request<any>('/admin/exams/upload-audio', {
+        method: 'POST',
+        body: formData,
+      }).then((res) => {
+        if (!res.success) throw new Error(res.message || 'Lỗi khi tải âm thanh lên');
+        return res.data;
+      });
+    },
+
+    deleteExamAudio: (url: string) => {
+      return this.request<any>('/admin/exams/delete-audio', {
+        method: 'POST',
+        body: JSON.stringify({ url }),
+      });
+    },
+
+    generateAudioTts: (data: { text: string; voice?: string; prefix?: string; previousUrl?: string }) => {
+      return this.request<any>('/admin/exams/generate-audio-tts', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }).then((res) => {
+        if (!res.success) throw new Error(res.message || 'Lỗi khi tạo âm thanh AI');
+        return res.data;
+      });
+    },
+
     uploadImportImage: (image: File) => {
       const formData = new FormData();
       formData.append('image', image);
@@ -804,12 +840,33 @@ class ApiClient {
       this.request(`/admin/parts/${partId}`, { method: 'DELETE' }),
 
     updateQuestion: (questionId: string, body: {
-      prompt?: string; questionType?: string; options?: string[];
+      prompt?: string; questionType?: string; options?: any;
       correctAnswer?: string; explanation?: string; maxScore?: number; questionNumber?: number;
     }) =>
       this.request(`/admin/questions/${questionId}`, {
         method: 'PATCH', body: JSON.stringify(body),
       }),
+
+    generateSpeakingHints: (questionId: string) =>
+      this.request<{
+        partNumber: 2 | 3;
+        topicTitle: string;
+        keywords: string[];
+        startingPhrases: string[];
+        linkingPhrases: string[];
+        aiImagePrompts: {
+          image1Prompt: string;
+          image2Prompt?: string;
+        };
+      }>(`/admin/questions/${questionId}/generate-speaking-hints`, {
+        method: 'POST',
+      }),
+
+    batchGenerateSpeakingHints: (examId: string) =>
+      this.request<{ updatedCount: number; totalCount: number }>(
+        `/admin/exams/${examId}/batch-generate-speaking-hints`,
+        { method: 'POST' }
+      ),
 
     addQuestion: (partId: string, body: {
       prompt?: string; questionType?: string; options?: string[];

@@ -231,8 +231,10 @@ ${transcriptText}
         // Chấm bài viết (Writing)
         subjectiveQuestionCount++;
         writingQuestionCount++;
-        const text = ans.text_answer || '';
-        const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const rawText = ans.text_answer || '';
+        // Bảo vệ an toàn bộ nhớ: Cắt chuỗi tối đa 3,000 ký tự & đếm từ bằng regex chống OOM Heap crash
+        const text = rawText.slice(0, 3000);
+        const wordCount = (text.trim().match(/\S+/g) || []).length;
 
         let evalResult: any = null;
         let modelUsed = 'heuristic-evaluator';

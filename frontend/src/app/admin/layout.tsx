@@ -36,6 +36,7 @@ import {
   Moon,
   Database,
   RefreshCw,
+  Lightbulb,
 } from "lucide-react";
 import { useEventTheme } from "@/contexts/event-theme-context";
 import AdminTutorialModal from "@/components/admin/admin-tutorial-modal";
@@ -157,6 +158,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           icon: Sparkles,
           badge: "HOT",
           badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono font-bold",
+        },
+        {
+          title: "Key & Mẹo Thi (Listening)",
+          href: "/admin/key-va-meo-thi",
+          icon: Lightbulb,
+          badge: "NEW",
+          badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono font-bold",
         },
         {
           title: "Đồng bộ & Đối soát Đề",

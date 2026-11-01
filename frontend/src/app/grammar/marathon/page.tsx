@@ -429,23 +429,25 @@ function GrammarMarathonContent() {
                     </div>
                   </div>
 
-                  {/* Explanation Toggle */}
-                  <div className="pt-2 border-t border-border/40 space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowExplanations((prev) => ({ ...prev, [qKey]: !prev[qKey] }))}
-                      className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3" />
-                      <span>{explanationOpen ? "Ẩn giải thích" : "Xem giải thích chi tiết"}</span>
-                    </button>
+                  {/* Explanation Toggle (chỉ hiển thị khi có nội dung giải thích) */}
+                  {q.explanation && q.explanation.trim() && (
+                    <div className="pt-2 border-t border-border/40 space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowExplanations((prev) => ({ ...prev, [qKey]: !prev[qKey] }))}
+                        className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>{explanationOpen ? "Ẩn giải thích" : "Xem giải thích chi tiết"}</span>
+                      </button>
 
-                    {explanationOpen && q.explanation && (
-                      <div className="p-3 rounded-xl bg-muted/30 border border-border/70 text-xs text-muted-foreground leading-relaxed animate-fadeIn">
-                        <strong className="text-foreground">Giải thích chi tiết:</strong> {q.explanation}
-                      </div>
-                    )}
-                  </div>
+                      {explanationOpen && (
+                        <div className="p-3 rounded-xl bg-muted/30 border border-border/70 text-xs text-muted-foreground leading-relaxed animate-fadeIn">
+                          <strong className="text-foreground">Giải thích chi tiết:</strong> {q.explanation.trim()}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}

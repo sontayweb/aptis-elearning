@@ -2,6 +2,9 @@ import sys
 import os
 import re
 import asyncio
+import aiohttp.connector
+# Fix Windows aiodns issue: Use ThreadedResolver instead of failing aiodns
+aiohttp.connector.DefaultResolver = aiohttp.ThreadedResolver
 import edge_tts
 
 async def run_single_tts(text, voice, output_path):

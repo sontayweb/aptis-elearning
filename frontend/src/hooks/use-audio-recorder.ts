@@ -7,6 +7,7 @@ export type MicPermissionState = "idle" | "requesting" | "granted" | "denied";
 
 export interface AudioRecorderState {
   isRecording: boolean;
+  isPaused: boolean;
   recordingDuration: number;
   audioBlob: Blob | null;
   audioUrl: string | null;
@@ -19,6 +20,7 @@ export interface AudioRecorderState {
 export function useAudioRecorder() {
   const [state, setState] = useState<AudioRecorderState>({
     isRecording: false,
+    isPaused: false,
     recordingDuration: 0,
     audioBlob: null,
     audioUrl: null,
@@ -35,7 +37,8 @@ export function useAudioRecorder() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number>(0);
+  const accumulatedDurationRef = useRef<number>(0);
+  const lastResumeTimeRef = useRef<number>(0);
 
   // Phát hiện MIME type tối ưu theo từng trình duyệt (Chrome, Safari, Firefox)
   const getSupportedMimeType = useCallback((): string => {
@@ -180,7 +183,8 @@ export function useAudioRecorder() {
           }
         };
 
-        startTimeRef.current = Date.now();
+        accumulatedDurationRef.current = 0;
+        lastResumeTimeRef.current = Date.now();
         recorder.start(1000);
         setupAudioAnalyser(stream);
 
@@ -188,13 +192,16 @@ export function useAudioRecorder() {
         timerIntervalRef.current = setInterval(() => {
           setState((prev) => ({
             ...prev,
-            recordingDuration: Math.round((Date.now() - startTimeRef.current) / 1000),
+            recordingDuration: Math.round(
+              accumulatedDurationRef.current + (Date.now() - lastResumeTimeRef.current) / 1000
+            ),
           }));
         }, 500);
 
         setState((prev) => ({
           ...prev,
           isRecording: true,
+          isPaused: false,
           errorMessage: null,
           audioBlob: null,
           audioUrl: null,
@@ -205,6 +212,7 @@ export function useAudioRecorder() {
         setState((prev) => ({
           ...prev,
           isRecording: false,
+          isPaused: false,
           errorMessage: `Không thể bắt đầu ghi âm: ${err.message}`,
         }));
         return false;
@@ -212,6 +220,60 @@ export function useAudioRecorder() {
     },
     [getSupportedMimeType, requestPermission, setupAudioAnalyser]
   );
+
+  // Tạm dừng ghi âm (Pause)
+  const pauseRecording = useCallback((): boolean => {
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state === "recording") {
+      try {
+        recorder.pause();
+        if (timerIntervalRef.current) {
+          clearInterval(timerIntervalRef.current);
+          timerIntervalRef.current = null;
+        }
+        accumulatedDurationRef.current += (Date.now() - lastResumeTimeRef.current) / 1000;
+        setState((prev) => ({
+          ...prev,
+          isPaused: true,
+          volumeLevel: 0,
+        }));
+        return true;
+      } catch (err: any) {
+        console.warn("pauseRecording error:", err);
+        return false;
+      }
+    }
+    return false;
+  }, []);
+
+  // Tiếp tục ghi âm (Resume)
+  const resumeRecording = useCallback((): boolean => {
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state === "paused") {
+      try {
+        recorder.resume();
+        lastResumeTimeRef.current = Date.now();
+        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = setInterval(() => {
+          setState((prev) => ({
+            ...prev,
+            recordingDuration: Math.round(
+              accumulatedDurationRef.current + (Date.now() - lastResumeTimeRef.current) / 1000
+            ),
+          }));
+        }, 500);
+        setState((prev) => ({
+          ...prev,
+          isPaused: false,
+        }));
+        return true;
+      } catch (err: any) {
+        console.warn("resumeRecording error:", err);
+        return false;
+      }
+    }
+    return false;
+  }, []);
 
   // Dừng ghi âm và trả về Promise chứa { blob, url, duration }
   const stopRecording = useCallback((): Promise<{ blob: Blob | null; url: string | null; duration: number }> => {
@@ -225,10 +287,14 @@ export function useAudioRecorder() {
         animFrameRef.current = null;
       }
 
-      const durationSec = Math.max(1, Math.round((Date.now() - startTimeRef.current) / 1000));
+      const activeTime =
+        mediaRecorderRef.current?.state === "recording"
+          ? (Date.now() - lastResumeTimeRef.current) / 1000
+          : 0;
+      const durationSec = Math.max(1, Math.round(accumulatedDurationRef.current + activeTime));
 
       const recorder = mediaRecorderRef.current;
-      if (recorder && recorder.state === "recording") {
+      if (recorder && (recorder.state === "recording" || recorder.state === "paused")) {
         try {
           if (typeof recorder.requestData === "function") {
             recorder.requestData();
@@ -246,6 +312,7 @@ export function useAudioRecorder() {
             setState((prev) => ({
               ...prev,
               isRecording: false,
+              isPaused: false,
               audioBlob: null,
               audioUrl: null,
               recordingDuration: 0,
@@ -260,6 +327,7 @@ export function useAudioRecorder() {
           setState((prev) => ({
             ...prev,
             isRecording: false,
+            isPaused: false,
             audioBlob: blob,
             audioUrl: url,
             recordingDuration: durationSec,
@@ -279,6 +347,7 @@ export function useAudioRecorder() {
         setState((prev) => ({
           ...prev,
           isRecording: false,
+          isPaused: false,
           audioBlob: null,
           audioUrl: null,
           recordingDuration: 0,
@@ -291,8 +360,11 @@ export function useAudioRecorder() {
 
   // Reset bản thu để nói lại (chỉ cho câu hiện tại)
   const resetRecording = useCallback(() => {
+    accumulatedDurationRef.current = 0;
     setState((prev) => ({
       ...prev,
+      isRecording: false,
+      isPaused: false,
       audioBlob: null,
       audioUrl: null,
       recordingDuration: 0,
@@ -375,6 +447,8 @@ export function useAudioRecorder() {
     ...state,
     requestPermission,
     startRecording,
+    pauseRecording,
+    resumeRecording,
     stopRecording,
     resetRecording,
     uploadRecording,

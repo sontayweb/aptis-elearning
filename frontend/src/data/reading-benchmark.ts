@@ -3,6 +3,7 @@ export interface Part1Gap {
   prompt: string;
   options: string[];
   correctAnswer: string;
+  explanation?: string | null;
 }
 
 export interface Part2Story {
@@ -11,6 +12,7 @@ export interface Part2Story {
   fixedSentence?: string | null;
   sentences: { id: string; text: string }[];
   correctOrder: string[];
+  explanation?: string | null;
 }
 
 export interface Part3Review {
@@ -24,6 +26,7 @@ export interface Part3Question {
   prompt: string;
   options: string[];
   correctAnswer: string;
+  explanation?: string | null;
 }
 
 export interface Part4Paragraph {
@@ -31,6 +34,7 @@ export interface Part4Paragraph {
   paragraphNumber: number;
   text: string;
   correctHeading: string;
+  explanation?: string | null;
 }
 
 export interface ReadingExamData {

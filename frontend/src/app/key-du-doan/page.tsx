@@ -180,15 +180,25 @@ export default function KeyDuDoanPage() {
           <div className="section-container py-12 md:py-16 relative z-10">
             <div className="max-w-3xl">
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white w-fit text-xs font-bold mb-4 shadow-sm shadow-blue-500/20">
-                <Flame className="w-4 h-4" />
+                <span>🍀</span>
                 <span>Cập nhật liên tục 24/7 theo từng ca thi thật</span>
               </div>
               <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-foreground mb-4">
                 Đề Key Dự Đoán Aptis
               </h1>
-              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-6">
                 Ngân hàng đề thi trọng tâm được tổng hợp trực tiếp từ review của các học viên vừa thi tại Hội đồng thi British Council (BC) Hà Nội, TP.HCM &amp; Đà Nẵng. Giúp bạn ôn trọng tâm, tiết kiệm 70% thời gian học.
               </p>
+
+              {/* Direct Banner to Key & Mẹo thi */}
+              <Link
+                href="/key-va-meo-thi"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-primary/40 text-foreground font-bold text-xs shadow-xs hover:border-primary hover:bg-muted/60 transition-all"
+              >
+                <span className="text-emerald-500">🍀</span>
+                <span>Xem chuyên đề <strong>Key &amp; Mẹo thi (Part 1 - 4)</strong> mới nhất</span>
+                <ArrowRight className="w-3.5 h-3.5 text-primary" />
+              </Link>
             </div>
           </div>
         </section>

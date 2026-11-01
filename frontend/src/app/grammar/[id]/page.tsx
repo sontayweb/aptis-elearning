@@ -762,22 +762,18 @@ function GrammarExamRunnerContent() {
                   })}
                 </div>
 
-                {/* Giải thích chi tiết */}
-                <div className="p-4 rounded-2xl bg-muted/40 border border-border space-y-2 mt-4">
-                  <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Giải thích chi tiết &amp; Kiến thức cần nhớ</span>
+                {/* Giải thích chi tiết (chỉ hiển thị khi có nội dung giải thích) */}
+                {currentQ.explanation && currentQ.explanation.trim() && (
+                  <div className="p-4 rounded-2xl bg-muted/40 border border-border space-y-2 mt-4 animate-in fade-in">
+                    <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
+                      <Sparkles className="w-4 h-4" />
+                      <span>Giải thích chi tiết &amp; Kiến thức cần nhớ</span>
+                    </div>
+                    <p className="text-xs md:text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                      {currentQ.explanation.trim()}
+                    </p>
                   </div>
-                  {currentQ.explanation ? (
-                    <p className="text-xs md:text-sm text-foreground/90 leading-relaxed">
-                      {currentQ.explanation}
-                    </p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground italic">
-                      Giải thích ngữ pháp &amp; ngữ nghĩa đang được chuyên gia học thuật hoàn thiện.
-                    </p>
-                  )}
-                </div>
+                )}
 
                 {/* Navigation nút chuyển câu trong Review Mode */}
                 <div className="flex items-center justify-between pt-4 border-t border-border/60">

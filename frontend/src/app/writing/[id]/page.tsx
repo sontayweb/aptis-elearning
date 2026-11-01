@@ -36,6 +36,11 @@ import {
 import { useAuth } from "@/contexts/auth-context";
 import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
 import {
+  WRITING_WORD_LIMITS,
+  countWords,
+  enforceWordLimit,
+} from "@/lib/writing-validator";
+import {
   type WritingQuestion,
   type WritingPart,
   DEFAULT_ART_CLUB_PARTS,
@@ -185,10 +190,16 @@ function WritingExamRunnerContent() {
     [submissionId, isReviewMode, answers, parts]
   );
 
-  // Xử lý thay đổi nội dung gõ phím với debounce 3 giây
-  const handleAnswerChange = (answerKey: string, value: string) => {
+  // Xử lý thay đổi nội dung gõ phím với debounce 3 giây và kiểm soát giới hạn từ cứng (Hard Lock)
+  const handleAnswerChange = (answerKey: string, value: string, maxWords?: number) => {
     if (isReviewMode) return;
-    const updated = { ...answers, [answerKey]: value };
+    const oldVal = answers[answerKey] || "";
+    let finalValue = value;
+    if (typeof maxWords === "number" && maxWords > 0) {
+      const res = enforceWordLimit(value, oldVal, maxWords);
+      finalValue = res.value;
+    }
+    const updated = { ...answers, [answerKey]: finalValue };
     setAnswers(updated);
     setSyncStatus("saving");
     if (autosaveTimeoutRef.current) {
@@ -764,7 +775,8 @@ function WritingExamRunnerContent() {
                 {currentPart.questions.map((q, qIdx) => {
                   const answerKey = `${currentPartIdx}_${qIdx}`;
                   const val = answers[answerKey] || "";
-                  const words = getWordCount(val);
+                  const words = countWords(val);
+                  const isLimitReached = words >= WRITING_WORD_LIMITS.PART_1;
 
                   return (
                     <div
@@ -778,14 +790,29 @@ function WritingExamRunnerContent() {
                         rows={2}
                         value={val}
                         readOnly={isReviewMode}
-                        onChange={(e) => handleAnswerChange(answerKey, e.target.value)}
-                        placeholder="Type your answer..."
-                        className={`w-full p-3 rounded-xl border border-input bg-background text-foreground text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans resize-y transition-all ${
-                          isReviewMode ? "bg-muted/30 cursor-default" : ""
-                        }`}
+                        onChange={(e) =>
+                          handleAnswerChange(
+                            answerKey,
+                            e.target.value,
+                            WRITING_WORD_LIMITS.PART_1
+                          )
+                        }
+                        placeholder="Type your answer (tối đa 10 từ)..."
+                        className={`w-full p-3 rounded-xl border bg-background text-foreground text-sm focus-visible:outline-none focus-visible:ring-2 font-sans resize-y transition-all ${
+                          isLimitReached
+                            ? "border-destructive ring-1 ring-destructive focus-visible:ring-destructive"
+                            : "border-input focus-visible:ring-primary"
+                        } ${isReviewMode ? "bg-muted/30 cursor-default" : ""}`}
                       />
-                      <div className="flex justify-end text-xs text-muted-foreground font-mono">
-                        Words {words} / 10
+                      <div
+                        className={`flex justify-end text-xs font-mono transition-colors ${
+                          isLimitReached
+                            ? "text-destructive font-bold"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        Words {words} / {WRITING_WORD_LIMITS.PART_1}{" "}
+                        {isLimitReached && "(Đạt giới hạn tối đa)"}
                       </div>
 
                       {/* Review Mode: Feedback AI & Sample Answer */}
@@ -854,10 +881,14 @@ function WritingExamRunnerContent() {
                   {/* Word status badge */}
                   {(() => {
                     const val = answers[`${currentPartIdx}_0`] || "";
-                    const words = getWordCount(val);
+                    const words = countWords(val);
+                    const isLimitReached = words >= WRITING_WORD_LIMITS.PART_2;
                     let wordStatusText = "Chưa nhập bài";
                     let wordStatusColor = "text-muted-foreground bg-muted border-border";
-                    if (words > 0) {
+                    if (isLimitReached) {
+                      wordStatusText = `Đã đạt giới hạn tối đa (${words}/${WRITING_WORD_LIMITS.PART_2} từ)`;
+                      wordStatusColor = "text-destructive bg-destructive/10 border-destructive";
+                    } else if (words > 0) {
                       if (words < 20) {
                         wordStatusText = `Chưa đủ dung lượng (${words}/20–30 từ)`;
                         wordStatusColor = "text-amber-700 bg-amber-500/10 border-amber-300 dark:text-amber-400";
@@ -865,7 +896,7 @@ function WritingExamRunnerContent() {
                         wordStatusText = `Đạt chuẩn dung lượng (${words}/20–30 từ)`;
                         wordStatusColor = "text-emerald-700 bg-emerald-500/10 border-emerald-300 dark:text-emerald-400";
                       } else {
-                        wordStatusText = `Vượt số từ khuyến nghị (${words}/30 từ)`;
+                        wordStatusText = `Vượt số từ khuyến nghị (${words}/${WRITING_WORD_LIMITS.PART_2} từ)`;
                         wordStatusColor = "text-blue-700 bg-blue-500/10 border-blue-300 dark:text-blue-400";
                       }
                     }
@@ -888,46 +919,69 @@ function WritingExamRunnerContent() {
                   </div>
                 </div>
 
-                <textarea
-                  rows={5}
-                  value={answers[`${currentPartIdx}_0`] || ""}
-                  readOnly={isReviewMode}
-                  onChange={(e) => handleAnswerChange(`${currentPartIdx}_0`, e.target.value)}
-                  placeholder="Write in sentences (20–30 words). Type your answer here..."
-                  className={`w-full p-4 rounded-xl border border-input bg-background text-foreground text-sm md:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans resize-y leading-relaxed transition-all shadow-inner ${
-                    isReviewMode ? "bg-muted/30 cursor-default" : ""
-                  }`}
-                />
+                {(() => {
+                  const val = answers[`${currentPartIdx}_0`] || "";
+                  const words = countWords(val);
+                  const isLimitReached = words >= WRITING_WORD_LIMITS.PART_2;
 
-                <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
-                  <div className="flex items-center gap-2">
-                    <div className="w-24 sm:w-36 h-2 rounded-full bg-muted overflow-hidden">
-                      {(() => {
-                        const words = getWordCount(answers[`${currentPartIdx}_0`] || "");
-                        return (
-                          <div
-                            className={`h-full transition-all duration-300 ${
-                              words >= 20 && words <= 35
-                                ? "bg-emerald-500"
-                                : words > 35
-                                ? "bg-blue-500"
-                                : "bg-primary"
+                  return (
+                    <>
+                      <textarea
+                        rows={5}
+                        value={val}
+                        readOnly={isReviewMode}
+                        onChange={(e) =>
+                          handleAnswerChange(
+                            `${currentPartIdx}_0`,
+                            e.target.value,
+                            WRITING_WORD_LIMITS.PART_2
+                          )
+                        }
+                        placeholder="Write in sentences (20–30 words, tối đa 45 từ). Type your answer here..."
+                        className={`w-full p-4 rounded-xl border bg-background text-foreground text-sm md:text-base focus-visible:outline-none focus-visible:ring-2 font-sans resize-y leading-relaxed transition-all shadow-inner ${
+                          isLimitReached
+                            ? "border-destructive ring-1 ring-destructive focus-visible:ring-destructive"
+                            : "border-input focus-visible:ring-primary"
+                        } ${isReviewMode ? "bg-muted/30 cursor-default" : ""}`}
+                      />
+
+                      <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 sm:w-36 h-2 rounded-full bg-muted overflow-hidden">
+                            <div
+                              className={`h-full transition-all duration-300 ${
+                                isLimitReached
+                                  ? "bg-destructive"
+                                  : words >= 20 && words <= 35
+                                  ? "bg-emerald-500"
+                                  : words > 35
+                                  ? "bg-blue-500"
+                                  : "bg-primary"
+                              }`}
+                              style={{
+                                width: `${Math.min(
+                                  100,
+                                  (words / WRITING_WORD_LIMITS.PART_2) * 100
+                                )}%`,
+                              }}
+                            />
+                          </div>
+                          <span
+                            className={`font-mono font-medium ${
+                              isLimitReached ? "text-destructive font-bold" : ""
                             }`}
-                            style={{
-                              width: `${Math.min(100, (words / 30) * 100)}%`,
-                            }}
-                          />
-                        );
-                      })()}
-                    </div>
-                    <span className="font-mono font-medium">
-                      {getWordCount(answers[`${currentPartIdx}_0`]) || 0} / 30 từ
-                    </span>
-                  </div>
-                  <span className="text-[11px] italic">
-                    Khuyến nghị: Viết 2–3 câu hoàn chỉnh có chủ vị
-                  </span>
-                </div>
+                          >
+                            {words} / {WRITING_WORD_LIMITS.PART_2} từ{" "}
+                            {isLimitReached && "(Khóa nhập)"}
+                          </span>
+                        </div>
+                        <span className="text-[11px] italic">
+                          Khuyến nghị: 20-30 từ · Tối đa: {WRITING_WORD_LIMITS.PART_2} từ
+                        </span>
+                      </div>
+                    </>
+                  );
+                })()}
 
                 {/* Review Mode: Feedback & Sample Answer */}
                 {isReviewMode && (
@@ -982,7 +1036,8 @@ function WritingExamRunnerContent() {
                 {currentPart.questions.map((q, qIdx) => {
                   const answerKey = `${currentPartIdx}_${qIdx}`;
                   const val = answers[answerKey] || "";
-                  const words = getWordCount(val);
+                  const words = countWords(val);
+                  const isLimitReached = words >= WRITING_WORD_LIMITS.PART_3;
 
                   return (
                     <div
@@ -996,14 +1051,29 @@ function WritingExamRunnerContent() {
                         rows={3}
                         value={val}
                         readOnly={isReviewMode}
-                        onChange={(e) => handleAnswerChange(answerKey, e.target.value)}
-                        placeholder="Write your answer here (30-40 words)..."
-                        className={`w-full p-3.5 rounded-xl border border-input bg-background text-foreground text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans resize-y leading-relaxed transition-all ${
-                          isReviewMode ? "bg-muted/30 cursor-default" : ""
-                        }`}
+                        onChange={(e) =>
+                          handleAnswerChange(
+                            answerKey,
+                            e.target.value,
+                            WRITING_WORD_LIMITS.PART_3
+                          )
+                        }
+                        placeholder="Write your answer here (tối đa 60 từ)..."
+                        className={`w-full p-3.5 rounded-xl border bg-background text-foreground text-sm focus-visible:outline-none focus-visible:ring-2 font-sans resize-y leading-relaxed transition-all ${
+                          isLimitReached
+                            ? "border-destructive ring-1 ring-destructive focus-visible:ring-destructive"
+                            : "border-input focus-visible:ring-primary"
+                        } ${isReviewMode ? "bg-muted/30 cursor-default" : ""}`}
                       />
-                      <div className="flex justify-end text-xs text-muted-foreground font-mono">
-                        Words {words} / 60
+                      <div
+                        className={`flex justify-end text-xs font-mono transition-colors ${
+                          isLimitReached
+                            ? "text-destructive font-bold"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        Words {words} / {WRITING_WORD_LIMITS.PART_3}{" "}
+                        {isLimitReached && "(Đạt giới hạn tối đa)"}
                       </div>
 
                       {/* Review Mode: Feedback & Sample Answer */}
@@ -1074,19 +1144,28 @@ function WritingExamRunnerContent() {
                 {currentPart.questions.map((q, qIdx) => {
                   const answerKey = `${currentPartIdx}_${qIdx}`;
                   const val = answers[answerKey] || "";
-                  const words = getWordCount(val);
+                  const words = countWords(val);
                   const isFormal = qIdx === 1;
+                  const maxLimit = isFormal
+                    ? WRITING_WORD_LIMITS.PART_4_MAIL_2
+                    : WRITING_WORD_LIMITS.PART_4_MAIL_1;
+                  const isLimitReached = words >= maxLimit;
 
                   // Chuẩn độ dài theo British Council
                   const targetMin = isFormal ? 120 : 40;
                   const targetMax = isFormal ? 150 : 60;
-                  const recommendedWords = isFormal ? "120 – 150 từ" : "40 – 60 từ (khuyến nghị 50 từ)";
+                  const recommendedWords = isFormal
+                    ? "120 – 150 từ (tối đa 225 từ)"
+                    : "40 – 60 từ (tối đa 75 từ)";
                   const recommendedTime = isFormal ? "20 phút" : "10 phút";
 
                   // Đánh giá trạng thái số lượng từ
                   let wordStatusText = "Chưa nhập bài";
                   let wordStatusColor = "text-muted-foreground bg-muted border-border";
-                  if (words > 0) {
+                  if (isLimitReached) {
+                    wordStatusText = `Đã đạt giới hạn tối đa (${words}/${maxLimit} từ)`;
+                    wordStatusColor = "text-destructive bg-destructive/10 border-destructive";
+                  } else if (words > 0) {
                     if (words < targetMin) {
                       wordStatusText = `Chưa đủ dung lượng (${words}/${isFormal ? 150 : 50} từ)`;
                       wordStatusColor = "text-amber-700 bg-amber-500/10 border-amber-300 dark:text-amber-400";
@@ -1094,7 +1173,7 @@ function WritingExamRunnerContent() {
                       wordStatusText = `Đạt chuẩn dung lượng (${words}/${isFormal ? 150 : 50} từ)`;
                       wordStatusColor = "text-emerald-700 bg-emerald-500/10 border-emerald-300 dark:text-emerald-400";
                     } else {
-                      wordStatusText = `Vượt số từ khuyến nghị (${words}/${isFormal ? 150 : 50} từ)`;
+                      wordStatusText = `Vượt số từ khuyến nghị (${words}/${maxLimit} từ)`;
                       wordStatusColor = "text-blue-700 bg-blue-500/10 border-blue-300 dark:text-blue-400";
                     }
                   }
@@ -1103,7 +1182,9 @@ function WritingExamRunnerContent() {
                     <div
                       key={q.questionNumber}
                       className={`bg-card rounded-2xl border transition-all shadow-sm ${
-                        isFormal
+                        isLimitReached
+                          ? "border-destructive ring-1 ring-destructive"
+                          : isFormal
                           ? "border-primary/30 ring-1 ring-primary/10"
                           : "border-sky-300/40 ring-1 ring-sky-400/10"
                       } p-5 md:p-6 space-y-4`}
@@ -1152,15 +1233,19 @@ function WritingExamRunnerContent() {
                         rows={isFormal ? 9 : 5}
                         value={val}
                         readOnly={isReviewMode}
-                        onChange={(e) => handleAnswerChange(answerKey, e.target.value)}
+                        onChange={(e) =>
+                          handleAnswerChange(answerKey, e.target.value, maxLimit)
+                        }
                         placeholder={
                           isFormal
-                            ? "Dear Mr./Ms. [Tên quản lý],\n\nI am writing to express my view regarding the recent notice...\n\n[Giải thích cảm nghĩ và đề xuất 2-3 giải pháp cụ thể (120 - 150 từ)]\n\nI look forward to hearing from you soon.\n\nYours sincerely,\n[Tên của bạn]"
-                            : "Hi [Tên bạn],\n\nDid you see the recent announcement about our club? I feel really...\n\n[Viết về cảm xúc và gợi ý câu lạc bộ nên làm gì (~50 từ)]\n\nTalk to you soon,\n[Tên của bạn]"
+                            ? "Dear Mr./Ms. [Tên quản lý],\n\nI am writing to express my view regarding the recent notice...\n\n[Giải thích cảm nghĩ và đề xuất 2-3 giải pháp cụ thể (120 - 150 từ, tối đa 225 từ)]\n\nI look forward to hearing from you soon.\n\nYours sincerely,\n[Tên của bạn]"
+                            : "Hi [Tên bạn],\n\nDid you see the recent announcement about our club? I feel really...\n\n[Viết về cảm xúc và gợi ý câu lạc bộ nên làm gì (~50 từ, tối đa 75 từ)]\n\nTalk to you soon,\n[Tên của bạn]"
                         }
-                        className={`w-full p-4 rounded-xl border border-input bg-background text-foreground text-sm md:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans resize-y leading-relaxed transition-all shadow-inner ${
-                          isReviewMode ? "bg-muted/30 cursor-default" : ""
-                        }`}
+                        className={`w-full p-4 rounded-xl border bg-background text-foreground text-sm md:text-base focus-visible:outline-none focus-visible:ring-2 font-sans resize-y leading-relaxed transition-all shadow-inner ${
+                          isLimitReached
+                            ? "border-destructive ring-1 ring-destructive focus-visible:ring-destructive"
+                            : "border-input focus-visible:ring-primary"
+                        } ${isReviewMode ? "bg-muted/30 cursor-default" : ""}`}
                       />
 
                       {/* Thống kê số từ & độ tiến độ */}
@@ -1169,19 +1254,28 @@ function WritingExamRunnerContent() {
                           <div className="w-24 sm:w-36 h-2 rounded-full bg-muted overflow-hidden">
                             <div
                               className={`h-full transition-all duration-300 ${
-                                words >= targetMin && words <= targetMax
+                                isLimitReached
+                                  ? "bg-destructive"
+                                  : words >= targetMin && words <= targetMax
                                   ? "bg-emerald-500"
                                   : words > targetMax
                                   ? "bg-blue-500"
                                   : "bg-primary"
                               }`}
                               style={{
-                                width: `${Math.min(100, (words / (isFormal ? 150 : 50)) * 100)}%`,
+                                width: `${Math.min(
+                                  100,
+                                  (words / maxLimit) * 100
+                                )}%`,
                               }}
                             />
                           </div>
-                          <span className="font-mono font-medium">
-                            {words} / {isFormal ? "150" : "50"} từ
+                          <span
+                            className={`font-mono font-medium ${
+                              isLimitReached ? "text-destructive font-bold" : ""
+                            }`}
+                          >
+                            {words} / {maxLimit} từ {isLimitReached && "(Khóa nhập)"}
                           </span>
                         </div>
 
