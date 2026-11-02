@@ -65,6 +65,7 @@ router.post('/exams/import/confirm', (req, res, next) => adminController.confirm
 router.get('/exams', (req, res, next) => adminController.listExams(req, res, next));
 router.post('/exams', (req, res, next) => adminController.createExam(req, res, next));
 router.get('/exams/:id/full', (req, res, next) => adminController.getExamFull(req, res, next));
+router.patch('/exams/bulk-hot-level', (req, res, next) => adminController.bulkUpdateHotLevel(req, res, next));
 router.patch('/exams/:id', (req, res, next) => adminController.updateExam(req, res, next));
 router.post('/exams/:id/duplicate', (req, res, next) => adminController.duplicateExam(req, res, next));
 router.post('/exams/:id/rerandomize', (req, res, next) => adminController.rerandomizeFullTestExam(req, res, next));
