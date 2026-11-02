@@ -22,8 +22,7 @@ interface ImageBufferResult {
 }
 
 /**
- * Helper tải hoặc đọc buffer hình ảnh từ đường dẫn cục bộ hoặc URL từ xa
- * Không phụ thuộc vào môi trường dev/production
+ * Đọc buffer và mime type của ảnh từ đường dẫn file cục bộ hoặc URL
  */
 async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | null> {
   if (!imgUrl || typeof imgUrl !== 'string' || imgUrl.trim() === '') {
@@ -46,7 +45,7 @@ async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | n
     return 'image/jpeg';
   };
 
-  // 0. Nếu đường dẫn trực tiếp tồn tại trên đĩa (relative hoặc absolute)
+  // Kiểm tra đường dẫn trực tiếp trên đĩa
   const directCandidates = [
     path.resolve(trimmed),
     path.resolve(process.cwd(), trimmed),
@@ -59,11 +58,11 @@ async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | n
         return { buffer: buf, mimeType: detectMimeType(p, buf) };
       }
     } catch {
-      // ignore
+      // Bỏ qua nếu không đọc được
     }
   }
 
-  // 1. Nếu là HTTP / HTTPS URL
+  // Tải ảnh từ URL nếu là liên kết http/https
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     try {
       const urlObj = new URL(trimmed);
@@ -99,7 +98,7 @@ async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | n
     }
   }
 
-  // 2. Thử đường dẫn tệp cục bộ
+  // Tìm file trong thư mục uploads hoặc public
   const cleanRel = trimmed.replace(/^\/?(api\/)?uploads\/?/, '');
   const candidatePaths = [
     path.resolve(process.env.UPLOAD_DIR || './uploads', cleanRel),
@@ -117,11 +116,11 @@ async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | n
         return { buffer: buf, mimeType: detectMimeType(cp, buf) };
       }
     } catch {
-      // bỏ qua, thử tiếp
+      // Thử đường dẫn tiếp theo
     }
   }
 
-  // 3. Dự phòng tải từ domain production nếu chạy môi trường dev chưa có đủ file
+  // Fallback tải từ domain production nếu chạy môi trường dev
   if (trimmed.startsWith('/uploads/') || trimmed.startsWith('uploads/')) {
     try {
       const prodUrl = `https://aptisesolpremier.com/${trimmed.replace(/^\//, '')}`;
@@ -144,8 +143,7 @@ async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | n
 
 export class SpeakingHintsGeneratorService {
   /**
-   * Sinh gợi ý học thuật dựa trên dữ liệu thị giác thực tế của bức tranh (Multimodal Vision)
-   * Tuyệt đối không phỏng đoán hay suy diễn khi không có ảnh
+   * Phân tích ảnh Speaking Part 2/3 bằng Vision AI để trích xuất từ vựng và mẫu câu
    */
   async generateHints(
     topicTitle: string,
@@ -156,7 +154,7 @@ export class SpeakingHintsGeneratorService {
   ): Promise<SpeakingVocabularyHintsData> {
     const isPart3 = partNumber === 3;
 
-    // Nạp buffer hình ảnh thật
+    // Lấy dữ liệu ảnh Part 2 hoặc cặp ảnh Part 3
     const img1Promise = imageUrl ? resolveImageBuffer(imageUrl) : Promise.resolve(null);
     const img2Promise = secondImageUrl ? resolveImageBuffer(secondImageUrl) : Promise.resolve(null);
     const [image1Data, image2Data] = await Promise.all([img1Promise, img2Promise]);
@@ -197,60 +195,7 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
   "image2Prompt": "${isPart3 ? 'A photorealistic documentary-style prompt accurately describing Picture 2 in detail.' : ''}"
 }`;
 
-    // 1. Thử dùng OpenAI Vision (gpt-4o-mini)
-    const openAiKey = process.env.OPENAI_API_KEY;
-    if (openAiKey && openAiKey.trim().length > 10) {
-      try {
-        const openai = new OpenAI({ apiKey: openAiKey });
-        const userContent: any[] = [{ type: 'text', text: prompt }];
-
-        if (image1Data) {
-          userContent.push({
-            type: 'image_url',
-            image_url: {
-              url: `data:${image1Data.mimeType};base64,${image1Data.buffer.toString('base64')}`,
-              detail: 'high',
-            },
-          });
-        }
-        if (image2Data) {
-          userContent.push({
-            type: 'image_url',
-            image_url: {
-              url: `data:${image2Data.mimeType};base64,${image2Data.buffer.toString('base64')}`,
-              detail: 'high',
-            },
-          });
-        }
-
-        const resp = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: userContent }],
-          response_format: { type: 'json_object' },
-          temperature: 0.3,
-        });
-
-        const text = resp.choices[0]?.message?.content || '{}';
-        const parsed = JSON.parse(text);
-        if (Array.isArray(parsed.keywords) && parsed.keywords.length >= 3) {
-          return {
-            partNumber,
-            topicTitle,
-            keywords: parsed.keywords,
-            startingPhrases: Array.isArray(parsed.startingPhrases) ? parsed.startingPhrases : [],
-            linkingPhrases: Array.isArray(parsed.linkingPhrases) ? parsed.linkingPhrases : [],
-            aiImagePrompts: {
-              image1Prompt: parsed.image1Prompt || '',
-              image2Prompt: isPart3 ? parsed.image2Prompt || '' : undefined,
-            },
-          };
-        }
-      } catch (err: any) {
-        console.warn('  [SpeakingHints] OpenAI Vision call failed, falling back to Gemini Vision:', err?.message || err);
-      }
-    }
-
-    // 2. Thử dùng Gemini Vision (gemini-1.5-flash / gemini-flash-latest)
+    // 1. Thử dùng Gemini Vision
     const geminiKey = process.env.GEMINI_API_KEY || (process.env.GEMINI_API_KEYS ? process.env.GEMINI_API_KEYS.split(',')[0].trim() : '');
     if (geminiKey && geminiKey.trim().length > 10 && !geminiKey.includes('YOUR_GEMINI_API_KEY')) {
       try {
@@ -258,6 +203,10 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
         const modelName = process.env.GEMINI_MODEL || 'gemini-flash-latest';
         const model = genAI.getGenerativeModel({
           model: modelName,
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 1024,
+          },
         });
 
         const contentParts: any[] = [prompt];
@@ -278,7 +227,13 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
           });
         }
 
-        const result = await model.generateContent(contentParts);
+        // Giới hạn timeout 20s
+        const geminiPromise = model.generateContent(contentParts);
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Gemini Vision timeout sau 20 giây')), 20000)
+        );
+        const result: any = await Promise.race([geminiPromise, timeoutPromise]);
+
         const text = result.response.text().trim();
         const cleanJson = text.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
         const parsed = JSON.parse(cleanJson);
@@ -296,11 +251,65 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
           };
         }
       } catch (err: any) {
-        console.warn('  [SpeakingHints] Gemini Vision call failed:', err?.message || err);
+        console.warn('  [SpeakingHints] Gemini Vision call failed, falling back to OpenAI Vision:', err?.message || err);
       }
     }
 
-    // Nếu cả OpenAI lẫn Gemini đều không khả dụng, báo lỗi rõ ràng chứ không tự phỏng đoán dữ liệu rác
+    // 2. Dự phòng OpenAI Vision (gpt-4o-mini)
+    const openAiKey = process.env.OPENAI_API_KEY;
+    if (openAiKey && openAiKey.trim().length > 10) {
+      try {
+        const openai = new OpenAI({ apiKey: openAiKey, timeout: 8000 });
+        const userContent: any[] = [{ type: 'text', text: prompt }];
+
+        if (image1Data) {
+          userContent.push({
+            type: 'image_url',
+            image_url: {
+              url: `data:${image1Data.mimeType};base64,${image1Data.buffer.toString('base64')}`,
+              detail: 'low',
+            },
+          });
+        }
+        if (image2Data) {
+          userContent.push({
+            type: 'image_url',
+            image_url: {
+              url: `data:${image2Data.mimeType};base64,${image2Data.buffer.toString('base64')}`,
+              detail: 'low',
+            },
+          });
+        }
+
+        const resp = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: userContent }],
+          response_format: { type: 'json_object' },
+          temperature: 0.3,
+          max_tokens: 1024,
+        });
+
+        const text = resp.choices[0]?.message?.content || '{}';
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed.keywords) && parsed.keywords.length >= 3) {
+          return {
+            partNumber,
+            topicTitle,
+            keywords: parsed.keywords,
+            startingPhrases: Array.isArray(parsed.startingPhrases) ? parsed.startingPhrases : [],
+            linkingPhrases: Array.isArray(parsed.linkingPhrases) ? parsed.linkingPhrases : [],
+            aiImagePrompts: {
+              image1Prompt: parsed.image1Prompt || '',
+              image2Prompt: isPart3 ? parsed.image2Prompt || '' : undefined,
+            },
+          };
+        }
+      } catch (err: any) {
+        console.warn('  [SpeakingHints] OpenAI Vision call failed:', err?.message || err);
+      }
+    }
+
+    // Trường hợp cả hai dịch vụ đều không phản hồi
     throw {
       statusCode: 502,
       message: 'Không thể phân tích hình ảnh qua Vision AI. Vui lòng kiểm tra cấu hình khóa API (OpenAI/Gemini) hoặc kết nối mạng máy chủ.',
@@ -337,7 +346,7 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
       .map((q) => q.prompt)
       .filter(Boolean);
 
-    // Trích xuất ảnh Part 2 hoặc Part 3
+    // Tách ảnh 1 và ảnh 2 (nếu có)
     const rawImg = question.part.image_url || '';
     let img1: string | undefined;
     let img2: string | undefined;
@@ -368,16 +377,20 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
       throw { statusCode: 404, message: 'Đề thi không tồn tại' };
     }
 
-    let updatedCount = 0;
     const totalCount = exam.parts.length;
 
-    for (const part of exam.parts) {
-      const pNum = part.part_number as 2 | 3;
-      const firstQ = part.questions[0];
-      const existingOptions = (firstQ?.options as any) || {};
+    // Xử lý song song các part để tối ưu thời gian phản hồi
+    const results = await Promise.all(
+      exam.parts.map(async (part) => {
+        const pNum = part.part_number as 2 | 3;
+        const firstQ = part.questions[0];
+        const existingOptions = (firstQ?.options as any) || {};
 
-      // Nếu chưa có vocabularyHints thì tiến hành sinh và lưu
-      if (!existingOptions.vocabularyHints) {
+        // Bỏ qua nếu part đã có gợi ý
+        if (existingOptions.vocabularyHints) {
+          return false;
+        }
+
         const topicTitle = part.title || exam.title;
         const questionsPrompts = part.questions.map((q) => q.prompt).filter(Boolean);
 
@@ -392,9 +405,9 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
           img1 = rawImg.trim() || undefined;
         }
 
-        // Bỏ qua nếu part chưa có ảnh minh họa
+        // Bỏ qua nếu chưa cấu hình ảnh
         if (!img1 && !img2) {
-          continue;
+          return false;
         }
 
         try {
@@ -412,13 +425,15 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
               },
             });
           }
-          updatedCount++;
+          return true;
         } catch (err: any) {
           console.error(`[BatchSpeakingHints] Lỗi khi phân tích ảnh cho part ${part.id} (${part.title}):`, err?.message || err);
+          return false;
         }
-      }
-    }
+      })
+    );
 
+    const updatedCount = results.filter(Boolean).length;
     return { updatedCount, totalCount };
   }
 }
