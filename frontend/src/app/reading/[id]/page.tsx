@@ -1531,6 +1531,7 @@ function ReadingExamRunner() {
                               <span className="font-extrabold text-xs text-primary bg-primary/10 px-2.5 py-1 rounded-lg shrink-0">
                                 Câu {gIdx + 1}
                               </span>
+                              <button type="button" onClick={() => handleOpenTranslate(isReviewMode ? `${beforeGap} ${gap.correctAnswer} ${afterGap}` : `${beforeGap} ... ${afterGap}`)} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-[10px] font-bold cursor-pointer shrink-0" title="Dịch bằng Google Dịch">🌐 GG Dịch</button>
                               <span>{beforeGap}</span>
                               <select
                                 value={userVal}
@@ -1605,6 +1606,7 @@ function ReadingExamRunner() {
                         currentOrder={currentOrder}
                         isReviewMode={isReviewMode}
                         correctOrder={story.correctOrder}
+                        onTranslate={(t) => handleOpenTranslate(t)}
                         onChangeOrder={(newOrder) =>
                           setP2Orders((prev) => ({
                             ...prev,
@@ -1632,6 +1634,7 @@ function ReadingExamRunner() {
                         currentOrder={currentOrder}
                         isReviewMode={isReviewMode}
                         correctOrder={story.correctOrder}
+                        onTranslate={(t) => handleOpenTranslate(t)}
                         onChangeOrder={(newOrder) =>
                           setP2Orders((prev) => ({
                             ...prev,
@@ -1684,6 +1687,7 @@ function ReadingExamRunner() {
                             <span className="px-2.5 py-0.5 rounded-md bg-primary/10 text-primary font-bold text-xs inline-block">
                               {rev.name || rev.person}
                             </span>
+                            <button type="button" onClick={() => handleOpenTranslate(rev.review)} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-[10px] font-bold cursor-pointer shrink-0" title="Dịch bằng Google Dịch">🌐 GG Dịch</button>
                             <p className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans">
                               {renderHighlightedContent(rev.review, rev.person)}
                             </p>
@@ -1719,6 +1723,7 @@ function ReadingExamRunner() {
                                   <p className="text-xs md:text-sm font-semibold text-foreground">
                                     {q.prompt}
                                   </p>
+                                  <button type="button" onClick={() => handleOpenTranslate(q.prompt)} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-[10px] font-bold cursor-pointer shrink-0" title="Dịch bằng Google Dịch">🌐 GG Dịch</button>
                                   {isReviewMode && (
                                     <div className="pt-1.5 text-xs">
                                       {userVal ? (
@@ -1845,6 +1850,7 @@ function ReadingExamRunner() {
                                 <span className="font-bold text-xs text-primary bg-primary/10 px-2.5 py-1 rounded-md inline-block">
                                   Đoạn văn {p.paragraphNumber}
                                 </span>
+                                <button type="button" onClick={() => handleOpenTranslate(p.text)} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-[10px] font-bold cursor-pointer shrink-0" title="Dịch bằng Google Dịch">🌐 GG Dịch</button>
 
                                 <select
                                   value={userVal}

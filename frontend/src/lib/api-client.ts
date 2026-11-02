@@ -720,6 +720,18 @@ class ApiClient {
         body: JSON.stringify(body),
       }),
 
+    bulkUpdateHotLevel: (body: {
+      examIds?: string[];
+      hotLevel?: number;
+      isPublished?: boolean;
+      skill?: string;
+      rules?: Array<{ keywords: string[]; hotLevel: number }>;
+    }) =>
+      this.request<{ updated: number; unmatched: string[]; matched: any[] }>(
+        '/admin/exams/bulk-hot-level',
+        { method: 'PATCH', body: JSON.stringify(body) }
+      ),
+
     duplicateExam: (id: string) =>
       this.request(`/admin/exams/${id}/duplicate`, {
         method: 'POST',

@@ -521,6 +521,7 @@ function ReadingMarathonContent() {
                           )}
                         </div>
 
+                        <a href={`https://translate.google.com/?sl=en&tl=vi&text=${encodeURIComponent(currentSentences.join(" "))}&op=translate`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-[10px] font-bold cursor-pointer shrink-0" title="Mở Google Dịch"><Globe className="w-3 h-3" /><span>GG Dịch</span></a>
                         <button
                           type="button"
                           onClick={() => setCohesionChecked((prev) => ({ ...prev, [demo.id]: !prev[demo.id] }))}
@@ -554,6 +555,7 @@ function ReadingMarathonContent() {
                                 <p className="leading-relaxed font-medium">{sent}</p>
                               </div>
 
+                              <a href={`https://translate.google.com/?sl=en&tl=vi&text=${encodeURIComponent(sent)}&op=translate`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-[10px] font-bold cursor-pointer shrink-0" title="Mở Google Dịch"><Globe className="w-3 h-3" /><span>GG Dịch</span></a>
                               <div className="flex items-center gap-1 shrink-0">
                                 <button
                                   type="button"

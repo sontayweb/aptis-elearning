@@ -138,6 +138,22 @@ export class AdminController {
     }
   }
 
+  async bulkUpdateHotLevel(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { examIds, hotLevel, isPublished, skill, rules } = req.body || {};
+      if (!examIds?.length && !rules?.length) {
+        throw { statusCode: 400, message: 'Cần truyền examIds hoặc rules để gán độ hot hàng loạt.' };
+      }
+      const result = await adminService.bulkUpdateHotLevel(
+        { examIds, hotLevel, isPublished, skill, rules },
+        req
+      );
+      sendSuccess(res, result, `Đã cập nhật ${result.updated} đề thi`, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async duplicateExam(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const examId = req.params.id;

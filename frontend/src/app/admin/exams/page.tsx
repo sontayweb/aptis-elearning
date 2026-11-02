@@ -41,6 +41,7 @@ import { QuestionEditModal } from "@/components/admin/exams/question-edit-modal"
 import { ExamPreviewModal } from "@/components/admin/exams/exam-preview-modal";
 import { ExamJsonModal } from "@/components/admin/exams/exam-json-modal";
 import { ExamCreateWizardModal } from "@/components/admin/exams/exam-create-wizard-modal";
+import { BulkHotLevelModal } from "@/components/admin/exams/bulk-hot-level-modal";
 
 export default function AdminExamsPage() {
   // ── View Mode: "EXAMS" vs "QUESTIONS" (Lưu và khôi phục khi quay lại)
@@ -153,6 +154,7 @@ export default function AdminExamsPage() {
 
   // ── Modals & Actions State
   const [smartImportOpen, setSmartImportOpen] = useState(false);
+  const [bulkHotOpen, setBulkHotOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Exam Builder
@@ -741,6 +743,14 @@ export default function AdminExamsPage() {
             </Link>
 
             <button
+              onClick={() => setBulkHotOpen(true)}
+              className="px-3.5 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
+              title="Dán danh sách tên đề để gán ☘️ hàng loạt"
+            >
+              <span>⚡ Gán độ hot hàng loạt</span>
+            </button>
+
+            <button
               onClick={() => setSmartImportOpen(true)}
               className="px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
             >
@@ -923,6 +933,16 @@ export default function AdminExamsPage() {
         cancelText="Hủy bỏ"
         onConfirm={handleDeleteQuestion}
         onCancel={() => setConfirmDeleteQuestion(null)}
+      />
+
+      <BulkHotLevelModal
+        isOpen={bulkHotOpen}
+        onClose={() => setBulkHotOpen(false)}
+        defaultSkill={skillFilter}
+        onDone={(msg) => {
+          showToast(msg);
+          fetchExams();
+        }}
       />
 
       <ExamSmartImportModal

@@ -148,6 +148,7 @@ interface SentenceOrderProps {
   onChangeOrder: (newOrder: string[]) => void;
   isReviewMode?: boolean;
   correctOrder?: string[];
+  onTranslate?: (text: string) => void;
 }
 
 export function ReadingSentenceOrder({
@@ -158,7 +159,12 @@ export function ReadingSentenceOrder({
   onChangeOrder,
   isReviewMode = false,
   correctOrder = [],
+  onTranslate,
 }: SentenceOrderProps) {
+  const tbtn = (text: string) =>
+    onTranslate && text ? (
+      <button type="button" draggable={false} onClick={(e) => { e.stopPropagation(); onTranslate(text); }} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-[10px] font-bold cursor-pointer shrink-0 ml-1" title="Dịch câu này bằng Google Dịch">🌐 GG Dịch</button>
+    ) : null;
   // Loại trừ các text placeholder dummy như 'Sentence 1 is fixed here.'
   const isDummyFixed = Boolean(fixedSentence && /sentence 1 is fixed/i.test(fixedSentence));
   // Chỉ coi là có câu cố định nếu có nội dung thực tế VÀ số câu kéo thả <= 4
@@ -265,6 +271,9 @@ export function ReadingSentenceOrder({
             <h3 className="text-base font-extrabold text-exam-text">
               {title || "Text Cohesion"}
             </h3>
+            {onTranslate && sentences.length > 0 && (
+              <button type="button" onClick={(e) => { e.stopPropagation(); onTranslate([fixedSentence, ...sentences.map((s) => s.text)].filter(Boolean).join(" ")); }} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-[10px] font-bold cursor-pointer shrink-0" title="Dịch toàn bộ các câu bằng Google Dịch">🌐 GG Dịch cả đoạn</button>
+            )}
             {!isReviewMode && slots.some(Boolean) && (
               <button
                 type="button"
@@ -288,7 +297,7 @@ export function ReadingSentenceOrder({
                 1
               </span>
               <div className="flex-1 p-4 rounded-2xl border border-exam-border/80 bg-exam-bg/40 text-sm font-medium text-exam-text leading-relaxed select-none">
-                {fixedSentence}
+                {fixedSentence} {tbtn(fixedSentence || "")}
               </div>
             </div>
           )}
@@ -329,7 +338,7 @@ export function ReadingSentenceOrder({
                       <GripVertical className="w-4 h-4 text-primary shrink-0 mt-0.5 group-hover:text-red-500 transition-colors" />
                     )}
                     <p className="flex-1 text-sm text-exam-text font-medium leading-relaxed select-none">
-                      {placed.text}
+                      {placed.text} {tbtn(placed.text)}
                     </p>
                     {isReviewMode ? (
                       isCorrect ? (
@@ -385,7 +394,7 @@ export function ReadingSentenceOrder({
               {hasFixed && (
                 <div className="p-3.5 rounded-xl border border-border bg-muted/20 text-xs text-foreground/80 leading-relaxed">
                   <span className="font-bold text-primary mr-1.5">[1]</span>
-                  <span>{fixedSentence}</span>
+                  <span>{fixedSentence}</span>{tbtn(fixedSentence || "")}
                 </div>
               )}
 
@@ -401,7 +410,7 @@ export function ReadingSentenceOrder({
                     <span className="font-extrabold text-emerald-600 dark:text-emerald-400 shrink-0">
                       [{num}]
                     </span>
-                    <span className="font-medium">{sItem.text}</span>
+                    <span className="font-medium">{sItem.text}</span>{tbtn(sItem.text)}
                   </div>
                 );
               })}
@@ -429,7 +438,7 @@ export function ReadingSentenceOrder({
                   >
                     <GripVertical className="w-4 h-4 text-exam-text-muted/60 shrink-0 mt-0.5 group-hover:text-primary transition-colors" />
                     <p className="flex-1 text-sm text-exam-text font-medium leading-relaxed select-none">
-                      {item.text}
+                      {item.text} {tbtn(item.text)}
                     </p>
                   </div>
                 ))

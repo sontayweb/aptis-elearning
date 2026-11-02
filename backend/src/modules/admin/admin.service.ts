@@ -352,6 +352,79 @@ export class AdminService {
     return { success: true, message: 'Xóa đề thi thành công' };
   }
 
+  /**
+   * Gán độ hot (☘️ 0–5) / trạng thái xuất bản hàng loạt.
+   * - examIds: cập nhật theo danh sách ID đã chọn.
+   * - rules: [{ keywords: string[], hotLevel }] khớp theo tên đề (không phân biệt hoa/thường, dấu cách),
+   *   có thể lọc theo skill (+ partNumber).
+   */
+  async bulkUpdateHotLevel(
+    input: {
+      examIds?: string[];
+      hotLevel?: number;
+      isPublished?: boolean;
+      skill?: string;
+      rules?: Array<{ keywords: string[]; hotLevel: number }>;
+    },
+    req?: Request
+  ) {
+    const norm = (s: string) =>
+      s.toLowerCase().replace(/\(.*?\)/g, ' ').replace(/[^a-z0-9à-ỹ]+/gi, ' ').trim();
+    const clamp = (n: number) => Math.max(0, Math.min(5, Math.round(Number(n) || 0)));
+    let updated = 0;
+    const unmatched: string[] = [];
+    const matchedSummary: Array<{ keyword: string; hotLevel: number; count: number }> = [];
+
+    if (input.examIds?.length) {
+      const data: any = {};
+      if (input.hotLevel !== undefined) data.hot_level = clamp(input.hotLevel);
+      if (input.isPublished !== undefined) data.is_published = input.isPublished;
+      if (Object.keys(data).length) {
+        const r = await prisma.exam.updateMany({ where: { id: { in: input.examIds } }, data });
+        updated += r.count;
+      }
+    }
+
+    if (input.rules?.length) {
+      const candidates = await prisma.exam.findMany({
+        where: { ...(input.skill && input.skill !== 'ALL' ? { skill: input.skill as any } : {}) },
+        select: { id: true, title: true, description: true },
+      });
+      const indexed = candidates.map((c) => ({
+        id: c.id,
+        key: norm(`${c.title} ${c.description || ''}`),
+      }));
+      for (const rule of input.rules) {
+        const level = clamp(rule.hotLevel);
+        for (const raw of rule.keywords || []) {
+          const kw = norm(raw);
+          if (!kw) continue;
+          const ids = indexed.filter((c) => c.key.includes(kw)).map((c) => c.id);
+          if (!ids.length) {
+            unmatched.push(raw);
+            continue;
+          }
+          const r = await prisma.exam.updateMany({
+            where: { id: { in: ids } },
+            data: { hot_level: level },
+          });
+          updated += r.count;
+          matchedSummary.push({ keyword: raw, hotLevel: level, count: r.count });
+        }
+      }
+    }
+
+    auditService.record({
+      req,
+      action: AuditAction.EXAM_UPDATE,
+      entityType: 'EXAM_BATCH',
+      entityId: 'BULK_HOT_LEVEL',
+      description: `Gán độ hot hàng loạt: cập nhật ${updated} đề, không khớp ${unmatched.length} từ khóa`,
+    });
+
+    return { updated, unmatched, matched: matchedSummary };
+  }
+
   async rerandomizeFullTestExam(examId: string, req?: Request) {
     const updated = await rerandomizeSingleFullTestExam(prisma, examId);
     auditService.record({
