@@ -536,31 +536,16 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
                           ? "bg-amber-600 text-white"
                           : "bg-emerald-600 text-white"
                       }`}
-                      title={
-                        isFirstFixed
-                          ? "Câu 1: Mở đầu cố định làm gốc trên bài thi"
-                          : `Câu ${idx + 1}: Học viên phải kéo thả vào vị trí số ${idx + 1}`
-                      }
+                      title={`Câu ${idx + 1}: Học viên phải kéo thả vào vị trí số ${idx + 1}`}
                     >
-                      {isFirstFixed ? (
-                        <>
-                          <Lock className="w-3 h-3" />
-                          <span>Câu 1 (Gốc)</span>
-                        </>
-                      ) : (
-                        <span>Thứ tự #{idx + 1}</span>
-                      )}
+                      <span>Thứ tự #{idx + 1}</span>
                     </div>
 
                     <input
                       type="text"
                       value={sentence}
                       onChange={(e) => handleSentenceChange(idx, e.target.value)}
-                      placeholder={
-                        isFirstFixed
-                          ? "Nhập câu số 1 (Câu mở đầu cố định làm mốc cho học viên)..."
-                          : `Nhập câu đứng ở vị trí thứ ${idx + 1} trong đoạn văn...`
-                      }
+                      placeholder={`Nhập câu đứng ở vị trí thứ ${idx + 1} trong đoạn văn...`}
                       className="flex-1 bg-transparent border-none text-xs text-slate-900 dark:text-white focus:outline-none font-medium"
                       required
                     />

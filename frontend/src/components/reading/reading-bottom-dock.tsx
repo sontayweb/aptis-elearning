@@ -490,15 +490,17 @@ export function ReadingModalsAndDrawer({
                   isComplete = count === examData.part1.gaps.length;
                   progressText = `${count}/${examData.part1.gaps.length}`;
                 } else if (stg.stageKey === "p2-1") {
-                  const stId = examData.part2.stories[0]?.id;
-                  const placed = (stId && p2Orders[stId]?.filter(Boolean).length) || 0;
-                  isComplete = placed === 4;
-                  progressText = placed === 4 ? "Đã xếp đủ 4 câu" : `${placed}/4 câu`;
+                  const st = examData.part2.stories[0];
+                  const targetCount = st?.sentences?.length || 5;
+                  const placed = (st?.id && p2Orders[st.id]?.filter(Boolean).length) || 0;
+                  isComplete = placed === targetCount && placed > 0;
+                  progressText = isComplete ? `Đã xếp đủ ${targetCount} câu` : `${placed}/${targetCount} câu`;
                 } else if (stg.stageKey === "p2-2") {
-                  const stId = examData.part2.stories[1]?.id;
-                  const placed = (stId && p2Orders[stId]?.filter(Boolean).length) || 0;
-                  isComplete = placed === 4;
-                  progressText = placed === 4 ? "Đã xếp đủ 4 câu" : `${placed}/4 câu`;
+                  const st = examData.part2.stories[1];
+                  const targetCount = st?.sentences?.length || 5;
+                  const placed = (st?.id && p2Orders[st.id]?.filter(Boolean).length) || 0;
+                  isComplete = placed === targetCount && placed > 0;
+                  progressText = isComplete ? `Đã xếp đủ ${targetCount} câu` : `${placed}/${targetCount} câu`;
                 } else if (stg.stageKey === "p3") {
                   const count = Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length;
                   isComplete = count === examData.part3.questions.length;
@@ -602,14 +604,17 @@ export function ReadingModalsAndDrawer({
                 return (
                   <div className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-2">
                     <div className="font-bold text-primary">{story.title}</div>
-                    <div className="text-foreground">
-                      <span className="font-bold">1 (Mở đầu cố định):</span> {story.fixedSentence}
-                    </div>
+                    {story.fixedSentence && (
+                      <div className="text-foreground">
+                        <span className="font-bold">1 (Mở đầu cố định):</span> {story.fixedSentence}
+                      </div>
+                    )}
                     {story.correctOrder.map((sId, idx) => {
                       const sObj = story.sentences.find((s) => s.id === sId);
+                      const num = story.fixedSentence ? idx + 2 : idx + 1;
                       return (
                         <div key={sId} className="text-foreground">
-                          <span className="font-bold">{idx + 2}:</span> {sObj?.text || sId}
+                          <span className="font-bold">{num}:</span> {sObj?.text || sId}
                         </div>
                       );
                     })}

@@ -100,7 +100,7 @@ export function ReadingGuideBanner({ onOpenGuideModal }: ReadingGuideBannerProps
               </div>
               <h4 className="font-heading font-bold text-sm text-foreground">Text Cohesion (Sắp xếp trật tự câu)</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                2 câu chuyện riêng biệt (mỗi chuyện 5 câu). Câu đầu tiên đã cố định, sắp xếp 4 câu còn lại.
+                2 câu chuyện riêng biệt (mỗi chuyện 5 câu). Kéo thả sắp xếp toàn bộ 5 câu thành đoạn văn hoàn chỉnh.
               </p>
               <div className="pt-2 border-t border-border/40 text-[11px] text-blue-600 font-semibold">
                 🎯 Thang điểm: 1 điểm/câu (10 điểm). Chú ý các từ liên kết: <em>this, that, these, after, then</em>.

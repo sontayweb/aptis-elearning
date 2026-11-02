@@ -206,13 +206,7 @@ export const QuestionCardRow: React.FC<QuestionCardRowProps> = ({
                       : "bg-emerald-600 text-white"
                   }`}
                 >
-                  {idx === 0 ? (
-                    <>
-                      <Lock className="w-2.5 h-2.5" /> Câu 1 (Gốc)
-                    </>
-                  ) : (
-                    `#${idx + 1}`
-                  )}
+                  `#${idx + 1}`
                 </span>
                 <span className="flex-1">{sent}</span>
               </div>

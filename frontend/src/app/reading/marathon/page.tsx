@@ -79,28 +79,26 @@ function parseStringArray(raw: any): string[] {
 }
 
 function deterministicShuffle(arr: string[], seedStr: string): string[] {
-  if (arr.length <= 2) return [...arr];
-  // Keep sentence 1 (index 0) fixed starter, shuffle sentences 2..N deterministically
-  const first = arr[0];
-  const rest = [...arr.slice(1)];
+  if (arr.length <= 1) return [...arr];
+  const copy = [...arr];
   let seed = 0;
   for (let i = 0; i < seedStr.length; i++) {
     seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
   }
-  for (let i = rest.length - 1; i > 0; i--) {
+  for (let i = copy.length - 1; i > 0; i--) {
     seed = (seed * 1664525 + 1013904223) >>> 0;
     const j = seed % (i + 1);
-    const tmp = rest[i];
-    rest[i] = rest[j];
-    rest[j] = tmp;
+    const tmp = copy[i];
+    copy[i] = copy[j];
+    copy[j] = tmp;
   }
-  // Ensure it's not identical to original order if possible
-  if (rest.length > 1 && rest.every((val, idx) => val === arr[idx + 1])) {
-    const tmp = rest[0];
-    rest[0] = rest[1];
-    rest[1] = tmp;
+  // Ensure it is not identical to original order
+  if (copy.length > 1 && copy.every((val, idx) => val === arr[idx])) {
+    const tmp = copy[0];
+    copy[0] = copy[copy.length - 1];
+    copy[copy.length - 1] = tmp;
   }
-  return [first, ...rest];
+  return copy;
 }
 
 function ReadingMarathonContent() {
@@ -655,7 +653,7 @@ function ReadingMarathonContent() {
                         Ngân hàng Full {filteredP2.length} Bộ Đề Reading Part 2 (Text Cohesion)
                       </h3>
                       <p className="text-muted-foreground mt-0.5">
-                        Câu số 1 là câu mở đầu cố định. Dùng mũi tên lên/xuống để sắp xếp các câu còn lại thành đoạn văn hoàn chỉnh và bấm &ldquo;Kiểm tra trật tự&rdquo;.
+                        Dùng nút mũi tên lên/xuống để sắp xếp toàn bộ 5 câu thành đoạn văn hoàn chỉnh và bấm &ldquo;Kiểm tra trật tự&rdquo;.
                       </p>
                     </div>
                     <span className="px-3 py-1 rounded-xl bg-card border border-border font-bold text-primary shrink-0 self-start sm:self-center">
@@ -720,13 +718,10 @@ function ReadingMarathonContent() {
 
                           <div className="space-y-2.5">
                             {currentSentences.map((sent, sentIdx) => {
-                              const isFirstFixed = sentIdx === 0;
                               const isMatch = sent === correctOrder[sentIdx];
 
-                              let cardBorder = isFirstFixed
-                                ? "border-amber-500/40 bg-amber-500/10"
-                                : "border-border bg-muted/20";
-                              if (isChecked && !isFirstFixed) {
+                              let cardBorder = "border-border bg-muted/20";
+                              if (isChecked) {
                                 cardBorder = isMatch
                                   ? "border-emerald-500 bg-emerald-500/10 text-emerald-950 dark:text-emerald-200"
                                   : "border-rose-500 bg-rose-500/10 text-rose-950 dark:text-rose-200";
@@ -738,60 +733,46 @@ function ReadingMarathonContent() {
                                   className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs transition-all ${cardBorder}`}
                                 >
                                   <div className="flex items-center gap-3">
-                                    <span
-                                      className={`px-2 py-1 rounded-lg font-bold text-[11px] flex items-center gap-1 shrink-0 ${
-                                        isFirstFixed
-                                          ? "bg-amber-600 text-white"
-                                          : "bg-card border border-border text-primary"
-                                      }`}
-                                    >
-                                      {isFirstFixed ? (
-                                        <>
-                                          <Lock className="w-3 h-3" /> Câu 1 (Cố định)
-                                        </>
-                                      ) : (
-                                        `#${sentIdx + 1}`
-                                      )}
+                                    <span className="px-2 py-1 rounded-lg font-bold text-[11px] flex items-center gap-1 shrink-0 bg-card border border-border text-primary">
+                                      `#${sentIdx + 1}`
                                     </span>
                                     <p className="leading-relaxed font-medium">{sent}</p>
                                   </div>
 
-                                  {!isFirstFixed && (
-                                    <div className="flex items-center gap-1 shrink-0">
-                                      <button
-                                        type="button"
-                                        disabled={sentIdx <= 1}
-                                        onClick={() =>
-                                          moveSentence(
-                                            item.partId,
-                                            correctOrder,
-                                            sentIdx,
-                                            sentIdx - 1
-                                          )
-                                        }
-                                        className="p-1 rounded bg-card hover:bg-muted border border-border disabled:opacity-30"
-                                        title="Di chuyển lên"
-                                      >
-                                        <ChevronUp className="w-3.5 h-3.5" />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        disabled={sentIdx === currentSentences.length - 1}
-                                        onClick={() =>
-                                          moveSentence(
-                                            item.partId,
-                                            correctOrder,
-                                            sentIdx,
-                                            sentIdx + 1
-                                          )
-                                        }
-                                        className="p-1 rounded bg-card hover:bg-muted border border-border disabled:opacity-30"
-                                        title="Di chuyển xuống"
-                                      >
-                                        <ChevronDown className="w-3.5 h-3.5" />
-                                      </button>
-                                    </div>
-                                  )}
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    <button
+                                      type="button"
+                                      disabled={sentIdx === 0}
+                                      onClick={() =>
+                                        moveSentence(
+                                          item.partId,
+                                          correctOrder,
+                                          sentIdx,
+                                          sentIdx - 1
+                                        )
+                                      }
+                                      className="p-1 rounded bg-card hover:bg-muted border border-border disabled:opacity-30 cursor-pointer"
+                                      title="Di chuyển lên"
+                                    >
+                                      <ChevronUp className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={sentIdx === currentSentences.length - 1}
+                                      onClick={() =>
+                                        moveSentence(
+                                          item.partId,
+                                          correctOrder,
+                                          sentIdx,
+                                          sentIdx + 1
+                                        )
+                                      }
+                                      className="p-1 rounded bg-card hover:bg-muted border border-border disabled:opacity-30 cursor-pointer"
+                                      title="Di chuyển xuống"
+                                    >
+                                      <ChevronDown className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
                                 </div>
                               );
                             })}
