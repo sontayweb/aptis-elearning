@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
@@ -139,6 +139,36 @@ export default function ExamEditorPage() {
         return `/thi-thu/${ex.id}`;
     }
   };
+
+  const hasSpeakingPart2 = useMemo(
+    () => Boolean(exam?.skill === "SPEAKING" && exam.parts?.some((p) => p.part_number === 2)),
+    [exam]
+  );
+  const hasSpeakingPart3 = useMemo(
+    () => Boolean(exam?.skill === "SPEAKING" && exam.parts?.some((p) => p.part_number === 3)),
+    [exam]
+  );
+  const canGenerateSpeakingHints = hasSpeakingPart2 || hasSpeakingPart3;
+
+  const speakingHintsBtnLabel = useMemo(() => {
+    if (hasSpeakingPart2 && hasSpeakingPart3) return "⚡ AI sinh gợi ý Part 2 & 3";
+    if (hasSpeakingPart2) return "⚡ AI sinh gợi ý Part 2";
+    if (hasSpeakingPart3) return "⚡ AI sinh gợi ý Part 3";
+    return "⚡ AI sinh gợi ý tranh";
+  }, [hasSpeakingPart2, hasSpeakingPart3]);
+
+  const speakingHintsBtnTitle = useMemo(() => {
+    if (hasSpeakingPart2 && hasSpeakingPart3) {
+      return "Tự động phân tích và sinh gợi ý từ vựng cho cả Part 2 & Part 3 còn thiếu";
+    }
+    if (hasSpeakingPart2) {
+      return "Tự động phân tích và sinh gợi ý từ vựng miêu tả tranh Part 2";
+    }
+    if (hasSpeakingPart3) {
+      return "Tự động phân tích và sinh gợi ý so sánh 2 tranh Part 3";
+    }
+    return "Tự động phân tích và sinh gợi ý tranh";
+  }, [hasSpeakingPart2, hasSpeakingPart3]);
 
   const showToast = (msg: string, type: "ok" | "err" = "ok") => {
     setToast({ msg, type });
@@ -403,7 +433,7 @@ export default function ExamEditorPage() {
     try {
       const res = await api.admin.batchGenerateSpeakingHints(examId);
       if (res.success) {
-        showToast(`Đã tự động sinh và lưu gợi ý cho ${res.data?.updatedCount || 0} phần thi!`);
+        showToast(`Đã tự động sinh và lưu gợi ý cho ${res.data?.updatedCount || 0} phần thi! Bấm nút "Gợi ý tranh" ở từng câu bên dưới để xem hoặc sửa.`, "ok");
         load();
       } else {
         showToast(res.error?.message || "Lỗi khi sinh gợi ý hàng loạt", "err");
@@ -566,20 +596,20 @@ export default function ExamEditorPage() {
             <span>Làm bài thử (Giao diện học viên)</span>
           </Link>
 
-          {exam.skill === "SPEAKING" && (
+          {canGenerateSpeakingHints && (
             <button
               type="button"
               onClick={handleBatchGenerateHints}
               disabled={batchGeneratingHints}
               className="px-3 py-1.5 rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/40 text-purple-800 dark:text-purple-300 text-xs font-heading font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-              title="Tự động phân tích và sinh gợi ý cho các câu hỏi Part 2 & Part 3 còn thiếu"
+              title={speakingHintsBtnTitle}
             >
               {batchGeneratingHints ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
               ) : (
                 <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
               )}
-              <span>{batchGeneratingHints ? "Đang sinh gợi ý..." : "🤖 AI Gợi ý Part 2 & 3"}</span>
+              <span>{batchGeneratingHints ? "Đang sinh gợi ý..." : speakingHintsBtnLabel}</span>
             </button>
           )}
 
@@ -815,6 +845,20 @@ export default function ExamEditorPage() {
                       Audio
                     </span>
                   )}
+                  {exam.skill === "SPEAKING" && (part.part_number === 2 || part.part_number === 3) && (() => {
+                    const hasVocabHints = part.questions.some((q) => Boolean(q.options?.vocabularyHints));
+                    return hasVocabHints ? (
+                      <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
+                        <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                        Đã có gợi ý tranh
+                      </span>
+                    ) : (
+                      <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60">
+                        <Sparkles className="w-3 h-3 text-amber-500" />
+                        Chưa có gợi ý tranh
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
 
