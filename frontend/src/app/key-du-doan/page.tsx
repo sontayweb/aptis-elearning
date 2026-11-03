@@ -20,6 +20,11 @@ import {
   RotateCcw,
   Crown,
   ArrowRight,
+  Mic,
+  PenTool,
+  BookOpen,
+  Headphones,
+  Flame,
 } from "lucide-react";
 
 interface KeySet {
@@ -186,11 +191,11 @@ export default function KeyDuDoanPage() {
           <div className="section-container py-12 md:py-16 relative z-10">
             <div className="max-w-3xl">
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white w-fit text-xs font-bold mb-4 shadow-sm shadow-blue-500/20">
-                <span>🍀</span>
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 <span>Cập nhật liên tục 24/7 theo từng ca thi thật</span>
               </div>
               <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-foreground mb-4">
-                Đề Key Dự Đoán Aptis ☘️
+                Đề Key Dự Đoán Aptis
               </h1>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-6">
                 Ngân hàng đề thi trọng tâm được gắn nhãn độ Hot (từ 1☘️ đến 5☘️) tổng hợp trực tiếp từ các ca thi gần nhất tại Hội đồng thi British Council (BC). Giúp bạn ôn đúng trọng tâm và làm bài trực tiếp ngay trên hệ thống.
@@ -201,7 +206,7 @@ export default function KeyDuDoanPage() {
                 href="/key-va-meo-thi"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-primary/40 text-foreground font-bold text-xs shadow-xs hover:border-primary hover:bg-muted/60 transition-all"
               >
-                <span className="text-emerald-500">🍀</span>
+                <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
                 <span>Xem chuyên đề <strong>Key &amp; Mẹo thi (Part 1 - 4)</strong> mới nhất</span>
                 <ArrowRight className="w-3.5 h-3.5 text-primary" />
               </Link>
@@ -218,10 +223,10 @@ export default function KeyDuDoanPage() {
               </div>
               <div>
                 <h3 className="font-heading font-bold text-base md:text-lg text-foreground">
-                  Ưu tiên luyện trước các đề từ 4☘️ đến 5☘️
+                  Ưu tiên luyện trước các đề từ 4 sao đến 5 sao
                 </h3>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  Các bộ đề Speaking, Writing, Reading và Listening có số lượng cỏ ☘️ càng cao thì tần suất gặp lại trong đợt thi hiện tại càng lớn.
+                  Các bộ đề Speaking, Writing, Reading và Listening có độ Hot càng cao thì tần suất gặp lại trong đợt thi hiện tại càng lớn.
                 </p>
               </div>
             </div>
@@ -244,26 +249,30 @@ export default function KeyDuDoanPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
                 {[
-                  { id: "ALL", label: `Tất cả (${keySets.length})` },
-                  { id: "SPEAKING", label: "🎙️ Speaking" },
-                  { id: "WRITING", label: "✏️ Writing" },
-                  { id: "READING", label: "📖 Reading" },
-                  { id: "LISTENING", label: "🔊 Listening" },
-                  { id: "FULL_TEST", label: "🔥 Full Test" },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                      activeTab === tab.id
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "bg-muted/70 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+                  { id: "ALL", label: `Tất cả (${keySets.length})`, icon: null },
+                  { id: "SPEAKING", label: "Speaking", icon: Mic },
+                  { id: "WRITING", label: "Writing", icon: PenTool },
+                  { id: "READING", label: "Reading", icon: BookOpen },
+                  { id: "LISTENING", label: "Listening", icon: Headphones },
+                  { id: "FULL_TEST", label: "Full Test", icon: Flame },
+                ].map((tab) => {
+                  const TabIcon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                        activeTab === tab.id
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-muted/70 text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {TabIcon && <TabIcon className="w-3.5 h-3.5 shrink-0" />}
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="relative w-full md:w-72">

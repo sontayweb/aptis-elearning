@@ -26,7 +26,7 @@ async function main() {
       }
     }
   }
-  console.log(`✅ Đã loại bỏ ${deletedListening} đề Full Listening không trọn bộ (> 36). Còn lại chính xác: ${allFullListening.length - deletedListening} đề.`);
+  console.log(`[PASS] Đã loại bỏ ${deletedListening} đề Full Listening không trọn bộ (> 36). Còn lại chính xác: ${allFullListening.length - deletedListening} đề.`);
 
   // 2. SPEAKING: Xóa các bộ Full Speaking > 26
   const allFullSpeaking = await prisma.exam.findMany({
@@ -45,7 +45,7 @@ async function main() {
       }
     }
   }
-  console.log(`✅ Đã loại bỏ ${deletedSpeaking} đề Full Speaking ngoài danh mục chính thức (> 26). Còn lại chính xác: ${allFullSpeaking.length - deletedSpeaking} đề.`);
+  console.log(`[PASS] Đã loại bỏ ${deletedSpeaking} đề Full Speaking ngoài danh mục chính thức (> 26). Còn lại chính xác: ${allFullSpeaking.length - deletedSpeaking} đề.`);
 
   // 3. KIỂM TRA LẠI SỐ LƯỢNG TRONG DB
   const countReading = await prisma.exam.count({
@@ -62,10 +62,10 @@ async function main() {
   });
 
   console.log('\n=== KẾT QUẢ CUỐI CÙNG TRONG DATABASE ===');
-  console.log(`📖 Reading Full:   ${countReading} bộ đề (Đề 01 ➔ Đề 32)`);
-  console.log(`🎧 Listening Full: ${countListening} bộ đề (Đề 01 ➔ Đề 36)`);
-  console.log(`🗣️ Speaking Full:  ${countSpeaking} bộ đề (Đề 01 ➔ Đề 26)`);
-  console.log(`✍️ Writing Full:   ${countWriting} bộ đề (CLB)`);
+  console.log(`[READING] Reading Full:   ${countReading} bộ đề (Đề 01 ➔ Đề 32)`);
+  console.log(`[LISTENING] Listening Full: ${countListening} bộ đề (Đề 01 ➔ Đề 36)`);
+  console.log(`️ Speaking Full:  ${countSpeaking} bộ đề (Đề 01 ➔ Đề 26)`);
+  console.log(`[WRITING] Writing Full:   ${countWriting} bộ đề (CLB)`);
 }
 
 main()

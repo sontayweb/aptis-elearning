@@ -88,7 +88,7 @@ async function main() {
     ...(limit ? { take: limit } : {}),
   });
 
-  console.log(`🔍 Tìm thấy ${listeningParts.length} phần bài nghe cần xử lý...\n`);
+  console.log(` Tìm thấy ${listeningParts.length} phần bài nghe cần xử lý...\n`);
 
   const manifestItems: StagingManifestItem[] = [];
   let successCount = 0;
@@ -115,7 +115,7 @@ async function main() {
     }
 
     if (!transcriptText) {
-      console.warn(`⚠️ [BỎ QUA] Đề "${examTitle}" - Part ${partNum} không có text.`);
+      console.warn(`[WARN] [BỎ QUA] Đề "${examTitle}" - Part ${partNum} không có text.`);
       skipCount++;
       continue;
     }
@@ -123,7 +123,7 @@ async function main() {
     const voice = VOICE_MAP[partNum] || 'en-GB-RyanNeural';
     const prefix = `listening_exam_${part.exam_id.substring(0, 8)}_p${partNum}`;
 
-    console.log(`🎙️ [XỬ LÝ] Đề "${examTitle}" | Part ${partNum} | Voice: ${voice} | Ký tự: ${transcriptText.length}`);
+    console.log(`[SPEAKING] [XỬ LÝ] Đề "${examTitle}" | Part ${partNum} | Voice: ${voice} | Ký tự: ${transcriptText.length}`);
 
     if (isDryRun) {
       console.log(`   -> [DRY-RUN SẼ SINH]: /uploads/audio/${subDir}/${prefix}_<timestamp>.mp3\n`);
@@ -157,14 +157,14 @@ async function main() {
           where: { id: part.id },
           data: { audio_url: result.publicUrl },
         });
-        console.log(`   ✅ [LIVE UPDATED DB] File: ${result.publicUrl} (${stats.size} bytes)\n`);
+        console.log(`   [PASS] [LIVE UPDATED DB] File: ${result.publicUrl} (${stats.size} bytes)\n`);
       } else {
-        console.log(`   📦 [STAGED AN TOÀN] File: ${result.publicUrl} (${stats.size} bytes - DB chưa đụng vào)\n`);
+        console.log(`   [STAGED AN TOÀN] File: ${result.publicUrl} (${stats.size} bytes - DB chưa đụng vào)\n`);
       }
 
       successCount++;
     } catch (err: any) {
-      console.error(`   ❌ [LỖI] Part ${partNum} (${part.id}): ${err.message}\n`);
+      console.error(`   [FAIL] [LỖI] Part ${partNum} (${part.id}): ${err.message}\n`);
       errorCount++;
     }
   }
@@ -180,7 +180,7 @@ async function main() {
       items: manifestItems,
     };
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
-    console.log(`📄 [MANIFEST ĐÃ LƯU]: ${manifestPath}`);
+    console.log(`[MANIFEST ĐÃ LƯU]: ${manifestPath}`);
   }
 
   console.log('================================================================');
@@ -190,8 +190,8 @@ async function main() {
   console.log(` - Bỏ qua: ${skipCount}`);
   console.log(` - Thất bại: ${errorCount}`);
   if (isStaging && !isDryRun) {
-    console.log(`\n 👉 Báo cáo Manifest: ${manifestPath}`);
-    console.log(' 👉 Để áp dụng vào Core DB sau khi kiểm duyệt:');
+    console.log(`\n  Báo cáo Manifest: ${manifestPath}`);
+    console.log('  Để áp dụng vào Core DB sau khi kiểm duyệt:');
     console.log('    npx ts-node -T backend/scripts/apply-staged-audio.ts\n');
   }
   console.log('================================================================');

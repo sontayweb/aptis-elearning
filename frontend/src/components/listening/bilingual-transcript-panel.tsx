@@ -8,6 +8,7 @@ import {
   RotateCcw,
   Sparkles,
   Loader2,
+  Lightbulb,
 } from "lucide-react";
 
 export interface BilingualData {
@@ -65,7 +66,7 @@ export function BilingualTranscriptPanel({
   
         {!isReviewMode && (
           <span className="text-[11px] text-muted-foreground italic hidden sm:inline">
-            💡 Nên nghe và làm bài trước khi mở transcript để rèn phản xạ thi thật
+            <Lightbulb className="w-3.5 h-3.5 text-amber-500 inline mr-1.5 shrink-0" /><span>Nên nghe và làm bài trước khi mở transcript để rèn phản xạ thi thật</span>
           </span>
         )}
       </div>

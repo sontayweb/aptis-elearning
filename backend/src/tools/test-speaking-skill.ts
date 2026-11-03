@@ -10,7 +10,7 @@ const submissionService = new SubmissionService();
 
 async function runSpeakingTests() {
   console.log('================================================================');
-  console.log('🎙️ BỘ TEST KIỂM THỬ CHUYÊN SÂU: PHÂN HỆ NÓI (SPEAKING SKILL)');
+  console.log('[SPEAKING] BỘ TEST KIỂM THỬ CHUYÊN SÂU: PHÂN HỆ NÓI (SPEAKING SKILL)');
   console.log('================================================================\n');
 
   let passed = 0;
@@ -20,11 +20,11 @@ async function runSpeakingTests() {
     total++;
     if (condition) {
       passed++;
-      console.log(`  ✅ [PASS] ${title}`);
-      if (note) console.log(`     ℹ️ ${note}`);
+      console.log(`  [PASS] [PASS] ${title}`);
+      if (note) console.log(`     [INFO] ${note}`);
     } else {
-      console.error(`  ❌ [FAIL] ${title}`);
-      if (note) console.error(`     ⚠️ ${note}`);
+      console.error(`  [FAIL] [FAIL] ${title}`);
+      if (note) console.error(`     [WARN] ${note}`);
     }
   }
 
@@ -49,7 +49,7 @@ async function runSpeakingTests() {
   const targetExam = speakingExams.find((e) => e.parts.some((p) => p.image_url && p.image_url.startsWith('/uploads/'))) || speakingExams[0];
   assert(!!targetExam, 'Tìm thấy đề thi Speaking mục tiêu');
 
-  console.log(`\n🔍 Đang kiểm tra chi tiết đề: "${targetExam.title}" (ID: ${targetExam.id})`);
+  console.log(`\n Đang kiểm tra chi tiết đề: "${targetExam.title}" (ID: ${targetExam.id})`);
   assert(targetExam.duration_minutes === 12, 'Thời lượng đề thi chuẩn Aptis Speaking: 12 phút');
 
   // Kiểm tra từng Part
@@ -73,7 +73,7 @@ async function runSpeakingTests() {
   }
 
   // 3. Mô phỏng Thí sinh làm bài thi Speaking (Ghi âm giọng nói)
-  console.log('\n🎙️ Mô phỏng Thí sinh ghi âm và nộp bài Speaking...');
+  console.log('\n[SPEAKING] Mô phỏng Thí sinh ghi âm và nộp bài Speaking...');
   let testUser = await prisma.user.findFirst({ where: { role: 'STUDENT' } });
   if (!testUser) {
     testUser = await prisma.user.create({
@@ -112,13 +112,13 @@ async function runSpeakingTests() {
   );
 
   console.log('\n================================================================');
-  console.log(`🎯 KẾT QUẢ KIỂM THỬ SPEAKING: ${passed}/${total} TEST CASES ĐẠT CHUẨN!`);
+  console.log(`[RESULT] KẾT QUẢ KIỂM THỬ SPEAKING: ${passed}/${total} TEST CASES ĐẠT CHUẨN!`);
   console.log('================================================================');
 }
 
 runSpeakingTests()
   .catch((err) => {
-    console.error('❌ Lỗi:', err);
+    console.error('[FAIL] Lỗi:', err);
     process.exit(1);
   })
   .finally(async () => {

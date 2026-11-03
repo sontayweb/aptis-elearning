@@ -105,7 +105,7 @@ export class PaymentController {
     try {
       const userId = req.user!.userId;
       const { code } = redeemPromoCodeSchema.parse(req.body);
-      const result = await paymentService.redeemPromoCode(userId, code);
+      const result = await paymentService.redeemPromoCode(userId, code, req);
       sendSuccess(res, result, result.message, 200);
     } catch (error) {
       next(error);

@@ -39,12 +39,12 @@ async function main() {
     updated++;
   }
 
-  console.log(`✅ Đã phân loại lại chuẩn xác ${updated} bộ đề theo đúng kỹ năng đơn lẻ!`);
+  console.log(`[PASS] Đã phân loại lại chuẩn xác ${updated} bộ đề theo đúng kỹ năng đơn lẻ!`);
 
   const fullTestsCount = await prisma.exam.count({
     where: { skill: ExamSkill.FULL_TEST },
   });
-  console.log(`🎉 Hiện tại mục FULL_TEST có đúng ${fullTestsCount} đề chuẩn 5 kỹ năng!`);
+  console.log(`Hiện tại mục FULL_TEST có đúng ${fullTestsCount} đề chuẩn 5 kỹ năng!`);
 }
 
 main()

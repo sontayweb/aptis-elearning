@@ -6,12 +6,12 @@ const prisma = new PrismaClient();
 
 async function importSource(sourceName: string, jsonPath: string) {
   if (!fs.existsSync(jsonPath)) {
-    console.warn(`⚠️ Không tìm thấy file: ${jsonPath}`);
+    console.warn(`[WARN] Không tìm thấy file: ${jsonPath}`);
     return;
   }
 
   const exams = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
-  console.log(`\n🚀 Đang nạp ${exams.length} đề thi từ nguồn [${sourceName}] vào PostgreSQL...`);
+  console.log(`\n[START] Đang nạp ${exams.length} đề thi từ nguồn [${sourceName}] vào PostgreSQL...`);
 
   let created = 0;
   let updated = 0;
@@ -80,18 +80,18 @@ async function importSource(sourceName: string, jsonPath: string) {
     }
   }
 
-  console.log(`✅ Hoàn tất [${sourceName}]: Thêm mới ${created} đề, Cập nhật ${updated} đề.`);
+  console.log(`[PASS] Hoàn tất [${sourceName}]: Thêm mới ${created} đề, Cập nhật ${updated} đề.`);
 }
 
 async function importDictation(setsPath: string, sentencesPath: string) {
   if (!fs.existsSync(setsPath) || !fs.existsSync(sentencesPath)) {
-    console.warn(`⚠️ Bỏ qua nạp Dictation (không tìm thấy file json)`);
+    console.warn(`[WARN] Bỏ qua nạp Dictation (không tìm thấy file json)`);
     return;
   }
 
   const dictationSets = JSON.parse(fs.readFileSync(setsPath, 'utf-8'));
   const allSentences = JSON.parse(fs.readFileSync(sentencesPath, 'utf-8'));
-  console.log(`\n🎧 Đang nạp ${dictationSets.length} bài nghe chép chính tả & ${allSentences.length} câu vào PostgreSQL...`);
+  console.log(`\n[LISTENING] Đang nạp ${dictationSets.length} bài nghe chép chính tả & ${allSentences.length} câu vào PostgreSQL...`);
 
   const sentencesBySet = new Map<string, any[]>();
   for (const s of allSentences) {
@@ -155,7 +155,7 @@ async function importDictation(setsPath: string, sentencesPath: string) {
     }
   }
 
-  console.log(`✅ Hoàn tất nạp Dictation: Thêm mới ${createdLessons} bài, Cập nhật ${updatedLessons} bài.`);
+  console.log(`[PASS] Hoàn tất nạp Dictation: Thêm mới ${createdLessons} bài, Cập nhật ${updatedLessons} bài.`);
 }
 
 async function main() {

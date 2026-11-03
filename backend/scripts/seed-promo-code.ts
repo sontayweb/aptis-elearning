@@ -33,36 +33,40 @@ async function main() {
     console.log('Đã tìm thấy plan hiện có:', plan.id, plan.name);
   }
 
-  // 2. Tạo hoặc cập nhật mã GOLIVE14
-  const promo = await prisma.promotionCode.upsert({
-    where: { code: 'GOLIVE14' },
-    update: {
-      title: 'Mã trải nghiệm Go-Live 14 ngày VIP Pro',
-      description: 'Tặng 14 ngày VIP Pro và 20 lượt chấm AI chuẩn British Council nhân dịp Go-Live',
-      plan_id: plan.id,
-      duration_days: 14,
-      ai_quota: 20,
-      teacher_quota: 0,
-      max_uses: null, // Không giới hạn số lượng học viên
-      is_active: true,
-      expires_at: new Date('2026-12-31T23:59:59.000Z'),
-    },
-    create: {
-      code: 'GOLIVE14',
-      title: 'Mã trải nghiệm Go-Live 14 ngày VIP Pro',
-      description: 'Tặng 14 ngày VIP Pro và 20 lượt chấm AI chuẩn British Council nhân dịp Go-Live',
-      plan_id: plan.id,
-      duration_days: 14,
-      ai_quota: 20,
-      teacher_quota: 0,
-      max_uses: null,
-      current_uses: 0,
-      is_active: true,
-      expires_at: new Date('2026-12-31T23:59:59.000Z'),
-    },
-  });
+  // 2. Tạo hoặc cập nhật mã GOLIVE14 (Chỉ mở đến 23:59:59 ngày 25/11/2026)
+  const EXPIRY_DATE_25_11 = new Date('2026-11-25T23:59:59.999+07:00');
 
-  console.log('✅ Thành công! Đã seed mã khuyến mại:', promo);
+  const promoCodes = ['GOLIVE14', 'APTISGOLIVE'];
+  for (const code of promoCodes) {
+    const promo = await prisma.promotionCode.upsert({
+      where: { code },
+      update: {
+        title: 'Mã trải nghiệm Go-Live 14 ngày VIP Pro',
+        description: 'Tặng 14 ngày VIP Pro và 20 lượt chấm AI chuẩn British Council nhân dịp Go-Live (Áp dụng đến 25/11)',
+        plan_id: plan.id,
+        duration_days: 14,
+        ai_quota: 20,
+        teacher_quota: 0,
+        max_uses: null, // Không giới hạn số lượng học viên, nhưng mỗi học viên chỉ dùng 1 lần
+        is_active: true,
+        expires_at: EXPIRY_DATE_25_11,
+      },
+      create: {
+        code,
+        title: 'Mã trải nghiệm Go-Live 14 ngày VIP Pro',
+        description: 'Tặng 14 ngày VIP Pro và 20 lượt chấm AI chuẩn British Council nhân dịp Go-Live (Áp dụng đến 25/11)',
+        plan_id: plan.id,
+        duration_days: 14,
+        ai_quota: 20,
+        teacher_quota: 0,
+        max_uses: null,
+        current_uses: 0,
+        is_active: true,
+        expires_at: EXPIRY_DATE_25_11,
+      },
+    });
+    console.log(`[PASS] Thành công! Đã seed mã khuyến mại [${code}]:`, promo);
+  }
 }
 
 main()

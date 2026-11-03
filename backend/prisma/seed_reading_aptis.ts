@@ -296,7 +296,7 @@ Person D (Olivia):
     console.log('Linking exam 13550c94 with parts if needed...');
   }
 
-  console.log('✅ SEED READING EXAM COMPLETED SUCCESSFULLY!');
+  console.log('[PASS] SEED READING EXAM COMPLETED SUCCESSFULLY!');
   console.log(`Exam ID: ${readingExam.id}`);
   console.log(`URL: http://localhost:3000/thi-thu/${readingExam.id}`);
 }

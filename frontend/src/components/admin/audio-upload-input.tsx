@@ -291,9 +291,9 @@ export default function AudioUploadInput({
                 onChange={(e) => setVoice(e.target.value)}
                 className="text-xs px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-amber-500"
               >
-                <option value="auto">🤖 Tự động (Phân vai Nam/Nữ theo Man: / Woman:)</option>
-                <option value="en-GB-RyanNeural">👨 Ryan (Nam - Chuẩn Anh)</option>
-                <option value="en-GB-SoniaNeural">👩 Sonia (Nữ - Chuẩn Anh)</option>
+                <option value="auto">Tự động (Phân vai Nam/Nữ theo Man: / Woman:)</option>
+                <option value="en-GB-RyanNeural">Ryan (Nam - Chuẩn Anh)</option>
+                <option value="en-GB-SoniaNeural">Sonia (Nữ - Chuẩn Anh)</option>
               </select>
             </div>
           </div>
@@ -324,7 +324,7 @@ export default function AudioUploadInput({
 
           <div className="flex items-center justify-between pt-1">
             <span className="text-[11px] text-slate-400 dark:text-slate-500">
-              ⚡ Miễn phí 100%, tự động ghép 2 người nói nếu có &quot;Man:&quot; và &quot;Woman:&quot;.
+              Miễn phí 100%, tự động ghép 2 người nói nếu có &quot;Man:&quot; và &quot;Woman:&quot;.
             </span>
             <button
               type="button"

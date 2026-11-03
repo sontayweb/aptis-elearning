@@ -191,7 +191,7 @@ const TEST_CASES = [
 
 async function runUnitTests() {
   console.log("================================================================================");
-  console.log("🧪  BẮT ĐẦU CHẠY UNIT TEST BỘ GENERATOR CHO SPEAKING VOCABULARY HINTS");
+  console.log("[TEST] BẮT ĐẦU CHẠY UNIT TEST BỘ GENERATOR CHO SPEAKING VOCABULARY HINTS");
   console.log("================================================================================\n");
 
   let passedTests = 0;
@@ -200,7 +200,7 @@ async function runUnitTests() {
   for (let i = 0; i < TEST_CASES.length; i++) {
     const tc = TEST_CASES[i];
     console.log(`--------------------------------------------------------------------------------`);
-    console.log(`▶ CHẠY TEST CASE ${i + 1}/${TEST_CASES.length}: ${tc.name}`);
+    console.log(` CHẠY TEST CASE ${i + 1}/${TEST_CASES.length}: ${tc.name}`);
     console.log(`  Đề thi: "${tc.topicTitle}" (Part ${tc.partNumber})`);
 
     const startTime = Date.now();
@@ -235,8 +235,8 @@ async function runUnitTests() {
 
     if (errors.length === 0) {
       passedTests++;
-      console.log(`  ✅ KẾT QUẢ: ĐẠT CHUẨN 100% (Thời gian: ${duration}ms)`);
-      console.log(`\n  📌 KẾT QUẢ ĐẦU RA SẼ RENDER LÊN GIAO DIỆN HỌC VIÊN:`);
+      console.log(`  [PASS] KẾT QUẢ: ĐẠT CHUẨN 100% (Thời gian: ${duration}ms)`);
+      console.log(`\n  [NOTE] KẾT QUẢ ĐẦU RA SẼ RENDER LÊN GIAO DIỆN HỌC VIÊN:`);
       console.log(`     • Collocations đối lập:`);
       result.keywords.forEach((kw) => console.log(`       [ ${kw} ]`));
       console.log(`\n     • Mẫu câu so sánh & đối chiếu:`);
@@ -250,13 +250,13 @@ async function runUnitTests() {
       }
     } else {
       failedTests++;
-      console.log(`  ❌ KẾT QUẢ: KHÔNG ĐẠT (${errors.join(", ")})`);
+      console.log(`  [FAIL] KẾT QUẢ: KHÔNG ĐẠT (${errors.join(", ")})`);
     }
     console.log();
   }
 
   console.log("================================================================================");
-  console.log(`📊 TỔNG KẾT UNIT TEST:`);
+  console.log(`[STATS] TỔNG KẾT UNIT TEST:`);
   console.log(`   - Tổng số ca kiểm thử: ${TEST_CASES.length}`);
   console.log(`   - Số ca ĐẠT (PASS):   ${passedTests} / ${TEST_CASES.length}`);
   console.log(`   - Số ca LỖI (FAIL):   ${failedTests} / ${TEST_CASES.length}`);

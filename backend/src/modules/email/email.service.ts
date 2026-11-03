@@ -198,7 +198,7 @@ export class EmailService {
 
       <div class="info-box">
         <p style="margin:0; font-size:13px; color:#475569;">
-          ⚠️ <strong>Lưu ý bảo mật:</strong><br>
+          <strong>Lưu ý bảo mật:</strong><br>
           • Đường dẫn này chỉ có hiệu lực trong vòng <strong>60 phút</strong> kể từ khi yêu cầu.<br>
           • Nếu bạn không yêu cầu thao tác này, vui lòng bỏ qua email và mật khẩu của bạn vẫn an toàn tuyệt đối.
         </p>
@@ -212,7 +212,7 @@ export class EmailService {
 
     await this.sendMail({
       to: toEmail,
-      subject: '🔑 [Aptis Kỳ Tích] Hướng dẫn đặt lại mật khẩu tài khoản',
+      subject: '[Aptis Kỳ Tích] Hướng dẫn đặt lại mật khẩu tài khoản',
       html: this.wrapEmailTemplate('Đặt lại mật khẩu', bodyContent),
       text: `Xin chào ${recipientName}, truy cập link sau để đặt lại mật khẩu: ${resetUrl}`,
     });
@@ -237,8 +237,8 @@ export class EmailService {
 
       <div class="info-box">
         <p style="margin:0; font-size:13px; color:#475569;">
-          ⏱️ <strong>Thời hạn hiệu lực:</strong> Liên kết này có giá trị trong vòng <strong>24 giờ</strong>.<br>
-          🛡️ <strong>Bảo mật:</strong> Nếu bạn không thực hiện đăng ký tài khoản này, vui lòng bỏ qua email.
+          <strong>Thời hạn hiệu lực:</strong> Liên kết này có giá trị trong vòng <strong>24 giờ</strong>.<br>
+          <strong>Bảo mật:</strong> Nếu bạn không thực hiện đăng ký tài khoản này, vui lòng bỏ qua email.
         </p>
       </div>
 
@@ -250,7 +250,7 @@ export class EmailService {
 
     await this.sendMail({
       to: toEmail,
-      subject: '✉️ [Aptis Kỳ Tích] Vui lòng xác thực địa chỉ email của bạn',
+      subject: '[Aptis Kỳ Tích] Vui lòng xác thực địa chỉ email của bạn',
       html: this.wrapEmailTemplate('Xác thực tài khoản', bodyContent),
       text: `Xin chào ${recipientName}, truy cập link sau để xác thực email: ${verifyUrl}`,
     });
@@ -291,13 +291,13 @@ export class EmailService {
       </div>
 
       <p style="font-size:13px; color:#475569;">
-        💡 <strong>Khuyến nghị:</strong> Sau khi đăng nhập lần đầu tiên, bạn nên vào mục <em>Hồ sơ cá nhân &rarr; Đổi mật khẩu</em> để đảm bảo an toàn cho tài khoản.
+        <strong>Khuyến nghị:</strong> Sau khi đăng nhập lần đầu tiên, bạn nên vào mục <em>Hồ sơ cá nhân &rarr; Đổi mật khẩu</em> để đảm bảo an toàn cho tài khoản.
       </p>
     `;
 
     await this.sendMail({
       to: toEmail,
-      subject: '🎉 [Aptis Kỳ Tích] Thông tin tài khoản học tập của bạn',
+      subject: '[Aptis Kỳ Tích] Thông tin tài khoản học tập của bạn',
       html: this.wrapEmailTemplate('Tài khoản mới', bodyContent),
       text: `Xin chào ${fullName}, tài khoản Aptis Kỳ Tích của bạn đã được tạo. Email: ${toEmail}, Mật khẩu: ${tempPassword}. Đăng nhập tại: ${loginUrl}`,
     });
@@ -350,7 +350,7 @@ export class EmailService {
 
     await this.sendMail({
       to: toEmail,
-      subject: `🎯 [Aptis Kỳ Tích] Kết quả chấm bài thi: ${data.examTitle}`,
+      subject: `[Aptis Kỳ Tích] Kết quả chấm bài thi: ${data.examTitle}`,
       html: this.wrapEmailTemplate('Kết quả chấm thi', bodyContent),
       text: `Xin chào ${data.fullName}, bài thi ${data.examTitle} đã được chấm điểm (${data.totalScore} điểm). Xem chi tiết tại: ${detailUrl}`,
     });
@@ -400,7 +400,7 @@ export class EmailService {
 
     await this.sendMail({
       to: toEmail,
-      subject: `🌟 [Aptis Kỳ Tích] Xác nhận kích hoạt thành công gói ${data.planName}`,
+      subject: `[Aptis Kỳ Tích] Xác nhận kích hoạt thành công gói ${data.planName}`,
       html: this.wrapEmailTemplate('Kích hoạt VIP', bodyContent),
       text: `Xin chào ${data.fullName}, gói ${data.planName} của bạn đã được kích hoạt thành công đến ngày ${formattedDate}.`,
     });
@@ -413,7 +413,7 @@ export class EmailService {
     const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER || 'aptiskytich.admin@gmail.com';
 
     const bodyContent = `
-      <h2 style="margin-top:0; color:#dc2626; font-size:18px;">⚠️ CẢNH BÁO QUẢN TRỊ HỆ THỐNG</h2>
+      <h2 style="margin-top:0; color:#dc2626; font-size:18px;">CẢNH BÁO QUẢN TRỊ HỆ THỐNG</h2>
       <div class="info-box" style="border-left: 4px solid #dc2626;">
         <p style="margin:0; font-size:14px; white-space:pre-wrap; color:#1e293b;">${message}</p>
       </div>

@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   AlertCircle,
   HelpCircle,
+  Target,
 } from "lucide-react";
 
 export interface ReadingGuideBannerProps {
@@ -86,7 +87,7 @@ export function ReadingGuideBanner({ onOpenGuideModal }: ReadingGuideBannerProps
                 5 câu hỏi nhỏ dưới dạng đoạn email ngắn. Mỗi câu có 3 đáp án để chọn từ phù hợp nhất.
               </p>
               <div className="pt-2 border-t border-border/40 text-[11px] text-emerald-600 font-semibold">
-                🎯 Thang điểm: 2 điểm/câu (10 điểm). Yêu cầu đúng ít nhất 4-5 câu.
+                <Target className="w-3.5 h-3.5 inline mr-1 text-emerald-500 shrink-0" /> Thang điểm: 2 điểm/câu (10 điểm). Yêu cầu đúng ít nhất 4-5 câu.
               </div>
             </div>
 
@@ -103,7 +104,7 @@ export function ReadingGuideBanner({ onOpenGuideModal }: ReadingGuideBannerProps
                 2 câu chuyện riêng biệt (mỗi chuyện 5 câu). Kéo thả sắp xếp toàn bộ 5 câu thành đoạn văn hoàn chỉnh.
               </p>
               <div className="pt-2 border-t border-border/40 text-[11px] text-blue-600 font-semibold">
-                🎯 Thang điểm: 1 điểm/câu (10 điểm). Chú ý các từ liên kết: <em>this, that, these, after, then</em>.
+                <Target className="w-3.5 h-3.5 inline mr-1 text-emerald-500 shrink-0" /> Thang điểm: 1 điểm/câu (10 điểm). Chú ý các từ liên kết: <em>this, that, these, after, then</em>.
               </div>
             </div>
 
@@ -120,7 +121,7 @@ export function ReadingGuideBanner({ onOpenGuideModal }: ReadingGuideBannerProps
                 Nối nhận định với quan điểm của 4 nhân vật (A, B, C, D). Tổng cộng 7 câu hỏi nhận định.
               </p>
               <div className="pt-2 border-t border-border/40 text-[11px] text-purple-600 font-semibold">
-                🎯 Thang điểm: Mỗi người 4 điểm (16 điểm). Cần tìm từ đồng nghĩa (paraphrase).
+                <Target className="w-3.5 h-3.5 inline mr-1 text-emerald-500 shrink-0" /> Thang điểm: Mỗi người 4 điểm (16 điểm). Cần tìm từ đồng nghĩa (paraphrase).
               </div>
             </div>
 
@@ -137,7 +138,7 @@ export function ReadingGuideBanner({ onOpenGuideModal }: ReadingGuideBannerProps
                 Bài văn dài gồm 7 đoạn văn, chọn tiêu đề phù hợp từ 8 tiêu đề cho trước (có 1 tiêu đề thừa).
               </p>
               <div className="pt-2 border-t border-border/40 text-[11px] text-rose-600 font-semibold">
-                🎯 Thang điểm: 2 điểm/câu (14 điểm). Đọc câu đầu và câu cuối mỗi đoạn trước.
+                <Target className="w-3.5 h-3.5 inline mr-1 text-emerald-500 shrink-0" /> Thang điểm: 2 điểm/câu (14 điểm). Đọc câu đầu và câu cuối mỗi đoạn trước.
               </div>
             </div>
           </div>

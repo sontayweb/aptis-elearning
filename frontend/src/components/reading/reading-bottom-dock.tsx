@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import type { ReadingExamData } from "@/data/reading-benchmark";
+import { QuestionReportModal } from "@/components/exam/question-report-modal";
 
 export interface ReadingStageDef {
   stageKey: "p1" | "p2-1" | "p2-2" | "p3" | "p4";
@@ -270,7 +271,9 @@ export function ReadingBottomDock({
   onOpenSubmitModal,
   onShowScoreReport,
 }: ReadingBottomDockProps) {
+  const [isReportModalOpen, setIsReportModalOpen] = React.useState(false);
   return (
+    <>
     <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
       {/* Left: Hiện đáp án & Báo lỗi */}
       <div className="flex items-center gap-2">
@@ -285,7 +288,7 @@ export function ReadingBottomDock({
 
         <button
           type="button"
-          onClick={() => alert("Đã gửi phản hồi báo lỗi đề thi Reading.")}
+          onClick={() => setIsReportModalOpen(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer"
         >
           <AlertCircle className="w-3.5 h-3.5" />
@@ -421,6 +424,15 @@ export function ReadingBottomDock({
         )}
       </div>
     </footer>
+    <QuestionReportModal
+      isOpen={isReportModalOpen}
+      onClose={() => setIsReportModalOpen(false)}
+      examId={examData?.id || "reading-exam"}
+      examTitle={examData?.title || "Bài thi Reading"}
+      questionNumber={activeStage + 1}
+      skillName="Reading"
+    />
+    </>
   );
 }
 

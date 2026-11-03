@@ -135,7 +135,7 @@ export class TeacherService {
     // Gửi thông báo in-app cho học viên
     notificationService.createNotification({
       userId: submission.user_id,
-      title: 'Bài thi đã có nhận xét từ giảng viên 📝',
+      title: 'Bài thi đã có nhận xét từ giảng viên',
       message: `Giảng viên ${teacher?.full_name || 'Giảng viên'} đã chấm xong bài thi "${submission.exam.title}". Điểm: ${data.totalScore}/50 (${data.cefrLevel}).`,
       type: NotificationType.EXAM_GRADED,
       link: '/history',

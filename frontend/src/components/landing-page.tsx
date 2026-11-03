@@ -916,7 +916,7 @@ export function LandingPage() {
                       <BookOpen className="w-4 h-4 text-primary" />
                       <span className="font-bold text-foreground">Reading · Part 2: Sắp xếp câu</span>
                     </div>
-                    <span className="text-xs font-mono font-bold text-primary">⏱ 18:42</span>
+                    <span className="text-xs font-mono font-bold text-primary flex items-center gap-1"><Clock className="w-3.5 h-3.5 shrink-0" />18:42</span>
                   </div>
                   <div className="space-y-2 text-xs">
                     <div className="p-2.5 rounded-xl bg-card border border-primary/40 font-medium text-foreground flex items-center justify-between">
@@ -1316,9 +1316,9 @@ export function LandingPage() {
 
               const badgeText =
                 plan.code === "PREMIER_6M"
-                  ? "👑 CAO CẤP NHẤT"
+                  ? "CAO CẤP NHẤT"
                   : plan.code === "VIP_3M"
-                  ? "🔥 PHỔ BIẾN NHẤT"
+                  ? "PHỔ BIẾN NHẤT"
                   : plan.code === "VIP_1M"
                   ? "TIẾT KIỆM 40%"
                   : undefined;

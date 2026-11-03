@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { useSiteSettings } from "@/contexts/site-settings-context";
+import { api } from "@/lib/api-client";
 import {
   Phone,
   Mail,
@@ -30,15 +31,24 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await api.courses.registerLead({
+        fullName: formData.fullName,
+        phoneNumber: formData.phone,
+        email: formData.email,
+        targetBand: formData.target,
+        note: formData.message,
+      });
+    } catch (err) {
+      console.warn("Lỗi gửi thông tin liên hệ:", err);
+    } finally {
       setLoading(false);
       setSubmitted(true);
-    }, 600);
+    }
   };
-
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />

@@ -19,10 +19,40 @@ import {
 import { ReadingResultCard } from "@/components/reading-result-card";
 import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
 import {
-  Clock, ArrowLeft, ArrowRight, List, Info, LogOut,
-  Mic, Volume2, CheckCircle2, Award, Sparkles, X, Loader2,
-  StopCircle, Play, AlertTriangle, Upload, Pause, Check, Eye, EyeOff,
-  Headphones, BookOpen, FileText, PenTool, RefreshCw, Flag, RotateCcw, RotateCw, ArrowUp, Lock,
+  Clock,
+  ArrowLeft,
+  ArrowRight,
+  List,
+  Info,
+  LogOut,
+  Mic,
+  Volume2,
+  CheckCircle2,
+  Award,
+  Sparkles,
+  X,
+  Loader2,
+  StopCircle,
+  Play,
+  AlertTriangle,
+  Upload,
+  Pause,
+  Check,
+  Eye,
+  EyeOff,
+  Headphones,
+  BookOpen,
+  FileText,
+  PenTool,
+  RefreshCw,
+  Flag,
+  RotateCcw,
+  RotateCw,
+  ArrowUp,
+  Lock,
+  Target,
+  Lightbulb,
+  Image,
 } from "lucide-react";
 
 /* ====================================================
@@ -299,9 +329,9 @@ function SpeakingRecorder({
 
       <p className="text-xs text-exam-text-muted">
         {rec.permissionState === "denied"
-          ? "⚠️ Chế độ mô phỏng (không có microphone thật)"
+          ? "Chế độ mô phỏng (không có microphone thật)"
           : rec.permissionState === "granted"
-          ? "🎙️ Microphone đã sẵn sàng"
+          ? "Microphone đã sẵn sàng"
           : "Nhấn Bắt đầu ghi âm để kích hoạt microphone"}
       </p>
     </div>
@@ -1921,7 +1951,7 @@ export default function OfficialMockExamRoom() {
             if (trimmed.startsWith("---") || trimmed.toLowerCase().startsWith("giải thích:") || trimmed.toLowerCase().startsWith("đáp án:")) {
               return (
                 <div key={idx} className="font-bold text-primary border-b border-primary/20 pb-1.5 mb-2 flex items-center gap-2">
-                  <span className="text-sm">📌</span>
+                  <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
                   <span>{trimmed.replace(/^---\s*/, "")}</span>
                 </div>
               );
@@ -1941,7 +1971,7 @@ export default function OfficialMockExamRoom() {
             if (trimmed.includes("Mẹo:") || trimmed.includes("👉")) {
               return (
                 <div key={idx} className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 font-medium">
-                  <span className="font-bold text-amber-600 dark:text-amber-400">👉 Mẹo phòng thi: </span>
+                  <span className="font-bold text-amber-600 dark:text-amber-400">Mẹo phòng thi: </span>
                   {renderClueText(trimmed.replace(/^[•·-]?\s*(👉\s*)?Mẹo:\s*/, ""))}
                 </div>
               );
@@ -2193,7 +2223,7 @@ export default function OfficialMockExamRoom() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold uppercase tracking-wider text-exam-text-muted flex items-center gap-1.5">
-                      <span>📜</span>
+                      <FileText className="w-4 h-4 text-primary shrink-0" />
                       <span>
                         {(activeRevQ.partTitle || "").toUpperCase().includes("LISTENING") ||
                         (activeRevQ.partTitle || "").toUpperCase().includes("NGHE") ||
@@ -2467,7 +2497,7 @@ export default function OfficialMockExamRoom() {
                   {!hideAnswersReview && (
                     <div className="p-3.5 rounded-xl bg-card border border-exam-border text-xs text-exam-text space-y-1">
                       <span className="font-bold text-primary flex items-center gap-1.5">
-                        <span>🎯</span>
+                        <Target className="w-4 h-4 text-primary shrink-0" />
                         <span>Mẹo tìm bằng chứng (Paraphrase Clue):</span>
                       </span>
                       <p className="text-exam-text-muted leading-relaxed">
@@ -2508,7 +2538,7 @@ export default function OfficialMockExamRoom() {
                     <div className="space-y-2.5 pt-1">
                       <div className="flex items-center justify-between border-b border-exam-border pb-1.5">
                         <span className="text-xs font-bold text-exam-text flex items-center gap-1.5">
-                          <span>📖</span>
+                          <BookOpen className="w-4 h-4 text-amber-500 shrink-0" />
                           <span>Đoạn văn hoàn chỉnh sau khi sắp xếp đúng logic:</span>
                         </span>
                         <span className="text-[11px] text-exam-text-muted">
@@ -2569,7 +2599,7 @@ export default function OfficialMockExamRoom() {
                   {Boolean(activeRevQ.partImageUrl || activeRevQ.image_url) && (
                     <div className="p-3 rounded-2xl border border-exam-border bg-card/60 space-y-2 text-center">
                       <span className="text-xs font-bold text-exam-text-muted block text-left">
-                        🖼️ Hình ảnh đề thi:
+                        Hình ảnh đề thi:
                       </span>
                       {(() => {
                         const revAll = [
@@ -2629,7 +2659,7 @@ export default function OfficialMockExamRoom() {
                   {/* Bản ghi âm của bạn */}
                   <div className="p-4 rounded-xl border border-exam-border bg-exam-bg/40 space-y-2">
                     <span className="text-xs font-bold text-primary block">
-                      🎙️ Bản ghi âm bài nói của bạn:
+                      Bản ghi âm bài nói của bạn:
                     </span>
                     {audioUrls[activeRevQ.id] ? (
                       <audio controls src={audioUrls[activeRevQ.id]!} className="w-full h-8" />
@@ -2647,11 +2677,11 @@ export default function OfficialMockExamRoom() {
                       </div>
                       <div className="space-y-2 text-exam-text">
                         <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/15">
-                          <span className="font-bold text-primary">👉 Công thức mở rộng ý: </span>
+                          <span className="font-bold text-primary">Công thức mở rộng ý: </span>
                           <span>Trả lời trực diện $\rightarrow$ Nêu nguyên nhân (Because...) $\rightarrow$ Trải nghiệm thực tế (For instance...).</span>
                         </div>
                         <div className="p-2.5 rounded-lg bg-muted/40 border border-exam-border">
-                          <span className="font-bold text-exam-text">💡 Bộ câu đệm mượt mà (Fillers / Openers): </span>
+                          <span className="font-bold text-exam-text flex items-center gap-1.5"><Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />Bộ câu đệm mượt mà (Fillers / Openers): </span>
                           <span className="italic text-exam-text-muted">
                             &ldquo;Well, to be honest...&rdquo;, &ldquo;As far as I remember...&rdquo;, &ldquo;Judging from what I can see...&rdquo;
                           </span>
@@ -2709,7 +2739,7 @@ export default function OfficialMockExamRoom() {
                           </div>
                           {isPart4 && (
                             <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/15 text-exam-text">
-                              <span className="font-bold text-primary">📌 Mẫu câu Formal đắt giá: </span>
+                              <span className="font-bold text-primary">Mẫu câu Formal đắt giá: </span>
                               <span className="italic">
                                 &ldquo;I am writing to express my dissatisfaction regarding...&rdquo;, &ldquo;I would appreciate it if you could look into this matter...&rdquo;
                               </span>
@@ -3051,7 +3081,7 @@ export default function OfficialMockExamRoom() {
                 {currentQ.partAudioUrl && (
                   <div className="mb-4">
                     <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
-                      🔊 Audio: {currentQ.partTitle}
+                      <span className="inline-flex items-center gap-1.5"><Volume2 className="w-3.5 h-3.5 text-blue-500 shrink-0" />Audio: {currentQ.partTitle}</span>
                     </p>
                     <AudioPlayer
                       src={
@@ -3083,7 +3113,7 @@ export default function OfficialMockExamRoom() {
                         return (
                           <div className="space-y-2">
                             <p className="text-xs font-bold uppercase tracking-wider text-primary flex items-center justify-between">
-                              <span>🖼️ Hình ảnh đề bài Speaking (Part 3)</span>
+                              <span>Hình ảnh đề bài Speaking (Part 3)</span>
                               <span className="text-[10px] text-exam-text-muted font-normal lowercase">so sánh 2 bức tranh</span>
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -3156,7 +3186,7 @@ export default function OfficialMockExamRoom() {
                           <div className="space-y-2.5">
                             <div className="flex items-center justify-between p-3 rounded-xl bg-exam-surface/80 border border-exam-border">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm">📜</span>
+                                <FileText className="w-4 h-4 text-primary shrink-0" />
                                 <div>
                                   <p className="text-xs font-bold text-exam-text">Lời thoại bài nghe (Transcript)</p>
                                   <p className="text-[11px] text-exam-text-muted">
@@ -3195,7 +3225,7 @@ export default function OfficialMockExamRoom() {
                         <div>
                           {currentQ.partTitle && (
                             <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
-                              📖 {currentQ.partTitle}
+                              <BookOpen className="w-3.5 h-3.5 text-amber-500 inline mr-1.5 shrink-0" />{currentQ.partTitle}
                             </p>
                           )}
                           {currentQ.partInstructions && (
@@ -3631,7 +3661,7 @@ export default function OfficialMockExamRoom() {
                 <div className="space-y-3">
                   <div className="p-3 rounded-xl bg-rose-500/5 border border-rose-500/20">
                     <p className="text-xs text-rose-600 dark:text-rose-400 font-semibold mb-1">
-                      🎙️ Hướng dẫn: Nhấn Bắt đầu ghi âm và nói câu trả lời rõ ràng vào microphone.
+                      Hướng dẫn: Nhấn Bắt đầu ghi âm và nói câu trả lời rõ ràng vào microphone.
                     </p>
                     <p className="text-xs text-exam-text-muted">
                       Chuẩn bị 15 giây · Trả lời 30-60 giây

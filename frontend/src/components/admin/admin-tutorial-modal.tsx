@@ -154,7 +154,7 @@ export default function AdminTutorialModal({ isOpen, onClose }: AdminTutorialMod
       description:
         "Video hướng dẫn toàn diện cách soi chi tiết đề thi trước khi nhập vào hệ thống: nghe thử kịch bản Listening bằng giọng bản xứ TTS, đọc đoạn văn Reading, kiểm tra tranh Speaking & xử lý thiếu ảnh trực tiếp, xem thông báo Writing và rà soát đáp án đúng.",
       tips: [
-        "Nghe thử kịch bản âm thanh: Bấm '🔊 Nghe thử kịch bản' để phát audio mô phỏng cho bài Nghe.",
+        "Nghe thử kịch bản âm thanh: Bấm 'Nghe thử kịch bản' để phát audio mô phỏng cho bài Nghe.",
         "Kiểm tra đáp án đúng: Bấm trực tiếp vào các lựa chọn A, B, C, D để đổi đáp án đúng nếu file Excel bị gõ nhầm.",
         "Xử lý thiếu ảnh Speaking: Bấm tải ảnh đính kèm ngay tại chỗ mà không cần mở lại file Word.",
         "Tích chọn từng đề: Chỉ những đề hợp lệ được tích chọn mới được lưu vào hệ thống, đề lỗi sẽ bị loại trừ.",

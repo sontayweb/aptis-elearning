@@ -11,17 +11,14 @@ import { Part1GroupView } from "@/components/key-meo-thi/part1-group-view";
 import { Part2SpeakerMatchView } from "@/components/key-meo-thi/part2-speaker-match-view";
 import { Part3CheatSheetView } from "@/components/key-meo-thi/part3-cheat-sheet-view";
 import { Part4TopicView } from "@/components/key-meo-thi/part4-topic-view";
+import { WritingCheatSheetView } from "@/components/key-meo-thi/writing-cheat-sheet-view";
+import { SpeakingCheatSheetView } from "@/components/key-meo-thi/speaking-cheat-sheet-view";
+import { ReadingCheatSheetView } from "@/components/key-meo-thi/reading-cheat-sheet-view";
 import {
   Headphones,
   BookOpen,
   Mic,
   PenTool,
-  Sparkles,
-  ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
-  Clock,
-  Layers,
 } from "lucide-react";
 
 type SkillTab = "listening" | "reading" | "speaking" | "writing";
@@ -87,13 +84,13 @@ function KeyVaMeoThiContent() {
               Tổng hợp phương pháp ôn thi cấp tốc, ma trận đáp án trúng tủ và mẹo ghi nhớ độc quyền theo từng phần bài thi.
             </p>
 
-            {/* LEVEL 1: SKILL TABS */}
+            {/* LEVEL 1: SKILL TABS (Listening, Reading, Speaking, Writing) */}
             <div className="pt-4 flex items-center justify-center gap-2 overflow-x-auto pb-1">
               {[
                 { id: "listening", label: "Listening", icon: Headphones, count: "4 Phần" },
-                { id: "reading", label: "Reading", icon: BookOpen, count: "Đang cập nhật" },
-                { id: "speaking", label: "Speaking", icon: Mic, count: "Đang cập nhật" },
-                { id: "writing", label: "Writing", icon: PenTool, count: "Đang cập nhật" },
+                { id: "reading", label: "Reading", icon: BookOpen, count: "4 Phần" },
+                { id: "speaking", label: "Speaking", icon: Mic, count: "4 Phần" },
+                { id: "writing", label: "Writing", icon: PenTool, count: "4 Phần" },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeSkill === tab.id;
@@ -127,7 +124,7 @@ function KeyVaMeoThiContent() {
 
         {/* Main Content Area */}
         <section className="section-container max-w-6xl mx-auto py-8">
-          {activeSkill === "listening" ? (
+          {activeSkill === "listening" && (
             <div className="space-y-6">
               {/* LEVEL 2: LISTENING SUB-TABS (Part 1 - 4) */}
               <div className="flex items-center justify-center sm:justify-start gap-2 overflow-x-auto pb-2 border-b border-border">
@@ -154,7 +151,7 @@ function KeyVaMeoThiContent() {
                     id: "p4",
                     num: "Part 4",
                     title: "Mẹo học theo Topic",
-                    clover: "🍀 19 Topics 2026",
+                    clover: "🍀 48 Topics 2026",
                   },
                 ].map((pTab) => {
                   const isActive = activeListeningPart === pTab.id;
@@ -183,44 +180,18 @@ function KeyVaMeoThiContent() {
               {activeListeningPart === "p3" && <Part3CheatSheetView customData={customConfig?.part3} />}
               {activeListeningPart === "p4" && <Part4TopicView customData={customConfig?.part4} />}
             </div>
-          ) : (
-            /* CLEAN PENDING STATE FOR READING, SPEAKING, WRITING */
-            <div className="p-12 md:p-16 text-center rounded-2xl border border-dashed border-border bg-card space-y-4 max-w-2xl mx-auto shadow-xs">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20">
-                {activeSkill === "reading" && <BookOpen className="w-7 h-7" />}
-                {activeSkill === "speaking" && <Mic className="w-7 h-7" />}
-                {activeSkill === "writing" && <PenTool className="w-7 h-7" />}
-              </div>
+          )}
 
-              <div className="space-y-1.5">
-                <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                  Kế hoạch phát triển nội dung
-                </span>
-                <h2 className="text-lg md:text-xl font-black font-heading text-foreground capitalize">
-                  Chuyên đề Mẹo Thi {activeSkill} đang được cập nhật
-                </h2>
-                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
-                  Đội ngũ chuyên gia học thuật đang tổng hợp và kiểm duyệt ngân hàng tài liệu theo chuẩn đề thi Aptis ESOL 2026.
-                </p>
-              </div>
+          {activeSkill === "reading" && (
+            <ReadingCheatSheetView customData={customConfig?.reading} />
+          )}
 
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <button
-                  onClick={() => setActiveSkill("listening")}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Headphones className="w-4 h-4" />
-                  <span>Khám phá Key &amp; Mẹo Listening</span>
-                </button>
-                <Link
-                  href={`/${activeSkill}`}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-bold text-foreground transition-all flex items-center justify-center gap-1.5"
-                >
-                  <span>Luyện đề thi {activeSkill} ngay</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
+          {activeSkill === "speaking" && (
+            <SpeakingCheatSheetView customData={customConfig?.speaking} />
+          )}
+
+          {activeSkill === "writing" && (
+            <WritingCheatSheetView customData={customConfig?.writing} />
           )}
         </section>
       </main>
@@ -230,4 +201,3 @@ function KeyVaMeoThiContent() {
     </div>
   );
 }
-

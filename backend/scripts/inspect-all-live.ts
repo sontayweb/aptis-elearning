@@ -7,7 +7,7 @@ async function main() {
   for (const skill of ['READING', 'LISTENING', 'SPEAKING', 'WRITING'] as const) {
     const res = await service.listExams({ skill, limit: 350, page: 1 } as any);
     const fullExams = res.exams.filter(e => e.title.includes('Full') || e.totalParts === 4);
-    console.log(`📌 Kỹ năng [${skill}]:`);
+    console.log(`[NOTE] Kỹ năng [${skill}]:`);
     console.log(`   - Tổng số đề trong kho: ${res.exams.length}`);
     console.log(`   - Số bài thi FULL liên hoàn (Tab 1): ${fullExams.length} đề`);
     console.log(`   - Mẫu đề đầu: "${fullExams[0]?.title}" (${fullExams[0]?.durationMinutes} phút, Pro: ${fullExams[0]?.isPro})`);

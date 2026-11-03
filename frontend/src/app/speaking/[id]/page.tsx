@@ -1,5 +1,7 @@
 "use client";
 
+import { QuestionReportModal } from "@/components/exam/question-report-modal";
+
 import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
@@ -1478,70 +1480,14 @@ function SpeakingExamRunnerContent() {
       )}
 
       {/* REPORT MODAL (Báo lỗi) */}
-      {isReportOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-destructive" />
-                <h3 className="font-heading font-bold text-sm text-foreground">
-                  Báo lỗi câu hỏi Speaking
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsReportOpen(false);
-                  setReportSent(false);
-                }}
-                className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {reportSent ? (
-              <div className="py-6 text-center space-y-2">
-                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
-                <p className="text-xs font-bold text-foreground">Cảm ơn bạn đã phản hồi!</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Đội ngũ kỹ thuật sẽ kiểm tra và hiệu đính ngay.
-                </p>
-              </div>
-            ) : (
-              <div className="py-4 space-y-3">
-                <p className="text-xs text-muted-foreground">
-                  Vui lòng mô tả vấn đề bạn gặp phải (âm thanh, ảnh, đề bài hoặc micro):
-                </p>
-                <textarea
-                  value={reportText}
-                  onChange={(e) => setReportText(e.target.value)}
-                  placeholder="Mô tả chi tiết..."
-                  className="w-full h-28 p-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
-                />
-                <div className="flex justify-end gap-2 pt-2 border-t border-border">
-                  <button
-                    type="button"
-                    onClick={() => setIsReportOpen(false)}
-                    className="px-3.5 py-1.5 rounded-xl border border-border text-xs font-semibold"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (reportText.trim()) setReportSent(true);
-                    }}
-                    className="px-4 py-1.5 rounded-xl bg-destructive text-white font-bold text-xs flex items-center gap-1.5"
-                  >
-                    <Send className="w-3 h-3" />
-                    <span>Gửi báo lỗi</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <QuestionReportModal
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+        examId={examId}
+        examTitle={examTitle || "Bài thi Speaking"}
+        questionNumber={currentIndex + 1}
+        skillName="Speaking"
+      />
 
       <SpeakingCompletionModal
         isOpen={isCompletedModalOpen}

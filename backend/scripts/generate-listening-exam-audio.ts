@@ -69,9 +69,9 @@ async function main() {
           // Copy to frontend/public for direct fallback serving
           const destFrontend = path.join(frontendUploadDir, path.basename(res.localPath));
           fs.copyFileSync(res.localPath, destFrontend);
-          console.log(`    ✅ Đã tạo: ${res.publicUrl} (${fs.statSync(res.localPath).size} bytes)`);
+          console.log(`    [PASS] Đã tạo: ${res.publicUrl} (${fs.statSync(res.localPath).size} bytes)`);
         } catch (e: any) {
-          console.error(`    ❌ Lỗi: ${e.message}`);
+          console.error(`    [FAIL] Lỗi: ${e.message}`);
         }
       }
     }
@@ -91,7 +91,7 @@ async function main() {
           where: { id: part.id },
           data: { audio_url: path.basename(res.publicUrl) },
         });
-        console.log(`    ✅ Đã tạo Part 2: ${res.publicUrl}`);
+        console.log(`    [PASS] Đã tạo Part 2: ${res.publicUrl}`);
       }
     }
 
@@ -110,7 +110,7 @@ async function main() {
           where: { id: part.id },
           data: { audio_url: path.basename(res.publicUrl) },
         });
-        console.log(`    ✅ Đã tạo Part 3: ${res.publicUrl}`);
+        console.log(`    [PASS] Đã tạo Part 3: ${res.publicUrl}`);
       }
     }
 
@@ -126,7 +126,7 @@ async function main() {
         const res1 = await ttsAudioService.generateSpeech(t1, 'de01_p4_rec1', { voice: 'en-GB-RyanNeural' });
         const destFrontend1 = path.join(frontendUploadDir, path.basename(res1.localPath));
         fs.copyFileSync(res1.localPath, destFrontend1);
-        console.log(`    ✅ Đã tạo Part 4 Rec 1: ${res1.publicUrl}`);
+        console.log(`    [PASS] Đã tạo Part 4 Rec 1: ${res1.publicUrl}`);
 
         await prisma.examPart.update({
           where: { id: part.id },
@@ -139,12 +139,12 @@ async function main() {
         const res2 = await ttsAudioService.generateSpeech(t2, 'de01_p4_rec2', { voice: 'en-GB-SoniaNeural' });
         const destFrontend2 = path.join(frontendUploadDir, path.basename(res2.localPath));
         fs.copyFileSync(res2.localPath, destFrontend2);
-        console.log(`    ✅ Đã tạo Part 4 Rec 2: ${res2.publicUrl}`);
+        console.log(`    [PASS] Đã tạo Part 4 Rec 2: ${res2.publicUrl}`);
       }
     }
   }
 
-  console.log('\n🎉 Hoàn thành sinh âm thanh toàn bộ 4 Parts cho đề thi!');
+  console.log('\nHoàn thành sinh âm thanh toàn bộ 4 Parts cho đề thi!');
 }
 
 main().finally(() => prisma.$disconnect());

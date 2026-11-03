@@ -288,7 +288,7 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-2xs">
-            {isNew ? "+" : "✏️"}
+            {isNew ? "+" : "✎"}
           </div>
           <div>
             <span className="font-heading font-bold text-sm text-slate-900 dark:text-white block">
@@ -344,7 +344,7 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
             {taskMeta.guideText}
           </p>
           <p className="text-slate-500 dark:text-slate-400">
-            📌 <strong>Ngữ cảnh Phần thi (ExamPart):</strong> {taskMeta.partContextRequirement}
+            <strong>Ngữ cảnh Phần thi (ExamPart):</strong> {taskMeta.partContextRequirement}
           </p>
         </div>
       </div>
@@ -645,7 +645,7 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
                 </>
               ) : (
                 <span className="text-amber-600 dark:text-amber-400 font-semibold text-xs">
-                  ⚠️ Câu văn chưa có ký hiệu [gap]. Hãy bấm nút &ldquo;+ Chèn ký hiệu [gap]&rdquo; ở trên để đặt ô chọn từ!
+                  Câu văn chưa có ký hiệu [gap]. Hãy bấm nút &ldquo;+ Chèn ký hiệu [gap]&rdquo; ở trên để đặt ô chọn từ!
                 </span>
               )}
             </div>
@@ -780,7 +780,7 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
                     className="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[10px] font-bold hover:bg-indigo-100"
                     title="Áp dụng nhanh bộ lựa chọn chuẩn"
                   >
-                    ⚡ {preset.label}
+                    {preset.label}
                   </button>
                 ))}
                 <button
@@ -991,7 +991,7 @@ export const PolymorphicQuestionForm: React.FC<PolymorphicQuestionFormProps> = (
                     onClick={() => handleApplyOptionPreset(["Man", "Woman", "Both"])}
                     className="px-2 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 text-[10px] font-bold"
                   >
-                    ⚡ Chuẩn Man / Woman / Both
+                    Chuẩn Man / Woman / Both
                   </button>
                 )}
                 <button

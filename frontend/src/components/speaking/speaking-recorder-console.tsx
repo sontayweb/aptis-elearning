@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Volume2,
   ChevronDown,
+  Lightbulb,
 } from "lucide-react";
 import type { SpeakingQuestion } from "@/lib/speaking/speaking-exam-utils";
 import { formatTimerDisplay } from "@/lib/speaking/speaking-exam-utils";
@@ -314,7 +315,7 @@ export function SpeakingRecorderConsole({
           </button>
 
           <p className="text-[11px] text-muted-foreground leading-normal">
-            💡 Hết giờ chuẩn bị, máy sẽ tự động phát tiếng bíp và bắt đầu ghi âm.
+            <Lightbulb className="w-3.5 h-3.5 text-amber-500 inline mr-1 shrink-0" /><span>Hết giờ chuẩn bị, máy sẽ tự động phát tiếng bíp và bắt đầu ghi âm.</span>
           </p>
         </div>
       )}

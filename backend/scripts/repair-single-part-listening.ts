@@ -193,12 +193,12 @@ async function main() {
     }
   }
 
-  console.log(`\n🎉 HOÀN TẤT CHUẨN HÓA ${updatedCount} BỘ ĐỀ SINGLE-PART LISTENING!`);
+  console.log(`\nHOÀN TẤT CHUẨN HÓA ${updatedCount} BỘ ĐỀ SINGLE-PART LISTENING!`);
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Lỗi:', e);
+    console.error('[FAIL] Lỗi:', e);
     process.exit(1);
   })
   .finally(async () => {

@@ -1,13 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import { Request } from 'express';
-import { AuditAction, QuestionType } from '@prisma/client';
+import { AuditAction, NotificationType, QuestionType } from '@prisma/client';
 import { prisma } from '../../config/database';
 import { ExamFilterInput, CustomExamBuilderInput } from './exam.dto';
 import { assertProAccess, checkProAccess } from '../../utils/pro-guard';
 import { gradeObjectiveQuestion } from '../../utils/scoring-engine';
 import { scoreToCefr } from '../../utils/cefr-engine';
 import { auditService } from '../audit/audit.service';
+import { notificationService } from '../notifications/notification.service';
 import { ensureTwentyFullTestExams } from './fulltest-generator';
 
 export class ExamService {
@@ -17,16 +18,25 @@ export class ExamService {
   private async ensureMockTestsReady() {
     if (this.fullTestsEnsured) return;
     if (!this.ensuringPromise) {
-      this.ensuringPromise = ensureTwentyFullTestExams(prisma)
-        .then(() => {
+      try {
+        const maybePromise = ensureTwentyFullTestExams(prisma);
+        if (maybePromise && typeof maybePromise.then === 'function') {
+          this.ensuringPromise = maybePromise
+            .then(() => {
+              this.fullTestsEnsured = true;
+            })
+            .catch((err) => {
+              console.warn('[WARN] Không thể tự động đồng bộ 20 bộ đề Full Test:', err?.message || err);
+            })
+            .finally(() => {
+              this.ensuringPromise = null;
+            });
+        } else {
           this.fullTestsEnsured = true;
-        })
-        .catch((err) => {
-          console.warn('⚠️ Không thể tự động đồng bộ 20 bộ đề Full Test:', err?.message || err);
-        })
-        .finally(() => {
-          this.ensuringPromise = null;
-        });
+        }
+      } catch (err: any) {
+        console.warn('[WARN] Không thể khởi tạo đồng bộ Full Test:', err?.message || err);
+      }
     }
     await this.ensuringPromise;
   }
@@ -394,7 +404,7 @@ export class ExamService {
       _count: { select: { submissions: true } },
     };
 
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed);
     if (isUuid) {
       const byId = await prisma.exam.findUnique({
         where: { id: trimmed },
@@ -557,7 +567,7 @@ export class ExamService {
   async getExamQuestions(examId: string, userId?: string) {
     await this.ensureMockTestsReady();
     const trimmed = examId.trim();
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed);
     const includeQuestionsSpec = {
       parts: {
         orderBy: { part_number: 'asc' as const },
@@ -1287,11 +1297,158 @@ export class ExamService {
         questionNumber: payload.questionNumber || null,
         reason: payload.reason,
         note: payload.note || '',
+        status: 'PENDING',
         reportedAt: new Date().toISOString(),
       },
     });
 
+    // Bắn thông báo nội bộ tới các Admin để tiếp nhận xử lý
+    try {
+      const admins = await prisma.user.findMany({
+        where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } },
+        select: { id: true },
+      });
+      for (const adm of admins) {
+        notificationService.createNotification({
+          userId: adm.id,
+          title: `[Báo lỗi đề thi] ${examTitle}`,
+          message: `Câu #${payload.questionNumber || '?'}: ${payload.reason}${payload.note ? ` - ${payload.note}` : ''}`,
+          type: NotificationType.SYSTEM,
+          link: '/admin/reports',
+        }).catch(() => {});
+      }
+    } catch (e) {
+      console.warn('[WARN] Lỗi gửi notification tới Admin:', e);
+    }
+
     return { reported: true };
+  }
+
+  /**
+   * Lấy danh sách báo lỗi câu hỏi từ AuditLog dành cho Admin
+   */
+  async listQuestionReports(query: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  }) {
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = Math.max(1, Math.min(100, Number(query.limit) || 20));
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+      entity_type: 'QUESTION_REPORT',
+    };
+
+    if (query.search) {
+      where.description = { contains: query.search, mode: 'insensitive' };
+    }
+
+    const allReports = await prisma.auditLog.findMany({
+      where,
+      orderBy: { created_at: 'desc' },
+      include: {
+        user: {
+          select: { id: true, full_name: true, email: true, avatar_url: true },
+        },
+      },
+    });
+
+    // Chuẩn hóa và lọc theo status (nếu có: PENDING / RESOLVED)
+    let formatted = allReports.map((log) => {
+      const val = (log.new_value as any) || {};
+      const status = val.status || 'PENDING';
+      return {
+        id: log.id,
+        examId: val.examId || log.entity_id,
+        examTitle: val.examTitle || 'Không xác định',
+        questionId: val.questionId || null,
+        questionNumber: val.questionNumber || null,
+        reason: val.reason || 'Báo lỗi nội dung',
+        note: val.note || '',
+        status,
+        resolvedAt: val.resolvedAt || null,
+        resolvedBy: val.resolvedBy || null,
+        reportedAt: val.reportedAt || log.created_at,
+        actorName: log.actor_name,
+        actorEmail: log.actor_email,
+        ipAddress: log.ip_address,
+        user: log.user,
+      };
+    });
+
+    if (query.status && query.status !== 'ALL') {
+      formatted = formatted.filter((r) => r.status === query.status);
+    }
+
+    const total = formatted.length;
+    const paginated = formatted.slice(skip, skip + limit);
+
+    // Tính metrics KPI nhanh
+    const pendingCount = allReports.filter(
+      (l) => ((l.new_value as any)?.status || 'PENDING') === 'PENDING'
+    ).length;
+    const resolvedCount = allReports.filter(
+      (l) => (l.new_value as any)?.status === 'RESOLVED'
+    ).length;
+
+    return {
+      reports: paginated,
+      kpi: {
+        total: allReports.length,
+        pending: pendingCount,
+        resolved: resolvedCount,
+      },
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
+  }
+
+  /**
+   * Cập nhật trạng thái báo lỗi (RESOLVED / PENDING)
+   */
+  async resolveQuestionReport(
+    reportId: string,
+    input: { status?: 'PENDING' | 'RESOLVED'; note?: string },
+    adminUser?: { email?: string; full_name?: string }
+  ) {
+    const log = await prisma.auditLog.findUnique({
+      where: { id: reportId },
+    });
+
+    if (!log || log.entity_type !== 'QUESTION_REPORT') {
+      throw { statusCode: 404, message: 'Không tìm thấy bản ghi báo lỗi' };
+    }
+
+    const currentVal = (log.new_value as any) || {};
+    const newStatus = input.status || 'RESOLVED';
+
+    const updatedVal = {
+      ...currentVal,
+      status: newStatus,
+      resolvedAt: newStatus === 'RESOLVED' ? new Date().toISOString() : null,
+      resolvedBy: newStatus === 'RESOLVED' ? (adminUser?.email || adminUser?.full_name || 'Admin') : null,
+      resolutionNote: input.note || currentVal.resolutionNote || null,
+    };
+
+    const updated = await prisma.auditLog.update({
+      where: { id: reportId },
+      data: {
+        new_value: updatedVal,
+      },
+    });
+
+    return {
+      id: updated.id,
+      status: newStatus,
+      resolvedAt: updatedVal.resolvedAt,
+      resolvedBy: updatedVal.resolvedBy,
+    };
   }
 }
 

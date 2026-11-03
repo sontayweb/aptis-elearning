@@ -112,7 +112,7 @@ export function GoalTracker({
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className="font-heading font-extrabold text-base md:text-lg text-foreground flex items-center gap-2">
-                <span>🎯</span>
+                <span><Target className="w-5 h-5 text-primary shrink-0" /></span>
                 <span>
                   Còn <strong className="text-primary">{daysRemaining} ngày</strong> tới ngày thi · Aim{" "}
                   <strong className="text-accent">{currentAim}</strong>

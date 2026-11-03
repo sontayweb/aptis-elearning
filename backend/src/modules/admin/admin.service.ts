@@ -353,7 +353,7 @@ export class AdminService {
   }
 
   /**
-   * Gán độ hot (☘️ 0–5) / trạng thái xuất bản hàng loạt.
+   * Gán độ hot (0–5) / trạng thái xuất bản hàng loạt.
    * - examIds: cập nhật theo danh sách ID đã chọn.
    * - rules: [{ keywords: string[], hotLevel }] khớp theo tên đề (không phân biệt hoa/thường, dấu cách),
    *   có thể lọc theo skill (+ partNumber).

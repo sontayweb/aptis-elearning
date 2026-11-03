@@ -94,6 +94,37 @@ export class ExamController {
       next(error);
     }
   }
+
+  async listQuestionReports(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { page, limit, status, search } = req.query;
+      const result = await examService.listQuestionReports({
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+        status: status as string,
+        search: search as string,
+      });
+      sendSuccess(res, result.reports, 'Lấy danh sách báo lỗi câu hỏi thành công', 200, {
+        ...result.pagination,
+        kpi: result.kpi,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resolveQuestionReport(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const reportId = req.params.id;
+      const { status, note, resolutionNote } = req.body || {};
+      const effectiveNote = note || resolutionNote;
+      const adminUser = (req as any).user;
+      const result = await examService.resolveQuestionReport(reportId, { status, note: effectiveNote }, adminUser);
+      sendSuccess(res, result, 'Cập nhật trạng thái báo lỗi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const examController = new ExamController();

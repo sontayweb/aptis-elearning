@@ -56,7 +56,7 @@ describe('--- UNIT TESTS: TOPIC RULES & AUTO-TAGGING ENGINE ---', () => {
     }
 
     // ─────────────────────────────────────────────────────────────
-    // Part 2 & 3: 5 CỎ (☘️☘️☘️☘️☘️)
+    // Part 2 & 3: 5 CỎ ()
     // ─────────────────────────────────────────────────────────────
     test('Part 2/3 - 5 Clovers: Film, singer, coffee shop, end of term', () => {
       const testCases = [
@@ -79,7 +79,7 @@ describe('--- UNIT TESTS: TOPIC RULES & AUTO-TAGGING ENGINE ---', () => {
     });
 
     // ─────────────────────────────────────────────────────────────
-    // Part 2 & 3: 4 CỎ (☘️☘️☘️☘️)
+    // Part 2 & 3: 4 CỎ ()
     // ─────────────────────────────────────────────────────────────
     test('Part 2/3 - 4 Clovers: Woman in space, Weekend activities, Movies then and now, Transportation', () => {
       const testCases = [
@@ -98,7 +98,7 @@ describe('--- UNIT TESTS: TOPIC RULES & AUTO-TAGGING ENGINE ---', () => {
     });
 
     // ─────────────────────────────────────────────────────────────
-    // Part 2 & 3: 3 CỎ (☘️☘️☘️)
+    // Part 2 & 3: 3 CỎ ()
     // ─────────────────────────────────────────────────────────────
     test('Part 2/3 - 3 Clovers: Family sport day, Mae - The Math Girl, Cultural festival, College Welcoming', () => {
       const testCases = [
@@ -116,7 +116,7 @@ describe('--- UNIT TESTS: TOPIC RULES & AUTO-TAGGING ENGINE ---', () => {
     });
 
     // ─────────────────────────────────────────────────────────────
-    // Part 2 & 3: 2 CỎ (☘️☘️)
+    // Part 2 & 3: 2 CỎ ()
     // ─────────────────────────────────────────────────────────────
     test('Part 2/3 - 2 Clovers: Public transportations, Writing about a place, Music show at the park', () => {
       const testCases = [
@@ -133,7 +133,7 @@ describe('--- UNIT TESTS: TOPIC RULES & AUTO-TAGGING ENGINE ---', () => {
     });
 
     // ─────────────────────────────────────────────────────────────
-    // Part 4: 5 CỎ (☘️☘️☘️☘️☘️)
+    // Part 4: 5 CỎ ()
     // ─────────────────────────────────────────────────────────────
     test('Part 4 - 5 Clovers: Childhood, Games, Tech, Music festival, Mountain, Four-day week, Women mathematicians', () => {
       const testCases = [
@@ -165,7 +165,7 @@ describe('--- UNIT TESTS: TOPIC RULES & AUTO-TAGGING ENGINE ---', () => {
     });
 
     // ─────────────────────────────────────────────────────────────
-    // Part 4: 4 CỎ (☘️☘️☘️☘️)
+    // Part 4: 4 CỎ ()
     // ─────────────────────────────────────────────────────────────
     test('Part 4 - 4 Clovers: Extreme sports (Versions 1-3)', () => {
       const testCases = [
@@ -182,7 +182,7 @@ describe('--- UNIT TESTS: TOPIC RULES & AUTO-TAGGING ENGINE ---', () => {
     });
 
     // ─────────────────────────────────────────────────────────────
-    // Part 4: 3 CỎ (☘️☘️☘️)
+    // Part 4: 3 CỎ ()
     // ─────────────────────────────────────────────────────────────
     test('Part 4 - 3 Clovers: Childhood memories, Free time activity, Job and training, Volunteering, Career', () => {
       const testCases = [
@@ -217,17 +217,17 @@ describe('--- UNIT TESTS: TOPIC RULES & AUTO-TAGGING ENGINE ---', () => {
       return 0;
     }
 
-    it('should resolve "Making films (5)" vs "Family sports day (3)" to 5 ☘️', () => {
+    it('should resolve "Making films (5)" vs "Family sports day (3)" to 5 ', () => {
       const title = 'Đề 07 - Making films + Family sports day';
       expect(matchTopicPure(title)).toBe(5);
     });
 
-    it('should resolve "Family sports day (3)" vs "The first American woman in space (4)" to 4 ☘️', () => {
+    it('should resolve "Family sports day (3)" vs "The first American woman in space (4)" to 4 ', () => {
       const title = 'Đề 34 - Family sports day + The first American woman in space';
       expect(matchTopicPure(title)).toBe(4);
     });
 
-    it('should resolve "End of term project (5)" vs "Music show at the park (2)" to 5 ☘️', () => {
+    it('should resolve "End of term project (5)" vs "Music show at the park (2)" to 5 ', () => {
       const title = 'Đề 37 - End of term project + Music show at the park';
       expect(matchTopicPure(title)).toBe(5);
     });

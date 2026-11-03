@@ -383,7 +383,7 @@ Card theo chủ đề (Môi trường, Gia đình, Công nghệ,...) với số 
 
 | Từ (EN) | Phiên âm | Loại từ | Nghĩa (VI) | Audio | Ví dụ |
 |---|---|---|---|---|---|
-| Click vào ô để sửa trực tiếp | | | | 🔊 | |
+| Click vào ô để sửa trực tiếp | | | |  | |
 
 - **Inline Edit:** Bấm đúp → sửa → Enter/blur để lưu → không cần mở form mới
 - **Xóa từ:** Icon thùng rác cuối hàng

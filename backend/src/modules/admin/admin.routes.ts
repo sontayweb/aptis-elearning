@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { adminController } from './admin.controller';
+import { examController } from '../exams/exam.controller';
 import { authGuard } from '../../middlewares/auth.guard';
 import { roleGuard } from '../../middlewares/role.guard';
 import { uploadAudioMiddleware } from '../../middlewares/upload.middleware';
@@ -119,5 +120,10 @@ router.get('/dashboard/stats', roleGuard(['ADMIN']), (req, res, next) =>
 router.get('/dashboard/export', roleGuard(['ADMIN']), (req, res, next) =>
   adminController.exportDashboardReport(req, res, next)
 );
+
+// Quản lý báo lỗi câu hỏi từ học viên
+router.get('/reports', (req, res, next) => examController.listQuestionReports(req, res, next));
+router.patch('/reports/:id', (req, res, next) => examController.resolveQuestionReport(req, res, next));
+router.patch('/reports/:id/resolve', (req, res, next) => examController.resolveQuestionReport(req, res, next));
 
 export default router;

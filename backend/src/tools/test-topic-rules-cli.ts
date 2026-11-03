@@ -16,7 +16,7 @@ interface TestCase {
 
 const testCases: TestCase[] = [
   // ─────────────────────────────────────────────────────────────
-  // PART 2 & 3: 5 CỎ (☘️☘️☘️☘️☘️)
+  // PART 2 & 3: 5 CỎ ()
   // ─────────────────────────────────────────────────────────────
   { part: 'Part 2/3', expectedLevel: 5, expectedTag: '★★★★★ Đề tủ cực hot', testTitle: 'Đề 07 - Making films + Family sports day', note: 'Chủ đề Film' },
   { part: 'Part 2/3', expectedLevel: 5, expectedTag: '★★★★★ Đề tủ cực hot', testTitle: 'Đề 09 - My visit to a new coffee shop + A famous singer', note: 'Chủ đề Coffee + Singer' },
@@ -29,7 +29,7 @@ const testCases: TestCase[] = [
   { part: 'Part 2/3', expectedLevel: 5, expectedTag: '★★★★★ Đề tủ cực hot', testTitle: 'Film club 2 — Full Writing · 4 Parts', skill: 'WRITING', note: 'Đề Writing Film club' },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 2 & 3: 4 CỎ (☘️☘️☘️☘️)
+  // PART 2 & 3: 4 CỎ ()
   // ─────────────────────────────────────────────────────────────
   { part: 'Part 2/3', expectedLevel: 4, expectedTag: '★★★★ Tần suất thi cao', testTitle: 'The first American woman in Space', note: 'Woman in Space' },
   { part: 'Part 2/3', expectedLevel: 4, expectedTag: '★★★★ Tần suất thi cao', testTitle: 'Weekend activities (Reading Part 2)', note: 'Weekend activities' },
@@ -39,7 +39,7 @@ const testCases: TestCase[] = [
   { part: 'Part 2/3', expectedLevel: 4, expectedTag: '★★★★ Tần suất thi cao', testTitle: 'Đề 14 - The history of transportation', note: 'Transportation' },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 2 & 3: 3 CỎ (☘️☘️☘️)
+  // PART 2 & 3: 3 CỎ ()
   // ─────────────────────────────────────────────────────────────
   { part: 'Part 2/3', expectedLevel: 3, expectedTag: '★★★ Trọng tâm ôn tập', testTitle: 'Family Sport Day (phiên bản 1)', note: 'Family sport' },
   { part: 'Part 2/3', expectedLevel: 3, expectedTag: '★★★ Trọng tâm ôn tập', testTitle: 'Family sports day (phiên bản 2)', note: 'Family sports' },
@@ -48,7 +48,7 @@ const testCases: TestCase[] = [
   { part: 'Part 2/3', expectedLevel: 3, expectedTag: '★★★ Trọng tâm ôn tập', testTitle: 'College Welcoming Day', note: 'College Welcoming' },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 2 & 3: 2 CỎ (☘️☘️)
+  // PART 2 & 3: 2 CỎ ()
   // ─────────────────────────────────────────────────────────────
   { part: 'Part 2/3', expectedLevel: 2, expectedTag: '★★ Luyện tập mở rộng', testTitle: 'Public Transportations in big cities', note: 'Public Transportations' },
   { part: 'Part 2/3', expectedLevel: 2, expectedTag: '★★ Luyện tập mở rộng', testTitle: 'Writing about a place (phiên bản 2)', note: 'Writing about a place' },
@@ -56,7 +56,7 @@ const testCases: TestCase[] = [
   { part: 'Part 2/3', expectedLevel: 2, expectedTag: '★★ Luyện tập mở rộng', testTitle: 'Music show at the park', note: 'Music show at the park' },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 4: 5 CỎ (☘️☘️☘️☘️☘️)
+  // PART 4: 5 CỎ ()
   // ─────────────────────────────────────────────────────────────
   { part: 'Part 4', expectedLevel: 5, expectedTag: '★★★★★ Đề tủ cực hot', testTitle: 'Đề thi Part 3: Childhood', note: 'Childhood đơn lẻ' },
   { part: 'Part 4', expectedLevel: 5, expectedTag: '★★★★★ Đề tủ cực hot', testTitle: 'Music festival - Version 3', note: 'Music festival V3' },
@@ -77,14 +77,14 @@ const testCases: TestCase[] = [
   { part: 'Part 4', expectedLevel: 5, expectedTag: '★★★★★ Đề tủ cực hot', testTitle: 'Mountain (phiên bản 4)', note: 'Mountain V4' },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 4: 4 CỎ (☘️☘️☘️☘️)
+  // PART 4: 4 CỎ ()
   // ─────────────────────────────────────────────────────────────
   { part: 'Part 4', expectedLevel: 4, expectedTag: '★★★★ Tần suất thi cao', testTitle: 'Extreme sports ( Phiên bản 3)', note: 'Extreme sports V3' },
   { part: 'Part 4', expectedLevel: 4, expectedTag: '★★★★ Tần suất thi cao', testTitle: 'Extreme sports', note: 'Extreme sports' },
   { part: 'Part 4', expectedLevel: 4, expectedTag: '★★★★ Tần suất thi cao', testTitle: 'Extreme sports (phiên bản 2)', note: 'Extreme sports V2' },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 4: 3 CỎ (☘️☘️☘️)
+  // PART 4: 3 CỎ ()
   // ─────────────────────────────────────────────────────────────
   { part: 'Part 4', expectedLevel: 3, expectedTag: '★★★ Trọng tâm ôn tập', testTitle: 'Childhood memories from secondary school', note: 'Childhood memories (không bị nuốt bởi childhood 5 Cỏ)' },
   { part: 'Part 4', expectedLevel: 3, expectedTag: '★★★ Trọng tâm ôn tập', testTitle: 'Đề 22 - Free time activity (2026)', note: 'Free time activity' },
@@ -101,7 +101,7 @@ const testCases: TestCase[] = [
 
 function runDiagnostic() {
   console.log('========================================================================================');
-  console.log('🚀 BẮT ĐẦU CHẠY UNIT TEST KIỂM THỬ TỪNG CHỦ ĐỀ & ĐỀ THI (TOPIC RULES TEST RUNNER)');
+  console.log('[START] BẮT ĐẦU CHẠY UNIT TEST KIỂM THỬ TỪNG CHỦ ĐỀ & ĐỀ THI (TOPIC RULES TEST RUNNER)');
   console.log('========================================================================================\n');
 
   let passed = 0;
@@ -146,9 +146,9 @@ function runDiagnostic() {
     if (isMatch) passed++;
     else failed++;
 
-    const statusStr = isMatch ? '✅ PASS' : '❌ FAIL';
-    const expStr = `${tc.expectedLevel} ☘️`;
-    const actStr = `${actualLevel} ☘️`;
+    const statusStr = isMatch ? '[PASS] PASS' : '[FAIL] FAIL';
+    const expStr = `${tc.expectedLevel} `;
+    const actStr = `${actualLevel} `;
 
     const displayTitle = tc.testTitle.length > 45 ? tc.testTitle.slice(0, 42) + '...' : tc.testTitle;
 
@@ -164,7 +164,7 @@ function runDiagnostic() {
   });
 
   console.log('\n' + '='.repeat(125));
-  console.log(`📊 TỔNG KẾT KIỂM THỬ: ${passed}/${testCases.length} TESTS PASS (${((passed / testCases.length) * 100).toFixed(1)}%) | ${failed} FAILED`);
+  console.log(`[STATS] TỔNG KẾT KIỂM THỬ: ${passed}/${testCases.length} TESTS PASS (${((passed / testCases.length) * 100).toFixed(1)}%) | ${failed} FAILED`);
   console.log('='.repeat(125));
 
   if (failed > 0) {

@@ -202,7 +202,7 @@ async function main() {
     }
   }
 
-  console.log('\n🎉 ĐÃ CẬP NHẬT HOÀN TẤT!');
+  console.log('\nĐÃ CẬP NHẬT HOÀN TẤT!');
   await prisma.$disconnect();
 }
 

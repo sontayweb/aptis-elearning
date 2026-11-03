@@ -1,5 +1,7 @@
 "use client";
 
+import { QuestionReportModal } from "@/components/exam/question-report-modal";
+
 import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -1189,81 +1191,14 @@ function GrammarExamRunnerContent() {
       )}
 
       {/* MODAL BÁO LỖI */}
-      {showReportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-destructive" />
-                <span>Báo lỗi câu {currentIndex + 1}</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowReportModal(false);
-                  setReportSent(false);
-                }}
-                className="p-1 rounded-lg hover:bg-muted text-muted-foreground cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {reportSent ? (
-              <div className="py-6 text-center space-y-2">
-                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
-                <p className="text-sm font-bold text-foreground">Cảm ơn bạn đã phản hồi!</p>
-                <p className="text-xs text-muted-foreground">
-                  Đội ngũ học thuật sẽ đối soát và cập nhật lại câu hỏi sớm nhất.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowReportModal(false);
-                    setReportSent(false);
-                    setReportText("");
-                  }}
-                  className="mt-3 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold cursor-pointer"
-                >
-                  Xong
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-xs text-muted-foreground">
-                  Vui lòng mô tả vấn đề bạn gặp phải với câu hỏi này (sai chính tả, sai đáp án, v.v.):
-                </p>
-                <textarea
-                  value={reportText}
-                  onChange={(e) => setReportText(e.target.value)}
-                  placeholder="Mô tả chi tiết nội dung cần chỉnh sửa..."
-                  className="w-full h-28 p-3 rounded-xl border border-border bg-background text-xs focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
-                />
-                <div className="flex justify-end gap-2 pt-2 border-t border-border">
-                  <button
-                    type="button"
-                    onClick={() => setShowReportModal(false)}
-                    className="px-3.5 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-muted cursor-pointer"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (reportText.trim()) setReportSent(true);
-                    }}
-                    disabled={!reportText.trim()}
-                    className="px-4 py-1.5 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Gửi báo lỗi</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <QuestionReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        examId={examId || "grammar-exam"}
+        examTitle={examTitle || "Bài luyện Grammar & Vocabulary"}
+        questionNumber={currentIndex + 1}
+        skillName="Grammar & Vocabulary"
+      />
 
       {/* DRAWER DANH SÁCH CÂU HỎI */}
       {isDrawerOpen && (

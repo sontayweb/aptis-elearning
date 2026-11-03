@@ -7,7 +7,7 @@ import path from 'path';
 
 async function runTests() {
   console.log('====================================================');
-  console.log('🚀 KIỂM THỬ TÍCH HỢP: UPLOAD, GHI ĐÈ & DỌN DẸP ẢNH');
+  console.log('[START] KIỂM THỬ TÍCH HỢP: UPLOAD, GHI ĐÈ & DỌN DẸP ẢNH');
   console.log('====================================================\n');
 
   // 1. Tạo JWT Token Admin
@@ -46,18 +46,18 @@ async function runTests() {
 
   if (res1.status === 200 && res1.body.success && res1.body.data.url) {
     uploadedUrl1 = res1.body.data.url;
-    console.log('✅ TEST 1 THÀNH CÔNG: URL ảnh 1 =', uploadedUrl1);
+    console.log('[PASS] TEST 1 THÀNH CÔNG: URL ảnh 1 =', uploadedUrl1);
 
     // Kiểm tra file thực tế trên đĩa cứng
     const localPath1 = path.resolve('./uploads', uploadedUrl1.replace(/^\/?(api\/)?uploads\/?/, ''));
     if (fs.existsSync(localPath1)) {
-      console.log('✅ File 1 đã được tạo vật lý trên ổ cứng:', localPath1);
+      console.log('[PASS] File 1 đã được tạo vật lý trên ổ cứng:', localPath1);
     } else {
-      console.error('❌ LỖI: File 1 không tồn tại trên ổ cứng!');
+      console.error('[FAIL] LỖI: File 1 không tồn tại trên ổ cứng!');
       process.exit(1);
     }
   } else {
-    console.error('❌ TEST 1 THẤT BẠI:', res1.status, res1.body);
+    console.error('[FAIL] TEST 1 THẤT BẠI:', res1.status, res1.body);
     process.exit(1);
   }
 
@@ -74,28 +74,28 @@ async function runTests() {
 
   if (res2.status === 200 && res2.body.success && res2.body.data.url) {
     uploadedUrl2 = res2.body.data.url;
-    console.log('✅ TEST 2 THÀNH CÔNG: URL ảnh 2 =', uploadedUrl2);
+    console.log('[PASS] TEST 2 THÀNH CÔNG: URL ảnh 2 =', uploadedUrl2);
 
     const localPath1 = path.resolve('./uploads', uploadedUrl1.replace(/^\/?(api\/)?uploads\/?/, ''));
     const localPath2 = path.resolve('./uploads', uploadedUrl2.replace(/^\/?(api\/)?uploads\/?/, ''));
 
     // Kiểm tra file 2 có trên đĩa cứng
     if (fs.existsSync(localPath2)) {
-      console.log('✅ File 2 mới đã được tạo trên ổ cứng:', localPath2);
+      console.log('[PASS] File 2 mới đã được tạo trên ổ cứng:', localPath2);
     } else {
-      console.error('❌ LỖI: File 2 không tồn tại!');
+      console.error('[FAIL] LỖI: File 2 không tồn tại!');
       process.exit(1);
     }
 
     // Kiểm tra file 1 ĐÃ BỊ XÓA (không còn tồn tại rác)
     if (!fs.existsSync(localPath1)) {
-      console.log('🎯 XUẤT SẮC: File 1 cũ ĐÃ ĐƯỢC TỰ ĐỘNG XÓA KHỎI Ổ ĐĨA! Không còn file rác tồn đọng.');
+      console.log('[RESULT] XUẤT SẮC: File 1 cũ ĐÃ ĐƯỢC TỰ ĐỘNG XÓA KHỎI Ổ ĐĨA! Không còn file rác tồn đọng.');
     } else {
-      console.error('❌ LỖI: File 1 cũ vẫn còn trên ổ cứng (chưa được dọn dẹp)!');
+      console.error('[FAIL] LỖI: File 1 cũ vẫn còn trên ổ cứng (chưa được dọn dẹp)!');
       process.exit(1);
     }
   } else {
-    console.error('❌ TEST 2 THẤT BẠI:', res2.status, res2.body);
+    console.error('[FAIL] TEST 2 THẤT BẠI:', res2.status, res2.body);
     process.exit(1);
   }
 
@@ -111,13 +111,13 @@ async function runTests() {
   if (res3.status === 200 && res3.body.data.deleted === true) {
     const localPath2 = path.resolve('./uploads', uploadedUrl2.replace(/^\/?(api\/)?uploads\/?/, ''));
     if (!fs.existsSync(localPath2)) {
-      console.log('✅ TEST 3 THÀNH CÔNG: File 2 đã bị xóa vật lý hoàn toàn khỏi ổ đĩa!');
+      console.log('[PASS] TEST 3 THÀNH CÔNG: File 2 đã bị xóa vật lý hoàn toàn khỏi ổ đĩa!');
     } else {
-      console.error('❌ LỖI: File 2 vẫn còn trên ổ cứng sau khi gọi DELETE!');
+      console.error('[FAIL] LỖI: File 2 vẫn còn trên ổ cứng sau khi gọi DELETE!');
       process.exit(1);
     }
   } else {
-    console.error('❌ TEST 3 THẤT BẠI:', res3.status, res3.body);
+    console.error('[FAIL] TEST 3 THẤT BẠI:', res3.status, res3.body);
     process.exit(1);
   }
 
@@ -133,9 +133,9 @@ async function runTests() {
   // package.json không bao giờ được phép bị xóa!
   const pkgExists = fs.existsSync(path.resolve('./package.json'));
   if (pkgExists && res4.body.data.deleted === false) {
-    console.log('✅ TEST 4 THÀNH CÔNG: Hệ thống đã chặn đứng hành vi xóa file ngoài thư mục!');
+    console.log('[PASS] TEST 4 THÀNH CÔNG: Hệ thống đã chặn đứng hành vi xóa file ngoài thư mục!');
   } else {
-    console.error('❌ LỖI BẢO MẬT: Path Traversal không được bảo vệ!');
+    console.error('[FAIL] LỖI BẢO MẬT: Path Traversal không được bảo vệ!');
     process.exit(1);
   }
 
@@ -149,14 +149,14 @@ async function runTests() {
     .attach('image', textBuffer, 'malicious.txt');
 
   if (res5.status === 400) {
-    console.log('✅ TEST 5 THÀNH CÔNG: Server từ chối file không phải ảnh (MIME check pass)!');
+    console.log('[PASS] TEST 5 THÀNH CÔNG: Server từ chối file không phải ảnh (MIME check pass)!');
   } else {
-    console.error('❌ TEST 5 THẤT BẠI: Server không chặn file sai MIME, status =', res5.status);
+    console.error('[FAIL] TEST 5 THẤT BẠI: Server không chặn file sai MIME, status =', res5.status);
     process.exit(1);
   }
 
   console.log('\n====================================================');
-  console.log('🎉 TẤT CẢ 5 BÀI KIỂM THỬ ĐÃ PASS 100% HOÀN HẢO!');
+  console.log('TẤT CẢ 5 BÀI KIỂM THỬ ĐÃ PASS 100% HOÀN HẢO!');
   console.log('====================================================\n');
   process.exit(0);
 }

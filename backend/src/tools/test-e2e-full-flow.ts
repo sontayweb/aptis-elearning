@@ -11,7 +11,7 @@ const submissionService = new SubmissionService();
 
 async function runEndToEndTests() {
   console.log('================================================================');
-  console.log('🧪 TEST CASE FULL LUỒNG: INGESTION -> EXAM API -> THI THỬ -> CHẤM BÀI');
+  console.log('[TEST] TEST CASE FULL LUỒNG: INGESTION -> EXAM API -> THI THỬ -> CHẤM BÀI');
   console.log('================================================================\n');
 
   let passedTests = 0;
@@ -21,16 +21,16 @@ async function runEndToEndTests() {
     totalTests++;
     if (condition) {
       passedTests++;
-      console.log(`  ✅ [PASS] ${testName}`);
-      if (detail) console.log(`     ℹ️ ${detail}`);
+      console.log(`  [PASS] [PASS] ${testName}`);
+      if (detail) console.log(`     [INFO] ${detail}`);
     } else {
-      console.error(`  ❌ [FAIL] ${testName}`);
-      if (detail) console.error(`     ⚠️ ${detail}`);
+      console.error(`  [FAIL] [FAIL] ${testName}`);
+      if (detail) console.error(`     [WARN] ${detail}`);
     }
   }
 
   // --- BƯỚC 1: KIỂM TRA DỮ LIỆU ĐÃ NẠP (INGESTION DATA) ---
-  console.log('📋 [PHASE 1] Kiểm tra cơ sở dữ liệu sau Ingestion (Đủ 4 Kỹ Năng + Full Test)');
+  console.log(' [PHASE 1] Kiểm tra cơ sở dữ liệu sau Ingestion (Đủ 4 Kỹ Năng + Full Test)');
 
   const [readingExams, speakingExams, listeningExams, writingExams, fullTests] = await Promise.all([
     prisma.exam.findMany({ where: { skill: ExamSkill.READING }, include: { parts: { include: { questions: true } } } }),
@@ -47,7 +47,7 @@ async function runEndToEndTests() {
   assert(fullTests.length > 0, 'Phân hệ THI THỬ FULL TEST có ít nhất 1 đề thi', `Tìm thấy ${fullTests.length} đề.`);
 
   // --- BƯỚC 2: KIỂM TRA MEDIA TÀI NGUYÊN (ẢNH SPEAKING & AUDIO LISTENING) ---
-  console.log('\n🎨 [PHASE 2] Kiểm tra Media thực tế (Hình ảnh tranh & Âm thanh phát ra)');
+  console.log('\n [PHASE 2] Kiểm tra Media thực tế (Hình ảnh tranh & Âm thanh phát ra)');
 
   // Kiểm tra ảnh Speaking
   const speakingPartWithImage = speakingExams
@@ -102,7 +102,7 @@ async function runEndToEndTests() {
   }
 
   // --- BƯỚC 3: KIỂM TRA API PHỤC VỤ THI THỬ (FRONTEND CONTRACT) ---
-  console.log('\n🔌 [PHASE 3] Kiểm tra API Backend trả dữ liệu cho màn hình Thi Thử (Frontend)');
+  console.log('\n [PHASE 3] Kiểm tra API Backend trả dữ liệu cho màn hình Thi Thử (Frontend)');
 
   const targetExam = fullTests[0] || readingExams[0];
   const examDetail = await examService.getExamDetail(targetExam.id);
@@ -115,7 +115,7 @@ async function runEndToEndTests() {
   assert(totalQ > 0, `API getExamQuestions trả về danh sách câu hỏi`, `Tổng số câu hỏi: ${totalQ}`);
 
   // --- BƯỚC 4: MÔ PHỎNG THÍ SINH LÀM BÀI VÀ NỘP BÀI (FULL E2E EXAM SUBMISSION) ---
-  console.log('\n📝 [PHASE 4] Mô phỏng Thí sinh vào phòng thi -> Điền đáp án -> Nộp bài -> Chấm điểm');
+  console.log('\n[PHASE 4] Mô phỏng Thí sinh vào phòng thi -> Điền đáp án -> Nộp bài -> Chấm điểm');
 
   // Lấy hoặc tạo tài khoản học viên test
   let testUser = await prisma.user.findFirst({ where: { role: 'STUDENT' } });
@@ -163,11 +163,11 @@ async function runEndToEndTests() {
 
   // --- TỔNG KẾT ---
   console.log('\n================================================================');
-  console.log(`🎯 KẾT QUẢ KIỂM THỬ E2E: ${passedTests}/${totalTests} TEST CASES ĐẠT CHUẨN 100%!`);
+  console.log(`[RESULT] KẾT QUẢ KIỂM THỬ E2E: ${passedTests}/${totalTests} TEST CASES ĐẠT CHUẨN 100%!`);
   console.log('================================================================');
 
   if (passedTests === totalTests) {
-    console.log('🎉 TOÀN BỘ LUỒNG HOẠT ĐỘNG HOÀN HẢO! HỆ THỐNG SẴN SÀNG CHO VẬN HÀNH THẬT.');
+    console.log('TOÀN BỘ LUỒNG HOẠT ĐỘNG HOÀN HẢO! HỆ THỐNG SẴN SÀNG CHO VẬN HÀNH THẬT.');
   } else {
     throw new Error('Có test case không đạt yêu cầu!');
   }
@@ -175,7 +175,7 @@ async function runEndToEndTests() {
 
 runEndToEndTests()
   .catch((err) => {
-    console.error('❌ Lỗi khi chạy Test Suite:', err);
+    console.error('[FAIL] Lỗi khi chạy Test Suite:', err);
     process.exit(1);
   })
   .finally(async () => {

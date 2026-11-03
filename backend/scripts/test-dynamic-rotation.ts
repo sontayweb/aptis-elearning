@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const apiKey = 'AQ.Ab8RN6IVwgbOPSbD3zmqMEtDhn6pOXqBReuqjKCETPAqhOu8Mw';
 
 async function testDynamicDiscoveryAndRotation() {
-  console.log('🌐 1. Tự động lấy danh sách Model từ Google API (Không hardcode)...');
+  console.log('1. Tự động lấy danh sách Model từ Google API (Không hardcode)...');
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
   const data = await res.json();
   
@@ -28,7 +28,7 @@ async function testDynamicDiscoveryAndRotation() {
   console.log(activeGeminiModels);
 
   // 2. Chạy thử cơ chế xoay vòng
-  console.log('\n🔄 2. Chạy kiểm tra xoay vòng (Model Rotation):');
+  console.log('\n2. Chạy kiểm tra xoay vòng (Model Rotation):');
   const genAI = new GoogleGenerativeAI(apiKey);
 
   let currentStickyModel = activeGeminiModels[0];
@@ -41,12 +41,12 @@ async function testDynamicDiscoveryAndRotation() {
       const output = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
       });
-      console.log(`✅ Model [${modelName}] HOẠT ĐỘNG HOÀN HẢO!`);
+      console.log(`[PASS] Model [${modelName}] HOẠT ĐỘNG HOÀN HẢO!`);
       currentStickyModel = modelName;
-      console.log(`🎯 ĐÃ LƯU MODEL "${currentStickyModel}" LÀM ACTIVE MODEL CHO CÁC LẦN GỌI TIẾP THEO!\n`);
+      console.log(`[RESULT] ĐÃ LƯU MODEL "${currentStickyModel}" LÀM ACTIVE MODEL CHO CÁC LẦN GỌI TIẾP THEO!\n`);
       break; // Đã tìm được model phản hồi tốt nhất -> Dừng lại và giữ làm sticky model!
     } catch (err: any) {
-      console.warn(`⚠️ Model [${modelName}] lỗi: ${err.message}. Đang xoay vòng sang model kế tiếp...`);
+      console.warn(`[WARN] Model [${modelName}] lỗi: ${err.message}. Đang xoay vòng sang model kế tiếp...`);
     }
   }
 }

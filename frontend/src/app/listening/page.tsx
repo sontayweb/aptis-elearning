@@ -35,6 +35,7 @@ import {
   Sparkles,
   Flame,
   Star,
+  Lightbulb,
 } from "lucide-react";
 
 interface ListeningExam {
@@ -312,7 +313,7 @@ export default function ListeningPracticePage() {
                 href="/meo-thi-aptis/meo-hoc-listening-aptis"
                 data-discover="true"
               >
-                💡 Xem ngay - Mẹo làm bài Listening
+                <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" /><span>Xem ngay - Mẹo làm bài Listening</span>
               </Link>
             </div>
           </div>

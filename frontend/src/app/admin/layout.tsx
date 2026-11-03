@@ -185,6 +185,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           icon: MessageSquare,
           badge: null,
         },
+        {
+          title: "Báo lỗi câu hỏi",
+          href: "/admin/reports",
+          icon: AlertTriangle,
+          badge: null,
+        },
       ],
     },
     {

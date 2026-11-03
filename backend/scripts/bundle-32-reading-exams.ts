@@ -48,7 +48,7 @@ async function main() {
     });
 
     if (deCatalog.length === 0) {
-      console.warn(`⚠️ Không tìm thấy catalog cho Đề ${code}`);
+      console.warn(`[WARN] Không tìm thấy catalog cho Đề ${code}`);
       continue;
     }
 
@@ -93,7 +93,7 @@ async function main() {
     }
 
     if (partsToCreate.length === 0) {
-      console.warn(`⚠️ Không tìm thấy câu hỏi nào cho Đề ${code}`);
+      console.warn(`[WARN] Không tìm thấy câu hỏi nào cho Đề ${code}`);
       continue;
     }
 
@@ -126,17 +126,17 @@ async function main() {
       }
     });
 
-    console.log(`✅ [${code}/32] Đã đóng gói thành công: "${fullExamTitle}" (${partsToCreate.length} parts, ${isPro ? 'VIP PRO' : 'MIỄN PHÍ'})`);
+    console.log(`[PASS] [${code}/32] Đã đóng gói thành công: "${fullExamTitle}" (${partsToCreate.length} parts, ${isPro ? 'VIP PRO' : 'MIỄN PHÍ'})`);
   }
 
-  console.log(`\n🎉 HOÀN THÀNH ĐÓNG GÓI 32 BỘ ĐỀ FULL READING!`);
+  console.log(`\nHOÀN THÀNH ĐÓNG GÓI 32 BỘ ĐỀ FULL READING!`);
   console.log(`- Mới tạo: ${createdCount} bộ đề`);
   console.log(`- Cập nhật: ${updatedCount} bộ đề`);
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Lỗi đóng gói:', e);
+    console.error('[FAIL] Lỗi đóng gói:', e);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());

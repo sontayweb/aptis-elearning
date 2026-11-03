@@ -110,19 +110,19 @@ export const ExamEditModal: React.FC<ExamEditModalProps> = ({
 
           <div>
             <label className="block font-heading font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Độ Hot ☘️
+              Độ Hot
             </label>
             <select
               value={form.hotLevel}
               onChange={(e) => setForm({ ...form, hotLevel: Number(e.target.value) })}
               className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-sans"
             >
-              <option value={0}>⚪ 0 Cỏ (Đề thường / Chưa gán)</option>
-              <option value={1}>☘️ 1 Cỏ</option>
-              <option value={2}>☘️☘️ 2 Cỏ</option>
-              <option value={3}>☘️☘️☘️ 3 Cỏ</option>
-              <option value={4}>☘️☘️☘️☘️ 4 Cỏ</option>
-              <option value={5}>☘️☘️☘️☘️☘️ 5 Cỏ (Trúng tủ cao nhất)</option>
+              <option value={0}>0 Sao (Đề thường / Chưa gán)</option>
+              <option value={1}>1 Sao</option>
+              <option value={2}>2 Sao</option>
+              <option value={3}>3 Sao</option>
+              <option value={4}>4 Sao</option>
+              <option value={5}>5 Sao (Trúng tủ cao nhất)</option>
             </select>
           </div>
 

@@ -35,7 +35,7 @@ function mapQuestionType(typeStr: string | null | undefined): QuestionType {
 // 1. DỌN DẸP DỮ LIỆU CŨ AN TOÀN TRƯỚC KHI NẠP DỮ LIỆU CHUẨN 100%
 // ----------------------------------------------------------------------------------
 async function cleanOldExamData() {
-  console.log('\n🧹 [BƯỚC 1/4] Dọn dẹp dữ liệu đề thi và bài học cũ để chuẩn bị insert...');
+  console.log('\n[BƯỚC 1/4] Dọn dẹp dữ liệu đề thi và bài học cũ để chuẩn bị insert...');
   
   // Xóa theo thứ tự quan hệ cascade
   const delAnswers = await prisma.submissionAnswer.deleteMany({});
@@ -49,21 +49,21 @@ async function cleanOldExamData() {
   const delSentences = await prisma.dictationSentence.deleteMany({});
   const delLessons = await prisma.dictationLesson.deleteMany({});
 
-  console.log(`✅ Đã làm sạch: ${delExams.count} exams cũ, ${delParts.count} parts, ${delQuestions.count} câu hỏi, ${delLessons.count} bài dictation.`);
+  console.log(`[PASS] Đã làm sạch: ${delExams.count} exams cũ, ${delParts.count} parts, ${delQuestions.count} câu hỏi, ${delLessons.count} bài dictation.`);
 }
 
 // ----------------------------------------------------------------------------------
 // 2. NẠP 26 ĐỀ THI THỬ TỔNG HỢP FULL TESTS (162P) TỪ APTIS KỲ TÍCH
 // ----------------------------------------------------------------------------------
 async function insertKyTichFullTests() {
-  console.log('\n🏆 [BƯỚC 2/4] Đang tổng hợp và nạp 26 Đề Thi Thử Full Tests (162p) Aptis Kỳ Tích...');
+  console.log('\n[BƯỚC 2/4] Đang tổng hợp và nạp 26 Đề Thi Thử Full Tests (162p) Aptis Kỳ Tích...');
   
   const fullTestsFile = path.join(kytichDir, 'full_tests.json');
   const catalogFile = path.join(kytichDir, 'exam_sets_catalog.json');
   const questionsFile = path.join(kytichDir, 'all_exam_questions.json');
 
   if (!fs.existsSync(fullTestsFile) || !fs.existsSync(catalogFile) || !fs.existsSync(questionsFile)) {
-    console.warn('⚠️ Thiếu file dữ liệu Kỳ Tích Full Tests');
+    console.warn('[WARN] Thiếu file dữ liệu Kỳ Tích Full Tests');
     return;
   }
 
@@ -83,7 +83,8 @@ async function insertKyTichFullTests() {
   let count = 0;
   for (const ft of fullTests) {
     try {
-      const ftTitle = `Đề thi thử Aptis ESOL Full Test ${ft.title.replace('Đề ', '')} (Kỳ Tích)`;
+      const ftNum = ft.title.replace('Đề ', '').trim();
+      const ftTitle = `Đề thi thử Aptis ESOL Full Test ${ftNum}`;
       const partsData: any[] = [];
       let partNumber = 1;
 
@@ -118,7 +119,7 @@ async function insertKyTichFullTests() {
       await prisma.exam.create({
         data: {
           title: ftTitle,
-          description: `Đề thi thử Aptis ESOL 5 kỹ năng (Speaking, Listening, Reading, Writing, Grammar & Vocabulary) theo chuẩn format British Council từ Aptis Kỳ Tích.`,
+          description: `Đề thi thử Aptis ESOL 5 kỹ năng (Speaking, Listening, Reading, Writing, Grammar & Vocabulary) theo chuẩn format British Council từ Aptis ESOL Premier.`,
           skill: ExamSkill.FULL_TEST,
           duration_minutes: 162,
           is_pro: ft.access_tier === 'pro',
@@ -135,7 +136,7 @@ async function insertKyTichFullTests() {
     }
   }
 
-  console.log(`✅ Đã nạp thành công ${count}/26 đề thi thử Full Tests Kỳ Tích!`);
+  console.log(`[PASS] Đã nạp thành công ${count}/26 đề thi thử Full Tests Kỳ Tích!`);
 }
 
 // ----------------------------------------------------------------------------------
@@ -143,12 +144,12 @@ async function insertKyTichFullTests() {
 // ----------------------------------------------------------------------------------
 async function insertNormalizedExams(sourceName: string, filePath: string) {
   if (!fs.existsSync(filePath)) {
-    console.warn(`⚠️ Không tìm thấy: ${filePath}`);
+    console.warn(`[WARN] Không tìm thấy: ${filePath}`);
     return;
   }
 
   const exams = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  console.log(`\n📚 Đang nạp ${exams.length} đề thi chuẩn hóa từ [${sourceName}]...`);
+  console.log(`\n Đang nạp ${exams.length} đề thi chuẩn hóa từ [${sourceName}]...`);
 
   let count = 0;
   for (const ex of exams) {
@@ -194,20 +195,20 @@ async function insertNormalizedExams(sourceName: string, filePath: string) {
     }
   }
 
-  console.log(`✅ Hoàn tất nạp [${sourceName}]: ${count}/${exams.length} đề thi vào PostgreSQL!`);
+  console.log(`[PASS] Hoàn tất nạp [${sourceName}]: ${count}/${exams.length} đề thi vào PostgreSQL!`);
 }
 
 // ----------------------------------------------------------------------------------
 // 4. NẠP KHO NGHE CHÉP CHÍNH TẢ (DICTATION): 670 BỘ ĐỀ & 3,852 CÂU
 // ----------------------------------------------------------------------------------
 async function insertDictationSystem() {
-  console.log('\n🎧 [BƯỚC 4/4] Đang nạp kho Nghe chép chính tả (Dictation) vào PostgreSQL...');
+  console.log('\n[LISTENING] [BƯỚC 4/4] Đang nạp kho Nghe chép chính tả (Dictation) vào PostgreSQL...');
 
   const setsFile = path.join(kytichDir, 'dictation_sets.json');
   const sentencesFile = path.join(kytichDir, 'all_dictation_sentences.json');
 
   if (!fs.existsSync(setsFile) || !fs.existsSync(sentencesFile)) {
-    console.warn('⚠️ Thiếu file dữ liệu Dictation');
+    console.warn('[WARN] Thiếu file dữ liệu Dictation');
     return;
   }
 
@@ -258,7 +259,7 @@ async function insertDictationSystem() {
     }
   }
 
-  console.log(`✅ Hoàn tất nạp Dictation: ${count}/${dictationSets.length} bài (${allSentences.length} câu) vào PostgreSQL!`);
+  console.log(`[PASS] Hoàn tất nạp Dictation: ${count}/${dictationSets.length} bài (${allSentences.length} câu) vào PostgreSQL!`);
 }
 
 // ----------------------------------------------------------------------------------
@@ -266,8 +267,8 @@ async function insertDictationSystem() {
 // ----------------------------------------------------------------------------------
 async function main() {
   console.log('================================================================================');
-  console.log('🚀 TIẾN TRÌNH NẠP DỮ LIỆU ĐA NGUỒN CHUẨN HÓA VÀO POSTGRESQL');
-  console.log('⏱️ Bắt đầu lúc:', new Date().toLocaleString());
+  console.log('[START] TIẾN TRÌNH NẠP DỮ LIỆU ĐA NGUỒN CHUẨN HÓA VÀO POSTGRESQL');
+  console.log('[TIME] Bắt đầu lúc:', new Date().toLocaleString());
   console.log('================================================================================');
 
   // 1. Dọn dẹp dữ liệu cũ (đã backup an toàn trước đó)
@@ -294,9 +295,9 @@ async function main() {
   const finalUserCount = await prisma.user.count();
 
   console.log('\n================================================================================');
-  console.log('🎉🎉 HOÀN THÀNH NẠP TOÀN BỘ DỮ LIỆU VÀO DATABASE THÀNH CÔNG RỰC RỠ!');
+  console.log('HOÀN THÀNH NẠP TOÀN BỘ DỮ LIỆU VÀO DATABASE THÀNH CÔNG RỰC RỠ!');
   console.log('================================================================================');
-  console.log(`📊 THỐNG KÊ DATABASE SAU KHI NẠP:`);
+  console.log(`[STATS] THỐNG KÊ DATABASE SAU KHI NẠP:`);
   console.log(`- Tài khoản người dùng (Users):        ${finalUserCount} (Bảo toàn 100%)`);
   console.log(`- Tổng số đề thi (Exams):             ${finalExamCount} bộ đề`);
   console.log(`- Tổng số phần thi (ExamParts):        ${finalPartCount} parts`);

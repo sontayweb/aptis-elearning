@@ -495,9 +495,9 @@ export class SubmissionService {
       setImmediate(async () => {
         try {
           await aiGradingService.evaluateSubmission(submissionId);
-          console.log(`✅ [Auto AI Grading] Đã chấm tự động xong bài thi ${submissionId}`);
+          console.log(`[SUCCESS] [Auto AI Grading] Đã chấm tự động xong bài thi ${submissionId}`);
         } catch (err: any) {
-          console.warn(`⚠️ [Auto AI Grading] Chấm ngầm bài ${submissionId} gặp sự cố:`, err?.message || err);
+          console.warn(`[WARN] [Auto AI Grading] Chấm ngầm bài ${submissionId} gặp sự cố:`, err?.message || err);
         }
       });
     }

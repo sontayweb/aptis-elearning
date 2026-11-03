@@ -1,5 +1,7 @@
 "use client";
 
+import { QuestionReportModal } from "@/components/exam/question-report-modal";
+
 import { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -683,7 +685,7 @@ function WritingExamRunnerContent() {
               {aiEvaluationStatus === "evaluating" ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>AI Kỳ Tích đang chấm ngầm...</span>
+                  <span>AI Premier đang chấm ngầm...</span>
                 </>
               ) : (
                 <>
@@ -966,80 +968,14 @@ function WritingExamRunnerContent() {
       )}
 
       {/* MODAL BÁO LỖI */}
-      {showReportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-destructive" />
-                <span>Báo lỗi câu hỏi Writing</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowReportModal(false)}
-                className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {reportSent ? (
-              <div className="py-6 text-center space-y-2">
-                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
-                <p className="text-xs font-bold text-foreground">Cảm ơn bạn đã phản hồi!</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Ban chuyên môn sẽ kiểm tra ngữ cảnh và bài tập viết trong thời gian sớm nhất.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3 text-xs">
-                <p className="text-muted-foreground">Vui lòng chọn loại lỗi bạn gặp phải:</p>
-                <div className="space-y-2">
-                  {[
-                    "Lỗi đề bài hoặc câu hỏi không rõ nghĩa",
-                    "Lỗi bài viết mẫu tham khảo",
-                    "Lỗi đếm số từ / giao diện gõ chữ",
-                    "Khác",
-                  ].map((t) => (
-                    <label key={t} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="writingReportType"
-                        value={t}
-                        checked={reportType === t}
-                        onChange={() => setReportType(t)}
-                        className="text-primary focus:ring-primary"
-                      />
-                      <span className="text-foreground">{t}</span>
-                    </label>
-                  ))}
-                </div>
-                <textarea
-                  value={reportNote}
-                  onChange={(e) => setReportNote(e.target.value)}
-                  placeholder="Mô tả chi tiết vấn đề (tùy chọn)..."
-                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs resize-none h-20 focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <div className="flex justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowReportModal(false)}
-                    className="px-3.5 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setReportSent(true)}
-                    className="px-4 py-1.5 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:opacity-90"
-                  >
-                    Gửi báo lỗi
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <QuestionReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        examId={examId || "writing-exam"}
+        examTitle={examTitle || "Bài thi Writing"}
+        questionNumber={currentPartIdx + 1}
+        skillName="Writing"
+      />
 
       {/* =========================================================================
           BACKUP CODE UI CŨ (GENERIC 2-COLUMN VIEW)

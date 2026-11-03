@@ -114,7 +114,7 @@ async function runE2EProgressTest() {
     }
 
     if (initStats.todayRecommendation && initStats.todayRecommendation.weakestPartLink === '/thi-thu') {
-      logPass(`⚡ Gợi ý hôm nay hiển thị trạng thái chào đón: "${initStats.todayRecommendation.weakestPartTitle}"`);
+      logPass(`Gợi ý hôm nay hiển thị trạng thái chào đón: "${initStats.todayRecommendation.weakestPartTitle}"`);
     } else {
       logFail(`Gợi ý hôm nay không đúng trạng thái khởi tạo: ${JSON.stringify(initStats.todayRecommendation)}`);
     }
@@ -260,7 +260,7 @@ async function runE2EProgressTest() {
     // 3. Kiểm tra Today Recommendation & Wrong Answers
     const rec = postStats.todayRecommendation;
     if (rec && rec.wrongQuestionsCount >= 1) {
-      logPass(`⚡ Gợi ý hôm nay ghi nhận chính xác ${rec.wrongQuestionsCount} câu sai đang chờ ôn tập!`);
+      logPass(`Gợi ý hôm nay ghi nhận chính xác ${rec.wrongQuestionsCount} câu sai đang chờ ôn tập!`);
       logPass(`Tiêu đề phần yếu: "${rec.weakestPartTitle}"`);
       logPass(`Tóm tắt các part sai: "${rec.wrongQuestionsDetail}"`);
       logPass(`Đường dẫn ôn tập tự động: ${rec.wrongQuestionsLink}`);

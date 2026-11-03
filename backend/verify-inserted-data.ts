@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function verify() {
   console.log('===========================================================');
-  console.log('🔍 KIỂM ĐỊNH CHI TIẾT CẤU TRÚC ĐỀ THI TRONG POSTGRESQL');
+  console.log('KIỂM ĐỊNH CHI TIẾT CẤU TRÚC ĐỀ THI TRONG POSTGRESQL');
   console.log('===========================================================');
 
   // 1. Kiểm tra Full Test tổng hợp

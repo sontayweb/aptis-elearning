@@ -16,6 +16,7 @@ import {
   Edit2,
   Copy,
   Trash2,
+  Target,
 } from "lucide-react";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import AdminTableCard from "@/components/admin/admin-table-card";
@@ -152,10 +153,10 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
             }}
             placeholder={
               skillFilter !== "ALL" && partFilter !== null
-                ? `🔍 Tìm trong ${skillFilter} Part ${partFilter} (tên đề, số đề vd: 010, so sánh, tranh, mã ID, dán link học viên)...`
+                ? `Tìm trong ${skillFilter} Part ${partFilter} (tên đề, số đề vd: 010, so sánh, tranh, mã ID, dán link học viên)...`
                 : skillFilter !== "ALL"
-                ? `🔍 Tìm trong toàn bộ đề ${skillFilter} (tên đề, số đề vd: 010, mã ID, dán link học viên)...`
-                : "🔍 Tìm nhanh đề thi (tên đề, số đề vd: 010, mã UUID, từ khóa câu hỏi, dán link học viên)..."
+                ? `Tìm trong toàn bộ đề ${skillFilter} (tên đề, số đề vd: 010, mã ID, dán link học viên)...`
+                : "Tìm nhanh đề thi (tên đề, số đề vd: 010, mã UUID, từ khóa câu hỏi, dán link học viên)..."
             }
             className="w-full pl-10 pr-24 py-2.5 rounded-xl text-xs bg-slate-50/80 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner"
           />
@@ -182,40 +183,40 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
               Bộ lọc Hot:
             </span>
             {[
-              { value: "ALL", label: "☘️ Tất cả độ Hot" },
+              { value: "ALL", label: "Tất cả độ Hot" },
               {
                 value: "HOT_5",
-                label: "☘️☘️☘️☘️☘️ 5 Cỏ",
+                label: "5 Sao",
                 activeClass:
                   "bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800 font-bold shadow-xs",
               },
               {
                 value: "HOT_4",
-                label: "☘️☘️☘️☘️ 4 Cỏ",
+                label: "4 Sao",
                 activeClass:
                   "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700 font-bold",
               },
               {
                 value: "HOT_3",
-                label: "☘️☘️☘️ 3 Cỏ",
+                label: "3 Sao",
                 activeClass:
                   "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-700 font-bold",
               },
               {
                 value: "HOT_2",
-                label: "☘️☘️ 2 Cỏ",
+                label: "2 Sao",
                 activeClass:
                   "bg-teal-50/70 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800 font-semibold",
               },
               {
                 value: "HOT_1",
-                label: "☘️ 1 Cỏ",
+                label: "1 Sao",
                 activeClass:
                   "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-semibold",
               },
               {
                 value: "HOT_0",
-                label: "⚪ Chưa gán",
+                label: "Chưa gán",
                 activeClass:
                   "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-bold",
               },
@@ -246,7 +247,7 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
             /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
           ) && (
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 animate-in fade-in">
-              🎯 Đã nhận diện mã ID / Link đề thi
+              <Target className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" /><span>Đã nhận diện mã ID / Link đề thi</span>
             </span>
           )}
         </div>
@@ -325,7 +326,7 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
               />
               <SortableHeader
                 field="hotLevel"
-                title="Độ Hot ☘️"
+                title="Độ Hot"
                 currentSort={sortState}
                 onSort={onSort}
                 align="center"
@@ -451,11 +452,11 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
                         type="button"
                         onClick={() => onCycleHotLevel(exam)}
                         className="inline-flex flex-col items-center gap-0.5 rounded-full text-[11px] font-heading font-bold transition-all hover:scale-105 active:scale-95"
-                        title="Bấm để đổi nhanh độ hot (0 ➔ 1 ➔ 2 ➔ 3 ➔ 4 ➔ 5 Cỏ ☘️)"
+                        title="Bấm để đổi nhanh độ hot (0 ➔ 1 ➔ 2 ➔ 3 ➔ 4 ➔ 5)"
                       >
                         {exam.hotLevel && exam.hotLevel > 0 ? (
                           <span className="inline-flex items-center gap-1 text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 px-2.5 py-0.5 rounded-full shadow-2xs font-sans tracking-wide">
-                            {"☘️".repeat(exam.hotLevel)}
+                            {exam.hotLevel > 0 ? "★".repeat(exam.hotLevel) : "-"}
                           </span>
                         ) : (
                           <span className="text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 font-normal">

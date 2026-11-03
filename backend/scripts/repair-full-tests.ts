@@ -46,7 +46,9 @@ async function main() {
 
   for (const ft of fullTests) {
     try {
-      const ftTitle = `Đề thi thử Aptis ESOL Full Test ${ft.title.replace('Đề ', '')} (Kỳ Tích)`;
+      const ftNum = ft.title.replace('Đề ', '').trim();
+      const ftTitle = `Đề thi thử Aptis ESOL Full Test ${ftNum}`;
+      const ftTitleOld = `${ftTitle} (Kỳ Tích)`;
       const partsData: any[] = [];
       let partNumber = 1;
 
@@ -280,7 +282,9 @@ async function main() {
 
       // Xóa các parts cũ của đề thi thử và cập nhật lại
       const existingExam = await prisma.exam.findFirst({
-        where: { title: ftTitle },
+        where: {
+          OR: [{ title: ftTitle }, { title: ftTitleOld }],
+        },
         include: { parts: { include: { questions: true } } },
       });
 
@@ -293,24 +297,28 @@ async function main() {
         await prisma.exam.update({
           where: { id: existingExam.id },
           data: {
+            title: ftTitle,
+            description: `Đề thi thử Aptis ESOL 5 kỹ năng (Speaking, Listening, Reading, Writing, Grammar & Vocabulary) theo chuẩn format British Council từ Aptis ESOL Premier.`,
             parts: { create: partsData },
           },
         });
-        console.log(`✅ [${count + 1}/26] Đã cập nhật chuẩn hóa: "${ftTitle}" (${partsData.length} parts)`);
+        console.log(`[PASS] [${count + 1}/26] Đã cập nhật chuẩn hóa: "${ftTitle}" (${partsData.length} parts)`);
       } else {
         await prisma.exam.create({
           data: {
             title: ftTitle,
-            description: `Đề thi thử Aptis ESOL 5 kỹ năng (Speaking, Listening, Reading, Writing, Grammar & Vocabulary) theo chuẩn format British Council từ Aptis Kỳ Tích.`,
+            description: `Đề thi thử Aptis ESOL 5 kỹ năng (Speaking, Listening, Reading, Writing, Grammar & Vocabulary) theo chuẩn format British Council từ Aptis ESOL Premier.`,
             skill: ExamSkill.FULL_TEST,
             duration_minutes: 162,
             is_pro: ft.access_tier === 'pro',
             is_published: true,
             source: 'APTIS_KYTICH',
+            title: ftTitle,
+            description: `Đề thi thử Aptis ESOL 5 kỹ năng (Speaking, Listening, Reading, Writing, Grammar & Vocabulary) theo chuẩn format British Council từ Aptis ESOL Premier.`,
             parts: { create: partsData },
           },
         });
-        console.log(`✅ [${count + 1}/26] Đã tạo mới: "${ftTitle}" (${partsData.length} parts)`);
+        console.log(`[PASS] [${count + 1}/26] Đã tạo mới: "${ftTitle}" (${partsData.length} parts)`);
       }
 
       count++;
@@ -319,12 +327,12 @@ async function main() {
     }
   }
 
-  console.log(`\n🎉 HOÀN TẤT CHUẨN HÓA ${count}/26 ĐỀ THI THỬ FULL TESTS!`);
+  console.log(`\nHOÀN TẤT CHUẨN HÓA ${count}/26 ĐỀ THI THỬ FULL TESTS!`);
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Lỗi:', e);
+    console.error('[FAIL] Lỗi:', e);
     process.exit(1);
   })
   .finally(async () => {

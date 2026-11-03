@@ -443,4 +443,4 @@ export const SPEAKING_PART1_ALL_QUESTIONS: SpeakingPart1QuestionItem[] = SPEAKIN
 fs.writeFileSync(path.join(dataTargetDir, 'speaking-part1-bank.ts'), part1TsContent, 'utf8');
 console.log('Saved frontend/src/data/speaking-part1-bank.ts');
 
-console.log('\n🚀 ALL DATA SAVED IN FRONTEND DATA DIR!');
+console.log('\n[START] ALL DATA SAVED IN FRONTEND DATA DIR!');

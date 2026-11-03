@@ -13,6 +13,7 @@ import {
   RotateCcw,
   ArrowLeft,
   ArrowRight,
+  Lightbulb,
 } from "lucide-react";
 import type {
   SpeakingQuestion,
@@ -373,7 +374,7 @@ export function SpeakingQuestionCard({
                   className="w-full h-28 md:h-32 p-3 rounded-xl border border-border bg-background text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none font-sans leading-relaxed shadow-inner"
                 />
                 <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-0.5">
-                  <span>💡 Ghi chú này luôn hiển thị trong suốt 2 phút nói để bạn tự tin nhìn theo.</span>
+                  <span className="inline-flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" /><span>Ghi chú này luôn hiển thị trong suốt 2 phút nói để bạn tự tin nhìn theo.</span></span>
                   <span>{prepNotes.trim().length} ký tự</span>
                 </div>
               </div>

@@ -8,7 +8,7 @@ const submissionService = new SubmissionService();
 
 async function runReadingTests() {
   console.log('================================================================');
-  console.log('📖 BỘ TEST KIỂM THỬ CHUYÊN SÂU: PHÂN HỆ ĐỌC (READING SKILL)');
+  console.log('[READING] BỘ TEST KIỂM THỬ CHUYÊN SÂU: PHÂN HỆ ĐỌC (READING SKILL)');
   console.log('================================================================\n');
 
   let passed = 0;
@@ -18,11 +18,11 @@ async function runReadingTests() {
     total++;
     if (condition) {
       passed++;
-      console.log(`  ✅ [PASS] ${title}`);
-      if (note) console.log(`     ℹ️ ${note}`);
+      console.log(`  [PASS] [PASS] ${title}`);
+      if (note) console.log(`     [INFO] ${note}`);
     } else {
-      console.error(`  ❌ [FAIL] ${title}`);
-      if (note) console.error(`     ⚠️ ${note}`);
+      console.error(`  [FAIL] [FAIL] ${title}`);
+      if (note) console.error(`     [WARN] ${note}`);
     }
   }
 
@@ -73,7 +73,7 @@ async function runReadingTests() {
   }
 
   // 4. Mô phỏng thí sinh làm bài thi Reading & Kiểm tra chấm tự động
-  console.log('\n📝 Mô phỏng Thí sinh làm bài thi Reading...');
+  console.log('\nMô phỏng Thí sinh làm bài thi Reading...');
   const testExam = p1Exam || readingExams[0];
   let testUser = await prisma.user.findFirst({ where: { role: 'STUDENT' } });
   if (!testUser) {
@@ -107,13 +107,13 @@ async function runReadingTests() {
   );
 
   console.log('\n================================================================');
-  console.log(`🎯 KẾT QUẢ KIỂM THỬ READING: ${passed}/${total} TEST CASES ĐẠT CHUẨN!`);
+  console.log(`[RESULT] KẾT QUẢ KIỂM THỬ READING: ${passed}/${total} TEST CASES ĐẠT CHUẨN!`);
   console.log('================================================================');
 }
 
 runReadingTests()
   .catch((err) => {
-    console.error('❌ Lỗi:', err);
+    console.error('[FAIL] Lỗi:', err);
     process.exit(1);
   })
   .finally(async () => {

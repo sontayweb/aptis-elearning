@@ -85,7 +85,7 @@ const defaultPlans: PricingPlan[] = [
     id: "vip-unlimited",
     code: "VIP_3M",
     name: "Aptis Cày Đề (3 Tháng)",
-    badge: "🔥 KHUYÊN DÙNG ★ BÁN CHẠY",
+    badge: "KHUYÊN DÙNG ★ BÁN CHẠY",
     price: "399.000đ",
     originalPrice: "690.000đ",
     duration: "Thời hạn 90 ngày",
@@ -104,7 +104,7 @@ const defaultPlans: PricingPlan[] = [
     id: "premier-six",
     code: "PREMIER_6M",
     name: "Aptis ESOL Premier (6 Tháng)",
-    badge: "👑 VIP TOÀN DIỆN (TIẾT KIỆM 60%)",
+    badge: "VIP TOÀN DIỆN (TIẾT KIỆM 60%)",
     price: "699.000đ",
     originalPrice: "1.050.000đ",
     duration: "Thời hạn 180 ngày",
@@ -172,9 +172,20 @@ export default function PricingPage() {
     ? Math.max(0, Math.ceil((new Date(activeSub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
 
+  // Mã trải nghiệm chỉ mở đến hết ngày 25/11/2026
+  const PROMO_EXPIRY_DATE = new Date("2026-11-25T23:59:59.999+07:00");
+  const isPromoExpired = new Date() > PROMO_EXPIRY_DATE;
+
   const handleRedeemPromo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!promoCodeInput.trim()) return;
+    if (isPromoExpired) {
+      setPromoNotice({
+        type: "error",
+        text: "Chương trình mã kích hoạt 14 ngày VIP trải nghiệm đã kết thúc vào ngày 25/11. Vui lòng đăng ký gói VIP Pro để tiếp tục sử dụng.",
+      });
+      return;
+    }
     if (!isAuthenticated) {
       setAuthModalOpen(true);
       return;
@@ -227,9 +238,9 @@ export default function PricingPage() {
             name: p.name,
             badge:
               p.code === "PREMIER_6M"
-                ? "👑 VIP TOÀN DIỆN (TIẾT KIỆM 60%)"
+                ? "VIP TOÀN DIỆN (TIẾT KIỆM 60%)"
                 : p.code === "VIP_3M"
-                ? "🔥 KHUYÊN DÙNG ★ BÁN CHẠY"
+                ? "KHUYÊN DÙNG ★ BÁN CHẠY"
                 : p.code === "VIP_1M"
                 ? "TIẾT KIỆM 40%"
                 : undefined,
@@ -554,67 +565,84 @@ export default function PricingPage() {
         {/* ================= PROMO CODE STRIP ================= */}
         <section className="section-container py-4 max-w-7xl mx-auto px-4">
           {!isVip ? (
-            // Full promo code box for non-VIP
-            <div className="rounded-2xl bg-gradient-to-r from-amber-500/10 via-primary/5 to-amber-500/10 border border-amber-500/30 p-5 md:p-6 shadow-xs">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="space-y-1 text-center md:text-left flex-1">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold">
-                    <Gift className="w-3.5 h-3.5" />
-                    <span>Mã Trải Nghiệm Go-Live</span>
+            isPromoExpired ? (
+              <div className="rounded-2xl bg-muted/40 border border-border p-5 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Chương trình trải nghiệm đã kết thúc</span>
                   </div>
-                  <h3 className="text-base md:text-lg font-heading font-extrabold text-foreground">
-                    Bạn có mã kích hoạt VIP miễn phí?
+                  <h3 className="text-base font-heading font-bold text-foreground">
+                    Chương trình tặng mã trải nghiệm VIP 14 ngày đã kết thúc vào ngày 25/11
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Nhập mã <span className="font-mono font-bold text-primary">GOLIVE14</span> (hoặc <span className="font-mono font-semibold">APTISGOLIVE</span>) để nhận ngay 14 ngày VIP đầy đủ tính năng &amp; 20 lượt chấm AI!
+                    Để tiếp tục mở khóa 860+ bộ đề thi Aptis ESOL và hệ thống chấm AI, học viên vui lòng đăng ký một trong các gói VIP Pro bên trên.
                   </p>
                 </div>
-
-                <form onSubmit={handleRedeemPromo} className="flex flex-col sm:flex-row gap-2 w-full md:w-auto shrink-0">
-                  <input
-                    type="text"
-                    value={promoCodeInput}
-                    onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
-                    placeholder="Mã CODE: GOLIVE14"
-                    className="px-4 py-2 rounded-xl border border-border bg-background text-xs font-mono font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-primary w-full sm:w-56"
-                  />
-                  <button
-                    type="submit"
-                    disabled={redeemingPromo || !promoCodeInput.trim()}
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-primary text-white text-xs font-bold shadow-md hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
-                  >
-                    {redeemingPromo ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Đang kích hoạt...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-3.5 h-3.5" />
-                        <span>Kích Hoạt Ngay</span>
-                      </>
-                    )}
-                  </button>
-                </form>
               </div>
+            ) : (
+              // Full promo code box for non-VIP
+              <div className="rounded-2xl bg-gradient-to-r from-amber-500/10 via-primary/5 to-amber-500/10 border border-amber-500/30 p-5 md:p-6 shadow-xs">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="space-y-1 text-center md:text-left flex-1">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold">
+                      <Gift className="w-3.5 h-3.5" />
+                      <span>Mã Trải Nghiệm Go-Live (Mở đến 25/11)</span>
+                    </div>
+                    <h3 className="text-base md:text-lg font-heading font-extrabold text-foreground">
+                      Bạn có mã kích hoạt VIP miễn phí?
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Nhập mã <span className="font-mono font-bold text-primary">GOLIVE14</span> để nhận ngay 14 ngày VIP đầy đủ tính năng &amp; 20 lượt chấm AI! (Chỉ áp dụng đến hết 25/11/2026, mỗi tài khoản được dùng 1 lần duy nhất).
+                    </p>
+                  </div>
 
-              {promoNotice && (
-                <div
-                  className={`mt-3 p-3 rounded-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
-                    promoNotice.type === "success"
-                      ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
-                      : "bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300"
-                  }`}
-                >
-                  {promoNotice.type === "success" ? (
-                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
-                  ) : (
-                    <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
-                  )}
-                  <span>{promoNotice.text}</span>
+                  <form onSubmit={handleRedeemPromo} className="flex flex-col sm:flex-row gap-2 w-full md:w-auto shrink-0">
+                    <input
+                      type="text"
+                      value={promoCodeInput}
+                      onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                      placeholder="Mã CODE: GOLIVE14"
+                      className="px-4 py-2 rounded-xl border border-border bg-background text-xs font-mono font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-primary w-full sm:w-56"
+                    />
+                    <button
+                      type="submit"
+                      disabled={redeemingPromo || !promoCodeInput.trim()}
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-primary text-white text-xs font-bold shadow-md hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+                    >
+                      {redeemingPromo ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Đang kích hoạt...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-3.5 h-3.5" />
+                          <span>Kích Hoạt Ngay</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
                 </div>
-              )}
-            </div>
+
+                {promoNotice && (
+                  <div
+                    className={`mt-3 p-3 rounded-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
+                      promoNotice.type === "success"
+                        ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                        : "bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300"
+                    }`}
+                  >
+                    {promoNotice.type === "success" ? (
+                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
+                    )}
+                    <span>{promoNotice.text}</span>
+                  </div>
+                )}
+              </div>
+            )
           ) : (
             // Collapsible discreet bar for already-VIP users
             <div className="rounded-xl border border-border/80 bg-card/60 p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">

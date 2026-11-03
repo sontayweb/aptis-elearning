@@ -11,7 +11,7 @@ const submissionService = new SubmissionService();
 
 async function runListeningTests() {
   console.log('================================================================');
-  console.log('🎧 BỘ TEST KIỂM THỬ CHUYÊN SÂU: PHÂN HỆ NGHE (LISTENING SKILL)');
+  console.log('[LISTENING] BỘ TEST KIỂM THỬ CHUYÊN SÂU: PHÂN HỆ NGHE (LISTENING SKILL)');
   console.log('================================================================\n');
 
   let passed = 0;
@@ -21,11 +21,11 @@ async function runListeningTests() {
     total++;
     if (condition) {
       passed++;
-      console.log(`  ✅ [PASS] ${title}`);
-      if (note) console.log(`     ℹ️ ${note}`);
+      console.log(`  [PASS] [PASS] ${title}`);
+      if (note) console.log(`     [INFO] ${note}`);
     } else {
-      console.error(`  ❌ [FAIL] ${title}`);
-      if (note) console.error(`     ⚠️ ${note}`);
+      console.error(`  [FAIL] [FAIL] ${title}`);
+      if (note) console.error(`     [WARN] ${note}`);
     }
   }
 
@@ -47,7 +47,7 @@ async function runListeningTests() {
   assert(listeningExams.length > 0, 'Tìm thấy đề thi Listening trong cơ sở dữ liệu', `Số lượng: ${listeningExams.length} đề`);
 
   // 2. Kiểm tra tính năng "Nó sẽ nói": Sinh audio từ văn bản (TTS Engine)
-  console.log('\n🔊 Kiểm tra khả năng sinh giọng nói thực tế (Live TTS Test)...');
+  console.log('\n[AUDIO] Kiểm tra khả năng sinh giọng nói thực tế (Live TTS Test)...');
   const testPhrase = 'This is a test of the automatic listening audio generator for Aptis mock test.';
   const ttsOutput = await ttsAudioService.generateSpeech(testPhrase, 'test_live_verify');
   assert(fs.existsSync(ttsOutput.localPath), 'Tập tin audio MP3 được tạo thành công trên đĩa', `Path: ${ttsOutput.localPath}`);
@@ -79,7 +79,7 @@ async function runListeningTests() {
   }
 
   // 4. Mô phỏng Thí sinh làm bài thi Listening (Nghe và chọn đáp án)
-  console.log('\n📝 Mô phỏng Thí sinh làm bài thi Listening...');
+  console.log('\nMô phỏng Thí sinh làm bài thi Listening...');
   let testUser = await prisma.user.findFirst({ where: { role: 'STUDENT' } });
   if (!testUser) {
     testUser = await prisma.user.create({
@@ -115,13 +115,13 @@ async function runListeningTests() {
   );
 
   console.log('\n================================================================');
-  console.log(`🎯 KẾT QUẢ KIỂM THỬ LISTENING: ${passed}/${total} TEST CASES ĐẠT CHUẨN!`);
+  console.log(`[RESULT] KẾT QUẢ KIỂM THỬ LISTENING: ${passed}/${total} TEST CASES ĐẠT CHUẨN!`);
   console.log('================================================================');
 }
 
 runListeningTests()
   .catch((err) => {
-    console.error('❌ Lỗi:', err);
+    console.error('[FAIL] Lỗi:', err);
     process.exit(1);
   })
   .finally(async () => {

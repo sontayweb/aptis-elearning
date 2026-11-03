@@ -27,9 +27,9 @@ async function main() {
 
     if (!feExists && !beExists) {
       missingCount++;
-      console.log(`❌ MISSING [Exam: ${p.exam.title} (${p.exam.skill})] Part ${p.part_number} (${p.title}): ${rawUrl}`);
+      console.log(`[FAIL] MISSING [Exam: ${p.exam.title} (${p.exam.skill})] Part ${p.part_number} (${p.title}): ${rawUrl}`);
     } else {
-      // console.log(`✅ OK: ${rawUrl}`);
+      // console.log(`[PASS] OK: ${rawUrl}`);
     }
   });
   console.log(`\nTotal Missing Images: ${missingCount} / ${parts.length}`);

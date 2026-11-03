@@ -267,7 +267,7 @@ export const Part3CheatSheetView: React.FC<{
                     {item.topic}
                   </h3>
                   <div className="p-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground/90 leading-relaxed font-medium">
-                    💡 {item.story}
+                    <Lightbulb className="w-3.5 h-3.5 text-amber-500 inline mr-1.5 shrink-0" /><span>{item.story}</span>
                   </div>
                 </div>
 

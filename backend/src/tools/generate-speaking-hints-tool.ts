@@ -21,7 +21,7 @@ async function main() {
   const targetExamId = examIdArg ? examIdArg.split("=")[1] : undefined;
 
   console.log("======================================================================");
-  console.log("🎙️  TOOL QUÉT & CHUẨN HÓA GỢI Ý SPEAKING PART 2 & PART 3 (APTIS ESOL)");
+  console.log("[SPEAKING] TOOL QUÉT & CHUẨN HÓA GỢI Ý SPEAKING PART 2 & PART 3 (APTIS ESOL)");
   console.log("======================================================================");
 
   const whereClause: any = { skill: "SPEAKING" };
@@ -63,7 +63,7 @@ async function main() {
 
       console.log(`\n[${scannedCount}] Đề: "${ex.title}" (Part ${pNum})`);
       console.log(`    Ảnh: ${p.image_url || "Chưa có ảnh"}`);
-      console.log(`    Trạng thái: ${hasExistingHints ? "✅ Đã có gợi ý chuẩn" : "⚠️ Đang dùng hardcode fallback"}`);
+      console.log(`    Trạng thái: ${hasExistingHints ? "[PASS] Đã có gợi ý chuẩn" : "[WARN] Đang dùng hardcode fallback"}`);
 
       if (isScanOnly) {
         exportData.push({
@@ -83,10 +83,10 @@ async function main() {
         questionsPrompts
       );
 
-      console.log(`    ✨ Collocations: ${hints.keywords.slice(0, 3).join(", ")}...`);
-      console.log(`    🖼️  Image 1 Prompt: ${hints.aiImagePrompts.image1Prompt.slice(0, 70)}...`);
+      console.log(`     Collocations: ${hints.keywords.slice(0, 3).join(", ")}...`);
+      console.log(`    Image 1 Prompt: ${hints.aiImagePrompts.image1Prompt.slice(0, 70)}...`);
       if (hints.aiImagePrompts.image2Prompt) {
-        console.log(`    🖼️  Image 2 Prompt: ${hints.aiImagePrompts.image2Prompt.slice(0, 70)}...`);
+        console.log(`    Image 2 Prompt: ${hints.aiImagePrompts.image2Prompt.slice(0, 70)}...`);
       }
 
       exportData.push({
@@ -112,7 +112,7 @@ async function main() {
           });
         }
         updatedCount++;
-        console.log(`    💾 Đã lưu vào DB thành công cho ${p.questions.length} câu hỏi.`);
+        console.log(`     Đã lưu vào DB thành công cho ${p.questions.length} câu hỏi.`);
       }
     }
   }
@@ -121,7 +121,7 @@ async function main() {
   const outPath = path.resolve(__dirname, "../../speaking-vocabulary-hints.json");
   fs.writeFileSync(outPath, JSON.stringify(exportData, null, 2), "utf-8");
   console.log(`\n======================================================================`);
-  console.log(`🎉 HOÀN TẤT:`);
+  console.log(`HOÀN TẤT:`);
   console.log(`   - Tổng đề quét: ${scannedCount}`);
   if (!isScanOnly && !isDryRun) {
     console.log(`   - Đã cập nhật vào Database: ${updatedCount} phần`);

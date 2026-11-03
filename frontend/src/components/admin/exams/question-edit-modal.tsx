@@ -84,7 +84,7 @@ export const QuestionEditModal: React.FC<QuestionEditModalProps> = ({
         if (onPartUpdated) onPartUpdated();
       }
     } catch {
-      setPartSavedMsg("⚠️ Lỗi lưu ngữ cảnh Phần thi");
+      setPartSavedMsg("Lỗi lưu ngữ cảnh Phần thi");
     } finally {
       setSavingPart(false);
     }
@@ -146,7 +146,7 @@ export const QuestionEditModal: React.FC<QuestionEditModalProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-heading font-bold text-slate-800 dark:text-slate-200">
-                📦 Ngữ cảnh Phần thi (ExamPart): {partTitle || question.part.title}
+                Ngữ cảnh Phần thi (ExamPart): {partTitle || question.part.title}
               </span>
               {partImageUrl && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 text-[10px] font-bold">
@@ -172,7 +172,7 @@ export const QuestionEditModal: React.FC<QuestionEditModalProps> = ({
             >
               {editingPartContext
                 ? "Đóng chỉnh sửa Ngữ cảnh Part"
-                : "🖼️ Sửa Tranh / Audio / Bài đọc của Part này"}
+                : "Sửa Tranh / Audio / Bài đọc của Part này"}
             </button>
           </div>
 

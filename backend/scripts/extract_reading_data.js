@@ -210,4 +210,4 @@ export const READING_PART4_TOPICS: ReadingTopicItem[] = ${JSON.stringify(part4To
 fs.writeFileSync(path.join(dataTargetDir, 'reading-topics-bank.ts'), readingTopicsTsContent, 'utf8');
 console.log('Saved frontend/src/data/reading-topics-bank.ts');
 
-console.log('\n✅ READING ASSETS & TOPICS EXTRACTED SUCCESSFULLY!');
+console.log('\n[PASS] READING ASSETS & TOPICS EXTRACTED SUCCESSFULLY!');

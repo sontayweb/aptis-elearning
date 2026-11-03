@@ -88,6 +88,7 @@ export default function AdminAuditLogsPage() {
       const [logsRes, statsRes] = await Promise.all([
         api.audit.getLogs({
           action: actionFilter !== "ALL" ? actionFilter : undefined,
+          search: searchTerm.trim() || undefined,
           page,
           limit: 15,
         }),
@@ -120,8 +121,11 @@ export default function AdminAuditLogsPage() {
   };
 
   useEffect(() => {
-    fetchLogs();
-  }, [page, actionFilter]);
+    const handler = setTimeout(() => {
+      fetchLogs();
+    }, 250);
+    return () => clearTimeout(handler);
+  }, [page, actionFilter, searchTerm]);
 
   // Lock body scroll and handle Escape key for audit log detail modal
   useEffect(() => {
@@ -143,18 +147,25 @@ export default function AdminAuditLogsPage() {
 
   const getActionBadge = (action: string) => {
     switch (action) {
-      case "PAYMENT_MANUAL_RESOLVE":
+      case "PAYMENT_WEBHOOK_RECEIVED":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-heading font-semibold text-[10px] border border-emerald-200 dark:border-emerald-800/60">
             <CreditCard className="w-3 h-3" />
-            Khớp lệnh SePay
+            Khớp lệnh QR
+          </span>
+        );
+      case "PAYMENT_MANUAL_RESOLVE":
+        return (
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-heading font-semibold text-[10px] border border-teal-200 dark:border-teal-800/60">
+            <CreditCard className="w-3 h-3" />
+            Xử lý thủ công
           </span>
         );
       case "USER_ROLE_CHANGE":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-heading font-semibold text-[10px] border border-amber-200 dark:border-amber-800/60">
             <ShieldCheck className="w-3 h-3" />
-            Cấp / Gia hạn VIP
+            Cấp / Kích hoạt VIP
           </span>
         );
       case "USER_STATUS_CHANGE":
@@ -175,7 +186,7 @@ export default function AdminAuditLogsPage() {
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-heading font-semibold text-[10px] border border-indigo-200 dark:border-indigo-800/60">
             <User className="w-3 h-3" />
-            Tạo tài khoản
+            Đăng ký mới
           </span>
         );
       case "EXAM_CREATE":
@@ -318,8 +329,10 @@ export default function AdminAuditLogsPage() {
         onSearchChange={setSearchTerm}
         tabs={[
           { id: "ALL", label: "Tất cả" },
-          { id: "PAYMENT_MANUAL_RESOLVE", label: "Khớp lệnh" },
-          { id: "USER_ROLE_CHANGE", label: "Cấp VIP" },
+          { id: "USER_CREATE", label: "Đăng ký mới" },
+          { id: "USER_ROLE_CHANGE", label: "Cấp VIP & Mã KM" },
+          { id: "PAYMENT_WEBHOOK_RECEIVED", label: "Khớp lệnh QR" },
+          { id: "PAYMENT_MANUAL_RESOLVE", label: "Xử lý thủ công" },
           { id: "USER_STATUS_CHANGE", label: "Khóa TK" },
           { id: "AUTH_PASSWORD_RESET", label: "Đổi MK" },
           { id: "EXAM_CREATE", label: "Tạo đề" },

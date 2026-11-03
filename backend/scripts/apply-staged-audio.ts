@@ -18,14 +18,14 @@ async function main() {
   console.log('================================================================\n');
 
   if (!fs.existsSync(manifestPath)) {
-    console.error(`❌ Không tìm thấy file manifest tại: ${manifestPath}`);
-    console.error('👉 Hãy chạy script sinh staging trước: npx ts-node -T backend/scripts/generate-missing-audio.ts');
+    console.error(`[FAIL] Không tìm thấy file manifest tại: ${manifestPath}`);
+    console.error(' Hãy chạy script sinh staging trước: npx ts-node -T backend/scripts/generate-missing-audio.ts');
     process.exit(1);
   }
 
   const manifest: StagingManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-  console.log(`📄 Đọc Manifest tạo lúc: ${manifest.createdAt}`);
-  console.log(`📦 Tổng số phần thi staged: ${manifest.items.length}\n`);
+  console.log(`Đọc Manifest tạo lúc: ${manifest.createdAt}`);
+  console.log(`Tổng số phần thi staged: ${manifest.items.length}\n`);
 
   const baseUpload = path.resolve(process.env.UPLOAD_DIR || './uploads');
   const coreDir = path.join(baseUpload, 'audio', 'listening');
@@ -43,19 +43,19 @@ async function main() {
 
     // Kiểm tra tính hợp lệ của file staging
     if (!fs.existsSync(item.localPath)) {
-      console.warn(`⚠️ [THIẾU FILE] Không tìm thấy file staging: ${item.localPath}`);
+      console.warn(`[WARN] [THIẾU FILE] Không tìm thấy file staging: ${item.localPath}`);
       missingFileCount++;
       continue;
     }
 
     const stat = fs.statSync(item.localPath);
     if (stat.size === 0) {
-      console.warn(`⚠️ [FILE RỖNG 0 BYTE] Bỏ qua file: ${item.localPath}`);
+      console.warn(`[WARN] [FILE RỖNG 0 BYTE] Bỏ qua file: ${item.localPath}`);
       missingFileCount++;
       continue;
     }
 
-    console.log(`🚀 [ÁP DỤNG] Part ${item.partNumber} ("${item.examTitle}") -> URL: ${item.coreTargetUrl}`);
+    console.log(`[START] [ÁP DỤNG] Part ${item.partNumber} ("${item.examTitle}") -> URL: ${item.coreTargetUrl}`);
 
     if (isDryRun) {
       appliedCount++;
@@ -76,7 +76,7 @@ async function main() {
 
       appliedCount++;
     } catch (err: any) {
-      console.error(`❌ [LỖI UPDATE DB] Part ${item.partId}: ${err.message}`);
+      console.error(`[FAIL] [LỖI UPDATE DB] Part ${item.partId}: ${err.message}`);
       errorCount++;
     }
   }

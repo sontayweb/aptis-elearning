@@ -44,7 +44,7 @@ async function main() {
   console.log(`- Số đề Reading có câu hỏi hợp lệ: ${validReadingExams}/${readingExams.length}`);
   console.log(`- Phân bố Part: Part 1 (${part1Count}) | Part 2 (${part2Count}) | Part 3 (${part3Count}) | Part 4 (${part4Count})`);
   if (validReadingExams === readingExams.length) {
-    console.log('✅ ĐẠT: 100% đề Reading có dữ liệu Part và câu hỏi đầy đủ.');
+    console.log('[PASS] ĐẠT: 100% đề Reading có dữ liệu Part và câu hỏi đầy đủ.');
   }
 
   // 2. Audit Writing Exams
@@ -83,7 +83,7 @@ async function main() {
   console.log(`- Số đề Writing có câu hỏi hợp lệ: ${validWritingExams}/${writingExams.length}`);
   console.log(`- Phân bố Part Writing: Part 1 (${writingPart1}) | Part 2 (${writingPart2}) | Part 3 (${writingPart3}) | Part 4 (${writingPart4})`);
   if (validWritingExams === writingExams.length) {
-    console.log('✅ ĐẠT: 100% đề Writing có dữ liệu Part và câu hỏi đầy đủ.');
+    console.log('[PASS] ĐẠT: 100% đề Writing có dữ liệu Part và câu hỏi đầy đủ.');
   }
 
   // 3. Test API DTO Delivery (Single Source of Truth)
@@ -99,7 +99,7 @@ async function main() {
     }
     const allHavePartType = readingDto.parts.every((p: any) => p.partType != null);
     if (allHavePartType) {
-      console.log('✅ ĐẠT: Reading DTO trả về partType chuẩn cho 100% Parts.');
+      console.log('[PASS] ĐẠT: Reading DTO trả về partType chuẩn cho 100% Parts.');
     }
   }
 
@@ -111,7 +111,7 @@ async function main() {
     }
     const allHavePartType = writingDto.parts.every((p: any) => p.partType != null && p.minWords != null);
     if (allHavePartType) {
-      console.log('✅ ĐẠT: Writing DTO trả về partType, minWords, maxWords chuẩn.');
+      console.log('[PASS] ĐẠT: Writing DTO trả về partType, minWords, maxWords chuẩn.');
     }
   }
 

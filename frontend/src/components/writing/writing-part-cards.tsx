@@ -102,7 +102,7 @@ export function WritingPart1Card({
                         <div className="flex items-center justify-between font-bold text-primary">
                           <span className="flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5" />
-                            <span>Nhận xét AI Kỳ Tích:</span>
+                            <span>Nhận xét AI Premier:</span>
                           </span>
                           {(qAi.cefr_level || qAi.cefrLevel) && (
                             <span className="px-2 py-0.5 rounded bg-primary/10 text-[10px] font-bold">
@@ -288,7 +288,7 @@ export function WritingPart2Card({
                 <div className="flex items-center justify-between font-bold text-primary">
                   <span className="flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Nhận xét AI Kỳ Tích:</span>
+                    <span>Nhận xét AI Premier:</span>
                   </span>
                   {qAi.cefr_level && (
                     <span className="px-2 py-0.5 rounded bg-primary/10 text-[10px] font-bold">
@@ -400,7 +400,7 @@ export function WritingPart3Card({
                         <div className="flex items-center justify-between font-bold text-primary">
                           <span className="flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5" />
-                            <span>Nhận xét AI Kỳ Tích:</span>
+                            <span>Nhận xét AI Premier:</span>
                           </span>
                           {(qAi.cefr_level || qAi.cefrLevel) && (
                             <span className="px-2 py-0.5 rounded bg-primary/10 text-[10px] font-bold">
@@ -636,7 +636,7 @@ export function WritingPart4Card({
                           <span className="flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5" />
                             <span>
-                              Nhận xét AI Kỳ Tích ({isFormal ? "Formal Email" : "Informal Email"}):
+                              Nhận xét AI Premier ({isFormal ? "Formal Email" : "Informal Email"}):
                             </span>
                           </span>
                           {(qAi.cefr_level || qAi.cefrLevel) && (
@@ -723,7 +723,7 @@ export function WritingReviewSidebar({
               <Loader2 className="w-5 h-5 animate-spin" />
             </div>
             <h4 className="font-bold text-xs text-foreground">
-              AI Kỳ Tích đang chấm bài viết
+              AI Premier đang chấm bài viết
             </h4>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
               Hệ thống đang phân tích Task Achievement, Coherence, Grammar &amp; Vocabulary

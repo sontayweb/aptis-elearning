@@ -26,6 +26,7 @@ import {
   Lock,
   Square,
   Search,
+  Lightbulb,
 } from "lucide-react";
 
 import {
@@ -1097,7 +1098,7 @@ export default function NgheChepPage() {
 
                             {showHint && currentSentence.hint && (
                               <p className="text-xs text-amber-600 mt-2 italic animate-in fade-in">
-                                💡 Gợi ý: {currentSentence.hint}
+                                <Lightbulb className="w-3.5 h-3.5 inline mr-1 text-amber-500 shrink-0" />Gợi ý: {currentSentence.hint}
                               </p>
                             )}
 

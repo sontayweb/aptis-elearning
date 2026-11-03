@@ -33,7 +33,7 @@ describe('--- MODULE 10: NOTIFICATIONS SYSTEM TESTS ---', () => {
     const n1 = await prisma.notification.create({
       data: {
         user_id: user1Id,
-        title: 'Chào mừng bạn đến với Aptis Kỳ Tích 🎉',
+        title: 'Chào mừng bạn đến với Aptis Kỳ Tích ',
         message: 'Bắt đầu luyện tập ngay với hơn 860 bộ đề thi chuẩn British Council.',
         type: NotificationType.SYSTEM,
         link: '/thi-thu',
@@ -44,7 +44,7 @@ describe('--- MODULE 10: NOTIFICATIONS SYSTEM TESTS ---', () => {
     const n2 = await prisma.notification.create({
       data: {
         user_id: user1Id,
-        title: 'Bài thi Speaking đã có kết quả chấm 📝',
+        title: 'Bài thi Speaking đã có kết quả chấm ',
         message: 'Điểm số của bạn: 42/50 (CEFR B2).',
         type: NotificationType.EXAM_GRADED,
         link: '/history',

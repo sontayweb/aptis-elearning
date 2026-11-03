@@ -326,7 +326,7 @@ export default function ImageUploadInput({
                       const errEl = document.createElement("div");
                       errEl.className =
                         "py-4 text-center text-rose-500 text-xs font-semibold flex items-center justify-center gap-1.5";
-                      errEl.innerHTML = `<span>⚠️ Không thể tải hình ảnh này (Link bị chặn hoặc không tồn tại)</span>`;
+                      errEl.innerHTML = `<span>Không thể tải hình ảnh này (Link bị chặn hoặc không tồn tại)</span>`;
                       parent.appendChild(errEl);
                     }
                   }}

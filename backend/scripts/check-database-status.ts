@@ -21,7 +21,7 @@ async function main() {
     console.log(`  -> Dung lượng: ${(stat.size / 1024).toFixed(2)} KB (${stat.size} bytes)`);
     console.log(`  -> Thời gian tạo: ${stat.mtime.toLocaleString('vi-VN')}`);
   } else {
-    console.log(`[SQL DUMP] ⚠️ Không tìm thấy file ${sqlBackupFile}`);
+    console.log(`[SQL DUMP] [WARN] Không tìm thấy file ${sqlBackupFile}`);
   }
 
   if (fs.existsSync(jsonDir)) {
@@ -42,7 +42,7 @@ async function main() {
       console.log(`  -> ${f}: ${(stat.size / 1024).toFixed(2)} KB${countStr}`);
     }
   } else {
-    console.log(`[JSON SNAPSHOTS] ⚠️ Không tìm thấy thư mục ${jsonDir}`);
+    console.log(`[JSON SNAPSHOTS] [WARN] Không tìm thấy thư mục ${jsonDir}`);
   }
 
   // 2. KIỂM TRA DATABASE HIỆN TẠI (POSTGRESQL)

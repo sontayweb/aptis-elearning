@@ -36,14 +36,18 @@ export function GoLivePromoBanner({ className = "", onOpenAuth }: GoLivePromoBan
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Nếu người dùng đã là SuperAdmin hoặc đã có gói trả phí thì không cần thúc đẩy mã này
+  // Mã chỉ mở đến hết ngày 25/11/2026. Sau ngày này mã sẽ tự động tắt
+  const PROMO_EXPIRY_DATE = new Date("2026-11-25T23:59:59.999+07:00");
+  const isExpired = new Date() > PROMO_EXPIRY_DATE;
+
+  // Nếu người dùng đã là SuperAdmin hoặc đã có gói trả phí hoặc chương trình đã kết thúc
   const isVipOrAdmin =
     user?.role === "SUPER_ADMIN" ||
     user?.role === "ADMIN" ||
     Boolean(user?.subscription) ||
     Boolean(user?.user_subscriptions?.length);
 
-  if (!isVisible || isVipOrAdmin) {
+  if (!isVisible || isVipOrAdmin || isExpired) {
     return null;
   }
 
@@ -56,7 +60,7 @@ export function GoLivePromoBanner({ className = "", onOpenAuth }: GoLivePromoBan
         <div className="flex items-center gap-2 overflow-hidden mx-auto sm:mx-0">
           <Gift className="w-4 h-4 text-amber-200 shrink-0 animate-bounce" />
           <span className="font-extrabold uppercase tracking-wider text-[11px] bg-white/20 px-2 py-0.5 rounded-full shrink-0 hidden sm:inline">
-            Go-Live 14 Ngày VIP
+            Go-Live 14 Ngày VIP (Đến 25/11)
           </span>
           <span className="truncate text-white/95">
             Mở khóa 860+ đề thi &amp; 20 lượt chấm AI với mã:
@@ -128,10 +132,10 @@ export function GoLivePromoBanner({ className = "", onOpenAuth }: GoLivePromoBan
           <div className="space-y-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider">
-                CHÀO MỪNG GO-LIVE
+                CHÀO MỪNG GO-LIVE (ĐẾN 25/11)
               </span>
               <span className="text-xs font-bold text-foreground truncate">
-                Tặng 14 ngày VIP Pro Miễn Phí
+                Tặng 14 ngày VIP Pro (1 lần/tài khoản)
               </span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">

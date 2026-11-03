@@ -16,7 +16,7 @@
 ### 🎧 KỸ NĂNG NGHE (LISTENING):
 1. **Xem Kịch bản âm thanh (Audio Script)**: Kiểm tra nội dung đối thoại hoặc độc thoại được bóc tách từ cột `Passage_Text` trong file Excel.
 2. **Phát thử giọng đọc (TTS Simulation)**:
-   - Bấm nút **"🔊 Nghe thử kịch bản này (TTS Preview)"** để hệ thống đọc mô phỏng bằng giọng đọc bản xứ Anh - Mỹ.
+   - Bấm nút **" Nghe thử kịch bản này (TTS Preview)"** để hệ thống đọc mô phỏng bằng giọng đọc bản xứ Anh - Mỹ.
    - Điều chỉnh tốc độ đọc `1.0x` hoặc `0.85x` để kiểm tra độ rõ ràng của ngữ điệu.
    - Bấm **"Dừng đọc âm thanh"** khi đã kiểm tra xong.
 3. **Chỉnh sửa kịch bản**: Nếu phát hiện sai sót chính tả, bấm **"Sửa kịch bản"** để sửa ngay tại chỗ.

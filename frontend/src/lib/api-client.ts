@@ -1,5 +1,5 @@
 /**
- * API Client for Aptis Kỳ Tích E-learning Platform
+ * API Client for Aptis ESOL Premier E-learning Platform
  * Connects Next.js Frontend with Node.js/Express Backend (Port 5000)
  */
 
@@ -1001,7 +1001,22 @@ class ApiClient {
       this.request<any>('/admin/topic-tags/sync-all', {
         method: 'POST',
       }),
-    deleteTopicRule: (id: string, resetHot?: boolean) =>
+        getReports: (params?: { page?: number; limit?: number; status?: string; search?: string }) => {
+      const query = new URLSearchParams();
+      if (params?.page) query.append('page', params.page.toString());
+      if (params?.limit) query.append('limit', params.limit.toString());
+      if (params?.status) query.append('status', params.status);
+      if (params?.search) query.append('search', params.search);
+      const qs = query.toString();
+      return this.request<any>(`/admin/reports${qs ? `?${qs}` : ''}`);
+    },
+    resolveReport: (id: string, data: { status: string; note?: string; resolutionNote?: string }) => {
+      return this.request<any>(`/admin/reports/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+    },
+deleteTopicRule: (id: string, resetHot?: boolean) =>
       this.request<any>(`/admin/topic-tags/${id}?reset=${Boolean(resetHot)}`, {
         method: 'DELETE',
       }),
@@ -1011,10 +1026,11 @@ class ApiClient {
   // 9. AUDIT LOGS (ENTERPRISE AUDIT TRAIL)
   // ==========================================
   audit = {
-    getLogs: (params?: { action?: string; entityType?: string; page?: number; limit?: number }) => {
+    getLogs: (params?: { action?: string; entityType?: string; search?: string; page?: number; limit?: number }) => {
       const query = new URLSearchParams();
       if (params?.action && params.action !== 'ALL') query.append('action', params.action);
       if (params?.entityType) query.append('entityType', params.entityType);
+      if (params?.search) query.append('search', params.search);
       if (params?.page) query.append('page', params.page.toString());
       if (params?.limit) query.append('limit', params.limit.toString());
       const qs = query.toString();

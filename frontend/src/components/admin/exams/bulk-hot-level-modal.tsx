@@ -62,7 +62,7 @@ export const BulkHotLevelModal: React.FC<Props> = ({ isOpen, onClose, defaultSki
 
         <div className="p-5 space-y-3 text-xs">
           <p className="text-slate-500">
-            Dán tên đề/chủ đề (mỗi dòng hoặc cách nhau bằng dấu phẩy) vào từng mức ☘️. Hệ thống khớp theo tên (không phân biệt
+            Dán tên đề/chủ đề (mỗi dòng hoặc cách nhau bằng dấu phẩy) vào từng mức độ hot. Hệ thống khớp theo tên (không phân biệt
             hoa/thường, bỏ phần trong ngoặc) và gán độ hot cho mọi đề khớp.
           </p>
           <div className="flex items-center gap-2">
@@ -83,7 +83,7 @@ export const BulkHotLevelModal: React.FC<Props> = ({ isOpen, onClose, defaultSki
           {LEVELS.map((lv) => (
             <div key={lv}>
               <label className="font-semibold block mb-1">
-                {lv === 0 ? "⚪ Gỡ độ hot (0)" : "☘️".repeat(lv) + ` ${lv} Cỏ`}
+                {lv === 0 ? "Gỡ độ hot (0)" : `${lv} Sao (Mức ${lv})`}
               </label>
               <textarea
                 rows={lv >= 3 ? 3 : 2}

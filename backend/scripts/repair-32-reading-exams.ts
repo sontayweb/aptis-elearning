@@ -51,7 +51,7 @@ async function main() {
     }
 
     if (!p1Cat || !p2Cat || !p3Cat || !p4Cat) {
-      console.warn(`⚠️ Thiếu catalog part cho Đề ${code}`);
+      console.warn(`[WARN] Thiếu catalog part cho Đề ${code}`);
       continue;
     }
 
@@ -61,7 +61,7 @@ async function main() {
     const p4Q = qMap.get(p4Cat.id)?.[0];
 
     if (!p1Q || !p2Q || !p3Q || !p4Q) {
-      console.warn(`⚠️ Thiếu question cho Đề ${code}`);
+      console.warn(`[WARN] Thiếu question cho Đề ${code}`);
       continue;
     }
 
@@ -262,7 +262,7 @@ async function main() {
           },
         },
       });
-      console.log(`✅ [${code}/32] Đã cập nhật thành công (giữ nguyên ID ${existingExam.id}): "${fullExamTitle}"`);
+      console.log(`[PASS] [${code}/32] Đã cập nhật thành công (giữ nguyên ID ${existingExam.id}): "${fullExamTitle}"`);
     } else {
       const created = await prisma.exam.create({
         data: {
@@ -278,18 +278,18 @@ async function main() {
           },
         },
       });
-      console.log(`✅ [${code}/32] Đã tạo mới: "${fullExamTitle}" (ID: ${created.id})`);
+      console.log(`[PASS] [${code}/32] Đã tạo mới: "${fullExamTitle}" (ID: ${created.id})`);
     }
 
     successCount++;
   }
 
-  console.log(`\n🎉 HOÀN TẤT CHUẨN HÓA ${successCount}/32 BỘ ĐỀ READING!`);
+  console.log(`\nHOÀN TẤT CHUẨN HÓA ${successCount}/32 BỘ ĐỀ READING!`);
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Lỗi:', e);
+    console.error('[FAIL] Lỗi:', e);
     process.exit(1);
   })
   .finally(async () => {

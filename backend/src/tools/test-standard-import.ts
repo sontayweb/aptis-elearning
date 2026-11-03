@@ -4,12 +4,12 @@ import { standardExamParser } from '../modules/ingestion/parsers/standard-exam.p
 
 async function testStandardImport() {
   console.log('================================================================');
-  console.log('🧪 TEST BỘ NHẬP ĐỀ THI CHUẨN DOANH NGHIỆP (SMART INGESTION TEST)');
+  console.log('[TEST] TEST BỘ NHẬP ĐỀ THI CHUẨN DOANH NGHIỆP (SMART INGESTION TEST)');
   console.log('================================================================\n');
 
   // 1. Kiểm tra Parse Word Template Mẫu Chuẩn
   const docxTemplatePath = path.resolve('../frontend/public/templates/Mau_Nhap_De_Speaking_Part2_Part3.docx');
-  console.log('📄 1. Kiểm định File Word Mẫu Chuẩn...');
+  console.log('1. Kiểm định File Word Mẫu Chuẩn...');
   if (!fs.existsSync(docxTemplatePath)) {
     throw new Error(`Không tìm thấy file: ${docxTemplatePath}`);
   }
@@ -25,7 +25,7 @@ async function testStandardImport() {
 
   // 1b. Kiểm tra Parse Word Template Mẫu Writing
   const writingDocxPath = path.resolve('../frontend/public/templates/Mau_Nhap_De_Writing.docx');
-  console.log('\n✍️ 1b. Kiểm định File Word Mẫu Writing (4 Parts)...');
+  console.log('\n[WRITING] 1b. Kiểm định File Word Mẫu Writing (4 Parts)...');
   if (fs.existsSync(writingDocxPath)) {
     const writingBuffer = fs.readFileSync(writingDocxPath);
     const writingResult = standardExamParser.parseAndValidateDocx(writingBuffer, 'Mau_Nhap_De_Writing.docx');
@@ -38,7 +38,7 @@ async function testStandardImport() {
 
   // 2. Kiểm tra Parse Excel Template Mẫu Chuẩn
   const xlsxTemplatePath = path.resolve('../frontend/public/templates/Mau_Nhap_De_Reading_Listening.xlsx');
-  console.log('\n📊 2. Kiểm định File Excel Mẫu Chuẩn...');
+  console.log('\n[STATS] 2. Kiểm định File Excel Mẫu Chuẩn...');
   if (!fs.existsSync(xlsxTemplatePath)) {
     throw new Error(`Không tìm thấy file: ${xlsxTemplatePath}`);
   }
@@ -55,7 +55,7 @@ async function testStandardImport() {
 
   // 3. Kiểm tra Parse File Docx Thực tế của User
   const realDocxPath = path.resolve('../docs/requirment-thêm/Tranh trọng điểm part 2.docx');
-  console.log('\n🖼️ 3. Kiểm định File Docx Thực Tế: "Tranh trọng điểm part 2.docx"...');
+  console.log('\n3. Kiểm định File Docx Thực Tế: "Tranh trọng điểm part 2.docx"...');
   if (fs.existsSync(realDocxPath)) {
     const realBuffer = fs.readFileSync(realDocxPath);
     const realResult = standardExamParser.parseAndValidateDocx(realBuffer, 'Tranh trọng điểm part 2.docx');
@@ -69,11 +69,11 @@ async function testStandardImport() {
   }
 
   console.log('\n================================================================');
-  console.log('🎯 KIỂM THỬ HOÀN TẤT: CẢ 3 BỘ DỮ LIỆU ĐỀU ĐƯỢC XỬ LÝ AN TOÀN & CHUẨN XÁC!');
+  console.log('[RESULT] KIỂM THỬ HOÀN TẤT: CẢ 3 BỘ DỮ LIỆU ĐỀU ĐƯỢC XỬ LÝ AN TOÀN & CHUẨN XÁC!');
   console.log('================================================================');
 }
 
 testStandardImport().catch((e) => {
-  console.error('❌ Lỗi:', e);
+  console.error('[FAIL] Lỗi:', e);
   process.exit(1);
 });

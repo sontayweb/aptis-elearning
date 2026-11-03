@@ -35,9 +35,9 @@ async function main() {
   console.log(`- Tổng số Part 4 Speaking trên toàn hệ thống: ${allPart4Speaking.length}`);
   console.log(`- Số Part 4 còn dính tranh rác: ${dirtyPart4.length}`);
   if (dirtyPart4.length === 0) {
-    console.log('✅ ĐẠT CHUẨN 100%: Tuyệt đối không còn bất kỳ Part 4 Speaking nào dính tranh rác!');
+    console.log('[PASS] ĐẠT CHUẨN 100%: Tuyệt đối không còn bất kỳ Part 4 Speaking nào dính tranh rác!');
   } else {
-    console.error('❌ LỖI: Vẫn còn Part 4 dính ảnh rác:', dirtyPart4);
+    console.error('[FAIL] LỖI: Vẫn còn Part 4 dính ảnh rác:', dirtyPart4);
   }
 
   // 2. Kiểm tra các đề FULL_TEST
@@ -59,7 +59,7 @@ async function main() {
   }
   console.log(`- Số đề Full Test đạt cấu trúc chuẩn (>= 10 parts, >= 30 questions): ${ftPassing}/${fullTests.length}`);
   if (ftPassing === fullTests.length) {
-    console.log('✅ ĐẠT: 100% đề Full Test có cấu trúc đầy đủ cả 4 kỹ năng.');
+    console.log('[PASS] ĐẠT: 100% đề Full Test có cấu trúc đầy đủ cả 4 kỹ năng.');
   }
 
   // 3. Kiểm tra các đề Grammar & Vocabulary
@@ -77,7 +77,7 @@ async function main() {
   console.log(`- Tổng số đề Grammar & Vocabulary đã xuất bản: ${gvExams.length}`);
   console.log(`- Số đề có part rỗng (0 câu hỏi): ${brokenGv.length}`);
   if (brokenGv.length === 0) {
-    console.log('✅ ĐẠT CHUẨN 100%: 0% đề có part rỗng. Mọi đề thi xuất bản đều có câu hỏi thực tế.');
+    console.log('[PASS] ĐẠT CHUẨN 100%: 0% đề có part rỗng. Mọi đề thi xuất bản đều có câu hỏi thực tế.');
   }
 
   // 4. Kiểm tra DTO của Full Test và Grammar qua examService.getExamQuestions
@@ -90,7 +90,7 @@ async function main() {
       if (spkPart4InFt) {
         console.log(`- Full Test DTO -> Speaking Part 4: image_url=${spkPart4InFt.image_url} | prepTime=${spkPart4InFt.prepTime} | speakTime=${spkPart4InFt.speakTime}`);
         if (spkPart4InFt.image_url === null && spkPart4InFt.prepTime === 60 && spkPart4InFt.speakTime === 120) {
-          console.log('✅ ĐẠT: Speaking Part 4 trong Full Test trả về DTO chuẩn tự thân (không tranh, prep 60s, speak 120s).');
+          console.log('[PASS] ĐẠT: Speaking Part 4 trong Full Test trả về DTO chuẩn tự thân (không tranh, prep 60s, speak 120s).');
         }
       }
     } catch (e: any) {
@@ -104,7 +104,7 @@ async function main() {
       const gvDto: any = await examService.getExamQuestions(nonProGv.id);
       console.log(`- Grammar DTO ("${gvDto.title}"): parts=${gvDto.parts.length} | recommendedMinutes=${gvDto.parts[0]?.recommendedMinutes}`);
       if (gvDto.parts.length > 0 && gvDto.parts[0]?.recommendedMinutes === 25) {
-        console.log('✅ ĐẠT: Grammar DTO trả về thông số thời gian chuẩn 25 phút.');
+        console.log('[PASS] ĐẠT: Grammar DTO trả về thông số thời gian chuẩn 25 phút.');
       }
     } catch (e: any) {
       console.log(`- Test Grammar DTO (${nonProGv.title}): Bỏ qua kiểm tra pro access`);

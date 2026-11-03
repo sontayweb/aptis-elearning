@@ -1,5 +1,7 @@
 "use client";
 
+import { QuestionReportModal } from "@/components/exam/question-report-modal";
+
 import {
   Eye,
   Flag,
@@ -12,6 +14,7 @@ import {
   CheckCircle2,
   X,
 } from "lucide-react";
+import { api } from "@/lib/api-client";
 import type { ListeningExamData } from "./listening-types";
 import type { ListeningStageItem } from "./listening-review-sidebar";
 
@@ -301,80 +304,14 @@ export function ListeningModalsAndDrawer({
       )}
 
       {/* MODAL BÁO LỖI */}
-      {showReportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-destructive" />
-                <span>Báo lỗi câu hỏi Listening</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowReportModal(false)}
-                className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {reportSent ? (
-              <div className="py-6 text-center space-y-2">
-                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
-                <p className="text-xs font-bold text-foreground">Cảm ơn bạn đã phản hồi!</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Ban chuyên môn sẽ kiểm tra file âm thanh và đề thi trong thời gian sớm nhất.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3 text-xs">
-                <p className="text-muted-foreground">Vui lòng chọn loại lỗi bạn gặp phải:</p>
-                <div className="space-y-2">
-                  {[
-                    "Lỗi âm thanh hoặc audio không phát được",
-                    "Lỗi đáp án hoặc giải thích chưa chuẩn",
-                    "Lỗi nội dung / câu hỏi hiển thị",
-                    "Khác",
-                  ].map((t) => (
-                    <label key={t} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="listeningReportType"
-                        value={t}
-                        checked={reportType === t}
-                        onChange={() => setReportType(t)}
-                        className="text-primary focus:ring-primary"
-                      />
-                      <span className="text-foreground">{t}</span>
-                    </label>
-                  ))}
-                </div>
-                <textarea
-                  value={reportNote}
-                  onChange={(e) => setReportNote(e.target.value)}
-                  placeholder="Mô tả chi tiết vấn đề (tùy chọn)..."
-                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs resize-none h-20 focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <div className="flex justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowReportModal(false)}
-                    className="px-3.5 py-1.5 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setReportSent(true)}
-                    className="px-4 py-1.5 rounded-xl bg-destructive text-destructive-foreground text-xs font-bold hover:opacity-90"
-                  >
-                    Gửi báo lỗi
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <QuestionReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        examId={(examData as any)?.id || (examData as any)?.examId || "listening-exam"}
+        examTitle={(examData as any)?.title || "Bài thi Listening"}
+        questionNumber={activeStage + 1}
+        skillName="Listening"
+      />
 
       {/* DRAWER DANH SÁCH CÂU HỎI */}
       {showDrawer && (

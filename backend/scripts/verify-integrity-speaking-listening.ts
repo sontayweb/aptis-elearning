@@ -40,9 +40,9 @@ async function main() {
         data: { image_url: null }
       });
     }
-    console.log('✅ ĐÃ DỌN SẠCH 100%: Toàn bộ Part 4 hiện tại image_url = null.');
+    console.log('[PASS] ĐÃ DỌN SẠCH 100%: Toàn bộ Part 4 hiện tại image_url = null.');
   } else {
-    console.log('✅ ĐẠT: 100% Speaking Part 4 không có tranh rác (image_url = null).');
+    console.log('[PASS] ĐẠT: 100% Speaking Part 4 không có tranh rác (image_url = null).');
   }
 
   // 2. Audit Speaking Part 2 & Part 3 images
@@ -82,14 +82,14 @@ async function main() {
     const inFrontend = fs.existsSync(path.join(frontendPublic, cleanUrl));
     if (!inBackend && !inFrontend) {
       missingFiles++;
-      console.warn(`  ⚠️ Ảnh không tồn tại trên đĩa: ${part.image_url} (Exam: ${pTruncate(part.exam.title)})`);
+      console.warn(`  [WARN] Ảnh không tồn tại trên đĩa: ${part.image_url} (Exam: ${pTruncate(part.exam.title)})`);
     }
   }
 
   console.log(`- Số Part 2/3 có image_url = null: ${nullImages}`);
   console.log(`- Số Part 2/3 trỏ file không tồn tại: ${missingFiles}`);
   if (missingFiles === 0) {
-    console.log('✅ ĐẠT: 100% ảnh Speaking Part 2 & Part 3 đều có file vật lý trên đĩa.');
+    console.log('[PASS] ĐẠT: 100% ảnh Speaking Part 2 & Part 3 đều có file vật lý trên đĩa.');
   }
 
   // 3. Audit Speaking Part 1
@@ -114,7 +114,7 @@ async function main() {
   console.log(`- Tổng số Part 1 tìm thấy: ${spkPart1List.length}`);
   console.log(`- Số Part 1 không có câu hỏi: ${invalidPart1.length}`);
   if (invalidPart1.length === 0) {
-    console.log('✅ ĐẠT: 100% Speaking Part 1 đều có danh sách câu hỏi hợp lệ.');
+    console.log('[PASS] ĐẠT: 100% Speaking Part 1 đều có danh sách câu hỏi hợp lệ.');
   }
 
   // 4. Audit Listening Data Structure
@@ -138,7 +138,7 @@ async function main() {
   }
   console.log(`- Số đề Listening có câu hỏi hợp lệ: ${validLisExams}/${listeningExams.length}`);
   if (validLisExams === listeningExams.length) {
-    console.log('✅ ĐẠT: 100% đề Listening có dữ liệu part và câu hỏi đầy đủ.');
+    console.log('[PASS] ĐẠT: 100% đề Listening có dữ liệu part và câu hỏi đầy đủ.');
   }
 
   console.log('\n===============================================================');

@@ -24,7 +24,7 @@ async function main() {
 
   for (const p of parts) {
     if (p.questions.length === 0) {
-      console.log(`❌ NO QUESTIONS: [${p.exam.title}]`);
+      console.log(`[FAIL] NO QUESTIONS: [${p.exam.title}]`);
       missingQuestionsCount++;
       continue;
     }
@@ -37,7 +37,7 @@ async function main() {
       const feAudioPath = path.resolve(__dirname, '../../frontend/public/audio', partAudio.replace(/^\/+/, ''));
       const feAudioListen = path.resolve(__dirname, '../../frontend/public/audio/listening', partAudio.replace(/^\/+/, ''));
       if (!fs.existsSync(fePath) && !fs.existsSync(bePath) && !fs.existsSync(feAudioPath) && !fs.existsSync(feAudioListen)) {
-        console.log(`❌ MISSING PART AUDIO [${p.exam.title}]: ${partAudio}`);
+        console.log(`[FAIL] MISSING PART AUDIO [${p.exam.title}]: ${partAudio}`);
         missingAudioCount++;
       }
     }
@@ -46,7 +46,7 @@ async function main() {
     p.questions.forEach(q => {
       // Check if q has audio
       if (!q.options || (Array.isArray(q.options) && q.options.length === 0)) {
-        console.log(`⚠️ Question without options: [${p.exam.title}] Q${q.question_number}`);
+        console.log(`[WARN] Question without options: [${p.exam.title}] Q${q.question_number}`);
       }
     });
   }

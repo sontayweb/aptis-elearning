@@ -3,7 +3,7 @@ import { geminiRotator } from '../src/modules/ai-grading/gemini-rotator.service'
 
 async function runFullTest() {
   console.log('========================================================');
-  console.log('🚀 BẮT ĐẦU KIỂM TRA TOÀN DIỆN GOOGLE GEMINI AI API');
+  console.log('[START] BẮT ĐẦU KIỂM TRA TOÀN DIỆN GOOGLE GEMINI AI API');
   console.log('========================================================');
   
   const startTime = Date.now();
@@ -18,27 +18,27 @@ I just heard the terrible news that our annual trip to the National Art Gallery 
 Best wishes,
 Hiep`;
 
-  console.log('📝 Đang gửi bài viết thực tế (60 từ) tới mô hình Gemini...');
+  console.log('Đang gửi bài viết thực tế (60 từ) tới mô hình Gemini...');
   const result = await geminiRotator.evaluateWriting(prompt, context, candidateText);
   const duration = ((Date.now() - startTime) / 1000).toFixed(2);
 
   console.log('--------------------------------------------------------');
-  console.log('⚡ Thời gian phản hồi:', duration, 'giây (Rất nhanh)');
-  console.log('✅ TRẠNG THÁI: KẾT NỐI THÀNH CÔNG 100%');
-  console.log('🤖 Mô hình AI phục vụ:', result.usedModel);
-  console.log('🎯 Điểm tổng kết:', result.score, '/ 50');
-  console.log('📊 Quy đổi CEFR:', result.cefr_level);
-  console.log('📌 Điểm chi tiết 4 tiêu chí chuẩn British Council:');
+  console.log('Thời gian phản hồi:', duration, 'giây (Rất nhanh)');
+  console.log('[PASS] TRẠNG THÁI: KẾT NỐI THÀNH CÔNG 100%');
+  console.log(' Mô hình AI phục vụ:', result.usedModel);
+  console.log('[RESULT] Điểm tổng kết:', result.score, '/ 50');
+  console.log('[STATS] Quy đổi CEFR:', result.cefr_level);
+  console.log('[NOTE] Điểm chi tiết 4 tiêu chí chuẩn British Council:');
   console.log('   • Task Fulfillment (Hoàn thành đề bài):', result.task_completion, '/ 50');
   console.log('   • Grammar Accuracy (Độ chuẩn ngữ pháp):', result.grammar_score, '/ 50');
   console.log('   • Vocabulary Diversity (Độ đa dạng từ vựng):', result.vocabulary_score, '/ 50');
   console.log('   • Cohesion & Flow (Tính liên kết câu):', result.cohesion_score, '/ 50');
   console.log('--------------------------------------------------------');
-  console.log('💬 Nhận xét tiếng Việt từ AI:');
+  console.log(' Nhận xét tiếng Việt từ AI:');
   console.log('  ', result.feedback_summary);
   
   if (Array.isArray(result.detailed_feedback) && result.detailed_feedback.length > 0) {
-    console.log('🔍 Sửa lỗi ngữ pháp & Gợi ý nâng band:');
+    console.log(' Sửa lỗi ngữ pháp & Gợi ý nâng band:');
     result.detailed_feedback.forEach((f: any, idx: number) => {
       console.log(`   ${idx + 1}. [${f.errorType || 'Grammar/Vocab'}]`);
       if (f.original) console.log(`      - Bản gốc: "${f.original}"`);
@@ -50,6 +50,6 @@ Hiep`;
 }
 
 runFullTest().catch((err) => {
-  console.error('❌ LỖI KHI GỌI GOOGLE AI:', err);
+  console.error('[FAIL] LỖI KHI GỌI GOOGLE AI:', err);
   process.exit(1);
 });

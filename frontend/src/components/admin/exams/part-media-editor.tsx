@@ -172,7 +172,7 @@ export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-2.5 rounded-xl border border-rose-100 dark:border-rose-900/40 bg-rose-50/30 dark:bg-rose-950/20">
                 <span className="text-[11px] font-bold text-rose-800 dark:text-rose-300 block mb-1.5">
-                  🖼️ Bức tranh 1 (Ảnh bên trái)
+                  Bức tranh 1 (Ảnh bên trái)
                 </span>
                 <ImageUploadInput
                   value={img1}
@@ -184,7 +184,7 @@ export const PartMediaEditor: React.FC<PartMediaEditorProps> = ({
 
               <div className="p-2.5 rounded-xl border border-rose-100 dark:border-rose-900/40 bg-rose-50/30 dark:bg-rose-950/20">
                 <span className="text-[11px] font-bold text-rose-800 dark:text-rose-300 block mb-1.5">
-                  🖼️ Bức tranh 2 (Ảnh bên phải)
+                  Bức tranh 2 (Ảnh bên phải)
                 </span>
                 <ImageUploadInput
                   value={img2}

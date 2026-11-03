@@ -218,7 +218,7 @@ async function main() {
           },
         },
       });
-      console.log(`✅ [${code}] Đã chuẩn hóa Full Listening (giữ nguyên ID ${existingExam.id}): "${fullExamTitle}"`);
+      console.log(`[PASS] [${code}] Đã chuẩn hóa Full Listening (giữ nguyên ID ${existingExam.id}): "${fullExamTitle}"`);
     } else {
       const created = await prisma.exam.create({
         data: {
@@ -234,18 +234,18 @@ async function main() {
           },
         },
       });
-      console.log(`✅ [${code}] Đã tạo mới: "${fullExamTitle}" (ID: ${created.id})`);
+      console.log(`[PASS] [${code}] Đã tạo mới: "${fullExamTitle}" (ID: ${created.id})`);
     }
 
     updatedCount++;
   }
 
-  console.log(`\n🎉 HOÀN TẤT CHUẨN HÓA ${updatedCount} BỘ ĐỀ FULL LISTENING!`);
+  console.log(`\nHOÀN TẤT CHUẨN HÓA ${updatedCount} BỘ ĐỀ FULL LISTENING!`);
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Lỗi:', e);
+    console.error('[FAIL] Lỗi:', e);
     process.exit(1);
   })
   .finally(async () => {

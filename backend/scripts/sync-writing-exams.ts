@@ -117,7 +117,7 @@ async function main() {
       p2SubUpdated++;
     }
   }
-  console.log(`✅ Đã cập nhật ${p2SubUpdated} / ${subExamsP2.length} Sub-Exams Part 2!`);
+  console.log(`[PASS] Đã cập nhật ${p2SubUpdated} / ${subExamsP2.length} Sub-Exams Part 2!`);
 
   // 2. Sửa Full Writing Exams (Part 2 & Part 4)
   console.log('\n--- 2. CẬP NHẬT FULL WRITING EXAMS ---');
@@ -239,8 +239,8 @@ async function main() {
     }
   }
 
-  console.log(`✅ Đã cập nhật Part 2 cho ${fullP2Updated} Full Writing Exams!`);
-  console.log(`✅ Đã cập nhật Part 4 cho ${fullP4Updated} Full Writing Exams!`);
+  console.log(`[PASS] Đã cập nhật Part 2 cho ${fullP2Updated} Full Writing Exams!`);
+  console.log(`[PASS] Đã cập nhật Part 4 cho ${fullP4Updated} Full Writing Exams!`);
 
   // 3. Sửa Sub-Exams Part 4
   console.log('\n--- 3. CẬP NHẬT SUB-EXAMS WRITING PART 4 ---');
@@ -319,9 +319,9 @@ async function main() {
       p4SubUpdated++;
     }
   }
-  console.log(`✅ Đã cập nhật ${p4SubUpdated} / ${subExamsP4.length} Sub-Exams Part 4!`);
+  console.log(`[PASS] Đã cập nhật ${p4SubUpdated} / ${subExamsP4.length} Sub-Exams Part 4!`);
 
-  console.log('\n🎉 ĐỒNG BỘ TOÀN BỘ DỮ LIỆU WRITING THÀNH CÔNG RỰC RỠ!');
+  console.log('\nĐỒNG BỘ TOÀN BỘ DỮ LIỆU WRITING THÀNH CÔNG RỰC RỠ!');
   await prisma.$disconnect();
 }
 

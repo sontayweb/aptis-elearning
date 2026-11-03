@@ -14,8 +14,8 @@ async function main() {
     return;
   }
 
-  console.log(`👤 User test: ${user.full_name} (${user.email})`);
-  console.log(`📦 Plan test: ${plan.name} (${plan.duration_days} ngày, ${plan.ai_quota} lượt AI)`);
+  console.log(` User test: ${user.full_name} (${user.email})`);
+  console.log(`Plan test: ${plan.name} (${plan.duration_days} ngày, ${plan.ai_quota} lượt AI)`);
 
   // Thực thi bên trong Transaction và Rollback để không làm bẩn dữ liệu thật
   await prisma.$transaction(async (tx) => {
@@ -24,7 +24,7 @@ async function main() {
       planId: plan.id,
     });
 
-    console.log('\n✅ Kết quả xử lý cấp/gia hạn gói cước:');
+    console.log('\n[PASS] Kết quả xử lý cấp/gia hạn gói cước:');
     console.log(`   - Subscription ID: ${sub.id}`);
     console.log(`   - Ngày bắt đầu:    ${sub.start_date.toISOString()}`);
     console.log(`   - Ngày kết thúc:   ${sub.end_date.toISOString()}`);
@@ -35,7 +35,7 @@ async function main() {
     throw new Error('ROLLBACK_INTENTIONAL');
   }).catch((e) => {
     if (e.message === 'ROLLBACK_INTENTIONAL') {
-      console.log('\n🔒 Dữ liệu đã được rollback an toàn 100%. Không ảnh hưởng Database thật.');
+      console.log('\n Dữ liệu đã được rollback an toàn 100%. Không ảnh hưởng Database thật.');
     } else {
       throw e;
     }

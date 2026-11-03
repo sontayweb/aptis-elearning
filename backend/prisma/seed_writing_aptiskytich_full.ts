@@ -18,7 +18,7 @@ const prisma = new PrismaClient();
 
 const WRITING_EXAMS = [
   {
-    title: 'Đề 01 — Art Club (Aptis Kỳ Tích)',
+    title: 'Đề 01 — Art Club',
     description: 'Chủ đề Câu lạc bộ Nghệ thuật (Art Club) — Chuẩn cấu trúc Aptis 4 phần thi viết thực tế.',
     duration_minutes: 50,
     is_pro: false,
@@ -113,7 +113,7 @@ const WRITING_EXAMS = [
     ],
   },
   {
-    title: 'Đề 02 — Sports & Fitness Club (Aptis Kỳ Tích)',
+    title: 'Đề 02 — Sports & Fitness Club',
     description: 'Chủ đề Câu lạc bộ Thể thao (Sports Club) — Đầy đủ 4 phần thi viết về rèn luyện thể lực và hoạt động nhóm.',
     duration_minutes: 50,
     is_pro: false,
@@ -208,7 +208,7 @@ const WRITING_EXAMS = [
     ],
   },
   {
-    title: 'Đề 03 — Book Club (Aptis Kỳ Tích)',
+    title: 'Đề 03 — Book Club',
     description: 'Chủ đề Câu lạc bộ Sách (Book Club) — Luyện viết về văn hóa đọc, trao đổi quan điểm tác phẩm và kiến nghị tổ chức.',
     duration_minutes: 50,
     is_pro: false,
@@ -303,7 +303,7 @@ const WRITING_EXAMS = [
     ],
   },
   {
-    title: 'Đề 04 — Travel Club (Aptis Kỳ Tích)',
+    title: 'Đề 04 — Travel Club',
     description: 'Chủ đề Câu lạc bộ Du lịch (Travel Club) — Viết về các điểm đến khám phá, trải nghiệm văn hóa và xử lý tình huống hủy chuyến.',
     duration_minutes: 50,
     is_pro: false,

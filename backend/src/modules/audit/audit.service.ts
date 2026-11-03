@@ -120,13 +120,28 @@ export class AuditService {
    * Truy vấn danh sách Audit Logs cho giao diện Quản trị viên
    */
   async listLogs(filter: AuditLogFilterInput) {
-    const { action, entityType, userId, page, limit } = filter;
+    const { action, entityType, userId, search, page, limit } = filter;
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    if (action) where.action = action;
+    if (action) {
+      if (action.includes(',')) {
+        where.action = { in: action.split(',').map((a) => a.trim() as AuditAction) };
+      } else {
+        where.action = action as AuditAction;
+      }
+    }
     if (entityType) where.entity_type = entityType;
     if (userId) where.user_id = userId;
+
+    if (search && search.trim()) {
+      const q = search.trim();
+      where.OR = [
+        { actor_name: { contains: q, mode: 'insensitive' } },
+        { actor_email: { contains: q, mode: 'insensitive' } },
+        { description: { contains: q, mode: 'insensitive' } },
+      ];
+    }
 
     const [logs, total] = await Promise.all([
       prisma.auditLog.findMany({

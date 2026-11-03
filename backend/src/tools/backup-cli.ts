@@ -11,7 +11,7 @@ async function main() {
   try {
     switch (command) {
       case 'status': {
-        console.log('📊 Đang kiểm tra trạng thái CSDL PostgreSQL...');
+        console.log('[STATS] Đang kiểm tra trạng thái CSDL PostgreSQL...');
         const stats = await backupService.getDatabaseStats();
 
         console.log(`\n• Database: ${stats.databaseName} (${stats.host}:${stats.port})`);
@@ -27,7 +27,7 @@ async function main() {
         }
         console.log('----------------------------------------------------------------\n');
 
-        console.log('📁 Danh sách các bản sao lưu hiện có:');
+        console.log('[DIR] Danh sách các bản sao lưu hiện có:');
         const backups = await backupService.listBackups();
         if (backups.length === 0) {
           console.log('  (Chưa có bản sao lưu nào. Chạy `npm run db:backup` để tạo bản sao lưu đầu tiên.)');
@@ -44,32 +44,32 @@ async function main() {
 
       case 'backup':
       case 'backup:full': {
-        console.log('🚀 Bắt đầu tạo bản sao lưu toàn diện (SQL Dump + JSON Snapshot)...');
+        console.log('[START] Bắt đầu tạo bản sao lưu toàn diện (SQL Dump + JSON Snapshot)...');
         const result = await backupService.createFullBackup({ type: 'full' });
-        console.log(`\n✅ ${result.message}`);
-        console.log(`⏱️ Thời gian thực thi: ${(result.durationMs / 1000).toFixed(2)}s\n`);
+        console.log(`\n[PASS] ${result.message}`);
+        console.log(`[TIME] Thời gian thực thi: ${(result.durationMs / 1000).toFixed(2)}s\n`);
         break;
       }
 
       case 'backup:sql': {
-        console.log('🚀 Bắt đầu tạo bản sao lưu SQL Dump (.sql)...');
+        console.log('[START] Bắt đầu tạo bản sao lưu SQL Dump (.sql)...');
         const result = await backupService.createSqlBackup();
-        console.log(`\n✅ ${result.message}`);
-        console.log(`🔑 SHA-256 Checksum: ${result.backup?.sha256}`);
-        console.log(`⏱️ Thời gian thực thi: ${(result.durationMs / 1000).toFixed(2)}s\n`);
+        console.log(`\n[PASS] ${result.message}`);
+        console.log(`SHA-256 Checksum: ${result.backup?.sha256}`);
+        console.log(`[TIME] Thời gian thực thi: ${(result.durationMs / 1000).toFixed(2)}s\n`);
         break;
       }
 
       case 'backup:json': {
-        console.log('🚀 Bắt đầu tạo bản sao lưu JSON Snapshot...');
+        console.log('[START] Bắt đầu tạo bản sao lưu JSON Snapshot...');
         const result = await backupService.createJsonSnapshot();
-        console.log(`\n✅ ${result.message}`);
-        console.log(`⏱️ Thời gian thực thi: ${(result.durationMs / 1000).toFixed(2)}s\n`);
+        console.log(`\n[PASS] ${result.message}`);
+        console.log(`[TIME] Thời gian thực thi: ${(result.durationMs / 1000).toFixed(2)}s\n`);
         break;
       }
 
       case 'list': {
-        console.log('📁 Danh sách các bản sao lưu hiện có:\n');
+        console.log('[DIR] Danh sách các bản sao lưu hiện có:\n');
         const backups = await backupService.listBackups();
         if (backups.length === 0) {
           console.log('  (Chưa có bản sao lưu nào)');
@@ -89,9 +89,9 @@ async function main() {
       case 'restore': {
         const targetFilename = args[1];
         if (!targetFilename) {
-          console.log('⚠️ Vui lòng chỉ định tên tệp sao lưu .sql cần khôi phục.');
+          console.log('[WARN] Vui lòng chỉ định tên tệp sao lưu .sql cần khôi phục.');
           console.log('   Ví dụ: npm run db:restore backup_aptis_kytich_db_20261027_070000.sql\n');
-          console.log('📁 Danh sách các tệp .sql hiện có:');
+          console.log('[DIR] Danh sách các tệp .sql hiện có:');
           const backups = await backupService.listBackups();
           const sqlFiles = backups.filter((b) => b.type === 'sql');
           sqlFiles.forEach((f, idx) => {
@@ -101,10 +101,10 @@ async function main() {
           process.exit(1);
         }
 
-        console.log(`⚠️ BẮT ĐẦU KHÔI PHỤC CSDL TỪ TỆP: ${targetFilename}`);
+        console.log(`[WARN] BẮT ĐẦU KHÔI PHỤC CSDL TỪ TỆP: ${targetFilename}`);
         console.log('   Quá trình này sẽ nạp lại toàn bộ cấu trúc và dữ liệu vào CSDL.');
         const result = await backupService.restoreSqlBackup(targetFilename);
-        console.log(`\n🎉 ${result.message}\n`);
+        console.log(`\n${result.message}\n`);
         break;
       }
 
@@ -121,7 +121,7 @@ async function main() {
       }
     }
   } catch (err: any) {
-    console.error(`\n❌ LỖI THỰC THI: ${err.message}\n`);
+    console.error(`\n[FAIL] LỖI THỰC THI: ${err.message}\n`);
     process.exit(1);
   } finally {
     process.exit(0);

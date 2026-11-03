@@ -41,7 +41,7 @@ export class DataSyncController {
 
       res.status(200).json({
         success: true,
-        message: `Đã chuẩn hóa dữ liệu thành công (${result.totalFixed} mục được tối ưu trong ${result.durationMs}ms).`,
+        message: `Tự động kiểm tra và tối ưu ngân hàng đề hoàn tất: ${result.totalFixed} mục đã được xử lý thành công (${result.durationMs}ms)!`,
         data: result,
       });
     } catch (error) {
@@ -60,7 +60,7 @@ export class DataSyncController {
 
       res.status(200).json({
         success: true,
-        message: `Hoàn tất kiểm thử ${result.totalPartsTested} phần thi — Tỷ lệ đạt: ${result.overallPassRate}%`,
+        message: `Hoàn tất kiểm tra phòng thi: ${result.totalPartsTested} phần thi — Tỷ lệ đạt chuẩn: ${result.overallPassRate}%`,
         data: result,
       });
     } catch (error) {
@@ -104,9 +104,7 @@ export class DataSyncController {
 
       res.status(200).json({
         success: true,
-        message: dryRun
-          ? `[Dry-Run] Đã thẩm định ${result.totalProcessed} đề thi: ${result.validDryRunCount} hợp lệ, ${result.validationFailedCount} bị chặn.`
-          : `Đồng bộ hoàn tất ${result.totalProcessed} đề thi (Tạo mới: ${result.createdCount}, Cập nhật sâu: ${result.deepUpdatedCount}, Bảo toàn bài nộp: ${result.inPlaceUpdatedCount}).`,
+        message: dryRun ? `[Kiểm tra thử] Đã thẩm định ${result.totalProcessed} đề: ${result.validDryRunCount} đề hợp lệ sẵn sàng nạp, ${result.validationFailedCount} đề bị lỗi cấu trúc.` : `Đã nạp thành công ${result.totalProcessed} đề vào kho (Tạo mới: ${result.createdCount}, Cập nhật: ${result.deepUpdatedCount}, Bảo toàn an toàn bài làm học viên: ${result.inPlaceUpdatedCount}).`,
         data: result,
       });
     } catch (error) {

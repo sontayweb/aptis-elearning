@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { prisma } from '../../config/database';
 import { PlanType, TransactionStatus, AuditAction, NotificationType } from '@prisma/client';
 import { SepayWebhookInput, ReportPaymentIssueInput } from './payment.dto';
@@ -231,7 +232,7 @@ export class PaymentService {
     // 4. Gửi thông báo cho người dùng
     notificationService.createNotification({
       userId: transaction.user_id,
-      title: 'Kích hoạt tài khoản VIP thành công 🎉',
+      title: 'Kích hoạt tài khoản VIP thành công',
       message: `Gói ${plan.name} đã được kích hoạt thành công. Hạn sử dụng đến ${result.newEndDate?.toLocaleDateString('vi-VN') || ''}.`,
       type: NotificationType.VIP_ACTIVATED,
       link: '/pricing',
@@ -565,7 +566,7 @@ export class PaymentService {
     };
   }
 
-  async redeemPromoCode(userId: string, inputCode: string) {
+  async redeemPromoCode(userId: string, inputCode: string, req?: Request) {
     const codeNormalized = inputCode.trim().toUpperCase();
     const now = new Date();
 
@@ -580,25 +581,29 @@ export class PaymentService {
     }
 
     if (promo.expires_at && now > promo.expires_at) {
-      throw { statusCode: 400, message: 'Mã kích hoạt đã hết hạn sử dụng' };
+      throw {
+        statusCode: 400,
+        message: 'Mã kích hoạt trải nghiệm đã hết hạn sử dụng (chương trình chỉ mở đến ngày 25/11). Vui lòng đăng ký gói VIP Pro để tiếp tục sử dụng toàn bộ tính năng.',
+      };
     }
 
     if (promo.max_uses !== null && promo.current_uses >= promo.max_uses) {
       throw { statusCode: 400, message: 'Mã kích hoạt đã hết lượt sử dụng' };
     }
 
-    // 2. Chống kích hoạt lặp lại (1 User chỉ được nhập mã này 1 lần duy nhất)
-    const alreadyRedeemed = await prisma.promotionRedemption.findUnique({
+    // 2. Chống kích hoạt lặp lại (Mỗi tài khoản chỉ được sử dụng mã trải nghiệm 1 lần duy nhất)
+    const alreadyRedeemed = await prisma.promotionRedemption.findFirst({
       where: {
-        code_id_user_id: {
-          code_id: promo.id,
-          user_id: userId,
-        },
+        user_id: userId,
       },
+      include: { code: true },
     });
 
     if (alreadyRedeemed) {
-      throw { statusCode: 400, message: 'Bạn đã từng kích hoạt mã trải nghiệm này rồi' };
+      throw {
+        statusCode: 400,
+        message: 'Tài khoản của bạn đã từng kích hoạt mã trải nghiệm VIP rồi (mỗi tài khoản chỉ được dùng 1 lần). Vui lòng đăng ký gói Pro để tiếp tục sử dụng.',
+      };
     }
 
     // 3. Thực thi transaction đảm bảo tính toàn vẹn (Atomic Execution)
@@ -632,14 +637,46 @@ export class PaymentService {
       return sub;
     });
 
-    // 4. Bắn thông báo chuông cho học viên
-    notificationService.createNotification({
-      userId,
-      type: NotificationType.VIP_ACTIVATED,
-      title: '🎉 Kích hoạt VIP Trải Nghiệm thành công!',
-      message: `Bạn đã nhận được ${promo.duration_days} ngày trải nghiệm VIP kèm ${promo.ai_quota} lượt chấm AI.`,
-      link: '/pricing',
-    }).catch(() => {});
+    // 4. Lấy thông tin user để ghi Audit Log kiểm toán append-only cho Quản trị viên
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, full_name: true, email: true, role: true },
+    });
+
+    const endDateFormatted = new Date(subscription.end_date).toLocaleDateString('vi-VN');
+    auditService.record({
+      req,
+      systemActor: user
+        ? {
+            id: user.id,
+            name: user.full_name,
+            email: user.email,
+            role: user.role,
+          }
+        : undefined,
+      action: AuditAction.USER_ROLE_CHANGE,
+      entityType: 'PROMOTION_REDEMPTION',
+      entityId: promo.id,
+      description: `Học viên ${user?.full_name || 'N/A'} (${user?.email || 'N/A'}) kích hoạt mã trải nghiệm [${promo.code}]: Nhận ${promo.duration_days} ngày VIP Pro miễn phí và ${promo.ai_quota} lượt chấm AI (Hạn dùng đến ${endDateFormatted}).`,
+      newValue: {
+        promoCode: promo.code,
+        planName: promo.plan.name,
+        durationDays: promo.duration_days,
+        aiQuota: promo.ai_quota,
+        endDate: subscription.end_date,
+      },
+    });
+
+    // 5. Bắn thông báo chuông cho học viên
+    notificationService
+      .createNotification({
+        userId,
+        type: NotificationType.VIP_ACTIVATED,
+        title: 'Kích hoạt VIP Trải Nghiệm thành công!',
+        message: `Bạn đã nhận được ${promo.duration_days} ngày trải nghiệm VIP kèm ${promo.ai_quota} lượt chấm AI.`,
+        link: '/pricing',
+      })
+      .catch(() => {});
 
     return {
       success: true,

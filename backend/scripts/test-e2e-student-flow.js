@@ -16,11 +16,11 @@ async function request(endpoint, options = {}, token = null) {
 
 async function run() {
   console.log('====================================================================');
-  console.log('🚀 BẮT ĐẦU KIỂM TRA ĐẦU LUỒNG END-TO-END QUA API CHO TÀI KHOẢN STUDENT');
+  console.log('[START] BẮT ĐẦU KIỂM TRA ĐẦU LUỒNG END-TO-END QUA API CHO TÀI KHOẢN STUDENT');
   console.log('====================================================================\n');
 
   // 1. ĐĂNG NHẬP
-  console.log('▶️ [BƯỚC 1] Đăng nhập tài khoản hoanghiep310102@gmail.com');
+  console.log('️ [BƯỚC 1] Đăng nhập tài khoản hoanghiep310102@gmail.com');
   const loginRes = await request('/auth/login', {
     method: 'POST',
     body: JSON.stringify({
@@ -32,18 +32,18 @@ async function run() {
   const tokens = loginRes.data?.data?.tokens || loginRes.data?.data;
   const token = tokens?.accessToken;
   if (!loginRes.ok || !token) {
-    console.error('❌ Đăng nhập thất bại:', loginRes.data);
+    console.error('[FAIL] Đăng nhập thất bại:', loginRes.data);
     return;
   }
   const user = loginRes.data.data.user;
   const activeSub = user.activeSubscription;
-  console.log(`  ✅ Đăng nhập thành công! User: ${user.fullName} (${user.email})`);
+  console.log(`  [PASS] Đăng nhập thành công! User: ${user.fullName} (${user.email})`);
   console.log(`     - Gói cước: ${activeSub?.planName || 'N/A'}`);
   console.log(`     - Quota AI còn lại: ${activeSub?.aiQuotaLeft}`);
   console.log(`     - Quota GV còn lại: ${activeSub?.teacherQuotaLeft}\n`);
 
   // 2. LẤY DANH SÁCH ĐỀ THI TỪNG KỸ NĂNG
-  console.log('▶️ [BƯỚC 2] Lấy danh sách đề thi (Reading, Listening, Writing)');
+  console.log('️ [BƯỚC 2] Lấy danh sách đề thi (Reading, Listening, Writing)');
   const [readingList, listeningList, writingList] = await Promise.all([
     request('/exams?skill=READING&limit=5', {}, token),
     request('/exams?skill=LISTENING&limit=5', {}, token),
@@ -54,14 +54,14 @@ async function run() {
   const listeningExam = listeningList.data?.data?.[0];
   const writingExam = writingList.data?.data?.[0];
 
-  console.log(`  📖 Reading Exam: "${readingExam?.title}" (${readingExam?.id})`);
-  console.log(`  🎧 Listening Exam: "${listeningExam?.title}" (${listeningExam?.id})`);
-  console.log(`  ✍️ Writing Exam: "${writingExam?.title}" (${writingExam?.id})\n`);
+  console.log(`  [READING] Reading Exam: "${readingExam?.title}" (${readingExam?.id})`);
+  console.log(`  [LISTENING] Listening Exam: "${listeningExam?.title}" (${listeningExam?.id})`);
+  console.log(`  [WRITING] Writing Exam: "${writingExam?.title}" (${writingExam?.id})\n`);
 
   // 3. TEST LUỒNG READING END-TO-END (Trắc nghiệm chấm tự động)
   if (readingExam) {
     console.log('--------------------------------------------------------------------');
-    console.log(`▶️ [BƯỚC 3] TEST LUỒNG READING: "${readingExam.title}"`);
+    console.log(`️ [BƯỚC 3] TEST LUỒNG READING: "${readingExam.title}"`);
     console.log('--------------------------------------------------------------------');
 
     // 3.1 Start / Resume (forceNew: false)
@@ -125,7 +125,7 @@ async function run() {
   // 4. TEST LUỒNG WRITING END-TO-END (Tự luận & Background AI Evaluation)
   if (writingExam) {
     console.log('--------------------------------------------------------------------');
-    console.log(`▶️ [BƯỚC 4] TEST LUỒNG WRITING: "${writingExam.title}"`);
+    console.log(`️ [BƯỚC 4] TEST LUỒNG WRITING: "${writingExam.title}"`);
     console.log('--------------------------------------------------------------------');
 
     // 4.1 Tạo bài thi Writing mới
@@ -175,7 +175,7 @@ async function run() {
       console.log(`      [Lần ${i} - ${i * 3}s] Status: ${subData?.status}, Score: ${subData?.total_score}, CEFR: ${subData?.cefr_level}, AI Results: ${subData?.ai_results?.length || 0}`);
       if (subData?.status === 'GRADED' || (subData?.ai_results && subData.ai_results.length > 0)) {
         graded = true;
-        console.log(`      ✅ AI đã chấm xong thành công!`);
+        console.log(`      [PASS] AI đã chấm xong thành công!`);
         console.log(`         - Band CEFR: ${subData?.cefr_level}`);
         console.log(`         - Điểm Writing: ${subData?.writing_score || subData?.total_score}`);
         if (subData?.ai_results?.[0]) {
@@ -185,13 +185,13 @@ async function run() {
       }
     }
     if (!graded) {
-      console.log(`      ℹ️ AI vẫn đang xử lý ngầm (hoặc chạy qua mock service)`);
+      console.log(`      [INFO] AI vẫn đang xử lý ngầm (hoặc chạy qua mock service)`);
     }
   }
 
   // 5. TEST LUỒNG LỊCH SỬ LÀM BÀI (/submissions/my-history)
   console.log('\n--------------------------------------------------------------------');
-  console.log('▶️ [BƯỚC 5] TEST API LỊCH SỬ LÀM BÀI (/submissions/my-history)');
+  console.log('️ [BƯỚC 5] TEST API LỊCH SỬ LÀM BÀI (/submissions/my-history)');
   console.log('--------------------------------------------------------------------');
   const historyRes = await request('/submissions/my-history?limit=10', {}, token);
   console.log(`  History status: ${historyRes.status}, Total items: ${historyRes.data?.data?.length}`);
@@ -210,7 +210,7 @@ async function run() {
   // 6. TEST TRUY VẤN LẠI BÀI ĐÃ LÀM (REVIEW MODE FETCH)
   if (items.length > 0) {
     const testReviewSub = items[0];
-    console.log(`\n▶️ [BƯỚC 6] Test lấy dữ liệu Review cho bài nộp ID: ${testReviewSub.id}`);
+    console.log(`\n️ [BƯỚC 6] Test lấy dữ liệu Review cho bài nộp ID: ${testReviewSub.id}`);
     const reviewRes = await request(`/submissions/${testReviewSub.id}`, {}, token);
     const rData = reviewRes.data?.data;
     console.log(`  Review fetch status: ${reviewRes.status}`);
@@ -222,7 +222,7 @@ async function run() {
   }
 
   console.log('\n====================================================================');
-  console.log('🎉 HOÀN THÀNH KIỂM TRA ĐẦU LUỒNG BACKEND API THÀNH CÔNG RỰC RỠ');
+  console.log('HOÀN THÀNH KIỂM TRA ĐẦU LUỒNG BACKEND API THÀNH CÔNG RỰC RỠ');
   console.log('====================================================================');
 }
 

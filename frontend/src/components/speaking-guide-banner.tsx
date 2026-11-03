@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Mic,
   Flame,
+  Target,
 } from "lucide-react";
 
 export interface SpeakingGuideBannerProps {
@@ -128,7 +129,7 @@ export function SpeakingGuideBanner({ onOpenGuideModal }: SpeakingGuideBannerPro
                   Trả lời 3 câu hỏi xoay quanh bản thân, công việc, học tập, gia đình, sở thích. <strong>Không có thời gian chuẩn bị</strong>.
                 </p>
                 <div className="pt-2 border-t border-border/40 text-[11px] text-primary font-medium">
-                  🎯 Tiêu chí: Nói trôi chảy, trả lời trực diện ngay câu đầu tiên.
+                  <Target className="w-3.5 h-3.5 inline mr-1 text-primary shrink-0" /> Tiêu chí: Nói trôi chảy, trả lời trực diện ngay câu đầu tiên.
                 </div>
               </div>
 
@@ -145,7 +146,7 @@ export function SpeakingGuideBanner({ onOpenGuideModal }: SpeakingGuideBannerPro
                   Xem 1 bức tranh, miêu tả tranh (Q1), kể trải nghiệm cá nhân liên quan (Q2), và nêu quan điểm/lý do xã hội (Q3).
                 </p>
                 <div className="pt-2 border-t border-border/40 text-[11px] text-primary font-medium">
-                  🎯 Tiêu chí: Bám sát từ vựng theo tranh, mở rộng 2-3 ý cụ thể.
+                  <Target className="w-3.5 h-3.5 inline mr-1 text-primary shrink-0" /> Tiêu chí: Bám sát từ vựng theo tranh, mở rộng 2-3 ý cụ thể.
                 </div>
               </div>
 
@@ -162,7 +163,7 @@ export function SpeakingGuideBanner({ onOpenGuideModal }: SpeakingGuideBannerPro
                   So sánh 2 bức tranh đối lập (Q1), chọn 1 trong 2 phương án & giải thích lý do (Q2), bình luận xu hướng tương lai (Q3).
                 </p>
                 <div className="pt-2 border-t border-border/40 text-[11px] text-primary font-medium">
-                  🎯 Tiêu chí: Dùng liên từ so sánh (whereas, while, on the contrary).
+                  <Target className="w-3.5 h-3.5 inline mr-1 text-primary shrink-0" /> Tiêu chí: Dùng liên từ so sánh (whereas, while, on the contrary).
                 </div>
               </div>
 

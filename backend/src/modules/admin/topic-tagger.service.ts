@@ -30,7 +30,7 @@ export function normalizeText(text: string): string {
 
 export const INITIAL_TOPIC_RULES: TopicRule[] = [
   // ─────────────────────────────────────────────────────────────
-  // PART 2 & 3: 5 CỎ (☘️☘️☘️☘️☘️) - ĐỀ TỦ CỰC HOT
+  // PART 2 & 3: 5 CỎ () - ĐỀ TỦ CỰC HOT
   // ─────────────────────────────────────────────────────────────
   {
     id: 'p23-film',
@@ -71,7 +71,7 @@ export const INITIAL_TOPIC_RULES: TopicRule[] = [
   },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 4: 5 CỎ (☘️☘️☘️☘️☘️) - ĐỀ TỦ CỰC HOT
+  // PART 4: 5 CỎ () - ĐỀ TỦ CỰC HOT
   // ─────────────────────────────────────────────────────────────
   {
     id: 'p4-childhood-tech-games',
@@ -147,7 +147,7 @@ export const INITIAL_TOPIC_RULES: TopicRule[] = [
   },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 2, 3, 4: 4 CỎ (☘️☘️☘️☘️) - TẦN SUẤT THI CAO
+  // PART 2, 3, 4: 4 CỎ () - TẦN SUẤT THI CAO
   // ─────────────────────────────────────────────────────────────
   {
     id: 'p23-woman-in-space',
@@ -204,7 +204,7 @@ export const INITIAL_TOPIC_RULES: TopicRule[] = [
   },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 2, 3, 4: 3 CỎ (☘️☘️☘️) - TRỌNG TÂM ÔN TẬP
+  // PART 2, 3, 4: 3 CỎ () - TRỌNG TÂM ÔN TẬP
   // ─────────────────────────────────────────────────────────────
   {
     id: 'p23-family-sport-day',
@@ -287,7 +287,7 @@ export const INITIAL_TOPIC_RULES: TopicRule[] = [
   },
 
   // ─────────────────────────────────────────────────────────────
-  // PART 2 & 3: 2 CỎ (☘️☘️) - LUYỆN TẬP MỞ RỘNG
+  // PART 2 & 3: 2 CỎ () - LUYỆN TẬP MỞ RỘNG
   // ─────────────────────────────────────────────────────────────
   {
     id: 'p23-public-transport',

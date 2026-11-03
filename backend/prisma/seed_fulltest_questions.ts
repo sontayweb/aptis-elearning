@@ -14,12 +14,12 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('=== SEEDING 20 FULL TEST MOCK EXAMS (APT-01 .. APT-20) ===');
   await ensureTwentyFullTestExams(prisma);
-  console.log('✅ Đã khởi tạo hoàn tất 20 Bộ đề Thi thử Aptis ESOL (APT-01 đến APT-20)!');
+  console.log('[PASS] Đã khởi tạo hoàn tất 20 Bộ đề Thi thử Aptis ESOL (APT-01 đến APT-20)!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error seeding full test mock exams:', e);
+    console.error('[FAIL] Error seeding full test mock exams:', e);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());

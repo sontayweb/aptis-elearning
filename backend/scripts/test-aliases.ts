@@ -19,9 +19,9 @@ async function testAliases() {
       const res = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: 'Say OK' }] }]
       });
-      console.log(`✅ [${m}] THÀNH CÔNG (${Date.now() - t0}ms):`, res.response.text().trim());
+      console.log(`[PASS] [${m}] THÀNH CÔNG (${Date.now() - t0}ms):`, res.response.text().trim());
     } catch (err: any) {
-      console.log(`❌ [${m}] THẤT BÀI (${Date.now() - t0}ms):`, err?.message || err);
+      console.log(`[FAIL] [${m}] THẤT BÀI (${Date.now() - t0}ms):`, err?.message || err);
     }
   }
 }

@@ -221,7 +221,7 @@ export const SpeakingHintsModal: React.FC<SpeakingHintsModalProps> = ({
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  <span>⚡ AI Tự động sinh gợi ý</span>
+                  <span>AI Tự động sinh gợi ý</span>
                 </>
               )}
             </button>

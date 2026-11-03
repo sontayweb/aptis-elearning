@@ -101,7 +101,7 @@ async function main() {
     });
     listCreated++;
   }
-  console.log(`✅ Đã đóng gói thành công ${listCreated} đề Full Listening (Đề 01 ➔ Đề 54)!`);
+  console.log(`[PASS] Đã đóng gói thành công ${listCreated} đề Full Listening (Đề 01 ➔ Đề 54)!`);
 
   // ==========================================
   // 2. ĐÓNG GÓI SPEAKING (Đề 01 ➔ Đề 75)
@@ -181,7 +181,7 @@ async function main() {
     });
     speakCreated++;
   }
-  console.log(`✅ Đã đóng gói thành công ${speakCreated} đề Full Speaking (Đề 01 ➔ Đề 75)!`);
+  console.log(`[PASS] Đã đóng gói thành công ${speakCreated} đề Full Speaking (Đề 01 ➔ Đề 75)!`);
 
   // ==========================================
   // 3. ĐÓNG GÓI WRITING (62 Câu lạc bộ CLB)
@@ -259,9 +259,9 @@ async function main() {
     });
     writeCreated++;
   }
-  console.log(`✅ Đã đóng gói thành công ${writeCreated} đề Full Writing theo Câu lạc bộ!`);
+  console.log(`[PASS] Đã đóng gói thành công ${writeCreated} đề Full Writing theo Câu lạc bộ!`);
 
-  console.log('\n🎉 TỔNG KẾT ĐÓNG GÓI HOÀN TẤT:');
+  console.log('\nTỔNG KẾT ĐÓNG GÓI HOÀN TẤT:');
   console.log(`- Listening: ${listCreated} bài thi Full`);
   console.log(`- Speaking:  ${speakCreated} bài thi Full`);
   console.log(`- Writing:   ${writeCreated} bài thi Full`);
@@ -269,7 +269,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('❌ Lỗi:', e);
+    console.error('[FAIL] Lỗi:', e);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());

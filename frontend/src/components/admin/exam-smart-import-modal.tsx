@@ -1255,7 +1255,7 @@ export default function ExamSmartImportModal({
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 shadow-sm transition-all hover:scale-[1.02] cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                      <span>⚡ Trải nghiệm ngay phòng kiểm định với bộ đề mẫu (Demo Studio)</span>
+                      <span>Trải nghiệm ngay phòng kiểm định với bộ đề mẫu (Demo Studio)</span>
                     </button>
                   </div>
                 </div>
@@ -1666,7 +1666,7 @@ export default function ExamSmartImportModal({
                             ) : (
                               <>
                                 <Play className="w-3.5 h-3.5 fill-current" />
-                                <span>🔊 Nghe thử kịch bản này (TTS Preview)</span>
+                                <span className="inline-flex items-center gap-1.5"><Volume2 className="w-3.5 h-3.5 text-blue-500 shrink-0" />Nghe thử kịch bản này (TTS Preview)</span>
                               </>
                             )}
                           </button>
@@ -1825,7 +1825,7 @@ export default function ExamSmartImportModal({
                             ) : (
                               <PlusCircle className="w-3.5 h-3.5" />
                             )}
-                            <span>📷 Tải ảnh lên ngay (Gắn trực tiếp)</span>
+                            <span>Tải ảnh lên ngay (Gắn trực tiếp)</span>
                           </button>
                         </div>
                       </div>

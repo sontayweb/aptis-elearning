@@ -56,7 +56,7 @@ export class GeminiRotatorService {
 
     try {
       this.isDiscovering = true;
-      console.log('🌐 [Gemini Rotator] Đang truy vấn Google API để đồng bộ danh sách models mới nhất...');
+      console.log('[Gemini Rotator] Đang truy vấn Google API để đồng bộ danh sách models mới nhất...');
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${this.apiKey}`);
       const data = (await response.json()) as any;
@@ -129,19 +129,19 @@ export class GeminiRotatorService {
             this.activeModel = this.modelsPool[0];
           }
           this.lastDiscoveredAt = new Date();
-          console.log(`✅ [Gemini Rotator] Đã đồng bộ ${this.modelsPool.length} models từ Google. Ưu tiên hàng đầu (Ổn định nhất): "${this.activeModel}"`);
-          console.log(`📋 Top 5 models ổn định: [${this.modelsPool.slice(0, 5).join(', ')}]`);
+          console.log(`[SUCCESS] [Gemini Rotator] Đã đồng bộ ${this.modelsPool.length} models từ Google. Ưu tiên hàng đầu (Ổn định nhất): "${this.activeModel}"`);
+          console.log(`Top 5 models ổn định: [${this.modelsPool.slice(0, 5).join(', ')}]`);
         }
       }
     } catch (err: any) {
-      console.warn('⚠️ [Gemini Rotator] Không thể kết nối Google API lúc khởi động, đọc từ Cache hoặc Bí danh vĩnh cửu:', err?.message || err);
+      console.warn('[WARN] [Gemini Rotator] Không thể kết nối Google API lúc khởi động, đọc từ Cache hoặc Bí danh vĩnh cửu:', err?.message || err);
       
       // Thử nạp từ File Cache đã lưu từ lần gọi thành công trước đó (KHÔNG CẦN HARDCODE)
       const cached = this.loadModelsFromLocalCache();
       if (cached.length > 0) {
         this.modelsPool = cached;
         this.activeModel = cached[0];
-        console.log(`📦 [Gemini Rotator] Đã khôi phục ${cached.length} models từ cache gần nhất. Active: "${this.activeModel}"`);
+        console.log(`[INFO] [Gemini Rotator] Đã khôi phục ${cached.length} models từ cache gần nhất. Active: "${this.activeModel}"`);
       } else if (this.modelsPool.length === 0) {
         // Phao cứu sinh tối giản: CHỈ dùng 2 Bí Danh Vĩnh Cửu của Google (Google cam kết không bao giờ 404/khai tử)
         this.modelsPool = ['gemini-flash-lite-latest', 'gemini-flash-latest'];
@@ -224,7 +224,7 @@ export class GeminiRotatorService {
         // Nếu model vừa thành công khác với model active cũ -> Đã chuyển sang model ổn định mới!
         if (candidateModel !== this.activeModel) {
           console.warn(
-            `🔄 [Gemini Rotator] ĐÃ TỰ ĐỘNG CHUYỂN SANG MODEL ỔN ĐỊNH: "${candidateModel}" LÀM ACTIVE MODEL MỚI! (Ghi nhớ cho các lần tiếp theo)`
+            `[Gemini Rotator] ĐÃ TỰ ĐỘNG CHUYỂN SANG MODEL ỔN ĐỊNH: "${candidateModel}" LÀM ACTIVE MODEL MỚI! (Ghi nhớ cho các lần tiếp theo)`
           );
           this.activeModel = candidateModel;
           this.lastRotatedAt = new Date();
@@ -240,12 +240,12 @@ export class GeminiRotatorService {
         // PHÂN LOẠI LỖI ĐỂ XỬ LÝ THÔNG MINH:
         if (errMsg.includes('404') || errMsg.includes('not found') || errMsg.includes('no longer available')) {
           // Model đã bị Google khai tử -> Đưa vào danh sách đen, không bao giờ gọi lại
-          console.warn(`🛑 [Gemini Rotator] Model "${candidateModel}" ĐÃ BỊ GOOGLE KHAI TỬ (404). Đang loại bỏ khỏi danh sách.`);
+          console.warn(`[WARN] [Gemini Rotator] Model "${candidateModel}" ĐÃ BỊ GOOGLE KHAI TỬ (404). Đang loại bỏ khỏi danh sách.`);
           this.deadModelsSet.add(candidateModel);
           this.modelHealth[candidateModel] = { status: 'error', lastChecked: new Date(), error: 'Deprecated 404' };
         } else if (errMsg.includes('503') || errMsg.includes('429') || errMsg.includes('high demand') || errMsg.includes('ResourceExhausted')) {
           // Model bị quá tải tạm thời -> Đưa vào Cooldown 3 phút
-          console.warn(`⏳ [Gemini Rotator] Model "${candidateModel}" bị quá tải tạm thời (503/429). Cooldown 3 phút.`);
+          console.warn(`[WARN] [Gemini Rotator] Model "${candidateModel}" bị quá tải tạm thời (503/429). Cooldown 3 phút.`);
           this.cooldownMap.set(candidateModel, Date.now() + 3 * 60 * 1000);
           this.modelHealth[candidateModel] = { status: 'cooldown', lastChecked: new Date(), error: 'Temporarily overloaded' };
         } else {

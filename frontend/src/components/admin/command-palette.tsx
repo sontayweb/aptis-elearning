@@ -17,6 +17,7 @@ import {
   Command,
   X,
   RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
 
 interface CommandPaletteProps {
@@ -81,10 +82,18 @@ export default function CommandPalette({ isOpen, onClose, onOpenTutorial }: Comm
     },
     {
       id: "reviews",
-      title: "Kiểm duyệt Đánh giá (Bảng Kỳ Tích)",
+      title: "Kiểm duyệt Đánh giá (Bảng Vinh Danh)",
       subtitle: "Duyệt nhận xét, lời vinh danh từ học viên điểm cao",
       icon: MessageSquare,
       href: "/admin/reviews",
+      category: "Trang điều hướng",
+    },
+    {
+      id: "reports",
+      title: "Hộp thư Báo lỗi Câu hỏi & Đề thi",
+      subtitle: "Tiếp nhận và xử lý các phản ánh đáp án, audio từ học viên",
+      icon: AlertTriangle,
+      href: "/admin/reports",
       category: "Trang điều hướng",
     },
     {

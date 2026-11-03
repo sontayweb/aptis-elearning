@@ -137,12 +137,12 @@ async function main() {
     ver1Exam = await prisma.exam.create({
       data: {
         title: 'Đề 09 - The Arrival of the Four-Day Work Week (Version 1)',
-        description: 'Part 5 – Long reading: The arrival of four-day week (Đề tủ Siêu Hot ☘️☘️☘️☘️☘️)',
+        description: 'Part 5 – Long reading: The arrival of four-day week (Đề tủ Siêu Hot )',
         skill: 'READING',
         duration_minutes: 15,
         is_pro: false,
         is_published: true,
-        hot_level: 5, // Siêu hot ☘️☘️☘️☘️☘️
+        hot_level: 5, // Siêu hot 
         forecast_tag: 'Đề Tủ Siêu Hot',
       },
       include: { parts: { include: { questions: true } } },
@@ -152,7 +152,7 @@ async function main() {
       where: { id: ver1Exam.id },
       data: {
         title: 'Đề 09 - The Arrival of the Four-Day Work Week (Version 1)',
-        description: 'Part 5 – Long reading: The arrival of four-day week (Đề tủ Siêu Hot ☘️☘️☘️☘️☘️)',
+        description: 'Part 5 – Long reading: The arrival of four-day week (Đề tủ Siêu Hot )',
         hot_level: 5,
         is_pro: false,
         forecast_tag: 'Đề Tủ Siêu Hot',
@@ -217,12 +217,12 @@ async function main() {
     ver2Exam = await prisma.exam.create({
       data: {
         title: 'Đề 35 - The Arrival of the Four-Day Work Week (Version 2)',
-        description: 'Part 5 – Long reading: The arrival of four-day week Version 2 (Đề tủ Siêu Hot ☘️☘️☘️☘️☘️)',
+        description: 'Part 5 – Long reading: The arrival of four-day week Version 2 (Đề tủ Siêu Hot )',
         skill: 'READING',
         duration_minutes: 15,
         is_pro: false,
         is_published: true,
-        hot_level: 5, // Siêu hot ☘️☘️☘️☘️☘️
+        hot_level: 5, // Siêu hot 
         forecast_tag: 'Đề Tủ Siêu Hot',
       },
       include: { parts: { include: { questions: true } } },
@@ -232,7 +232,7 @@ async function main() {
       where: { id: ver2Exam.id },
       data: {
         title: 'Đề 35 - The Arrival of the Four-Day Work Week (Version 2)',
-        description: 'Part 5 – Long reading: The arrival of four-day week Version 2 (Đề tủ Siêu Hot ☘️☘️☘️☘️☘️)',
+        description: 'Part 5 – Long reading: The arrival of four-day week Version 2 (Đề tủ Siêu Hot )',
         hot_level: 5,
         is_pro: false,
         forecast_tag: 'Đề Tủ Siêu Hot',
@@ -283,7 +283,7 @@ async function main() {
   }
   console.log(`[OK] Đã chuẩn hóa xong Version 2 (ID: ${ver2Exam.id}) với 7 câu hỏi & hot_level = 5!`);
 
-  console.log('\n🎉 HOÀN TẤT TOÀN BỘ QUÁ TRÌNH DỌN DẸP VÀ CHUẨN HÓA READING!');
+  console.log('\nHOÀN TẤT TOÀN BỘ QUÁ TRÌNH DỌN DẸP VÀ CHUẨN HÓA READING!');
 }
 
 main()

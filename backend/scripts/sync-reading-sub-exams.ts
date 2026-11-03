@@ -21,7 +21,7 @@ async function main() {
     });
 
     if (!fullExam) {
-      console.warn(`⚠️ Không tìm thấy Full Exam "${fullExamTitle}"`);
+      console.warn(`[WARN] Không tìm thấy Full Exam "${fullExamTitle}"`);
       continue;
     }
 
@@ -120,7 +120,7 @@ async function main() {
       }
 
       if (!sourcePart) {
-        console.warn(`  ⚠️ Không tìm thấy sourcePart cho: ${sub.title}`);
+        console.warn(`  [WARN] Không tìm thấy sourcePart cho: ${sub.title}`);
         continue;
       }
 
@@ -162,11 +162,11 @@ async function main() {
         });
       }
 
-      console.log(`  ✅ Đã đồng bộ [${targetPartTitle}] (${sourcePart.questions.length} câu) -> "${sub.title}"`);
+      console.log(`  [PASS] Đã đồng bộ [${targetPartTitle}] (${sourcePart.questions.length} câu) -> "${sub.title}"`);
     }
   }
 
-  console.log('\n🎉 HOÀN TẤT ĐỒNG BỘ TẤT CẢ SUB-EXAMS READING!');
+  console.log('\nHOÀN TẤT ĐỒNG BỘ TẤT CẢ SUB-EXAMS READING!');
 }
 
 main()

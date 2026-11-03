@@ -171,7 +171,7 @@
   - [x] State Machine: Thêm trạng thái `stage: "sound_check" | "testing" | "review"`.
   - [x] Khối 1 - Thông tin tổng quan đề thi: Tiêu đề đề, 4 phần thi, 25 câu hỏi, tổng thời gian (40 phút).
   - [x] Khối 2 - Kiểm tra âm thanh (Sound Test):
-    - Nút bấm: `[ 🔊 Nghe thử âm thanh ]`.
+    - Nút bấm: `[  Nghe thử âm thanh ]`.
     - Sử dụng Web Audio API hoặc audio mẫu 3s phát câu test chuẩn Aptis: *"This is a sound check for the Aptis listening test."*
     - Hiển thị thanh chỉnh âm lượng và badge tích xanh: `✓ Âm thanh rõ ràng! Hãy điều chỉnh âm lượng vừa nghe.`
   - [x] Khối 3 - Quy chế phòng thi chuẩn British Council:
@@ -448,6 +448,73 @@
 
 ---
 
+## 🛡️ PHẦN V: KIỂM SOÁT TÀI KHOẢN, MÃ GOLIVE14 & AUDIT LOG QUẢN TRỊ
+
+> **Mục tiêu:** Xóa bỏ hoàn toàn tình trạng "code mù mờ, tự chế, không vết kiểm toán". Đảm bảo mọi luồng tạo tài khoản mới, kích hoạt VIP qua mã hay thanh toán đều được định danh rõ ràng, có căn cứ kỹ thuật (Single Source of Truth), lưu vết Append-Only và hiển thị trực quan trên giao diện Quản trị viên.
+
+### 1. Luồng Mã Trải Nghiệm `GOLIVE14` (Mỗi tài khoản 1 lần, mở đến 25/11)
+- [x] 🔴 **[P0 - Security & Anti-abuse]** **Quy tắc 1 lần duy nhất cho mỗi tài khoản**:
+  - [x] Bảng `PromotionRedemption` có ràng buộc duy nhất `@@unique([code_id, user_id])`.
+  - [x] Kiểm tra chặn trước (`findFirst({ where: { user_id } })`): Mỗi tài khoản đăng ký chỉ được dùng mã trải nghiệm VIP miễn phí 1 lần trong toàn bộ vòng đời tài khoản.
+  - [x] Thông báo lỗi minh bạch: *"Tài khoản của bạn đã từng kích hoạt mã trải nghiệm VIP rồi (mỗi tài khoản chỉ được dùng 1 lần). Vui lòng đăng ký gói Pro để tiếp tục sử dụng."*
+- [x] 🔴 **[P0 - Business Deadline]** **Thời hạn cứng chương trình: Hết ngày 25/11/2026**:
+  - [x] Backend Check: `expires_at = 2026-11-25T23:59:59.999+07:00`. Nếu request gửi sau thời điểm này, API lập tức từ chối HTTP 400.
+  - [x] Frontend Banner: [`golive-promo-banner.tsx`](file:///c:/Users/hiepth/OneDrive%20-%20MERCANTILE%20EXCHANGE%20OF%20VIETNAM/Documents/Github/aptis-elearning/frontend/src/components/golive-promo-banner.tsx) tự động ẩn toàn bộ thanh banner khi quá hạn 25/11.
+  - [x] Frontend Pricing: [`pricing/page.tsx`](file:///c:/Users/hiepth/OneDrive%20-%20MERCANTILE%20EXCHANGE%20OF%20VIETNAM/Documents/Github/aptis-elearning/frontend/src/app/pricing/page.tsx) tự động thay hộp nhập code bằng banner thông báo kết thúc chương trình và điều hướng học viên mua gói Pro.
+- [x] 🔴 **[P0 - Audit Logging]** **Lưu vết kiểm toán khi nhập mã thành công**:
+  - [x] Gọi `auditService.record()` tại [`payment.service.ts`](file:///c:/Users/hiepth/OneDrive%20-%20MERCANTILE%20EXCHANGE%20OF%20VIETNAM/Documents/Github/aptis-elearning/backend/src/modules/payment/payment.service.ts) ghi nhận đầy đủ `userId`, họ tên, email, `code`, ngày hết hạn VIP mới, IP Address và User-Agent.
+
+---
+
+### 2. Trang Quản trị "Nhật ký Audit" (Admin Audit Trail & Filtering)
+- [x] 🔴 **[P0 - Filter Bar]** **Chuẩn hóa 10 Tab bộ lọc theo nghiệp vụ vận hành thực tế**:
+  1. `[Tất cả] (ALL)`: Xem toàn bộ luồng hệ thống.
+  2. `[Đăng ký mới] (USER_CREATE)`: Giám sát toàn bộ học viên mới đăng ký tài khoản.
+  3. `[Cấp VIP & Mã KM] (USER_ROLE_CHANGE)`: Xem người nhập mã trải nghiệm 14 ngày & Admin cấp VIP thủ công.
+  4. `[Khớp lệnh QR] (PAYMENT_WEBHOOK_RECEIVED)`: Xem đơn SePay tự động kích hoạt gói VIP thành công.
+  5. `[Xử lý thủ công] (PAYMENT_MANUAL_RESOLVE)`: Xem đơn xử lý khiếu nại chuyển khoản hoặc khớp offline.
+  6. `[Khóa TK] (USER_STATUS_CHANGE)`: Lịch sử khóa / mở khóa tài khoản.
+  7. `[Đổi MK] (AUTH_PASSWORD_RESET)`: Lịch sử đặt lại mật khẩu học viên.
+  8. `[Tạo đề] (EXAM_CREATE)`: Lịch sử import, tạo mới đề thi.
+  9. `[Gói cước] (PLAN_UPDATE)`: Lịch sử thay đổi thông tin gói, quota AI.
+  10. `[Gửi Email] (EMAIL_NOTIFICATION_SENT)`: Nhật ký gửi email tự động.
+- [x] 🔴 **[P0 - Full Database Search]** **Tìm kiếm từ khóa toàn diện từ Database**:
+  - [x] Nâng cấp API `GET /api/audit?search=...`: Tìm kiếm không phân biệt chữ hoa/thường (`insensitive`) trên các trường `actor_name`, `actor_email`, `description`.
+  - [x] Tích hợp Debounce 250ms trên giao diện tìm kiếm mượt mà, không giật lag.
+- [x] 🟡 **[P1 - Microcopy & Badges]** **Quy chuẩn thẻ trạng thái trực quan**:
+  - [x] Badge `Đăng ký mới`: Tông màu Indigo (`User`).
+  - [x] Badge `Cấp / Kích hoạt VIP`: Tông màu Amber (`ShieldCheck`).
+  - [x] Badge `Khớp lệnh QR`: Tông màu Emerald (`CreditCard`).
+  - [x] Badge `Xử lý thủ công`: Tông màu Teal (`CreditCard`).
+
+---
+
+### 3. Phân Hệ Quản Trị Key & Mẹo Thi (`/admin/key-va-meo-thi` & `/key-va-meo-thi`)
+- [x] 🔴 **[P0 - Full 4 Skills & 16 Parts]** **Phát triển trọn bộ Key & Mẹo thi cho cả 4 kỹ năng (Listening, Reading, Speaking, Writing)**:
+  - [x] **Listening (4 Phần):** Sửa Part 2 (Ghép người nói), Part 3 (Ma trận câu 15 W-M-B), Part 4 (Mẹo topic 2026 với toàn bộ 48 topic trích xuất từ `Part 4-Listening-Meo-Thi.md`, thay thế sticker lửa thành cỏ bốn lá 🍀🍀🍀🍀, modal chỉnh sửa, thêm, xóa đầy đủ).
+  - [x] **Writing (4 Phần):** Bố cục chuẩn theo ảnh mẫu (Hero banner, 4 pill tabs, Tổng quan, Thời gian đề xuất, Mẹo làm bài, Công thức trả lời nhanh, Những lỗi cần tránh, Ví dụ câu trả lời, Cúp vàng ghi nhớ).
+    - Part 1: Trả lời 5 câu hỏi ngắn 1–5 từ.
+    - Part 2: Điền form CLB 20–30 từ.
+    - Part 3: Chat hội thoại 3 câu 30–40 từ.
+    - Part 4: 2 Email (Informal 40–50 từ & Formal 120–150 từ).
+  - [x] **Speaking (4 Phần):** Cập nhật chính xác 100% theo nội dung chi tiết người dùng cung cấp:
+    - Part 1: 3 câu hỏi cá nhân 30s/câu, công thức `Direct Answer + Reason + Detail`, bảng cấu trúc câu hữu ích, ngữ pháp thường dùng (Present Simple, Past Simple, Present Continuous), lỗi cần tránh.
+    - Part 2: Miêu tả 1 tranh & 2 câu hỏi liên quan 45s/câu, công thức `Where + Who + What + Details + Impression`, ngữ pháp (Present Continuous, Modal verbs), bài nói mẫu chuẩn, lỗi cần tránh.
+    - Part 3: So sánh 2 tranh đối lập 45s/câu, công thức `Similarity + Picture A + Picture B + Difference`, bài nói mẫu 4 bước chuẩn, bộ từ nối so sánh (while, whereas, in contrast, unlike), ngữ pháp so sánh & câu điều kiện.
+    - Part 4: Thuyết trình 3 câu hỏi theo chủ đề (1 phút chuẩn bị + 2 phút nói), công thức `Introduction + Experience + Opinion + Reasons + Example + Conclusion`, bài nói mẫu 5 giai đoạn thời gian (Opening, Idea 1, Idea 2, Idea 3, Result), ngữ pháp đa thì.
+  - [x] **Reading (4 Phần):** Cập nhật chính xác 100% theo ảnh mẫu và tài liệu `Part 2-Reading-Meo-Thi.md`:
+    - Part 1: Bố cục chuẩn theo ảnh mẫu (Đặc điểm ~4 phút, Cách làm bài 5 bước, Bảng dấu hiệu & mẹo nhận diện từ loại/giới từ, Lỗi cần tránh, Ví dụ minh họa `excited about`, Ghi nhớ nhanh).
+    - Part 2: Bố cục 2 cột theo ảnh mẫu (`media_1793691131769_e62232ee.jpg`): Cột trái danh mục `+ TOPICS` (20 chủ đề hot có emoji và thanh tìm kiếm), Cột phải bảng đối chiếu song song `CÂU GỐC` vs `DỊCH NGHĨA` (tự động highlight từ khóa paraphrasing) + Khung `📌 TÓM TẮT MẸO NHỚ` từ tài liệu.
+    - Part 3: Nối ý kiến 4 nhân vật (A, B, C, D) với 7 nhận định & Bẫy Paraphrase.
+    - Part 4: Nối tiêu đề đoạn văn bài đọc 750 từ & Chiến lược Đọc câu Đầu - câu Cuối (Topic / Concluding sentence).
+  - [x] **Tone màu & Phong cách thiết kế đồng nhất:** Tuân thủ hệ màu `globals.css` (warm amber/orange/primary accents), giao diện responsive mượt mà trên mobile và desktop.
+  - [x] **Quản trị Database & Chức năng Khôi phục gốc:**
+    - Lưu trữ tập trung vào `SystemSetting` (`KEY_MEO_LISTENING_CONFIG`).
+    - Nút `[Khôi phục gốc]`: Hoàn tác mọi thay đổi và đưa nội dung về seed data chuẩn mặc định.
+    - Nút `[Lưu lên hệ thống]`: Ghi dữ liệu trực tiếp vào database để học viên thấy ngay lập tức.
+
+---
+
 ## 🚀 KẾ HOẠCH TRIỂN KHAI THEO GIAI ĐOẠN (IMPLEMENTATION ROADMAP)
 
 ```mermaid
@@ -492,4 +559,6 @@ flowchart TD
 | 4 | **Listening Audio & TTS** | Quản lý audio đề Listening: Tải file thủ công hay AI tự động sinh giọng từ script khi import đề? | **Hoàn thành:** Đã xây dựng Mô hình Lai (Hybrid) với Microsoft Azure Neural Voice miễn phí (Ryan/Sonia), phân vai Nam/Nữ tự động, Kéo thả Upload MP3 và dọn dẹp file cũ an toàn (Unit Test 5/5 Pass). | `[x] Đã hoàn thành` |
 | 5 | **Phòng thi thử** | Định dạng Access Code cho từng bộ đề: Sinh mã tự động dạng ngẫu nhiên (VD: `APTIS-PRO-XXXX`) hay cho phép Admin tự đặt mã tùy biến (VD: `DE01-VIP`)? | **Hoàn thành:** Hệ thống hỗ trợ cả mã phòng chuẩn `[APT-01]..[APT-20]` và mã kích hoạt VIP tùy biến (`PromotionCode`). | `[x] Đã hoàn thành` |
 | 6 | **Luồng Giáo viên soạn Giải thích** | Phân quyền cho giáo viên: Cho phép Giáo viên dùng chung trang `/admin/exams/[id]/edit` (mở thêm quyền role TEACHER sửa câu hỏi) hay xây dựng một tab chuyên biệt `/teacher/exams` trong Teacher Portal để giáo viên chỉ tập trung viết lời giải thích chi tiết cho câu hỏi? | **Hoàn thành:** Đã mở quyền `TEACHER` truy cập phân hệ Học vụ (`/admin/exams`, `/admin/exams/[id]/edit`) và tích hợp mục `Soạn Đề & Giải thích` trên Cổng Giảng Viên (`/teacher`). | `[x] Đã hoàn thành` |
+| 7 | **Audit Log & Mã GOLIVE14** | Kiểm soát luồng người mới đăng ký tài khoản, học viên kích hoạt VIP qua mã GOLIVE14 (1 lần/tài khoản, mở đến 25/11/2026) và nâng cấp bộ lọc trang Nhật ký Audit. | **Hoàn thành:** Đã bổ sung `auditService.record()`, khóa chặt 1 lần/tài khoản, tự động hết hạn sau 25/11, chuẩn hóa 10 tab bộ lọc và tìm kiếm toàn DB (Backend + Frontend 0 lỗi). | `[x] Đã hoàn thành` |
+| 8 | **Key & Mẹo Thi (4 Kỹ Năng - 16 Parts)** | Phát triển trọn bộ mẹo thi Listening, Reading, Speaking, Writing chuẩn format hình ảnh, tone màu đồng nhất và chức năng Admin sửa/lưu/khôi phục gốc. | **Hoàn thành:** Đã triển khai đầy đủ 4 kỹ năng (16 Parts) với cấu trúc thẻ, bảng mẫu, cúp vàng ghi nhớ, đồng bộ DB và xác thực `tsc --noEmit` đạt 0 lỗi. | `[x] Đã hoàn thành` |
 

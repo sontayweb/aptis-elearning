@@ -234,7 +234,7 @@ export class DataSyncService {
     const warnings: string[] = [];
 
     if (!exam.title || exam.title.trim().length === 0) {
-      errors.push('Thiếu tiêu đề đề thi (title).');
+      errors.push('Thiếu tiêu đề đề thi.');
     }
 
     if (!VALID_SKILLS.includes(exam.skill)) {
@@ -242,7 +242,7 @@ export class DataSyncService {
     }
 
     if (!Array.isArray(exam.parts) || exam.parts.length === 0) {
-      errors.push('Đề thi không có phần thi nào (parts trống).');
+      errors.push('Đề thi chưa có phần thi (Part) nào.');
       return { isValid: false, errors, warnings, questionsCount: 0, totalScore: 0 };
     }
 
@@ -252,7 +252,7 @@ export class DataSyncService {
     exam.parts.forEach((part, pIdx) => {
       const partNum = part.part_number || pIdx + 1;
       if (!Array.isArray(part.questions) || part.questions.length === 0) {
-        errors.push(`Part ${partNum} ("${part.title || ''}") không có câu hỏi nào.`);
+        errors.push(`Phần thi Part ${partNum} ("${part.title || ''}") chưa có câu hỏi nào.`);
         return;
       }
 
@@ -262,23 +262,23 @@ export class DataSyncService {
         const qLabel = `Part ${partNum} - Câu ${qNum}`;
 
         if (!VALID_QUESTION_TYPES.includes(q.question_type)) {
-          errors.push(`${qLabel}: Loại câu hỏi không hợp lệ "${q.question_type}".`);
+          errors.push(`${qLabel}: Dạng câu hỏi "${q.question_type}" chưa đúng quy chuẩn khảo thí.`);
         }
 
         const score = Number(q.max_score);
         if (isNaN(score) || score <= 0) {
-          errors.push(`${qLabel}: max_score không hợp lệ (${q.max_score}).`);
+          errors.push(`${qLabel}: Điểm tối đa (${q.max_score}) chưa hợp lệ.`);
         } else {
           totalScore += score;
         }
 
         if (q.question_type === 'GAP_FILL') {
           if (!Array.isArray(q.options) || q.options.length < 2) {
-            errors.push(`${qLabel} (GAP_FILL): options phải có ít nhất 2 lựa chọn.`);
+            errors.push(`${qLabel} (Điền từ): Cần có ít nhất 2 phương án lựa chọn.`);
           }
         } else if (q.question_type === 'MULTIPLE_CHOICE') {
           if (!Array.isArray(q.options) || q.options.length < 2) {
-            warnings.push(`${qLabel} (MULTIPLE_CHOICE): options có ít hơn 2 lựa chọn.`);
+            warnings.push(`${qLabel} (Trắc nghiệm): Lựa chọn đang ít hơn 2 phương án.`);
           }
         } else if (
           q.question_type === 'SPEAKING_AUDIO' ||
@@ -286,7 +286,7 @@ export class DataSyncService {
           q.question_type === 'SHORT_TEXT'
         ) {
           if (!q.prompt || q.prompt.trim().length === 0) {
-            errors.push(`${qLabel} (${q.question_type}): Prompt đề bài không được để trống.`);
+            errors.push(`${qLabel}: Nội dung yêu cầu đề bài không được để trống.`);
           }
         }
       });
@@ -977,7 +977,7 @@ export class DataSyncService {
               suite.failures.push({
                 examId: ex.id,
                 examTitle: ex.title,
-                reason: `Có part rỗng hoặc thiếu câu hỏi (${detail.parts.length} parts, ${totalQs} câu).`,
+                reason: `Có phần thi trống hoặc thiếu câu hỏi (${detail.parts.length} parts, ${totalQs} câu).`,
               });
             }
             continue;
@@ -1009,18 +1009,18 @@ export class DataSyncService {
             if (skill === 'READING') {
               if (pKey === 'p1') {
                 isPass = qs.some((q: any) => q.question_type === 'GAP_FILL');
-                if (!isPass) failReason = 'Câu hỏi Reading Part 1 không phải GAP_FILL.';
+                if (!isPass) failReason = 'Câu hỏi Reading Part 1 chưa đúng dạng điền từ (GAP_FILL).';
               } else if (pKey === 'p2') {
                 isPass = qs.some((q: any) => q.question_type === 'SENTENCE_ORDER');
-                if (!isPass) failReason = 'Câu hỏi Reading Part 2 không phải SENTENCE_ORDER.';
+                if (!isPass) failReason = 'Câu hỏi Reading Part 2 chưa đúng dạng sắp xếp câu (SENTENCE_ORDER).';
               } else if (pKey === 'p3') {
                 isPass = qs.some((q: any) =>
                   ['MATCHING', 'SENTENCE_ORDER', 'GAP_FILL'].includes(q.question_type)
                 );
-                if (!isPass) failReason = 'Reading Part 3 sai định dạng question_type.';
+                if (!isPass) failReason = 'Reading Part 3 chưa đúng dạng bài nối hoặc sắp xếp.';
               } else if (pKey === 'p4') {
                 isPass = qs.some((q: any) => String(q.question_type).includes('MATCH'));
-                if (!isPass) failReason = 'Reading Part 4 không phải MATCHING.';
+                if (!isPass) failReason = 'Reading Part 4 chưa đúng dạng bài nối tiêu đề (MATCHING).';
               }
             } else if (skill === 'LISTENING') {
               isPass = qs.every(
@@ -1029,13 +1029,13 @@ export class DataSyncService {
                   Array.isArray(q.options) &&
                   q.options.length >= 2
               );
-              if (!isPass) failReason = 'Listening thiếu options hoặc sai question_type.';
+              if (!isPass) failReason = 'Phần thi Listening bị thiếu phương án lựa chọn hoặc sai dạng câu hỏi.';
             } else if (skill === 'WRITING') {
               isPass = qs.every((q: any) => ['SHORT_TEXT', 'ESSAY'].includes(q.question_type));
-              if (!isPass) failReason = 'Writing không thuộc SHORT_TEXT / ESSAY.';
+              if (!isPass) failReason = 'Phần thi Writing không đúng dạng trả lời ngắn hoặc viết luận.';
             } else if (skill === 'SPEAKING') {
               isPass = qs.every((q: any) => q.question_type === 'SPEAKING_AUDIO');
-              if (!isPass) failReason = 'Speaking không phải SPEAKING_AUDIO.';
+              if (!isPass) failReason = 'Phần thi Speaking chưa đúng dạng câu hỏi thu âm microphone.';
             }
 
             if (isPass) {

@@ -70,7 +70,7 @@ async function testResumeFlow() {
     throw new Error('FAILED: Expected same submission ID to be resumed!');
   }
 
-  console.log('✅ ALL TESTS PASSED: Auto-resume and session recovery verified 100%!');
+  console.log('[PASS] ALL TESTS PASSED: Auto-resume and session recovery verified 100%!');
 
   // Cleanup: mark this test submission as submitted so we do not leave it lingering
   await prisma.examSubmission.update({

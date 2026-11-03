@@ -77,7 +77,7 @@ export const Part4TopicView: React.FC<{
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
-            Tất cả ({LISTENING_PART4_DATA.length})
+            Tất cả ({topicList.length})
           </button>
           {[4, 3, 2].map((cnt) => (
             <button

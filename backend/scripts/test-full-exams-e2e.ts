@@ -19,7 +19,7 @@ interface TestResult {
 
 async function main() {
   console.log('========================================================================');
-  console.log('🚀 RUNNING END-TO-END VERIFICATION SUITE: 4 APTIS SKILLS (FULL EXAMS)');
+  console.log('[START] RUNNING END-TO-END VERIFICATION SUITE: 4 APTIS SKILLS (FULL EXAMS)');
   console.log('========================================================================\n');
 
   // Lấy 1 tài khoản thực tế để test (Admin / Staff)
@@ -31,7 +31,7 @@ async function main() {
   if (!testUser) {
     throw new Error('No test user found in database!');
   }
-  console.log(`👤 Test Runner User: ${testUser.email} (${testUser.role}, id: ${testUser.id})\n`);
+  console.log(` Test Runner User: ${testUser.email} (${testUser.role}, id: ${testUser.id})\n`);
 
   const results: TestResult[] = [];
 
@@ -39,7 +39,7 @@ async function main() {
   // TEST 1: LISTENING - FULL 4 PARTS
   // ============================================================================
   console.log('------------------------------------------------------------------------');
-  console.log('▶ [TEST 1/4] LISTENING: Full 4 Parts Exam Verification');
+  console.log(' [TEST 1/4] LISTENING: Full 4 Parts Exam Verification');
   console.log('------------------------------------------------------------------------');
   const listeningResult: TestResult = {
     skill: 'LISTENING',
@@ -157,7 +157,7 @@ async function main() {
   // TEST 2: READING - FULL 4 PARTS
   // ============================================================================
   console.log('\n------------------------------------------------------------------------');
-  console.log('▶ [TEST 2/4] READING: Full 4 Parts Exam Verification');
+  console.log(' [TEST 2/4] READING: Full 4 Parts Exam Verification');
   console.log('------------------------------------------------------------------------');
   const readingResult: TestResult = {
     skill: 'READING',
@@ -238,7 +238,7 @@ async function main() {
   // TEST 3: SPEAKING - FULL EXAM & PART 4 FLOW
   // ============================================================================
   console.log('\n------------------------------------------------------------------------');
-  console.log('▶ [TEST 3/4] SPEAKING: Full Exam & Part 4 60s/120s Verification');
+  console.log(' [TEST 3/4] SPEAKING: Full Exam & Part 4 60s/120s Verification');
   console.log('------------------------------------------------------------------------');
   const speakingResult: TestResult = {
     skill: 'SPEAKING',
@@ -323,7 +323,7 @@ async function main() {
   // TEST 4: WRITING - FULL 4 PARTS & 2 EMAILS
   // ============================================================================
   console.log('\n------------------------------------------------------------------------');
-  console.log('▶ [TEST 4/4] WRITING: Full 4 Parts & Part 4 (2 Emails) Verification');
+  console.log(' [TEST 4/4] WRITING: Full 4 Parts & Part 4 (2 Emails) Verification');
   console.log('------------------------------------------------------------------------');
   const writingResult: TestResult = {
     skill: 'WRITING',
@@ -406,28 +406,28 @@ async function main() {
   // SUMMARY REPORT
   // ============================================================================
   console.log('\n========================================================================');
-  console.log('📊 FINAL TEST RESULTS SUMMARY: ALL 4 SKILLS');
+  console.log('[STATS] FINAL TEST RESULTS SUMMARY: ALL 4 SKILLS');
   console.log('========================================================================');
 
   let allPassed = true;
   for (const r of results) {
-    const statusIcon = r.passed ? '✅ PASSED' : '❌ FAILED';
+    const statusIcon = r.passed ? '[PASS] PASSED' : '[FAIL] FAILED';
     console.log(`\n${statusIcon} [${r.skill}] "${r.examTitle}"`);
     console.log(`   ID: ${r.examId}`);
     console.log(`   Parts Checked: ${r.partsChecked} | Questions Checked: ${r.questionsChecked}`);
     r.details.forEach(d => console.log(`   ${d}`));
     if (r.errors.length > 0) {
       allPassed = false;
-      r.errors.forEach(e => console.log(`   ❌ ERROR: ${e}`));
+      r.errors.forEach(e => console.log(`   [FAIL] ERROR: ${e}`));
     }
   }
 
   console.log('\n------------------------------------------------------------------------');
   if (allPassed) {
-    console.log('🎉 ALL 4 APTIS SKILLS PASSED FULL-EXAM AUTOMATED E2E VERIFICATION!');
+    console.log('ALL 4 APTIS SKILLS PASSED FULL-EXAM AUTOMATED E2E VERIFICATION!');
     console.log('   Information is 100% accurate, stable, and ready for production.');
   } else {
-    console.log('⚠️ SOME SKILLS ENCOUNTERED ISSUES. Please inspect errors above.');
+    console.log('[WARN] SOME SKILLS ENCOUNTERED ISSUES. Please inspect errors above.');
   }
   console.log('------------------------------------------------------------------------\n');
 

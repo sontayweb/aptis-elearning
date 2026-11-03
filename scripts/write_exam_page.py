@@ -693,7 +693,7 @@ export default function OfficialMockExamRoom() {
             {currentQ.partAudioUrl && (
               <div className="mb-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-exam-text-muted mb-2">
-                  🔊 Audio: {currentQ.partTitle}
+                   Audio: {currentQ.partTitle}
                 </p>
                 <AudioPlayer
                   src={

@@ -21,6 +21,7 @@ import {
   Flame,
   Star,
   Trophy,
+  Lightbulb,
 } from "lucide-react";
 
 interface GrammarExam {
@@ -229,7 +230,7 @@ export default function GrammarPracticePage() {
                   className="inline-flex items-center gap-2 border bg-card py-2 rounded-full border-border text-foreground hover:bg-muted text-xs font-semibold px-4 transition-colors"
                   href="/meo-thi-aptis/meo-hoc-grammar-aptis"
                 >
-                  <span>💡 Xem ngay - Mẹo làm bài Grammar &amp; Vocabulary</span>
+                  <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" /><span>Xem ngay - Mẹo làm bài Grammar &amp; Vocabulary</span>
                 </Link>
               </div>
             </div>

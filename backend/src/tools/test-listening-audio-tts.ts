@@ -28,7 +28,7 @@ async function runTest(name: string, fn: () => Promise<string | void>) {
       durationMs: Date.now() - start,
       details: details || undefined,
     });
-    console.log(`  ✅ [PASS] ${name} (${Date.now() - start}ms)`);
+    console.log(`  [PASS] [PASS] ${name} (${Date.now() - start}ms)`);
     if (details) console.log(`     ↳ ${details}`);
   } catch (err: any) {
     results.push({
@@ -37,14 +37,14 @@ async function runTest(name: string, fn: () => Promise<string | void>) {
       durationMs: Date.now() - start,
       error: err.message || String(err),
     });
-    console.error(`  ❌ [FAIL] ${name} (${Date.now() - start}ms)`);
+    console.error(`  [FAIL] [FAIL] ${name} (${Date.now() - start}ms)`);
     console.error(`     ↳ Error: ${err.message || String(err)}`);
   }
 }
 
 async function main() {
   console.log('===============================================================');
-  console.log('🧪 BẮT ĐẦU KIỂM THỬ TỰ ĐỘNG: QUẢN LÝ AUDIO & AI TTS LISTENING');
+  console.log('[TEST] BẮT ĐẦU KIỂM THỬ TỰ ĐỘNG: QUẢN LÝ AUDIO & AI TTS LISTENING');
   console.log('===============================================================\n');
 
   let generatedMonologueUrl = '';
@@ -165,11 +165,11 @@ async function main() {
   const passedTests = results.filter((r) => r.passed).length;
   const passRate = ((passedTests / totalTests) * 100).toFixed(0);
 
-  console.log(`📊 TỔNG KẾT: ${passedTests}/${totalTests} KIỂM THỬ THÀNH CÔNG (${passRate}%)`);
+  console.log(`[STATS] TỔNG KẾT: ${passedTests}/${totalTests} KIỂM THỬ THÀNH CÔNG (${passRate}%)`);
   if (passedTests === totalTests) {
-    console.log('🎉 TẤT CẢ CÁC TÍNH NĂNG AUDIO & AI TTS ĐỀU ĐẠT CHUẨN 100%!');
+    console.log('TẤT CẢ CÁC TÍNH NĂNG AUDIO & AI TTS ĐỀU ĐẠT CHUẨN 100%!');
   } else {
-    console.log('⚠️ CÓ TEST THẤT BẠI, CẦN KIỂM TRA LẠI LOG CHI TIẾT Ở TRÊN');
+    console.log('[WARN] CÓ TEST THẤT BẠI, CẦN KIỂM TRA LẠI LOG CHI TIẾT Ở TRÊN');
   }
   console.log('===============================================================\n');
 

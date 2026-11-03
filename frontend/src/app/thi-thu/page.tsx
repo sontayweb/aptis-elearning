@@ -24,6 +24,11 @@ import {
   Lock,
   Crown,
   X,
+  Headphones,
+  BookOpen,
+  PenTool,
+  Mic,
+  BookA,
 } from "lucide-react";
 
 const VALID_SKILLS = [
@@ -357,27 +362,31 @@ export default function MockExamListPage() {
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-muted/60 border border-border">
                 {[
-                  { id: "FULL_TEST", label: "🔥 Full Test (20 Đề chuẩn)" },
-                  { id: "ALL", label: "Tất cả" },
-                  { id: "LISTENING", label: "🔊 Listening" },
-                  { id: "READING", label: "📖 Reading" },
-                  { id: "WRITING", label: "✏️ Writing" },
-                  { id: "SPEAKING", label: "🎙️ Speaking" },
-                  { id: "GRAMMAR_VOCABULARY", label: "🔤 Grammar & Vocab" },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setSelectedSkill(tab.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      selectedSkill === tab.id
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+                  { id: "FULL_TEST", label: "Full Test (20 Đề chuẩn)", icon: Sparkles },
+                  { id: "ALL", label: "Tất cả", icon: null },
+                  { id: "LISTENING", label: "Listening", icon: Headphones },
+                  { id: "READING", label: "Reading", icon: BookOpen },
+                  { id: "WRITING", label: "Writing", icon: PenTool },
+                  { id: "SPEAKING", label: "Speaking", icon: Mic },
+                  { id: "GRAMMAR_VOCABULARY", label: "Grammar & Vocab", icon: BookA },
+                ].map((tab) => {
+                  const TabIcon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setSelectedSkill(tab.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        selectedSkill === tab.id
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {TabIcon && <TabIcon className="w-3.5 h-3.5 shrink-0" />}
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Nút lọc Đề Hot / Đề Tủ */}

@@ -374,7 +374,7 @@ export class StudentService {
       else if (topSkill === 'WRITING') wrongQuestionsLink = '/writing';
     }
 
-    // 7. Tạo mục Gợi ý Hôm Nay (⚡ Hôm nay nên làm)
+    // 7. Tạo mục Gợi ý Hôm Nay (Hôm nay nên làm)
     const skillRouteMap: Record<string, string> = {
       Grammar: '/grammar',
       Reading: '/reading',

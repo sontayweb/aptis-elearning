@@ -128,12 +128,12 @@ async function main() {
     console.log("==================================================");
 
     if (issues.length === 0) {
-        console.log("\n✅ XÁC NHẬN: 100% CÁC ĐỀ THI TRONG DATABASE ĐỀU HOÀN HẢO!");
+        console.log("\n[PASS] XÁC NHẬN: 100% CÁC ĐỀ THI TRONG DATABASE ĐỀU HOÀN HẢO!");
         console.log("   - Đầy đủ bài đọc & đoạn văn.");
         console.log("   - Đầy đủ số lượng câu hỏi.");
         console.log("   - Đầy đủ đáp án đúng & danh sách lựa chọn.");
     } else {
-        console.log(`\n⚠️ PHÁT HIỆN ${issues.length} ĐỀ CẦN XEM XÉT:`);
+        console.log(`\n[WARN] PHÁT HIỆN ${issues.length} ĐỀ CẦN XEM XÉT:`);
         for (const item of issues) {
             const ex = exams.find(e => e.id === item.id);
             const subCount = await prisma.examSubmission.count({ where: { exam_id: item.id } });

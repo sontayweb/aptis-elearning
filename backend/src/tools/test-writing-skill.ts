@@ -8,7 +8,7 @@ const submissionService = new SubmissionService();
 
 async function runWritingTests() {
   console.log('================================================================');
-  console.log('✍️ BỘ TEST KIỂM THỬ CHUYÊN SÂU: PHÂN HỆ VIẾT (WRITING SKILL)');
+  console.log('[WRITING] BỘ TEST KIỂM THỬ CHUYÊN SÂU: PHÂN HỆ VIẾT (WRITING SKILL)');
   console.log('================================================================\n');
 
   let passed = 0;
@@ -18,11 +18,11 @@ async function runWritingTests() {
     total++;
     if (condition) {
       passed++;
-      console.log(`  ✅ [PASS] ${title}`);
-      if (note) console.log(`     ℹ️ ${note}`);
+      console.log(`  [PASS] [PASS] ${title}`);
+      if (note) console.log(`     [INFO] ${note}`);
     } else {
-      console.error(`  ❌ [FAIL] ${title}`);
-      if (note) console.error(`     ⚠️ ${note}`);
+      console.error(`  [FAIL] [FAIL] ${title}`);
+      if (note) console.error(`     [WARN] ${note}`);
     }
   }
 
@@ -45,7 +45,7 @@ async function runWritingTests() {
 
   // 2. Kiểm tra cấu trúc chuẩn 4 Parts của đề thi Writing
   const targetExam = writingExams[0];
-  console.log(`\n🔍 Đang kiểm tra chi tiết đề: "${targetExam.title}" (ID: ${targetExam.id})`);
+  console.log(`\n Đang kiểm tra chi tiết đề: "${targetExam.title}" (ID: ${targetExam.id})`);
   assert(targetExam.duration_minutes === 50, 'Thời lượng đề thi chuẩn Aptis Writing: 50 phút');
   assert(targetExam.parts.length >= 4, 'Đề thi Writing có đủ 4 Parts chuẩn Aptis', `Số Parts: ${targetExam.parts.length}`);
 
@@ -60,7 +60,7 @@ async function runWritingTests() {
   }
 
   // 3. Mô phỏng Thí sinh làm bài thi Writing (Điền form và viết email)
-  console.log('\n📝 Mô phỏng Thí sinh làm bài thi Writing...');
+  console.log('\nMô phỏng Thí sinh làm bài thi Writing...');
   let testUser = await prisma.user.findFirst({ where: { role: 'STUDENT' } });
   if (!testUser) {
     testUser = await prisma.user.create({
@@ -93,13 +93,13 @@ async function runWritingTests() {
   );
 
   console.log('\n================================================================');
-  console.log(`🎯 KẾT QUẢ KIỂM THỬ WRITING: ${passed}/${total} TEST CASES ĐẠT CHUẨN!`);
+  console.log(`[RESULT] KẾT QUẢ KIỂM THỬ WRITING: ${passed}/${total} TEST CASES ĐẠT CHUẨN!`);
   console.log('================================================================');
 }
 
 runWritingTests()
   .catch((err) => {
-    console.error('❌ Lỗi:', err);
+    console.error('[FAIL] Lỗi:', err);
     process.exit(1);
   })
   .finally(async () => {

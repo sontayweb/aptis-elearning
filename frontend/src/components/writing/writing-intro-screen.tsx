@@ -188,7 +188,7 @@ export function WritingIntroScreen({
             <ul className="list-disc list-inside space-y-1 pl-1">
               <li>Bài viết được tự động lưu nháp liên tục mỗi khi bạn gõ phím.</li>
               <li>Bạn có thể chuyển đổi tự do giữa các Part và dùng nút <strong className="text-foreground">Gắn cờ</strong> để đánh dấu phần cần kiểm tra lại.</li>
-              <li>Sau khi nộp bài, hệ thống <strong className="text-primary">AI Kỳ Tích</strong> sẽ chấm điểm chi tiết theo thang CEFR (A1–C) và sửa lỗi ngữ pháp từng câu.</li>
+              <li>Sau khi nộp bài, hệ thống <strong className="text-primary">AI Premier</strong> sẽ chấm điểm chi tiết theo thang CEFR (A1–C) và sửa lỗi ngữ pháp từng câu.</li>
             </ul>
           </div>
 

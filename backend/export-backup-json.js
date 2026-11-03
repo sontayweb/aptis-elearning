@@ -7,7 +7,7 @@ const backupDir = path.resolve(__dirname, 'backups/json_snapshot');
 
 async function exportJson() {
   fs.mkdirSync(backupDir, { recursive: true });
-  console.log('📦 Bắt đầu xuất snapshot JSON các bảng dữ liệu...');
+  console.log('Bắt đầu xuất snapshot JSON các bảng dữ liệu...');
 
   const models = [
     { name: 'users', fn: () => prisma.user.findMany() },
@@ -22,13 +22,13 @@ async function exportJson() {
     try {
       const data = await m.fn();
       fs.writeFileSync(path.join(backupDir, `${m.name}.json`), JSON.stringify(data, null, 2), 'utf-8');
-      console.log(`✅ Xuất thành công ${m.name}: ${data.length} bản ghi`);
+      console.log(`[PASS] Xuất thành công ${m.name}: ${data.length} bản ghi`);
     } catch (e) {
-      console.warn(`⚠️ Bảng ${m.name}:`, e.message);
+      console.warn(`[WARN] Bảng ${m.name}:`, e.message);
     }
   }
 
-  console.log(`\n🎉 Đã lưu toàn bộ snapshot JSON vào: ${backupDir}`);
+  console.log(`\nĐã lưu toàn bộ snapshot JSON vào: ${backupDir}`);
 }
 
 exportJson()
