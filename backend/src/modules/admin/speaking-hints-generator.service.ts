@@ -436,6 +436,323 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
     const updatedCount = results.filter(Boolean).length;
     return { updatedCount, totalCount };
   }
+
+  /**
+   * Lấy tổng quan toàn bộ tranh Speaking Part 2 & Part 3 trên toàn hệ thống đề thi
+   */
+  async getOverview(): Promise<{
+    summary: {
+      totalParts: number;
+      completedCount: number;
+      pendingCount: number;
+      missingImageCount: number;
+      completionRate: number;
+    };
+    items: Array<{
+      partId: string;
+      partNumber: 2 | 3;
+      partTitle: string;
+      examId: string;
+      examTitle: string;
+      examCode: string;
+      skill: string;
+      imageUrl: string | null;
+      secondImageUrl: string | null;
+      hasImage: boolean;
+      status: 'COMPLETED' | 'PENDING' | 'MISSING_IMAGE';
+      questionCount: number;
+      firstQuestionId: string | null;
+      vocabularyHints: SpeakingVocabularyHintsData | null;
+      questions: Array<{
+        id: string;
+        question_number: number;
+        prompt: string;
+      }>;
+    }>;
+  }> {
+    const parts = await prisma.examPart.findMany({
+      where: {
+        part_number: { in: [2, 3] },
+        OR: [
+          { exam: { skill: { in: ['SPEAKING', 'FULL_TEST'] as any } } },
+          { image_url: { not: null } },
+        ],
+      },
+      include: {
+        exam: {
+          select: {
+            id: true,
+            title: true,
+            skill: true,
+            created_at: true,
+          },
+        },
+        questions: {
+          select: {
+            id: true,
+            question_number: true,
+            prompt: true,
+            options: true,
+          },
+          orderBy: { question_number: 'asc' },
+        },
+      },
+      orderBy: [
+        { exam: { created_at: 'desc' } },
+        { part_number: 'asc' },
+      ],
+    });
+
+    let completedCount = 0;
+    let pendingCount = 0;
+    let missingImageCount = 0;
+
+    const items = parts.map((part) => {
+      const pNum = part.part_number as 2 | 3;
+      const rawImg = part.image_url || '';
+      let img1: string | null = null;
+      let img2: string | null = null;
+
+      if (rawImg.includes(',')) {
+        const splitUrls = rawImg.split(',').map((s) => s.trim()).filter(Boolean);
+        img1 = splitUrls[0] || null;
+        img2 = splitUrls[1] || null;
+      } else if (rawImg.trim()) {
+        img1 = rawImg.trim();
+      }
+
+      const hasImage = Boolean(img1);
+      const firstQ = part.questions[0];
+      const firstOptions = (firstQ?.options as any) || {};
+      const hints = (firstOptions.vocabularyHints as SpeakingVocabularyHintsData) || null;
+      const hasHints = Boolean(
+        hints &&
+        Array.isArray(hints.keywords) &&
+        hints.keywords.length > 0
+      );
+
+      let status: 'COMPLETED' | 'PENDING' | 'MISSING_IMAGE';
+      if (!hasImage) {
+        status = 'MISSING_IMAGE';
+        missingImageCount++;
+      } else if (hasHints) {
+        status = 'COMPLETED';
+        completedCount++;
+      } else {
+        status = 'PENDING';
+        pendingCount++;
+      }
+
+      return {
+        partId: part.id,
+        partNumber: pNum,
+        partTitle: part.title || `Part ${pNum}`,
+        examId: part.exam.id,
+        examTitle: part.exam.title,
+        examCode: part.exam.id.slice(0, 8).toUpperCase(),
+        skill: part.exam.skill,
+        imageUrl: img1,
+        secondImageUrl: img2,
+        hasImage,
+        status,
+        questionCount: part.questions.length,
+        firstQuestionId: firstQ?.id || null,
+        vocabularyHints: hasHints ? hints : null,
+        questions: part.questions.map((q) => ({
+          id: q.id,
+          question_number: q.question_number,
+          prompt: q.prompt,
+        })),
+      };
+    });
+
+    const totalParts = items.length;
+    const completionRate = totalParts > 0 ? Math.round((completedCount / totalParts) * 100) : 0;
+
+    return {
+      summary: {
+        totalParts,
+        completedCount,
+        pendingCount,
+        missingImageCount,
+        completionRate,
+      },
+      items,
+    };
+  }
+
+  /**
+   * Lưu gợi ý thủ công hoặc cập nhật cho toàn bộ câu hỏi trong Part
+   */
+  async saveHintsForPart(partId: string, hints: SpeakingVocabularyHintsData): Promise<void> {
+    const part = await prisma.examPart.findUnique({
+      where: { id: partId },
+      include: { questions: true },
+    });
+
+    if (!part) {
+      throw { statusCode: 404, message: 'Phần thi không tồn tại' };
+    }
+
+    for (const q of part.questions) {
+      const currentOpt = (q.options as any) || {};
+      await prisma.question.update({
+        where: { id: q.id },
+        data: {
+          options: {
+            ...currentOpt,
+            vocabularyHints: hints,
+          },
+        },
+      });
+    }
+  }
+
+  /**
+   * Sinh gợi ý AI cho một Part duy nhất và cập nhật toàn bộ câu hỏi trong Part
+   */
+  async generateHintsForPart(partId: string): Promise<SpeakingVocabularyHintsData> {
+    const part = await prisma.examPart.findUnique({
+      where: { id: partId },
+      include: {
+        exam: true,
+        questions: true,
+      },
+    });
+
+    if (!part) {
+      throw { statusCode: 404, message: 'Phần thi không tồn tại' };
+    }
+
+    const pNum = part.part_number;
+    if (pNum !== 2 && pNum !== 3) {
+      throw { statusCode: 400, message: 'Tính năng gợi ý tranh chỉ áp dụng cho Speaking Part 2 và Part 3' };
+    }
+
+    const topicTitle = part.title || part.exam.title;
+    const questionsPrompts = part.questions.map((q) => q.prompt).filter(Boolean);
+
+    const rawImg = part.image_url || '';
+    let img1: string | undefined;
+    let img2: string | undefined;
+
+    if (rawImg.includes(',')) {
+      const parts = rawImg.split(',').map((s) => s.trim()).filter(Boolean);
+      img1 = parts[0];
+      img2 = parts[1];
+    } else {
+      img1 = rawImg.trim() || undefined;
+    }
+
+    if (!img1 && !img2) {
+      throw { statusCode: 400, message: 'Phần thi này chưa được cấu hình hình ảnh.' };
+    }
+
+    const hints = await this.generateHints(topicTitle, pNum as 2 | 3, questionsPrompts, img1, img2);
+    await this.saveHintsForPart(partId, hints);
+    return hints;
+  }
+
+  /**
+   * Sinh hàng loạt toàn hệ thống theo cơ chế tuần tự + delay an toàn tránh rate limit
+   */
+  async batchGenerateAll(options?: {
+    skipExisting?: boolean;
+    delayMs?: number;
+    partIds?: string[];
+  }): Promise<{
+    processed: number;
+    succeeded: number;
+    skipped: number;
+    failed: number;
+    errors: Array<{ partId: string; examTitle: string; partNumber: number; error: string }>;
+  }> {
+    const skipExisting = options?.skipExisting ?? true;
+    const delayMs = options?.delayMs ?? 1500;
+    const filterPartIds = options?.partIds && options.partIds.length > 0 ? options.partIds : undefined;
+
+    const parts = await prisma.examPart.findMany({
+      where: {
+        part_number: { in: [2, 3] },
+        ...(filterPartIds ? { id: { in: filterPartIds } } : {}),
+        OR: [
+          { exam: { skill: { in: ['SPEAKING', 'FULL_TEST'] as any } } },
+          { image_url: { not: null } },
+        ],
+      },
+      include: {
+        exam: { select: { id: true, title: true } },
+        questions: true,
+      },
+      orderBy: [{ exam: { created_at: 'desc' } }, { part_number: 'asc' }],
+    });
+
+    let processed = 0;
+    let succeeded = 0;
+    let skipped = 0;
+    let failed = 0;
+    const errors: Array<{ partId: string; examTitle: string; partNumber: number; error: string }> = [];
+
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    for (const part of parts) {
+      processed++;
+      const pNum = part.part_number as 2 | 3;
+      const rawImg = part.image_url || '';
+
+      let img1: string | undefined;
+      let img2: string | undefined;
+      if (rawImg.includes(',')) {
+        const splitUrls = rawImg.split(',').map((s) => s.trim()).filter(Boolean);
+        img1 = splitUrls[0];
+        img2 = splitUrls[1];
+      } else {
+        img1 = rawImg.trim() || undefined;
+      }
+
+      if (!img1 && !img2) {
+        skipped++;
+        continue;
+      }
+
+      const firstQ = part.questions[0];
+      const existingHints = (firstQ?.options as any)?.vocabularyHints;
+      if (skipExisting && existingHints && Array.isArray(existingHints.keywords) && existingHints.keywords.length > 0) {
+        skipped++;
+        continue;
+      }
+
+      try {
+        const topicTitle = part.title || part.exam.title;
+        const questionsPrompts = part.questions.map((q) => q.prompt).filter(Boolean);
+
+        const hints = await this.generateHints(topicTitle, pNum, questionsPrompts, img1, img2);
+        await this.saveHintsForPart(part.id, hints);
+        succeeded++;
+
+        // Delay an toàn chống 429 quota Gemini/OpenAI
+        if (delayMs > 0) {
+          await sleep(delayMs);
+        }
+      } catch (err: any) {
+        failed++;
+        errors.push({
+          partId: part.id,
+          examTitle: part.exam.title,
+          partNumber: pNum,
+          error: err?.message || 'Lỗi không xác định khi gọi AI Vision',
+        });
+      }
+    }
+
+    return {
+      processed,
+      succeeded,
+      skipped,
+      failed,
+      errors,
+    };
+  }
 }
 
 export const speakingHintsGeneratorService = new SpeakingHintsGeneratorService();

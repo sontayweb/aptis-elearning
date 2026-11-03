@@ -160,11 +160,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono font-bold",
         },
         {
-          title: "Key & Mẹo Thi (Listening)",
+          title: "Key & Mẹo Thi (4 Kỹ Năng)",
           href: "/admin/key-va-meo-thi",
           icon: Lightbulb,
-          badge: "NEW",
+          badge: "HOT",
           badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono font-bold",
+        },
+        {
+          title: "AI Gợi Ý Tranh Speaking",
+          href: "/admin/tools/speaking-hints",
+          icon: Sparkles,
+          badge: "AI HUB",
+          badgeColor: "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 font-mono font-bold",
         },
         {
           title: "Đồng bộ & Đối soát Đề",

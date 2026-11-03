@@ -86,6 +86,18 @@ router.delete('/questions/:questionId', (req, res, next) => adminController.dele
 router.post('/questions/:questionId/generate-speaking-hints', (req, res, next) =>
   adminController.generateSpeakingHints(req, res, next)
 );
+router.get('/speaking-hints/overview', (req, res, next) =>
+  adminController.getSpeakingHintsOverview(req, res, next)
+);
+router.post('/speaking-hints/batch-all', (req, res, next) =>
+  adminController.batchGenerateAllSpeakingHints(req, res, next)
+);
+router.post('/parts/:partId/generate-speaking-hints', (req, res, next) =>
+  adminController.generatePartSpeakingHints(req, res, next)
+);
+router.post('/parts/:partId/speaking-hints', (req, res, next) =>
+  adminController.savePartSpeakingHints(req, res, next)
+);
 router.post('/exams/:examId/batch-generate-speaking-hints', (req, res, next) =>
   adminController.batchGenerateSpeakingHints(req, res, next)
 );

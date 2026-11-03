@@ -893,6 +893,59 @@ class ApiClient {
         method: 'POST',
       }),
 
+    getSpeakingHintsOverview: () =>
+      this.request<{
+        summary: {
+          totalParts: number;
+          completedCount: number;
+          pendingCount: number;
+          missingImageCount: number;
+          completionRate: number;
+        };
+        items: Array<{
+          partId: string;
+          partNumber: 2 | 3;
+          partTitle: string;
+          examId: string;
+          examTitle: string;
+          examCode: string;
+          skill: string;
+          imageUrl: string | null;
+          secondImageUrl: string | null;
+          hasImage: boolean;
+          status: 'COMPLETED' | 'PENDING' | 'MISSING_IMAGE';
+          questionCount: number;
+          firstQuestionId: string | null;
+          vocabularyHints: any | null;
+          questions: Array<{
+            id: string;
+            question_number: number;
+            prompt: string;
+          }>;
+        }>;
+      }>('/admin/speaking-hints/overview'),
+
+    generatePartSpeakingHints: (partId: string) =>
+      this.request<any>(`/admin/parts/${partId}/generate-speaking-hints`, { method: 'POST' }),
+
+    savePartSpeakingHints: (partId: string, hints: any) =>
+      this.request<{ success: boolean }>(`/admin/parts/${partId}/speaking-hints`, {
+        method: 'POST',
+        body: JSON.stringify({ hints }),
+      }),
+
+    batchGenerateAllSpeakingHints: (body?: { skipExisting?: boolean; delayMs?: number; partIds?: string[] }) =>
+      this.request<{
+        processed: number;
+        succeeded: number;
+        skipped: number;
+        failed: number;
+        errors: Array<{ partId: string; examTitle: string; partNumber: number; error: string }>;
+      }>('/admin/speaking-hints/batch-all', {
+        method: 'POST',
+        body: JSON.stringify(body || {}),
+      }),
+
     batchGenerateSpeakingHints: (examId: string) =>
       this.request<{ updatedCount: number; totalCount: number }>(
         `/admin/exams/${examId}/batch-generate-speaking-hints`,

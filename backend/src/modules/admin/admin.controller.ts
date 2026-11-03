@@ -402,6 +402,53 @@ export class AdminController {
     }
   }
 
+  async getSpeakingHintsOverview(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const data = await speakingHintsGeneratorService.getOverview();
+      sendSuccess(res, data, 'Lay danh sach tong quan tranh Speaking thanh cong', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async generatePartSpeakingHints(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const hints = await speakingHintsGeneratorService.generateHintsForPart(partId);
+      sendSuccess(res, hints, 'Sinh goi y tranh Speaking cho phan thi thanh cong', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async savePartSpeakingHints(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const hints = req.body?.hints || req.body;
+      if (!hints) {
+        throw { statusCode: 400, message: 'Du lieu goi y khong hop le' };
+      }
+      await speakingHintsGeneratorService.saveHintsForPart(partId, hints);
+      sendSuccess(res, { success: true }, 'Luu goi y Speaking cho phan thi thanh cong', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async batchGenerateAllSpeakingHints(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { skipExisting, delayMs, partIds } = req.body || {};
+      const result = await speakingHintsGeneratorService.batchGenerateAll({
+        skipExisting: skipExisting !== undefined ? Boolean(skipExisting) : true,
+        delayMs: typeof delayMs === 'number' ? delayMs : 1500,
+        partIds: Array.isArray(partIds) ? partIds : undefined,
+      });
+      sendSuccess(res, result, 'Hoan thanh tien trinh sinh goi y hang loat toan he thong', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async batchGenerateSpeakingHints(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const examId = req.params.examId;
