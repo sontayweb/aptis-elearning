@@ -4,6 +4,40 @@ Tất cả các thay đổi và tiến độ nâng cấp hệ thống được g
 
 ---
 
+## [2.5.0] - 2026-11-03 (KEY & MẸO THI 4 KỸ NĂNG & AI SPEAKING HINTS HUB)
+
+### Phân Hệ "Key & Mẹo Thi" Toàn Diện 4 Kỹ Năng (`/key-va-meo-thi` & `/admin/key-va-meo-thi`)
+- **Reading (Đọc hiểu 4 Parts):**
+  - **Part 1:** Tích hợp bảng dấu hiệu nhận diện từ loại (Danh từ, Động từ, Tính từ, Giới từ), cấu trúc ngữ pháp thường gặp và ví dụ minh họa kèm câu ghi nhớ cốt lõi.
+  - **Part 2:** Xây dựng bố cục 2 cột chuẩn thiết kế: Cột trái chứa danh sách 20 thẻ đề hot (`Making films`, `Family sport day`, `Protect the environment`, `Do exercise`, `The Internet`,...); Cột phải hiển thị bảng song song đối chiếu câu gốc tiếng Anh và dịch nghĩa tiếng Việt với highlight từ khóa biến thể (paraphrasing), kèm khung tóm tắt mẹo nhớ.
+  - **Part 3 & Part 4:** Tối ưu hóa mẹo làm bài, quy tắc phân tích bẫy và logic liên kết mạch văn.
+- **Listening (Nghe hiểu 4 Parts):**
+  - **Part 4:** Hoàn thiện toàn bộ 48 chủ đề thi hot nhất từ ngân hàng đề khảo thí, thay thế toàn bộ sticker lửa thành biểu tượng cỏ bốn lá may mắn (`🍀🍀🍀🍀`) kèm bộ lọc theo cấp độ cỏ bốn lá.
+  - **Part 1, 2, 3:** Hệ thống hóa mẹo nhận diện từ khóa và kỹ thuật tránh bẫy gây nhiễu (distractors).
+- **Speaking (Nói 4 Parts):**
+  - Cập nhật chuẩn xác công thức trả lời nhanh (`Direct Answer + Reason + Detail`, `Where + Who + What + Details + Impression`), cấu trúc câu hữu ích, thì ngữ pháp trọng tâm và tổng hợp các lỗi tối kỵ cần tránh.
+- **Writing (Viết 4 Parts):**
+  - **Part 1:** Bảng công thức trả lời câu hỏi ngắn 1–5 từ không cần giải thích dài.
+  - **Part 2:** Mẹo đóng vai thành viên câu lạc bộ và mẫu câu chuẩn số từ 20–30 từ.
+  - **Part 3:** Công thức 3 câu hỏi chat (30–40 từ/câu) theo 3 dạng bài: Trải nghiệm (`Experience`), Quan điểm (`Opinion`), Đề xuất (`Suggestions`).
+  - **Part 4:** Cấu trúc 2 email phản hồi (Email 1 Informal bạn bè 40–50 từ và Email 2 Formal ban quản lý 120–150 từ) kèm bộ từ vựng diễn tả cảm xúc và đề xuất giải pháp.
+- **Quản Trị Nội Dung:** Lưu trữ cài đặt nội dung thông qua `SystemSetting` trong CSDL, cho phép quản trị viên chỉnh sửa nội dung động từ trang Admin.
+
+### Trung Tâm AI Gợi Ý Tranh Speaking Toàn Hệ Thống (`/admin/tools/speaking-hints`)
+- **Backend Service & Aggregator (`SpeakingHintsGeneratorService`):**
+  - `GET /api/admin/speaking-hints/overview`: Quét toàn bộ đề thi `SPEAKING` & `FULL_TEST`, tổng hợp các chỉ số KPI thời gian thực: Tổng số phần thi có tranh, Đã có gợi ý, Chờ sinh gợi ý, Thiếu ảnh và Tỷ lệ hoàn thành (%).
+  - `POST /api/admin/speaking-hints/batch-all`: Bộ xử lý tự động sinh gợi ý hàng loạt toàn hệ thống theo chuỗi tuần tự với **độ trễ an toàn tùy chỉnh (mặc định 1.5s)** nhằm triệt tiêu hoàn toàn lỗi chạm giới hạn `429 Too Many Requests` (Quota Rate Limit) của Google Gemini Vision API.
+  - `POST /api/admin/parts/:partId/generate-speaking-hints`: Sinh gợi ý tranh cho riêng một Part và tự động đồng bộ vào tất cả các câu hỏi thuộc Part đó.
+  - `POST /api/admin/parts/:partId/speaking-hints`: Lưu và chỉnh sửa thủ công gợi ý từ vựng cho Part.
+- **Giao Diện Quản Trị Độc Lập:**
+  - 4 thẻ KPI trực quan hiển thị trạng thái phân tích ảnh.
+  - Bộ lọc đa chiều: Tìm kiếm theo tên đề, part, từ khóa; Lọc theo trạng thái tab (`Tất cả`, `Chờ sinh`, `Đã xong`, `Thiếu ảnh`) và theo loại Part (Part 2 - 1 ảnh vs Part 3 - 2 ảnh).
+  - Bảng dữ liệu thông minh: Thumbnail ảnh hỗ trợ click xem phóng to (zoom modal), xem trước các chip từ khóa đã sinh, nút sinh AI độc lập từng phần, nút sửa nhanh tích hợp `SpeakingHintsModal` và liên kết trực tiếp tới trình biên tập đề.
+  - Cửa sổ tiến trình sinh hàng loạt với thanh tiến độ thời gian thực, console logs chi tiết và nút dừng an toàn bất kỳ lúc nào.
+- **Admin Sidebar Navigation:** Bổ sung mục điều hướng "AI Gợi Ý Tranh Speaking" với badge `AI HUB` nổi bật.
+
+---
+
 ## [2.4.1] - 2026-10-29 (ADMIN DATA SYNC & AUTOMATED UNIT TEST AUDIT CENTER)
 
 ### Tích Hợp Trung Tâm Đồng Bộ & Đối Soát Đề Thi Lên Giao Diện Admin (`/admin/data-sync`)
