@@ -79,7 +79,7 @@ function GrammarExamRunnerContent() {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.exams.getQuestions(examId);
+      const res = await api.exams.getQuestions(examId, { mode: 'practice' });
       if (res.success && res.data && res.data.parts?.length > 0) {
         setExamTitle(res.data.title || "Grammar & Vocabulary");
         const mins = res.data.duration_minutes || 25;

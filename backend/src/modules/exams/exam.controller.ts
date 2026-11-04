@@ -47,7 +47,8 @@ export class ExamController {
     try {
       const examId = req.params.id;
       const userId = (req as AuthenticatedRequest).user?.userId;
-      const result = await examService.getExamQuestions(examId, userId);
+      const mode = (req.query.mode as string) || undefined;
+      const result = await examService.getExamQuestions(examId, userId, mode);
       sendSuccess(res, result, 'Lấy danh sách câu hỏi phòng thi thành công', 200);
     } catch (error) {
       next(error);

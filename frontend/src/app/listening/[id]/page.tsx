@@ -596,7 +596,7 @@ function ListeningExamRunnerContent() {
       try {
         setLoading(true);
         setError(null);
-        const res = await api.exams.getQuestions(examId);
+        const res = await api.exams.getQuestions(examId, { mode: 'practice' });
         if (res.success && res.data) {
           const apiExam = res.data;
           const parsed = parseApiToListeningData(apiExam);

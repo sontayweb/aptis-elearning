@@ -564,7 +564,7 @@ export class ExamService {
     };
   }
 
-  async getExamQuestions(examId: string, userId?: string) {
+  async getExamQuestions(examId: string, userId?: string, mode?: string) {
     await this.ensureMockTestsReady();
     const trimmed = examId.trim();
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed);
@@ -1040,7 +1040,8 @@ export class ExamService {
       }
 
       // BẢO MẬT: Tuyệt đối không để lộ explanation và correct_answer cho các kỹ năng trắc nghiệm khi chưa nộp bài
-      if (exam.skill !== 'SPEAKING' && exam.skill !== 'WRITING') {
+      const isPracticeMode = mode === 'practice';
+      if (!isPracticeMode && exam.skill !== 'SPEAKING' && exam.skill !== 'WRITING') {
         for (const q of part.questions) {
           delete (q as any).explanation;
           delete (q as any).correct_answer;

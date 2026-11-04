@@ -1,0 +1,11 @@
+{
+  "name": "aptistest",
+  "displayName": "Aptis Test (.NET Core)",
+  "baseUrl": "https://aptistest.edu.vn",
+  "account": {
+    "email": "Levandatfibc8@columbed.us",
+    "password": "Onthi01"
+  },
+  "remotePort": 9224
+}
+

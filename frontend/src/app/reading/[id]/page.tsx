@@ -391,7 +391,7 @@ function ReadingExamRunner() {
         setLoading(true);
         setError(null);
 
-        const res = await api.exams.getQuestions(examId);
+        const res = await api.exams.getQuestions(examId, { mode: 'practice' });
         if (res.success && res.data) {
           const apiData = res.data;
           const parsed = parseApiToReadingData(apiData);

@@ -175,9 +175,16 @@ model Exam {
   hot_level        Int            @default(0) // Mức độ hot: 0 = Thường, 1 = 1 sao (Ôn tập), 2 = 2 sao (Hot), 3 = 3 sao (Đề tủ cực hot)
   forecast_tag     String?        // Nhãn dự đoán (ví dụ: "Đề tủ tháng này", "Tần suất thi cao")
   source           String         @default("WEB") // "WEB" hoặc "CUSTOM"
+  external_id      String?        // Mã định danh gốc từ crawler (chống trùng lặp tuyệt đối)
   creator_id       String?
   created_at       DateTime       @default(now())
   updated_at       DateTime       @updatedAt
+
+  // Biến thể đề thi (Self-relation)
+  parent_exam_id   String?
+  variant_note     String?
+  parent_exam      Exam?          @relation("ExamVariants", fields: [parent_exam_id], references: [id], onDelete: SetNull)
+  variants         Exam[]         @relation("ExamVariants")
 
   creator          User?          @relation("CustomExamCreator", fields: [creator_id], references: [id], onDelete: SetNull)
   parts            ExamPart[]
@@ -187,6 +194,7 @@ model Exam {
   @@index([skill, is_published])
   @@index([hot_level])
   @@index([source, creator_id])
+  @@index([parent_exam_id])
 }
 
 model ExamPart {

@@ -4,6 +4,36 @@ Tất cả các thay đổi và tiến độ nâng cấp hệ thống được g
 
 ---
 
+## [2.5.1] - 2026-11-04 (SIDE-BY-SIDE VISUAL DIFF & ENTERPRISE INGESTION PREVIEW)
+
+### Nâng Cấp Trung Tâm Thu Nạp Đề Thi & Chẩn Đoán Lỗi Trực Quan (`/admin/data-sync`)
+- **Backend Diff Engine (`DataSyncService.computeExamDiff` & `resolveExamAction`):**
+  - Tự động đối chiếu chi tiết từng Part và từng Câu hỏi giữa đề thi đang có trong CSDL và đề thi mới kéo về/tải lên.
+  - Tính toán chỉ số tương đồng (`similarityPercent`), phát hiện thay đổi tiêu đề, thời lượng thi, thay đổi media (Audio/Hình ảnh/Passage).
+  - Phân loại trạng thái từng câu hỏi: `UNCHANGED` (Giữ nguyên 100%), `MODIFIED` (Thay đổi prompt/options/key/score), `ADDED` (Thêm mới), `REMOVED` (Bị thiếu trong tệp mới).
+  - Cung cấp dữ liệu diff ngay cả trong chế độ **Dry-Run ("Kiểm Tra Thử - Chưa Lưu")** giúp Admin phát hiện và chẩn đoán trước mọi sai lệch.
+  - API `POST /api/admin/data-sync/resolve-exam`: Hỗ trợ 3 quyết định độc lập trực tiếp từ Modal (Ghi đè `OVERWRITE`, Tạo biến thể liên kết `CREATE_VARIANT`, Bỏ qua `SKIP`).
+- **Giao Diện Popup Modal "Side-by-Side Visual Diff" (`frontend/src/app/admin/data-sync/page.tsx`):**
+  - Bảng kết quả tích hợp badge đo độ tương đồng trực quan (`Khớp: X%`, `X câu sửa`, `+X câu mới`, `Audio/Ảnh đổi`) và nút `[👁️ Xem So Sánh (Diff)]`.
+  - Cửa sổ so sánh trực quan chia 2 cột toàn màn hình: Cột trái (Dữ liệu đang có trong CSDL) vs Cột phải (Dữ liệu mới kéo về).
+  - **Banner phong cách Git Diff Terminal:** `git diff --exam a/[CSDL] ... b/[CRAWL]` với chip đếm `+insertions`, `-deletions`, `~changes`.
+  - Highlight trực quan theo màu: Nền vàng cho câu thay đổi nội dung/đáp án/prompt, nền xanh dương cho câu mới thêm, nền đỏ cho câu bị lược bỏ, nền xanh lá cho câu đồng nhất.
+  - Bộ lọc 3 chế độ: `Tất Cả`, `Chỉ Câu Thay Đổi`, `Chỉ Đổi Audio/Ảnh`.
+  - **Bộ 3 nút quyết định Merge Actions 1 chạm ở chân Modal:**
+    1. 🔄 `1. Ghi Đè Đề Cũ (Overwrite)`: Cập nhật đè sạch sẽ (Deep Replace) hoặc an toàn bài làm (Safe In-Place).
+    2. 🔀 `2. Tạo Thành Biến Thể Liên Kết (Create Variant)`: Tự động gắn tag và liên kết đề gốc (ví dụ biến thể Nam nói trước 25/10).
+    3. ⏭️ `3. Bỏ Qua Đề Này (Skip)`: Không lưu và không làm xáo trộn CSDL.
+  - Hiển thị rõ cơ chế bảo vệ bài nộp: Thông báo số lượt nộp bài của học viên (`submissionsPreserved`) và kích hoạt Safe In-Place Update bảo toàn ID tuyệt đối.
+- **Database Schema Hardening (`backend/prisma/schema.prisma`):**
+  - Bổ sung quan hệ đệ quy tự liên kết biến thể (`parent_exam_id`, `variant_note`, `parent_exam`, `variants`) vào `model Exam`.
+  - Khi quản trị viên chọn *"2. Tạo Thành Biến Thể Liên Kết"*, hệ thống tự động gán khóa `parent_exam_id` trỏ về đề gốc.
+- **Tích Hợp Trọn Vẹn Crawler Nguồn 3 (`tools/sources/aptistest/`):**
+  - Xây dựng `config.json` và `crawler.js` chuẩn hóa, tự động đăng nhập API hoặc đọc cookie phiên `AptisWeb.Auth` từ `session.json`.
+  - Lọc nghiêm ngặt 100% đề thi **Aptis ESOL** (Speaking, Listening, Writing, Reading).
+  - Xuất dữ liệu sạch về file Staging JSON `tools/data/aptistest/normalized_exams.json` và bổ sung Snapshot `aptistest` lên giao diện quản trị `/admin/data-sync`.
+
+---
+
 ## [2.5.0] - 2026-11-03 (KEY & MẸO THI 4 KỸ NĂNG & AI SPEAKING HINTS HUB)
 
 ### Phân Hệ "Key & Mẹo Thi" Toàn Diện 4 Kỹ Năng (`/key-va-meo-thi` & `/admin/key-va-meo-thi`)

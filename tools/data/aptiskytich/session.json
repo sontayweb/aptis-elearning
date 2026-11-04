@@ -1,6 +1,6 @@
 {
-  "accessToken": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjQ1MjI3NTAzLWZhMjYtNDc3ZC04NjJhLTM0ODU0NDhkMzBhNCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2JhY29hbWhiYXRxcHhhdHJyZmx6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyODMwYzI1Yy1jYTA1LTRlYzktYmM5YS03OWJjZmM4ZTJkNGIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkxMDQ0MTU4LCJpYXQiOjE3OTEwNDA1NTgsImVtYWlsIjoic29udGF5d2ViLmFkbWluQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJzb250YXl3ZWIuYWRtaW5AZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IldlYiBTxqFuIFTDonkiLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6IjI4MzBjMjVjLWNhMDUtNGVjOS1iYzlhLTc5YmNmYzhlMmQ0YiJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzkxMDQwNTU4fV0sInNlc3Npb25faWQiOiI4NjU5MGY4Zi1jZmQyLTQ0Y2EtYmMzNS0zY2NjZGVlOTJjMjUiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ._yFgzRpZ3CrMsQaegjckTC5Fj02LfVARRxt9xHyivspA1-evvh9ISBRKjMwIteyyRwAnJ9PzUyiQIguHW5viLw",
-  "refreshToken": "5l7cbcjhoq4d",
+  "accessToken": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjQ1MjI3NTAzLWZhMjYtNDc3ZC04NjJhLTM0ODU0NDhkMzBhNCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2JhY29hbWhiYXRxcHhhdHJyZmx6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyODMwYzI1Yy1jYTA1LTRlYzktYmM5YS03OWJjZmM4ZTJkNGIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkzNzU5NTgyLCJpYXQiOjE3OTM3NTU5ODIsImVtYWlsIjoic29udGF5d2ViLmFkbWluQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiLCJnb29nbGUiXX0sInVzZXJfbWV0YWRhdGEiOnsiYXZhdGFyX3VybCI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pMX0tSNDNZU2hXOF8ybHZKQ0xQMldKLWx4UWtHZW1ocEw0dmZHazM1QVFtSDBrVjg9czk2LWMiLCJlbWFpbCI6InNvbnRheXdlYi5hZG1pbkBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZnVsbF9uYW1lIjoiV2ViIFPGoW4gVMOieSIsImlzcyI6Imh0dHBzOi8vYWNjb3VudHMuZ29vZ2xlLmNvbSIsIm5hbWUiOiJXZWIgU8ahbiBUw6J5IiwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSkxfS1I0M1lTaFc4XzJsdkpDTFAyV0otbHhRa0dlbWhwTDR2ZkdrMzVBUW1IMGtWOD1zOTYtYyIsInByb3ZpZGVyX2lkIjoiMTE3MTQxMjcyMzg3MTg3NDQ2OTUzIiwic3ViIjoiMTE3MTQxMjcyMzg3MTg3NDQ2OTUzIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTM3NTU5ODJ9XSwic2Vzc2lvbl9pZCI6ImY1YTg1ZjgxLWUxM2ItNDdkZi04ZDE2LWIzYTk3NDliNGE3MCIsImlzX2Fub255bW91cyI6ZmFsc2V9.hF3d2Z-vJwPrfUzcSLMXuQQm-7bD8mz1X61RQHdbjtNCWmRk2ikVxBDOJz9h2-FE6UtN9UJ0tTvZfovx96OQjg",
+  "refreshToken": "ghgyjndicdmz",
   "user": {
     "id": "2830c25c-ca05-4ec9-bc9a-79bcfc8e2d4b",
     "aud": "authenticated",
@@ -11,19 +11,25 @@
     "confirmation_sent_at": "2026-10-03T09:43:30.264816Z",
     "confirmed_at": "2026-10-03T09:43:55.868955Z",
     "recovery_sent_at": "2026-10-03T15:00:53.773049Z",
-    "last_sign_in_at": "2026-10-03T15:15:58.489623348Z",
+    "last_sign_in_at": "2026-11-04T01:33:02.768371126Z",
     "app_metadata": {
       "provider": "email",
       "providers": [
-        "email"
+        "email",
+        "google"
       ]
     },
     "user_metadata": {
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocJL_KR43YShW8_2lvJCLP2WJ-lxQkGemhpL4vfGk35AQmH0kV8=s96-c",
       "email": "sontayweb.admin@gmail.com",
       "email_verified": true,
       "full_name": "Web Sơn Tây",
+      "iss": "https://accounts.google.com",
+      "name": "Web Sơn Tây",
       "phone_verified": false,
-      "sub": "2830c25c-ca05-4ec9-bc9a-79bcfc8e2d4b"
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocJL_KR43YShW8_2lvJCLP2WJ-lxQkGemhpL4vfGk35AQmH0kV8=s96-c",
+      "provider_id": "117141272387187446953",
+      "sub": "117141272387187446953"
     },
     "identities": [
       {
@@ -42,11 +48,33 @@
         "created_at": "2026-10-03T09:43:30.256484Z",
         "updated_at": "2026-10-03T09:43:30.256484Z",
         "email": "sontayweb.admin@gmail.com"
+      },
+      {
+        "identity_id": "bf323ddb-819e-4e18-8cce-a08400ce28e8",
+        "id": "117141272387187446953",
+        "user_id": "2830c25c-ca05-4ec9-bc9a-79bcfc8e2d4b",
+        "identity_data": {
+          "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocJL_KR43YShW8_2lvJCLP2WJ-lxQkGemhpL4vfGk35AQmH0kV8=s96-c",
+          "email": "sontayweb.admin@gmail.com",
+          "email_verified": true,
+          "full_name": "Web Sơn Tây",
+          "iss": "https://accounts.google.com",
+          "name": "Web Sơn Tây",
+          "phone_verified": false,
+          "picture": "https://lh3.googleusercontent.com/a/ACg8ocJL_KR43YShW8_2lvJCLP2WJ-lxQkGemhpL4vfGk35AQmH0kV8=s96-c",
+          "provider_id": "117141272387187446953",
+          "sub": "117141272387187446953"
+        },
+        "provider": "google",
+        "last_sign_in_at": "2026-10-12T06:48:54.560093Z",
+        "created_at": "2026-10-12T06:48:54.560137Z",
+        "updated_at": "2026-10-12T06:48:54.560137Z",
+        "email": "sontayweb.admin@gmail.com"
       }
     ],
     "created_at": "2026-10-03T09:43:30.240417Z",
-    "updated_at": "2026-10-03T15:15:58.499539Z",
+    "updated_at": "2026-11-04T01:33:02.77227Z",
     "is_anonymous": false
   },
-  "savedAt": "2026-10-03T15:15:58.902Z"
+  "savedAt": "2026-11-04T01:33:02.710Z"
 }

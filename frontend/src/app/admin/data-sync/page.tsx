@@ -7,6 +7,8 @@ import {
   RefreshCw,
   ShieldCheck,
   CheckCircle2,
+  GitCompare,
+  Eye,
   AlertTriangle,
   Database,
   Layers,
@@ -51,7 +53,7 @@ interface OverviewData {
   bySource: Array<{ source: string; count: number }>;
   byQuestionType: Array<{ questionType: string; count: number }>;
   snapshots: Array<{
-    id: "aptisacademy" | "aptiskytich";
+    id: "aptisacademy" | "aptiskytich" | "aptistest";
     name: string;
     sourceCode: string;
     available: boolean;
@@ -106,6 +108,10 @@ interface SyncBatchResult {
     partsCount?: number;
     questionsCount?: number;
     submissionsPreserved?: number;
+    action?: string;
+    existingExamId?: string | null;
+    diff?: any;
+    incomingExam?: any;
     errors?: string[];
     warnings?: string[];
   }>;
@@ -164,6 +170,50 @@ export default function AdminDataSyncPage() {
   const [uploadedExams, setUploadedExams] = useState<any[] | null>(null);
   const [customSourceTag, setCustomSourceTag] = useState("APTIS_ACADEMY");
   const [syncResult, setSyncResult] = useState<SyncBatchResult | null>(null);
+
+  // Side-by-Side Visual Diff Modal state
+  const [selectedDiffItem, setSelectedDiffItem] = useState<any | null>(null);
+  const [diffFilter, setDiffFilter] = useState<"ALL" | "CHANGED_ONLY" | "MEDIA_ONLY">("ALL");
+  const [variantTagInput, setVariantTagInput] = useState<string>("Biến thể mới");
+  const [resolvingAction, setResolvingAction] = useState<boolean>(false);
+
+  // Xử lý 3 hành động Git-style quyết định: Ghi đè, Tạo biến thể, Bỏ qua
+  const handleResolveExam = async (action: "OVERWRITE" | "CREATE_VARIANT" | "SKIP") => {
+    if (!selectedDiffItem) return;
+    try {
+      setResolvingAction(true);
+      const res = await api.admin.dataSync.resolveExam({
+        action,
+        incomingExam: selectedDiffItem.incomingExam || {
+          title: selectedDiffItem.title,
+          skill: selectedDiffItem.skill,
+        },
+        existingExamId: selectedDiffItem.existingExamId,
+        variantTag: variantTagInput,
+      });
+
+      if (res.success) {
+        setMessage({
+          type: "success",
+          text: res.message || "Xử lý đề thi thành công!",
+        });
+        setSelectedDiffItem(null);
+        await loadOverview();
+      } else {
+        setMessage({
+          type: "error",
+          text: res.message || "Không thể xử lý đề thi.",
+        });
+      }
+    } catch (err: any) {
+      setMessage({
+        type: "error",
+        text: err.message || "Lỗi khi xử lý quyết định đề thi.",
+      });
+    } finally {
+      setResolvingAction(false);
+    }
+  };
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const loadOverview = useCallback(async () => {
@@ -187,13 +237,14 @@ export default function AdminDataSyncPage() {
   // Close tutorial with Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && showTutorial) {
-        setShowTutorial(false);
+      if (e.key === "Escape") {
+        if (selectedDiffItem) setSelectedDiffItem(null);
+        else if (showTutorial) setShowTutorial(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showTutorial]);
+  }, [showTutorial, selectedDiffItem]);
 
   // 1. Chạy Tự Động Sửa Lỗi & Gộp Đề Trùng
   const handleRunStandardize = async () => {
@@ -322,7 +373,7 @@ export default function AdminDataSyncPage() {
 
   // Thực thi nạp từ Snapshot máy chủ hoặc từ file JSON đã upload
   const handleExecuteSync = async (options: {
-    snapshotId?: "aptisacademy" | "aptiskytich";
+    snapshotId?: "aptisacademy" | "aptiskytich" | "aptistest";
     dryRun: boolean;
   }) => {
     try {
@@ -1298,13 +1349,61 @@ export default function AdminDataSyncPage() {
                         </td>
                         <td className="px-4 py-2.5 text-muted-foreground">
                           {item.errors && item.errors.length > 0 ? (
-                            <span className="text-red-500">{item.errors.join("; ")}</span>
+                            <div className="text-red-500 flex flex-col gap-0.5">
+                              <span>{item.errors.join("; ")}</span>
+                            </div>
+                          ) : item.diff ? (
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span
+                                className={`px-2 py-0.5 rounded-md font-mono font-bold text-[10px] border ${
+                                  item.diff.similarityPercent >= 95
+                                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                                    : item.diff.similarityPercent >= 70
+                                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                    : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
+                                }`}
+                              >
+                                Tương đồng: {item.diff.similarityPercent}%
+                              </span>
+
+                              {item.diff.modifiedQuestionsCount > 0 && (
+                                <span className="text-amber-600 dark:text-amber-400 font-semibold text-[11px]">
+                                  • {item.diff.modifiedQuestionsCount} câu sửa
+                                </span>
+                              )}
+                              {item.diff.addedQuestionsCount > 0 && (
+                                <span className="text-blue-600 dark:text-blue-400 font-semibold text-[11px]">
+                                  • +{item.diff.addedQuestionsCount} câu mới
+                                </span>
+                              )}
+                              {item.diff.mediaChangedPartsCount > 0 && (
+                                <span className="text-purple-600 dark:text-purple-400 font-semibold text-[11px]">
+                                  • Audio/Ảnh đổi
+                                </span>
+                              )}
+                              {item.submissionsPreserved !== undefined && item.submissionsPreserved > 0 && (
+                                <span className="text-indigo-600 dark:text-indigo-400 font-medium text-[10px]">
+                                  (Đã có {item.submissionsPreserved} bài nộp)
+                                </span>
+                              )}
+
+                              <button
+                                onClick={() => setSelectedDiffItem(item)}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-all cursor-pointer shadow-xs ml-auto"
+                                title="Mở bảng so sánh trực quan 2 cột giữa đề trong CSDL và đề mới kéo về"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Xem So Sánh (Diff)</span>
+                              </button>
+                            </div>
                           ) : item.warnings && item.warnings.length > 0 ? (
                             <span className="text-amber-500">{item.warnings.join("; ")}</span>
                           ) : (
-                            <span className="text-emerald-600 dark:text-emerald-400">
-                              Định dạng hoàn hảo, sẵn sàng cho học viên làm bài
-                            </span>
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-emerald-600 dark:text-emerald-400">
+                                Đề mới hoàn toàn, định dạng chuẩn British Council
+                              </span>
+                            </div>
                           )}
                         </td>
                         <td className="px-4 py-2.5 text-right font-mono font-bold">
@@ -1690,6 +1789,486 @@ export default function AdminDataSyncPage() {
           </div>
         </div>
       )}
+
+      {/* =====================================================================
+          MODAL SO SÁNH TRỰC QUAN 2 CỘT (SIDE-BY-SIDE VISUAL DIFF)
+         ===================================================================== */}
+      {selectedDiffItem && selectedDiffItem.diff && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+          <div className="bg-card border border-border w-full max-w-6xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/20">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                    <GitCompare className="w-5 h-5" />
+                  </span>
+                  <h2 className="text-base sm:text-lg font-bold text-foreground">
+                    Bảng So Sánh Đối Chiếu Đề Thi (Side-by-Side Visual Diff)
+                  </h2>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-primary/10 text-primary border border-primary/20">
+                    {selectedDiffItem.skill}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Đề thi: <strong className="text-foreground">{selectedDiffItem.title}</strong>
+                  {selectedDiffItem.diff.titleChanged && (
+                    <span className="text-amber-500 ml-2">
+                      (Đổi tiêu đề từ &quot;{selectedDiffItem.diff.existingTitle}&quot; → &quot;{selectedDiffItem.diff.incomingTitle}&quot;)
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setSelectedDiffItem(null)}
+                className="p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-colors cursor-pointer self-end sm:self-center"
+                title="Đóng cửa sổ so sánh (Esc)"
+              >
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <div className="px-5 py-3 border-b border-border bg-background flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-muted-foreground">Chỉ số đối chiếu:</span>
+                <span className="px-2.5 py-1 rounded-lg font-mono font-bold bg-muted text-foreground border border-border">
+                  Độ khớp: {selectedDiffItem.diff.similarityPercent}%
+                </span>
+                <span className="px-2.5 py-1 rounded-lg font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  Giữ nguyên: {selectedDiffItem.diff.unchangedQuestionsCount} câu
+                </span>
+                <span className="px-2.5 py-1 rounded-lg font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                  Thay đổi: {selectedDiffItem.diff.modifiedQuestionsCount} câu
+                </span>
+                {selectedDiffItem.diff.addedQuestionsCount > 0 && (
+                  <span className="px-2.5 py-1 rounded-lg font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                    Thêm mới: {selectedDiffItem.diff.addedQuestionsCount} câu
+                  </span>
+                )}
+                {selectedDiffItem.diff.removedQuestionsCount > 0 && (
+                  <span className="px-2.5 py-1 rounded-lg font-mono font-bold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                    Bị thiếu/xóa: {selectedDiffItem.diff.removedQuestionsCount} câu
+                  </span>
+                )}
+                {selectedDiffItem.diff.mediaChangedPartsCount > 0 && (
+                  <span className="px-2.5 py-1 rounded-lg font-mono font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                    Audio/Ảnh: {selectedDiffItem.diff.mediaChangedPartsCount} phần
+                  </span>
+                )}
+              </div>
+
+              {/* Bộ lọc xem */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setDiffFilter("ALL")}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                    diffFilter === "ALL"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted/50 hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  Tất Cả
+                </button>
+                <button
+                  onClick={() => setDiffFilter("CHANGED_ONLY")}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                    diffFilter === "CHANGED_ONLY"
+                      ? "bg-amber-500 text-white"
+                      : "bg-muted/50 hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  Chỉ Câu Thay Đổi
+                </button>
+                <button
+                  onClick={() => setDiffFilter("MEDIA_ONLY")}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                    diffFilter === "MEDIA_ONLY"
+                      ? "bg-purple-600 text-white"
+                      : "bg-muted/50 hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  Chỉ Đổi Audio/Ảnh
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body: Two-Column Side-by-Side Diff */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6">
+              {/* Git Diff Terminal-style Banner */}
+              <div className="p-3 rounded-xl bg-muted/60 border border-border font-mono text-[11px] text-muted-foreground flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-500 font-bold">$</span>
+                  <span className="text-foreground font-semibold">git diff --exam</span>
+                  <span className="text-red-500">a/[CSDL: "{selectedDiffItem.diff.existingTitle}"]</span>
+                  <span className="text-muted-foreground">...</span>
+                  <span className="text-emerald-500">b/[CRAWL: "{selectedDiffItem.diff.incomingTitle}"]</span>
+                </div>
+                <div className="flex items-center gap-3 text-[10px]">
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">+{selectedDiffItem.diff.addedQuestionsCount} insertions</span>
+                  <span className="text-red-600 dark:text-red-400 font-bold">-{selectedDiffItem.diff.removedQuestionsCount} deletions</span>
+                  <span className="text-amber-600 dark:text-amber-400 font-bold">~{selectedDiffItem.diff.modifiedQuestionsCount} changes</span>
+                </div>
+              </div>
+              {/* Cột tiêu đề mẫu */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sticky top-0 z-10 bg-card py-2 border-b border-border font-bold text-xs uppercase tracking-wider">
+                <div className="flex items-center justify-between text-muted-foreground bg-muted/40 p-2.5 rounded-xl border border-border">
+                  <span>CỘT TRÁI: Dữ Liệu Đang Có Trong CSDL (Hiện Tại)</span>
+                  <span className="font-mono text-[11px] font-normal">
+                    {selectedDiffItem.diff.existingDuration} phút • {selectedDiffItem.diff.totalExistingQuestions} câu
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-primary bg-primary/10 p-2.5 rounded-xl border border-primary/20">
+                  <span>CỘT PHẢI: Dữ Liệu Mới Kéo Về / Tải Lên (Sắp Nạp)</span>
+                  <span className="font-mono text-[11px] font-normal">
+                    {selectedDiffItem.diff.incomingDuration} phút • {selectedDiffItem.diff.totalIncomingQuestions} câu
+                  </span>
+                </div>
+              </div>
+
+              {/* Danh sách từng Part */}
+              {selectedDiffItem.diff.parts
+                .filter((part: any) => {
+                  if (diffFilter === "MEDIA_ONLY") return part.mediaChanged;
+                  if (diffFilter === "CHANGED_ONLY") {
+                    return (
+                      part.status !== "UNCHANGED" ||
+                      part.questions.some((q: any) => q.status !== "UNCHANGED")
+                    );
+                  }
+                  return true;
+                })
+                .map((part: any, pIdx: number) => {
+                  const filteredQuestions = part.questions.filter((q: any) => {
+                    if (diffFilter === "CHANGED_ONLY") return q.status !== "UNCHANGED";
+                    return true;
+                  });
+
+                  return (
+                    <div
+                      key={pIdx}
+                      className="border border-border rounded-2xl overflow-hidden bg-background shadow-xs space-y-3"
+                    >
+                      {/* Part Header */}
+                      <div className="p-3.5 bg-muted/30 border-b border-border flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-foreground">
+                            Part {part.part_number}: {part.title}
+                          </span>
+                        </div>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-md font-mono text-[10px] font-bold border ${
+                            part.status === "UNCHANGED"
+                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                              : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                          }`}
+                        >
+                          {part.status === "UNCHANGED" ? "ĐỒNG NHẤT 100%" : "CÓ SỰ THAY ĐỔI"}
+                        </span>
+                      </div>
+
+                      {/* Part Media Diff (nếu có audio, hình ảnh, bài đọc) */}
+                      {(part.existingMedia?.audio_url ||
+                        part.incomingMedia?.audio_url ||
+                        part.existingMedia?.image_url ||
+                        part.incomingMedia?.image_url ||
+                        part.existingMedia?.passage_text ||
+                        part.incomingMedia?.passage_text) && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 px-4 py-2 text-xs border-b border-border/60">
+                          {/* Cột trái: Media hiện tại */}
+                          <div className="p-3 rounded-xl bg-muted/20 border border-border/80 space-y-1.5">
+                            <div className="text-[11px] font-bold text-muted-foreground uppercase">
+                              Tài nguyên Media CSDL
+                            </div>
+                            {part.existingMedia?.audio_url ? (
+                              <div className="text-muted-foreground truncate">
+                                🎵 Audio: <span className="font-mono text-foreground">{part.existingMedia.audio_url}</span>
+                              </div>
+                            ) : (
+                              <div className="text-muted-foreground italic">Không có Audio</div>
+                            )}
+                            {part.existingMedia?.image_url ? (
+                              <div className="text-muted-foreground truncate">
+                                🖼️ Ảnh: <span className="font-mono text-foreground">{part.existingMedia.image_url}</span>
+                              </div>
+                            ) : null}
+                          </div>
+
+                          {/* Cột phải: Media mới */}
+                          <div
+                            className={`p-3 rounded-xl border space-y-1.5 ${
+                              part.mediaChanged
+                                ? "bg-amber-500/10 border-amber-500/30"
+                                : "bg-muted/20 border-border/80"
+                            }`}
+                          >
+                            <div className="text-[11px] font-bold text-primary uppercase flex items-center justify-between">
+                              <span>Tài nguyên Media Mới</span>
+                              {part.mediaChanged && (
+                                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono font-bold">
+                                  [ĐÃ ĐỔI MEDIA]
+                                </span>
+                              )}
+                            </div>
+                            {part.incomingMedia?.audio_url ? (
+                              <div className="text-muted-foreground truncate">
+                                🎵 Audio: <span className="font-mono text-foreground">{part.incomingMedia.audio_url}</span>
+                              </div>
+                            ) : (
+                              <div className="text-muted-foreground italic">Không có Audio</div>
+                            )}
+                            {part.incomingMedia?.image_url ? (
+                              <div className="text-muted-foreground truncate">
+                                🖼️ Ảnh: <span className="font-mono text-foreground">{part.incomingMedia.image_url}</span>
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Danh sách câu hỏi đối chiếu 2 cột */}
+                      <div className="p-4 space-y-3">
+                        {filteredQuestions.length === 0 ? (
+                          <div className="text-center py-4 text-xs text-muted-foreground italic">
+                            Không có câu hỏi nào thay đổi trong phần thi này.
+                          </div>
+                        ) : (
+                          filteredQuestions.map((q: any, qIdx: number) => {
+                            const isMod = q.status === "MODIFIED";
+                            const isAdd = q.status === "ADDED";
+                            const isRem = q.status === "REMOVED";
+
+                            return (
+                              <div
+                                key={qIdx}
+                                className={`grid grid-cols-1 lg:grid-cols-2 gap-4 p-3 rounded-xl border transition-colors ${
+                                  isMod
+                                    ? "bg-amber-500/10 border-amber-500/40"
+                                    : isAdd
+                                    ? "bg-blue-500/10 border-blue-500/40"
+                                    : isRem
+                                    ? "bg-red-500/10 border-red-500/40"
+                                    : "bg-muted/10 border-border/60"
+                                }`}
+                              >
+                                {/* Cột trái: Câu hỏi trong CSDL */}
+                                <div className="space-y-1.5 text-xs">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="font-bold font-mono text-foreground">
+                                      Câu {q.question_number} (CSDL Hiện Tại)
+                                    </span>
+                                    {q.existing ? (
+                                      <span className="font-mono text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted">
+                                        {q.existing.question_type} • {q.existing.max_score}đ
+                                      </span>
+                                    ) : null}
+                                  </div>
+
+                                  {q.existing ? (
+                                    <>
+                                      <div className="text-foreground font-medium">
+                                        {q.existing.prompt}
+                                      </div>
+                                      {Array.isArray(q.existing.options) && q.existing.options.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5 pt-1">
+                                          {q.existing.options.map((opt: any, oIdx: number) => {
+                                            const optText = typeof opt === "string" ? opt : opt.text || opt.label;
+                                            const isCorrect =
+                                              String(optText || "").trim() === String(q.existing.correct_answer || "").trim() ||
+                                              String(opt.key || "").trim() === String(q.existing.correct_answer || "").trim();
+
+                                            return (
+                                              <span
+                                                key={oIdx}
+                                                className={`px-2 py-0.5 rounded text-[11px] ${
+                                                  isCorrect
+                                                    ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/30"
+                                                    : "bg-muted text-muted-foreground"
+                                                }`}
+                                              >
+                                                {optText}
+                                              </span>
+                                            );
+                                          })}
+                                        </div>
+                                      )}
+                                      {q.existing.correct_answer && (
+                                        <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
+                                          Đáp án đúng: <strong>{q.existing.correct_answer}</strong>
+                                        </div>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <div className="text-muted-foreground italic text-xs py-2">
+                                      — Câu hỏi này không tồn tại trong CSDL cũ (Mới được thêm).
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Cột phải: Câu hỏi mới kéo về */}
+                                <div className="space-y-1.5 text-xs">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="font-bold font-mono text-primary flex items-center gap-1.5">
+                                      <span>Câu {q.question_number} (Dữ Liệu Mới)</span>
+                                      {isMod && (
+                                        <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                                          ĐÃ ĐỔI: {q.changedFields?.join(", ")}
+                                        </span>
+                                      )}
+                                      {isAdd && (
+                                        <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-500/20 text-blue-700 dark:text-blue-300">
+                                          MỚI THÊM
+                                        </span>
+                                      )}
+                                    </span>
+                                    {q.incoming ? (
+                                      <span className="font-mono text-[10px] text-primary px-1.5 py-0.5 rounded bg-primary/10">
+                                        {q.incoming.question_type} • {q.incoming.max_score}đ
+                                      </span>
+                                    ) : null}
+                                  </div>
+
+                                  {q.incoming ? (
+                                    <>
+                                      <div
+                                        className={`font-medium ${
+                                          q.changedFields?.includes("prompt")
+                                            ? "text-amber-700 dark:text-amber-300 font-bold bg-amber-500/10 p-1 rounded"
+                                            : "text-foreground"
+                                        }`}
+                                      >
+                                        {q.incoming.prompt}
+                                      </div>
+                                      {Array.isArray(q.incoming.options) && q.incoming.options.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5 pt-1">
+                                          {q.incoming.options.map((opt: any, oIdx: number) => {
+                                            const optText = typeof opt === "string" ? opt : opt.text || opt.label;
+                                            const isCorrect =
+                                              String(optText || "").trim() === String(q.incoming.correct_answer || "").trim() ||
+                                              String(opt.key || "").trim() === String(q.incoming.correct_answer || "").trim();
+
+                                            return (
+                                              <span
+                                                key={oIdx}
+                                                className={`px-2 py-0.5 rounded text-[11px] ${
+                                                  isCorrect
+                                                    ? "bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/40"
+                                                    : "bg-muted text-muted-foreground"
+                                                }`}
+                                              >
+                                                {optText}
+                                              </span>
+                                            );
+                                          })}
+                                        </div>
+                                      )}
+                                      {q.incoming.correct_answer && (
+                                        <div
+                                          className={`text-[11px] font-mono ${
+                                            q.changedFields?.includes("correct_answer")
+                                              ? "text-amber-700 dark:text-amber-300 font-bold bg-amber-500/20 px-1.5 py-0.5 rounded inline-block"
+                                              : "text-emerald-600 dark:text-emerald-400"
+                                          }`}
+                                        >
+                                          Đáp án đúng: <strong>{q.incoming.correct_answer}</strong>
+                                        </div>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <div className="text-red-500 italic text-xs py-2">
+                                      — Câu hỏi này đã bị lược bỏ trong tệp dữ liệu mới.
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* Modal Footer với 3 Lựa Chọn Quyết Định (Git Merge Conflict Resolution) */}
+            <div className="p-4 border-t border-border flex flex-col gap-3 bg-muted/20 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-muted-foreground">
+                <div>
+                  {selectedDiffItem.submissionsPreserved > 0 ? (
+                    <span className="text-purple-600 dark:text-purple-400 font-semibold flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 shrink-0" />
+                      Cơ chế bảo vệ: Đã có {selectedDiffItem.submissionsPreserved} học viên làm bài thi này. Chọn "Ghi đè" sẽ Safe In-Place Update (bảo toàn 100% ID và điểm thi).
+                    </span>
+                  ) : (
+                    <span className="text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 shrink-0" />
+                      Cơ chế cập nhật: Đề này chưa có lượt thi nào. Chọn "Ghi đè" sẽ Deep Replace toàn diện dữ liệu mới nhất.
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-foreground shrink-0 text-[11px]">Nhãn Biến Thể:</span>
+                  <input
+                    type="text"
+                    value={variantTagInput}
+                    onChange={(e) => setVariantTagInput(e.target.value)}
+                    placeholder="VD: Biến thể Nam nói trước (MWBW)"
+                    className="px-2.5 py-1 text-xs rounded-lg border border-border bg-background text-foreground w-60 focus:outline-none focus:ring-1 focus:ring-primary font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-border/50">
+                <button
+                  onClick={() => setSelectedDiffItem(null)}
+                  disabled={resolvingAction}
+                  className="px-3.5 py-2 rounded-xl text-xs font-semibold border border-border hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+                >
+                  Đóng (Esc)
+                </button>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Nút 3: Bỏ qua */}
+                  <button
+                    onClick={() => handleResolveExam("SKIP")}
+                    disabled={resolvingAction}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer disabled:opacity-50"
+                    title="Bỏ qua đề này, không lưu hay tác động gì vào Database"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    <span>3. Bỏ Qua Đề Này</span>
+                  </button>
+
+                  {/* Nút 2: Tạo thành Biến Thể Liên Kết */}
+                  <button
+                    onClick={() => handleResolveExam("CREATE_VARIANT")}
+                    disabled={resolvingAction}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                    title="Tạo đề thi mới độc lập nhưng liên kết là Biến thể đề thi của đề gốc (Khuyên dùng cho đề tủ thi thật xoay vòng giọng đọc/tranh)"
+                  >
+                    <GitCompare className="w-3.5 h-3.5 text-purple-500" />
+                    <span>2. Tạo Thành Biến Thể Liên Kết</span>
+                  </button>
+
+                  {/* Nút 1: Ghi đè đề cũ */}
+                  <button
+                    onClick={() => handleResolveExam("OVERWRITE")}
+                    disabled={resolvingAction}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                    title="Cập nhật hoặc ghi đè nội dung mới lên đề thi cũ trong CSDL"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${resolvingAction ? "animate-spin" : ""}`} />
+                    <span>1. Ghi Đè Đề Cũ (Overwrite)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
