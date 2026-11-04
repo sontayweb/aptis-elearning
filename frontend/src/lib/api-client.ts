@@ -218,6 +218,58 @@ class ApiClient {
       }),
   };
 
+  marathon = {
+    getCatalog: (skill: string, part: number) =>
+      this.request(`/marathon/catalog?skill=${encodeURIComponent(skill)}&part=${part}`),
+
+    getBatch: (skill: string, part: number, indices: number[]) =>
+      this.request(
+        `/marathon/batch?skill=${encodeURIComponent(skill)}&part=${part}&indices=${indices.join(',')}`
+      ),
+
+    getProgress: (skill: string, part: number) =>
+      this.request(`/marathon/progress?skill=${encodeURIComponent(skill)}&part=${part}`),
+
+    autosave: (data: {
+      skill: string;
+      partNumber: number;
+      currentExamIndex: number;
+      currentExamId?: string;
+      currentDraftAnswers?: Record<string, any>;
+      currentDraftOrders?: Record<string, any>;
+      additionalTimeSeconds?: number;
+    }) =>
+      this.request('/marathon/progress/autosave', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
+    completeExam: (data: {
+      skill: string;
+      partNumber: number;
+      examId: string;
+      examIndex: number;
+      answers: Record<string, string>;
+      orders?: Record<string, string[]>;
+      timeSpentSeconds?: number;
+    }) =>
+      this.request('/marathon/progress/complete-exam', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
+    resetProgress: (data: {
+      skill: string;
+      partNumber: number;
+      scope?: 'EXAM' | 'ALL';
+      examId?: string;
+    }) =>
+      this.request('/marathon/progress/reset', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+  };
+
   // ==========================================
   // 3. EXAM SUBMISSIONS & ROOM LIFECYCLE
   // ==========================================

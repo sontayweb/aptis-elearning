@@ -87,6 +87,51 @@ function ListeningMarathonContent() {
   // Full DB Marathon items
   const [dbItems, setDbItems] = useState<MarathonPartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [roomProgress, setRoomProgress] = useState<{
+    hasProgress: boolean;
+    currentExamIndex: number;
+    totalExams: number;
+    percent: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const partNum = parseInt(currentPart, 10) || 1;
+        const res = await api.marathon.getProgress("LISTENING", partNum);
+        if (res.success && res.data?.hasProgress && res.data.progress) {
+          const p = res.data.progress;
+          const total = p.totalExams || 50;
+          const current = p.currentExamIndex || 0;
+          const pct = total > 0 ? Math.round(((current + 1) / total) * 100) : 0;
+          setRoomProgress({
+            hasProgress: true,
+            currentExamIndex: current,
+            totalExams: total,
+            percent: pct,
+          });
+        } else {
+          const local = localStorage.getItem(`aptis_marathon_draft_LISTENING_p${partNum}`);
+          if (local) {
+            const parsed = JSON.parse(local);
+            if (parsed.currentIndex !== undefined) {
+              setRoomProgress({
+                hasProgress: true,
+                currentExamIndex: parsed.currentIndex,
+                totalExams: 50,
+                percent: Math.round(((parsed.currentIndex + 1) / 50) * 100),
+              });
+              return;
+            }
+          }
+          setRoomProgress(null);
+        }
+      } catch {
+        setRoomProgress(null);
+      }
+    };
+    fetchProgress();
+  }, [currentPart]);
 
   // Audio player state
   const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
@@ -358,6 +403,52 @@ function ListeningMarathonContent() {
                 Full {p4Items.length} bài độc thoại dài
               </p>
             </button>
+          </div>
+
+          {/* EXAM ROOM MARATHON HERO BANNER */}
+          <div className="mb-8 p-5 sm:p-6 rounded-3xl border border-primary/30 bg-gradient-to-r from-primary/15 via-primary/5 to-card relative overflow-hidden shadow-xs">
+            <div className="absolute -right-8 -top-8 w-60 h-60 bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1.5 max-w-2xl">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-extrabold text-[10px] uppercase tracking-wider shadow-xs">
+                    <Sparkles className="w-3 h-3" />
+                    Chế độ Phòng Thi Chuẩn Aptis
+                  </div>
+                  {roomProgress?.hasProgress && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-extrabold text-[10px]">
+                      ⚡ Đang làm dở: Đề #{roomProgress.currentExamIndex + 1} ({roomProgress.percent}%)
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-base sm:text-xl font-heading font-extrabold text-foreground">
+                  Luyện Tập Liên Hoàn Trong Phòng Thi — Listening Part {currentPart}
+                </h2>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Luyện nghe Audio tập trung chuẩn quy chế thi Aptis ESOL, không thanh cuộn xao nhãng, ma trận toàn bộ đề và tự động ghi nhớ chính xác tiến trình dở dang trên đám mây.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+                {roomProgress?.hasProgress ? (
+                  <Link
+                    href={`/listening/marathon/room?part=${currentPart}`}
+                    className="h-11 px-5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                  >
+                    <Play className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+                    <span>Tiếp Tục Đề #{roomProgress.currentExamIndex + 1}</span>
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/listening/marathon/room?part=${currentPart}`}
+                    className="h-11 px-5 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                  >
+                    <Play className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+                    <span>Vào Luyện Trong Phòng Thi</span>
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
 
           {loading ? (

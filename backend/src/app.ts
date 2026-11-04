@@ -22,6 +22,7 @@ import settingsRoutes from './modules/settings/settings.routes';
 import ingestionRoutes from './modules/ingestion/ingestion.routes';
 import backupRoutes from './modules/backup/backup.routes';
 import dataSyncRoutes from './modules/data-sync/data-sync.routes';
+import marathonRoutes from './modules/marathon/marathon.routes';
 import { errorHandler } from './middlewares/error.handler';
 
 const app = express();
@@ -60,6 +61,7 @@ app.get('/api/health', (req, res) => {
 // Module Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/exams', examRoutes);
+app.use('/api/marathon', marathonRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/dictation', dictationRoutes);

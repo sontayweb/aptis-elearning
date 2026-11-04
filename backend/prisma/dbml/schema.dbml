@@ -31,6 +31,7 @@ Table User {
   notifications notifications [not null]
   course_leads CourseLeadRegistration [not null]
   promotion_redemptions PromotionRedemption [not null]
+  marathon_progress marathon_progress [not null]
 }
 
 Table Exam {
@@ -474,6 +475,32 @@ Table system_settings {
   created_at DateTime [default: `now()`, not null]
 }
 
+Table marathon_progress {
+  id String [pk]
+  user_id String [not null]
+  skill ExamSkill [not null]
+  part_number Int [not null]
+  current_exam_id String
+  current_exam_index Int [not null, default: 0]
+  total_exams Int [not null, default: 0]
+  completed_exams_count Int [not null, default: 0]
+  total_correct_items Int [not null, default: 0]
+  total_answered_items Int [not null, default: 0]
+  total_time_seconds Int [not null, default: 0]
+  status String [not null, default: 'IN_PROGRESS']
+  completed_data Json [not null, default: '{}']
+  current_draft_answers Json [not null, default: '{}']
+  current_draft_orders Json [not null, default: '{}']
+  last_active_at DateTime [default: `now()`, not null]
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  user User [not null]
+
+  indexes {
+    (user_id, skill, part_number) [unique]
+  }
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
@@ -665,3 +692,5 @@ Ref: CourseLeadRegistration.course_id > Course.id [delete: Cascade]
 Ref: CourseLeadRegistration.batch_id > CourseBatch.id [delete: Set Null]
 
 Ref: CourseLeadRegistration.user_id > User.id [delete: Set Null]
+
+Ref: marathon_progress.user_id > User.id [delete: Cascade]

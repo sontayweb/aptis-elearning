@@ -154,6 +154,7 @@ model User {
   notifications   Notification[]
   course_leads    CourseLeadRegistration[]
   promotion_redemptions PromotionRedemption[]
+  marathon_progress     MarathonProgress[]
 
   @@index([email])
   @@index([role])
@@ -754,6 +755,44 @@ model SystemSetting {
   @@index([category, is_public])
   @@map("system_settings")
 }
+
+// ==========================================
+// 15. MARATHON PROGRESS & EXAM ROOM SESSIONS
+// ==========================================
+
+model MarathonProgress {
+  id                    String      @id @default(uuid())
+  user_id               String
+  skill                 ExamSkill   // READING, LISTENING, GRAMMAR_VOCABULARY, SPEAKING, WRITING
+  part_number           Int         // 1, 2, 3, 4
+  
+  current_exam_id       String?     // ID de dang lam do
+  current_exam_index    Int         @default(0)
+  total_exams           Int         @default(0)
+  completed_exams_count Int         @default(0)
+  
+  total_correct_items   Int         @default(0)
+  total_answered_items  Int         @default(0)
+  total_time_seconds    Int         @default(0)
+  
+  status                String      @default("IN_PROGRESS") // IN_PROGRESS, PAUSED, COMPLETED
+  
+  completed_data        Json        @default("{}") // { [examId]: { bestScore, maxScore, correctCount, totalQuestions, completedAt } }
+  current_draft_answers Json        @default("{}") // { [questionId]: selectedOption }
+  current_draft_orders  Json        @default("{}") // { [storyId]: string[] } cho Part 2 Cohesion
+  
+  last_active_at        DateTime    @default(now())
+  created_at            DateTime    @default(now())
+  updated_at            DateTime    @updatedAt
+
+  user                  User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, skill, part_number], name: "user_skill_part_unique")
+  @@index([user_id, status])
+  @@index([skill, part_number])
+  @@map("marathon_progress")
+}
+
 
 
 
