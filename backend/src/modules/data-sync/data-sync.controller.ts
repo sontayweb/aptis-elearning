@@ -72,6 +72,36 @@ export class DataSyncController {
    * POST /api/admin/data-sync/sync-batch
    * Đồng bộ hàng loạt đề thi qua Data Contract & Deep Upsert Engine
    */
+
+  /**
+   * POST /api/admin/data-sync/resolve-exam
+   * Xử lý quyết định của Admin từ Modal Visual Diff: Ghi đè, Tạo biến thể, hoặc Bỏ qua
+   */
+  async resolveExamAction(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { action, incomingExam, existingExamId, variantTag } = req.body || {};
+      if (!action || !incomingExam) {
+        res.status(400).json({ success: false, message: 'Thiếu tham số action hoặc incomingExam.' });
+        return;
+      }
+
+      const result = await dataSyncService.resolveExamAction({
+        action,
+        incomingExam,
+        existingExamId,
+        variantTag,
+      });
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async syncBatch(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { snapshotId, exams, defaultSource, dryRun = false, limit } = req.body || {};

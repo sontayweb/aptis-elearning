@@ -179,7 +179,8 @@ class ApiClient {
 
     getById: (id: string) => this.request(`/exams/${id}`),
 
-    getQuestions: (id: string) => this.request(`/exams/${id}/questions`),
+    getQuestions: (id: string, options?: { mode?: string }) =>
+      this.request(`/exams/${id}/questions${options?.mode ? `?mode=${encodeURIComponent(options.mode)}` : ''}`),
 
     getMarathon: (skill: string) =>
       this.request(`/exams/marathon?skill=${encodeURIComponent(skill)}`),
@@ -1033,6 +1034,16 @@ class ApiClient {
         limit?: number;
       }) =>
         this.request<any>('/admin/data-sync/sync-batch', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        }),
+      resolveExam: (body: {
+        action: 'OVERWRITE' | 'CREATE_VARIANT' | 'SKIP';
+        incomingExam: any;
+        existingExamId?: string;
+        variantTag?: string;
+      }) =>
+        this.request<any>('/admin/data-sync/resolve-exam', {
           method: 'POST',
           body: JSON.stringify(body),
         }),

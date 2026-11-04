@@ -2152,6 +2152,124 @@
 
 ---
 
+## 🔄 PHẦN X: KIẾN TRÚC THU NẠP, CHẨN ĐOÁN LỖI TRỰC QUAN & CHỐNG TRÙNG LẶP ĐỀ THI (DATA INGESTION, VISUAL PREVIEW & DEDUPLICATION ENGINE)
+
+### 1. Nguyên Tắc Bất Biến & Kỷ Luật Phát Triển (Invariants & Guardrails)
+*Mục đích: Thiết lập bộ khung kỷ luật sắt đá ngăn chặn hoàn toàn việc code bị bỏ sót, phỏng đoán, hallucinate hoặc phá vỡ cấu trúc dữ liệu thi cử hiện hữu.*
+
+- [x] 🔴 **[P0 - Core Scope]** **Chỉ chấp nhận đề thi APTIS ESOL:**
+  - 100% dữ liệu nạp vào thuộc 6 kỹ năng chuẩn khảo thí: `READING`, `LISTENING`, `WRITING`, `SPEAKING`, `GRAMMAR_VOCABULARY`, `FULL_TEST`.
+  - Bộ lọc tự động loại bỏ triệt để các nguồn đề TOEIC, IELTS, VSTEP không đúng trọng tâm.
+- [x] 🔴 **[P0 - Data Staging]** **Nguyên tắc "Staging JSON Trung Gian":**
+  - Mọi dữ liệu crawl từ bên ngoài (`aptiskytich`, `aptisacademy`, `aptistest`,...) bắt buộc lưu vào thư mục `tools/data/<source>/` dưới dạng tệp JSON độc lập.
+  - Tuyệt đối không cho phép script crawler ghi trần trực tiếp vào Database khi chưa qua cổng Thẩm Định Dữ Liệu (Data Contract Gate).
+- [x] 🔴 **[P0 - Zero Submission Loss]** **Bảo vệ toàn vẹn lịch sử nộp bài của học viên:**
+  - Nếu đề thi **đã có học viên nộp bài** (`submissionsCount > 0`): Tuyệt đối **KHÔNG ĐƯỢC XÓA** `ExamPart` hoặc `Question` (tránh phá vỡ Foreign Key của `ExamSubmission` và `SubmissionAnswer`).
+  - Hệ thống bắt buộc sử dụng cơ chế **Safe In-Place Update** (giữ nguyên ID câu hỏi, chỉ cập nhật đè text đề, audio, ảnh và options).
+  - Nếu đề thi **chưa có bài nộp nào** (`submissionsCount === 0`): Cho phép thực hiện **Deep Replace** trong một PostgreSQL Transaction để nạp dữ liệu sạch sẽ, tinh gọn nhất.
+- [x] 🔴 **[P0 - No Silent Overwrite / No Duplicate]** **Minh bạch trực quan phong cách Git:**
+  - Đề trùng 100%: Tự động làm giàu nội dung, không nhân bản sinh thêm đề rác.
+  - Đề gần trùng (70% - 94%): Cảnh báo rõ ràng trên giao diện, hiển thị so sánh đối chiếu phong cách Git Diff và trao quyền quyết định 1 chạm cho Admin (Ghi đè, Tạo biến thể liên kết, hoặc Bỏ qua).
+
+---
+
+### 2. Chi Tiết Triển Khai 5 Tầng Kiến Trúc Phễu Dữ Liệu
+
+```mermaid
+flowchart TD
+    subgraph L1["TẦNG 1: CRAWLER & SESSION STAGING (tools/data/)"]
+        AuthScript["Auto-Login Script / Cookie Session"] --> StagingFiles["all_exam_questions.json & normalized_exams.json"]
+    end
+
+    subgraph L2["TẦNG 2: DATA CONTRACT & STANDARDIZATION GATE"]
+        StagingFiles --> TitleNorm["normalizeExamTitle ('Đề 1' -> 'Đề 01')"]
+        TitleNorm --> TypeMap["mapQuestionType (Đa hình Speaking/Writing/Reading)"]
+        TypeMap --> ContractVal["validateExam (Parts >= 1, Questions >= 1, Options >= 2)"]
+    end
+
+    subgraph L3["TẦNG 3: VISUAL PREVIEW & CHẨN ĐOÁN (UI)"]
+        ContractVal --> DryRunTest{"Dry-Run (Kiểm tra thử)"}
+        DryRunTest --> AnomalyBox["4 Thẻ Chẩn Đoán: Đề rỗng, Đề trùng, Lệch type, Thiếu option"]
+        DryRunTest --> AuditSuite["17 Part Suites Test Live API Phòng Thi"]
+    end
+
+    subgraph L4["TẦNG 4: GIT-STYLE SIDE-BY-SIDE DIFF & RESOLUTION"]
+        DryRunTest --> DiffEngine["computeExamDiff (Tính toán độ khớp %)"]
+        DiffEngine --> GitModal["Modal So Sánh 2 Cột Phong Cách Git Diff"]
+        GitModal --> Act1["1. Ghi Đè (Overwrite / Safe In-Place)"]
+        GitModal --> Act2["2. Tạo Biến Thể Liên Kết (Linked Variant)"]
+        GitModal --> Act3["3. Bỏ Qua (Skip / Discard)"]
+    end
+
+    subgraph L5["TẦNG 5: POSTGRESQL DATABASE & PRISMA"]
+        Act1 --> PgTx["PostgreSQL ACID Transaction"]
+        Act2 --> PgTx
+        PgTx --> MainDb[("Database: Exam, ExamPart, Question")]
+    end
+```
+
+#### Tầng 1: Crawler & Session Staging
+- [x] 🔴 **[P0 - Crawler Architecture]** Triển khai crawler nguồn tách biệt:
+  - `tools/sources/aptiskytich/crawler.js`: Cơ chế tự động đăng nhập API `getProToken()` qua Supabase Auth, xuất `session.json` và kéo 893 bộ đề.
+  - `tools/sources/aptisacademy/crawler.js`: Kết nối Chrome DevTools Protocol (CDP port 9223) kéo đề có tài khoản Pro/VIP.
+  - `tools/sources/aptistest/`: Xác thực qua API `/api/auth/login-cookie`, lưu cookie phiên `AptisWeb.Auth`, bóc tách 9 đề thi Aptis thật mới nhất (Speaking 28/10, Listening 25/10 Cầu Giấy MWBW, Writing Art Club,...), chuẩn hóa xuất tệp Staging JSON `tools/data/aptistest/normalized_exams.json` và tích hợp làm Snapshot nguồn thứ 3 trên giao diện Admin.
+
+#### Tầng 2: Data Contract & Chuẩn Hóa Khảo Thí
+- [x] 🔴 **[P0 - Normalization Gate]** Chuẩn hóa tiêu đề đề thi:
+  - Khử lặp tiền tố: `"Đề 42 - Đề 33 (Đề mới)"` $ightarrow$ `"Đề 42 (Đề mới)"`.
+  - Khử lặp số đề: `"Đề 22 - Đề 3"` $ightarrow$ `"Đề 22"`.
+  - Thống nhất định dạng số: `"Đề 1"` $ightarrow$ `"Đề 01"`, `"Test 5"` $ightarrow$ `"Test 05"`.
+- [x] 🔴 **[P0 - British Council Type Mapping]** Ánh xạ QuestionType đa hình chuẩn xác:
+  - Speaking: 100% câu hỏi là `SPEAKING_AUDIO`.
+  - Writing: Part 1 & Part 3 là `SHORT_TEXT`; Part 2 & Part 4 là `ESSAY`.
+  - Reading: Part 1 là `GAP_FILL`; Part 2 & Part 3 là `SENTENCE_ORDER`; Part 4 là `MATCHING`.
+  - Listening: Part 1 là `MULTIPLE_CHOICE`; Part 2 & Part 3 là `MATCHING`.
+- [x] 🔴 **[P0 - Data Contract Validation]** Thẩm định cấu trúc nghiêm ngặt qua `validateExam()`:
+  - Từ chối đề không có title hoặc skill không hợp lệ.
+  - Bắt buộc mỗi Part có ít nhất 1 câu hỏi (`questions.length > 0`).
+  - Câu hỏi `GAP_FILL` và `MULTIPLE_CHOICE` bắt buộc có danh sách options $ge 2$ phần tử.
+  - Điểm số `max_score > 0` (Reading P1: 2đ/câu; Reading P2/P3: 5đ/câu; Trắc nghiệm khác: 1đ).
+
+#### Tầng 3: Visual Preview & Chẩn Đoán Lỗi Trực Quan (Dry-Run Mode)
+- [x] 🔴 **[P0 - Admin UI Dry-Run]** Xây dựng chế độ "Kiểm Tra Thử (Chưa Lưu)" tại `/admin/data-sync`:
+  - Hỗ trợ tải tệp JSON từ máy tính (hỗ trợ file dung lượng lớn tới 30MB) hoặc chọn Snapshot máy chủ.
+  - Chạy toàn bộ dữ liệu qua bộ kiểm định mà không lưu một byte nào vào CSDL.
+  - Bảng kết quả hiển thị chi tiết: Tên đề, kỹ năng, số câu, danh sách lỗi/cảnh báo, và badge trạng thái.
+- [x] 🔴 **[P0 - Health Check Dashboard]** Dashboard chẩn đoán 4 chỉ tiêu sức khỏe kho đề:
+  - Đề / Phần thi trống (`emptyExamsCount`).
+  - Đề thi trùng tên cần gộp (`duplicateGroupsCount`).
+  - Câu hỏi chưa đúng dạng bài (`typeMismatchCount`).
+  - Câu trắc nghiệm thiếu lựa chọn (`brokenOptionsCount`).
+  - Nút 1-Chạm **"Tự Động Sửa Lỗi & Gộp Đề"** (Auto-Standardize / Self-Heal) sửa lỗi trực tiếp trên CSDL.
+- [x] 🔴 **[P0 - Live API Audit Suite]** Bộ kiểm thử tự động 17 Suite từng Part qua `ExamService.getExamQuestions()`:
+  - Kiểm tra giao diện phòng thi thực tế của học viên đối với 5 kỹ năng.
+  - Xuất file báo cáo Markdown chi tiết `BAO_CAO_KIEM_TRA_PHONG_THI_*.md`.
+
+#### Tầng 4: Bộ Đối Chiếu Git Diff & Quyết Định Xử Lý Đề Gần Trùng (70% - 94%)
+- [x] 🔴 **[P0 - Git Diff Engine]** Thuật toán `computeExamDiff` đối chiếu chi tiết:
+  - Tính toán độ khớp nội dung (`similarityPercent`).
+  - So sánh tiêu đề, thời lượng thi, media (`audio_url`, `image_url`, `passage_text`).
+  - Phân loại trạng thái từng câu: `UNCHANGED` (xanh lá), `MODIFIED` (vàng), `ADDED` (xanh dương), `REMOVED` (đỏ).
+- [x] 🔴 **[P0 - Git Terminal-style Modal]** Giao diện Modal Side-by-Side Visual Diff:
+  - Terminal Banner: `git diff --exam a/[CSDL] ... b/[CRAWL]` kèm chip `+insertions`, `-deletions`, `~changes`.
+  - Cột Trái (Dữ liệu CSDL hiện tại) vs Cột Phải (Dữ liệu mới kéo về).
+  - Highlight rõ từ khóa, file audio và đáp án bị thay đổi.
+  - Bộ lọc 3 chế độ: `Tất Cả`, `Chỉ Câu Thay Đổi`, `Chỉ Đổi Audio/Ảnh`.
+- [x] 🔴 **[P0 - 3 Merge Decision Actions]** Bộ 3 nút quyết định 1 chạm chân Modal:
+  - **Nút 1: Ghi đè đề cũ (`OVERWRITE`):** Tự động phân nhánh Deep Replace (0 submissions) hoặc Safe In-Place Update (> 0 submissions).
+  - **Nút 2: Tạo thành Biến Thể Liên Kết (`CREATE_VARIANT`):** Cho phép nhập nhãn biến thể (ví dụ: `Biến thể Nam nói trước (MWBW)`) và tạo đề mới liên kết với đề gốc.
+  - **Nút 3: Bỏ qua đề này (`SKIP`):** Đóng modal, không ghi vào CSDL, không làm xáo trộn kho đề.
+
+#### Tầng 5: Database Hardening (PostgreSQL & Prisma)
+- [x] 🔴 **[P0 - Transaction Consistency]** Mọi thao tác Upsert và Auto-Standardize đều chạy trong Prisma Transaction (`prisma.$transaction`), cam kết chuẩn ACID.
+- [x] 🔴 **[P0 - Variant Self-Relation]** Bổ sung trường quan hệ tự liên kết biến thể (`parent_exam_id`, `variant_note`, `parent_exam`, `variants`) trong `schema.prisma` và sinh lại Prisma Client thành công; khi chọn "Tạo thành Biến Thể Liên Kết", đề mới được gắn chặt chẽ vào ID đề gốc.
+- [x] 🟡 **[P1 - DB Unique Constraints]** Bổ sung Partial Unique Index ở tầng PostgreSQL:
+  - Đã thêm `external_id` vào `Exam` trong `schema.prisma`, ánh xạ đầy đủ ở `data-sync.service.ts` và sinh Prisma Client thành công.
+  - Tệp SQL Migration: `backend/prisma/migrations/add_partial_unique_indexes.sql`.
+  - Script thực thi tự động: `npm run db:apply-indexes` (`backend/scripts/apply-unique-indexes.ts`) sẵn sàng áp dụng trực tiếp vào Database.
+
+---
+
 ## 🚀 KẾ HOẠCH TRIỂN KHAI THEO GIAI ĐOẠN (IMPLEMENTATION ROADMAP)
 
 
@@ -2336,7 +2454,9 @@ flowchart TD
 
 
 
-| 9 | **Chuẩn hóa Đáp án CSDL (UUID & Index)** | Khắc phục lỗi đáp án không lên và bị chấm 0 điểm. **Quyết định kiến trúc của User:** Tuyệt đối KHÔNG dùng fallback ngầm ở Backend / Frontend (tránh che giấu bug và hardcode). Toàn bộ dữ liệu được chuẩn hóa triệt để từ tầng Ingestion Pipeline và Database. | **Hoàn thành:** 100% sạch UUID (0 câu), chuẩn hóa 4,025 câu trắc nghiệm, dọn 2,837 câu '0' tự luận, cập nhật lại 62 câu làm đúng và 90 bài nộp của học viên. Backend & Frontend giữ nguyên logic so sánh chuỗi nguyên bản sạch sẽ. | `[x] Đã hoàn thành` |
+| 9 | **Chuẩn hóa Đáp án CSDL (UUID & Index)** | Khắc phục lỗi đáp án không lên và bị chấm 0 điểm. **Quyết định kiến trúc của User:** Tuyệt đối KHÔNG dùng fallback ngầm ở Backend / Frontend (tránh che giấu bug và hardcode). Toàn bộ dữ liệu được chuẩn hóa triệt để từ tầng Ingestion Pipeline và Database. | **Hoàn thành:** 100% sạch UUID (0 câu), chuẩn hóa 4,025 câu trắc nghiệm, dọn 2,837 câu '0' tự luận, cập nhật lại 62 câu làm đúng và 90 bài nộp của học viên. Backend & Frontend giữ nguyên logic so sánh chuỗi nguyên bản sạch sẽ. | `[x] Đã hoàn thành` |
+| 10 | **Hệ thống Thu Nạp, Visual Diff & Chống Trùng Lặp Đề Thi** | Xây dựng cơ chế chẩn đoán lỗi trực quan trước khi nạp (Preview / Dry-Run), chống duplicate 100% bảo vệ lịch sử làm bài của học viên, và xử lý đề gần trùng (70% - 94% biến thể thi thật) theo phong cách Git Diff 3 nút bấm (Ghi đè, Tạo biến thể, Bỏ qua). | **Hoàn thành:** Đã xây dựng trọn vẹn `computeExamDiff`, Modal Side-by-Side Visual Diff phong cách Git Terminal, API `/api/admin/data-sync/resolve-exam` và tích hợp 3 nút hành động 1 chạm (Backend + Frontend Next.js build 62/62 routes đạt 0 lỗi). | `[x] Đã hoàn thành` |
+
 
 
 

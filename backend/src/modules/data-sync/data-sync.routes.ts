@@ -24,5 +24,8 @@ router.post('/audit', (req, res, next) => dataSyncController.runUnitTestAudit(re
 // 4. Đồng bộ hàng loạt đề thi qua Data Contract & Deep Upsert Engine
 router.post('/sync-batch', (req, res, next) => dataSyncController.syncBatch(req, res, next));
 
+// 5. Xử lý quyết định Git Diff 1 chạm: Ghi đè, Tạo biến thể, Bỏ qua
+router.post('/resolve-exam', (req, res, next) => dataSyncController.resolveExamAction(req, res, next));
+
 export default router;
 

@@ -59,6 +59,63 @@ export interface NormalizedExamInput {
   parts: NormalizedPartInput[];
 }
 
+
+export interface QuestionDiffItem {
+  question_number: number;
+  status: 'UNCHANGED' | 'MODIFIED' | 'ADDED' | 'REMOVED';
+  existing?: {
+    prompt: string;
+    question_type: string;
+    options: any;
+    correct_answer: string | null;
+    max_score: number;
+  };
+  incoming?: {
+    prompt: string;
+    question_type: string;
+    options: any;
+    correct_answer: string | null;
+    max_score: number;
+  };
+  changedFields?: string[];
+}
+
+export interface PartDiffItem {
+  part_number: number;
+  title: string;
+  status: 'UNCHANGED' | 'MODIFIED' | 'ADDED' | 'REMOVED';
+  existingMedia?: {
+    audio_url: string | null;
+    image_url: string | null;
+    passage_text: string | null;
+  };
+  incomingMedia?: {
+    audio_url: string | null;
+    image_url: string | null;
+    passage_text: string | null;
+  };
+  mediaChanged: boolean;
+  questions: QuestionDiffItem[];
+}
+
+export interface ExamDiffResult {
+  similarityPercent: number;
+  titleChanged: boolean;
+  durationChanged: boolean;
+  existingTitle: string;
+  incomingTitle: string;
+  existingDuration: number;
+  incomingDuration: number;
+  totalExistingQuestions: number;
+  totalIncomingQuestions: number;
+  unchangedQuestionsCount: number;
+  modifiedQuestionsCount: number;
+  addedQuestionsCount: number;
+  removedQuestionsCount: number;
+  mediaChangedPartsCount: number;
+  parts: PartDiffItem[];
+}
+
 export class DataSyncService {
   /**
    * Chuẩn hóa tiêu đề đề thi (ví dụ: "Đề 1" -> "Đề 01", xóa khoảng trắng thừa)
@@ -1088,6 +1145,269 @@ export class DataSyncService {
   /**
    * 4. DEEP IDEMPOTENT UPSERT ĐỀ THI VÀO DATABASE (HỖ TRỢ DRY-RUN & LIVE SYNC)
    */
+  
+  /**
+   * Tính toán độ tương đồng và trích xuất khác biệt chi tiết (Side-by-Side Visual Diff)
+   * giữa đề thi đang có trong CSDL và đề thi mới kéo về/tải lên
+   */
+  computeExamDiff(existing: any, incoming: NormalizedExamInput): ExamDiffResult {
+    const existingParts = Array.isArray(existing.parts) ? existing.parts : [];
+    const incomingParts = Array.isArray(incoming.parts) ? incoming.parts : [];
+
+    const existingTitle = String(existing.title || '').trim();
+    const incomingTitle = String(incoming.title || '').trim();
+    const titleChanged = existingTitle.toLowerCase() !== incomingTitle.toLowerCase();
+    const existingDuration = Number(existing.duration_minutes || 0);
+    const incomingDuration = Number(incoming.duration_minutes || 0);
+    const durationChanged = existingDuration !== incomingDuration;
+
+    let totalExistingQuestions = 0;
+    let totalIncomingQuestions = 0;
+    let unchangedQuestionsCount = 0;
+    let modifiedQuestionsCount = 0;
+    let addedQuestionsCount = 0;
+    let removedQuestionsCount = 0;
+    let mediaChangedPartsCount = 0;
+
+    const partDiffs: PartDiffItem[] = [];
+
+    const allPartNumbers = Array.from(
+      new Set([
+        ...existingParts.map((p: any) => Number(p.part_number)),
+        ...incomingParts.map((p: any) => Number(p.part_number)),
+      ])
+    ).sort((a: any, b: any) => a - b);
+
+    for (const pNum of allPartNumbers) {
+      const exPart = existingParts.find((p: any) => Number(p.part_number) === pNum);
+      const inPart = incomingParts.find((p: any) => Number(p.part_number) === pNum);
+
+      if (!exPart && inPart) {
+        const inQs = Array.isArray(inPart.questions) ? inPart.questions : [];
+        totalIncomingQuestions += inQs.length;
+        addedQuestionsCount += inQs.length;
+        mediaChangedPartsCount++;
+
+        const qDiffs: QuestionDiffItem[] = inQs.map((q) => ({
+          question_number: q.question_number,
+          status: 'ADDED' as const,
+          incoming: {
+            prompt: q.prompt,
+            question_type: q.question_type,
+            options: q.options,
+            correct_answer: q.correct_answer,
+            max_score: q.max_score,
+          },
+        }));
+
+        partDiffs.push({
+          part_number: pNum,
+          title: inPart.title,
+          status: 'ADDED',
+          incomingMedia: {
+            audio_url: inPart.audio_url,
+            image_url: inPart.image_url,
+            passage_text: inPart.passage_text,
+          },
+          mediaChanged: true,
+          questions: qDiffs,
+        });
+        continue;
+      }
+
+      if (exPart && !inPart) {
+        const exQs = Array.isArray(exPart.questions) ? exPart.questions : [];
+        totalExistingQuestions += exQs.length;
+        removedQuestionsCount += exQs.length;
+
+        const qDiffs: QuestionDiffItem[] = exQs.map((q: any) => ({
+          question_number: q.question_number,
+          status: 'REMOVED' as const,
+          existing: {
+            prompt: q.prompt,
+            question_type: q.question_type,
+            options: q.options,
+            correct_answer: q.correct_answer,
+            max_score: q.max_score,
+          },
+        }));
+
+        partDiffs.push({
+          part_number: pNum,
+          title: exPart.title,
+          status: 'REMOVED',
+          existingMedia: {
+            audio_url: exPart.audio_url,
+            image_url: exPart.image_url,
+            passage_text: exPart.passage_text,
+          },
+          mediaChanged: false,
+          questions: qDiffs,
+        });
+        continue;
+      }
+
+      if (!exPart || !inPart) continue;
+
+      const exQs = Array.isArray(exPart.questions) ? exPart.questions : [];
+      const inQs = Array.isArray(inPart.questions) ? inPart.questions : [];
+      totalExistingQuestions += exQs.length;
+      totalIncomingQuestions += inQs.length;
+
+      const normUrl = (u: any) => (typeof u === 'string' ? u.trim() : '');
+      const mediaChanged =
+        normUrl(exPart.audio_url) !== normUrl(inPart.audio_url) ||
+        normUrl(exPart.image_url) !== normUrl(inPart.image_url) ||
+        normUrl(exPart.passage_text) !== normUrl(inPart.passage_text);
+
+      if (mediaChanged) mediaChangedPartsCount++;
+
+      const allQNums = Array.from(
+        new Set([
+          ...exQs.map((q: any) => Number(q.question_number)),
+          ...inQs.map((q: any) => Number(q.question_number)),
+        ])
+      ).sort((a: any, b: any) => a - b);
+
+      const qDiffs: QuestionDiffItem[] = [];
+
+      for (const qNum of allQNums) {
+        const exQ = exQs.find((q: any) => Number(q.question_number) === qNum);
+        const inQ = inQs.find((q: any) => Number(q.question_number) === qNum);
+
+        if (!exQ && inQ) {
+          addedQuestionsCount++;
+          qDiffs.push({
+            question_number: qNum,
+            status: 'ADDED',
+            incoming: {
+              prompt: inQ.prompt,
+              question_type: inQ.question_type,
+              options: inQ.options,
+              correct_answer: inQ.correct_answer,
+              max_score: inQ.max_score,
+            },
+          });
+        } else if (exQ && !inQ) {
+          removedQuestionsCount++;
+          qDiffs.push({
+            question_number: qNum,
+            status: 'REMOVED',
+            existing: {
+              prompt: exQ.prompt,
+              question_type: exQ.question_type,
+              options: exQ.options,
+              correct_answer: exQ.correct_answer,
+              max_score: exQ.max_score,
+            },
+          });
+        } else if (exQ && inQ) {
+          const changedFields: string[] = [];
+          if (String(exQ.prompt || '').trim() !== String(inQ.prompt || '').trim()) {
+            changedFields.push('prompt');
+          }
+          if (exQ.question_type !== inQ.question_type) {
+            changedFields.push('question_type');
+          }
+          if (JSON.stringify(exQ.options ?? []) !== JSON.stringify(inQ.options ?? [])) {
+            changedFields.push('options');
+          }
+          if (String(exQ.correct_answer || '').trim() !== String(inQ.correct_answer || '').trim()) {
+            changedFields.push('correct_answer');
+          }
+          if (Number(exQ.max_score) !== Number(inQ.max_score)) {
+            changedFields.push('max_score');
+          }
+
+          if (changedFields.length > 0) {
+            modifiedQuestionsCount++;
+            qDiffs.push({
+              question_number: qNum,
+              status: 'MODIFIED',
+              changedFields,
+              existing: {
+                prompt: exQ.prompt,
+                question_type: exQ.question_type,
+                options: exQ.options,
+                correct_answer: exQ.correct_answer,
+                max_score: exQ.max_score,
+              },
+              incoming: {
+                prompt: inQ.prompt,
+                question_type: inQ.question_type,
+                options: inQ.options,
+                correct_answer: inQ.correct_answer,
+                max_score: inQ.max_score,
+              },
+            });
+          } else {
+            unchangedQuestionsCount++;
+            qDiffs.push({
+              question_number: qNum,
+              status: 'UNCHANGED',
+              existing: {
+                prompt: exQ.prompt,
+                question_type: exQ.question_type,
+                options: exQ.options,
+                correct_answer: exQ.correct_answer,
+                max_score: exQ.max_score,
+              },
+              incoming: {
+                prompt: inQ.prompt,
+                question_type: inQ.question_type,
+                options: inQ.options,
+                correct_answer: inQ.correct_answer,
+                max_score: inQ.max_score,
+              },
+            });
+          }
+        }
+      }
+
+      const partStatus =
+        mediaChanged || qDiffs.some((q) => q.status !== 'UNCHANGED') ? 'MODIFIED' : 'UNCHANGED';
+
+      partDiffs.push({
+        part_number: pNum,
+        title: inPart.title,
+        status: partStatus,
+        existingMedia: {
+          audio_url: exPart.audio_url,
+          image_url: exPart.image_url,
+          passage_text: exPart.passage_text,
+        },
+        incomingMedia: {
+          audio_url: inPart.audio_url,
+          image_url: inPart.image_url,
+          passage_text: inPart.passage_text,
+        },
+        mediaChanged,
+        questions: qDiffs,
+      });
+    }
+
+    const maxTotal = Math.max(totalExistingQuestions, totalIncomingQuestions);
+    const similarityPercent = maxTotal > 0 ? Math.round((unchangedQuestionsCount / maxTotal) * 100) : 100;
+
+    return {
+      similarityPercent,
+      titleChanged,
+      durationChanged,
+      existingTitle,
+      incomingTitle,
+      existingDuration,
+      incomingDuration,
+      totalExistingQuestions,
+      totalIncomingQuestions,
+      unchangedQuestionsCount,
+      modifiedQuestionsCount,
+      addedQuestionsCount,
+      removedQuestionsCount,
+      mediaChangedPartsCount,
+      parts: partDiffs,
+    };
+  }
+
   async upsertSingleExam(normalizedExam: NormalizedExamInput, dryRun = false) {
     const validation = this.validateExam(normalizedExam);
     if (!validation.isValid) {
@@ -1098,38 +1418,78 @@ export class DataSyncService {
         questionsCount: validation.questionsCount,
         errors: validation.errors,
         warnings: validation.warnings,
-      };
-    }
-
-    if (dryRun) {
-      return {
-        status: 'VALID_DRY_RUN' as const,
-        title: normalizedExam.title,
-        skill: normalizedExam.skill,
-        partsCount: normalizedExam.parts.length,
-        questionsCount: validation.questionsCount,
-        errors: [],
-        warnings: validation.warnings,
+        diff: null,
       };
     }
 
     const cleanTitle = this.normalizeExamTitle(normalizedExam.title);
 
-    const existing = await prisma.exam.findFirst({
-      where: {
-        skill: normalizedExam.skill,
-        title: { equals: cleanTitle, mode: 'insensitive' },
-      },
-      include: {
-        parts: {
-          orderBy: { part_number: 'asc' },
-          include: {
-            questions: { orderBy: { question_number: 'asc' } },
-          },
+    // Tra cứu đề thi đã tồn tại trong CSDL (theo externalId hoặc chuẩn hóa Title + Skill)
+    let existing = null;
+    if (normalizedExam.externalId && normalizedExam.source) {
+      existing = await prisma.exam.findFirst({
+        where: {
+          source: normalizedExam.source,
+        external_id: normalizedExam.externalId || null,
+          OR: [
+            { external_id: normalizedExam.externalId },
+            { id: normalizedExam.externalId },
+            { description: { contains: normalizedExam.externalId } },
+          ],
         },
-        _count: { select: { submissions: true } },
-      },
-    });
+        include: {
+          parts: {
+            orderBy: { part_number: 'asc' },
+            include: {
+              questions: { orderBy: { question_number: 'asc' } },
+            },
+          },
+          _count: { select: { submissions: true } },
+        },
+      });
+    }
+
+    if (!existing) {
+      existing = await prisma.exam.findFirst({
+        where: {
+          skill: normalizedExam.skill,
+          title: { equals: cleanTitle, mode: 'insensitive' },
+        },
+        include: {
+          parts: {
+            orderBy: { part_number: 'asc' },
+            include: {
+              questions: { orderBy: { question_number: 'asc' } },
+            },
+          },
+          _count: { select: { submissions: true } },
+        },
+      });
+    }
+
+    const diff = existing ? this.computeExamDiff(existing, normalizedExam) : null;
+    const submissionsCount = existing?._count?.submissions || 0;
+
+    if (dryRun) {
+      return {
+        status: 'VALID_DRY_RUN' as const,
+        action: existing
+          ? submissionsCount > 0
+            ? ('SAFE_UPDATE' as const)
+            : ('DEEP_UPDATE' as const)
+          : ('CREATE' as const),
+        title: normalizedExam.title,
+        skill: normalizedExam.skill,
+        partsCount: normalizedExam.parts.length,
+        questionsCount: validation.questionsCount,
+        existingExamId: existing?.id || null,
+        submissionsPreserved: submissionsCount,
+        diff,
+        incomingExam: normalizedExam,
+        errors: [],
+        warnings: validation.warnings,
+      };
+    }
 
     if (existing) {
       const submissionsCount = existing._count?.submissions || 0;
@@ -1148,6 +1508,7 @@ export class DataSyncService {
               hot_level: normalizedExam.hot_level,
               forecast_tag: normalizedExam.forecast_tag || existing.forecast_tag,
               source: normalizedExam.source || existing.source,
+              external_id: normalizedExam.externalId || existing.external_id,
             },
           });
 
@@ -1360,8 +1721,73 @@ export class DataSyncService {
   /**
    * Đồng bộ hàng loạt từ Snapshot trên server hoặc JSON tải lên từ Admin UI
    */
+
+  /**
+   * Quyết định xử lý một đề thi từ Modal So Sánh Trực Quan (Side-by-Side Diff):
+   * 1. OVERWRITE: Ghi đè / cập nhật đề cũ (Deep Replace hoặc Safe In-Place)
+   * 2. CREATE_VARIANT: Tạo thành đề Biến Thể liên kết với đề gốc
+   * 3. SKIP: Bỏ qua không nạp
+   */
+  async resolveExamAction(options: {
+    action: 'OVERWRITE' | 'CREATE_VARIANT' | 'SKIP';
+    incomingExam: any;
+    existingExamId?: string;
+    variantTag?: string;
+  }) {
+    const { action, incomingExam, existingExamId, variantTag } = options;
+
+    if (action === 'SKIP') {
+      return {
+        action: 'SKIP',
+        message: `Đã bỏ qua đề "${incomingExam?.title || 'Không rõ tên'}". Không có thay đổi nào trong CSDL.`,
+      };
+    }
+
+    const normalized = this.normalizeExam(incomingExam);
+
+    if (action === 'OVERWRITE') {
+      const res = await this.upsertSingleExam(normalized, false);
+      return {
+        action: 'OVERWRITE',
+        message: `Đã ghi đè/cập nhật thành công đề "${normalized.title}" (${res.status})!`,
+        result: res,
+      };
+    }
+
+    if (action === 'CREATE_VARIANT') {
+      const baseClean = this.normalizeExamTitle(normalized.title);
+      const tag = variantTag && variantTag.trim().length > 0 ? variantTag.trim() : 'Biến thể mới';
+      const variantTitle = `${baseClean} (${tag})`;
+
+      const variantNormalized: NormalizedExamInput = {
+        ...normalized,
+        title: variantTitle,
+        forecast_tag: tag,
+        description: `${normalized.description || ''}\n[Biến thể phòng thi liên kết từ đề gốc: ${baseClean}]`.trim(),
+      };
+
+      const created = await this.upsertSingleExam(variantNormalized, false);
+      if (created.id && existingExamId) {
+        await prisma.exam.update({
+          where: { id: created.id },
+          data: {
+            parent_exam_id: existingExamId,
+            variant_note: tag,
+          },
+        });
+      }
+      return {
+        action: 'CREATE_VARIANT',
+        message: `Đã tạo thành công đề Biến Thể: "${variantTitle}"!`,
+        result: created,
+      };
+    }
+
+    throw new Error(`Hành động không hợp lệ: "${action}". Hợp lệ: OVERWRITE, CREATE_VARIANT, SKIP.`);
+  }
+
   async syncBatch(options: {
-    snapshotId?: 'aptisacademy' | 'aptiskytich';
+    snapshotId?: 'aptisacademy' | 'aptiskytich' | 'aptistest';
     exams?: any[];
     defaultSource?: string;
     dryRun?: boolean;

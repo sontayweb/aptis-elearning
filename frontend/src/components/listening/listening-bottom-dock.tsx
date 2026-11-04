@@ -254,7 +254,11 @@ export function ListeningModalsAndDrawer({
                     {examData.part1[currentStage.subIndex].prompt}
                   </div>
                   <div className="text-primary font-bold">
-                    Đáp án đúng: {examData.part1[currentStage.subIndex].correctAnswer}
+                    Đáp án đúng: {examData.part1[currentStage.subIndex].correctAnswer ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">{examData.part1[currentStage.subIndex].correctAnswer}</span>
+                  ) : (
+                    <span className="text-amber-500 font-normal italic">Chưa có đáp án chính thức trong ngân hàng đề</span>
+                  )}
                   </div>
                   <div className="text-muted-foreground italic">
                     {examData.part1[currentStage.subIndex].explanation}
@@ -266,7 +270,11 @@ export function ListeningModalsAndDrawer({
                 examData.part2.speakers.map((s, idx) => (
                   <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-1">
                     <div className="font-bold text-primary">{s.speaker}</div>
-                    <div className="text-foreground font-medium">Đáp án: {s.correctAnswer}</div>
+                    <div className="text-foreground font-medium">Đáp án: {s.correctAnswer ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">{s.correctAnswer}</span>
+                  ) : (
+                    <span className="text-amber-500 font-normal italic">Chưa có đáp án chính thức trong ngân hàng đề</span>
+                  )}</div>
                     <div className="text-muted-foreground italic text-[11px]">{s.explanation}</div>
                   </div>
                 ))}
@@ -275,7 +283,11 @@ export function ListeningModalsAndDrawer({
                 examData.part3.opinions.map((op, idx) => (
                   <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-1">
                     <div className="font-medium text-foreground">{op.statement}</div>
-                    <div className="text-primary font-bold">Đáp án: {op.correctAnswer}</div>
+                    <div className="text-primary font-bold">Đáp án: {op.correctAnswer ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">{op.correctAnswer}</span>
+                  ) : (
+                    <span className="text-amber-500 font-normal italic">Chưa có đáp án chính thức trong ngân hàng đề</span>
+                  )}</div>
                     <div className="text-muted-foreground italic text-[11px]">{op.explanation}</div>
                   </div>
                 ))}
@@ -284,7 +296,11 @@ export function ListeningModalsAndDrawer({
                 examData.part4[currentStage.subIndex]?.questions.map((q, idx) => (
                   <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-1">
                     <div className="font-medium text-foreground">{q.prompt}</div>
-                    <div className="text-primary font-bold">Đáp án: {q.correctAnswer}</div>
+                    <div className="text-primary font-bold">Đáp án: {q.correctAnswer ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">{q.correctAnswer}</span>
+                  ) : (
+                    <span className="text-amber-500 font-normal italic">Chưa có đáp án chính thức trong ngân hàng đề</span>
+                  )}</div>
                     <div className="text-muted-foreground italic text-[11px]">{q.explanation}</div>
                   </div>
                 ))}

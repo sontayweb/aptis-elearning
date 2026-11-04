@@ -1,0 +1,62 @@
+{
+  "source": "APTISTEST",
+  "totalExams": 9,
+  "savedToDb": false,
+  "crawledAt": "2026-11-04T05:19:25.752Z",
+  "examsList": [
+    {
+      "externalId": "aptistest_3597",
+      "title": "Đề SPEAKING - 28/10",
+      "skill": "SPEAKING",
+      "questionsCount": 1
+    },
+    {
+      "externalId": "aptistest_3595",
+      "title": "Đề Listening chiều 25/10 – 188 Cầu Giấy: The arts nam nói trước 25/10/2026",
+      "skill": "LISTENING",
+      "questionsCount": 1
+    },
+    {
+      "externalId": "aptistest_3593",
+      "title": "Đề SPEAKING - 25/10 - Chiều (188 Cầu Giấy)",
+      "skill": "SPEAKING",
+      "questionsCount": 1
+    },
+    {
+      "externalId": "aptistest_3591",
+      "title": "Đề WRITING - Art Club 25/10 - Chiều (188 Cầu Giấy)",
+      "skill": "WRITING",
+      "questionsCount": 1
+    },
+    {
+      "externalId": "aptistest_3589",
+      "title": "Đề SPEAKING - 23/10 - Chiều",
+      "skill": "SPEAKING",
+      "questionsCount": 1
+    },
+    {
+      "externalId": "aptistest_3587",
+      "title": "Đề SPEAKING - 22/10 - Chiều HMĐ",
+      "skill": "SPEAKING",
+      "questionsCount": 1
+    },
+    {
+      "externalId": "aptistest_3585",
+      "title": "Đề WRITING - Photography Club 18/10",
+      "skill": "WRITING",
+      "questionsCount": 1
+    },
+    {
+      "externalId": "aptistest_3583",
+      "title": "Đề READING - 18/10",
+      "skill": "READING",
+      "questionsCount": 1
+    },
+    {
+      "externalId": "aptistest_3581",
+      "title": "Đề LISTENING - transcription giống đề thi 18/10",
+      "skill": "LISTENING",
+      "questionsCount": 1
+    }
+  ]
+}
