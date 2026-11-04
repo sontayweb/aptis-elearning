@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="/js/theme.js?v=20261008-default-light-v1"></script>
+    <script src="/js/content-copy-protection.js?v=20261018-ai-only-v2" defer></script>
+    <script>
+        // Discourage printing and opening DevTools with common shortcuts on every page.
+        // Browser menus and settings remain outside the page's control.
+        window.addEventListener('keydown', function (event) {
+            const key = (event.key || '').toLowerCase();
+            const devToolsShortcut = ((event.ctrlKey && event.shiftKey)
+                || (event.metaKey && event.altKey))
+                && (key === 'i' || key === 'j' || key === 'c' || key === 'k');
+            const printShortcut = (event.ctrlKey || event.metaKey)
+                && (key === 'p' || event.code === 'KeyP');
+            if (key === 'f12' || devToolsShortcut || printShortcut) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }
+        }, true);
+        window.addEventListener('contextmenu', function (event) {
+            event.preventDefault();
+        }, true);
+    </script><script>document.documentElement.classList.add('css-pending');</script>
+        <style>
+        html.css-pending body > :not(.app-style-loader) {
+            visibility: hidden;
+        }
+
+        .app-style-loader {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            color: #0f172a;
+            font-family: "Be Vietnam Pro", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            z-index: var(--z-style-loader, 100000);
+        }
+
+        html.css-pending .app-style-loader {
+            display: flex;
+        }
+
+        .app-style-loader__content {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        .app-style-loader__spinner {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
+            border-top-color: #2563eb;
+            animation: app-style-loader-spin 0.9s linear infinite;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .app-style-loader {
+                background: #101513;
+                color: #eef4ec;
+            }
+
+            :root:not([data-theme="light"]) .app-style-loader__content {
+                background: #171f1b;
+                border-color: rgba(238, 244, 236, 0.16);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+            }
+
+            :root:not([data-theme="light"]) .app-style-loader__spinner {
+                border-color: rgba(79, 196, 158, 0.24);
+                border-top-color: #4fc49e;
+            }
+        }
+
+        [data-theme="dark"] .app-style-loader {
+            background: #101513;
+            color: #eef4ec;
+        }
+
+        [data-theme="dark"] .app-style-loader__content {
+            background: #171f1b;
+            border-color: rgba(238, 244, 236, 0.16);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+        }
+
+        [data-theme="dark"] .app-style-loader__spinner {
+            border-color: rgba(79, 196, 158, 0.24);
+            border-top-color: #4fc49e;
+        }
+
+        @keyframes app-style-loader-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        </style><base href="/">
+
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+
+    <link rel="stylesheet" href="styles/tokens.css?v=20260908-repository-dark-audit-v1">
+    <link rel="stylesheet" href="CssDetail/Tokens.css?v=20260908-repository-dark-audit-v1"><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+        <link href="_content/Blazor.Bootstrap/blazor.bootstrap.css" rel="stylesheet"><link rel="stylesheet" href="app.css?v=20260910-advanced-catalog-dark-audit-v1">
+        <link rel="stylesheet" href="AptisWeb.styles.css?v=20261101-review-leaders-theme-v1">
+        <link rel="stylesheet" href="CssDetail/CommonShared.css?v=20260609-stagger-visible">
+        <link rel="stylesheet" href="CssDetail/CommonLearning.css?v=20260729-dark-theme-tokens">
+        <link rel="stylesheet" href="CssDetail/MainLayout.css?v=20260823-dashboard-shell-v2-brand-lockup-v1">
+        <link rel="stylesheet" href="CssDetail/Ui.css?v=20260814-profile-mobile">
+        <link rel="stylesheet" href="CssDetail/Reconnect.css?v=20260916-mobile-resume-v1">
+        <link rel="stylesheet" href="CssDetail/AuthNotifications.css?v=20260903-pseudo-cleanup-1">
+        <link rel="stylesheet" href="CssDetail/Practice.css?v=20260729-dark-theme-tokens">
+        <link rel="stylesheet" href="CssDetail/DoPracticeTest.css?v=20260729-dark-theme-tokens">
+        <link rel="stylesheet" href="CssDetail/CommunityWelcomeModal.css?v=20261009-viewport-spacing-v2">
+        <link rel="stylesheet" href="CssDetail/VietnameseTypographyFixes.css?v=20260716-typography">
+        <link rel="stylesheet" href="CssDetail/OfficialExamSimulation.css?v=20261028-listening-task-instructions"><link rel="icon" type="image/png" sizes="192x192" href="/favicon.png?v=20260827">
+    <link rel="apple-touch-icon" sizes="192x192" href="/favicon.png?v=20260827">
+    <meta name="theme-color" content="#0f2f5f">
+
+    <!--Blazor:{"type":"server","prerenderId":"8584731bca584cb0b9d69122258fca05","key":{"locationHash":"3667084F0ABF162AE4E9133E04C869BBA8990E6206166FEE0136DEDAECA7EDC2:13","formattedComponentKey":""},"sequence":0,"descriptor":"CfDJ8IdZHkjFwQtMj6uSWS/jZQp9M0VdBHdHzmVHqagU42xDMpDbIQuevKwT7oCVnXGgpLyW645wkhdy0F0wkzHkJgQP7FHDrZcQQhnMzOeLQqIvYSu7/twZ\u002BsJGkYl9hcT9A/7hsZCvplcsh2Dophh/8drg0336faquWHabdT/dJHwVwW2myOEuUc9kddAjYUFK/73QDoqEtIWKtRu7dZ/MhdoliSq33OMFPxtX6UhDEafP5iYnA2q9dB6lemJmIUFiJpBpUPq5lI4i96AKECP3BTwqaW0KMahm8VZ17oRBvAeUVaWpDI/yL3tqzhQt8eQADki4Gd1suxDXh41nQcAJyg5kOEDOuc5HGMXj3eYlGZjviipV0Cpn\u002BZoWGwXWUcT1agClJvdICaU66DSzdYqGldJPjpER5O\u002BDIFOK8986lMob0\u002BHI8KLoGYNcWXXhIS4qlbpWNJVQ\u002B4PUqARcuL1QXxVdJZFoEdLNxPEebU4BvQCbdR4/MvNXOLtdfkHOMUp1mt4Bgz\u002Bkzhv4JWwl99vAbfc3R6HV/vURVUqfJzgTdqY2"}-->
+<!--Blazor:{"prerenderId":"8584731bca584cb0b9d69122258fca05"}-->
+    <!--Blazor:{"type":"server","prerenderId":"e276b4f6b54a4f83b8fcad4a335964e6","key":{"locationHash":"77D12F14A8105320B1AAED6AE7E689DA0EC4483270A645E84079EAA0FFDF550D:15","formattedComponentKey":""},"sequence":1,"descriptor":"CfDJ8IdZHkjFwQtMj6uSWS/jZQqtw42LILZXd\u002B/ODwx/S1Peb\u002BXMRrRss4sbNqlfqqGpiz\u002Bn1g2SWYrBuqxUd1Pd591/q3IarzGECa5JZqV1nlNnuzZta3FXVkTFkyXbeezTzLYU3O34gtiG8/HQ25c4LphUakQVayZGn3KzqLa0M19Ma5/\u002BI1MW97mRJEb4rybYxznn5\u002BDsSAH\u002Bt48\u002ByMt3Yro4uAIWNYCiawc32vi4YYwA9q5U5C8oeky\u002BevLm7H1utrsEuV\u002BQm6IZ17ZpAXXhGg15IdIWSo7oFRAMxMpAkAI7Vwbk2JT5OScm7V7Xjy94Pda30bfUkQkpIdvuRk00HKCNitMbP8a0E/vvI\u002BK6WHdwyrc10Ta8Tb1zZGDsu741wHSwAJG9znfPyUe7VdJrWFBIPAj7Ty6N3/s1wNTFKQmqHx0sws61WPQvlY9XVMx0vZq8wmakHXkI56K7yV93F8gS9lBv0K5ouH\u002BaRhp0\u002BHYEa6YzWeusgS9gGDCfQ4Uo0BLrW8xF2sW0cSD/Gs3BaexKvt4TzoCPWNeB5V67qUFowAL33EVIRy/E6ZFuLoXF6F\u002BRjcFsWNwSZZwUTtwJJlg="}--><title>Aptis Test</title><meta name="description" content="T&#x1EF1; h&#x1ECD;c Aptis v&#x1EDB;i l&#x1ED9; tr&#xEC;nh r&#xF5; r&#xE0;ng, &#x111;&#x1EC1; thi th&#x1EED; v&#xE0; t&#xE0;i nguy&#xEA;n h&#x1ECD;c t&#x1EAD;p t&#x1EA1;i Aptis Test." />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <link rel="canonical" href="https://aptistest.edu.vn/learning/listening/3595/do-test" />
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Aptis Test" />
+    <meta property="og:title" content="Aptis Test" />
+    <meta property="og:description" content="T&#x1EF1; h&#x1ECD;c Aptis v&#x1EDB;i l&#x1ED9; tr&#xEC;nh r&#xF5; r&#xE0;ng, &#x111;&#x1EC1; thi th&#x1EED; v&#xE0; t&#xE0;i nguy&#xEA;n h&#x1ECD;c t&#x1EAD;p t&#x1EA1;i Aptis Test." />
+    <meta property="og:url" content="https://aptistest.edu.vn/learning/listening/3595/do-test" />
+    <meta property="og:image" content="https://aptistest.edu.vn/images/og/default.png" />
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Aptis Test" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Aptis Test" />
+    <meta name="twitter:description" content="T&#x1EF1; h&#x1ECD;c Aptis v&#x1EDB;i l&#x1ED9; tr&#xEC;nh r&#xF5; r&#xE0;ng, &#x111;&#x1EC1; thi th&#x1EED; v&#xE0; t&#xE0;i nguy&#xEA;n h&#x1ECD;c t&#x1EAD;p t&#x1EA1;i Aptis Test." />
+    <meta name="twitter:image" content="https://aptistest.edu.vn/images/og/default.png" /><!--Blazor:{"prerenderId":"e276b4f6b54a4f83b8fcad4a335964e6"}--></head>
+
+<body><div class="app-style-loader" aria-live="polite" aria-busy="true"><div class="app-style-loader__content"><span class="app-style-loader__spinner"></span>
+        <span>Đang tải</span></div></div><!--Blazor:{"type":"server","key":{"locationHash":"68517E8313E8FB1003E86FC4E4AC4B09A783554752589568A50DF92BFEF11DF8:19","formattedComponentKey":""},"sequence":2,"descriptor":"CfDJ8IdZHkjFwQtMj6uSWS/jZQr0EfdXQPoJBRHhQcbwsq8orJhpSXU003J9KfoYgS29X3t2nzpxgs7J5nLCClHIhC8ijzt1hWnJj4cpnzGTSkacYFnIPc3tB8gOZpSLUMqIweDzcrCVbIBvEToXksEbDvl4cTc\u002BbAQY/fpc8hAYHvPHRxmx3WlrNyTn4o1pNK04\u002BLJV2dT23vSq\u002BcY6UKjT88X8L2fSOOrtrZz8HSFfon6LIBt4z4LH\u002BJL5vvhRA7/H\u002BsSu3LzaZ2qFewhY4\u002Bv9VcvemYmD8Pu7K\u002B66jV7fyh0VbucVP/cn9\u002Bvbgvt1znQcgoiwcURuDI9ZotCZ0BIBPHvc6VJ5N/bcSoCv3u5TI9lHZ0WND/ghwIsieTCB6iTgSi7cnBFSpsw6HZ/K4Y79PRSLVrSmjmY9CAHQ7d\u002BgvmpGZb626qbGEcTTbfwTI7ng2\u002B5dYmYQ4Q4DkwupJtRA3\u002Bge98xrvdNQzZMJzjXq7mQQ24QASYqIt0n/VUYEVG0Ee4PSlmYXYfR10dNlYEE435QEedo27DQqKuVj4vPTn2JEetVkXs\u002BJrGFBmX7spN5hy8qi6TqZ4iRgypbHqalIZCIom0itov79NEJ6WGso6Yz0hrn70znUeGFI20pDPFI\u002BcERWsnLo1yxtpJD2fMJe5yl7wMqxuTJvZWigVkMLP6jCm2paxRnOLo5YlIr9aymNB4L2I1esK/M40QutEAwTqz0="}--><div id="components-reconnect-modal" class="components-reconnect-hide" role="dialog" aria-modal="true" aria-live="assertive" aria-atomic="true" aria-labelledby="reconnect-title"><div class="reconnect-overlay" aria-hidden="true"></div>
+    <div class="reconnect-card"><h2 id="reconnect-title" class="reconnect-dialog-title">Tr&#7841;ng th&#225;i k&#7871;t n&#7889;i b&#224;i thi</h2>
+        <div class="reconnect-icon" aria-hidden="true"><span class="reconnect-spinner"></span>
+            <svg class="reconnect-icon-offline" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"></path>
+                <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+                <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+                <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+                <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                <path d="M12 20h.01"></path></svg>
+            <svg class="reconnect-icon-success" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"></path></svg>
+            <svg class="reconnect-icon-failed" width="44" height="44" viewBox="0 0 48 48" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="4.5" width="26" height="37" rx="4.5" stroke="#08366f" stroke-width="3"></rect>
+                <path d="M12 13h12M12 20h8M12 27h5" stroke="#8aa9c1" stroke-width="3"></path>
+                <circle cx="30" cy="29" r="13" fill="#f9fcfd" stroke="#0d6279" stroke-width="3"></circle>
+                <path d="M30 22v7l5 3" stroke="#0d6279" stroke-width="3"></path>
+                <circle cx="39" cy="39" r="7.5" fill="#f2554c" stroke="#fff" stroke-width="1.5"></circle>
+                <path d="M39 35.5v4M39 42.5h.01" stroke="#fff" stroke-width="2"></path></svg></div>
+
+        <section class="reconnect-state reconnect-state--offline"><h2>B&#7841;n &#273;ang ngo&#7841;i tuy&#7871;n</h2>
+            <p>Kh&#244;ng c&#243; k&#7871;t n&#7889;i Internet. B&#7841;n c&#243; th&#7875; ti&#7871;p t&#7909;c l&#224;m b&#224;i.</p>
+            <div class="reconnect-save-status"><span class="reconnect-save-dot" aria-hidden="true"></span>
+                B&#224;i l&#224;m &#273;ang &#273;&#432;&#7907;c l&#432;u t&#7841;m tr&#234;n thi&#7871;t b&#7883;
+            </div></section>
+
+        <section class="reconnect-state reconnect-state--show"><h2>M&#7845;t k&#7871;t n&#7889;i t&#7841;m th&#7901;i</h2>
+            <p>&#272;ang k&#7871;t n&#7889;i l&#7841;i...</p>
+            <div class="reconnect-attempt" data-reconnect-attempt hidden>
+                L&#7847;n th&#7917; <strong id="components-reconnect-current-attempt"></strong>
+                / <strong id="components-reconnect-max-retries"></strong></div></section>
+
+        <section class="reconnect-state reconnect-state--failed"><h2>Ch&#432;a th&#7875; k&#7871;t n&#7889;i l&#7841;i</h2>
+            <p>M&#225;y ch&#7911; hi&#7879;n ch&#432;a th&#7875; k&#7871;t n&#7889;i. B&#224;i l&#224;m c&#7911;a b&#7841;n v&#7851;n &#273;&#432;&#7907;c gi&#7919; t&#7841;m.</p>
+            <div class="reconnect-actions"><button id="reconnect-retry-button" type="button" class="reconnect-button reconnect-button--primary" data-reconnect-retry>
+                    Th&#7917; k&#7871;t n&#7889;i l&#7841;i
+                </button>
+                <button id="reconnect-reload-button" type="button" class="reconnect-button reconnect-button--secondary" data-reconnect-reload>
+                    T&#7843;i l&#7841;i trang
+                </button></div></section>
+
+        <section class="reconnect-state reconnect-state--rejected"><h2>Phi&#234;n k&#7871;t n&#7889;i &#273;&#227; h&#7871;t h&#7841;n</h2>
+            <p>&#272;ang kh&#244;i ph&#7909;c b&#224;i l&#224;m...</p>
+            <div class="reconnect-save-status reconnect-save-status--success">&#10003; B&#224;i l&#224;m &#273;&#227; &#273;&#432;&#7907;c l&#432;u t&#7841;m</div>
+            <div class="reconnect-actions"><button id="reconnect-reload-rejected-button" type="button" class="reconnect-button reconnect-button--primary" data-reconnect-reload>
+                    T&#7843;i l&#7841;i v&#224; kh&#244;i ph&#7909;c b&#224;i
+                </button></div></section>
+
+        <section class="reconnect-state reconnect-state--restored"><h2>&#272;&#227; k&#7871;t n&#7889;i l&#7841;i</h2>
+            <p>B&#7841;n c&#243; th&#7875; ti&#7871;p t&#7909;c l&#224;m b&#224;i.</p></section></div></div>
+<div id="aptis-draft-restore-toast" class="draft-restore-toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+    &#10003; &#272;&#227; kh&#244;i ph&#7909;c b&#224;i l&#224;m tr&#432;&#7899;c &#273;&#243;
+</div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" integrity="sha512-7SRCYIJtR6F8ocwW7UxW6wGKqbSyqREDbfCORCbGLatU0iugBLwyOXpzhkPyHIFdBO0K2VCu57fvP2Twgx1o2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="js/lessonToc.js?v=20260825-focus-restore-v1"></script>
+<script src="js/toeic700LessonToc.js?v=20261015-owner-cleanup-v2"></script>
+<script src="js/toeic700LessonCollapsible.js?v=20261015-razor-dom-ownership-v1"></script>
+<script src="js/ttsHelper.js?v=20261025-mobile-vocab-speech"></script>
+<script src="js/analyticsCharts.js?v=20261019-runtime-repair-v1"></script><script src="js/siteMetrics.js?v=20260818-ga4-key-events-1"></script>
+<script>
+    // Keep Blazor JS interop safe when a privacy extension blocks analytics assets.
+    window.aptisGoogleAnalytics = window.aptisGoogleAnalytics || Object.freeze({
+        initialize: function () { return false; },
+        trackPageView: function () { return false; },
+        trackEvent: function () { return false; }
+    });
+</script>
+
+<script src="js/auth.js?v=20261026-auth-expiry-v1"></script>
+<script src="js/visibilityTimer.js?v=20261015-shared-shell-v1"></script><script src="js/matchingDropdown.js?v=20260709-1"></script>
+<script src="js/questionNavigator.js?v=20261019-runtime-repair-v1"></script>
+<script src="js/DictationPlayer.js?v=20261015-player-ownership-v1"></script>
+<script src="js/ieltsTestHelpers.js?v=20261019-runtime-repair-v1"></script>
+<script>
+    // Keep session monitoring compatible with a browser that still has an
+    // older auth runtime cached during a rolling deployment. The current
+    // runtime defines this method itself; this only fills the missing method
+    // instead of letting every interactive render produce a JS interop error.
+    (function () {
+        const auth = window.aptisAuth;
+        if (!auth || typeof auth.setCurrentStamp === "function") {
+            return;
+        }
+
+        auth.setCurrentStamp = function (stamp) {
+            if (typeof stamp === "string" && stamp.trim().length > 0) {
+                this._currentStamp = stamp.trim();
+            }
+        };
+    })();
+</script>
+<script src="js/communityWelcome.js?v=20260717-onboarding-1"></script>
+<script src="js/chatRoom.js?v=20260730-chat-draft-reset"></script>
+<script src="js/ai-tutor-upload.js?v=20260803-paste-image-1"></script>
+<script type="module" src="js/layout.js?v=20260106"></script>
+<script src="js/layoutController.js?v=20260923-account-layer-1"></script>
+<script src="js/topbar-notifications.js?v=20261018-entry-once-v1"></script>
+<script src="js/subscriptionLock.js?v=20260206"></script>
+<script src="js/inputMetrics.js?v=20261019-runtime-repair-v1"></script>
+<script src="js/adminAudit.js?v=20260302-1"></script>
+<script src="js/movieEnglishLab.js?v=20261029-dom-ownership-v1"></script>
+<script src="js/officialExamSimulation.js?v=20261028-listening-task-instructions"></script>
+<script src="js/printHelper.js?v=20260905-webkit-safe-print-v1"></script><script src="_framework/blazor.web.js" autostart="false"></script><script src="js/testDraftBackup.js?v=20260911-progress-restore-v2"></script>
+<script src="js/reconnect.js?v=20261022-google-navigation-v3"></script>
+<script>
+    (function () {
+        if (window.__aptisBlazorStarted || typeof window.Blazor?.start !== "function") {
+            return;
+        }
+
+        window.__aptisBlazorStarted = true;
+        window.Blazor.start({
+            circuit: {
+                configureSignalR: function (builder) {
+                    // Temporary access through the CDN while the primary DNS is repaired.
+                    if (true
+                        && ["studylab.vn", "www.studylab.vn"].includes(window.location.hostname)) {
+                        builder.withUrl("/_blazor", { transport: 4 }); // SignalR LongPolling over HTTPS.
+                    }
+                    return builder
+                        .withServerTimeout(60000)
+                        .withKeepAliveInterval(15000);
+                }
+            }
+        }).catch(function (error) {
+            window.__aptisBlazorStarted = false;
+            console.error("[Blazor] Failed to start interactive runtime", error);
+        });
+    })();
+</script>
+<script>
+    (function () {
+        const MAX_PENDING_MS = 20000;
+        const root = document.documentElement;
+        const pendingStyles = new Set();
+        let releaseTimer = 0;
+        let initialLoadComplete = false;
+
+        function releaseIfReady() {
+            if (initialLoadComplete) {
+                return;
+            }
+
+            if (pendingStyles.size > 0) {
+                if (releaseTimer) {
+                    window.clearTimeout(releaseTimer);
+                    releaseTimer = 0;
+                }
+                return;
+            }
+
+            if (releaseTimer) {
+                window.clearTimeout(releaseTimer);
+            }
+
+            releaseTimer = window.setTimeout(() => {
+                releaseTimer = 0;
+                if (pendingStyles.size > 0) return;
+                initialLoadComplete = true;
+                root.classList.remove("css-pending");
+            }, 50);
+        }
+
+        function markReady(link) {
+            pendingStyles.delete(link);
+            releaseIfReady();
+        }
+
+        function trackStylesheet(link) {
+            // Later route changes can replace a stylesheet before its load event.
+            // Never hide an already mounted page while Blazor updates its head.
+            if (initialLoadComplete) return;
+            if (!(link instanceof HTMLLinkElement)) return;
+            if (!stringEqualsIgnoreCase(link.rel, "stylesheet")) return;
+            if (link.dataset.styleTracked === "1") return;
+
+            link.dataset.styleTracked = "1";
+
+            if (link.sheet) {
+                markReady(link);
+                return;
+            }
+
+            pendingStyles.add(link);
+            root.classList.add("css-pending");
+
+            const onDone = () => markReady(link);
+            link.addEventListener("load", onDone, {once: true});
+            link.addEventListener("error", onDone, {once: true});
+        }
+
+        function scanNode(node) {
+            if (!(node instanceof Element)) return;
+
+            if (node.matches("link[rel='stylesheet']")) {
+                trackStylesheet(node);
+            }
+
+            node.querySelectorAll("link[rel='stylesheet']").forEach(trackStylesheet);
+        }
+
+        function forgetRemovedStyles(node) {
+            if (!(node instanceof Element)) return;
+
+            if (node instanceof HTMLLinkElement) {
+                pendingStyles.delete(node);
+            }
+
+            node.querySelectorAll("link[rel='stylesheet']").forEach(link => {
+                pendingStyles.delete(link);
+            });
+        }
+
+        function stringEqualsIgnoreCase(left, right) {
+            return String(left || "").toLowerCase() === String(right || "").toLowerCase();
+        }
+
+        scanNode(document.documentElement);
+        releaseIfReady();
+
+        const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                mutation.removedNodes.forEach(forgetRemovedStyles);
+                if (!initialLoadComplete) {
+                    mutation.addedNodes.forEach(scanNode);
+                }
+            }
+            releaseIfReady();
+        });
+
+        observer.observe(document.documentElement, {childList: true, subtree: true});
+
+        window.setTimeout(() => {
+            pendingStyles.clear();
+            initialLoadComplete = true;
+            root.classList.remove("css-pending");
+        }, MAX_PENDING_MS);
+    })();
+</script>
+<script>
+    // Namespaced app utilities
+    window.aptisApp = window.aptisApp || {};
+
+    aptisApp.toggleSidebar = function () {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    };
+
+    // Legacy alias (for any existing callers)
+    window.toggleSidebar = aptisApp.toggleSidebar;
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function (e) {
+        const dropdowns = document.querySelectorAll('.user-dropdown.show');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(e.target) &&
+                !e.target.closest('.user-menu-toggle')) {
+                dropdown.classList.remove('show');
+            }
+        });
+    });
+</script><script src="_content/Blazor.Bootstrap/blazor.bootstrap.js"></script></body></html><!--Blazor-Server-Component-State:CfDJ8IdZHkjFwQtMj6uSWS/jZQp+HnWJMg1NbR23NUFq3hkvJGfHkcydNiSXAe69DIjADMLC9qMadSVMRhIFJAflxbErH1agpPlZm5XkMg3bCb5DqhFEI5BuGW2zUtLLGEEvBbx3RnXcZHBQZEKcI7rtuJbJbI9U2YOwdi0svZdAQtOp37aHo3gEIBdVHk/RCZKthcWg7BQqmlewhqxoqdyLK6G3hQYRIQYkCQqtBPvrueYNSoOsx25gYmh/DC5OremHWqZxfACqJQ6lI/zkkiaiI8XakbArANc46nE3HVGPBJmb9steRGtel8QMNRnVjVFJJI2odTiorLJSWAVNx+WLDQErB7fmM8L43po5OTyRvqxPNTrUHzeDF8VkeBEE4dyk6+Shr7Dc4yo6bBDNCrh1JVYOQTjAqySC/Ve8//9nhz6xuSmjduT8oXM+Z0Nf+MoJI6OX7yBmhkU2KHon/G11RjjlQ7LYi0Yk2kwwBwwEB/xKpDOAD64lqyhYnvxADHqFUIpOysDZeCUnK5xP8plDT/hfRdJr91VRh1s0sgPHOkj7bMkTlUFZg9zI3//fw34MPLOnlWOq4p4bFp5KDqhkhjL0OoDD2DHbi5IwVr7eTmva-->

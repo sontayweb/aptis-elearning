@@ -1,0 +1,38 @@
+[
+  {
+    "method": "GET",
+    "url": "https://aptistest.edu.vn/login",
+    "resourceType": "document"
+  },
+  {
+    "method": "GET",
+    "url": "https://aptistest.edu.vn/_blazor/initializers",
+    "resourceType": "fetch"
+  },
+  {
+    "method": "POST",
+    "url": "https://aptistest.edu.vn/_blazor/negotiate?negotiateVersion=1",
+    "resourceType": "fetch"
+  },
+  {
+    "method": "POST",
+    "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-6K7B8MWB39&gtm=45je6b21v9259535416za200zd9259535416xf1&_p=1793756493527&gcd=13l3l3l3l1l1&npa=0&dma=0&cid=1635485934.1793756494&frm=0&ngs=1&pscdl=noapi&rcb=7&sr=800x600&uaa=&uab=&uafvl=&uam=&uamb=0&uap=&uapv=&uaw=0&ul=en-us&_s=1&tag_exp=115938466~115938469~118897920~118897930~120213116~120385423~120412528~120420414~120469145~120469153~121246026~121246034~123691370~123814184~123814944&dt=%C4%90%C4%83ng%20nh%E1%BA%ADp&dl=https%3A%2F%2Faptistest.edu.vn%2Flogin&dp=%2Flogin&sid=1793756493&sct=1&seg=0&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=1311",
+    "resourceType": "fetch"
+  },
+  {
+    "method": "POST",
+    "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-6K7B8MWB39&gtm=45je6b21v9259535416za200zd9259535416xf1&_p=1793756493527&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&cid=1635485934.1793756494&frm=0&ngs=1&pscdl=noapi&rcb=7&sr=800x600&uaa=&uab=&uafvl=&uam=&uamb=0&uap=&uapv=&uaw=0&ul=en-us&_s=2&tag_exp=115938466~115938469~118897920~118897930~120213116~120385423~120412528~120420414~120469145~120469153~121246026~121246034~123691370~123814184~123814944&sid=1793756493&sct=1&seg=0&dl=https%3A%2F%2Faptistest.edu.vn%2Flogin&dt=%C4%90%C4%83ng%20nh%E1%BA%ADp&en=scroll&epn.percent_scrolled=90&_et=6&tfd=3046",
+    "resourceType": "fetch"
+  },
+  {
+    "method": "POST",
+    "url": "https://aptistest.edu.vn/api/auth/login-cookie",
+    "resourceType": "fetch",
+    "postData": "{\"emailOrUsername\":\"trabingo03@gmail.com\",\"password\":\"Onthi122\",\"rememberMe\":false,\"loginContext\":\"Student\"}"
+  },
+  {
+    "method": "POST",
+    "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-6K7B8MWB39&gtm=45je6b21v9259535416za200zd9259535416xf1&_p=1793756493527&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEEAAAQ&ae=a&cid=1635485934.1793756494&frm=0&ngs=1&pscdl=noapi&rcb=7&sr=800x600&uaa=&uab=&uafvl=&uam=&uamb=0&uap=&uapv=&uaw=0&ul=en-us&_s=3&tag_exp=115938466~115938469~118897920~118897930~120213116~120385423~120412528~120420414~120469145~120469153~121246026~121246034~123691370~123814184~123814944&sid=1793756493&sct=1&seg=0&dl=https%3A%2F%2Faptistest.edu.vn%2Flogin&dt=%C4%90%C4%83ng%20nh%E1%BA%ADp&en=form_start&ep.form_id=&ep.form_destination=https%3A%2F%2Faptistest.edu.vn%2Flogin&epn.form_length=6&ep.first_field_id=username&epn.first_field_position=1&_et=1725&tfd=8059",
+    "resourceType": "fetch"
+  }
+]

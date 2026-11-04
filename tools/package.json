@@ -13,6 +13,6 @@
     "list": "node sync.js --list"
   },
   "dependencies": {
-    "puppeteer-core": "^23.6.0"
+    "puppeteer-core": "^23.11.1"
   }
 }

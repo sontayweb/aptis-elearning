@@ -1,0 +1,42 @@
+[
+  {
+    "name": "_ga_6K7B8MWB39",
+    "value": "GS2.1.s1793757010$o1$g0$t1793757011$j59$l0$h0",
+    "domain": ".aptistest.edu.vn",
+    "path": "/",
+    "expires": 1828317011.623953,
+    "size": 59,
+    "httpOnly": false,
+    "secure": false,
+    "session": false,
+    "priority": "Medium",
+    "sourceScheme": "Secure"
+  },
+  {
+    "name": ".AspNetCore.Antiforgery.VyLW6ORzMgk",
+    "value": "CfDJ8IdZHkjFwQtMj6uSWS_jZQpKIt5gbEPlUjoKZdtklh4gC-S5-6VtpHOQfB0pS8SDkU5NmAyPBDFab3noe_xB_n55NYq7emCJVg3VNKGn6VzBXvLkBsb61zCPe2TIpzO6rghltp40aLoNeOPAGDXGKJE",
+    "domain": "aptistest.edu.vn",
+    "path": "/",
+    "expires": -1,
+    "size": 190,
+    "httpOnly": true,
+    "secure": false,
+    "session": true,
+    "sameSite": "Strict",
+    "priority": "Medium",
+    "sourceScheme": "Secure"
+  },
+  {
+    "name": "_ga",
+    "value": "GA1.1.1621516598.1793757010",
+    "domain": ".aptistest.edu.vn",
+    "path": "/",
+    "expires": 1828317010.314611,
+    "size": 30,
+    "httpOnly": false,
+    "secure": false,
+    "session": false,
+    "priority": "Medium",
+    "sourceScheme": "Secure"
+  }
+]

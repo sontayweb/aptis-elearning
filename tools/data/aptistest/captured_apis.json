@@ -1,0 +1,27 @@
+[
+  {
+    "method": "GET",
+    "url": "https://aptistest.edu.vn/_blazor/initializers",
+    "type": "fetch"
+  },
+  {
+    "method": "POST",
+    "url": "https://aptistest.edu.vn/_blazor/negotiate?negotiateVersion=1",
+    "type": "fetch"
+  },
+  {
+    "method": "GET",
+    "url": "https://aptistest.edu.vn/api/auth/session-status",
+    "type": "fetch"
+  },
+  {
+    "method": "POST",
+    "url": "https://aptistest.edu.vn/hubs/auth/negotiate?negotiateVersion=1",
+    "type": "fetch"
+  },
+  {
+    "method": "POST",
+    "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-6K7B8MWB39&gtm=45je6b30h2v9259535416za200zd9259535416xf1&_p=1793757060489&gcd=13l3l3l3l1l1&npa=0&dma=0&cid=965092151.1793757061&frm=0&ngs=1&pscdl=noapi&rcb=19&sr=1920x1080&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.49%7CGoogle%2520Chrome%3B156.0.8078.49&uam=&uamb=0&uap=Windows&uapv=15.0.0&uaw=0&ul=en-us&_s=1&tag_exp=115938466~115938469~118897920~118897930~120213116~120385422~120412528~120420416~120469145~120469153~121246026~121246034~123691370~123692835~123785232~123814184~123814944&dt=B%E1%BA%A3ng%20%C4%91i%E1%BB%81u%20khi%E1%BB%83n&dl=https%3A%2F%2Faptistest.edu.vn%2Fstudent%2Fdashboard&dp=%2Fstudent%2Fdashboard&sid=1793757061&sct=1&seg=0&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=2136",
+    "type": "fetch"
+  }
+]
