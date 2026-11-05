@@ -62,7 +62,7 @@ interface NavGroup {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isAuthenticated, quickLogin, logout } = useAuth();
+  const { user, isAuthenticated, loading, quickLogin, logout } = useAuth();
   const { currentTheme, setTheme } = useEventTheme();
 
   // Sidebar states
@@ -258,6 +258,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   // Flattened items for matching breadcrumb title
   const allNavItems = filteredNavGroups.flatMap((g) => g.items);
+
+  // Show clean loading state while authentication & roles are resolving
+  if (loading || !hasMounted) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 flex flex-col items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-9 h-9 border-2 border-slate-300 dark:border-slate-700 border-t-indigo-600 rounded-full animate-spin" />
+          <p className="text-xs text-slate-500 font-medium">Đang xác thực quyền truy cập...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Guard Screen if not admin, super admin, or teacher
   if (!isAuthenticated || (user?.role !== "ADMIN" && user?.role !== "SUPER_ADMIN" && user?.role !== "TEACHER")) {

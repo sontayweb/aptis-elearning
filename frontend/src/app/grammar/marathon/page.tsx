@@ -29,6 +29,7 @@ import {
   RefreshCw,
   ExternalLink,
   Flame,
+  Play,
 } from "lucide-react";
 
 interface MarathonQuestionItem {
@@ -318,6 +319,35 @@ function GrammarMarathonContent() {
                 {allQuestions.filter((q) => q.type === "vocabulary").length} câu hỏi đồng nghĩa, collocation, word match
               </p>
             </button>
+          </div>
+
+          {/* EXAM ROOM MARATHON HERO BANNER */}
+          <div className="mb-6 p-5 sm:p-6 rounded-3xl border border-primary/30 bg-gradient-to-r from-primary/15 via-primary/5 to-card relative overflow-hidden shadow-xs">
+            <div className="absolute -right-8 -top-8 w-60 h-60 bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1.5 max-w-2xl">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground font-extrabold text-[10px] uppercase tracking-wider shadow-xs">
+                  <Sparkles className="w-3 h-3" />
+                  Chế độ Phòng Thi Chuẩn Aptis
+                </div>
+                <h2 className="text-base sm:text-xl font-heading font-extrabold text-foreground">
+                  Luyện Tập Liên Hoàn Trong Phòng Thi — {currentTab === "grammar" ? "Phần 1: Ngữ Pháp" : "Phần 2: Từ Vựng"}
+                </h2>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Làm bài tập trung 2 cột chuẩn đề thi Aptis, chuyển đề mượt mà, ma trận toàn bộ ngân hàng câu hỏi và tự động lưu tiến trình dở dang trên đám mây.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2.5 shrink-0">
+                <Link
+                  href={`/grammar/marathon/room?part=${currentTab === "grammar" ? "1" : "2"}`}
+                  className="h-11 px-5 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                >
+                  <Play className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+                  <span>Vào Luyện Trong Phòng Thi</span>
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Banner Info */}

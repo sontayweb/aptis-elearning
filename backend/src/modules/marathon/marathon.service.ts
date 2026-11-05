@@ -301,15 +301,31 @@ export class MarathonService {
         maxScore += q.maxScore || 5;
         let expectedOrder: string[] = [];
         try {
-          expectedOrder = typeof q.options === 'string' ? JSON.parse(q.options) : q.options || [];
+          expectedOrder =
+            typeof q.correctAnswer === 'string'
+              ? JSON.parse(q.correctAnswer)
+              : q.correctAnswer || [];
         } catch {
           expectedOrder = [];
         }
 
-        const userOrder = payload.orders?.[currentItem.partId] || [];
+        // Hỗ trợ cả key theo q.id hoặc theo partId
+        const userOrder = payload.orders?.[q.id] || payload.orders?.[currentItem.partId] || [];
         let isCorrect = false;
+
         if (expectedOrder.length > 0 && userOrder.length === expectedOrder.length) {
-          isCorrect = userOrder.every((val, idx) => val === expectedOrder[idx]);
+          isCorrect = userOrder.every((val, idx) => {
+            const exp = expectedOrder[idx];
+            if (val === exp) return true;
+            // Nếu userOrder lưu cả câu văn (text) thay vì ID
+            if (q.options && typeof q.options === 'object' && Array.isArray((q.options as any).sentences)) {
+              const matchedSent = (q.options as any).sentences.find((s: any) => s.id === exp);
+              if (matchedSent && (matchedSent.text === val || matchedSent.text?.trim() === val?.trim())) {
+                return true;
+              }
+            }
+            return false;
+          });
         }
 
         if (isCorrect) {

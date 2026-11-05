@@ -20,7 +20,7 @@ import {
 
 export default function TeacherLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, isAuthenticated, logout, quickLogin } = useAuth();
+  const { user, isAuthenticated, loading, logout, quickLogin } = useAuth();
   const isTeacherOrAdmin =
     user?.role === "TEACHER" || user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
 
@@ -30,6 +30,17 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
     { name: "Hàng đợi Chấm thi", href: "/teacher/grading", icon: PenTool },
     { name: "Soạn Đề & Giải thích", href: "/admin/exams?view=QUESTIONS", icon: BookOpen },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-9 h-9 border-2 border-slate-300 dark:border-slate-700 border-t-amber-600 rounded-full animate-spin" />
+          <p className="text-xs text-slate-500 font-medium">Đang xác thực quyền Giảng viên...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated || !isTeacherOrAdmin) {
     return (
