@@ -22,14 +22,29 @@ interface ImageBufferResult {
 }
 
 /**
+ * Chuẩn hóa URL ảnh (gắn domain chính xác cho các đường dẫn relative speaking/2025/...)
+ */
+export function normalizeSpeakingImageUrl(imgUrl: string | null | undefined): string | null {
+  if (!imgUrl || typeof imgUrl !== 'string') return null;
+  const trimmed = imgUrl.trim();
+  if (!trimmed) return null;
+
+  if (trimmed.startsWith('speaking/')) {
+    return `https://files.aptisacademy.com.vn/${trimmed}`;
+  }
+  return trimmed;
+}
+
+/**
  * Đọc buffer và mime type của ảnh từ đường dẫn file cục bộ hoặc URL
  */
 async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | null> {
-  if (!imgUrl || typeof imgUrl !== 'string' || imgUrl.trim() === '') {
+  const normalized = normalizeSpeakingImageUrl(imgUrl);
+  if (!normalized) {
     return null;
   }
 
-  const trimmed = imgUrl.trim();
+  const trimmed = normalized;
 
   const detectMimeType = (filePathOrUrl: string, buf?: Buffer): string => {
     if (buf && buf.length >= 4) {
@@ -70,6 +85,7 @@ async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | n
       if (pathname.includes('/uploads/')) {
         const localRel = pathname.replace(/^\/?(api\/)?uploads\/?/, '');
         const candidatePaths = [
+          path.resolve('/app/uploads', localRel),
           path.resolve(process.env.UPLOAD_DIR || './uploads', localRel),
           path.resolve('./uploads', localRel),
           path.resolve('../frontend/public/uploads', localRel),
@@ -101,6 +117,7 @@ async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | n
   // Tìm file trong thư mục uploads hoặc public
   const cleanRel = trimmed.replace(/^\/?(api\/)?uploads\/?/, '');
   const candidatePaths = [
+    path.resolve('/app/uploads', cleanRel),
     path.resolve(process.env.UPLOAD_DIR || './uploads', cleanRel),
     path.resolve('./uploads', cleanRel),
     path.resolve('../frontend/public/uploads', cleanRel),
@@ -120,21 +137,26 @@ async function resolveImageBuffer(imgUrl: string): Promise<ImageBufferResult | n
     }
   }
 
-  // Fallback tải từ domain production nếu chạy môi trường dev
+  // Fallback tải từ domain production nếu chạy môi trường dev hoặc host khác
   if (trimmed.startsWith('/uploads/') || trimmed.startsWith('uploads/')) {
-    try {
-      const prodUrl = `https://aptisesolpremier.com/${trimmed.replace(/^\//, '')}`;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      const res = await fetch(prodUrl, { signal: controller.signal });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const arrayBuf = await res.arrayBuffer();
-        const buf = Buffer.from(arrayBuf);
-        return { buffer: buf, mimeType: detectMimeType(prodUrl, buf) };
+    const prodCandidates = [
+      `https://api.aptisesolpremier.com/${trimmed.replace(/^\/?(api\/)?/, '')}`,
+      `https://aptisesolpremier.com/${trimmed.replace(/^\//, '')}`,
+    ];
+    for (const prodUrl of prodCandidates) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const res = await fetch(prodUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const arrayBuf = await res.arrayBuffer();
+          const buf = Buffer.from(arrayBuf);
+          return { buffer: buf, mimeType: detectMimeType(prodUrl, buf) };
+        }
+      } catch (err: any) {
+        // Thử candidate tiếp theo
       }
-    } catch (err: any) {
-      console.warn(`[SpeakingHintsGenerator] Không tải được ảnh từ host production ${trimmed}:`, err?.message || err);
     }
   }
 
@@ -162,7 +184,8 @@ export class SpeakingHintsGeneratorService {
     if (!image1Data && !image2Data) {
       throw {
         statusCode: 400,
-        message: `Phần thi Speaking Part ${partNumber} chưa có ảnh minh họa hợp lệ (Ảnh: "${imageUrl || 'trống'}"). Vui lòng tải ảnh minh họa lên trước khi yêu cầu AI sinh gợi ý.`,
+        message: `Phần thi Speaking Part ${partNumber} chưa có ảnh minh họa hợp lệ (Ảnh: "${imageUrl || 'trống'}"). Vui lòng kiểm tra lại ảnh minh họa trước khi sinh gợi ý.`,
+        isImageError: true,
       };
     }
 
@@ -486,7 +509,9 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
       totalParts: number;
       completedCount: number;
       pendingCount: number;
+      brokenImageCount: number;
       missingImageCount: number;
+      readyToGenCount: number;
       completionRate: number;
     };
     items: Array<{
@@ -500,7 +525,8 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
       imageUrl: string | null;
       secondImageUrl: string | null;
       hasImage: boolean;
-      status: 'COMPLETED' | 'PENDING' | 'MISSING_IMAGE';
+      isImageBroken: boolean;
+      status: 'COMPLETED' | 'PENDING' | 'BROKEN_IMAGE' | 'MISSING_IMAGE';
       questionCount: number;
       firstQuestionId: string | null;
       vocabularyHints: SpeakingVocabularyHintsData | null;
@@ -553,6 +579,7 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
 
     let completedCount = 0;
     let pendingCount = 0;
+    let brokenImageCount = 0;
     let missingImageCount = 0;
 
     const items = parts.map((part) => {
@@ -569,7 +596,14 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
         img1 = rawImg.trim();
       }
 
+      img1 = normalizeSpeakingImageUrl(img1);
+      img2 = normalizeSpeakingImageUrl(img2);
+
       const hasImage = Boolean(img1);
+      const isDead1 = Boolean(img1 && (img1.includes('thithuaptis.com') || img1.startsWith('javascript:')));
+      const isDead2 = Boolean(img2 && (img2.includes('thithuaptis.com') || img2.startsWith('javascript:')));
+      const isImageBroken = isDead1 || (pNum === 3 && isDead2);
+
       const firstQ = part.questions[0];
       const firstOptions = (firstQ?.options as any) || {};
       const hints = (firstOptions.vocabularyHints as SpeakingVocabularyHintsData) || null;
@@ -579,13 +613,16 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
         hints.keywords.length > 0
       );
 
-      let status: 'COMPLETED' | 'PENDING' | 'MISSING_IMAGE';
+      let status: 'COMPLETED' | 'PENDING' | 'BROKEN_IMAGE' | 'MISSING_IMAGE';
       if (!hasImage) {
         status = 'MISSING_IMAGE';
         missingImageCount++;
       } else if (hasHints) {
         status = 'COMPLETED';
         completedCount++;
+      } else if (isImageBroken) {
+        status = 'BROKEN_IMAGE';
+        brokenImageCount++;
       } else {
         status = 'PENDING';
         pendingCount++;
@@ -602,6 +639,7 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
         imageUrl: img1,
         secondImageUrl: img2,
         hasImage,
+        isImageBroken,
         status,
         questionCount: part.questions.length,
         firstQuestionId: firstQ?.id || null,
@@ -615,6 +653,7 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
     });
 
     const totalParts = items.length;
+    const readyToGenCount = pendingCount;
     const completionRate = totalParts > 0 ? Math.round((completedCount / totalParts) * 100) : 0;
 
     return {
@@ -622,7 +661,9 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
         totalParts,
         completedCount,
         pendingCount,
+        brokenImageCount,
         missingImageCount,
+        readyToGenCount,
         completionRate,
       },
       items,
