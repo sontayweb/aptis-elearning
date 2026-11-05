@@ -391,10 +391,15 @@ model PromotionCode {
   code             String               @unique // Lưu UPPERCASE (ví dụ: "APTISGOLIVE")
   title            String               // "Mã trải nghiệm Go-Live 14 ngày VIP"
   description      String?              // "Tặng 14 ngày VIP và 20 lượt chấm AI chuẩn British Council"
-  plan_id          String               // Trỏ tới Gói VIP trong bảng SubscriptionPlan
+  code_type        String               @default("FREE_TRIAL") // "FREE_TRIAL", "DISCOUNT_AMOUNT", "DISCOUNT_PERCENT"
+  plan_id          String?              // Trỏ tới Gói VIP trong bảng SubscriptionPlan (nếu là FREE_TRIAL)
   duration_days    Int                  @default(14) // Thời hạn ngày trải nghiệm
   ai_quota         Int                  @default(20) // Số lượt chấm AI tặng kèm
   teacher_quota    Int                  @default(0)  // Số lượt giáo viên chấm (mặc định 0)
+  discount_amount  Int?                 // Số tiền giảm VNĐ (cho DISCOUNT_AMOUNT)
+  discount_percent Int?                 // % giảm giá (cho DISCOUNT_PERCENT)
+  min_order_amount Int?                 // Đơn hàng tối thiểu để áp dụng
+  is_featured      Boolean              @default(false) // Chỉ 1 mã có is_featured=true làm đại diện Banner
   max_uses         Int?                 // Giới hạn số lượt toàn hệ thống (null = không giới hạn)
   current_uses     Int                  @default(0)  // Đếm số lượt đã kích hoạt
   is_active        Boolean              @default(true)
@@ -403,10 +408,11 @@ model PromotionCode {
   created_at       DateTime             @default(now())
   updated_at       DateTime             @updatedAt
 
-  plan             SubscriptionPlan     @relation(fields: [plan_id], references: [id])
+  plan             SubscriptionPlan?    @relation(fields: [plan_id], references: [id])
   redemptions      PromotionRedemption[]
 
   @@index([code, is_active])
+  @@index([is_featured, is_active])
 }
 
 model PromotionRedemption {

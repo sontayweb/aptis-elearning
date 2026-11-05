@@ -495,7 +495,7 @@ export function SpeakingQuestionCard({
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs md:text-sm text-foreground/90 leading-relaxed font-sans">
+            <p className="text-sm md:text-base text-foreground/95 leading-relaxed font-medium">
               {currentSampleText}
             </p>
             <div className="text-[11px] text-muted-foreground font-mono pt-1">

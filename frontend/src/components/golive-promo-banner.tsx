@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Sparkles, Gift, ArrowRight, X, Copy, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
+import { api } from "@/lib/api-client";
 
 interface GoLivePromoBannerProps {
   className?: string;
@@ -14,6 +15,45 @@ export function GoLivePromoBanner({ className = "", onOpenAuth }: GoLivePromoBan
   const { user, isAuthenticated } = useAuth();
   const [isVisible, setIsVisible] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [featuredPromo, setFeaturedPromo] = useState<{
+    id: string;
+    code: string;
+    title: string;
+    description?: string;
+    codeType: string;
+    durationDays: number;
+    aiQuota: number;
+    discountAmount?: number;
+    discountPercent?: number;
+    expiresAt?: string;
+    planName?: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Tải mã khuyến mại nổi bật (Featured Promo) trực tiếp từ Database
+  useEffect(() => {
+    let isMounted = true;
+    async function loadFeaturedPromo() {
+      try {
+        const res = await api.payment.getFeaturedPromo();
+        if (isMounted) {
+          if (res.success && res.data) {
+            setFeaturedPromo(res.data);
+          } else {
+            setFeaturedPromo(null);
+          }
+        }
+      } catch {
+        if (isMounted) setFeaturedPromo(null);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadFeaturedPromo();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     // Kiểm tra xem user đã ẩn banner trong session này chưa
@@ -31,27 +71,32 @@ export function GoLivePromoBanner({ className = "", onOpenAuth }: GoLivePromoBan
   const handleCopyCode = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    navigator.clipboard.writeText("GOLIVE14");
+    if (!featuredPromo) return;
+    navigator.clipboard.writeText(featuredPromo.code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Mã chỉ mở đến hết ngày 25/11/2026. Sau ngày này mã sẽ tự động tắt
-  const PROMO_EXPIRY_DATE = new Date("2026-11-25T23:59:59.999+07:00");
-  const isExpired = new Date() > PROMO_EXPIRY_DATE;
-
-  // Nếu người dùng đã là SuperAdmin hoặc đã có gói trả phí hoặc chương trình đã kết thúc
+  // Nếu người dùng đã là SuperAdmin hoặc đã có gói trả phí
   const isVipOrAdmin =
     user?.role === "SUPER_ADMIN" ||
     user?.role === "ADMIN" ||
     Boolean(user?.subscription) ||
     Boolean(user?.user_subscriptions?.length);
 
-  if (!isVisible || isVipOrAdmin || isExpired) {
+  // Nếu đang tải, hoặc không có mã featured trong CSDL, hoặc user là VIP/Admin, hoặc đã bấm tắt banner
+  if (loading || !featuredPromo || !isVisible || isVipOrAdmin) {
     return null;
   }
 
-  // Nếu nằm trong Navbar (khi có onOpenAuth hoặc không có className dạng card riêng)
+  // Định dạng ngày hết hạn động
+  const expiryFormatted = featuredPromo.expiresAt
+    ? new Date(featuredPromo.expiresAt).toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+      })
+    : null;
+
   const isTopBar = Boolean(onOpenAuth);
 
   if (isTopBar) {
@@ -60,18 +105,20 @@ export function GoLivePromoBanner({ className = "", onOpenAuth }: GoLivePromoBan
         <div className="flex items-center gap-2 overflow-hidden mx-auto sm:mx-0">
           <Gift className="w-4 h-4 text-amber-200 shrink-0 animate-bounce" />
           <span className="font-extrabold uppercase tracking-wider text-[11px] bg-white/20 px-2 py-0.5 rounded-full shrink-0 hidden sm:inline">
-            Go-Live 14 Ngày VIP (Đến 25/11)
+            {featuredPromo.title} {expiryFormatted ? `(Đến ${expiryFormatted})` : ""}
           </span>
           <span className="truncate text-white/95">
-            Mở khóa 860+ đề thi &amp; 20 lượt chấm AI với mã:
+            {featuredPromo.codeType === "FREE_TRIAL"
+              ? `Tặng ${featuredPromo.durationDays} ngày VIP & ${featuredPromo.aiQuota} lượt AI với mã:`
+              : `Nhận ưu đãi giảm giá độc quyền với mã:`}
           </span>
           <button
             type="button"
             onClick={handleCopyCode}
-            title="Bấm để copy mã GOLIVE14"
+            title={`Bấm để copy mã ${featuredPromo.code}`}
             className="inline-flex items-center gap-1 font-mono font-black bg-white text-amber-800 px-2 py-0.5 rounded-md hover:bg-amber-100 transition-colors cursor-pointer shrink-0"
           >
-            <span>GOLIVE14</span>
+            <span>{featuredPromo.code}</span>
             {copied ? (
               <CheckCircle2 className="w-3 h-3 text-emerald-600" />
             ) : (
@@ -92,7 +139,7 @@ export function GoLivePromoBanner({ className = "", onOpenAuth }: GoLivePromoBan
             </button>
           ) : (
             <Link
-              href="/pricing?code=GOLIVE14"
+              href={`/pricing?code=${encodeURIComponent(featuredPromo.code)}`}
               className="px-3 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold text-xs transition-colors cursor-pointer hidden md:inline-flex items-center gap-1"
             >
               <span>Kích hoạt ngay</span>
@@ -104,90 +151,62 @@ export function GoLivePromoBanner({ className = "", onOpenAuth }: GoLivePromoBan
             type="button"
             onClick={handleDismiss}
             aria-label="Đóng thông báo"
-            className="p-1 rounded-lg hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer"
+            className="p-1 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
     );
   }
 
-  // Dạng Card Banner (Dùng trong Dashboard hoặc Landing Page)
+  // Dạng card đặt trên các trang hoặc dashboard
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl sm:rounded-3xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-primary/10 to-amber-500/10 p-4 sm:p-5 shadow-sm transition-all hover:border-amber-500/60 ${className}`}
+      className={`rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-primary/5 to-amber-500/15 p-4 sm:p-5 relative overflow-hidden shadow-xs ${className}`}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-12 -right-12 w-36 h-36 rounded-full bg-amber-500/20 blur-2xl"
-      />
-
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
-        <div className="flex items-start sm:items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 shadow-xs border border-amber-500/30">
-            <Gift className="w-5 h-5 animate-pulse" />
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-primary text-white flex items-center justify-center shrink-0 shadow-md">
+            <Gift className="w-5 h-5" />
           </div>
-
-          <div className="space-y-1 min-w-0">
+          <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider">
-                CHÀO MỪNG GO-LIVE (ĐẾN 25/11)
+              <span className="font-heading font-extrabold text-sm sm:text-base text-foreground">
+                {featuredPromo.title}
               </span>
-              <span className="text-xs font-bold text-foreground truncate">
-                Tặng 14 ngày VIP Pro (1 lần/tài khoản)
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider">
+                {expiryFormatted ? `Hạn dùng: ${expiryFormatted}` : "Đang diễn ra"}
               </span>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Nhập mã{" "}
-              <button
-                type="button"
-                onClick={handleCopyCode}
-                title="Bấm để copy mã"
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 font-mono font-bold text-xs border border-amber-500/30 transition-colors cursor-pointer"
-              >
-                <span>GOLIVE14</span>
-                {copied ? (
-                  <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                ) : (
-                  <Copy className="w-3 h-3 opacity-70" />
-                )}
-              </button>{" "}
-              để mở khóa toàn bộ 860+ đề thi &amp; 20 lượt chấm AI.
+            <p className="text-xs text-muted-foreground mt-1 max-w-xl">
+              {featuredPromo.description ||
+                `Nhập mã ${featuredPromo.code} để mở khóa toàn bộ ${featuredPromo.durationDays} ngày VIP và ${featuredPromo.aiQuota} lượt chấm AI.`}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 pt-1 sm:pt-0">
-          {!isAuthenticated && onOpenAuth ? (
-            <button
-              type="button"
-              onClick={onOpenAuth}
-              className="flex-1 sm:flex-initial h-9 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-primary hover:from-amber-700 hover:to-primary/90 text-white font-bold text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Đăng nhập nhận quà</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          ) : (
-            <Link
-              href="/pricing?code=GOLIVE14"
-              className="flex-1 sm:flex-initial h-9 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-primary hover:from-amber-700 hover:to-primary/90 text-white font-bold text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Kích hoạt ngay</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          )}
-
+        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
           <button
             type="button"
-            onClick={handleDismiss}
-            aria-label="Đóng thông báo"
-            className="w-8 h-8 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+            onClick={handleCopyCode}
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-amber-500/30 bg-background text-foreground hover:bg-muted font-mono font-bold text-xs transition-colors cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            <span>{featuredPromo.code}</span>
+            {copied ? (
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            ) : (
+              <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+            )}
           </button>
+
+          <Link
+            href={`/pricing?code=${encodeURIComponent(featuredPromo.code)}`}
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-primary text-white text-xs font-bold shadow-md hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap"
+          >
+            <span>Dùng ngay</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </div>
     </div>

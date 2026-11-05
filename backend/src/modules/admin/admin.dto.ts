@@ -132,3 +132,104 @@ export type AdminAdjustQuotaInput = z.infer<typeof adminAdjustQuotaSchema>;
 export type AdminUpdatePlanInput = z.infer<typeof adminUpdatePlanSchema>;
 export type AdminCreateVocabWordInput = z.infer<typeof adminCreateVocabWordSchema>;
 export type AdminUpdateVocabWordInput = z.infer<typeof adminUpdateVocabWordSchema>;
+
+export const adminCreatePromotionSchema = z
+  .object({
+    code: z
+      .string()
+      .min(3, 'Mã khuyến mại phải có ít nhất 3 ký tự')
+      .max(30, 'Mã khuyến mại không vượt quá 30 ký tự')
+      .transform((val) => val.trim().toUpperCase()),
+    title: z.string().min(2, 'Tiêu đề mã khuyến mại không được để trống'),
+    description: z.string().optional().nullable(),
+    code_type: z.enum(['FREE_TRIAL', 'DISCOUNT_AMOUNT', 'DISCOUNT_PERCENT']).optional(),
+    codeType: z.enum(['FREE_TRIAL', 'DISCOUNT_AMOUNT', 'DISCOUNT_PERCENT']).optional(),
+    plan_id: z.string().optional().nullable(),
+    planId: z.string().optional().nullable(),
+    duration_days: z.number().int().min(1).optional(),
+    durationDays: z.number().int().min(1).optional(),
+    ai_quota: z.number().int().min(0).optional(),
+    aiQuota: z.number().int().min(0).optional(),
+    teacher_quota: z.number().int().min(0).optional(),
+    teacherQuota: z.number().int().min(0).optional(),
+    discount_amount: z.number().int().min(0).optional().nullable(),
+    discountAmount: z.number().int().min(0).optional().nullable(),
+    discount_percent: z.number().int().min(1).max(100).optional().nullable(),
+    discountPercent: z.number().int().min(1).max(100).optional().nullable(),
+    min_order_amount: z.number().int().min(0).optional().nullable(),
+    minOrderAmount: z.number().int().min(0).optional().nullable(),
+    is_featured: z.boolean().optional(),
+    isFeatured: z.boolean().optional(),
+    is_active: z.boolean().optional(),
+    isActive: z.boolean().optional(),
+    max_uses: z.number().int().min(1).optional().nullable(),
+    maxUses: z.number().int().min(1).optional().nullable(),
+    expires_at: z.string().optional().nullable(),
+    expiresAt: z.string().optional().nullable(),
+  })
+  .transform((data) => ({
+    code: data.code,
+    title: data.title,
+    description: data.description,
+    code_type: data.code_type ?? data.codeType ?? 'FREE_TRIAL',
+    plan_id: data.plan_id ?? data.planId ?? null,
+    duration_days: data.duration_days ?? data.durationDays ?? 14,
+    ai_quota: data.ai_quota ?? data.aiQuota ?? 20,
+    teacher_quota: data.teacher_quota ?? data.teacherQuota ?? 0,
+    discount_amount: data.discount_amount ?? data.discountAmount ?? null,
+    discount_percent: data.discount_percent ?? data.discountPercent ?? null,
+    min_order_amount: data.min_order_amount ?? data.minOrderAmount ?? null,
+    is_featured: data.is_featured ?? data.isFeatured ?? false,
+    is_active: data.is_active ?? data.isActive ?? true,
+    max_uses: data.max_uses ?? data.maxUses ?? null,
+    expires_at: data.expires_at ?? data.expiresAt ?? null,
+  }));
+
+export const adminUpdatePromotionSchema = z
+  .object({
+    title: z.string().optional(),
+    description: z.string().optional().nullable(),
+    code_type: z.enum(['FREE_TRIAL', 'DISCOUNT_AMOUNT', 'DISCOUNT_PERCENT']).optional(),
+    codeType: z.enum(['FREE_TRIAL', 'DISCOUNT_AMOUNT', 'DISCOUNT_PERCENT']).optional(),
+    plan_id: z.string().optional().nullable(),
+    planId: z.string().optional().nullable(),
+    duration_days: z.number().int().min(1).optional(),
+    durationDays: z.number().int().min(1).optional(),
+    ai_quota: z.number().int().min(0).optional(),
+    aiQuota: z.number().int().min(0).optional(),
+    teacher_quota: z.number().int().min(0).optional(),
+    teacherQuota: z.number().int().min(0).optional(),
+    discount_amount: z.number().int().min(0).optional().nullable(),
+    discountAmount: z.number().int().min(0).optional().nullable(),
+    discount_percent: z.number().int().min(1).max(100).optional().nullable(),
+    discountPercent: z.number().int().min(1).max(100).optional().nullable(),
+    min_order_amount: z.number().int().min(0).optional().nullable(),
+    minOrderAmount: z.number().int().min(0).optional().nullable(),
+    is_featured: z.boolean().optional(),
+    isFeatured: z.boolean().optional(),
+    is_active: z.boolean().optional(),
+    isActive: z.boolean().optional(),
+    max_uses: z.number().int().min(1).optional().nullable(),
+    maxUses: z.number().int().min(1).optional().nullable(),
+    expires_at: z.string().optional().nullable(),
+    expiresAt: z.string().optional().nullable(),
+  })
+  .transform((data) => ({
+    title: data.title,
+    description: data.description,
+    code_type: data.code_type ?? data.codeType,
+    plan_id: data.plan_id ?? data.planId,
+    duration_days: data.duration_days ?? data.durationDays,
+    ai_quota: data.ai_quota ?? data.aiQuota,
+    teacher_quota: data.teacher_quota ?? data.teacherQuota,
+    discount_amount: data.discount_amount ?? data.discountAmount,
+    discount_percent: data.discount_percent ?? data.discountPercent,
+    min_order_amount: data.min_order_amount ?? data.minOrderAmount,
+    is_featured: data.is_featured ?? data.isFeatured,
+    is_active: data.is_active ?? data.isActive,
+    max_uses: data.max_uses ?? data.maxUses,
+    expires_at: data.expires_at ?? data.expiresAt,
+  }));
+
+export type AdminCreatePromotionInput = z.infer<typeof adminCreatePromotionSchema>;
+export type AdminUpdatePromotionInput = z.infer<typeof adminUpdatePromotionSchema>;

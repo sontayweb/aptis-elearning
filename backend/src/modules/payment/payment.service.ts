@@ -8,6 +8,63 @@ import { grantOrExtendSubscription } from '../../utils/subscription-helper';
 import { emailService } from '../email/email.service';
 
 export class PaymentService {
+  /**
+   * Lấy mã khuyến mại đại diện đang được chọn Treo Banner (Single Active Featured Promo)
+   */
+  async getFeaturedPromo() {
+    try {
+      const count = await prisma.promotionCode.count();
+      if (count === 0) {
+        const plan = await prisma.subscriptionPlan.findFirst({
+          where: { is_active: true },
+          orderBy: { price_vnd: 'desc' },
+        });
+        if (plan) {
+          await prisma.promotionCode.create({
+            data: {
+              code: 'GOLIVE14',
+              title: 'Mã trải nghiệm Go-Live 14 ngày VIP Pro',
+              description: 'Tặng 14 ngày VIP Pro và 20 lượt chấm AI chuẩn British Council nhân dịp Go-Live',
+              code_type: 'FREE_TRIAL',
+              plan_id: plan.id,
+              duration_days: 14,
+              ai_quota: 20,
+              is_featured: true,
+              is_active: true,
+              expires_at: new Date('2026-11-25T23:59:59.999+07:00'),
+            },
+          });
+        }
+      }
+    } catch {}
+
+    const now = new Date();
+    const promo = await prisma.promotionCode.findFirst({
+      where: {
+        is_featured: true,
+        is_active: true,
+        OR: [{ expires_at: null }, { expires_at: { gt: now } }],
+      },
+      include: { plan: true },
+    });
+
+    if (!promo) return null;
+
+    return {
+      id: promo.id,
+      code: promo.code,
+      title: promo.title,
+      description: promo.description,
+      codeType: promo.code_type,
+      durationDays: promo.duration_days,
+      aiQuota: promo.ai_quota,
+      discountAmount: promo.discount_amount,
+      discountPercent: promo.discount_percent,
+      expiresAt: promo.expires_at,
+      planName: promo.plan?.name || 'VIP Pro',
+    };
+  }
+
   async getPlans() {
     return prisma.subscriptionPlan.findMany({
       where: { is_active: true },
@@ -15,7 +72,7 @@ export class PaymentService {
     });
   }
 
-  async initiatePayment(userId: string, planCode: PlanType) {
+  async initiatePayment(userId: string, planCode: PlanType, promoCodeInput?: string) {
     const plan = await prisma.subscriptionPlan.findUnique({
       where: { code: planCode },
     });
@@ -28,6 +85,32 @@ export class PaymentService {
       throw { statusCode: 400, message: 'Gói miễn phí không cần thanh toán' };
     }
 
+    let finalAmount = plan.price_vnd;
+    let appliedDiscount = 0;
+    let appliedPromoCode: string | null = null;
+
+    if (promoCodeInput && promoCodeInput.trim()) {
+      const codeNorm = promoCodeInput.trim().toUpperCase();
+      const now = new Date();
+      const promo = await prisma.promotionCode.findUnique({
+        where: { code: codeNorm },
+      });
+
+      if (promo && promo.is_active && (!promo.expires_at || promo.expires_at > now)) {
+        if (promo.max_uses === null || promo.current_uses < promo.max_uses) {
+          if (promo.code_type === 'DISCOUNT_AMOUNT' && promo.discount_amount) {
+            appliedDiscount = Math.min(plan.price_vnd, promo.discount_amount);
+          } else if (promo.code_type === 'DISCOUNT_PERCENT' && promo.discount_percent) {
+            appliedDiscount = Math.round((plan.price_vnd * promo.discount_percent) / 100);
+          }
+          if (appliedDiscount > 0) {
+            finalAmount = Math.max(10000, plan.price_vnd - appliedDiscount);
+            appliedPromoCode = promo.code;
+          }
+        }
+      }
+    }
+
     // Sinh mã đơn hàng duy nhất: APTIS_<TIMESTAMP>_<SUFFIX>
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const orderCode = `APTIS${Date.now()}${randomSuffix}`;
@@ -36,7 +119,7 @@ export class PaymentService {
       data: {
         user_id: userId,
         order_code: orderCode,
-        amount: plan.price_vnd,
+        amount: finalAmount,
         status: TransactionStatus.PENDING,
         bank_account: process.env.SEPAY_BANK_ACCOUNT || '0866950837',
         bank_name: process.env.SEPAY_BANK_NAME || 'MBBank',
@@ -49,6 +132,9 @@ export class PaymentService {
       transactionId: transaction.id,
       orderCode: transaction.order_code,
       amount: transaction.amount,
+      originalAmount: plan.price_vnd,
+      discountAmount: appliedDiscount,
+      appliedPromoCode,
       bankAccount: transaction.bank_account,
       bankName: transaction.bank_name,
       accountHolder: 'APTIS KY TICH',
@@ -571,10 +657,35 @@ export class PaymentService {
     const now = new Date();
 
     // 1. Kiểm tra mã tồn tại & hiệu lực
-    const promo = await prisma.promotionCode.findUnique({
+    let promo = await prisma.promotionCode.findUnique({
       where: { code: codeNormalized },
       include: { plan: true },
     });
+
+    // Tự động đảm bảo mã GOLIVE14 tồn tại nếu học viên nhập
+    if (!promo && (codeNormalized === 'GOLIVE14' || codeNormalized === 'APTISGOLIVE')) {
+      const defaultPlan = await prisma.subscriptionPlan.findFirst({
+        where: { is_active: true },
+        orderBy: { price_vnd: 'desc' },
+      });
+      if (defaultPlan) {
+        promo = await prisma.promotionCode.create({
+          data: {
+            code: codeNormalized,
+            title: 'Mã trải nghiệm Go-Live 14 ngày VIP Pro',
+            description: 'Tặng 14 ngày VIP Pro và 20 lượt chấm AI chuẩn British Council nhân dịp Go-Live',
+            code_type: 'FREE_TRIAL',
+            plan_id: defaultPlan.id,
+            duration_days: 14,
+            ai_quota: 20,
+            is_featured: true,
+            is_active: true,
+            expires_at: new Date('2026-11-25T23:59:59.999+07:00'),
+          },
+          include: { plan: true },
+        });
+      }
+    }
 
     if (!promo || !promo.is_active) {
       throw { statusCode: 400, message: 'Mã kích hoạt không hợp lệ hoặc đã kết thúc chương trình' };
@@ -611,7 +722,7 @@ export class PaymentService {
       // 3.1 Cấp VIP qua helper hiện hữu
       const sub = await grantOrExtendSubscription(tx, {
         userId,
-        planId: promo.plan_id,
+        planId: promo.plan_id || (await prisma.subscriptionPlan.findFirst({ where: { is_active: true }, orderBy: { price_vnd: 'desc' } }))?.id || '',
         customDurationDays: promo.duration_days,
         customAiQuota: promo.ai_quota,
         customTeacherQuota: promo.teacher_quota,
@@ -660,7 +771,7 @@ export class PaymentService {
       description: `Học viên ${user?.full_name || 'N/A'} (${user?.email || 'N/A'}) kích hoạt mã trải nghiệm [${promo.code}]: Nhận ${promo.duration_days} ngày VIP Pro miễn phí và ${promo.ai_quota} lượt chấm AI (Hạn dùng đến ${endDateFormatted}).`,
       newValue: {
         promoCode: promo.code,
-        planName: promo.plan.name,
+        planName: promo.plan?.name || 'VIP Pro',
         durationDays: promo.duration_days,
         aiQuota: promo.ai_quota,
         endDate: subscription.end_date,
@@ -681,7 +792,7 @@ export class PaymentService {
     return {
       success: true,
       message: `Chúc mừng bạn! Đã kích hoạt thành công ${promo.duration_days} ngày VIP trải nghiệm miễn phí!`,
-      planName: promo.plan.name,
+      planName: promo.plan?.name || 'VIP Pro',
       durationDays: promo.duration_days,
       aiQuotaGranted: promo.ai_quota,
       aiQuotaLeft: subscription.ai_quota_left,

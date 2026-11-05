@@ -3,6 +3,7 @@ import { PlanType } from '@prisma/client';
 
 export const initiatePaymentSchema = z.object({
   planCode: z.nativeEnum(PlanType),
+  promoCode: z.string().optional(),
 });
 
 export const sepayWebhookSchema = z.object({

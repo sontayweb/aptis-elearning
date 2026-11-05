@@ -692,7 +692,8 @@ export class ExamService {
         }
 
         // Trích xuất số hiệu đề từ part.title (nếu là Full Test ghép từ Đề XX) hoặc exam.title
-        const partNumMatch = part.title.match(/Đề\s*(\d+)/i);
+        const partTitle = part.title || '';
+        const partNumMatch = partTitle.match(/Đề\s*(\d+)/i);
         const numMatch =
           partNumMatch ||
           exam.title.match(/Đề\s*(\d+)/i) ||
@@ -701,7 +702,7 @@ export class ExamService {
         const examNumStr = numMatch ? String(numMatch[1]).padStart(2, '0') : null;
         const examPrefix = examNumStr ? `de${examNumStr}` : null;
 
-        if (part.part_number === 1 || part.title.toLowerCase().includes('part 1')) {
+        if (part.part_number === 1 || partTitle.toLowerCase().includes('part 1')) {
           for (let i = 0; i < part.questions.length; i++) {
             const q = part.questions[i];
             const transcript = extractListeningTranscript(q.explanation);
@@ -719,7 +720,7 @@ export class ExamService {
               (q as any).audio_url = `/uploads/audio/listening/${matchingAudio}`;
             }
           }
-        } else if (part.part_number === 2 || part.title.toLowerCase().includes('part 2')) {
+        } else if (part.part_number === 2 || partTitle.toLowerCase().includes('part 2')) {
           const qWithExp = part.questions.find((q) => q.explanation && q.explanation.length > 30);
           const transcript = extractListeningTranscript(qWithExp?.explanation || part.passage_text);
           if (transcript) {
@@ -738,7 +739,7 @@ export class ExamService {
           if (p2Audio) {
             part.audio_url = `/uploads/audio/listening/${p2Audio}`;
           }
-        } else if (part.part_number === 3 || part.title.toLowerCase().includes('part 3')) {
+        } else if (part.part_number === 3 || partTitle.toLowerCase().includes('part 3')) {
           const qWithExp = part.questions.find((q) => q.explanation && q.explanation.length > 30);
           const transcript = extractListeningTranscript(qWithExp?.explanation || part.passage_text);
           if (transcript) {
@@ -757,7 +758,7 @@ export class ExamService {
           if (p3Audio) {
             part.audio_url = `/uploads/audio/listening/${p3Audio}`;
           }
-        } else if (part.part_number === 4 || part.title.toLowerCase().includes('part 4')) {
+        } else if (part.part_number === 4 || partTitle.toLowerCase().includes('part 4')) {
           const q1Exp = part.questions.slice(0, 2).find((q) => q.explanation && q.explanation.length > 30);
           const q2Exp = part.questions.slice(2, 4).find((q) => q.explanation && q.explanation.length > 30);
           const t1 = extractListeningTranscript(q1Exp?.explanation);

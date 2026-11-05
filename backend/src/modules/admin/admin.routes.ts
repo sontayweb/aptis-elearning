@@ -122,6 +122,16 @@ router.post('/transactions/:id/resolve', roleGuard(['ADMIN']), (req, res, next) 
 );
 
 // Quản lý gói cước (Plans)
+
+// ==========================================
+// QUẢN LÝ MÃ KHUYẾN MẠI (PROMOTIONS & VOUCHERS)
+// ==========================================
+router.get('/promotions', roleGuard(['ADMIN']), (req, res, next) => adminController.listPromotions(req, res, next));
+router.post('/promotions', roleGuard(['ADMIN']), (req, res, next) => adminController.createPromotion(req, res, next));
+router.patch('/promotions/:id', roleGuard(['ADMIN']), (req, res, next) => adminController.updatePromotion(req, res, next));
+router.delete('/promotions/:id', roleGuard(['ADMIN']), (req, res, next) => adminController.deletePromotion(req, res, next));
+router.get('/promotions/:id/redemptions', roleGuard(['ADMIN']), (req, res, next) => adminController.listPromotionRedemptions(req, res, next));
+
 router.get('/plans', roleGuard(['ADMIN']), (req, res, next) => adminController.listPlans(req, res, next));
 router.patch('/plans/:id', roleGuard(['ADMIN']), (req, res, next) => adminController.updatePlan(req, res, next));
 
