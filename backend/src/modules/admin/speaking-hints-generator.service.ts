@@ -747,6 +747,7 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
    */
   async batchGenerateAll(options?: {
     skipExisting?: boolean;
+    skipBrokenImages?: boolean;
     delayMs?: number;
     partIds?: string[];
   }): Promise<{
@@ -757,6 +758,7 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
     errors: Array<{ partId: string; examTitle: string; partNumber: number; error: string }>;
   }> {
     const skipExisting = options?.skipExisting ?? true;
+    const skipBrokenImages = options?.skipBrokenImages ?? true;
     const delayMs = options?.delayMs ?? 1500;
     const filterPartIds = options?.partIds && options.partIds.length > 0 ? options.partIds : undefined;
 
@@ -806,9 +808,21 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
         img1 = rawImg.trim() || undefined;
       }
 
+      img1 = normalizeSpeakingImageUrl(img1) || undefined;
+      img2 = normalizeSpeakingImageUrl(img2) || undefined;
+
       if (!img1 && !img2) {
         skipped++;
         continue;
+      }
+
+      if (skipBrokenImages) {
+        const isDead1 = Boolean(img1 && (img1.includes('thithuaptis.com') || img1.startsWith('javascript:')));
+        const isDead2 = Boolean(img2 && (img2.includes('thithuaptis.com') || img2.startsWith('javascript:')));
+        if (isDead1 || (pNum === 3 && isDead2)) {
+          skipped++;
+          continue;
+        }
       }
 
       const firstQ = part.questions[0];
@@ -831,6 +845,10 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
           await sleep(delayMs);
         }
       } catch (err: any) {
+        if (skipBrokenImages && (err?.isImageError || err?.statusCode === 400)) {
+          skipped++;
+          continue;
+        }
         failed++;
         errors.push({
           partId: part.id,

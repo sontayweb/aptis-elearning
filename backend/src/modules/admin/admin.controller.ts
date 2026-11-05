@@ -439,9 +439,10 @@ export class AdminController {
 
   async batchGenerateAllSpeakingHints(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { skipExisting, delayMs, partIds } = req.body || {};
+      const { skipExisting, skipBrokenImages, delayMs, partIds } = req.body || {};
       const result = await speakingHintsGeneratorService.batchGenerateAll({
         skipExisting: skipExisting !== undefined ? Boolean(skipExisting) : true,
+        skipBrokenImages: skipBrokenImages !== undefined ? Boolean(skipBrokenImages) : true,
         delayMs: typeof delayMs === 'number' ? delayMs : 1500,
         partIds: Array.isArray(partIds) ? partIds : undefined,
       });
