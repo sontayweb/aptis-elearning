@@ -62,6 +62,110 @@ interface OverviewData {
   items: SpeakingPartItem[];
 }
 
+// ── FALLBACK UI CHO THUMBNAIL ẢNH BỊ LỖI ──
+function SpeakingThumbnail({
+  url,
+  label,
+  examTitle,
+  examId,
+  otherUrl,
+  onPreview,
+}: {
+  url: string;
+  label: string;
+  examTitle: string;
+  examId: string;
+  otherUrl?: string | null;
+  onPreview: (preview: { title: string; url: string; url2?: string }) => void;
+}) {
+  const [loadError, setLoadError] = useState<boolean>(false);
+  const isDeadDomain = url.includes("thithuaptis.com");
+  const isBroken = loadError || isDeadDomain;
+
+  if (isBroken) {
+    return (
+      <Link
+        href={`/admin/exams/${examId}/edit`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-medium transition-all group shadow-2xs hover:shadow-xs"
+        title="Ảnh cũ từ thithuaptis.com bị lỗi 404. Bấm để mở trình biên tập đề và gắn ảnh mới"
+      >
+        <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0 group-hover:scale-110 transition-transform" />
+        <span className="whitespace-nowrap font-medium">Ảnh lỗi ({label})</span>
+        <span className="inline-flex items-center gap-0.5 text-[10px] bg-amber-200/90 dark:bg-amber-900 text-amber-900 dark:text-amber-100 px-1.5 py-0.5 rounded font-semibold ml-0.5">
+          ✏️ Gắn ảnh
+        </span>
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        onPreview({
+          title: `${examTitle} - (${label})`,
+          url: url,
+          url2: otherUrl || undefined,
+        })
+      }
+      className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 group hover:ring-2 hover:ring-indigo-500 transition-all bg-slate-100 dark:bg-slate-800 shrink-0"
+      title={`Bấm để xem ${label} phóng to`}
+    >
+      <img
+        src={url}
+        alt={label}
+        onError={() => setLoadError(true)}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+      />
+      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+        <Eye className="w-3.5 h-3.5" />
+      </div>
+    </button>
+  );
+}
+
+// ── PREVIEW MODAL IMAGE ITEM WITH ERROR HANDLING ──
+function PreviewImageModalItem({
+  src,
+  alt,
+}: {
+  src: string;
+  alt: string;
+}) {
+  const [error, setError] = useState(false);
+  const isDead = error || src.includes("thithuaptis.com");
+
+  if (isDead) {
+    return (
+      <div className="rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/40 p-8 flex flex-col items-center justify-center text-center gap-3">
+        <AlertTriangle className="w-10 h-10 text-amber-500" />
+        <div>
+          <p className="text-sm font-bold text-amber-800 dark:text-amber-200">Không thể tải ảnh ({alt})</p>
+          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 max-w-sm break-all font-mono">
+            {src}
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            Server ảnh cũ trả về 404. Vui lòng vào trình chỉnh sửa đề thi để tải ảnh mới lên.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-black/5 flex items-center justify-center">
+      <img
+        src={src}
+        alt={alt}
+        onError={() => setError(true)}
+        className="w-full h-auto object-contain max-h-[65vh]"
+      />
+    </div>
+  );
+}
+
 export default function SpeakingAiHintsHubPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<OverviewData | null>(null);
@@ -683,50 +787,26 @@ export default function SpeakingAiHintsHubPage() {
                       {/* Image Thumbnail */}
                       <td className="py-3.5 px-4">
                         {item.hasImage ? (
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
                             {item.imageUrl && (
-                              <button
-                                onClick={() =>
-                                  setPreviewImage({
-                                    title: `${item.examTitle} - Part ${item.partNumber} (Ảnh 1)`,
-                                    url: item.imageUrl!,
-                                    url2: item.secondImageUrl || undefined,
-                                  })
-                                }
-                                className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 group hover:ring-2 hover:ring-indigo-500 transition-all bg-slate-100 dark:bg-slate-800"
-                                title="Bấm để xem ảnh phóng to"
-                              >
-                                <img
-                                  src={item.imageUrl}
-                                  alt="Part 1"
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                />
-                                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                                  <Eye className="w-3.5 h-3.5" />
-                                </div>
-                              </button>
+                              <SpeakingThumbnail
+                                url={item.imageUrl}
+                                label="Part 1"
+                                examTitle={item.examTitle}
+                                examId={item.examId}
+                                otherUrl={item.secondImageUrl}
+                                onPreview={setPreviewImage}
+                              />
                             )}
 
                             {item.secondImageUrl && (
-                              <button
-                                onClick={() =>
-                                  setPreviewImage({
-                                    title: `${item.examTitle} - Part ${item.partNumber} (Ảnh 2)`,
-                                    url: item.secondImageUrl!,
-                                  })
-                                }
-                                className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 group hover:ring-2 hover:ring-indigo-500 transition-all bg-slate-100 dark:bg-slate-800"
-                                title="Bấm để xem ảnh 2 phóng to"
-                              >
-                                <img
-                                  src={item.secondImageUrl}
-                                  alt="Part 2"
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                />
-                                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                                  <Eye className="w-3.5 h-3.5" />
-                                </div>
-                              </button>
+                              <SpeakingThumbnail
+                                url={item.secondImageUrl}
+                                label="Part 2"
+                                examTitle={item.examTitle}
+                                examId={item.examId}
+                                onPreview={setPreviewImage}
+                              />
                             )}
                           </div>
                         ) : (
@@ -981,13 +1061,9 @@ export default function SpeakingAiHintsHubPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[75vh] overflow-y-auto">
-              <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-black/5">
-                <img src={previewImage.url} alt="Preview 1" className="w-full h-auto object-contain max-h-[65vh]" />
-              </div>
+              <PreviewImageModalItem src={previewImage.url} alt="Ảnh 1" />
               {previewImage.url2 && (
-                <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-black/5">
-                  <img src={previewImage.url2} alt="Preview 2" className="w-full h-auto object-contain max-h-[65vh]" />
-                </div>
+                <PreviewImageModalItem src={previewImage.url2} alt="Ảnh 2" />
               )}
             </div>
           </div>
