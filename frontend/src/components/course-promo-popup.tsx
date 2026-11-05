@@ -310,7 +310,9 @@ export function CoursePromoPopup({
                 </span>
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-400/90 text-amber-950 text-[11px] font-black uppercase tracking-wider shadow-sm">
                   <Flame className="w-3 h-3 fill-amber-950" />
-                  Ưu đãi 1.400.000đ / khóa
+                  {SITE_CONFIG.courseClass.tuitionVnd > 0
+                    ? `Ưu đãi ${SITE_CONFIG.courseClass.tuitionFormatted} / khóa`
+                    : "Ưu đãi học phí đặc biệt"}
                 </span>
               </div>
 

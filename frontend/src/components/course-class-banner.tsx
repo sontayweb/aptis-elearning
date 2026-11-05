@@ -513,7 +513,11 @@ export function CourseClassBanner() {
                 }`}
               >
                 <Send className="w-4 h-4" />
-                <span>Đăng ký — Học phí 1.400.000đ</span>
+                <span>
+                  {SITE_CONFIG.courseClass.tuitionVnd > 0
+                    ? `Đăng ký — Học phí ${SITE_CONFIG.courseClass.tuitionFormatted}`
+                    : `Đăng ký — ${SITE_CONFIG.courseClass.tuitionFormatted}`}
+                </span>
               </button>
             </div>
 
