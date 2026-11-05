@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
 async function main() {
-  const apiKey = 'AQ.Ab8RN6IVwgbOPSbD3zmqMEtDhn6pOXqBReuqjKCETPAqhOu8Mw';
+  const apiKey = process.env.GEMINI_API_KEY || process.env.FREE_GEMINI_API_KEY || '';
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
   const data: any = await res.json();
   if (!data.models) {

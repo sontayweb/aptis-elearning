@@ -195,26 +195,17 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
   "image2Prompt": "${isPart3 ? 'A photorealistic documentary-style prompt accurately describing Picture 2 in detail.' : ''}"
 }`;
 
-    // 1. Thử dùng Gemini Vision với danh sách model ưu tiên
-    // Ưu tiên key riêng của Admin nếu được cấu hình (dùng key free chuyên dụng cho Admin, tách biệt hoàn toàn quota học viên)
-    const geminiKey =
-      process.env.ADMIN_GEMINI_API_KEY ||
-      process.env.GEMINI_ADMIN_API_KEY ||
-      '' ||
-      process.env.GEMINI_API_KEY ||
-      (process.env.GEMINI_API_KEYS ? process.env.GEMINI_API_KEYS.split(',')[0].trim() : '');
-    if (geminiKey && geminiKey.trim().length > 10 && !geminiKey.includes('YOUR_GEMINI_API_KEY')) {
-      try {
-        const genAI = new GoogleGenerativeAI(geminiKey);
-        const candidateModels = [
-          process.env.ADMIN_GEMINI_MODEL,
-          process.env.GEMINI_MODEL,
-          'gemini-3.1-flash-lite',
-          'gemini-3.5-flash',
-          'gemini-3.8-flash',
-          'gemini-flash-latest',
-        ].filter(Boolean) as string[];
+    // 1. Thử dùng Gemini Vision với cơ chế Khám phá Động và Đa Tầng Key (Free Tier trước -> Billing sau)
+    const candidateKeys = Array.from(new Set([
+      process.env.FREE_GEMINI_API_KEY,
+      process.env.ADMIN_GEMINI_API_KEY,
+      process.env.GEMINI_ADMIN_API_KEY,
+      process.env.GEMINI_API_KEY,
+      ...(process.env.GEMINI_API_KEYS ? process.env.GEMINI_API_KEYS.split(',').map((k) => k.trim()) : []),
+    ].filter((k): k is string => Boolean(k && k.trim().length > 10 && !k.includes('YOUR_GEMINI_API_KEY')))));
 
+    if (candidateKeys.length > 0) {
+      try {
         const contentParts: any[] = [prompt];
         if (image1Data) {
           contentParts.push({
@@ -233,42 +224,71 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
           });
         }
 
-        for (const modelName of candidateModels) {
-          try {
-            const model = genAI.getGenerativeModel({
-              model: modelName,
-              generationConfig: {
-                temperature: 0.3,
-                maxOutputTokens: 2048,
-              },
-            });
+        // Lặp qua từng tầng Key (Free Tier trước -> Failover sang Paid Billing Key)
+        for (let kIdx = 0; kIdx < candidateKeys.length; kIdx++) {
+          const activeKey = candidateKeys[kIdx];
+          const genAI = new GoogleGenerativeAI(activeKey);
 
-            // Giới hạn timeout 20s
-            const geminiPromise = model.generateContent(contentParts);
-            const timeoutPromise = new Promise<never>((_, reject) =>
-              setTimeout(() => reject(new Error(`Gemini Vision (${modelName}) timeout sau 20 giây`)), 20000)
-            );
-            const result: any = await Promise.race([geminiPromise, timeoutPromise]);
+          const candidateModels = [
+            process.env.ADMIN_GEMINI_MODEL,
+            process.env.GEMINI_MODEL,
+            'gemini-flash-lite-latest',
+            'gemini-flash-latest',
+            'gemini-3.1-flash-lite',
+            'gemini-3.5-flash',
+            'gemini-3.8-flash',
+          ].filter(Boolean) as string[];
 
-            const text = result.response.text().trim();
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            const cleanJson = jsonMatch ? jsonMatch[0] : text.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
-            const parsed = JSON.parse(cleanJson);
-            if (Array.isArray(parsed.keywords) && parsed.keywords.length >= 3) {
-              return {
-                partNumber,
-                topicTitle,
-                keywords: parsed.keywords,
-                startingPhrases: Array.isArray(parsed.startingPhrases) ? parsed.startingPhrases : [],
-                linkingPhrases: Array.isArray(parsed.linkingPhrases) ? parsed.linkingPhrases : [],
-                aiImagePrompts: {
-                  image1Prompt: parsed.image1Prompt || '',
-                  image2Prompt: isPart3 ? parsed.image2Prompt || '' : undefined,
+          let keyQuotaExceeded = false;
+
+          for (const modelName of candidateModels) {
+            try {
+              const model = genAI.getGenerativeModel({
+                model: modelName,
+                generationConfig: {
+                  temperature: 0.3,
+                  maxOutputTokens: 2048,
                 },
-              };
+              });
+
+              // Giới hạn timeout 20s
+              const geminiPromise = model.generateContent(contentParts);
+              const timeoutPromise = new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error(`Gemini Vision (${modelName}) timeout sau 20 giây`)), 20000)
+              );
+              const result: any = await Promise.race([geminiPromise, timeoutPromise]);
+
+              const text = result.response.text().trim();
+              const jsonMatch = text.match(/\{[\s\S]*\}/);
+              const cleanJson = jsonMatch ? jsonMatch[0] : text.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+              const parsed = JSON.parse(cleanJson);
+              if (Array.isArray(parsed.keywords) && parsed.keywords.length >= 3) {
+                return {
+                  partNumber,
+                  topicTitle,
+                  keywords: parsed.keywords,
+                  startingPhrases: Array.isArray(parsed.startingPhrases) ? parsed.startingPhrases : [],
+                  linkingPhrases: Array.isArray(parsed.linkingPhrases) ? parsed.linkingPhrases : [],
+                  aiImagePrompts: {
+                    image1Prompt: parsed.image1Prompt || '',
+                    image2Prompt: isPart3 ? parsed.image2Prompt || '' : undefined,
+                  },
+                };
+              }
+            } catch (modelErr: any) {
+              const errMsg = (modelErr?.message || String(modelErr)).toLowerCase();
+              if (errMsg.includes('429') || errMsg.includes('resourceexhausted') || errMsg.includes('quota')) {
+                console.warn(`  [SpeakingHints] Key #${kIdx + 1} chạm hạn ngạch (429/ResourceExhausted). Chuyển sang Key tiếp theo...`);
+                keyQuotaExceeded = true;
+                break; // Thoát vòng lặp model của key này để thử key tiếp theo
+              } else {
+                console.warn(`  [SpeakingHints] Gemini Vision model "${modelName}" failed:`, modelErr?.message || modelErr);
+              }
             }
-          } catch (modelErr: any) {
-            console.warn(`  [SpeakingHints] Gemini Vision model "${modelName}" failed:`, modelErr?.message || modelErr);
+          }
+
+          if (keyQuotaExceeded) {
+            continue;
           }
         }
       } catch (err: any) {

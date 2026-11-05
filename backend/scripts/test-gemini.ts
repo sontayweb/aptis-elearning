@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const apiKey = 'AQ.Ab8RN6IVwgbOPSbD3zmqMEtDhn6pOXqBReuqjKCETPAqhOu8Mw';
+const apiKey = process.env.GEMINI_API_KEY || process.env.FREE_GEMINI_API_KEY || '';
 
 const modelsToTest = [
   'gemini-3.8-flash',
