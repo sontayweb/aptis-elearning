@@ -21,6 +21,7 @@ import {
   Eye,
   X,
   Check,
+  ZoomIn,
 } from "lucide-react";
 import AdminPageHeader from "@/components/admin/admin-page-header";
 import AdminTableCard from "@/components/admin/admin-table-card";
@@ -69,6 +70,7 @@ export default function AdminKeyVaMeoThiPage() {
 
   // Search filters
   const [search, setSearch] = useState("");
+  const [previewP2Image, setPreviewP2Image] = useState(false);
 
   // Modal edit state
   const [editingItem, setEditingItem] = useState<{
@@ -1516,6 +1518,97 @@ export default function AdminKeyVaMeoThiPage() {
           {/* TAB 2: SPEAKING PART 2 MÔ TẢ TRANH & TRẢI NGHIỆM */}
           {activeTab === "p2" && (
             <div className="space-y-4">
+              {/* Infographic 8 bước Band B2-C1 đồng bộ cho học viên */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-card border border-purple-500/30 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-600" />
+                    <div>
+                      <h3 className="font-heading font-black text-sm text-foreground">
+                        Cấu Trúc Speaking Aptis Part 2 — Band B2–C1 (Infographic 8 Bước)
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground">
+                        Tài liệu trực quan được hiển thị đồng bộ cho học viên tại trang Key &amp; Mẹo thi
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <a
+                      href="/images/key-meo-thi/cau-truc-speaking-part-2-band-b2-c1.jpg"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-bold text-foreground flex items-center gap-1.5 transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Mở ảnh tab mới</span>
+                    </a>
+                    <button
+                      onClick={() => setPreviewP2Image(true)}
+                      className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                    >
+                      <ZoomIn className="w-3.5 h-3.5" />
+                      <span>Phóng to xem</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+                  <div className="md:col-span-4">
+                    <div
+                      onClick={() => setPreviewP2Image(true)}
+                      className="group relative rounded-xl overflow-hidden border border-purple-500/30 bg-muted/20 cursor-pointer shadow-xs hover:shadow-md transition-all"
+                    >
+                      <img
+                        src="/images/key-meo-thi/cau-truc-speaking-part-2-band-b2-c1.jpg"
+                        alt="Cấu Trúc Speaking Aptis Part 2 Band B2-C1"
+                        className="w-full h-auto object-cover group-hover:scale-102 transition-transform"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-bold">
+                        <ZoomIn className="w-4 h-4" />
+                        <span>Xem chi tiết</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-8 space-y-3">
+                    <div className="rounded-xl border border-border bg-muted/20 overflow-hidden">
+                      <div className="p-2.5 bg-muted/60 border-b border-border text-[11px] font-black uppercase text-foreground">
+                        Danh sách 8 bước &amp; Mục tiêu đánh giá B2–C1
+                      </div>
+                      <div className="divide-y divide-border text-xs max-h-[220px] overflow-y-auto">
+                        {[
+                          { step: 1, name: "PEOPLE (Có ai?)", goal: "Nhận xét về mối quan hệ, thái độ, vai trò" },
+                          { step: 2, name: "PLACE (Ở đâu?)", goal: "Mô tả không gian và bầu không khí" },
+                          { step: 3, name: "ACTIONS (Đang làm gì?)", goal: "Mô tả hành động + Mục đích có thể" },
+                          { step: 4, name: "CLOTHES (Mặc gì?)", goal: "Nhận xét về phong cách và phù hợp ngữ cảnh" },
+                          { step: 5, name: "AGE (Đoán tuổi)", goal: "Ước lượng + Lý do ước lượng" },
+                          { step: 6, name: "FEELINGS (Cảm xúc)", goal: "Đoán cảm xúc + Giải thích sâu hơn" },
+                          { step: 7, name: "BACKGROUND (Phía sau có gì?)", goal: "Mô tả chi tiết + Nhận xét, suy luận" },
+                          { step: 8, name: "PREDICTION (Sau đó làm gì?)", goal: "Dự đoán nhiều khả năng + Lý do, mục đích" },
+                        ].map((s) => (
+                          <div key={s.step} className="p-2 flex items-center justify-between gap-2">
+                            <span className="font-bold text-purple-700 dark:text-purple-300">
+                              #{s.step} {s.name}
+                            </span>
+                            <span className="text-[11px] text-muted-foreground italic">{s.goal}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 text-xs text-foreground/90 space-y-1">
+                      <strong className="text-emerald-700 dark:text-emerald-300 font-bold block text-[11px] uppercase">
+                        Trạng thái hiển thị:
+                      </strong>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        ✓ Ảnh Infographic và bảng 8 bước nâng cao đã được chèn đồng bộ hiển thị tại giao diện học viên (<code className="font-mono text-foreground">/key-va-meo-thi?skill=speaking</code>).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="p-4 rounded-2xl bg-card border border-border shadow-xs space-y-3">
                 <div className="flex items-center justify-between border-b border-border pb-3">
                   <h3 className="font-heading font-black text-sm text-foreground">
@@ -4119,6 +4212,53 @@ export default function AdminKeyVaMeoThiPage() {
               >
                 Xác nhận
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Phóng To Infographic Speaking Part 2 */}
+      {previewP2Image && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in"
+          onClick={() => setPreviewP2Image(false)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[95vh] w-full bg-card rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-3.5 border-b border-border bg-muted/40">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-600" />
+                <span className="font-heading font-black text-xs sm:text-sm text-foreground">
+                  Cấu Trúc Speaking Aptis Part 2 — Band B2–C1 (Infographic Gốc)
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="/images/key-meo-thi/cau-truc-speaking-part-2-band-b2-c1.jpg"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1 rounded-lg border border-border bg-card hover:bg-muted text-[11px] font-bold text-foreground flex items-center gap-1 transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span className="hidden sm:inline">Mở tab mới</span>
+                </a>
+                <button
+                  onClick={() => setPreviewP2Image(false)}
+                  className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-auto p-2 sm:p-4 flex-1 flex items-center justify-center bg-black/5">
+              <img
+                src="/images/key-meo-thi/cau-truc-speaking-part-2-band-b2-c1.jpg"
+                alt="Cấu trúc Speaking Aptis Part 2 Band B2-C1"
+                className="max-h-[82vh] w-auto object-contain rounded-xl shadow-md"
+              />
             </div>
           </div>
         </div>

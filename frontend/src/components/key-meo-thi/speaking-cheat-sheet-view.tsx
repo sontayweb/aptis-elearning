@@ -17,6 +17,11 @@ import {
   Volume2,
   BookOpen,
   Code2,
+  ZoomIn,
+  Copy,
+  Check,
+  X,
+  ExternalLink,
 } from "lucide-react";
 import { SPEAKING_KEY_MEO_DATA, SpeakingPartData } from "@/data/key-meo-speaking-data";
 
@@ -26,10 +31,18 @@ interface SpeakingCheatSheetViewProps {
 
 export function SpeakingCheatSheetView({ customData }: SpeakingCheatSheetViewProps) {
   const [activePartKey, setActivePartKey] = useState<"p1" | "p2" | "p3" | "p4">("p1");
+  const [activeZoomImage, setActiveZoomImage] = useState<{ url: string; title: string } | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   // Merge customData from DB (if any) with default seed data
   const data: SpeakingPartData =
     (customData && customData[activePartKey]) || SPEAKING_KEY_MEO_DATA[activePartKey] || SPEAKING_KEY_MEO_DATA.p1;
+
+  const b2c1P2Info = data.b2c1Formula8Steps || SPEAKING_KEY_MEO_DATA.p2.b2c1Formula8Steps;
+  const b2c1P2SampleText = b2c1P2Info?.sampleBandB2C1.sentences.map((s) => `${s.num}. ${s.text}`).join("\n") || "";
+
+  const b2c1P3Info = data.b2c1Formula6Steps || SPEAKING_KEY_MEO_DATA.p3.b2c1Formula6Steps;
+  const b2c1P3SampleText = b2c1P3Info?.sampleBandB2C1.sentences.map((s) => `${s.num}. ${s.text}`).join("\n") || "";
 
   return (
     <div className="space-y-6">
@@ -121,6 +134,268 @@ export function SpeakingCheatSheetView({ customData }: SpeakingCheatSheetViewPro
           </p>
         </div>
       </div>
+
+      {/* 3.5. KHỐI ĐẶC BIỆT DÀNH RIÊNG CHO PART 2: CÔNG THỨC 8 BƯỚC NÂNG CAO BAND B2-C1 KÈM ẢNH GỐC */}
+      {activePartKey === "p2" && b2c1P2Info && (
+        <div className="rounded-3xl border border-purple-500/30 bg-gradient-to-br from-purple-500/10 via-card to-indigo-500/10 p-5 md:p-7 shadow-sm space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-purple-500/20 pb-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-black uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Chiến Lược Độc Quyền Band B2 – C1</span>
+              </div>
+              <h3 className="text-xl md:text-2xl font-black font-heading text-foreground">
+                {b2c1P2Info.title}
+              </h3>
+              <p className="text-xs md:text-sm text-muted-foreground">
+                {b2c1P2Info.subtitle}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setActiveZoomImage({ url: b2c1P2Info.imageUrl, title: b2c1P2Info.title })}
+              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer self-start md:self-auto shrink-0"
+            >
+              <ZoomIn className="w-4 h-4" />
+              <span>Phóng to Infographic</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Cột trái: Ảnh Infographic */}
+            <div className="lg:col-span-5">
+              <div
+                onClick={() => setActiveZoomImage({ url: b2c1P2Info.imageUrl, title: b2c1P2Info.title })}
+                className="group relative rounded-2xl overflow-hidden border border-purple-500/30 bg-black/5 shadow-md hover:shadow-xl transition-all cursor-pointer"
+              >
+                <img
+                  src={b2c1P2Info.imageUrl}
+                  alt={b2c1P2Info.title}
+                  className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-102"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 text-white p-4 text-center">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+                    <ZoomIn className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-xs font-bold drop-shadow">Nhấn để xem kích thước gốc sắc nét</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-muted-foreground text-center mt-2 italic">
+                * Click vào ảnh để phóng to toàn màn hình
+              </p>
+            </div>
+
+            {/* Cột phải: Bảng chi tiết 8 Bước & Bài Mẫu B2-C1 */}
+            <div className="lg:col-span-7 space-y-4">
+              {/* Bảng 8 bước */}
+              <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+                <div className="p-3 bg-muted/60 border-b border-border flex items-center justify-between">
+                  <span className="text-xs font-black uppercase text-foreground">8 Bước Mô Tả & Cấu Trúc Nâng Cao</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold">
+                    8 BƯỚC CHUẨN
+                  </span>
+                </div>
+                <div className="divide-y divide-border text-xs max-h-[340px] overflow-y-auto">
+                  {b2c1P2Info.steps.map((st) => (
+                    <div key={st.step} className="p-3 hover:bg-muted/30 transition-colors space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-extrabold text-purple-600 dark:text-purple-400 font-mono text-xs">
+                          #{st.step} {st.name} ({st.question})
+                        </span>
+                        <span className="text-[11px] text-muted-foreground italic font-medium">{st.goal}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {st.patterns.map((p, pIdx) => (
+                          <span
+                            key={pIdx}
+                            className="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-800 dark:text-purple-200 font-mono text-[11px] font-semibold border border-purple-500/20"
+                          >
+                            {p}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bài mẫu Band B2-C1 */}
+              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-black uppercase tracking-wide text-emerald-800 dark:text-emerald-300">
+                      Bài Mẫu Thực Chiến Band B2 – C1 (Ứng Dụng Đủ 8 Bước)
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (b2c1P2SampleText) {
+                        navigator.clipboard.writeText(b2c1P2SampleText);
+                        setCopiedKey("p2");
+                        setTimeout(() => setCopiedKey(null), 2000);
+                      }
+                    }}
+                    className="px-2.5 py-1 rounded-lg border border-emerald-500/30 bg-card hover:bg-muted text-[11px] font-bold text-foreground flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    {copiedKey === "p2" ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-emerald-600">Đã chép</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Chép bài mẫu</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="space-y-1.5 text-xs text-foreground/90 font-medium leading-relaxed bg-card p-3 rounded-xl border border-border">
+                  {b2c1P2Info.sampleBandB2C1.sentences.map((s) => (
+                    <p key={s.num} className="flex items-start gap-1.5">
+                      <strong className="text-emerald-600 dark:text-emerald-400 font-mono shrink-0">[{s.num}]</strong>
+                      <span>{s.text}</span>
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3.6. KHỐI ĐẶC BIỆT DÀNH RIÊNG CHO PART 3: CÔNG THỨC 6 BƯỚC SO SÁNH 2 TRANH BAND B2-C1 KÈM ẢNH GỐC */}
+      {activePartKey === "p3" && b2c1P3Info && (
+        <div className="rounded-3xl border border-purple-500/30 bg-gradient-to-br from-purple-500/10 via-card to-indigo-500/10 p-5 md:p-7 shadow-sm space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-purple-500/20 pb-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-black uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Chiến Lược Độc Quyền Band B2 – C1</span>
+              </div>
+              <h3 className="text-xl md:text-2xl font-black font-heading text-foreground">
+                {b2c1P3Info.title}
+              </h3>
+              <p className="text-xs md:text-sm text-muted-foreground">
+                {b2c1P3Info.subtitle}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setActiveZoomImage({ url: b2c1P3Info.imageUrl, title: b2c1P3Info.title })}
+              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer self-start md:self-auto shrink-0"
+            >
+              <ZoomIn className="w-4 h-4" />
+              <span>Phóng to Infographic</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Cột trái: Ảnh Infographic */}
+            <div className="lg:col-span-5">
+              <div
+                onClick={() => setActiveZoomImage({ url: b2c1P3Info.imageUrl, title: b2c1P3Info.title })}
+                className="group relative rounded-2xl overflow-hidden border border-purple-500/30 bg-black/5 shadow-md hover:shadow-xl transition-all cursor-pointer"
+              >
+                <img
+                  src={b2c1P3Info.imageUrl}
+                  alt={b2c1P3Info.title}
+                  className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-102"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 text-white p-4 text-center">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+                    <ZoomIn className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-xs font-bold drop-shadow">Nhấn để xem kích thước gốc sắc nét</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-muted-foreground text-center mt-2 italic">
+                * Click vào ảnh để phóng to toàn màn hình
+              </p>
+            </div>
+
+            {/* Cột phải: Bảng chi tiết 6 Bước & Bài Mẫu B2-C1 */}
+            <div className="lg:col-span-7 space-y-4">
+              {/* Bảng 6 bước */}
+              <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+                <div className="p-3 bg-muted/60 border-b border-border flex items-center justify-between">
+                  <span className="text-xs font-black uppercase text-foreground">6 Bước So Sánh & Cấu Trúc Nâng Cao</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold">
+                    6 BƯỚC CHUẨN
+                  </span>
+                </div>
+                <div className="divide-y divide-border text-xs max-h-[340px] overflow-y-auto">
+                  {b2c1P3Info.steps.map((st) => (
+                    <div key={st.step} className="p-3 hover:bg-muted/30 transition-colors space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-extrabold text-purple-600 dark:text-purple-400 font-mono text-xs">
+                          #{st.step} {st.name} ({st.question})
+                        </span>
+                        <span className="text-[11px] text-muted-foreground italic font-medium">{st.goal}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {st.patterns.map((p, pIdx) => (
+                          <span
+                            key={pIdx}
+                            className="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-800 dark:text-purple-200 font-mono text-[11px] font-semibold border border-purple-500/20"
+                          >
+                            {p}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bài mẫu Band B2-C1 */}
+              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-black uppercase tracking-wide text-emerald-800 dark:text-emerald-300">
+                      Bài Mẫu Thực Chiến Band B2 – C1 (So Sánh 2 Bức Tranh)
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (b2c1P3SampleText) {
+                        navigator.clipboard.writeText(b2c1P3SampleText);
+                        setCopiedKey("p3");
+                        setTimeout(() => setCopiedKey(null), 2000);
+                      }
+                    }}
+                    className="px-2.5 py-1 rounded-lg border border-emerald-500/30 bg-card hover:bg-muted text-[11px] font-bold text-foreground flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    {copiedKey === "p3" ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-emerald-600">Đã chép</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Chép bài mẫu</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="space-y-1.5 text-xs text-foreground/90 font-medium leading-relaxed bg-card p-3 rounded-xl border border-border">
+                  {b2c1P3Info.sampleBandB2C1.sentences.map((s) => (
+                    <p key={s.num} className="flex items-start gap-1.5">
+                      <strong className="text-emerald-600 dark:text-emerald-400 font-mono shrink-0">[{s.num}]</strong>
+                      <span>{s.text}</span>
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 4. ROW 2: MẸO LÀM BÀI + CÔNG THỨC TRẢ LỜI NHANH */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -436,6 +711,53 @@ export function SpeakingCheatSheetView({ customData }: SpeakingCheatSheetViewPro
           </p>
         </div>
       </div>
+
+      {/* MODAL PHÓNG TO INFOGRAPHIC SPEAKING B2-C1 (PART 2 & PART 3) */}
+      {activeZoomImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in"
+          onClick={() => setActiveZoomImage(null)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[95vh] w-full bg-card rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-3.5 border-b border-border bg-muted/40">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-600" />
+                <span className="font-heading font-black text-xs sm:text-sm text-foreground">
+                  {activeZoomImage.title}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={activeZoomImage.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1 rounded-lg border border-border bg-card hover:bg-muted text-[11px] font-bold text-foreground flex items-center gap-1 transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span className="hidden sm:inline">Mở tab mới</span>
+                </a>
+                <button
+                  onClick={() => setActiveZoomImage(null)}
+                  className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-auto p-2 sm:p-4 flex-1 flex items-center justify-center bg-black/5">
+              <img
+                src={activeZoomImage.url}
+                alt={activeZoomImage.title}
+                className="max-h-[82vh] w-auto object-contain rounded-xl shadow-md"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -195,19 +195,25 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
   "image2Prompt": "${isPart3 ? 'A photorealistic documentary-style prompt accurately describing Picture 2 in detail.' : ''}"
 }`;
 
-    // 1. Thử dùng Gemini Vision
-    const geminiKey = process.env.GEMINI_API_KEY || (process.env.GEMINI_API_KEYS ? process.env.GEMINI_API_KEYS.split(',')[0].trim() : '');
+    // 1. Thử dùng Gemini Vision với danh sách model ưu tiên
+    // Ưu tiên key riêng của Admin nếu được cấu hình (dùng key free chuyên dụng cho Admin, tách biệt hoàn toàn quota học viên)
+    const geminiKey =
+      process.env.ADMIN_GEMINI_API_KEY ||
+      process.env.GEMINI_ADMIN_API_KEY ||
+      '' ||
+      process.env.GEMINI_API_KEY ||
+      (process.env.GEMINI_API_KEYS ? process.env.GEMINI_API_KEYS.split(',')[0].trim() : '');
     if (geminiKey && geminiKey.trim().length > 10 && !geminiKey.includes('YOUR_GEMINI_API_KEY')) {
       try {
         const genAI = new GoogleGenerativeAI(geminiKey);
-        const modelName = process.env.GEMINI_MODEL || 'gemini-flash-latest';
-        const model = genAI.getGenerativeModel({
-          model: modelName,
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1024,
-          },
-        });
+        const candidateModels = [
+          process.env.ADMIN_GEMINI_MODEL,
+          process.env.GEMINI_MODEL,
+          'gemini-3.1-flash-lite',
+          'gemini-3.5-flash',
+          'gemini-3.8-flash',
+          'gemini-flash-latest',
+        ].filter(Boolean) as string[];
 
         const contentParts: any[] = [prompt];
         if (image1Data) {
@@ -227,31 +233,46 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
           });
         }
 
-        // Giới hạn timeout 20s
-        const geminiPromise = model.generateContent(contentParts);
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Gemini Vision timeout sau 20 giây')), 20000)
-        );
-        const result: any = await Promise.race([geminiPromise, timeoutPromise]);
+        for (const modelName of candidateModels) {
+          try {
+            const model = genAI.getGenerativeModel({
+              model: modelName,
+              generationConfig: {
+                temperature: 0.3,
+                maxOutputTokens: 2048,
+              },
+            });
 
-        const text = result.response.text().trim();
-        const cleanJson = text.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
-        const parsed = JSON.parse(cleanJson);
-        if (Array.isArray(parsed.keywords) && parsed.keywords.length >= 3) {
-          return {
-            partNumber,
-            topicTitle,
-            keywords: parsed.keywords,
-            startingPhrases: Array.isArray(parsed.startingPhrases) ? parsed.startingPhrases : [],
-            linkingPhrases: Array.isArray(parsed.linkingPhrases) ? parsed.linkingPhrases : [],
-            aiImagePrompts: {
-              image1Prompt: parsed.image1Prompt || '',
-              image2Prompt: isPart3 ? parsed.image2Prompt || '' : undefined,
-            },
-          };
+            // Giới hạn timeout 20s
+            const geminiPromise = model.generateContent(contentParts);
+            const timeoutPromise = new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error(`Gemini Vision (${modelName}) timeout sau 20 giây`)), 20000)
+            );
+            const result: any = await Promise.race([geminiPromise, timeoutPromise]);
+
+            const text = result.response.text().trim();
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            const cleanJson = jsonMatch ? jsonMatch[0] : text.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+            const parsed = JSON.parse(cleanJson);
+            if (Array.isArray(parsed.keywords) && parsed.keywords.length >= 3) {
+              return {
+                partNumber,
+                topicTitle,
+                keywords: parsed.keywords,
+                startingPhrases: Array.isArray(parsed.startingPhrases) ? parsed.startingPhrases : [],
+                linkingPhrases: Array.isArray(parsed.linkingPhrases) ? parsed.linkingPhrases : [],
+                aiImagePrompts: {
+                  image1Prompt: parsed.image1Prompt || '',
+                  image2Prompt: isPart3 ? parsed.image2Prompt || '' : undefined,
+                },
+              };
+            }
+          } catch (modelErr: any) {
+            console.warn(`  [SpeakingHints] Gemini Vision model "${modelName}" failed:`, modelErr?.message || modelErr);
+          }
         }
       } catch (err: any) {
-        console.warn('  [SpeakingHints] Gemini Vision call failed, falling back to OpenAI Vision:', err?.message || err);
+        console.warn('  [SpeakingHints] Gemini Vision calls failed, falling back to OpenAI Vision:', err?.message || err);
       }
     }
 
@@ -474,7 +495,14 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
       where: {
         part_number: { in: [2, 3] },
         OR: [
-          { exam: { skill: { in: ['SPEAKING', 'FULL_TEST'] as any } } },
+          { exam: { skill: 'SPEAKING' } },
+          {
+            exam: { skill: 'FULL_TEST' },
+            OR: [
+              { title: { contains: 'SPEAKING', mode: 'insensitive' } },
+              { image_url: { not: null } },
+            ],
+          },
           { image_url: { not: null } },
         ],
       },
@@ -676,7 +704,14 @@ Return ONLY a valid, parseable JSON object matching this schema (no markdown blo
         part_number: { in: [2, 3] },
         ...(filterPartIds ? { id: { in: filterPartIds } } : {}),
         OR: [
-          { exam: { skill: { in: ['SPEAKING', 'FULL_TEST'] as any } } },
+          { exam: { skill: 'SPEAKING' } },
+          {
+            exam: { skill: 'FULL_TEST' },
+            OR: [
+              { title: { contains: 'SPEAKING', mode: 'insensitive' } },
+              { image_url: { not: null } },
+            ],
+          },
           { image_url: { not: null } },
         ],
       },

@@ -31,6 +31,11 @@ export function ReadingPart1Story({
 }: ReadingPart1StoryProps) {
   const hasExample = Boolean(exampleText && exampleText.word);
 
+  // Lọc bỏ câu mẫu dạng placeholder dummy như "Ở ĐÂY SẼ LÀ CÂU MẪU KHÔNG CẦN LÀM"
+  const validGaps = gaps.filter(
+    (g) => !g.prompt || !/câu mẫu không cần làm/i.test(g.prompt)
+  );
+
   return (
     <div className="space-y-6 max-w-2xl py-2">
       <p className="text-sm font-bold text-exam-text">
@@ -52,13 +57,27 @@ export function ReadingPart1Story({
         )}
 
         {/* Các câu hỏi điền từ của Part 1 */}
-        {gaps.map((gap) => {
-          const parts = gap.prompt.split(/\[(?:gap|blank|\.\.\.)\]/i);
+        {validGaps.map((gap) => {
+          // Hỗ trợ linh hoạt các định dạng gap: [gap], [blank], [...], tentisspace, _____, ....
+          const parts = (gap.prompt || "").split(/\[(?:gap|blank|\.\.\.)\]|tentisspace|_{3,}|\.{3,}/i);
           const currentVal = answers[gap.id] || "";
+
+          // An toàn phân tích options (dù là array, JSON string hay null)
+          let optionsList: string[] = [];
+          if (Array.isArray(gap.options)) {
+            optionsList = gap.options;
+          } else if (typeof gap.options === "string") {
+            try {
+              const parsed = JSON.parse(gap.options);
+              if (Array.isArray(parsed)) optionsList = parsed;
+            } catch {
+              optionsList = [];
+            }
+          }
 
           return (
             <div key={gap.id} className="flex items-center gap-2 flex-wrap">
-              <span>{parts[0]}</span>
+              <span>{parts[0] || ""}</span>
               <select
                 value={currentVal}
                 onChange={(e) => onSelect(gap.id, e.target.value)}
@@ -69,13 +88,13 @@ export function ReadingPart1Story({
                 }`}
               >
                 <option value="">—</option>
-                {gap.options.map((opt) => (
+                {optionsList.map((opt) => (
                   <option key={opt} value={opt}>
                     {opt}
                   </option>
                 ))}
               </select>
-              <span>{parts[1] || ""}</span>
+              <span>{parts.slice(1).join(" ") || ""}</span>
             </div>
           );
         })}
@@ -143,7 +162,7 @@ interface SentenceItem {
 interface SentenceOrderProps {
   fixedSentence?: string | null;
   title?: string;
-  sentences: SentenceItem[];
+  sentences: (SentenceItem | string)[];
   currentOrder?: string[]; // array of sentence IDs placed in slots
   onChangeOrder: (newOrder: string[]) => void;
   isReviewMode?: boolean;
@@ -159,12 +178,29 @@ export function ReadingSentenceOrder({
   isReviewMode = false,
   correctOrder = [],
 }: SentenceOrderProps) {
+  // Chuẩn hóa linh hoạt: Chấp nhận cả SentenceItem[] lẫn mảng chuỗi string[] thô
+  const normalizedSentences: SentenceItem[] = React.useMemo(() => {
+    if (!Array.isArray(sentences)) return [];
+    return sentences.map((item: any, idx: number) => {
+      if (typeof item === "string") {
+        return { id: `s${idx + 1}`, text: item };
+      }
+      if (item && typeof item === "object") {
+        return {
+          id: String(item.id || `s${idx + 1}`),
+          text: String(item.text || item.content || item.en || ""),
+        };
+      }
+      return { id: `s${idx + 1}`, text: String(item || "") };
+    });
+  }, [sentences]);
+
   // Loại trừ các text placeholder dummy như 'Sentence 1 is fixed here.'
   const isDummyFixed = Boolean(fixedSentence && /sentence 1 is fixed/i.test(fixedSentence));
   // Chỉ coi là có câu cố định nếu có nội dung thực tế VÀ số câu kéo thả <= 4
-  const hasFixed = Boolean(fixedSentence && fixedSentence.trim() && !isDummyFixed && sentences.length <= 4);
+  const hasFixed = Boolean(fixedSentence && fixedSentence.trim() && !isDummyFixed && normalizedSentences.length <= 4);
   // Luôn đảm bảo số ô kéo thả bằng đúng số lượng câu cần xếp
-  const totalSlotsCount = sentences.length > 0 ? sentences.length : (hasFixed ? 4 : 5);
+  const totalSlotsCount = normalizedSentences.length > 0 ? normalizedSentences.length : (hasFixed ? 4 : 5);
 
   // target slots
   const [slots, setSlots] = useState<(SentenceItem | null)[]>(() =>
@@ -173,7 +209,7 @@ export function ReadingSentenceOrder({
 
   // Synchronize state from currentOrder
   useEffect(() => {
-    const map = new Map(sentences.map((s) => [s.id, s]));
+    const map = new Map(normalizedSentences.map((s) => [s.id, s]));
     const newSlots: (SentenceItem | null)[] = Array(totalSlotsCount).fill(null);
     if (Array.isArray(currentOrder) && currentOrder.length > 0) {
       for (let i = 0; i < totalSlotsCount; i++) {
@@ -187,17 +223,17 @@ export function ReadingSentenceOrder({
       const isSame = prev.every((p, idx) => p?.id === newSlots[idx]?.id);
       return isSame ? prev : newSlots;
     });
-  }, [sentences, currentOrder, totalSlotsCount]);
+  }, [normalizedSentences, currentOrder, totalSlotsCount]);
 
   // Xáo trộn cố định (Deterministic Derangement Shuffle) danh sách câu ở cột phải
   // Đảm bảo: (1) Giữ nguyên id gốc (s1..s5) để chấm điểm chuẩn 100%,
   // (2) Không bao giờ hiển thị trùng thứ tự đáp án đúng ban đầu,
   // (3) Không bị nhảy vị trí khi học viên gỡ câu ra/vào hoặc F5 trang.
   const shuffledPool = React.useMemo(() => {
-    if (!sentences || sentences.length <= 1) return sentences;
-    const copy = [...sentences];
+    if (!normalizedSentences || normalizedSentences.length <= 1) return normalizedSentences;
+    const copy = [...normalizedSentences];
 
-    const seedStr = `${title || ""}_${sentences.map((s) => `${s.id}:${s.text}`).join("|")}`;
+    const seedStr = `${title || ""}_${normalizedSentences.map((s) => `${s.id}:${s.text}`).join("|")}`;
     let hash = 2166136261;
     for (let i = 0; i < seedStr.length; i++) {
       hash ^= seedStr.charCodeAt(i);
@@ -216,11 +252,11 @@ export function ReadingSentenceOrder({
       copy[j] = tmp;
     }
 
-    const originalIds = sentences.map((s) => s.id).join(",");
+    const originalIds = normalizedSentences.map((s) => s.id).join(",");
     const targetIds = (
-      correctOrder && correctOrder.length === sentences.length
+      correctOrder && correctOrder.length === normalizedSentences.length
         ? correctOrder
-        : sentences.map((s) => s.id)
+        : normalizedSentences.map((s) => s.id)
     ).join(",");
     const currentShuffledIds = copy.map((s) => s.id).join(",");
 
@@ -232,14 +268,14 @@ export function ReadingSentenceOrder({
     }
 
     // Đảm bảo câu đầu tiên không nằm ngay ở vị trí số 1 để tránh bấm tuần tự từ trên xuống
-    if (copy.length >= 3 && copy[0].id === sentences[0].id) {
+    if (copy.length >= 3 && copy[0].id === normalizedSentences[0].id) {
       const temp = copy[0];
       copy[0] = copy[1];
       copy[1] = temp;
     }
 
     return copy;
-  }, [sentences, title, correctOrder]);
+  }, [normalizedSentences, title, correctOrder]);
 
   // Unplaced sentences in the pool (hiển thị theo thứ tự đã xáo trộn)
   const placedIds = new Set(slots.filter(Boolean).map((s) => s!.id));
@@ -282,7 +318,7 @@ export function ReadingSentenceOrder({
 
   const handleDropOnSlot = (targetSlotIdx: number) => {
     if (!draggedItem) return;
-    const item = sentences.find((s) => s.id === draggedItem.id);
+    const item = normalizedSentences.find((s) => s.id === draggedItem.id);
     if (!item) return;
 
     const next = [...slots];
@@ -442,7 +478,7 @@ export function ReadingSentenceOrder({
               )}
 
               {correctOrder.map((corId, cIdx) => {
-                const sItem = sentences.find((s) => s.id === corId);
+                const sItem = normalizedSentences.find((s) => s.id === corId);
                 if (!sItem) return null;
                 const num = hasFixed ? cIdx + 2 : cIdx + 1;
                 return (

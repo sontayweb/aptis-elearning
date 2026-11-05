@@ -45,9 +45,14 @@ Table Exam {
   hot_level Int [not null, default: 0]
   forecast_tag String
   source String [not null, default: 'WEB']
+  external_id String
   creator_id String
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
+  parent_exam_id String
+  variant_note String
+  parent_exam Exam
+  variants Exam [not null]
   creator User
   parts ExamPart [not null]
   submissions ExamSubmission [not null]
@@ -206,10 +211,15 @@ Table PromotionCode {
   code String [unique, not null]
   title String [not null]
   description String
-  plan_id String [not null]
+  code_type String [not null, default: 'FREE_TRIAL']
+  plan_id String
   duration_days Int [not null, default: 14]
   ai_quota Int [not null, default: 20]
   teacher_quota Int [not null, default: 0]
+  discount_amount Int
+  discount_percent Int
+  min_order_amount Int
+  is_featured Boolean [not null, default: false]
   max_uses Int
   current_uses Int [not null, default: 0]
   is_active Boolean [not null, default: true]
@@ -217,7 +227,7 @@ Table PromotionCode {
   expires_at DateTime
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
-  plan SubscriptionPlan [not null]
+  plan SubscriptionPlan
   redemptions PromotionRedemption [not null]
 }
 
@@ -622,6 +632,8 @@ Enum AuditAction {
   SYSTEM_SETTING_UPDATE
   EMAIL_NOTIFICATION_SENT
 }
+
+Ref: Exam.parent_exam_id - Exam.id [delete: Set Null]
 
 Ref: Exam.creator_id > User.id [delete: Set Null]
 

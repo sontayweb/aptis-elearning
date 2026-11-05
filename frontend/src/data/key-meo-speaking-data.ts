@@ -46,6 +46,38 @@ export interface SpeakingPartData {
   modelSampleP2?: {
     template: string;
   };
+  // Part 2: Công thức 8 bước nâng cao Band B2-C1
+  b2c1Formula8Steps?: {
+    title: string;
+    subtitle: string;
+    imageUrl: string;
+    steps: {
+      step: number;
+      name: string;
+      question: string;
+      goal: string;
+      patterns: string[];
+    }[];
+    sampleBandB2C1: {
+      sentences: { num: number; text: string }[];
+    };
+  };
+  // Part 3: Công thức 6 bước nâng cao Band B2-C1
+  b2c1Formula6Steps?: {
+    title: string;
+    subtitle: string;
+    imageUrl: string;
+    steps: {
+      step: number;
+      name: string;
+      question: string;
+      goal: string;
+      patterns: string[];
+    }[];
+    sampleBandB2C1: {
+      sentences: { num: number; text: string }[];
+    };
+  };
   // Part 3: Bài nói mẫu 4 bước & Từ nối
   modelSampleP3?: {
     step1Intro: string;
@@ -167,6 +199,85 @@ export const SPEAKING_KEY_MEO_DATA: Record<string, SpeakingPartData> = {
       template:
         "Looking at the picture, I can see a group of people [người/vật chính, ví dụ: a family in a park]. There are [number] people in the picture. They are/ He is/ She is + [hành động, V_ing ví dụ: cooking, reading, talking] and they are wearing [trang phục, ví dụ: casual clothes]. The setting seems to be [không gian, indoors/outdoors]. It looks like a [địa điểm, ví dụ: shop, school,.. ] while in the background, there is [cảnh phía sau, ví dụ: a lot of green trees]. Overall, the atmosphere looks very [cảm xúc, ví dụ: happy / peaceful / warm]. They seem to be having a great time together.",
     },
+    b2c1Formula8Steps: {
+      title: "CẤU TRÚC SPEAKING APTIS PART 2 BAND B2-C1",
+      subtitle: "Mô tả bức tranh theo công thức 8 bước – NÂNG CAO NHẤT (B2-C1)",
+      imageUrl: "/images/key-meo-thi/cau-truc-speaking-part-2-band-b2-c1.jpg",
+      steps: [
+        {
+          step: 1,
+          name: "PEOPLE",
+          question: "Có ai?",
+          goal: "Nhận xét về mối quan hệ, thái độ, vai trò",
+          patterns: ["I can see... who appear to be...", "They look like... / It seems that..."],
+        },
+        {
+          step: 2,
+          name: "PLACE",
+          question: "Ở đâu?",
+          goal: "Mô tả không gian và bầu không khí",
+          patterns: ["They are in/at..., which looks like...", "The atmosphere suggests that..."],
+        },
+        {
+          step: 3,
+          name: "ACTIONS",
+          question: "Đang làm gì?",
+          goal: "Mô tả hành động + Mục đích có thể",
+          patterns: [
+            "On the left, ... is... possibly...",
+            "In the middle, ... seems to be...",
+            "On the right, ... looks as if...",
+          ],
+        },
+        {
+          step: 4,
+          name: "CLOTHES",
+          question: "Mặc gì?",
+          goal: "Nhận xét về phong cách và phù hợp ngữ cảnh",
+          patterns: ["He/She is wearing..., which suits...", "They are dressed in..., suggesting..."],
+        },
+        {
+          step: 5,
+          name: "AGE",
+          question: "Đoán tuổi",
+          goal: "Ước lượng + Lý do ước lượng",
+          patterns: ["I would say they are in their...", "They look to be around... probably because..."],
+        },
+        {
+          step: 6,
+          name: "FEELINGS",
+          question: "Cảm xúc",
+          goal: "Đoán cảm xúc + Giải thích sâu hơn",
+          patterns: ["They seem to be... which might be because...", "Their expressions indicate that..."],
+        },
+        {
+          step: 7,
+          name: "BACKGROUND",
+          question: "Phía sau có gì?",
+          goal: "Mô tả chi tiết + Nhận xét, suy luận",
+          patterns: ["In the background, there appears to be...", "This suggests that..."],
+        },
+        {
+          step: 8,
+          name: "PREDICTION",
+          question: "Sau đó làm gì?",
+          goal: "Dự đoán nhiều khả năng + Lý do, mục đích",
+          patterns: ["They are likely to...", "It's possible that...", "This may be because..."],
+        },
+      ],
+      sampleBandB2C1: {
+        sentences: [
+          { num: 1, text: "I can see three people who look like close friends." },
+          { num: 2, text: "They are at a modern café, which has a calm and cozy atmosphere." },
+          { num: 3, text: "On the left, a woman is holding a cup of coffee and listening carefully. In the middle, a man is explaining something while using his hands. On the right, another woman is taking notes." },
+          { num: 4, text: "They are wearing smart casual clothes, which seems suitable for a relaxed meeting." },
+          { num: 5, text: "I would say they are in their mid to late 20s, probably because of their style and appearance." },
+          { num: 6, text: "They seem engaged and positive, which might be because they are discussing something interesting and productive." },
+          { num: 7, text: "In the background, there are shelves with books, decorative plants, and large windows letting in natural light. This suggests the place is popular for working or studying." },
+          { num: 8, text: "They are likely to continue their discussion and plan their next steps. It's possible they are working on a project or preparing for an event." },
+        ],
+      },
+    },
     mistakesToAvoid: [
       "Chỉ nói tên đồ vật mà không mô tả hành động.",
       "Dùng Present Simple cho mọi hành động đang diễn ra trong ảnh (phải dùng V-ing).",
@@ -242,6 +353,86 @@ export const SPEAKING_KEY_MEO_DATA: Record<string, SpeakingPartData> = {
       "in contrast (đối lập lại)",
       "on the other hand (mặt khác)",
     ],
+    b2c1Formula6Steps: {
+      title: "CẤU TRÚC SPEAKING APTIS PART 3 BAND B2-C1",
+      subtitle: "So sánh 2 bức tranh theo công thức 6 bước – NÂNG CAO NHẤT (B2-C1)",
+      imageUrl: "/images/key-meo-thi/cau-truc-speaking-part-3-band-b2-c1.jpg",
+      steps: [
+        {
+          step: 1,
+          name: "TOPIC",
+          question: "Chủ đề chung",
+          goal: "Nêu điểm tương đồng khái quát của 2 tranh",
+          patterns: ["Both pictures show people who are...", "The common theme here is..."],
+        },
+        {
+          step: 2,
+          name: "PICTURE 1",
+          question: "Mô tả tranh 1",
+          goal: "Nêu bối cảnh, hành động và chi tiết chính",
+          patterns: ["In the first picture, we can see...", "He appears to be waiting at..."],
+        },
+        {
+          step: 3,
+          name: "LINKING",
+          question: "Từ nối đối lập",
+          goal: "Chuyển ý tự nhiên sang bức tranh thứ 2",
+          patterns: ["In contrast, ...", "On the other hand, ...", "Whereas the second picture shows..."],
+        },
+        {
+          step: 4,
+          name: "PICTURE 2",
+          question: "Mô tả tranh 2",
+          goal: "Mô tả tranh 2 đối chiếu trực tiếp với tranh 1",
+          patterns: ["In the second picture, there is a man at...", "Unlike the first person, he is..."],
+        },
+        {
+          step: 5,
+          name: "DIFFERENCES",
+          question: "Khác biệt sâu",
+          goal: "So sánh phương tiện, bầu không khí, chi phí",
+          patterns: [
+            "The main difference is the mode of transport...",
+            "Air travel is..., whereas train travel...",
+          ],
+        },
+        {
+          step: 6,
+          name: "FEELINGS & PREFERENCE",
+          question: "Cảm xúc & Lựa chọn cá nhân",
+          goal: "Đoán cảm xúc nhân vật + Nêu lựa chọn cá nhân",
+          patterns: ["Both men seem to be...", "Personally, I would prefer... because..."],
+        },
+      ],
+      sampleBandB2C1: {
+        sentences: [
+          {
+            num: 1,
+            text: "Both pictures show people who are travelling and waiting for their transport, although they are at very different locations.",
+          },
+          {
+            num: 2,
+            text: "In the first picture, we can see a man at an airport terminal, holding a suitcase and looking out of a large window as an airplane takes off in the distance.",
+          },
+          {
+            num: 3,
+            text: "In contrast, the second picture shows a completely different setting, with a man standing alone outdoors on a train platform.",
+          },
+          {
+            num: 4,
+            text: "In the second picture, there is a man with a large backpack waiting on a platform, watching the tracks under a sheltered station roof as a train appears to be departing or arriving.",
+          },
+          {
+            num: 5,
+            text: "The main difference is the mode of transport and the atmosphere; air travel is associated with long-distance journeys and busy terminals, whereas train travel is more localized, and this station feels more quiet and cold.",
+          },
+          {
+            num: 6,
+            text: "Both men seem to be focused and patient as they wait for their journeys, but personally, I would prefer air travel because it is faster and allows me to go to far-off places.",
+          },
+        ],
+      },
+    },
     mistakesToAvoid: [
       "Mô tả riêng từng ảnh mà không so sánh liên kết.",
       "Lặp lại liên tục “In picture one” và “In picture two”.",

@@ -545,6 +545,23 @@ export default function OfficialMockExamRoom() {
 
           const flat: any[] = [];
           for (const part of targetParts) {
+            const pTitle = (part.title || "").toUpperCase();
+            const pNum = Number(part.part_number || 0);
+            const isWritingPart =
+              exam.skill === "WRITING" ||
+              pTitle.includes("WRITING") ||
+              pTitle.includes("VIẾT") ||
+              pTitle.includes("VIET") ||
+              (pNum >= 9 && pNum <= 12 && exam.skill === "FULL_TEST");
+
+            const isReadingPart1 =
+              (exam.skill === "READING" && (pNum === 1 || pTitle.includes("PART 1"))) ||
+              (exam.skill === "FULL_TEST" && (pNum === 5 || pTitle.includes("PART 1")));
+
+            const isReadingPart2 =
+              (exam.skill === "READING" && (pNum === 2 || pTitle.includes("PART 2") || pTitle.includes("COHESION"))) ||
+              (exam.skill === "FULL_TEST" && (pNum === 6 || pTitle.includes("PART 2") || pTitle.includes("COHESION")));
+
             for (const q of part.questions || []) {
               let opts: any = null;
               if (Array.isArray(q.options) || (typeof q.options === "object" && q.options !== null)) {
@@ -552,6 +569,34 @@ export default function OfficialMockExamRoom() {
               } else if (typeof q.options === "string") {
                 try { opts = JSON.parse(q.options); } catch { opts = q.options; }
               }
+
+              let qType = q.question_type;
+              // Nếu là phần Writing, đảm bảo luôn là ESSAY để học viên có khung làm bài
+              if (isWritingPart) {
+                if (qType === "MULTIPLE_CHOICE" || qType === "SHORT_TEXT" || !opts || (Array.isArray(opts) && opts.length === 0)) {
+                  qType = "ESSAY";
+                }
+              }
+
+              // Nếu là Reading Part 1 và có dấu hiệu điền từ, ép sang GAP_FILL
+              if (isReadingPart1 && qType === "MULTIPLE_CHOICE") {
+                const prompt = q.prompt || "";
+                if (prompt.includes("[gap]") || prompt.includes("tentisspace") || prompt.includes("___") || prompt.includes("...")) {
+                  qType = "GAP_FILL";
+                }
+              }
+
+              // Nếu là Reading Part 2 (Sentence Order) và options là mảng chuỗi
+              if (qType === "SENTENCE_ORDER" || isReadingPart2) {
+                if (Array.isArray(opts) && opts.length > 0 && typeof opts[0] === "string") {
+                  opts = {
+                    title: part.title || "Text Cohesion",
+                    sentences: opts.map((text: string, sIdx: number) => ({ id: `s${sIdx + 1}`, text })),
+                  };
+                  qType = "SENTENCE_ORDER";
+                }
+              }
+
               const rawImgs = (part.image_url || (part as any).imageUrl || "")
                 .split(",")
                 .map((s: string) => s.trim())
@@ -561,6 +606,7 @@ export default function OfficialMockExamRoom() {
 
               flat.push({
                 ...q,
+                question_type: qType,
                 part_id: q.part_id || part.id,
                 options: opts,
                 partNumber: part.part_number,
@@ -1340,11 +1386,19 @@ export default function OfficialMockExamRoom() {
   const isAnswered = (idx: number) => {
     const q = questions[idx];
     if (!q) return false;
+    const isWriting =
+      q.question_type === "ESSAY" ||
+      q.question_type === "SHORT_TEXT" ||
+      q.question_type === "WRITING_ESSAY" ||
+      examData?.skill === "WRITING" ||
+      (q.partTitle || "").toUpperCase().includes("WRITING") ||
+      (q.partTitle || "").toUpperCase().includes("VIẾT") ||
+      (q.partTitle || "").toUpperCase().includes("VIET");
+    if (isWriting) return !!(textAnswers[q.id]?.trim());
     if (q.question_type === "MULTIPLE_CHOICE") return selectedAnswers[idx] !== undefined;
-    if (q.question_type === "GAP_FILL") return selectedAnswers[idx] !== undefined || !!textAnswers[q.id];
+    if (q.question_type === "GAP_FILL") return selectedAnswers[idx] !== undefined || !!(textAnswers[q.id]?.trim());
     if (q.question_type === "SENTENCE_ORDER") return !!(orderAnswers[q.id]?.length);
     if (q.question_type === "MATCHING") return !!matchingAnswers[q.id];
-    if (q.question_type === "ESSAY") return !!(textAnswers[q.id]?.trim());
     if (q.question_type === "SPEAKING_AUDIO") return !!audioUrls[q.id];
     return false;
   };
@@ -1354,6 +1408,17 @@ export default function OfficialMockExamRoom() {
   };
   const flaggedCount = Object.values(flaggedQuestions).filter(Boolean).length;
   const currentQ = questions[questionIdx];
+  const isWritingCurrentQ = Boolean(
+    currentQ && (
+      currentQ.question_type === "ESSAY" ||
+      currentQ.question_type === "SHORT_TEXT" ||
+      currentQ.question_type === "WRITING_ESSAY" ||
+      examData?.skill === "WRITING" ||
+      (currentQ.partTitle || "").toUpperCase().includes("WRITING") ||
+      (currentQ.partTitle || "").toUpperCase().includes("VIẾT") ||
+      (currentQ.partTitle || "").toUpperCase().includes("VIET")
+    )
+  );
 
   const getSkillFromQuestion = useCallback((q: any) => {
     const pTitle = (q?.partTitle || "").toUpperCase();
@@ -2024,7 +2089,14 @@ export default function OfficialMockExamRoom() {
           return "correct";
         }
       }
-      if (q.question_type === "ESSAY") {
+      if (
+        q.question_type === "ESSAY" ||
+        q.question_type === "SHORT_TEXT" ||
+        q.question_type === "WRITING_ESSAY" ||
+        (q.partTitle || "").toUpperCase().includes("WRITING") ||
+        (q.partTitle || "").toUpperCase().includes("VIẾT") ||
+        (q.partTitle || "").toUpperCase().includes("VIET")
+      ) {
         return textAnswers[q.id]?.trim() ? "answered" : "unanswered";
       }
       if (q.question_type === "SPEAKING_AUDIO") {
@@ -3289,7 +3361,7 @@ export default function OfficialMockExamRoom() {
                     <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-exam-bg text-primary">
                       {currentQ.question_type === "SPEAKING_AUDIO"
                         ? "🎙 Speaking"
-                        : currentQ.question_type === "ESSAY"
+                        : currentQ.question_type === "ESSAY" || isWritingCurrentQ
                         ? "✏️ Writing"
                         : currentQ.question_type === "GAP_FILL"
                         ? "🔤 Gap Fill"
@@ -3337,7 +3409,13 @@ export default function OfficialMockExamRoom() {
                 <ReadingSentenceOrder
                   title={currentQ.options?.title || "Text Cohesion"}
                   fixedSentence={currentQ.options?.fixedSentence}
-                  sentences={currentQ.options?.sentences || []}
+                  sentences={
+                    Array.isArray(currentQ.options?.sentences)
+                      ? currentQ.options.sentences
+                      : Array.isArray(currentQ.options)
+                      ? currentQ.options
+                      : []
+                  }
                   currentOrder={orderAnswers[currentQ.id]}
                   onChangeOrder={(newOrder) => {
                     setOrderAnswers((prev) => ({ ...prev, [currentQ.id]: newOrder }));
@@ -3602,6 +3680,7 @@ export default function OfficialMockExamRoom() {
 
               {/* 4. MULTIPLE CHOICE STANDARD */}
               {currentQ.question_type === "MULTIPLE_CHOICE" &&
+                !isWritingCurrentQ &&
                 Array.isArray(currentQ.options) &&
                 currentQ.options.length > 0 && (
                   <div className="space-y-3">
@@ -3635,11 +3714,14 @@ export default function OfficialMockExamRoom() {
                 )}
 
               {/* Essay / Writing */}
-              {currentQ.question_type === "ESSAY" && (
-                <div className="space-y-2">
+              {(currentQ.question_type === "ESSAY" ||
+                currentQ.question_type === "SHORT_TEXT" ||
+                currentQ.question_type === "WRITING_ESSAY" ||
+                isWritingCurrentQ) && (
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-exam-text-muted">Bài viết của bạn:</label>
-                    <span className="text-xs text-exam-text-muted">
+                    <label className="text-xs font-bold text-exam-text-muted">Bài viết của bạn:</label>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-muted text-exam-text">
                       {(textAnswers[currentQ.id] || "").split(/\s+/).filter(Boolean).length} từ
                     </span>
                   </div>
