@@ -276,50 +276,96 @@ export function SpeakingCheatSheetView({ customData }: SpeakingCheatSheetViewPro
 
           {/* PART 2: Bài nói mẫu miêu tả tranh */}
           {activePartKey === "p2" && data.modelSampleP2 && (
-            <div className="p-4 rounded-xl bg-muted/60 border border-border text-xs leading-relaxed text-foreground/90 font-sans space-y-2">
-              <div className="text-[10px] font-bold uppercase text-primary">
-                🎙️ Khung bài nói mẫu (45 giây):
+            <div className="p-4 sm:p-5 rounded-2xl bg-muted/50 border border-border space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-xs sm:text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                  🎙️ Khung bài nói mẫu (45 giây):
+                </div>
+                <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
+                  Chuẩn CEFR B1 - C
+                </span>
               </div>
-              <p className="whitespace-pre-line leading-relaxed italic text-[11.5px]">
-                "{data.modelSampleP2.template}"
+              <div className="p-3.5 sm:p-4 rounded-xl bg-background border border-border/80 shadow-xs">
+                <p className="whitespace-pre-line leading-relaxed text-sm sm:text-base text-foreground/95 font-medium">
+                  "{data.modelSampleP2.template}"
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                <span>💡</span>
+                <span>Thay thế các thông tin trong ngoặc vuông <strong className="text-foreground font-semibold">[ ... ]</strong> bằng chi tiết thực tế của bức tranh khi nói.</span>
               </p>
             </div>
           )}
 
           {/* PART 3: Bài nói mẫu so sánh 2 tranh */}
           {activePartKey === "p3" && data.modelSampleP3 && (
-            <div className="space-y-2 text-xs">
-              <div className="p-2.5 rounded-lg bg-muted/60 border border-border space-y-0.5">
-                <span className="font-bold text-primary text-[10px] uppercase">1. Mở bài – Giới thiệu chung</span>
-                <p className="italic text-foreground/80">{data.modelSampleP3.step1Intro}</p>
+            <div className="space-y-3">
+              <div className="p-3.5 sm:p-4 rounded-xl bg-muted/50 border border-border space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  <span className="font-bold text-primary text-xs sm:text-sm uppercase tracking-wide">
+                    1. Mở bài – Giới thiệu chung
+                  </span>
+                </div>
+                <p className="text-sm sm:text-base text-foreground/95 leading-relaxed pl-4 font-medium">
+                  {data.modelSampleP3.step1Intro}
+                </p>
               </div>
-              <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 space-y-0.5">
-                <span className="font-bold text-blue-700 dark:text-blue-300 text-[10px] uppercase">2. Mô tả ảnh bên trái (Left Picture) (10–12 giây)</span>
-                <p className="text-foreground/90">{data.modelSampleP3.step2Left}</p>
+
+              <div className="p-3.5 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/25 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-500" />
+                  <span className="font-bold text-blue-700 dark:text-blue-300 text-xs sm:text-sm uppercase tracking-wide">
+                    2. Mô tả ảnh bên trái (Left Picture) (~10–12 giây)
+                  </span>
+                </div>
+                <p className="text-sm sm:text-base text-foreground/95 leading-relaxed pl-4 font-medium">
+                  {data.modelSampleP3.step2Left}
+                </p>
               </div>
-              <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 space-y-0.5">
-                <span className="font-bold text-amber-700 dark:text-amber-300 text-[10px] uppercase">3. Mô tả ảnh bên phải (Right Picture) (10–12 giây)</span>
-                <p className="text-foreground/90">{data.modelSampleP3.step3Right}</p>
+
+              <div className="p-3.5 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  <span className="font-bold text-amber-700 dark:text-amber-300 text-xs sm:text-sm uppercase tracking-wide">
+                    3. Mô tả ảnh bên phải (Right Picture) (~10–12 giây)
+                  </span>
+                </div>
+                <p className="text-sm sm:text-base text-foreground/95 leading-relaxed pl-4 font-medium">
+                  {data.modelSampleP3.step3Right}
+                </p>
               </div>
-              <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 space-y-0.5">
-                <span className="font-bold text-emerald-700 dark:text-emerald-300 text-[10px] uppercase">4. Kết luận – Quan điểm cá nhân (Conclusion & Opinion)</span>
-                <p className="text-foreground/90">{data.modelSampleP3.step4Conclusion}</p>
+
+              <div className="p-3.5 sm:p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="font-bold text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm uppercase tracking-wide">
+                    4. Kết luận – Quan điểm cá nhân (Conclusion & Opinion)
+                  </span>
+                </div>
+                <p className="text-sm sm:text-base text-foreground/95 leading-relaxed pl-4 font-medium">
+                  {data.modelSampleP3.step4Conclusion}
+                </p>
               </div>
             </div>
           )}
 
           {/* PART 4: Bài nói mẫu 5 giai đoạn */}
           {activePartKey === "p4" && data.modelSampleP4 && (
-            <div className="space-y-2 text-xs">
+            <div className="space-y-3">
               {data.modelSampleP4.map((stageItem, idx) => (
-                <div key={idx} className="p-2.5 rounded-lg bg-muted/60 border border-border space-y-1">
+                <div key={idx} className="p-3.5 sm:p-4 rounded-xl bg-muted/50 border border-border space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-primary text-[11px]">{stageItem.stage}</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-bold">
+                    <span className="font-bold text-primary text-xs sm:text-sm uppercase tracking-wide">
+                      {stageItem.stage}
+                    </span>
+                    <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
                       {stageItem.time}
                     </span>
                   </div>
-                  <p className="text-foreground/90 italic leading-relaxed text-[11px]">{stageItem.content}</p>
+                  <p className="text-foreground/95 leading-relaxed text-sm sm:text-[15px] font-medium">
+                    {stageItem.content}
+                  </p>
                 </div>
               ))}
             </div>

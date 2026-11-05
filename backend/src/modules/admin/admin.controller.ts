@@ -3,6 +3,8 @@ import { adminService } from './admin.service';
 import {
   adminUserFilterSchema,
   adminCreateUserSchema,
+  adminCreatePromotionSchema,
+  adminUpdatePromotionSchema,
   adminUpdateUserStatusSchema,
   adminCreateExamSchema,
   adminResolveTransactionSchema,
@@ -758,6 +760,56 @@ export class AdminController {
       next(error);
     }
   }
+  async listPromotions(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await adminService.listPromotions();
+      sendSuccess(res, result, 'Lấy danh sách mã khuyến mại thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createPromotion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const validatedInput = adminCreatePromotionSchema.parse(req.body);
+      const result = await adminService.createPromotion(validatedInput, req);
+      sendSuccess(res, result, 'Tạo mã khuyến mại mới thành công', 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updatePromotion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id;
+      const validatedInput = adminUpdatePromotionSchema.parse(req.body);
+      const result = await adminService.updatePromotion(id, validatedInput, req);
+      sendSuccess(res, result, 'Cập nhật mã khuyến mại thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deletePromotion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id;
+      const result = await adminService.deletePromotion(id, req);
+      sendSuccess(res, result, result.message, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async listPromotionRedemptions(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id;
+      const result = await adminService.listPromotionRedemptions(id);
+      sendSuccess(res, result, 'Lấy danh sách học viên đã dùng mã thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 export const adminController = new AdminController();

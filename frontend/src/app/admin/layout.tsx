@@ -37,6 +37,7 @@ import {
   Database,
   RefreshCw,
   Lightbulb,
+  Tag,
 } from "lucide-react";
 import { useEventTheme } from "@/contexts/event-theme-context";
 import AdminTutorialModal from "@/components/admin/admin-tutorial-modal";
@@ -139,6 +140,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           href: "/admin/transactions",
           icon: CreditCard,
           badge: pendingTxCount > 0 ? String(pendingTxCount) : null,
+          badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono font-bold",
+        },
+        {
+          title: "Mã Khuyến Mại",
+          href: "/admin/promotions",
+          icon: Tag,
+          badge: "HOT",
           badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono font-bold",
         },
       ],

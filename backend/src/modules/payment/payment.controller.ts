@@ -5,6 +5,15 @@ import { sendSuccess, sendError } from '../../utils/api-response';
 import { AuthenticatedRequest } from '../../middlewares/auth.guard';
 
 export class PaymentController {
+  async featuredPromo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await paymentService.getFeaturedPromo();
+      sendSuccess(res, result, 'Lấy thông tin mã khuyến mại nổi bật thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getPlans(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const plans = await paymentService.getPlans();
@@ -17,8 +26,8 @@ export class PaymentController {
   async initiate(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user!.userId;
-      const { planCode } = initiatePaymentSchema.parse(req.body);
-      const result = await paymentService.initiatePayment(userId, planCode);
+      const { planCode, promoCode } = initiatePaymentSchema.parse(req.body);
+      const result = await paymentService.initiatePayment(userId, planCode, promoCode);
       sendSuccess(res, result, 'Khởi tạo đơn hàng thanh toán thành công', 201);
     } catch (error) {
       next(error);

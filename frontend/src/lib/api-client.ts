@@ -573,6 +573,21 @@ class ApiClient {
     getOrderStatus: (orderCode: string) =>
       this.request(`/payment/order-status/${orderCode}`),
 
+    getFeaturedPromo: () =>
+      this.request<{
+        id: string;
+        code: string;
+        title: string;
+        description?: string;
+        codeType: string;
+        durationDays: number;
+        aiQuota: number;
+        discountAmount?: number;
+        discountPercent?: number;
+        expiresAt?: string;
+        planName?: string;
+      } | null>('/payment/featured-promo'),
+
     redeemPromoCode: (code: string) =>
       this.request('/payment/redeem-code', {
         method: 'POST',
@@ -1065,6 +1080,28 @@ class ApiClient {
         }),
       getDownloadUrl: (filename: string) =>
         `${getApiBaseUrl()}/admin/backups/${encodeURIComponent(filename)}/download`,
+    },
+
+    
+    // ── Promotions & Voucher Management ──────────────────────
+    promotions: {
+      list: () => this.request<any[]>('/admin/promotions'),
+      create: (data: any) =>
+        this.request<any>('/admin/promotions', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }),
+      update: (id: string, data: any) =>
+        this.request<any>(`/admin/promotions/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(data),
+        }),
+      delete: (id: string) =>
+        this.request<any>(`/admin/promotions/${id}`, {
+          method: 'DELETE',
+        }),
+      getRedemptions: (id: string) =>
+        this.request<any>(`/admin/promotions/${id}/redemptions`),
     },
 
     dataSync: {

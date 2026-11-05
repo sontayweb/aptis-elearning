@@ -9,6 +9,8 @@ import {
   AdminGrantVipInput,
   AdminResetPasswordInput,
   AdminAdjustQuotaInput,
+  AdminCreatePromotionInput,
+  AdminUpdatePromotionInput,
 } from './admin.dto';
 import { TransactionStatus, SubmissionStatus, AuditAction, TargetBand, UserRole } from '@prisma/client';
 import { auditService } from '../audit/audit.service';
@@ -2160,6 +2162,261 @@ export class AdminService {
 
     return lines.join('\r\n');
   }
+  // ==========================================
+  // QUẢN LÝ MÃ KHUYẾN MẠI & QUÀ TẶNG (PROMOTIONS)
+  // ==========================================
+  async listPromotions() {
+    const list = await prisma.promotionCode.findMany({
+      orderBy: [
+        { is_featured: 'desc' },
+        { is_active: 'desc' },
+        { created_at: 'desc' },
+      ],
+      include: {
+        plan: true,
+        _count: {
+          select: { redemptions: true },
+        },
+      },
+    });
+
+    return list.map((p) => ({
+      id: p.id,
+      code: p.code,
+      title: p.title,
+      description: p.description,
+      codeType: p.code_type,
+      planId: p.plan_id,
+      planName: p.plan?.name || null,
+      durationDays: p.duration_days,
+      aiQuota: p.ai_quota,
+      teacherQuota: p.teacher_quota,
+      discountAmount: p.discount_amount,
+      discountPercent: p.discount_percent,
+      minOrderAmount: p.min_order_amount,
+      isFeatured: p.is_featured,
+      isActive: p.is_active,
+      maxUses: p.max_uses,
+      currentUses: p.current_uses,
+      redemptionsCount: p._count.redemptions,
+      startsAt: p.starts_at,
+      expiresAt: p.expires_at,
+      createdAt: p.created_at,
+    }));
+  }
+
+  async createPromotion(input: AdminCreatePromotionInput, req?: Request) {
+    const code = input.code.trim().toUpperCase();
+
+    const existing = await prisma.promotionCode.findUnique({ where: { code } });
+    if (existing) {
+      throw { statusCode: 400, message: `Mã [${code}] đã tồn tại trong hệ thống. Vui lòng đặt mã khác.` };
+    }
+
+    const expiresAt = input.expires_at ? new Date(input.expires_at) : null;
+
+    let createdPromo: any;
+    if (input.is_featured) {
+      // Cách 1: Hoán đổi độc quyền - Hạ toàn bộ các mã khác xuống, chỉ bật mã mới
+      createdPromo = await prisma.$transaction(async (tx) => {
+        await tx.promotionCode.updateMany({
+          data: { is_featured: false },
+        });
+
+        return await tx.promotionCode.create({
+          data: {
+            code,
+            title: input.title,
+            description: input.description,
+            code_type: input.code_type,
+            plan_id: input.plan_id || null,
+            duration_days: input.duration_days,
+            ai_quota: input.ai_quota,
+            teacher_quota: input.teacher_quota,
+            discount_amount: input.discount_amount,
+            discount_percent: input.discount_percent,
+            min_order_amount: input.min_order_amount,
+            is_featured: true,
+            is_active: input.is_active,
+            max_uses: input.max_uses || null,
+            expires_at: expiresAt,
+          },
+          include: { plan: true },
+        });
+      });
+    } else {
+      createdPromo = await prisma.promotionCode.create({
+        data: {
+          code,
+          title: input.title,
+          description: input.description,
+          code_type: input.code_type,
+          plan_id: input.plan_id || null,
+          duration_days: input.duration_days,
+          ai_quota: input.ai_quota,
+          teacher_quota: input.teacher_quota,
+          discount_amount: input.discount_amount,
+          discount_percent: input.discount_percent,
+          min_order_amount: input.min_order_amount,
+          is_featured: false,
+          is_active: input.is_active,
+          max_uses: input.max_uses || null,
+          expires_at: expiresAt,
+        },
+        include: { plan: true },
+      });
+    }
+
+    auditService.record({
+      req,
+      action: AuditAction.USER_ROLE_CHANGE,
+      entityType: 'PROMOTION_CODE',
+      entityId: createdPromo.id,
+      description: `Admin tạo mã khuyến mại mới [${createdPromo.code}]: ${createdPromo.title} (Loại: ${createdPromo.code_type}, Treo Banner: ${createdPromo.is_featured ? 'Có' : 'Không'}).`,
+      newValue: createdPromo,
+    });
+
+    return createdPromo;
+  }
+
+  async updatePromotion(id: string, input: AdminUpdatePromotionInput, req?: Request) {
+    const promo = await prisma.promotionCode.findUnique({ where: { id } });
+    if (!promo) {
+      throw { statusCode: 404, message: 'Mã khuyến mại không tồn tại' };
+    }
+
+    const expiresAt = input.expires_at !== undefined ? (input.expires_at ? new Date(input.expires_at) : null) : undefined;
+
+    let updated: any;
+    if (input.is_featured === true) {
+      // Cách 1: Hoán đổi độc quyền - Khi bật Treo Banner cho mã này, tự động hạ các mã khác xuống
+      updated = await prisma.$transaction(async (tx) => {
+        await tx.promotionCode.updateMany({
+          where: { id: { not: id } },
+          data: { is_featured: false },
+        });
+
+        return await tx.promotionCode.update({
+          where: { id },
+          data: {
+            ...(input.title !== undefined && { title: input.title }),
+            ...(input.description !== undefined && { description: input.description }),
+            ...(input.code_type !== undefined && { code_type: input.code_type }),
+            ...(input.plan_id !== undefined && { plan_id: input.plan_id }),
+            ...(input.duration_days !== undefined && { duration_days: input.duration_days }),
+            ...(input.ai_quota !== undefined && { ai_quota: input.ai_quota }),
+            ...(input.teacher_quota !== undefined && { teacher_quota: input.teacher_quota }),
+            ...(input.discount_amount !== undefined && { discount_amount: input.discount_amount }),
+            ...(input.discount_percent !== undefined && { discount_percent: input.discount_percent }),
+            ...(input.min_order_amount !== undefined && { min_order_amount: input.min_order_amount }),
+            ...(input.is_active !== undefined && { is_active: input.is_active }),
+            is_featured: true,
+            ...(input.max_uses !== undefined && { max_uses: input.max_uses }),
+            ...(expiresAt !== undefined && { expires_at: expiresAt }),
+          },
+          include: { plan: true },
+        });
+      });
+    } else {
+      updated = await prisma.promotionCode.update({
+        where: { id },
+        data: {
+          ...(input.title !== undefined && { title: input.title }),
+          ...(input.description !== undefined && { description: input.description }),
+          ...(input.code_type !== undefined && { code_type: input.code_type }),
+          ...(input.plan_id !== undefined && { plan_id: input.plan_id }),
+          ...(input.duration_days !== undefined && { duration_days: input.duration_days }),
+          ...(input.ai_quota !== undefined && { ai_quota: input.ai_quota }),
+          ...(input.teacher_quota !== undefined && { teacher_quota: input.teacher_quota }),
+          ...(input.discount_amount !== undefined && { discount_amount: input.discount_amount }),
+          ...(input.discount_percent !== undefined && { discount_percent: input.discount_percent }),
+          ...(input.min_order_amount !== undefined && { min_order_amount: input.min_order_amount }),
+          ...(input.is_active !== undefined && { is_active: input.is_active }),
+          ...(input.is_featured !== undefined && { is_featured: input.is_featured }),
+          ...(input.max_uses !== undefined && { max_uses: input.max_uses }),
+          ...(expiresAt !== undefined && { expires_at: expiresAt }),
+        },
+        include: { plan: true },
+      });
+    }
+
+    auditService.record({
+      req,
+      action: AuditAction.USER_ROLE_CHANGE,
+      entityType: 'PROMOTION_CODE',
+      entityId: id,
+      description: `Admin cập nhật mã khuyến mại [${promo.code}]: Trạng thái ${updated.is_active ? 'Bật' : 'Tắt'}, Treo Banner: ${updated.is_featured ? 'Có' : 'Không'}.`,
+      oldValue: promo,
+      newValue: updated,
+    });
+
+    return updated;
+  }
+
+  async deletePromotion(id: string, req?: Request) {
+    const promo = await prisma.promotionCode.findUnique({
+      where: { id },
+      include: { _count: { select: { redemptions: true } } },
+    });
+    if (!promo) {
+      throw { statusCode: 404, message: 'Mã khuyến mại không tồn tại' };
+    }
+
+    if (promo._count.redemptions > 0) {
+      await prisma.promotionCode.update({
+        where: { id },
+        data: { is_active: false, is_featured: false },
+      });
+      return { message: 'Mã đã có học viên sử dụng. Đã tự động tắt kích hoạt và hạ khỏi Banner.' };
+    }
+
+    await prisma.promotionCode.delete({ where: { id } });
+
+    auditService.record({
+      req,
+      action: AuditAction.USER_ROLE_CHANGE,
+      entityType: 'PROMOTION_CODE',
+      entityId: id,
+      description: `Admin xóa mã khuyến mại [${promo.code}].`,
+    });
+
+    return { message: 'Đã xóa mã khuyến mại thành công' };
+  }
+
+  async listPromotionRedemptions(id: string) {
+    const promo = await prisma.promotionCode.findUnique({
+      where: { id },
+      select: { code: true, title: true },
+    });
+    if (!promo) {
+      throw { statusCode: 404, message: 'Mã khuyến mại không tồn tại' };
+    }
+
+    const redemptions = await prisma.promotionRedemption.findMany({
+      where: { code_id: id },
+      orderBy: { redeemed_at: 'desc' },
+      include: {
+        user: {
+          select: { id: true, full_name: true, email: true, phone_number: true },
+        },
+        subscription: {
+          select: { id: true, start_date: true, end_date: true, ai_quota_left: true },
+        },
+      },
+    });
+
+    return {
+      promo,
+      totalRedemptions: redemptions.length,
+      redemptions: redemptions.map((r: any) => ({
+        id: r.id,
+        user: r.user,
+        subscription: r.subscription,
+        redeemedAt: r.redeemed_at,
+      })),
+    };
+  }
+
 }
 
 export const adminService = new AdminService();

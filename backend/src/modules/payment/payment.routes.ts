@@ -6,6 +6,7 @@ const router = Router();
 
 // Public routes
 router.get('/plans', (req, res, next) => paymentController.getPlans(req, res, next));
+router.get('/featured-promo', (req, res, next) => paymentController.featuredPromo(req, res, next));
 router.get('/order-status/:orderCode', (req, res, next) => paymentController.getStatus(req, res, next));
 // Webhook từ SePay (không yêu cầu Bearer token của user)
 router.post('/webhook', (req, res, next) => paymentController.handleWebhook(req, res, next));

@@ -154,6 +154,17 @@ export default function PricingPage() {
   const [redeemingPromo, setRedeemingPromo] = useState(false);
   const [promoNotice, setPromoNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [showPromoBox, setShowPromoBox] = useState(false);
+  const [featuredPromo, setFeaturedPromo] = useState<{
+    code: string;
+    title: string;
+    description?: string;
+    durationDays?: number;
+    aiQuota?: number;
+    expiresAt?: string;
+    codeType?: string;
+    discountAmount?: number;
+    discountPercent?: number;
+  } | null>(null);
 
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
@@ -172,9 +183,23 @@ export default function PricingPage() {
     ? Math.max(0, Math.ceil((new Date(activeSub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
 
-  // Mã trải nghiệm chỉ mở đến hết ngày 25/11/2026
-  const PROMO_EXPIRY_DATE = new Date("2026-11-25T23:59:59.999+07:00");
-  const isPromoExpired = new Date() > PROMO_EXPIRY_DATE;
+    useEffect(() => {
+    api.payment
+      .getFeaturedPromo()
+      .then((res: any) => {
+        if (res?.success && res.data) {
+          setFeaturedPromo(res.data);
+        }
+      })
+      .catch((err) => console.warn("Failed to load featured promo:", err));
+  }, []);
+
+  const promoExpiryDate = featuredPromo?.expiresAt ? new Date(featuredPromo.expiresAt) : null;
+  const isPromoExpired = promoExpiryDate ? new Date() > promoExpiryDate : false;
+  const promoCodeToDisplay = featuredPromo?.code || "GOLIVE14";
+  const promoTitle = featuredPromo?.title || "Chương trình Trải nghiệm Go-Live VIP";
+  const promoDays = featuredPromo?.durationDays || 14;
+  const promoAi = featuredPromo?.aiQuota || 20;
 
   const handleRedeemPromo = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,7 +207,7 @@ export default function PricingPage() {
     if (isPromoExpired) {
       setPromoNotice({
         type: "error",
-        text: "Chương trình mã kích hoạt 14 ngày VIP trải nghiệm đã kết thúc vào ngày 25/11. Vui lòng đăng ký gói VIP Pro để tiếp tục sử dụng.",
+        text: `Chương trình mã kích hoạt [${promoCodeToDisplay}] đã kết thúc${promoExpiryDate ? ` vào ngày ${promoExpiryDate.toLocaleDateString("vi-VN")}` : ""}. Vui lòng đăng ký gói VIP Pro để tiếp tục sử dụng.`,
       });
       return;
     }
@@ -573,7 +598,7 @@ export default function PricingPage() {
                     <span>Chương trình trải nghiệm đã kết thúc</span>
                   </div>
                   <h3 className="text-base font-heading font-bold text-foreground">
-                    Chương trình tặng mã trải nghiệm VIP 14 ngày đã kết thúc vào ngày 25/11
+                    Chương trình tặng mã trải nghiệm [{promoCodeToDisplay}] đã kết thúc{promoExpiryDate ? ` vào ngày ${promoExpiryDate.toLocaleDateString("vi-VN")}` : ""}
                   </h3>
                   <p className="text-xs text-muted-foreground">
                     Để tiếp tục mở khóa 860+ bộ đề thi Aptis ESOL và hệ thống chấm AI, học viên vui lòng đăng ký một trong các gói VIP Pro bên trên.
@@ -587,13 +612,13 @@ export default function PricingPage() {
                   <div className="space-y-1 text-center md:text-left flex-1">
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold">
                       <Gift className="w-3.5 h-3.5" />
-                      <span>Mã Trải Nghiệm Go-Live (Mở đến 25/11)</span>
+                      <span>{promoTitle}{promoExpiryDate ? ` (Mở đến ${promoExpiryDate.toLocaleDateString("vi-VN")})` : ""}</span>
                     </div>
                     <h3 className="text-base md:text-lg font-heading font-extrabold text-foreground">
                       Bạn có mã kích hoạt VIP miễn phí?
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      Nhập mã <span className="font-mono font-bold text-primary">GOLIVE14</span> để nhận ngay 14 ngày VIP đầy đủ tính năng &amp; 20 lượt chấm AI! (Chỉ áp dụng đến hết 25/11/2026, mỗi tài khoản được dùng 1 lần duy nhất).
+                      Nhập mã <span className="font-mono font-bold text-primary">{promoCodeToDisplay}</span> để nhận ngay {promoDays} ngày VIP đầy đủ tính năng &amp; {promoAi} lượt chấm AI! {promoExpiryDate ? `(Chỉ áp dụng đến hết ${promoExpiryDate.toLocaleDateString("vi-VN")}, mỗi tài khoản được dùng 1 lần duy nhất).` : "(Mỗi tài khoản được dùng 1 lần duy nhất)."}
                     </p>
                   </div>
 
@@ -602,7 +627,7 @@ export default function PricingPage() {
                       type="text"
                       value={promoCodeInput}
                       onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
-                      placeholder="Mã CODE: GOLIVE14"
+                      placeholder={`Mã CODE: ${promoCodeToDisplay}`}
                       className="px-4 py-2 rounded-xl border border-border bg-background text-xs font-mono font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-primary w-full sm:w-56"
                     />
                     <button
