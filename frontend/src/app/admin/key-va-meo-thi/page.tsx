@@ -70,7 +70,7 @@ export default function AdminKeyVaMeoThiPage() {
 
   // Search filters
   const [search, setSearch] = useState("");
-  const [previewP2Image, setPreviewP2Image] = useState(false);
+  const [previewSpeakingModal, setPreviewSpeakingModal] = useState<{ url: string; title: string } | null>(null);
 
   // Modal edit state
   const [editingItem, setEditingItem] = useState<{
