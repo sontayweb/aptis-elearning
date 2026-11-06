@@ -161,11 +161,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           badge: null,
         },
         {
-          title: "Gán nhãn Đề Tủ & Chủ đề",
-          href: "/admin/key-du-doan",
-          icon: Sparkles,
-          badge: "HOT",
-          badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono font-bold",
+          title: "Kho Từ vựng",
+          href: "/admin/vocabulary",
+          icon: BookMarked,
+          badge: null,
         },
         {
           title: "Key & Mẹo Thi (4 Kỹ Năng)",
@@ -173,26 +172,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           icon: Lightbulb,
           badge: "HOT",
           badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono font-bold",
-        },
-        {
-          title: "AI Gợi Ý Tranh Speaking",
-          href: "/admin/tools/speaking-hints",
-          icon: Sparkles,
-          badge: "AI HUB",
-          badgeColor: "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 font-mono font-bold",
-        },
-        {
-          title: "Đồng bộ & Đối soát Đề",
-          href: "/admin/data-sync",
-          icon: RefreshCw,
-          badge: "NEW",
-          badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono font-bold",
-        },
-        {
-          title: "Kho Từ vựng",
-          href: "/admin/vocabulary",
-          icon: BookMarked,
-          badge: null,
         },
         {
           title: "Đánh giá học viên",
@@ -205,6 +184,32 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           href: "/admin/reports",
           icon: AlertTriangle,
           badge: null,
+        },
+      ],
+    },
+    {
+      group: "CÔNG CỤ",
+      items: [
+        {
+          title: "Gán nhãn Đề Tủ & Chủ đề",
+          href: "/admin/key-du-doan",
+          icon: Sparkles,
+          badge: "HOT",
+          badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono font-bold",
+        },
+        {
+          title: "AI Gợi Ý Tranh Speaking",
+          href: "/admin/tools/speaking-hints",
+          icon: Zap,
+          badge: "AI HUB",
+          badgeColor: "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 font-mono font-bold",
+        },
+        {
+          title: "Đồng bộ & Kiểm định Đề",
+          href: "/admin/data-sync",
+          icon: RefreshCw,
+          badge: "NEW",
+          badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono font-bold",
         },
       ],
     },
@@ -250,7 +255,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const isTeacher = user?.role === "TEACHER";
   const filteredNavGroups = navGroups.map((group) => {
     if (isTeacher) {
-      return group.group === "HỌC VỤ" ? group : null;
+      return (group.group === "HỌC VỤ" || group.group === "CÔNG CỤ") ? group : null;
     }
     if (group.group === "HỆ THỐNG" && !isSuperAdmin) {
       return null;
