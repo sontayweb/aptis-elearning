@@ -21,6 +21,7 @@ import { standardExamParser } from '../ingestion/parsers/standard-exam.parser';
 import { ttsAudioService } from '../ingestion/tts-audio.service';
 import { topicTaggerService } from './topic-tagger.service';
 import { speakingHintsGeneratorService } from './speaking-hints-generator.service';
+import { speakingImageIntelligenceService } from './speaking-image-intelligence.service';
 
 export class AdminController {
   async listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -457,6 +458,34 @@ export class AdminController {
       const examId = req.params.examId;
       const result = await speakingHintsGeneratorService.batchGenerateForExam(examId);
       sendSuccess(res, result, 'Sinh gợi ý hàng loạt cho đề thi thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async suggestPartImages(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const suggestions = await speakingImageIntelligenceService.getSuggestionsForPart(partId);
+      sendSuccess(res, suggestions, 'Lấy danh sách ảnh gợi ý chuẩn ngữ cảnh thành công', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async applySuggestedPartImages(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const partId = req.params.partId;
+      const { image1SourceUrl, image2SourceUrl } = req.body || {};
+      if (!image1SourceUrl) {
+        throw { statusCode: 400, message: 'Vui lòng cung cấp đường dẫn ảnh tranh 1 (image1SourceUrl).' };
+      }
+      const result = await speakingImageIntelligenceService.applySuggestedImages(
+        partId,
+        image1SourceUrl,
+        image2SourceUrl
+      );
+      sendSuccess(res, result, 'Áp dụng ảnh chuẩn ngữ cảnh vào đề thi thành công', 200);
     } catch (error) {
       next(error);
     }

@@ -1002,6 +1002,52 @@ class ApiClient {
         body: JSON.stringify({ hints }),
       }),
 
+    suggestPartImages: (partId: string) =>
+      this.request<{
+        partId: string;
+        partNumber: 2 | 3;
+        topicTitle: string;
+        analysis: {
+          summary: string;
+          concept1: string;
+          concept2?: string;
+          searchQuery1: string;
+          searchQuery2?: string;
+        };
+        candidatePairs: Array<{
+          id: string;
+          title: string;
+          image1: {
+            id: string;
+            title: string;
+            previewUrl: string;
+            downloadUrl: string;
+            source: string;
+            photographer?: string;
+          };
+          image2?: {
+            id: string;
+            title: string;
+            previewUrl: string;
+            downloadUrl: string;
+            source: string;
+            photographer?: string;
+          };
+        }>;
+      }>(`/admin/parts/${partId}/suggest-images`, { method: 'POST' }),
+
+    applySuggestedPartImages: (
+      partId: string,
+      data: { image1SourceUrl: string; image2SourceUrl?: string }
+    ) =>
+      this.request<{
+        partId: string;
+        newImageUrl: string;
+      }>(`/admin/parts/${partId}/apply-suggested-images`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
     batchGenerateAllSpeakingHints: (body?: { skipExisting?: boolean; delayMs?: number; partIds?: string[] }) =>
       this.request<{
         processed: number;

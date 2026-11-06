@@ -102,6 +102,13 @@ router.post('/exams/:examId/batch-generate-speaking-hints', (req, res, next) =>
   adminController.batchGenerateSpeakingHints(req, res, next)
 );
 
+router.post('/parts/:partId/suggest-images', (req, res, next) =>
+  adminController.suggestPartImages(req, res, next)
+);
+router.post('/parts/:partId/apply-suggested-images', (req, res, next) =>
+  adminController.applySuggestedPartImages(req, res, next)
+);
+
 // Quản lý Gán nhãn Sao / Cỏ theo Chủ Đề (Topic Tagging & Auto-Propagation)
 router.get('/topic-tags', (req, res, next) => adminController.getTopicRules(req, res, next));
 router.post('/topic-tags/preview-matches', (req, res, next) => adminController.previewTopicMatches(req, res, next));

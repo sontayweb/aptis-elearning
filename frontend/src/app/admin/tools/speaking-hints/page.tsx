@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { SpeakingHintsModal, SpeakingHintsData } from "@/components/admin/exams/speaking-hints-modal";
+import { SpeakingImageSuggestModal } from "@/components/admin/exams/speaking-image-suggest-modal";
+import { Camera } from "lucide-react";
 
 interface SpeakingPartItem {
   partId: string;
@@ -233,6 +235,7 @@ export default function SpeakingAiHintsHubPage() {
   // Single Item Operations
   const [generatingPartId, setGeneratingPartId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<SpeakingPartItem | null>(null);
+  const [suggestingItem, setSuggestingItem] = useState<SpeakingPartItem | null>(null);
 
   // Image Preview Modal
   const [previewImage, setPreviewImage] = useState<{ title: string; url: string; url2?: string } | null>(null);
@@ -1196,15 +1199,24 @@ export default function SpeakingAiHintsHubPage() {
                             )}
                           </div>
                         ) : (
-                          <Link
-                            href={`/admin/exams/${item.examId}/edit`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-rose-500 hover:text-rose-600 font-semibold"
-                          >
-                            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                            <span>Chưa có ảnh (Gắn ngay)</span>
-                          </Link>
+                          <div className="flex flex-col items-start gap-1">
+                            <Link
+                              href={`/admin/exams/${item.examId}/edit`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-rose-500 hover:text-rose-600 font-semibold"
+                            >
+                              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                              <span>Chưa có ảnh (Gắn ngay)</span>
+                            </Link>
+                            <button
+                              onClick={() => setSuggestingItem(item)}
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5"
+                            >
+                              <Camera className="w-3 h-3" />
+                              <span>✨ Gợi ý ảnh</span>
+                            </button>
+                          </div>
                         )}
                       </td>
 
@@ -1281,6 +1293,15 @@ export default function SpeakingAiHintsHubPage() {
                             ) : (
                               <Sparkles className="w-4 h-4" />
                             )}
+                          </button>
+
+                          {/* Suggest Images Button */}
+                          <button
+                            onClick={() => setSuggestingItem(item)}
+                            className="p-2 rounded-xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-600 dark:text-sky-300 transition-colors"
+                            title="Gợi ý & Gán ảnh chuẩn ngữ cảnh"
+                          >
+                            <Camera className="w-4 h-4" />
                           </button>
 
                           {/* Edit Hints Button */}
@@ -1472,6 +1493,38 @@ export default function SpeakingAiHintsHubPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── IMAGE SUGGEST MODAL ── */}
+      {suggestingItem && (
+        <SpeakingImageSuggestModal
+          isOpen={Boolean(suggestingItem)}
+          partId={suggestingItem.partId}
+          partNumber={suggestingItem.partNumber}
+          examTitle={suggestingItem.partTitle || suggestingItem.examTitle}
+          currentImageUrl={suggestingItem.imageUrl}
+          currentSecondImageUrl={suggestingItem.secondImageUrl}
+          onClose={() => setSuggestingItem(null)}
+          onApplied={(newImageUrl) => {
+            const split = newImageUrl.split(',').map((s) => s.trim());
+            setData((prev) => {
+              if (!prev) return prev;
+              const updated = prev.items.map((it) => {
+                if (it.partId === suggestingItem.partId) {
+                  return {
+                    ...it,
+                    hasImage: true,
+                    imageUrl: split[0] || null,
+                    secondImageUrl: split[1] || null,
+                  };
+                }
+                return it;
+              });
+              return { ...prev, items: updated };
+            });
+            setSuggestingItem(null);
+          }}
+        />
       )}
 
       {/* ── SPEAKING HINTS EDIT MODAL ── */}

@@ -25,7 +25,8 @@
     "db:restore": "node ./node_modules/tsx/dist/cli.mjs src/tools/backup-cli.ts restore",
     "db:pull": "python scripts/pull-db-from-vps.py",
     "db:clean-reading": "node ./node_modules/tsx/dist/cli.mjs scripts/clean-reading-keys-and-add-hot.ts",
-    "db:apply-indexes": "node ./node_modules/tsx/dist/cli.mjs scripts/apply-unique-indexes.ts"
+    "db:apply-indexes": "node ./node_modules/tsx/dist/cli.mjs scripts/apply-unique-indexes.ts",
+    "tools:heal-speaking-images": "node ./node_modules/tsx/dist/cli.mjs src/tools/heal-speaking-images-cli.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
