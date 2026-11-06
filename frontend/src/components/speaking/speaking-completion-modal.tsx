@@ -15,25 +15,34 @@ import type { SpeakingQuestion } from "@/lib/speaking/speaking-exam-utils";
 export interface SpeakingCompletionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onReview?: () => void;
   targetPart: number | null;
   examTitle: string;
   completedCount: number;
   questions: SpeakingQuestion[];
   handleRestartExam: () => void;
   isRestarting: boolean;
+  estimatedScore?: number | null;
+  cefrBand?: string | null;
 }
 
 export function SpeakingCompletionModal({
   isOpen,
   onClose,
+  onReview,
   targetPart,
   examTitle,
   completedCount,
   questions,
   handleRestartExam,
   isRestarting,
+  estimatedScore,
+  cefrBand,
 }: SpeakingCompletionModalProps) {
   if (!isOpen) return null;
+
+  const displayBand = cefrBand ? (cefrBand.toLowerCase().startsWith("band") ? cefrBand : `Band ${cefrBand}`) : "Chờ chấm";
+  const hasScore = typeof estimatedScore === "number" && !isNaN(estimatedScore);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
@@ -68,9 +77,9 @@ export function SpeakingCompletionModal({
               CEFR Target
             </span>
             <span className="text-xl md:text-2xl font-black font-heading gradient-text mt-0.5 block">
-              Band B2
+              {displayBand}
             </span>
-            <span className="text-[10px] text-emerald-600 font-semibold">Tốt</span>
+            <span className="text-[10px] text-emerald-600 font-semibold">{hasScore ? "Đã đánh giá" : "Chờ AI"}</span>
           </div>
 
           <div className="p-3 rounded-xl bg-card border border-border/80">
@@ -78,9 +87,9 @@ export function SpeakingCompletionModal({
               Điểm ước tính
             </span>
             <span className="text-xl md:text-2xl font-black font-heading text-primary mt-0.5 block">
-              42<span className="text-xs text-muted-foreground font-normal">/50</span>
+              {hasScore ? estimatedScore : "--"}<span className="text-xs text-muted-foreground font-normal">/50</span>
             </span>
-            <span className="text-[10px] text-muted-foreground font-medium">Quy đổi Aptis</span>
+            <span className="text-[10px] text-muted-foreground font-medium">{hasScore ? "Quy đổi Aptis" : "Chưa chấm"}</span>
           </div>
 
           <div className="col-span-2 sm:col-span-1 p-3 rounded-xl bg-card border border-border/80">
@@ -98,7 +107,10 @@ export function SpeakingCompletionModal({
         <div className="space-y-2 pt-2 border-t border-border">
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => {
+              if (onReview) onReview();
+              else onClose();
+            }}
             className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Play className="w-4 h-4" />

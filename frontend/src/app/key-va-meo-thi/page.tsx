@@ -16,6 +16,7 @@ import { SpeakingCheatSheetView } from "@/components/key-meo-thi/speaking-cheat-
 import { ReadingCheatSheetView } from "@/components/key-meo-thi/reading-cheat-sheet-view";
 import {
   Headphones,
+  Info,
   BookOpen,
   Mic,
   PenTool,
@@ -70,22 +71,32 @@ function KeyVaMeoThiContent() {
       <Navbar />
 
       <main className="flex-1 pt-16">
-        {/* Top Hero Banner */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-primary/10 via-background to-background py-10 md:py-14 border-b border-border">
-          <div className="section-container relative z-10 max-w-5xl mx-auto text-center space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold shadow-xs">
-              <span>🍀</span>
-              <span>Dự đoán trọng tâm & Mẹo thi Aptis ESOL 2026</span>
+        {/* Compact Header Web App */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-background to-background py-3.5 sm:py-4 border-b border-border/80">
+          <div className="section-container relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <span className="text-sm">🍀</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold font-heading tracking-tight text-foreground">
+                Key &amp; Mẹo Thi Aptis
+              </h1>
+              <div className="relative group/info inline-flex items-center">
+                <button
+                  type="button"
+                  className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                  aria-label="Thông tin Key & Mẹo thi"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+                <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-80 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                  Tổng hợp phương pháp ôn thi cấp tốc, ma trận đáp án trúng tủ và mẹo ghi nhớ độc quyền theo từng phần bài thi Aptis ESOL 2026.
+                </div>
+              </div>
             </div>
-            <h1 className="text-2xl md:text-4xl font-black font-heading tracking-tight text-foreground">
-              Key &amp; Mẹo Thi Aptis
-            </h1>
-            <p className="text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Tổng hợp phương pháp ôn thi cấp tốc, ma trận đáp án trúng tủ và mẹo ghi nhớ độc quyền theo từng phần bài thi.
-            </p>
 
             {/* LEVEL 1: SKILL TABS (Listening, Reading, Speaking, Writing) */}
-            <div className="pt-4 flex items-center justify-center gap-2 overflow-x-auto pb-1">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
               {[
                 { id: "listening", label: "Listening", icon: Headphones, count: "4 Phần" },
                 { id: "reading", label: "Reading", icon: BookOpen, count: "4 Phần" },
@@ -98,13 +109,13 @@ function KeyVaMeoThiContent() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveSkill(tab.id as SkillTab)}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
                       isActive
                         ? "bg-primary text-primary-foreground border-primary shadow-xs"
-                        : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border-border"
+                        : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted"
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-3.5 h-3.5" />
                     <span>{tab.label}</span>
                     <span
                       className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${

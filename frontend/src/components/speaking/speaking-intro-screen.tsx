@@ -5,6 +5,8 @@ import { Mic, Volume2, CheckCircle2, Loader2, AlertTriangle, ArrowRight, ArrowLe
 interface SpeakingIntroScreenProps {
   examTitle: string;
   questionCount: number;
+  targetPart?: number | null;
+  estimatedMinutes?: number;
   introSubStep: "check" | "instructions";
   onSubStepChange: (step: "check" | "instructions") => void;
   /** Bắt đầu làm bài (hoặc "Vào nhanh" bỏ qua bước kiểm tra). */
@@ -22,6 +24,8 @@ interface SpeakingIntroScreenProps {
 export function SpeakingIntroScreen({
   examTitle,
   questionCount,
+  targetPart,
+  estimatedMinutes,
   introSubStep,
   onSubStepChange,
   onStart,
@@ -33,6 +37,11 @@ export function SpeakingIntroScreen({
   onTestSound,
   deviceTestError,
 }: SpeakingIntroScreenProps) {
+  const questionCountLabel = targetPart
+    ? `${questionCount} câu (Part ${targetPart})`
+    : `${questionCount} câu (4 Phần)`;
+  const durationLabel = `~${estimatedMinutes ?? (targetPart ? 3 : 12)} phút`;
+
   return (
       <div className="max-w-2xl mx-auto space-y-6 py-4">
         {introSubStep === "check" ? (
@@ -52,11 +61,11 @@ export function SpeakingIntroScreen({
             <div className="grid grid-cols-2 gap-3 text-center">
               <div className="p-3.5 rounded-xl border border-border bg-muted/30">
                 <div className="text-[10px] text-muted-foreground uppercase font-bold">Số câu hỏi</div>
-                <div className="text-base font-extrabold text-foreground mt-0.5">{questionCount} câu (4 Phần)</div>
+                <div className="text-base font-extrabold text-foreground mt-0.5">{questionCountLabel}</div>
               </div>
               <div className="p-3.5 rounded-xl border border-border bg-muted/30">
                 <div className="text-[10px] text-muted-foreground uppercase font-bold">Thời gian làm bài</div>
-                <div className="text-base font-extrabold text-foreground mt-0.5">~12 phút</div>
+                <div className="text-base font-extrabold text-foreground mt-0.5">{durationLabel}</div>
               </div>
             </div>
   

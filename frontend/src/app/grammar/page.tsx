@@ -11,6 +11,7 @@ import { FloatingActions } from "@/components/floating-actions";
 import { UniversalSkillGuideModal } from "@/components/skill-format-guide-modal";
 import {
   BookA,
+  Info,
   History,
   Search,
   ArrowRight,
@@ -185,53 +186,47 @@ export default function GrammarPracticePage() {
       <Navbar />
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden border-b border-border bg-card">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -top-32 -right-24"
-            style={{ width: "420px", height: "420px", background: "rgba(171, 48, 232, 0.28)" }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -bottom-40 -left-20 opacity-70"
-            style={{ width: "320px", height: "320px", background: "hsl(var(--primary) / 0.35)" }}
-          />
-
-          <div className="section-container py-12 md:py-16 relative z-10">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <BookA className="w-6 h-6 text-primary" />
+        {/* Compact Header Web App */}
+        <section className="relative overflow-hidden bg-card/60 backdrop-blur-xs border-b border-border/80">
+          <div className="section-container py-3.5 sm:py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <BookA className="w-4 h-4" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
-                    Aptis ESOL Core Component
-                  </span>
+                <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground tracking-tight">
+                  Grammar &amp; Vocabulary Practice
+                </h1>
+                <div className="relative group/info inline-flex items-center">
+                  <button
+                    type="button"
+                    className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                    aria-label="Thông tin Grammar & Vocabulary"
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
+                  <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-80 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                    Luyện trắc nghiệm ngữ pháp và từ vựng chuẩn cấu trúc British Council. Mỗi đề gồm 25 câu ngữ pháp (Part 1) + 25 câu từ vựng (Part 2), thời gian làm bài 25 phút.
+                  </div>
                 </div>
               </div>
-              <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
-                Grammar &amp; Vocabulary Practice
-              </h1>
-              <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                Luyện trắc nghiệm ngữ pháp và từ vựng chuẩn cấu trúc British Council. Mỗi đề gồm 25 câu ngữ pháp (Part 1) + 25 câu từ vựng (Part 2), thời gian làm bài 25 phút.
-              </p>
 
-              <div className="flex items-center gap-3 flex-wrap mt-5">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   type="button"
                   onClick={() => setIsGuideModalOpen(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-all cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-semibold transition-colors cursor-pointer"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-primary" />
-                  <span>Hướng dẫn định dạng đề thi</span>
+                  <span>Hướng dẫn định dạng</span>
                 </button>
 
                 <Link
-                  className="inline-flex items-center gap-2 border bg-card py-2 rounded-full border-border text-foreground hover:bg-muted text-xs font-semibold px-4 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold transition-colors"
                   href="/meo-thi-aptis/meo-hoc-grammar-aptis"
                 >
-                  <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" /><span>Xem ngay - Mẹo làm bài Grammar &amp; Vocabulary</span>
+                  <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span>Mẹo làm bài</span>
                 </Link>
               </div>
             </div>
@@ -239,7 +234,7 @@ export default function GrammarPracticePage() {
         </section>
 
         {/* Progress Tracker Strip */}
-        <section className="section-container pt-6 md:pt-8">
+        <section className="section-container pt-4 sm:pt-5">
           <div className="mb-6 rounded-xl border border-border bg-card/60 px-4 py-3.5 md:px-5 md:py-4 flex items-center gap-3 md:gap-4 shadow-xs">
             <div className="w-10 h-10 md:w-11 md:h-11 rounded-lg bg-muted flex items-center justify-center shrink-0">
               <History className="w-5 h-5 text-foreground/70" />

@@ -10,6 +10,7 @@ import { ProUnlockButton } from "@/components/ui/pro-unlock-button";
 import { FloatingActions } from "@/components/floating-actions";
 import {
   Sparkles,
+  Info,
   Lock,
   Unlock,
   CheckCircle2,
@@ -181,45 +182,48 @@ export default function KeyDuDoanPage() {
       <Navbar />
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-accent/10 to-transparent border-b border-border">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -top-32 -right-24"
-            style={{ width: "450px", height: "450px", background: "hsl(var(--primary) / 0.4)" }}
-          />
-
-          <div className="section-container py-12 md:py-16 relative z-10">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white w-fit text-xs font-bold mb-4 shadow-sm shadow-blue-500/20">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>Cập nhật liên tục 24/7 theo từng ca thi thật</span>
+        {/* Compact Header Web App */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-accent/5 to-transparent border-b border-border/80">
+          <div className="section-container py-3.5 sm:py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Sparkles className="w-4 h-4 text-emerald-500" />
+                </div>
+                <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground tracking-tight">
+                  Đề Key Dự Đoán Aptis
+                </h1>
+                <div className="relative group/info inline-flex items-center">
+                  <button
+                    type="button"
+                    className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                    aria-label="Thông tin Đề Key dự đoán"
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
+                  <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-80 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                    Ngân hàng đề thi trọng tâm được gắn nhãn độ Hot (từ 1☘️ đến 5☘️) tổng hợp trực tiếp từ các ca thi gần nhất tại Hội đồng thi British Council (BC), cập nhật liên tục 24/7.
+                  </div>
+                </div>
               </div>
-              <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-foreground mb-4">
-                Đề Key Dự Đoán Aptis
-              </h1>
-              <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-6">
-                Ngân hàng đề thi trọng tâm được gắn nhãn độ Hot (từ 1☘️ đến 5☘️) tổng hợp trực tiếp từ các ca thi gần nhất tại Hội đồng thi British Council (BC). Giúp bạn ôn đúng trọng tâm và làm bài trực tiếp ngay trên hệ thống.
-              </p>
 
-              {/* Direct Banner to Key & Mẹo thi */}
               <Link
                 href="/key-va-meo-thi"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-primary/40 text-foreground font-bold text-xs shadow-xs hover:border-primary hover:bg-muted/60 transition-all"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-card border border-primary/30 text-foreground font-semibold text-xs shadow-2xs hover:border-primary hover:bg-muted/60 transition-all shrink-0 w-fit"
               >
                 <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Xem chuyên đề <strong>Key &amp; Mẹo thi (Part 1 - 4)</strong> mới nhất</span>
-                <ArrowRight className="w-3.5 h-3.5 text-primary" />
+                <span>Xem <strong>Key &amp; Mẹo thi (Part 1 - 4)</strong></span>
+                <ArrowRight className="w-3 h-3 text-primary" />
               </Link>
             </div>
           </div>
         </section>
 
         {/* Highlight Banner */}
-        <section className="section-container pt-8">
-          <div className="rounded-2xl border border-primary/30 bg-card p-5 md:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <section className="section-container pt-4 sm:pt-5">
+          <div className="rounded-2xl border border-primary/30 bg-card p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3.5">
             <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
                 <TrendingUp className="w-6 h-6" />
               </div>
               <div>

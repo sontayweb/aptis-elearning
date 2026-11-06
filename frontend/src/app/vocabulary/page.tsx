@@ -8,6 +8,7 @@ import { FloatingActions } from "@/components/floating-actions";
 import { api } from "@/lib/api-client";
 import {
   BookOpen,
+  Info,
   Library,
   Brain,
   Search,
@@ -431,51 +432,27 @@ export default function VocabularyPage() {
       <Navbar />
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
-        {/* Hero Section theo giao diện mới */}
-        <section className="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 via-primary/5 to-card border-b border-border">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl -top-24 -right-16 w-96 h-96 bg-primary/10"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl -bottom-24 -left-16 w-80 h-80 bg-emerald-500/10"
-          />
-
-          <div className="section-container py-8 md:py-12 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-            <div className="flex items-center gap-4 sm:gap-5 text-left">
-              <div className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shrink-0 shadow-sm border border-emerald-500/20">
-                <BookOpen className="w-7 h-7 sm:w-8 sm:h-8" />
+        {/* Compact Header Web App */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 via-primary/5 to-card border-b border-border/80">
+          <div className="section-container py-3.5 sm:py-4">
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shrink-0">
+                <BookOpen className="w-4 h-4" />
               </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-black text-foreground tracking-tight">
-                  Học từ vựng Aptis
-                </h1>
-                <p className="text-muted-foreground mt-1 text-xs sm:text-sm md:text-base font-medium">
-                  Ôn luyện từ vựng theo từng kỹ năng trong bài thi Aptis ESOL.
-                </p>
-              </div>
-            </div>
-
-            {/* Artwork phối cảnh góc phải */}
-            <div className="hidden lg:flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-card/80 border border-border/80 shadow-xs backdrop-blur-sm shrink-0">
-              <div className="flex -space-x-2 overflow-hidden">
-                <div className="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
-                  R
+              <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground tracking-tight">
+                Học từ vựng Aptis
+              </h1>
+              <div className="relative group/info inline-flex items-center">
+                <button
+                  type="button"
+                  className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                  aria-label="Thông tin học từ vựng"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+                <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-80 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                  Ôn luyện từ vựng trọng tâm theo từng kỹ năng và chủ đề trong bài thi Aptis ESOL, tích hợp phiên âm IPA và ví dụ thực tế.
                 </div>
-                <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
-                  L
-                </div>
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
-                  S
-                </div>
-                <div className="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
-                  W
-                </div>
-              </div>
-              <div className="text-xs">
-                <span className="font-bold text-foreground block">Aptis ESOL Vocabulary</span>
-                <span className="text-muted-foreground text-[11px]">Skills for Success</span>
               </div>
             </div>
           </div>

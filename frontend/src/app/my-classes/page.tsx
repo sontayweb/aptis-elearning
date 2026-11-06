@@ -10,6 +10,7 @@ import { api } from "@/lib/api-client";
 import {
   Users,
   GraduationCap,
+  Info,
   KeyRound,
   CheckCircle2,
   AlertCircle,
@@ -112,31 +113,31 @@ export default function MyClassesPage() {
       <Navbar />
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-accent/5 to-transparent border-b border-border py-12 md:py-16">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -top-24 -right-24"
-            style={{ width: "400px", height: "400px", background: "hsl(var(--primary) / 0.25)" }}
-          />
-
-          <div className="section-container relative z-10">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary w-fit text-xs font-bold mb-4">
-                <GraduationCap className="w-4 h-4" />
-                <span>Không gian lớp học & Đồng hành cùng Giảng viên</span>
+        {/* Compact Header Web App */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-accent/5 to-transparent border-b border-border/80 py-3.5 sm:py-4">
+          <div className="section-container relative z-10 flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <GraduationCap className="w-4 h-4" />
+            </div>
+            <h1 className="text-xl sm:text-2xl font-heading font-bold tracking-tight text-foreground">
+              Lớp Học Của Tôi
+            </h1>
+            <div className="relative group/info inline-flex items-center">
+              <button
+                type="button"
+                className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                aria-label="Thông tin lớp học"
+              >
+                <Info className="w-4 h-4" />
+              </button>
+              <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-80 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                Nhập mã lớp do thầy cô cung cấp để tham gia lớp học, nhận bài tập kỹ năng Speaking &amp; Writing theo lịch đào tạo và được giảng viên chấm điểm chi tiết.
               </div>
-              <h1 className="text-3xl md:text-5xl font-heading font-black tracking-tight mb-4">
-                Lớp Học Của Tôi & <span className="gradient-text">Tham Gia Lớp</span>
-              </h1>
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                Nhập mã lớp do thầy cô cung cấp để tham gia lớp học, nhận bài tập kỹ năng Speaking & Writing theo lịch đào tạo và được giảng viên chấm điểm chi tiết.
-              </p>
             </div>
           </div>
         </section>
 
-        <section className="section-container py-10 space-y-10">
+        <section className="section-container pt-4 pb-12 space-y-6">
           {/* JOIN CLASSROOM CARD */}
           <div className="rounded-3xl border border-border bg-card p-6 md:p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-4">

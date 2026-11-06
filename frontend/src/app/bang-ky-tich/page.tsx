@@ -8,6 +8,7 @@ import { FloatingActions } from "@/components/floating-actions";
 import { api } from "@/lib/api-client";
 import {
   Trophy,
+  Info,
   Award,
   Sparkles,
   Lock,
@@ -275,18 +276,27 @@ export default function BangKyTichPage() {
       <Navbar />
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] pb-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 space-y-6">
-          {/* Header Bảng Kỳ Tích chuẩn Screenshot 3 */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Trophy className="w-6 h-6 text-red-600 dark:text-red-500" />
-              <h1 className="text-2xl md:text-3xl font-heading font-black text-foreground">
-                Bảng Kỳ Tích
-              </h1>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 pt-4 pb-12 space-y-5">
+          {/* Header Bảng Kỳ Tích Compact */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-red-500/10 text-red-600 dark:text-red-500 flex items-center justify-center shrink-0">
+              <Trophy className="w-4 h-4" />
             </div>
-            <p className="text-xs md:text-sm text-muted-foreground max-w-3xl leading-relaxed">
-              Những bài Writing và Speaking đạt điểm đỉnh của học viên, chia sẻ lại để bạn đọc tham khảo cách viết, cách nói và từ vựng đáng học.
-            </p>
+            <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground tracking-tight">
+              Bảng Kỳ Tích
+            </h1>
+            <div className="relative group/info inline-flex items-center">
+              <button
+                type="button"
+                className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                aria-label="Thông tin Bảng Kỳ Tích"
+              >
+                <Info className="w-4 h-4" />
+              </button>
+              <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-80 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                Những bài Writing và Speaking đạt điểm đỉnh của học viên, chia sẻ lại để bạn đọc tham khảo cách viết, cách nói và từ vựng đáng học.
+              </div>
+            </div>
           </div>
 
           {/* Thanh công cụ 4 bộ lọc chuẩn Screenshot 3 */}

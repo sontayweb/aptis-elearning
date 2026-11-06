@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api-client";
 import {
   LineChart as LucideLineChart,
+  Info,
   Calendar,
   BarChart3,
   ArrowUp,
@@ -226,17 +227,26 @@ export default function ProgressPage() {
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       <Navbar />
 
-      <main className="flex-1 pt-20 md:pt-24 pb-20">
+      <main className="flex-1 pt-[calc(var(--navbar-total-height,64px)+16px)] pb-16">
         <div className="section-container max-w-6xl mx-auto space-y-6">
-          {/* Header & Tiêu đề trang */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-heading font-extrabold text-foreground">
+          {/* Header & Tiêu đề trang Compact */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground">
                 Tiến độ học tập
               </h1>
-              <p className="text-sm md:text-base text-muted-foreground mt-1">
-                Theo dõi sự tiến bộ của bạn qua thời gian
-              </p>
+              <div className="relative group/info inline-flex items-center">
+                <button
+                  type="button"
+                  className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                  aria-label="Thông tin tiến độ học tập"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+                <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-80 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                  Theo dõi chi tiết sự tiến bộ của bạn qua thời gian, phân tích điểm mạnh/yếu từng kỹ năng và tần suất luyện tập.
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">

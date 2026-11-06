@@ -24,6 +24,7 @@ import {
 } from "@/components/skills/skill-exam-card";
 import {
   Headphones,
+  Info,
   Clock,
   History,
   Search,
@@ -277,50 +278,44 @@ export default function ListeningPracticePage() {
       <Navbar />
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden border-b border-border bg-card">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -top-32 -right-24"
-            style={{ width: "420px", height: "420px", background: "hsl(var(--primary) / 0.35)" }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -bottom-40 -left-20 opacity-70"
-            style={{ width: "320px", height: "320px", background: "hsl(var(--primary) / 0.35)" }}
-          />
-
-          <div className="section-container py-12 md:py-16 relative z-10">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Headphones className="w-6 h-6 text-primary" />
+        {/* Compact Header Web App */}
+        <section className="relative overflow-hidden bg-card/60 backdrop-blur-xs border-b border-border/80">
+          <div className="section-container py-3.5 sm:py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Headphones className="w-4 h-4" />
                 </div>
-                <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 border-transparent bg-secondary text-secondary-foreground text-xs font-medium gap-1.5">
-                  <Clock className="w-3 h-3" />
-                  <span>40 phút · 25 câu</span>
+                <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground tracking-tight">
+                  Luyện tập kỹ năng Listening
+                </h1>
+                <div className="relative group/info inline-flex items-center">
+                  <button
+                    type="button"
+                    className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                    aria-label="Thông tin kỹ năng Listening"
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
+                  <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-80 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                    Hoàn thành tất cả các Part của kỹ năng này trong một lượt thi liên tục để đánh giá năng lực chính xác nhất (40 phút · 25 câu). Mỗi đoạn audio được nghe tối đa 2 lần.
+                  </div>
                 </div>
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
-                Luyện tập full part kỹ năng Listening
-              </h1>
-              <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                Hoàn thành tất cả các Part của kỹ năng này trong một lượt thi liên tục để đánh giá năng lực chính xác nhất. Mỗi đoạn audio được nghe tối đa 2 lần.
-              </p>
               <Link
-                className="tech-btn inline-flex items-center justify-center gap-2 whitespace-nowrap border dark:text-primary-foreground bg-background py-2 mt-4 rounded-full border-primary text-primary hover:bg-primary/10 hover:text-primary h-9 px-4 text-sm font-medium transition-colors"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-semibold transition-colors shrink-0 w-fit"
                 href="/meo-thi-aptis/meo-hoc-listening-aptis"
-                data-discover="true"
               >
-                <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" /><span>Xem ngay - Mẹo làm bài Listening</span>
+                <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span>Mẹo làm bài Listening</span>
               </Link>
             </div>
           </div>
         </section>
 
         {/* Progress Strip */}
-        <section className="section-container pt-6 md:pt-8">
+        <section className="section-container pt-4 sm:pt-5">
           <div className="mb-6 rounded-xl border border-border bg-card/60 px-4 py-3.5 md:px-5 md:py-4 flex items-center gap-3 md:gap-4">
             <div className="w-10 h-10 md:w-11 md:h-11 rounded-lg bg-muted flex items-center justify-center shrink-0">
               <History className="w-5 h-5 text-foreground/70" />
@@ -347,7 +342,7 @@ export default function ListeningPracticePage() {
         </section>
 
         {/* Search, Filter & Parts */}
-        <section className="section-container py-8 md:py-10">
+        <section className="section-container pt-5 pb-10 md:pt-6 md:pb-12">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

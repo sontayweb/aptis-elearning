@@ -483,6 +483,37 @@ function SpeakingExamRunnerContent() {
   }, [completedCount, isRecording]);
 
   // Tính toán số câu trong part hiện tại (Question X of 3)
+  const SPEAKING_PART_NAMES: Record<number, string> = {
+    1: "Personal Information",
+    2: "Describing a Picture",
+    3: "Describe, Compare & Explain",
+    4: "Discuss Personal Experience & Opinion",
+  };
+
+  const availableParts = useMemo(() => {
+    const partSet = new Set<number>();
+    allQuestions.forEach((q) => {
+      if (q.partNumber >= 1 && q.partNumber <= 4) {
+        partSet.add(q.partNumber);
+      }
+    });
+    return Array.from(partSet).sort((a, b) => a - b);
+  }, [allQuestions]);
+
+  const estimatedMinutes = useMemo(() => {
+    const totalSeconds = questions.reduce(
+      (acc, q) => acc + (q.prepTime || 0) + (q.speakTime || 0),
+      0
+    );
+    return Math.max(1, Math.round(totalSeconds / 60));
+  }, [questions]);
+
+  const currentPartNum = currentQ ? currentQ.partNumber : targetPart || 1;
+  const isFullTest = !targetPart && availableParts.length > 1;
+  const headerPartTitle = isFullTest
+    ? `Part ${currentPartNum} of ${availableParts.length || 4}`
+    : `Part ${currentPartNum} · ${SPEAKING_PART_NAMES[currentPartNum] || "Practice"}`;
+
   const questionsInCurrentPart = currentQ
     ? questions.filter((q) => q.partNumber === currentQ.partNumber)
     : [];
@@ -625,29 +656,33 @@ function SpeakingExamRunnerContent() {
         startRecording();
       }
     } else if (stage === "speaking") {
-      if (timer > 0 && isRecording && !isSpeakingPaused && !isMicPaused) {
+      if (timer > 0 && !isSpeakingPaused && !isMicPaused) {
         timerRef.current = setInterval(() => {
           setTimer((t) => t - 1);
         }, 1000);
-      } else if (timer === 0 && isRecording) {
+      } else if (timer === 0) {
         // Hết thời gian nói -> Dừng ghi âm tự động & Lưu tức thì
         setIsSpeakingPaused(false);
-        stopRecording().then((res) => {
-          if (res && res.url) {
-            setRecordedData((prev) => ({
-              ...prev,
-              [currentIndex]: {
-                ...(prev[currentIndex] || {}),
-                audioUrl: res.url,
-                audioBlob: res.blob,
-                duration: res.duration,
-                prepNotes,
-                isCompleted: true,
-              },
-            }));
-          }
+        if (isRecording) {
+          stopRecording().then((res) => {
+            if (res && res.url) {
+              setRecordedData((prev) => ({
+                ...prev,
+                [currentIndex]: {
+                  ...(prev[currentIndex] || {}),
+                  audioUrl: res.url,
+                  audioBlob: res.blob,
+                  duration: res.duration,
+                  prepNotes,
+                  isCompleted: true,
+                },
+              }));
+            }
+            setStage("finished");
+          });
+        } else {
           setStage("finished");
-        });
+        }
       }
     }
 
@@ -1147,20 +1182,20 @@ function SpeakingExamRunnerContent() {
               Speaking Practice
             </span>
             <span className="text-sm md:text-base font-bold text-foreground">
-              Part {currentQ ? currentQ.partNumber : targetPart || 1} of 4
+              {headerPartTitle}
             </span>
           </div>
         </div>
 
-        {/* Căn giữa: Bộ chọn Part (1, 2, 3, 4, Full Test) */}
-        {allQuestions.length > 0 && (
+        {/* Căn giữa: Bộ chọn Part (chỉ hiển thị khi đề thi thực sự có từ 2 Part trở lên) */}
+        {availableParts.length > 1 && (
           <div className="hidden sm:flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border">
-            {[1, 2, 3, 4].map((pNum) => {
-              const isSelected = (currentQ?.partNumber || targetPart) === pNum;
+            {availableParts.map((pNum) => {
+              const isSelected = (targetPart || currentQ?.partNumber) === pNum;
               return (
                 <Link
                   key={pNum}
-                  href={`/speaking/${examId}?part=p${pNum}`}
+                  href={`/speaking/${examId}?part=${pNum}`}
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                     isSelected
                       ? "bg-primary text-primary-foreground shadow-xs"
@@ -1339,6 +1374,8 @@ function SpeakingExamRunnerContent() {
               <SpeakingIntroScreen
                 examTitle={examTitle}
                 questionCount={questions.length}
+                targetPart={targetPart}
+                estimatedMinutes={estimatedMinutes}
                 introSubStep={introSubStep}
                 onSubStepChange={setIntroSubStep}
                 onStart={() => setIsIntroStep(false)}
@@ -1492,12 +1529,20 @@ function SpeakingExamRunnerContent() {
       <SpeakingCompletionModal
         isOpen={isCompletedModalOpen}
         onClose={() => setIsCompletedModalOpen(false)}
+        onReview={() => {
+          setIsCompletedModalOpen(false);
+          setIsReviewMode(true);
+          setStage("finished");
+          setCurrentIndex(0);
+        }}
         targetPart={targetPart}
         examTitle={examTitle}
         completedCount={completedCount}
         questions={questions}
         handleRestartExam={handleRestartExam}
         isRestarting={isRestarting}
+        estimatedScore={aiResult?.score ?? null}
+        cefrBand={aiResult?.band ?? null}
       />
 
       {/* MODAL TÍNH NĂNG DÀNH CHO PRO (Screenshot 2) */}
