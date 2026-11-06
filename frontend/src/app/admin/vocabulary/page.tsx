@@ -407,7 +407,9 @@ export default function AdminVocabularyPage() {
       {/* Top Header — Chuẩn hóa theo AdminPageHeader */}
       {!selectedSet ? (
         <AdminPageHeader
-          stats={[
+        title="Quản lý Kho Từ vựng Aptis"
+        infoTooltip="Biên soạn danh mục chủ đề từ vựng chuẩn CEFR, phiên âm IPA, giải nghĩa và ví dụ ngữ cảnh cho bài thi Aptis."
+        stats={[
             { icon: BookMarked, label: "bộ từ vựng", value: sets.length, subValue: "Chủ đề Aptis" },
             { icon: Layers, label: "từ trong kho", value: totalWordsInSystem, subValue: "Chuẩn IPA & Ví dụ", iconColor: "text-emerald-500" },
             { icon: Crown, label: "VIP PRO", value: proSetsCount, subValue: `(${sets.length - proSetsCount} Free)`, iconColor: "text-amber-500" },

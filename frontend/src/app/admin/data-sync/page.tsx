@@ -1,5 +1,6 @@
 "use client";
 
+import AdminPageHeader from "@/components/admin/admin-page-header";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
@@ -425,57 +426,44 @@ export default function AdminDataSyncPage() {
 
   return (
     <div className="space-y-6">
-      {/* 1. HEADER & BREADCRUMB */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-            <Link href="/admin" className="hover:text-foreground transition-colors">
-              Bảng điều khiển
+      {/* 1. HEADER CHUẨN HÓA 2 HÀNG */}
+      <AdminPageHeader
+        title="Quản lý & Kiểm định Ngân hàng Đề thi"
+        infoTooltip="Kiểm tra chất lượng đề thi, tự động phát hiện & sửa lỗi định dạng, dọn dẹp đề trùng và nạp đề thi mới an toàn (bảo toàn 100% bài làm của học viên)."
+        stats={[
+          { icon: RefreshCw, value: overview?.summary?.totalExams || 0, label: "đề thi" },
+          { icon: Layers, value: overview?.summary?.totalQuestions || 0, label: "câu hỏi" },
+          { icon: ShieldCheck, value: `${overview?.summary?.healthScore || 100}%`, label: "điểm sức khỏe", iconColor: "text-emerald-500" },
+        ]}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setShowTutorial(true)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition-all shadow-xs cursor-pointer"
+            >
+              <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span>Hướng dẫn sử dụng</span>
+            </button>
+
+            <Link
+              href="/admin/database-backup"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors shadow-2xs"
+            >
+              <Database className="w-3.5 h-3.5 text-blue-500" />
+              <span>Sao lưu dữ liệu</span>
             </Link>
-            <span>/</span>
-            <Link href="/admin/exams" className="hover:text-foreground transition-colors">
-              Học vụ
-            </Link>
-            <span>/</span>
-            <span className="text-primary font-semibold">Quản lý &amp; Tối ưu ngân hàng đề</span>
+
+            <button
+              onClick={loadOverview}
+              disabled={loadingOverview}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingOverview ? "animate-spin" : ""}`} />
+              <span>Làm mới dữ liệu</span>
+            </button>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
-            <RefreshCw className="w-6 h-6 text-primary" />
-            Quản Lý &amp; Kiểm Định Ngân Hàng Đề Thi
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Kiểm tra chất lượng đề thi, tự động phát hiện &amp; sửa lỗi định dạng, dọn dẹp đề trùng và nạp đề thi mới an toàn (bảo toàn 100% bài làm của học viên).
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Nút Hướng Dẫn Sử Dụng */}
-          <button
-            onClick={() => setShowTutorial(true)}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition-all shadow-xs cursor-pointer"
-          >
-            <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-            <span>Hướng dẫn sử dụng</span>
-          </button>
-
-          <Link
-            href="/admin/database-backup"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-border bg-card hover:bg-muted text-foreground transition-colors"
-          >
-            <Database className="w-3.5 h-3.5 text-blue-500" />
-            Sao lưu dữ liệu
-          </Link>
-
-          <button
-            onClick={loadOverview}
-            disabled={loadingOverview}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border border-border bg-card hover:bg-muted text-foreground transition-colors cursor-pointer disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loadingOverview ? "animate-spin" : ""}`} />
-            Làm mới dữ liệu
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* 2. THÔNG BÁO FEEDBACK */}
       {message && (

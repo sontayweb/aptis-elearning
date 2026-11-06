@@ -1,5 +1,6 @@
 "use client";
 
+import AdminPageHeader from "@/components/admin/admin-page-header";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
@@ -168,41 +169,31 @@ export default function DatabaseBackupAdminPage() {
 
   return (
     <div className="space-y-6">
-      {/* 1. HEADER & BREADCRUMB */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-            <Link href="/admin" className="hover:text-foreground transition-colors">
-              Bảng điều khiển
-            </Link>
-            <span>/</span>
-            <span className="text-foreground font-medium">Hệ thống</span>
-            <span>/</span>
-            <span className="text-primary font-semibold">Sao lưu CSDL</span>
+      {/* 1. HEADER CHUẨN HÓA 2 HÀNG */}
+      <AdminPageHeader
+        title="Quản lý & Sao lưu Cơ sở Dữ liệu"
+        infoTooltip="Sao lưu vật lý (pg_dump SQL) và sao lưu logic (JSON Snapshot) bảo vệ toàn vẹn 100% dữ liệu."
+        stats={[
+          { icon: Database, value: stats?.databaseName || "PostgreSQL", label: "CSDL", iconColor: "text-blue-500" },
+          { icon: Layers, value: stats?.totalRecords?.toLocaleString("vi-VN") || 0, label: "bản ghi" },
+          { icon: Clock, value: backups.length, label: "bản snapshot", iconColor: "text-purple-500" },
+        ]}
+        actions={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                loadStats();
+                loadBackups();
+              }}
+              disabled={loadingStats || loadingBackups}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingStats || loadingBackups ? "animate-spin text-primary" : ""}`} />
+              <span>Làm mới số liệu</span>
+            </button>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
-            <Database className="w-6 h-6 text-primary" />
-            Quản Lý & Sao Lưu Cơ Sở Dữ Liệu
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Sao lưu vật lý (pg_dump SQL) và sao lưu logic (JSON Snapshot) bảo vệ toàn vẹn 100% dữ liệu.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              loadStats();
-              loadBackups();
-            }}
-            disabled={loadingStats || loadingBackups}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border border-border bg-card hover:bg-muted text-foreground transition-colors cursor-pointer disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loadingStats || loadingBackups ? "animate-spin" : ""}`} />
-            Làm mới số liệu
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* 2. THÔNG BÁO FEEDBACK */}
       {message && (

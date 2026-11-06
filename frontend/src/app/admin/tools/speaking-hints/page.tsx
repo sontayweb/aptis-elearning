@@ -676,7 +676,12 @@ export default function SpeakingAiHintsHubPage() {
     <div className="space-y-6 pb-20">
       <AdminPageHeader
         title="AI Gợi Ý Tranh Speaking"
-        description="Tự động phân tích ảnh tranh Part 2 & Part 3 qua mô hình Vision AI, bỏ qua ảnh lỗi và tối ưu ngân hàng gợi ý."
+        infoTooltip="Tự động phân tích ảnh tranh Part 2 & Part 3 qua mô hình Vision AI, bỏ qua ảnh lỗi và tối ưu ngân hàng gợi ý chuẩn B2/C1."
+        stats={[
+          { icon: Sparkles, value: counts.total, label: "tranh đề thi" },
+          { icon: CheckCircle2, value: counts.completed, label: "đã tạo gợi ý", iconColor: "text-emerald-500" },
+          { icon: AlertTriangle, value: counts.broken, label: "ảnh lỗi", iconColor: "text-amber-500" },
+        ]}
         actions={
           <div className="flex flex-wrap items-center gap-2.5">
             <button

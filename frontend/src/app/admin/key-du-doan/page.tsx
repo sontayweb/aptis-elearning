@@ -524,12 +524,12 @@ export default function AdminKeyDuDoanPage() {
 
       {/* Header */}
       <AdminPageHeader
-        badge={{
-          icon: Sparkles,
-          label: `${topicStats.totalTopics} Chủ đề · ${topicStats.totalMatchedExams} Đề thi khớp`,
-        }}
-        title="Quản lý Gán nhãn Sao & Đề Key Dự Đoán ☘️"
-        description="Gán nhãn Cỏ (☘️) tự động theo Chủ đề (Topic-based propagation) — Đổi số sao cho 1 chủ đề sẽ tự động lan tỏa tới tất cả đề thi có cùng chủ đề trên toàn hệ thống."
+        title="Quản lý Gán nhãn Đề Tủ & Key Dự Đoán ☘️"
+        infoTooltip="Gán nhãn Cỏ (☘️) tự động theo Chủ đề (Topic-based propagation) — Đổi số cỏ cho 1 chủ đề sẽ tự động lan tỏa tới tất cả đề thi có cùng chủ đề trên toàn hệ thống."
+        stats={[
+          { icon: Sparkles, value: topicStats.totalTopics, label: "chủ đề" },
+          { icon: BookOpen, value: topicStats.totalMatchedExams, label: "đề thi khớp" },
+        ]}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Link

@@ -632,6 +632,8 @@ export default function AdminPermissionsPage() {
 
       {/* 1. TOP HEADER — Chuẩn hóa theo AdminPageHeader */}
       <AdminPageHeader
+        title="Phân quyền Hệ thống (RBAC)"
+        infoTooltip="Quản lý vai trò (Admin, Giảng viên, Học vụ, Học viên) và cấu hình chi tiết ma trận quyền hạn trên toàn bộ hệ thống."
         stats={[
           {
             icon: ShieldCheck,

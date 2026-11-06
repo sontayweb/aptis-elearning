@@ -234,6 +234,8 @@ export default function AdminAuditLogsPage() {
     <div className="space-y-5 pb-16">
       {/* 1. TOP HEADER & METRICS — Chuẩn hóa AdminPageHeader */}
       <AdminPageHeader
+        title="Nhật ký Hoạt động (Audit Logs)"
+        infoTooltip="Theo dõi toàn bộ lịch sử truy cập, thao tác quản trị dữ liệu và các sự kiện bảo mật trên hệ thống."
         stats={[
           {
             icon: History,

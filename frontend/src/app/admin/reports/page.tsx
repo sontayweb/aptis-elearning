@@ -152,7 +152,22 @@ export default function AdminQuestionReportsPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Hộp Thư Báo Lỗi Đề Thi & Câu Hỏi"
-        description="Theo dõi, đối soát và xử lý các phản ánh về đáp án, lỗi âm thanh, chính tả từ học viên trong quá trình làm bài."
+        infoTooltip="Theo dõi, đối soát và xử lý các phản ánh về đáp án, lỗi âm thanh, chính tả từ học viên trong quá trình làm bài."
+        stats={[
+          { icon: AlertTriangle, value: kpi.total, label: "phản ánh" },
+          { icon: Clock, value: kpi.pending, label: "chờ xử lý", iconColor: "text-amber-500" },
+          { icon: CheckCircle2, value: kpi.resolved, label: "đã giải quyết", iconColor: "text-emerald-500" },
+        ]}
+        actions={
+          <button
+            onClick={fetchReports}
+            disabled={loading}
+            className="px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-heading font-semibold rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-slate-900 dark:text-white" : ""}`} />
+            <span>Làm mới</span>
+          </button>
+        }
       />
 
       {/* Toast thông báo */}

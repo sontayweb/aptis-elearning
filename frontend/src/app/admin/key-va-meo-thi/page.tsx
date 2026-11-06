@@ -146,8 +146,14 @@ export default function AdminKeyVaMeoThiPage() {
 
       {/* Header with Actions */}
       <AdminPageHeader
-        title="Quản Trị Key & Mẹo Thi (Aptis ESOL)"
-        description="Cấu hình ngân hàng câu hỏi, bóc tách audio script và ma trận đáp án 4 kỹ năng hiển thị cho học viên."
+        title="Quản trị Key & Mẹo Thi (Aptis ESOL)"
+        infoTooltip="Cấu hình ngân hàng câu hỏi, bóc tách audio script và ma trận đáp án 4 kỹ năng hiển thị cho học viên."
+        stats={[
+          { icon: Headphones, label: "Listening", value: "Part 1-4", iconColor: "text-blue-500" },
+          { icon: BookOpen, label: "Reading", value: "Part 1-4", iconColor: "text-emerald-500" },
+          { icon: Mic, label: "Speaking", value: "Part 1-4", iconColor: "text-amber-500" },
+          { icon: PenTool, label: "Writing", value: "Part 1-4", iconColor: "text-rose-500" },
+        ]}
         actions={
           <div className="flex flex-wrap items-center gap-2.5">
             <Link

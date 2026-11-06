@@ -288,6 +288,8 @@ export default function AdminEventsPage() {
     <div className="space-y-6 pb-16">
       {/* 1. TOP HEADER WITH MASTER SWITCH — Chuẩn hóa AdminPageHeader */}
       <AdminPageHeader
+        title="Sự kiện & Giao diện Ngày lễ"
+        infoTooltip="Cấu hình hiệu ứng giao diện chào mừng các ngày lễ lớn (Tết, Giáng Sinh, 20/11) và banner thông báo tương tác toàn hệ thống."
         stats={[
           {
             icon: Sparkles,

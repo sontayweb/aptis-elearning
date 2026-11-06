@@ -151,6 +151,8 @@ export default function AdminReviewsPage() {
 
       {/* Top Header */}
       <AdminPageHeader
+        title="Quản lý Đánh giá & Phản hồi"
+        infoTooltip="Kiểm duyệt và hiển thị nhận xét, đánh giá của học viên sau khi hoàn thành các bài thi thử trên hệ thống."
         stats={[
           {
             icon: MessageSquare,

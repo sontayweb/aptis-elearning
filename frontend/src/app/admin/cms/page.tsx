@@ -292,6 +292,8 @@ export default function AdminCmsPricingPage() {
 
       {/* 1. TOP HEADER & METRICS — Chuẩn hóa AdminPageHeader */}
       <AdminPageHeader
+        title="Quản lý Gói cước & Nội dung (CMS)"
+        infoTooltip="Quản trị bảng giá gói VIP, chính sách quyền lợi, nội dung bài viết và cấu hình trang đích."
         stats={[
           {
             icon: Crown,

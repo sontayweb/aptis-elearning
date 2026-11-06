@@ -493,6 +493,8 @@ export default function AdminTransactionsPage() {
 
       {/* 1. TOP HEADER & CONTROLS — Sử dụng AdminPageHeader dùng chung */}
       <AdminPageHeader
+        title="Quản lý Giao dịch & Đơn hàng"
+        infoTooltip="Theo dõi doanh thu, lịch sử nạp gói VIP qua SePay VietQR và trạng thái kích hoạt dịch vụ của học viên."
         stats={[
           {
             icon: DollarSign,

@@ -692,6 +692,8 @@ export default function AdminExamsPage() {
 
       {/* Top Header */}
       <AdminPageHeader
+        title="Quản lý Ngân hàng Đề thi"
+        infoTooltip="Quản lý toàn bộ đề thi Full Test, kỹ năng đơn lẻ, chỉ số lượt thi và công cụ nhập đề tự động chuẩn Aptis ESOL."
         stats={[
           { icon: BookOpen, value: totalCountExams || exams.length, label: "đề" },
           { icon: Sparkles, value: fullTestCount, label: "Full Test" },
