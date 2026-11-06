@@ -15,6 +15,7 @@ import {
   Layers,
   ArrowRight,
   ShieldCheck,
+  Info,
   CheckCircle2,
   Key,
   AlertCircle,
@@ -268,44 +269,46 @@ export default function MockExamListPage() {
       <Navbar />
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent border-b border-border">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-full blur-3xl animate-breathing -top-32 -right-24"
-            style={{ width: "420px", height: "420px", background: "hsl(var(--primary) / 0.3)" }}
-          />
-
-          <div className="section-container py-10 md:py-14 relative z-10">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary w-fit text-xs font-bold mb-3">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Format đề thi chuẩn khảo thí British Council</span>
+        {/* Compact Header Web App */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-primary/5 via-accent/5 to-transparent border-b border-border/80">
+          <div className="section-container py-3.5 sm:py-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <GraduationCap className="w-4 h-4" />
               </div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-extrabold text-foreground mb-3 tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground tracking-tight">
                 Luyện Thi Thử Aptis ESOL Full Test
               </h1>
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                Trải nghiệm phòng thi thực tế với trọn bộ 4 kỹ năng Listening, Reading, Writing và Speaking. Rèn luyện phản xạ, làm quen áp lực thời gian và tự tin bứt phá band điểm kỳ thi.
-              </p>
+              <div className="relative group/info inline-flex items-center">
+                <button
+                  type="button"
+                  className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                  aria-label="Thông tin đề thi thử"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+                <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-80 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                  Trải nghiệm phòng thi thực tế với trọn bộ 4 kỹ năng Listening, Reading, Writing và Speaking chuẩn format British Council. Rèn luyện phản xạ, làm quen áp lực thời gian và tự tin bứt phá band điểm.
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Join by Room Code Box (SRS 3.4) */}
-        <section className="section-container pt-8">
-          <div className="rounded-2xl border border-primary/30 bg-card p-5 md:p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <Key className="w-6 h-6" />
+        {/* Join by Room Code Box (SRS 3.4) - Kéo sát lên trên */}
+        <section className="section-container pt-4 sm:pt-5">
+          <div className="rounded-2xl border border-primary/25 bg-card p-4 sm:p-5 shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Key className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-heading font-bold text-base md:text-lg text-foreground">
+                  <h3 className="font-heading font-bold text-sm sm:text-base text-foreground">
                     Vào nhanh đề thi thử bằng Mã Đề riêng
                   </h3>
-                  <p className="text-xs md:text-sm text-muted-foreground">
-                    Nhập mã đề thi của bạn (ví dụ: <span className="font-mono font-bold text-foreground">APT-01</span>) để vào thẳng phòng thi và bắt đầu làm bài.
+                  <p className="text-xs text-muted-foreground">
+                    Nhập mã đề thi (ví dụ: <span className="font-mono font-bold text-foreground">APT-01</span>) để vào thẳng phòng thi và bắt đầu làm bài.
                   </p>
                 </div>
               </div>
@@ -319,12 +322,12 @@ export default function MockExamListPage() {
                     if (roomError) setRoomError(null);
                   }}
                   placeholder="MÃ ĐỀ (VD: APT-01)"
-                  className="px-3.5 py-2 rounded-xl border border-input bg-background font-mono font-bold text-sm tracking-wider uppercase h-10 w-52 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="px-3.5 py-2 rounded-xl border border-input bg-background font-mono font-bold text-xs sm:text-sm tracking-wider uppercase h-9 sm:h-10 w-44 sm:w-52 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
                 <button
                   type="submit"
                   disabled={!roomCode.trim() || joiningRoom}
-                  className="tech-btn px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs h-10 shadow-sm disabled:opacity-50 transition-colors inline-flex items-center gap-1.5"
+                  className="tech-btn px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs h-9 sm:h-10 shadow-xs disabled:opacity-50 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                 >
                   {joiningRoom ? (
                     <>
@@ -348,7 +351,7 @@ export default function MockExamListPage() {
         </section>
 
         {/* Mock Exam Cards Grid */}
-        <section className="section-container py-8 md:py-12">
+        <section className="section-container pt-5 pb-10 md:pt-6 md:pb-12">
           {/* Section Header */}
           <div className="mb-5">
             <h2 className="text-xl font-heading font-bold text-foreground">

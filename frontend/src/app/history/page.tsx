@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { api } from "@/lib/api-client";
 import {
   History,
+  Info,
   Clock,
   Target,
   Award,
@@ -98,57 +99,66 @@ export default function HistoryPage() {
       <Navbar />
 
       <main className="flex-1 pt-[var(--navbar-total-height,64px)] transition-all duration-300">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-card border-b border-border">
-          <div className="section-container py-10 md:py-14">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                <History className="w-6 h-6" />
+        {/* Compact Header Web App */}
+        <section className="relative overflow-hidden bg-card/60 backdrop-blur-xs border-b border-border/80">
+          <div className="section-container py-3.5 sm:py-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <History className="w-4 h-4" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground">
+              <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground tracking-tight">
                 Lịch sử làm bài &amp; Tiến độ
               </h1>
+              <div className="relative group/info inline-flex items-center">
+                <button
+                  type="button"
+                  className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted cursor-help"
+                  aria-label="Thông tin lịch sử và tiến độ"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+                <div className="pointer-events-none absolute left-0 top-full mt-1.5 z-50 w-72 max-w-xs rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs p-3 shadow-xl border border-slate-700 opacity-0 group-hover/info:opacity-100 group-hover/info:pointer-events-auto group-focus-within/info:opacity-100 group-focus-within/info:pointer-events-auto transition-all transform origin-top-left leading-relaxed">
+                  Theo dõi chi tiết quá trình cải thiện điểm số qua từng bài luyện tập và thi thử. Xem lại đáp án, lời giải thích và nhận xét chi tiết của AI.
+                </div>
+              </div>
             </div>
-            <p className="text-base text-muted-foreground max-w-2xl">
-              Theo dõi chi tiết quá trình cải thiện điểm số qua từng bài luyện tập và thi thử. Xem lại đáp án, lời giải thích và nhận xét chi tiết của AI.
-            </p>
           </div>
         </section>
 
-        {/* Stats Summary Bar */}
-        <section className="section-container pt-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <BookOpen className="w-6 h-6" />
+        {/* Stats Summary Bar - Kéo sát lên trên */}
+        <section className="section-container pt-4 sm:pt-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 mb-5">
+            <div className="p-4 sm:p-5 rounded-2xl border border-border bg-card shadow-xs flex items-center gap-3.5 sm:gap-4">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <BookOpen className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Tổng số bài đã hoàn thành</div>
-                <div className="text-2xl font-extrabold font-heading text-foreground mt-0.5">
+                <div className="text-xs text-muted-foreground font-medium">Tổng số bài đã hoàn thành</div>
+                <div className="text-xl sm:text-2xl font-extrabold font-heading text-foreground mt-0.5">
                   {stats.totalCompleted} bài
                 </div>
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                <Target className="w-6 h-6" />
+            <div className="p-4 sm:p-5 rounded-2xl border border-border bg-card shadow-xs flex items-center gap-3.5 sm:gap-4">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                <Target className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Tỷ lệ chính xác trung bình</div>
-                <div className="text-2xl font-extrabold font-heading text-foreground mt-0.5">
+                <div className="text-xs text-muted-foreground font-medium">Tỷ lệ chính xác trung bình</div>
+                <div className="text-xl sm:text-2xl font-extrabold font-heading text-foreground mt-0.5">
                   {stats.avgAccuracyPercent}%
                 </div>
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0">
-                <Award className="w-6 h-6" />
+            <div className="p-4 sm:p-5 rounded-2xl border border-border bg-card shadow-xs flex items-center gap-3.5 sm:gap-4">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0">
+                <Award className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Ước tính trình độ hiện tại</div>
-                <div className="text-2xl font-extrabold font-heading text-foreground mt-0.5">
+                <div className="text-xs text-muted-foreground font-medium">Ước tính trình độ hiện tại</div>
+                <div className="text-xl sm:text-2xl font-extrabold font-heading text-foreground mt-0.5">
                   {stats.estimatedLevel}
                 </div>
               </div>
