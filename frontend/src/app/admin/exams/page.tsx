@@ -41,7 +41,6 @@ import { QuestionEditModal } from "@/components/admin/exams/question-edit-modal"
 import { ExamPreviewModal } from "@/components/admin/exams/exam-preview-modal";
 import { ExamJsonModal } from "@/components/admin/exams/exam-json-modal";
 import { ExamCreateWizardModal } from "@/components/admin/exams/exam-create-wizard-modal";
-import { BulkHotLevelModal } from "@/components/admin/exams/bulk-hot-level-modal";
 
 export default function AdminExamsPage() {
   // ── View Mode: "EXAMS" vs "QUESTIONS" (Lưu và khôi phục khi quay lại)
@@ -154,7 +153,6 @@ export default function AdminExamsPage() {
 
   // ── Modals & Actions State
   const [smartImportOpen, setSmartImportOpen] = useState(false);
-  const [bulkHotOpen, setBulkHotOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Exam Builder
@@ -421,21 +419,6 @@ export default function AdminExamsPage() {
         fetchExams();
       } else {
         showToast(res.error?.message || "Không thể trộn lại câu hỏi cho đề thi này");
-      }
-    } catch {
-      showToast("Lỗi kết nối máy chủ");
-    }
-  };
-
-  const handleGenerateFullTests = async () => {
-    try {
-      showToast("Đang tổng hợp đủ 20 bộ đề Full Test (APT-01 đến APT-20)...");
-      const res = await api.admin.generateFullTestExams();
-      if (res.success) {
-        showToast("Đã khởi tạo / khôi phục đủ 20 bộ đề thi thử Full Test!");
-        fetchExams();
-      } else {
-        showToast(res.error?.message || "Không thể tạo bộ đề Full Test");
       }
     } catch {
       showToast("Lỗi kết nối máy chủ");
@@ -723,7 +706,7 @@ export default function AdminExamsPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={toggleMetrics}
-              className={`p-2 rounded-xl border text-xs font-heading font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-2 rounded-xl border text-xs font-heading font-semibold transition-all flex items-center gap-1.5 ${
                 showMetrics
                   ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800"
                   : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
@@ -739,30 +722,14 @@ export default function AdminExamsPage() {
               )}
             </button>
 
-            <button
-              onClick={handleGenerateFullTests}
-              className="px-3.5 py-2 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
-              title="Tự động tạo hoặc khôi phục đủ 20 bộ đề thi thử Full Test (APT-01 đến APT-20) từ ngân hàng câu hỏi"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Khôi phục 20 Đề Full Test</span>
-            </button>
-
             <Link
               href="/admin/data-sync"
-              className="px-3.5 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
+              className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
+              title="Đồng bộ & Đối soát ngân hàng đề"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
+              <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
               <span>Đồng bộ &amp; Đối soát</span>
             </Link>
-
-            <button
-              onClick={() => setBulkHotOpen(true)}
-              className="px-3.5 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
-              title="Dán danh sách tên đề để gán ☘️ hàng loạt"
-            >
-              <span>⚡ Gán độ hot hàng loạt</span>
-            </button>
 
             <button
               onClick={() => setSmartImportOpen(true)}
@@ -774,9 +741,10 @@ export default function AdminExamsPage() {
 
             <button
               onClick={() => setJsonModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
+              className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-heading font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
+              title="Nhập cấu trúc đề thi qua JSON"
             >
-              <FileCode className="w-3.5 h-3.5" />
+              <FileCode className="w-3.5 h-3.5 text-slate-500" />
               <span>Nhập JSON</span>
             </button>
 
@@ -948,16 +916,6 @@ export default function AdminExamsPage() {
         cancelText="Hủy bỏ"
         onConfirm={handleDeleteQuestion}
         onCancel={() => setConfirmDeleteQuestion(null)}
-      />
-
-      <BulkHotLevelModal
-        isOpen={bulkHotOpen}
-        onClose={() => setBulkHotOpen(false)}
-        defaultSkill={skillFilter}
-        onDone={(msg) => {
-          showToast(msg);
-          fetchExams();
-        }}
       />
 
       <ExamSmartImportModal

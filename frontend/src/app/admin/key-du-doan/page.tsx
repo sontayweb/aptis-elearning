@@ -34,6 +34,7 @@ import AdminPageHeader from "@/components/admin/admin-page-header";
 import AdminTableCard from "@/components/admin/admin-table-card";
 import { ExamItem, EditExamFormData } from "@/components/admin/exams/exam.types";
 import { ExamEditModal } from "@/components/admin/exams/exam-edit-modal";
+import { BulkHotLevelModal } from "@/components/admin/exams/bulk-hot-level-modal";
 import ConfirmModal from "@/components/admin/confirm-modal";
 import { DEFAULT_TOPIC_RULES, TopicRule, normalizeText } from "@/lib/topic-rules";
 
@@ -119,6 +120,7 @@ export default function AdminKeyDuDoanPage() {
 
   // Confirm remove from Key
   const [confirmRemoveExam, setConfirmRemoveExam] = useState<ExamItem | null>(null);
+  const [bulkHotOpen, setBulkHotOpen] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -539,6 +541,15 @@ export default function AdminKeyDuDoanPage() {
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Xem trang Học viên</span>
             </Link>
+
+            <button
+              onClick={() => setBulkHotOpen(true)}
+              className="px-3.5 py-2 rounded-xl border border-emerald-300 dark:border-emerald-700/60 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-heading font-bold flex items-center gap-1.5 transition-colors"
+              title="Dán danh sách tên đề để gán mức Cỏ ☘️ hàng loạt"
+            >
+              <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Gán độ hot hàng loạt</span>
+            </button>
 
             <button
               onClick={handleSyncAllRules}
@@ -1267,6 +1278,17 @@ export default function AdminKeyDuDoanPage() {
           onSave={handleSaveEdit}
         />
       )}
+
+      <BulkHotLevelModal
+        isOpen={bulkHotOpen}
+        onClose={() => setBulkHotOpen(false)}
+        defaultSkill={skillFilter}
+        onDone={(msg) => {
+          showToast(msg);
+          fetchKeyExams();
+          fetchTopicRules();
+        }}
+      />
 
       {confirmRemoveExam && (
         <ConfirmModal
