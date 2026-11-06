@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
+import AdminPageHeader from "@/components/admin/admin-page-header";
 import {
   Sparkles,
   RefreshCw,
@@ -14,7 +15,10 @@ import {
   Edit3,
   X,
   Loader2,
+  ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Eye,
   Layers,
   StopCircle,
@@ -196,6 +200,19 @@ function PreviewImageModalItem({ src, alt }: { src: string; alt: string }) {
   );
 }
 
+function getPageNumbers(current: number, total: number): (number | "...")[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, "...", total];
+  }
+  if (current >= total - 3) {
+    return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
+  }
+  return [1, "...", current - 1, current, current + 1, "...", total];
+}
+
 export default function SpeakingAiHintsHubPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<OverviewData | null>(null);
@@ -208,6 +225,15 @@ export default function SpeakingAiHintsHubPage() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "READY" | "COMPLETED" | "BROKEN" | "MISSING">("ALL");
   const [partFilter, setPartFilter] = useState<"ALL" | "2" | "3">("ALL");
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number | "ALL">(25);
+
+  // Auto reset to page 1 on search or filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, partFilter]);
 
   // Selection Checkbox State
   const [selectedPartIds, setSelectedPartIds] = useState<string[]>([]);
@@ -335,6 +361,23 @@ export default function SpeakingAiHintsHubPage() {
     });
   }, [data, statusFilter, partFilter, searchTerm, brokenUrls]);
 
+  // Pagination Calculations
+  const totalFiltered = filteredItems.length;
+  const totalPages = pageSize === "ALL" ? 1 : Math.max(1, Math.ceil(totalFiltered / pageSize));
+
+  // Keep currentPage within valid bounds
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const paginatedItems = useMemo(() => {
+    if (pageSize === "ALL") return filteredItems;
+    const start = (currentPage - 1) * pageSize;
+    return filteredItems.slice(start, start + pageSize);
+  }, [filteredItems, currentPage, pageSize]);
+
   // Dynamic KPI counts
   const counts = useMemo(() => {
     if (!data?.items) return { total: 0, completed: 0, ready: 0, broken: 0, missing: 0, rate: 0 };
@@ -361,15 +404,20 @@ export default function SpeakingAiHintsHubPage() {
   }, [data, brokenUrls]);
 
   // Checkbox Selection Helpers
-  const handleToggleSelectAllVisible = () => {
-    const visibleIds = filteredItems.map((i) => i.partId);
-    const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedPartIds.includes(id));
+  const handleToggleSelectCurrentPage = () => {
+    const pageIds = paginatedItems.map((i) => i.partId);
+    const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedPartIds.includes(id));
 
     if (allSelected) {
-      setSelectedPartIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
+      setSelectedPartIds((prev) => prev.filter((id) => !pageIds.includes(id)));
     } else {
-      setSelectedPartIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
+      setSelectedPartIds((prev) => Array.from(new Set([...prev, ...pageIds])));
     }
+  };
+
+  const handleSelectAllFiltered = () => {
+    const allIds = filteredItems.map((i) => i.partId);
+    setSelectedPartIds(allIds);
   };
 
   const handleSelectOnlyReadyVisible = () => {
@@ -619,68 +667,43 @@ export default function SpeakingAiHintsHubPage() {
     abortBatchRef.current = true;
   };
 
-  const isAllVisibleSelected =
+  const isAllCurrentPageSelected =
+    paginatedItems.length > 0 && paginatedItems.every((i) => selectedPartIds.includes(i.partId));
+  const isAllFilteredSelected =
     filteredItems.length > 0 && filteredItems.every((i) => selectedPartIds.includes(i.partId));
 
   return (
-    <div className="min-h-screen bg-slate-50/70 dark:bg-slate-950 p-4 sm:p-6 lg:p-8 space-y-6">
-      {/* ── HEADER & ACTIONS ── */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
-        <div>
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
-            <Link href="/admin" className="hover:text-indigo-600 transition-colors">
-              Bảng điều khiển
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            <span>Công cụ AI</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-              AI Gợi Ý Tranh Speaking
-            </span>
+    <div className="space-y-6 pb-20">
+      <AdminPageHeader
+        title="AI Gợi Ý Tranh Speaking"
+        description="Tự động phân tích ảnh tranh Part 2 & Part 3 qua mô hình Vision AI, bỏ qua ảnh lỗi và tối ưu ngân hàng gợi ý."
+        actions={
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={fetchData}
+              disabled={loading || batchRunning}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
+              title="Làm mới lại dữ liệu từ server"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-blue-600" : ""}`} />
+              <span>Làm mới</span>
+            </button>
+
+            <button
+              onClick={() => startBatchGeneration()}
+              disabled={loading || batchRunning || counts.ready === 0}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+              title="Tự động sinh gợi ý cho toàn bộ đề có ảnh hợp lệ"
+            >
+              <Zap className="w-3.5 h-3.5 fill-white" />
+              <span>Sinh AI Hàng Loạt</span>
+              <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-[11px] font-mono font-bold">
+                {counts.ready}
+              </span>
+            </button>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/25 ring-4 ring-indigo-50 dark:ring-indigo-950/50 shrink-0">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                AI Gợi Ý Tranh Speaking
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 max-w-2xl">
-                Tự động phân tích ảnh tranh Part 2 & Part 3 qua mô hình Vision AI. Tự động loại bỏ và bỏ qua các ảnh lỗi 404 để không làm gián đoạn tiến trình.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={fetchData}
-            disabled={loading || batchRunning}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-semibold text-xs sm:text-sm transition-all shadow-2xs disabled:opacity-50"
-            title="Làm mới lại dữ liệu từ server"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-indigo-600" : ""}`} />
-            <span>Làm mới</span>
-          </button>
-
-          <button
-            onClick={() => startBatchGeneration()}
-            disabled={loading || batchRunning || counts.ready === 0}
-            className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/20 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none"
-            title="Tự động sinh gợi ý cho toàn bộ đề có ảnh hợp lệ"
-          >
-            <Zap className="w-4 h-4 fill-white" />
-            <span>Sinh AI Hàng Loạt</span>
-            <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-mono font-bold">
-              {counts.ready}
-            </span>
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* ── KPI METRIC CARDS (INTERACTIVE CLICK-TO-FILTER) ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
@@ -1031,6 +1054,15 @@ export default function SpeakingAiHintsHubPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
+            {selectedPartIds.length < totalFiltered && (
+              <button
+                onClick={handleSelectAllFiltered}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-300 hover:text-white hover:bg-indigo-600/30 transition-colors"
+              >
+                Chọn tất cả {totalFiltered} đề đang lọc
+              </button>
+            )}
+
             <button
               onClick={() => handleClearSelection()}
               className="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
@@ -1083,11 +1115,11 @@ export default function SpeakingAiHintsHubPage() {
                   <th className="py-3.5 px-3 w-10 text-center">
                     <button
                       type="button"
-                      onClick={handleToggleSelectAllVisible}
+                      onClick={handleToggleSelectCurrentPage}
                       className="p-1 hover:text-indigo-600 transition-colors"
-                      title={isAllVisibleSelected ? "Bỏ chọn tất cả" : "Chọn tất cả đề hiển thị"}
+                      title={isAllCurrentPageSelected ? "Bỏ chọn trang hiện tại" : "Chọn tất cả đề trên trang này"}
                     >
-                      {isAllVisibleSelected ? (
+                      {isAllCurrentPageSelected ? (
                         <CheckSquare className="w-4 h-4 text-indigo-600" />
                       ) : (
                         <Square className="w-4 h-4 text-slate-400" />
@@ -1103,12 +1135,13 @@ export default function SpeakingAiHintsHubPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm">
-                {filteredItems.map((item, idx) => {
+                {paginatedItems.map((item, idx) => {
                   const isGenThis = generatingPartId === item.partId;
                   const keywords = item.vocabularyHints?.keywords || [];
                   const isBroken = checkIsItemBroken(item);
                   const isReady = checkIsItemReadyToGen(item);
                   const isSelected = selectedPartIds.includes(item.partId);
+                  const rowNumber = pageSize === "ALL" ? idx + 1 : (currentPage - 1) * pageSize + idx + 1;
 
                   return (
                     <tr
@@ -1138,7 +1171,7 @@ export default function SpeakingAiHintsHubPage() {
 
                       {/* Index */}
                       <td className="py-3.5 px-2 text-center font-mono text-xs text-slate-400">
-                        {idx + 1}
+                        {rowNumber}
                       </td>
 
                       {/* Exam Title & Part info */}
@@ -1326,6 +1359,117 @@ export default function SpeakingAiHintsHubPage() {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* ── PAGINATION CONTROLS BAR ── */}
+        {!loading && !error && filteredItems.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-xs">
+            {/* Left: Range Info & Page Size Selector */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-slate-600 dark:text-slate-400">
+                Hiển thị{" "}
+                <span className="font-bold text-slate-900 dark:text-white font-mono">
+                  {totalFiltered === 0
+                    ? 0
+                    : (currentPage - 1) * (pageSize === "ALL" ? totalFiltered : pageSize) + 1}
+                </span>{" "}
+                -{" "}
+                <span className="font-bold text-slate-900 dark:text-white font-mono">
+                  {pageSize === "ALL" ? totalFiltered : Math.min(currentPage * pageSize, totalFiltered)}
+                </span>{" "}
+                trong tổng số{" "}
+                <span className="font-bold text-indigo-600 dark:text-indigo-400 font-mono">
+                  {totalFiltered}
+                </span>{" "}
+                phần thi
+              </span>
+
+              <div className="flex items-center gap-1.5 ml-2">
+                <span className="text-slate-400">Mỗi trang:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    const val = e.target.value === "ALL" ? "ALL" : Number(e.target.value);
+                    setPageSize(val);
+                    setCurrentPage(1);
+                  }}
+                  className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-300 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                >
+                  <option value={25}>25 đề</option>
+                  <option value={50}>50 đề</option>
+                  <option value={100}>100 đề</option>
+                  <option value="ALL">Tất cả ({totalFiltered})</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Right: Page Navigation Buttons */}
+            {pageSize !== "ALL" && totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  title="Trang đầu"
+                >
+                  <ChevronsLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  title="Trang trước"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {/* Page Numbers */}
+                <div className="flex items-center gap-1 px-1">
+                  {getPageNumbers(currentPage, totalPages).map((p, i) =>
+                    p === "..." ? (
+                      <span key={`dots-${i}`} className="px-2 text-slate-400 font-mono">
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setCurrentPage(Number(p))}
+                        className={`min-w-8 h-8 px-2 rounded-lg font-bold font-mono text-xs transition-all ${
+                          currentPage === p
+                            ? "bg-indigo-600 text-white shadow-xs"
+                            : "border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  title="Trang sau"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  title="Trang cuối"
+                >
+                  <ChevronsRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
