@@ -32,6 +32,8 @@ export interface ApiResponse<T = any> {
 }
 
 class ApiClient {
+  private refreshPromise: Promise<string | null> | null = null;
+
   private getAuthHeader(): Record<string, string> {
     if (typeof window === 'undefined') return {};
     const token =
@@ -41,9 +43,67 @@ class ApiClient {
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
+  /**
+   * Tự động làm mới accessToken bằng refreshToken (Silent Auto-refresh)
+   * Sử dụng Mutex Promise để tránh nhiều request gọi refresh trùng lặp đồng thời
+   */
+  private async refreshAccessToken(): Promise<string | null> {
+    if (typeof window === 'undefined') return null;
+
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.refreshPromise = (async () => {
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) {
+          return null;
+        }
+
+        const url = `${getApiBaseUrl()}/auth/refresh`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refreshToken }),
+        });
+
+        if (!res.ok) {
+          // Refresh token đã hết hạn hoàn toàn (sau 30 ngày) hoặc bị vô hiệu
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          return null;
+        }
+
+        const json = await res.json();
+        if (json.success && json.data?.accessToken) {
+          const newAccessToken = json.data.accessToken;
+          const newRefreshToken = json.data.refreshToken;
+          localStorage.setItem('accessToken', newAccessToken);
+          if (newRefreshToken) {
+            localStorage.setItem('refreshToken', newRefreshToken);
+          }
+          return newAccessToken;
+        }
+
+        return null;
+      } catch (err) {
+        console.error('[ApiClient] Lỗi khi tự động làm mới phiên đăng nhập:', err);
+        return null;
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
+  }
+
   private async request<T = any>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    isRetry = false
   ): Promise<ApiResponse<T>> {
     const url = `${getApiBaseUrl()}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
     const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
@@ -61,13 +121,26 @@ class ApiClient {
         headers,
       });
 
+      // Nếu 401 Unauthorized và chưa thử refresh, tự động gia hạn token ngầm và gửi lại request
+      if (
+        response.status === 401 &&
+        !isRetry &&
+        endpoint !== '/auth/login' &&
+        endpoint !== '/auth/refresh' &&
+        endpoint !== '/auth/register' &&
+        typeof window !== 'undefined'
+      ) {
+        const newToken = await this.refreshAccessToken();
+        if (newToken) {
+          return this.request<T>(endpoint, options, true);
+        }
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        // If 401 Unauthorized, notify or clear stale token
         if (response.status === 401 && typeof window !== 'undefined') {
-          // Token expired or invalid
-          if (endpoint !== '/auth/login' && endpoint !== '/auth/me') {
+          if (endpoint !== '/auth/login' && endpoint !== '/auth/me' && endpoint !== '/auth/refresh') {
             console.warn('Session expired or unauthorized');
           }
         }
@@ -123,6 +196,12 @@ class ApiClient {
       ),
 
     getMe: () => this.request('/auth/me', { method: 'GET' }),
+
+    refresh: (refreshToken: string) =>
+      this.request<{ accessToken: string; refreshToken: string }>('/auth/refresh', {
+        method: 'POST',
+        body: JSON.stringify({ refreshToken }),
+      }),
 
     forgotPassword: (email: string) =>
       this.request<{ message: string; resetToken?: string }>('/auth/forgot-password', {

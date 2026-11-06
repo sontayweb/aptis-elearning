@@ -99,6 +99,9 @@ export interface SkillExamCardProps {
   status: "not_started" | "in_progress" | "completed";
   completedParts?: number;
   totalParts?: number;
+  correctQuestions?: number | null;
+  answeredQuestions?: number | null;
+  questionsCount?: number | null;
   targetUrl: string;
   onLockedClick?: () => void;
 }
@@ -115,6 +118,9 @@ export function SkillExamCard({
   status,
   completedParts,
   totalParts = 4,
+  correctQuestions,
+  answeredQuestions,
+  questionsCount,
   targetUrl,
   onLockedClick,
 }: SkillExamCardProps) {
@@ -130,12 +136,22 @@ export function SkillExamCard({
       ? "border-emerald-500/30"
       : "border-border";
 
-  const isCompleted =
-    status === "completed" ||
-    (completedParts !== undefined && completedParts >= totalParts);
+  const hasAnsweredAny =
+    (answeredQuestions !== undefined && answeredQuestions !== null && answeredQuestions > 0) ||
+    (correctQuestions !== undefined && correctQuestions !== null && correctQuestions > 0);
+
+  const isCompleted = status === "completed";
   const isInProgress =
     !isCompleted &&
-    (status === "in_progress" || (completedParts !== undefined && completedParts > 0));
+    (status === "in_progress" ||
+      hasAnsweredAny ||
+      (completedParts !== undefined && completedParts > 0));
+
+  const totalQ = questionsCount && questionsCount > 0 ? questionsCount : 0;
+  const hasCorrectStat =
+    correctQuestions !== undefined && correctQuestions !== null && totalQ > 0;
+  const hasAnsweredStat =
+    answeredQuestions !== undefined && answeredQuestions !== null && answeredQuestions > 0 && totalQ > 0;
 
   return (
     <div

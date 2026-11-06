@@ -115,6 +115,15 @@ export class ExamService {
               id: true,
               part_number: true,
               title: true,
+              questions: {
+                select: {
+                  id: true,
+                  question_type: true,
+                  correct_answer: true,
+                  max_score: true,
+                  options: true,
+                },
+              },
               _count: { select: { questions: true } },
             },
           },
@@ -148,11 +157,24 @@ export class ExamService {
           started_at: true,
           answers: {
             select: {
+              question_id: true,
+              selected_option: true,
+              text_answer: true,
+              audio_url: true,
+              audio_duration: true,
+              score: true,
               question: {
                 select: {
                   part_id: true,
                 },
               },
+            },
+          },
+          ai_results: {
+            select: {
+              question_id: true,
+              score: true,
+              cefr_level: true,
             },
           },
         },
@@ -179,6 +201,134 @@ export class ExamService {
         const userAttempts = userSubs.length;
         let lastAttemptedAt: Date | null = null;
 
+        // Tính tổng số câu hỏi thực tế (hỗ trợ cả Reading Part 2 SENTENCE_ORDER lưu mảng câu trong 1 Question & Writing Part 4 2 emails)
+        const allExamQuestions = exam.parts.flatMap((p) => p.questions || []);
+        let effectiveTotalQuestions = 0;
+        for (const p of exam.parts) {
+          const pQuestions = p.questions || [];
+          const isWritingP4 =
+            exam.skill === 'WRITING' &&
+            pQuestions.length === 1 &&
+            (p.part_number === 4 || /part\s*4|email/i.test(`${p.title || ''} ${exam.title || ''}`));
+          if (isWritingP4) {
+            effectiveTotalQuestions += 2;
+            continue;
+          }
+          for (const q of pQuestions) {
+            if (q.question_type === QuestionType.SENTENCE_ORDER && q.correct_answer) {
+              try {
+                const corArr = JSON.parse(q.correct_answer);
+                if (Array.isArray(corArr) && corArr.length > 0) {
+                  effectiveTotalQuestions += corArr.length;
+                  continue;
+                }
+              } catch {}
+            }
+            effectiveTotalQuestions += 1;
+          }
+        }
+        if (effectiveTotalQuestions === 0) {
+          effectiveTotalQuestions = exam.parts.reduce((sum, p) => sum + p._count.questions, 0) || 1;
+        }
+
+        const hasValidAnswerResponse = (ans: any): boolean => {
+          if (!ans) return false;
+          if (ans.selected_option != null) {
+            const s = String(ans.selected_option).trim();
+            if (s !== '' && s !== '[]' && s !== 'null') {
+              try {
+                const parsed = JSON.parse(s);
+                if (Array.isArray(parsed)) {
+                  return parsed.some((item) => Boolean(item));
+                }
+              } catch {}
+              return true;
+            }
+          }
+          if (ans.text_answer != null && String(ans.text_answer).trim() !== '') return true;
+          if (ans.audio_url != null && String(ans.audio_url).trim() !== '') return true;
+          if (ans.audio_duration != null && Number(ans.audio_duration) > 0) return true;
+          return false;
+        };
+
+        const evaluateSubmissionAccuracy = (sub: any) => {
+          const ansList: any[] = sub?.answers || [];
+          const aiList: any[] = sub?.ai_results || [];
+          const ansByQId = new Map<string, any>(ansList.map((a) => [String(a.question_id), a]));
+          const aiByQId = new Map<string, any>(aiList.map((r) => [String(r.question_id), r]));
+
+          let answeredCount = 0;
+          let correctCount = 0;
+          const isSubjectiveExam = exam.skill === 'WRITING' || exam.skill === 'SPEAKING';
+
+          for (const q of allExamQuestions) {
+            const ans = ansByQId.get(String(q.id));
+            const ai = aiByQId.get(String(q.id));
+            const hasResp = hasValidAnswerResponse(ans);
+
+            if (isSubjectiveExam) {
+              if (hasResp || ai) {
+                answeredCount += 1;
+                if (ai) {
+                  if (Number(ai.score || 0) > 0) correctCount += 1;
+                } else if (ans?.score != null && Number(ans.score) > 0) {
+                  correctCount += 1;
+                } else if (hasResp) {
+                  correctCount += 1;
+                }
+              }
+              continue;
+            }
+
+            if (q.question_type === QuestionType.SENTENCE_ORDER) {
+              let corArr: string[] = [];
+              try {
+                if (q.correct_answer) {
+                  const p = JSON.parse(q.correct_answer);
+                  if (Array.isArray(p)) corArr = p;
+                }
+              } catch {}
+              if (corArr.length > 0) {
+                let userArr: string[] = [];
+                if (hasResp) {
+                  try {
+                    const u = JSON.parse(String(ans.selected_option || ans.text_answer || '[]'));
+                    if (Array.isArray(u)) userArr = u;
+                  } catch {}
+                }
+                const filledSlots = userArr.filter(Boolean).length;
+                answeredCount += Math.min(corArr.length, filledSlots);
+                for (let i = 0; i < corArr.length; i++) {
+                  if (userArr[i] && userArr[i] === corArr[i]) {
+                    correctCount += 1;
+                  }
+                }
+                continue;
+              }
+            }
+
+            if (hasResp) {
+              answeredCount += 1;
+              const userChoice = String(ans.selected_option || ans.text_answer || '');
+              const graded = gradeObjectiveQuestion(
+                q.question_type,
+                q.correct_answer,
+                userChoice,
+                q.max_score,
+                q.options
+              );
+              if (graded.isCorrect || (ans.score != null && Number(ans.score) > 0)) {
+                correctCount += 1;
+              }
+            }
+          }
+
+          return { answeredCount, correctCount };
+        };
+
+        let correctQuestions: number | null = null;
+        let answeredQuestions = 0;
+
         if (userSubs.length > 0) {
           lastAttemptedAt = userSubs[0].submitted_at || userSubs[0].started_at;
           const completedSubs = userSubs.filter(
@@ -192,9 +342,18 @@ export class ExamService {
             userStatus = 'COMPLETED';
             completedParts = totalPartsCount;
 
-            // Điểm cao nhất của thí sinh
+            // Điểm cao nhất & số câu đúng cao nhất của thí sinh
             let maxScore = -1;
+            let bestCorrect = -1;
+            let bestAnswered = 0;
+
             for (const s of completedSubs) {
+              const acc = evaluateSubmissionAccuracy(s);
+              if (acc.correctCount > bestCorrect) {
+                bestCorrect = acc.correctCount;
+                bestAnswered = acc.answeredCount;
+              }
+
               let scoreVal = s.total_score;
               if (exam.skill === 'GRAMMAR_VOCABULARY' && s.grammar_score != null) {
                 scoreVal = s.grammar_score;
@@ -216,6 +375,11 @@ export class ExamService {
               }
             }
 
+            if (bestCorrect >= 0) {
+              correctQuestions = bestCorrect;
+              answeredQuestions = bestAnswered;
+            }
+
             if (maxScore >= 0) {
               bestScoreNumber = Math.round(maxScore * 10) / 10;
               const maxScale = exam.skill === 'FULL_TEST' ? 200 : 50;
@@ -234,17 +398,35 @@ export class ExamService {
               bestCefr = 'A0';
             }
           } else if (userSubs.some((s) => s.status === 'IN_PROGRESS')) {
-            userStatus = 'IN_PROGRESS';
-            const inProgressSub = userSubs.find((s) => s.status === 'IN_PROGRESS');
-            if (inProgressSub && inProgressSub.answers && inProgressSub.answers.length > 0) {
+            // Tìm phiên IN_PROGRESS có câu trả lời thực sự
+            const inProgressSubs = userSubs.filter((s) => s.status === 'IN_PROGRESS');
+            let activeInProg: any = null;
+            let activeAcc = { answeredCount: 0, correctCount: 0 };
+
+            for (const sub of inProgressSubs) {
+              const acc = evaluateSubmissionAccuracy(sub);
+              if (acc.answeredCount > activeAcc.answeredCount) {
+                activeAcc = acc;
+                activeInProg = sub;
+              }
+            }
+
+            // CHỈ đánh dấu IN_PROGRESS khi học viên thực sự đã làm ít nhất 1 câu
+            if (activeInProg && activeAcc.answeredCount > 0) {
+              userStatus = 'IN_PROGRESS';
+              correctQuestions = activeAcc.correctCount;
+              answeredQuestions = activeAcc.answeredCount;
+
               const uniquePartIds = new Set(
-                inProgressSub.answers
+                (activeInProg.answers || [])
+                  .filter((a: any) => hasValidAnswerResponse(a))
                   .map((a: any) => a.question?.part_id)
                   .filter(Boolean)
               );
               completedParts = Math.min(totalPartsCount, Math.max(1, uniquePartIds.size));
             } else {
-              completedParts = 1;
+              userStatus = 'NOT_STARTED';
+              completedParts = 0;
             }
           }
         }
@@ -264,7 +446,7 @@ export class ExamService {
           forecastTag: exam.forecast_tag ?? null,
           source: exam.source,
           totalParts: totalPartsCount,
-          totalQuestions: exam.parts.reduce((sum, p) => sum + p._count.questions, 0),
+          totalQuestions: effectiveTotalQuestions,
           partTitle: exam.parts[0]?.title || null,
           parts: exam.parts.map((p) => ({
             id: p.id,
@@ -274,6 +456,8 @@ export class ExamService {
           attemptCount: exam._count.submissions,
           userStatus,
           completedParts,
+          correctQuestions,
+          answeredQuestions,
           bestCefr,
           bestScore,
           bestScoreNumber,
