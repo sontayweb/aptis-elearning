@@ -700,17 +700,50 @@ function SpeakingExamRunnerContent() {
         if (isRecording) {
           stopRecording().then((res) => {
             if (res && res.url) {
-              setRecordedData((prev) => ({
-                ...prev,
-                [currentIndex]: {
-                  ...(prev[currentIndex] || {}),
-                  audioUrl: res.url,
-                  audioBlob: res.blob,
-                  duration: res.duration,
-                  prepNotes,
-                  isCompleted: true,
-                },
-              }));
+              setRecordedData((prev) => {
+                const next = {
+                  ...prev,
+                  [currentIndex]: {
+                    ...(prev[currentIndex] || {}),
+                    audioUrl: res.url,
+                    audioBlob: res.blob,
+                    duration: res.duration,
+                    prepNotes,
+                    isCompleted: true,
+                  },
+                };
+                if (typeof window !== "undefined" && examId) {
+                  try {
+                    const currentPartNum = currentQ?.partNumber || 1;
+                    const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
+                    let oldParts = [currentPartNum];
+                    if (oldStr) {
+                      const oldData = JSON.parse(oldStr);
+                      if (Array.isArray(oldData.partsList)) {
+                        oldParts = Array.from(new Set([...oldData.partsList, currentPartNum]));
+                      }
+                    }
+                    const completedQCount = Object.values(next).filter(
+                      (item: any) => item?.isCompleted || item?.audioUrl
+                    ).length;
+                    localStorage.setItem(
+                      `aptis_exam_progress_${examId}`,
+                      JSON.stringify({
+                        examId,
+                        status: "in_progress",
+                        correctQuestions: completedQCount,
+                        answeredQuestions: completedQCount,
+                        totalQuestions: questions.length,
+                        partsList: oldParts,
+                        completedParts: Math.max(1, oldParts.length),
+                        totalParts: availableParts.length || 4,
+                        updatedAt: new Date().toISOString(),
+                      })
+                    );
+                  } catch {}
+                }
+                return next;
+              });
               if (res.blob) {
                 uploadQuestionAudioInBackground(currentIndex, res.blob, res.duration);
               }
@@ -923,11 +956,19 @@ function SpeakingExamRunnerContent() {
             oldParts = Array.from(new Set([...oldData.partsList, currentPartNum]));
           }
         }
+        const completedQCount =
+          Object.values({
+            ...recordedData,
+            [currentIndex]: { ...(recordedData[currentIndex] || {}), isCompleted: true },
+          }).filter((item: any) => item?.isCompleted || item?.audioUrl).length;
         localStorage.setItem(
           `aptis_exam_progress_${examId}`,
           JSON.stringify({
             examId,
             status: "in_progress",
+            correctQuestions: completedQCount,
+            answeredQuestions: completedQCount,
+            totalQuestions: questions.length,
             partsList: oldParts,
             completedParts: Math.max(1, oldParts.length),
             totalParts: availableParts.length || 4,
@@ -1045,12 +1086,16 @@ function SpeakingExamRunnerContent() {
           const finishedPartsCount = targetPart ? 1 : totalPartsCount;
           const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
           const oldData = oldStr ? JSON.parse(oldStr) : {};
+          const aiScoredCount = aiResultsList.filter((r: any) => (Number(r.score) || 0) > 0).length;
           localStorage.setItem(
             `aptis_exam_progress_${examId}`,
             JSON.stringify({
               ...oldData,
               examId,
               status: "completed",
+              correctQuestions: aiScoredCount > 0 ? aiScoredCount : aiResultsList.length,
+              answeredQuestions: Math.max(aiResultsList.length, oldData.answeredQuestions || 0),
+              totalQuestions: questions.length,
               completedParts: finishedPartsCount,
               totalParts: totalPartsCount,
               bestScore: `${computedScore}/50`,
@@ -1138,12 +1183,18 @@ function SpeakingExamRunnerContent() {
       try {
         const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
         const oldData = oldStr ? JSON.parse(oldStr) : {};
+        const completedQCount = Object.values(latestData).filter(
+          (item: any) => item?.isCompleted || item?.audioUrl || item?.audioBlob
+        ).length;
         localStorage.setItem(
           `aptis_exam_progress_${examId}`,
           JSON.stringify({
             ...oldData,
             examId,
             status: "completed",
+            correctQuestions: completedQCount,
+            answeredQuestions: completedQCount,
+            totalQuestions: questions.length,
             completedParts: finishedPartsCount,
             totalParts: totalPartsCount,
             updatedAt: new Date().toISOString(),

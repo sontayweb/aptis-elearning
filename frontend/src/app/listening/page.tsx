@@ -44,6 +44,9 @@ interface ListeningExam {
   title: string;
   parts: string;
   totalParts: number;
+  completedParts?: number;
+  correctQuestions?: number | null;
+  answeredQuestions?: number | null;
   partTitle?: string | null;
   questionsCount: number;
   duration: string;
@@ -89,6 +92,50 @@ export default function ListeningPracticePage() {
             else if (exam.userStatus === "IN_PROGRESS") status = "in_progress";
 
             const isFullListening = exam.totalParts === 4 || exam.title.includes("Full Listening");
+            let completedParts = Number(exam.completedParts || 0);
+            let correctQuestions: number | null =
+              exam.correctQuestions !== undefined && exam.correctQuestions !== null
+                ? Number(exam.correctQuestions)
+                : null;
+            let answeredQuestions: number | null =
+              exam.answeredQuestions !== undefined && exam.answeredQuestions !== null
+                ? Number(exam.answeredQuestions)
+                : null;
+            let questionsCount = Number(exam.totalQuestions || (isFullListening ? 25 : 4));
+            let bestScore = exam.bestCefr || exam.bestScore || null;
+
+            if (typeof window !== "undefined") {
+              try {
+                const localProgStr = localStorage.getItem(`aptis_exam_progress_${exam.id}`);
+                if (localProgStr) {
+                  const localProg = JSON.parse(localProgStr);
+                  if (localProg.status === "completed") {
+                    status = "completed";
+                    completedParts = exam.totalParts || 1;
+                  } else if (
+                    localProg.status === "in_progress" &&
+                    status === "not_started" &&
+                    ((localProg.answeredQuestions && localProg.answeredQuestions > 0) ||
+                      (localProg.correctQuestions !== undefined && localProg.correctQuestions !== null))
+                  ) {
+                    status = "in_progress";
+                    completedParts = localProg.completedParts || 1;
+                  }
+                  if (localProg.correctQuestions !== undefined && localProg.correctQuestions !== null) {
+                    correctQuestions = Number(localProg.correctQuestions);
+                  }
+                  if (localProg.answeredQuestions !== undefined && localProg.answeredQuestions !== null) {
+                    answeredQuestions = Number(localProg.answeredQuestions);
+                  }
+                  if (localProg.totalQuestions && Number(localProg.totalQuestions) > 0) {
+                    questionsCount = Number(localProg.totalQuestions);
+                  }
+                  if ((localProg.bestCefr || localProg.bestScore) && !bestScore) {
+                    bestScore = localProg.bestCefr || localProg.bestScore;
+                  }
+                }
+              } catch {}
+            }
 
             let hotLevel = Number(exam.hotLevel ?? exam.hot_level ?? 0);
             if (hotLevel === 0) {
@@ -111,12 +158,15 @@ export default function ListeningPracticePage() {
               title: exam.title,
               parts: isFullListening ? "Full Listening · 4 Parts" : (exam.partTitle || "Listening Part"),
               totalParts: exam.totalParts || 1,
+              completedParts,
+              correctQuestions,
+              answeredQuestions,
               partTitle: exam.partTitle,
-              questionsCount: exam.totalQuestions || 25,
+              questionsCount,
               duration: `${exam.durationMinutes || 40} phút`,
               isFree: !exam.isPro,
               status,
-              bestScore: exam.bestScore || (status === "completed" ? "A0" : null),
+              bestScore: bestScore || (status === "completed" ? "A0" : null),
               bestScoreNumber: exam.bestScoreNumber,
               userAttempts: exam.userAttempts || 0,
               priority: (hotLevel >= 4 ? "HIGH" : hotLevel >= 3 ? "MEDIUM" : "LOW") as any,
@@ -206,8 +256,8 @@ export default function ListeningPracticePage() {
       filterStatus === "all"
         ? true
         : filterStatus === "completed"
-        ? e.status === "completed"
-        : e.status !== "completed";
+        ? e.status === "completed" || e.status === "in_progress"
+        : e.status === "not_started";
     return matchesSearch && matchesPriority && matchesStatus;
   }).sort((a, b) => {
     // Sắp xếp ưu tiên tuyệt đối theo Độ Hot (Cỏ ☘️) từ cao xuống thấp (6 -> 5 -> 4 -> 3 -> 2 -> 1 -> 0)
@@ -482,7 +532,11 @@ export default function ListeningPracticePage() {
                     cloverLevel={exam.hotLevel}
                     trophyText={exam.bestScore}
                     status={exam.status}
-                    totalParts={4}
+                    completedParts={exam.completedParts}
+                    totalParts={exam.totalParts || 1}
+                    correctQuestions={exam.correctQuestions}
+                    answeredQuestions={exam.answeredQuestions}
+                    questionsCount={exam.questionsCount}
                     targetUrl={`/listening/${exam.id}${activeTab !== "full" ? `?part=${activeTab}` : ""}`}
                   />
                 );

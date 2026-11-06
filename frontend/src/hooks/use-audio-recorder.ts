@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { getApiBaseUrl } from "@/lib/api-client";
+import { api, getApiBaseUrl } from "@/lib/api-client";
 
 export type MicPermissionState = "idle" | "requesting" | "granted" | "denied";
 
@@ -398,16 +398,35 @@ export function useAudioRecorder() {
         formData.append("durationSeconds", String(durationOverride || state.recordingDuration || 30));
 
         const apiBaseUrl = getApiBaseUrl();
-        const res = await fetch(
+        const activeToken =
+          (typeof window !== "undefined" && localStorage.getItem("accessToken")) || token;
+        let res = await fetch(
           `${apiBaseUrl}/submissions/${submissionId}/answers/${questionId}/audio`,
           {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${activeToken}`,
             },
             body: formData,
           }
         );
+
+        // Nếu 401 Unauthorized, tự động gọi refreshAccessToken và gửi lại file ghi âm
+        if (res.status === 401 && typeof window !== "undefined") {
+          const newToken = await api.refreshAccessToken();
+          if (newToken) {
+            res = await fetch(
+              `${apiBaseUrl}/submissions/${submissionId}/answers/${questionId}/audio`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${newToken}`,
+                },
+                body: formData,
+              }
+            );
+          }
+        }
 
         const data = await res.json();
         setState((prev) => ({ ...prev, isUploading: false }));

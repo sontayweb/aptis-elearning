@@ -34,12 +34,39 @@ export interface ApiResponse<T = any> {
 class ApiClient {
   private refreshPromise: Promise<string | null> | null = null;
 
-  private getAuthHeader(): Record<string, string> {
-    if (typeof window === 'undefined') return {};
-    const token =
+  private getStoredAccessToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return (
       localStorage.getItem('accessToken') ||
       localStorage.getItem('token') ||
-      localStorage.getItem('aptis_token');
+      localStorage.getItem('aptis_token')
+    );
+  }
+
+  /**
+   * Kiểm tra xem JWT accessToken đã hết hạn hoặc sắp hết hạn trong vòng 2 phút tới chưa
+   */
+  private isTokenExpiredOrExpiringSoon(token: string, bufferSeconds = 120): boolean {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return false;
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const payload = JSON.parse(jsonPayload);
+      if (typeof payload.exp !== 'number') return false;
+      return payload.exp * 1000 <= Date.now() + bufferSeconds * 1000;
+    } catch {
+      return false;
+    }
+  }
+
+  private getAuthHeader(): Record<string, string> {
+    const token = this.getStoredAccessToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
@@ -47,7 +74,7 @@ class ApiClient {
    * Tự động làm mới accessToken bằng refreshToken (Silent Auto-refresh)
    * Sử dụng Mutex Promise để tránh nhiều request gọi refresh trùng lặp đồng thời
    */
-  private async refreshAccessToken(): Promise<string | null> {
+  public async refreshAccessToken(): Promise<string | null> {
     if (typeof window === 'undefined') return null;
 
     if (this.refreshPromise) {
@@ -71,9 +98,12 @@ class ApiClient {
         });
 
         if (!res.ok) {
-          // Refresh token đã hết hạn hoàn toàn (sau 30 ngày) hoặc bị vô hiệu
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+          // CHỈ xóa token khi server xác nhận 401/403 (Refresh token hết hạn sau 30 ngày hoặc bị thu hồi)
+          // Không xóa khi lỗi 500/502/503 tạm thời lúc server đang khởi động lại
+          if (res.status === 401 || res.status === 403) {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+          }
           return null;
         }
 
@@ -90,7 +120,7 @@ class ApiClient {
 
         return null;
       } catch (err) {
-        console.error('[ApiClient] Lỗi khi tự động làm mới phiên đăng nhập:', err);
+        console.error('[ApiClient] Lỗi mạng tạm thời khi làm mới phiên đăng nhập:', err);
         return null;
       } finally {
         this.refreshPromise = null;
@@ -105,6 +135,22 @@ class ApiClient {
     options: RequestInit = {},
     isRetry = false
   ): Promise<ApiResponse<T>> {
+    const isAuthEndpoint =
+      endpoint === '/auth/login' ||
+      endpoint === '/auth/refresh' ||
+      endpoint === '/auth/register' ||
+      endpoint === '/auth/google';
+
+    // Proactive Refresh: Nếu accessToken sắp/đã hết hạn hoặc bị thiếu nhưng còn refreshToken,
+    // chủ động làm mới trước khi gửi request (đặc biệt quan trọng cho các route optionalAuthGuard như GET /exams)
+    if (typeof window !== 'undefined' && !isRetry && !isAuthEndpoint) {
+      const currentToken = this.getStoredAccessToken();
+      const hasRefresh = Boolean(localStorage.getItem('refreshToken'));
+      if (hasRefresh && (!currentToken || this.isTokenExpiredOrExpiringSoon(currentToken))) {
+        await this.refreshAccessToken();
+      }
+    }
+
     const url = `${getApiBaseUrl()}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
     const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
     const headers: Record<string, string> = {
@@ -253,7 +299,7 @@ class ApiClient {
       if (params?.hotLevel !== undefined) query.append('hotLevel', String(params.hotLevel));
       if (params?.source) query.append('source', params.source);
       const qs = query.toString();
-      return this.request(`/exams${qs ? `?${qs}` : ''}`);
+      return this.request(`/exams${qs ? `?${qs}` : ''}`, { cache: 'no-store' });
     },
 
     getById: (id: string) => this.request(`/exams/${id}`),

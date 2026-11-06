@@ -127,13 +127,26 @@ export class SubmissionService {
       }
     }
 
-    // 2. Tự động đóng các phiên IN_PROGRESS cũ đã quá hạn
+    // 2. Dọn dẹp các phiên IN_PROGRESS cũ đã quá hạn:
+    // - Nếu chưa trả lời câu nào (answers rỗng): xóa hẳn để không biến thành bài SUBMITTED ảo (0 câu)
+    // - Nếu đã có câu trả lời thực sự: chuyển sang SUBMITTED để bảo toàn kết quả làm dở
+    await prisma.examSubmission.deleteMany({
+      where: {
+        user_id: userId,
+        exam_id: exam.id,
+        status: SubmissionStatus.IN_PROGRESS,
+        deadline_at: { lte: now },
+        answers: { none: {} },
+      },
+    });
+
     await prisma.examSubmission.updateMany({
       where: {
         user_id: userId,
         exam_id: exam.id,
         status: SubmissionStatus.IN_PROGRESS,
         deadline_at: { lte: now },
+        answers: { some: {} },
       },
       data: {
         status: SubmissionStatus.SUBMITTED,
@@ -197,9 +210,77 @@ export class SubmissionService {
       };
     }
 
+    // Chuẩn hóa questionId (loại bỏ hậu tố -1/-2 hoặc _email1/_email2 của câu tách đôi trên UI) và gộp theo UUID hợp lệ
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const normalizedMap = new Map<
+      string,
+      {
+        questionId: string;
+        selectedOption?: string | null;
+        textAnswer?: string | null;
+        audioUrl?: string | null;
+        audioDuration?: number | null;
+      }
+    >();
+
+    for (const ans of input.answers) {
+      const baseQId = String(ans.questionId || '')
+        .replace(/-[12]$/, '')
+        .replace(/_email[12]$/, '');
+      if (!uuidRegex.test(baseQId)) continue;
+
+      const existing = normalizedMap.get(baseQId);
+      if (existing) {
+        // Nếu 2 email Writing Part 4 hoặc 2 đoạn Reading Part 2 cùng trỏ về 1 Question gốc trong DB
+        if (ans.textAnswer && existing.textAnswer && ans.textAnswer !== existing.textAnswer) {
+          existing.textAnswer = `${existing.textAnswer}\n\n---EMAIL_SPLIT---\n\n${ans.textAnswer}`;
+        } else if (ans.textAnswer) {
+          existing.textAnswer = ans.textAnswer;
+        }
+        if (ans.selectedOption && existing.selectedOption) {
+          try {
+            const arr1 = JSON.parse(existing.selectedOption);
+            const arr2 = JSON.parse(ans.selectedOption);
+            if (Array.isArray(arr1) && Array.isArray(arr2)) {
+              existing.selectedOption = JSON.stringify([...arr1, ...arr2]);
+            } else {
+              existing.selectedOption = ans.selectedOption;
+            }
+          } catch {
+            existing.selectedOption = ans.selectedOption;
+          }
+        } else if (ans.selectedOption) {
+          existing.selectedOption = ans.selectedOption;
+        }
+        if (ans.audioUrl) existing.audioUrl = ans.audioUrl;
+        if (ans.audioDuration != null) existing.audioDuration = ans.audioDuration;
+      } else {
+        normalizedMap.set(baseQId, {
+          questionId: baseQId,
+          selectedOption: ans.selectedOption,
+          textAnswer: ans.textAnswer,
+          audioUrl: ans.audioUrl,
+          audioDuration: ans.audioDuration,
+        });
+      }
+    }
+
+    const validAnswers = Array.from(normalizedMap.values());
+    if (validAnswers.length === 0) {
+      const serverTimeRemaining = Math.max(
+        0,
+        Math.floor((submission.deadline_at.getTime() - now.getTime()) / 1000)
+      );
+      return {
+        isExpired: false,
+        serverTimeRemaining,
+        savedCount: 0,
+      };
+    }
+
     // Upsert câu trả lời và cập nhật last_active_at theo batch atomic transaction
     await prisma.$transaction([
-      ...input.answers.map((ans) =>
+      ...validAnswers.map((ans) =>
         prisma.submissionAnswer.upsert({
           where: {
             submission_id_question_id: {

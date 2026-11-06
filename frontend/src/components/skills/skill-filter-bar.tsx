@@ -64,11 +64,11 @@ export function SkillFilterBar({
     { id: "all", label: `Tất cả (${exams.length})` },
     {
       id: "not_started",
-      label: `Chưa làm (${exams.filter((e) => e.status !== "completed").length})`,
+      label: `Chưa làm (${exams.filter((e) => e.status === "not_started").length})`,
     },
     {
       id: "completed",
-      label: `Đã làm (${exams.filter((e) => e.status === "completed").length})`,
+      label: `Đã làm (${exams.filter((e) => e.status === "completed" || e.status === "in_progress").length})`,
     },
   ];
 

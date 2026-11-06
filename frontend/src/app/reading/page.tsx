@@ -48,6 +48,8 @@ interface ReadingExam {
   parts: string;
   totalParts: number;
   completedParts?: number;
+  correctQuestions?: number | null;
+  answeredQuestions?: number | null;
   partTitle?: string | null;
   questionsCount: number;
   duration: string;
@@ -94,6 +96,15 @@ export default function ReadingPracticePage() {
             else if (exam.userStatus === "IN_PROGRESS") status = "in_progress";
 
             let completedParts = Number(exam.completedParts || 0);
+            let correctQuestions: number | null =
+              exam.correctQuestions !== undefined && exam.correctQuestions !== null
+                ? Number(exam.correctQuestions)
+                : null;
+            let answeredQuestions: number | null =
+              exam.answeredQuestions !== undefined && exam.answeredQuestions !== null
+                ? Number(exam.answeredQuestions)
+                : null;
+            let questionsCount = Number(exam.totalQuestions || 20);
             let bestCefr = exam.bestCefr || null;
             let bestScore = exam.bestScore || null;
 
@@ -104,10 +115,24 @@ export default function ReadingPracticePage() {
                   const localProg = JSON.parse(localProgStr);
                   if (localProg.status === "completed") {
                     status = "completed";
-                    completedParts = exam.totalParts || 4;
-                  } else if (localProg.status === "in_progress" && status === "not_started") {
+                    completedParts = exam.totalParts || 1;
+                  } else if (
+                    localProg.status === "in_progress" &&
+                    status === "not_started" &&
+                    ((localProg.answeredQuestions && localProg.answeredQuestions > 0) ||
+                      (localProg.correctQuestions !== undefined && localProg.correctQuestions !== null))
+                  ) {
                     status = "in_progress";
                     completedParts = localProg.completedParts || 1;
+                  }
+                  if (localProg.correctQuestions !== undefined && localProg.correctQuestions !== null) {
+                    correctQuestions = Number(localProg.correctQuestions);
+                  }
+                  if (localProg.answeredQuestions !== undefined && localProg.answeredQuestions !== null) {
+                    answeredQuestions = Number(localProg.answeredQuestions);
+                  }
+                  if (localProg.totalQuestions && Number(localProg.totalQuestions) > 0) {
+                    questionsCount = Number(localProg.totalQuestions);
                   }
                   if (localProg.bestCefr && !bestCefr) bestCefr = localProg.bestCefr;
                   if (localProg.bestScore && !bestScore) bestScore = localProg.bestScore;
@@ -121,10 +146,12 @@ export default function ReadingPracticePage() {
               id: exam.id,
               title: exam.title,
               parts: isFullReading ? `Full Reading · 4 Parts` : (exam.partTitle || `Reading Part`),
-              totalParts: exam.totalParts || 4,
+              totalParts: exam.totalParts || (isFullReading ? 4 : 1),
               completedParts,
+              correctQuestions,
+              answeredQuestions,
               partTitle: exam.partTitle,
-              questionsCount: exam.totalQuestions || 20,
+              questionsCount,
               duration: `${exam.durationMinutes || 35} phút`,
               isFree: !exam.isPro,
               status,
@@ -250,7 +277,12 @@ export default function ReadingPracticePage() {
     })
     .filter((e) => {
       const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = filterStatus === "all" ? true : e.status === filterStatus;
+      const matchesStatus =
+        filterStatus === "all"
+          ? true
+          : filterStatus === "completed"
+          ? e.status === "completed" || e.status === "in_progress"
+          : e.status === "not_started";
       const matchesPriority =
         activeTab === "p1" || filterPriority === "all"
           ? true
@@ -523,7 +555,10 @@ export default function ReadingPracticePage() {
                     trophyText={trophy}
                     status={exam.status}
                     completedParts={exam.completedParts}
-                    totalParts={exam.totalParts || 4}
+                    totalParts={exam.totalParts || 1}
+                    correctQuestions={exam.correctQuestions}
+                    answeredQuestions={exam.answeredQuestions}
+                    questionsCount={exam.questionsCount}
                     targetUrl={targetUrl}
                   />
                 );

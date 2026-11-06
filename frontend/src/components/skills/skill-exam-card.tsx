@@ -209,18 +209,29 @@ export function SkillExamCard({
         {/* Progress Status */}
         <div className="pt-0.5 text-xs">
           {isCompleted ? (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold shadow-2xs">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold shadow-2xs tabular-nums">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>
-                {totalParts > 1
+                {hasCorrectStat
+                  ? `Đã làm đúng ${correctQuestions}/${totalQ} câu`
+                  : hasAnsweredStat
+                  ? `Đã làm đúng ${answeredQuestions}/${totalQ} câu`
+                  : totalParts > 1
                   ? `Đã hoàn thành tất cả ${totalParts} Part`
                   : "Đã hoàn thành"}
               </span>
             </div>
           ) : isInProgress ? (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/20 text-xs font-semibold shadow-2xs">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/20 text-xs font-semibold shadow-2xs tabular-nums">
+              <CheckCircle2 className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
               <span>
-                Đã làm {completedParts || 1}/{totalParts} Part
+                {hasCorrectStat
+                  ? `Đã làm đúng ${correctQuestions}/${totalQ} câu`
+                  : hasAnsweredStat
+                  ? `Đã làm ${answeredQuestions}/${totalQ} câu`
+                  : totalParts > 1
+                  ? `Đã làm ${completedParts || 1}/${totalParts} Part`
+                  : "Đang luyện tập"}
               </span>
             </div>
           ) : (

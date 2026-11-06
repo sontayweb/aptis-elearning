@@ -161,6 +161,12 @@ function ReadingExamRunner() {
     setIsRestarting(true);
     setIsSubmitted(false);
     setIsReviewMode(false);
+    if (typeof window !== "undefined" && examId) {
+      try {
+        localStorage.removeItem(`aptis_draft_reading_${examId}`);
+        localStorage.removeItem(`aptis_exam_progress_${examId}`);
+      } catch {}
+    }
     setP1Answers({});
     setP3Answers({});
     setP4Answers({});
@@ -466,6 +472,16 @@ function ReadingExamRunner() {
                     } catch {
                       loadedP2[qId] = [];
                     }
+                  } else if (activeData.part2.stories.some((s) => s.id === `${qId}-1` || s.id === `${qId}-2`)) {
+                    try {
+                      const arr = JSON.parse(opt);
+                      if (Array.isArray(arr)) {
+                        const st1 = activeData.part2.stories.find((s) => s.id === `${qId}-1`);
+                        const st1Len = st1?.correctOrder?.length || st1?.sentences?.length || Math.ceil(arr.length / 2);
+                        loadedP2[`${qId}-1`] = arr.slice(0, st1Len);
+                        loadedP2[`${qId}-2`] = arr.slice(st1Len);
+                      }
+                    } catch {}
                   } else if (activeData.part3.questions.some((q) => q.id === qId)) {
                     loadedP3[qId] = opt;
                   } else if (activeData.part4.paragraphs.some((p) => p.id === qId)) {
@@ -782,16 +798,30 @@ function ReadingExamRunner() {
     } catch {}
   }, [examId, isSubmitted, isReviewMode, modeParam]);
 
-  // 4. Tự động ghi bản nháp vào LocalStorage khi câu trả lời thay đổi
+  // Total questions count calculation
+  const totalQuestionsCount =
+    examData.part1.gaps.length +
+    examData.part2.stories.reduce(
+      (sum, st) => sum + (st.correctOrder?.length || st.sentences?.length || 0),
+      0
+    ) +
+    examData.part3.questions.length +
+    examData.part4.paragraphs.length;
+
+  const totalAnsweredCount =
+    Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length +
+    Object.values(p2Orders).reduce(
+      (sum, arr) => sum + (Array.isArray(arr) ? arr.filter(Boolean).length : 0),
+      0
+    ) +
+    Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length +
+    Object.keys(p4Answers).filter((k) => !!p4Answers[k]).length;
+
+  // 4. Tự động ghi bản nháp + tiến trình chính xác vào LocalStorage & Autosave lên Backend khi câu trả lời thay đổi
   useEffect(() => {
     if (typeof window === "undefined" || !examId || isSubmitted || isReviewMode || modeParam === "review") return;
-    const hasAnswers =
-      Object.keys(p1Answers).length > 0 ||
-      Object.keys(p2Orders).length > 0 ||
-      Object.keys(p3Answers).length > 0 ||
-      Object.keys(p4Answers).length > 0;
 
-    if (hasAnswers) {
+    if (totalAnsweredCount > 0) {
       try {
         localStorage.setItem(
           `aptis_draft_reading_${examId}`,
@@ -803,9 +833,82 @@ function ReadingExamRunner() {
             savedAt: new Date().toISOString(),
           })
         );
+
+        const effectiveTotal = readingReviewStats.totalQuestions || totalQuestionsCount;
+        localStorage.setItem(
+          `aptis_exam_progress_${examId}`,
+          JSON.stringify({
+            examId,
+            status: "in_progress",
+            correctQuestions: readingReviewStats.totalCorrect,
+            answeredQuestions: totalAnsweredCount,
+            totalQuestions: effectiveTotal,
+            completedParts: 1,
+            totalParts: stages.length || 1,
+            updatedAt: new Date().toISOString(),
+          })
+        );
       } catch {}
     }
-  }, [p1Answers, p2Orders, p3Answers, p4Answers, examId, isSubmitted, isReviewMode, modeParam]);
+
+    if (!submissionId || totalAnsweredCount === 0) return;
+    const timer = setTimeout(async () => {
+      try {
+        const answersPayload: Array<{ questionId: string; selectedOption: string }> = [];
+        examData.part1.gaps.forEach((g) => {
+          if (g.id && p1Answers[g.id]) {
+            answersPayload.push({ questionId: String(g.id), selectedOption: p1Answers[g.id] });
+          }
+        });
+        examData.part2.stories.forEach((st) => {
+          if (st.id && Array.isArray(p2Orders[st.id]) && p2Orders[st.id].some(Boolean)) {
+            answersPayload.push({
+              questionId: String(st.id),
+              selectedOption: JSON.stringify(p2Orders[st.id]),
+            });
+          }
+        });
+        examData.part3.questions.forEach((q) => {
+          if (q.id && p3Answers[q.id]) {
+            answersPayload.push({ questionId: String(q.id), selectedOption: p3Answers[q.id] });
+          }
+        });
+        examData.part4.paragraphs.forEach((p) => {
+          if (p.id && p4Answers[p.id]) {
+            answersPayload.push({ questionId: String(p.id), selectedOption: p4Answers[p.id] });
+          }
+        });
+
+        if (answersPayload.length > 0) {
+          setSyncStatus("saving");
+          await api.submissions.autosave(submissionId, answersPayload);
+          setSyncStatus("saved");
+          setLastSavedAt(new Date());
+          setTimeout(() => setSyncStatus("idle"), 2000);
+        }
+      } catch (e) {
+        console.warn("Reading autosave error:", e);
+      }
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [
+    p1Answers,
+    p2Orders,
+    p3Answers,
+    p4Answers,
+    examId,
+    isSubmitted,
+    isReviewMode,
+    modeParam,
+    totalAnsweredCount,
+    totalQuestionsCount,
+    readingReviewStats.totalCorrect,
+    readingReviewStats.totalQuestions,
+    stages.length,
+    submissionId,
+    examData,
+  ]);
 
   // 5. Cảnh báo beforeunload chống vô tình F5/thoát trang khi đang thi
   useEffect(() => {
@@ -845,7 +948,14 @@ function ReadingExamRunner() {
                   try {
                     const parsed = JSON.parse(ans.selectedOption);
                     if (Array.isArray(parsed) && parsed.length > 0) {
-                      p2[qId] = parsed;
+                      if (examData.part2.stories.some((s) => s.id === `${qId}-1` || s.id === `${qId}-2`)) {
+                        const st1 = examData.part2.stories.find((s) => s.id === `${qId}-1`);
+                        const st1Len = st1?.correctOrder?.length || st1?.sentences?.length || Math.ceil(parsed.length / 2);
+                        p2[`${qId}-1`] = parsed.slice(0, st1Len);
+                        p2[`${qId}-2`] = parsed.slice(st1Len);
+                      } else {
+                        p2[qId] = parsed;
+                      }
                       return;
                     }
                   } catch {}
@@ -914,19 +1024,6 @@ function ReadingExamRunner() {
       [storyId]: [],
     }));
   };
-
-  // Total questions count calculation
-  const totalQuestionsCount =
-    examData.part1.gaps.length +
-    examData.part2.stories.length +
-    examData.part3.questions.length +
-    examData.part4.paragraphs.length;
-
-  const totalAnsweredCount =
-    Object.keys(p1Answers).filter((k) => !!p1Answers[k]).length +
-    Object.keys(p2Orders).length +
-    Object.keys(p3Answers).filter((k) => !!p3Answers[k]).length +
-    Object.keys(p4Answers).filter((k) => !!p4Answers[k]).length;
 
   // Grade & Submit calculation
   const handleSubmitExam = useCallback(async () => {
@@ -1040,6 +1137,29 @@ function ReadingExamRunner() {
     setResultScore(totalCalculated);
     setCefrBand(cefr);
     setPartScores(calculatedPartScores);
+
+    const initialCorrectSum = calculatedPartScores.reduce((sum, item) => sum + item.correct, 0);
+    const initialTotalSum = calculatedPartScores.reduce((sum, item) => sum + item.total, 0);
+
+    if (typeof window !== "undefined" && examId) {
+      try {
+        localStorage.setItem(
+          `aptis_exam_progress_${examId}`,
+          JSON.stringify({
+            examId,
+            status: "completed",
+            correctQuestions: initialCorrectSum,
+            answeredQuestions: totalAnsweredCount,
+            totalQuestions: initialTotalSum || totalQuestionsCount,
+            completedParts: stages.length || 1,
+            totalParts: stages.length || 1,
+            bestScore: `${totalCalculated}/${totalMax}`,
+            bestCefr: cefr,
+            updatedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
 
     // Save to backend submission
     if (submissionId) {
@@ -1189,6 +1309,32 @@ function ReadingExamRunner() {
 
             if (updatedPartScores.length > 0) {
               setPartScores(updatedPartScores);
+              if (typeof window !== "undefined" && examId) {
+                try {
+                  const finalCorrectSum = updatedPartScores.reduce((sum, item) => sum + item.correct, 0);
+                  const finalTotalSum = updatedPartScores.reduce((sum, item) => sum + item.total, 0);
+                  const finalMaxSum = Math.round(updatedPartScores.reduce((sum, item) => sum + item.maxScore, 0));
+                  const finalScoreVal =
+                    sub.total_score != null
+                      ? Math.round(sub.total_score * 10) / 10
+                      : Math.round(updatedPartScores.reduce((sum, item) => sum + item.score, 0));
+                  localStorage.setItem(
+                    `aptis_exam_progress_${examId}`,
+                    JSON.stringify({
+                      examId,
+                      status: "completed",
+                      correctQuestions: finalCorrectSum,
+                      answeredQuestions: totalAnsweredCount,
+                      totalQuestions: finalTotalSum || totalQuestionsCount,
+                      completedParts: stages.length || 1,
+                      totalParts: stages.length || 1,
+                      bestScore: `${finalScoreVal}/${finalMaxSum}`,
+                      bestCefr: sub.cefr_level || cefr,
+                      updatedAt: new Date().toISOString(),
+                    })
+                  );
+                } catch {}
+              }
             }
           }
         } catch (subErr) {
@@ -1200,7 +1346,7 @@ function ReadingExamRunner() {
     }
 
     setIsSubmitted(true);
-  }, [examData, p1Answers, p2Orders, p3Answers, p4Answers, submissionId]);
+  }, [examData, examId, p1Answers, p2Orders, p3Answers, p4Answers, stages.length, submissionId, totalAnsweredCount, totalQuestionsCount]);
 
   const currentStage = stages[activeStage] || stages[0];
 

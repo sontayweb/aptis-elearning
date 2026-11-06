@@ -9,6 +9,7 @@ export class ExamController {
     try {
       const filter = examFilterSchema.parse(req.query);
       const userId = (req as AuthenticatedRequest).user?.userId;
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       const result = await examService.listExams(filter, userId);
       sendSuccess(res, result.exams, 'Lấy danh sách đề thi thành công', 200, {
         total: result.total,

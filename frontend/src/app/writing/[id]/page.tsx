@@ -236,6 +236,7 @@ function WritingExamRunnerContent() {
       setAnswers({});
       if (typeof window !== "undefined") {
         localStorage.removeItem(`aptis_draft_writing_${examId}`);
+        localStorage.removeItem(`aptis_exam_progress_${examId}`);
       }
       setIsReviewMode(false);
       setShowPart2Result(false);
@@ -424,10 +425,15 @@ function WritingExamRunnerContent() {
     } catch {}
   }, [examId]);
 
-  // 2. Tự động lưu bản nháp vào LocalStorage mỗi khi gõ phím
+  // 2. Tự động lưu bản nháp + tiến trình câu trả lời vào LocalStorage mỗi khi gõ phím
   useEffect(() => {
     if (typeof window === "undefined" || !examId) return;
-    if (Object.keys(answers).length > 0) {
+    const answeredCount = Object.values(answers).filter(
+      (v) => typeof v === "string" && v.trim().length > 0
+    ).length;
+    const totalCount = parts.reduce((sum, p) => sum + p.questions.length, 0);
+
+    if (answeredCount > 0) {
       try {
         localStorage.setItem(
           `aptis_draft_writing_${examId}`,
@@ -436,9 +442,24 @@ function WritingExamRunnerContent() {
             savedAt: new Date().toISOString(),
           })
         );
+        if (!isReviewMode) {
+          localStorage.setItem(
+            `aptis_exam_progress_${examId}`,
+            JSON.stringify({
+              examId,
+              status: "in_progress",
+              correctQuestions: answeredCount,
+              answeredQuestions: answeredCount,
+              totalQuestions: totalCount,
+              completedParts: 1,
+              totalParts: parts.length || 1,
+              updatedAt: new Date().toISOString(),
+            })
+          );
+        }
       } catch {}
     }
-  }, [answers, examId]);
+  }, [answers, examId, parts, isReviewMode]);
 
   // 3. Cảnh báo beforeunload chống vô tình F5/thoát trang làm mất bài viết
   useEffect(() => {
@@ -480,12 +501,20 @@ function WritingExamRunnerContent() {
             parts.forEach((p, pIdx) => {
               p.questions.forEach((q, qIdx) => {
                 if (q.id) {
+                  const baseQId = String(q.id).replace(/_email[12]$/, "");
                   const foundAns = (sub.answers || []).find(
-                    (a: any) => String(a.question_id || a.questionId) === String(q.id)
+                    (a: any) => String(a.question_id || a.questionId) === baseQId
                   );
                   if (foundAns) {
                     const text = foundAns.text_answer || foundAns.textAnswer || "";
-                    if (text) loaded[`${pIdx}_${qIdx}`] = text;
+                    if (text) {
+                      if (text.includes("---EMAIL_SPLIT---") && p.questions.length === 2) {
+                        const splitParts = text.split("---EMAIL_SPLIT---").map((s: string) => s.trim());
+                        if (splitParts[qIdx]) loaded[`${pIdx}_${qIdx}`] = splitParts[qIdx];
+                      } else {
+                        loaded[`${pIdx}_${qIdx}`] = text;
+                      }
+                    }
                   }
                 }
               });
@@ -521,9 +550,15 @@ function WritingExamRunnerContent() {
               parts.forEach((p, pIdx) => {
                 p.questions.forEach((q, qIdx) => {
                   if (q.id) {
-                    const text = (subData.savedAnswers as Record<string, any>)[q.id]?.textAnswer;
+                    const baseQId = String(q.id).replace(/_email[12]$/, "");
+                    const text = (subData.savedAnswers as Record<string, any>)[baseQId]?.textAnswer;
                     if (typeof text === "string" && text.trim().length > 0) {
-                      loaded[`${pIdx}_${qIdx}`] = text;
+                      if (text.includes("---EMAIL_SPLIT---") && p.questions.length === 2) {
+                        const splitParts = text.split("---EMAIL_SPLIT---").map((s: string) => s.trim());
+                        if (splitParts[qIdx]) loaded[`${pIdx}_${qIdx}`] = splitParts[qIdx];
+                      } else {
+                        loaded[`${pIdx}_${qIdx}`] = text;
+                      }
                     }
                   }
                 });
@@ -577,6 +612,33 @@ function WritingExamRunnerContent() {
             setAiResult(sub);
             setAiEvaluationStatus("completed");
             clearInterval(pollInterval);
+            if (typeof window !== "undefined" && examId) {
+              try {
+                const answeredCount = Object.values(answers).filter(
+                  (v) => typeof v === "string" && v.trim().length > 0
+                ).length;
+                const totalCount = parts.reduce((sum, p) => sum + p.questions.length, 0);
+                const aiScoredCount = Array.isArray(sub.ai_results)
+                  ? sub.ai_results.filter((r: any) => (Number(r.score) || 0) > 0).length
+                  : answeredCount;
+                const scoreVal = sub.writing_score ?? sub.total_score;
+                localStorage.setItem(
+                  `aptis_exam_progress_${examId}`,
+                  JSON.stringify({
+                    examId,
+                    status: "completed",
+                    correctQuestions: aiScoredCount > 0 ? aiScoredCount : answeredCount,
+                    answeredQuestions: answeredCount,
+                    totalQuestions: totalCount,
+                    completedParts: parts.length || 1,
+                    totalParts: parts.length || 1,
+                    ...(scoreVal != null ? { bestScore: `${Math.round(scoreVal)}/50` } : {}),
+                    ...(sub.cefr_level ? { bestCefr: sub.cefr_level } : {}),
+                    updatedAt: new Date().toISOString(),
+                  })
+                );
+              } catch {}
+            }
           }
         }
       } catch (e) {
@@ -628,6 +690,28 @@ function WritingExamRunnerContent() {
     }
 
     // Chuyển sang Review Mode với Right Review Panel hiển thị trạng thái chấm Live
+    if (typeof window !== "undefined" && examId) {
+      try {
+        const answeredCount = Object.values(answers).filter(
+          (v) => typeof v === "string" && v.trim().length > 0
+        ).length;
+        const totalCount = parts.reduce((sum, p) => sum + p.questions.length, 0);
+        localStorage.removeItem(`aptis_draft_writing_${examId}`);
+        localStorage.setItem(
+          `aptis_exam_progress_${examId}`,
+          JSON.stringify({
+            examId,
+            status: "completed",
+            correctQuestions: answeredCount,
+            answeredQuestions: answeredCount,
+            totalQuestions: totalCount,
+            completedParts: parts.length || 1,
+            totalParts: parts.length || 1,
+            updatedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
     setIsReviewMode(true);
     setAiEvaluationStatus("evaluating");
   };

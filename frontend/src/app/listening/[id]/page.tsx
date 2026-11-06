@@ -1424,6 +1424,40 @@ function ListeningExamRunnerContent() {
 
   const results = calculateResults();
 
+  const totalAnsweredCount =
+    Object.values(p1Answers).filter(Boolean).length +
+    Object.values(p2Answers).filter(Boolean).length +
+    Object.values(p3Answers).filter(Boolean).length +
+    Object.values(p4Answers).filter(Boolean).length;
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !examId || isReviewMode || isSubmitted) return;
+    if (totalAnsweredCount > 0) {
+      try {
+        localStorage.setItem(
+          `aptis_exam_progress_${examId}`,
+          JSON.stringify({
+            examId,
+            status: "in_progress",
+            correctQuestions: results.totalCorrect,
+            answeredQuestions: totalAnsweredCount,
+            totalQuestions: results.totalQuestionsInExam,
+            completedParts: 1,
+            totalParts: 1,
+            updatedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
+  }, [
+    examId,
+    isReviewMode,
+    isSubmitted,
+    totalAnsweredCount,
+    results.totalCorrect,
+    results.totalQuestionsInExam,
+  ]);
+
   // Helper tính kết quả từng stage/câu hỏi phục vụ Mục lục xem lại
   const getStageResult = (stageIdx: number) => {
     const stage = listeningStages[stageIdx];
@@ -1548,6 +1582,7 @@ function ListeningExamRunnerContent() {
       if (typeof window !== "undefined" && examId) {
         try {
           localStorage.removeItem(`aptis_draft_listening_${examId}`);
+          localStorage.removeItem(`aptis_exam_progress_${examId}`);
         } catch {}
       }
       setP1Answers({});
@@ -1584,6 +1619,21 @@ function ListeningExamRunnerContent() {
     if (typeof window !== "undefined" && examId) {
       try {
         localStorage.removeItem(`aptis_draft_listening_${examId}`);
+        localStorage.setItem(
+          `aptis_exam_progress_${examId}`,
+          JSON.stringify({
+            examId,
+            status: "completed",
+            correctQuestions: results.totalCorrect,
+            answeredQuestions: totalAnsweredCount,
+            totalQuestions: results.totalQuestionsInExam,
+            completedParts: 1,
+            totalParts: 1,
+            bestScore: `${results.totalScore}/${results.maxScore}`,
+            bestCefr: results.cefr,
+            updatedAt: new Date().toISOString(),
+          })
+        );
       } catch {}
     }
     let subId = submissionId;

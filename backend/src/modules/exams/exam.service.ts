@@ -201,6 +201,48 @@ export class ExamService {
         const userAttempts = userSubs.length;
         let lastAttemptedAt: Date | null = null;
 
+        // Helper trích xuất mảng đáp án chuẩn của câu hỏi sắp xếp câu (Reading Part 2 SENTENCE_ORDER)
+        const resolveSentenceOrderCorrectArray = (q: any): string[] => {
+          if (q.correct_answer) {
+            try {
+              const parsed = JSON.parse(q.correct_answer);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed.map(String);
+              }
+            } catch {}
+          }
+          let optsObj: any = q.options;
+          if (typeof optsObj === 'string') {
+            try {
+              optsObj = JSON.parse(optsObj);
+            } catch {}
+          }
+          if (Array.isArray(optsObj)) {
+            if (optsObj.length >= 8) {
+              const mid = Math.ceil(optsObj.length / 2);
+              const st1 = optsObj.slice(0, mid);
+              const st2 = optsObj.slice(mid);
+              const st1HasFixed = st1.length < 5;
+              const st2HasFixed = st2.length < 5;
+              const order1 = (st1HasFixed ? st1.slice(1) : st1).map(
+                (_: any, idx: number) => `s${idx + (st1HasFixed ? 2 : 1)}`
+              );
+              const order2 = (st2HasFixed ? st2.slice(1) : st2).map(
+                (_: any, idx: number) => `s${mid + idx + (st2HasFixed ? 2 : 1)}`
+              );
+              return [...order1, ...order2];
+            } else if (optsObj.length >= 4) {
+              const hasFixed = optsObj.length < 5;
+              return (hasFixed ? optsObj.slice(1) : optsObj).map(
+                (_: any, idx: number) => `s${idx + (hasFixed ? 2 : 1)}`
+              );
+            }
+          } else if (optsObj && Array.isArray(optsObj.sentences) && optsObj.sentences.length > 0) {
+            return optsObj.sentences.map((s: any, idx: number) => String(s?.id || `s${idx + 1}`));
+          }
+          return [];
+        };
+
         // Tính tổng số câu hỏi thực tế (hỗ trợ cả Reading Part 2 SENTENCE_ORDER lưu mảng câu trong 1 Question & Writing Part 4 2 emails)
         const allExamQuestions = exam.parts.flatMap((p) => p.questions || []);
         let effectiveTotalQuestions = 0;
@@ -215,14 +257,12 @@ export class ExamService {
             continue;
           }
           for (const q of pQuestions) {
-            if (q.question_type === QuestionType.SENTENCE_ORDER && q.correct_answer) {
-              try {
-                const corArr = JSON.parse(q.correct_answer);
-                if (Array.isArray(corArr) && corArr.length > 0) {
-                  effectiveTotalQuestions += corArr.length;
-                  continue;
-                }
-              } catch {}
+            if (q.question_type === QuestionType.SENTENCE_ORDER) {
+              const corArr = resolveSentenceOrderCorrectArray(q);
+              if (corArr.length > 0) {
+                effectiveTotalQuestions += corArr.length;
+                continue;
+              }
             }
             effectiveTotalQuestions += 1;
           }
@@ -261,64 +301,74 @@ export class ExamService {
           let correctCount = 0;
           const isSubjectiveExam = exam.skill === 'WRITING' || exam.skill === 'SPEAKING';
 
-          for (const q of allExamQuestions) {
-            const ans = ansByQId.get(String(q.id));
-            const ai = aiByQId.get(String(q.id));
-            const hasResp = hasValidAnswerResponse(ans);
+          for (const p of exam.parts) {
+            const pQuestions = p.questions || [];
+            const isWritingP4Single =
+              exam.skill === 'WRITING' &&
+              pQuestions.length === 1 &&
+              (p.part_number === 4 || /part\s*4|email/i.test(`${p.title || ''} ${exam.title || ''}`));
 
-            if (isSubjectiveExam) {
-              if (hasResp || ai) {
-                answeredCount += 1;
-                if (ai) {
-                  if (Number(ai.score || 0) > 0) correctCount += 1;
-                } else if (ans?.score != null && Number(ans.score) > 0) {
-                  correctCount += 1;
-                } else if (hasResp) {
-                  correctCount += 1;
-                }
-              }
-              continue;
-            }
+            for (const q of pQuestions) {
+              const ans = ansByQId.get(String(q.id));
+              const ai = aiByQId.get(String(q.id));
+              const hasResp = hasValidAnswerResponse(ans);
 
-            if (q.question_type === QuestionType.SENTENCE_ORDER) {
-              let corArr: string[] = [];
-              try {
-                if (q.correct_answer) {
-                  const p = JSON.parse(q.correct_answer);
-                  if (Array.isArray(p)) corArr = p;
-                }
-              } catch {}
-              if (corArr.length > 0) {
-                let userArr: string[] = [];
-                if (hasResp) {
-                  try {
-                    const u = JSON.parse(String(ans.selected_option || ans.text_answer || '[]'));
-                    if (Array.isArray(u)) userArr = u;
-                  } catch {}
-                }
-                const filledSlots = userArr.filter(Boolean).length;
-                answeredCount += Math.min(corArr.length, filledSlots);
-                for (let i = 0; i < corArr.length; i++) {
-                  if (userArr[i] && userArr[i] === corArr[i]) {
-                    correctCount += 1;
+              if (isSubjectiveExam) {
+                if (hasResp || ai) {
+                  let itemCount = 1;
+                  if (isWritingP4Single && ans?.text_answer) {
+                    const splitEmails = String(ans.text_answer)
+                      .split('---EMAIL_SPLIT---')
+                      .map((s) => s.trim())
+                      .filter(Boolean);
+                    itemCount = Math.min(2, Math.max(1, splitEmails.length));
+                  }
+                  answeredCount += itemCount;
+                  if (ai) {
+                    if (Number(ai.score || 0) > 0) correctCount += itemCount;
+                  } else if (ans?.score != null && Number(ans.score) > 0) {
+                    correctCount += itemCount;
+                  } else if (hasResp) {
+                    correctCount += itemCount;
                   }
                 }
                 continue;
               }
-            }
 
-            if (hasResp) {
-              answeredCount += 1;
-              const userChoice = String(ans.selected_option || ans.text_answer || '');
-              const graded = gradeObjectiveQuestion(
-                q.question_type,
-                q.correct_answer,
-                userChoice,
-                q.max_score,
-                q.options
-              );
-              if (graded.isCorrect || (ans.score != null && Number(ans.score) > 0)) {
-                correctCount += 1;
+              if (q.question_type === QuestionType.SENTENCE_ORDER) {
+                const corArr = resolveSentenceOrderCorrectArray(q);
+                if (corArr.length > 0) {
+                  let userArr: string[] = [];
+                  if (hasResp) {
+                    try {
+                      const u = JSON.parse(String(ans.selected_option || ans.text_answer || '[]'));
+                      if (Array.isArray(u)) userArr = u;
+                    } catch {}
+                  }
+                  const filledSlots = userArr.filter(Boolean).length;
+                  answeredCount += Math.min(corArr.length, filledSlots);
+                  for (let i = 0; i < corArr.length; i++) {
+                    if (userArr[i] && userArr[i] === corArr[i]) {
+                      correctCount += 1;
+                    }
+                  }
+                  continue;
+                }
+              }
+
+              if (hasResp) {
+                answeredCount += 1;
+                const userChoice = String(ans.selected_option || ans.text_answer || '');
+                const graded = gradeObjectiveQuestion(
+                  q.question_type,
+                  q.correct_answer,
+                  userChoice,
+                  q.max_score,
+                  q.options
+                );
+                if (graded.isCorrect || (ans.score != null && Number(ans.score) > 0)) {
+                  correctCount += 1;
+                }
               }
             }
           }
@@ -331,12 +381,15 @@ export class ExamService {
 
         if (userSubs.length > 0) {
           lastAttemptedAt = userSubs[0].submitted_at || userSubs[0].started_at;
-          const completedSubs = userSubs.filter(
-            (s) =>
-              s.status === 'GRADED' ||
-              s.status === 'SUBMITTED' ||
-              s.status === 'PENDING_EVALUATION'
-          );
+          // Lọc các phiên đã hoàn thành thực sự (loại bỏ các phiên SUBMITTED ảo do hết hạn mà chưa trả lời câu nào và chưa có điểm)
+          const completedSubs = userSubs.filter((s) => {
+            if (s.status === 'GRADED' || s.status === 'PENDING_EVALUATION') return true;
+            if (s.status === 'SUBMITTED') {
+              const acc = evaluateSubmissionAccuracy(s);
+              return acc.answeredCount > 0 || s.total_score != null;
+            }
+            return false;
+          });
 
           if (completedSubs.length > 0) {
             userStatus = 'COMPLETED';
@@ -670,18 +723,24 @@ export class ExamService {
     if (userId) {
       const userSubs = await prisma.examSubmission.findMany({
         where: { user_id: userId, exam_id: exam.id },
+        include: {
+          _count: { select: { answers: true } },
+        },
         orderBy: { started_at: 'desc' },
       });
-      userAttempts = userSubs.length;
+      userAttempts = userSubs.filter(
+        (s) => s.status !== 'IN_PROGRESS' || (s._count?.answers ?? 0) > 0
+      ).length;
 
       if (userSubs.length > 0) {
         lastAttemptedAt = userSubs[0].submitted_at || userSubs[0].started_at;
-        const completedSubs = userSubs.filter(
-          (s) =>
-            s.status === 'GRADED' ||
-            s.status === 'SUBMITTED' ||
-            s.status === 'PENDING_EVALUATION'
-        );
+        const completedSubs = userSubs.filter((s) => {
+          if (s.status === 'GRADED' || s.status === 'PENDING_EVALUATION') return true;
+          if (s.status === 'SUBMITTED') {
+            return (s._count?.answers ?? 0) > 0 || s.total_score != null;
+          }
+          return false;
+        });
 
         if (completedSubs.length > 0) {
           userStatus = 'COMPLETED';
@@ -710,7 +769,7 @@ export class ExamService {
             const maxScale = exam.skill === 'FULL_TEST' ? 200 : 50;
             bestScore = `${bestScoreNumber}/${maxScale}`;
           }
-        } else if (userSubs.some((s) => s.status === 'IN_PROGRESS')) {
+        } else if (userSubs.some((s) => s.status === 'IN_PROGRESS' && (s._count?.answers ?? 0) > 0)) {
           userStatus = 'IN_PROGRESS';
         }
       }

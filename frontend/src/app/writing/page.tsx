@@ -38,6 +38,9 @@ interface WritingExam {
   title: string;
   parts: string;
   totalParts: number;
+  completedParts?: number;
+  correctQuestions?: number | null;
+  answeredQuestions?: number | null;
   partTitle?: string | null;
   questionsCount: number;
   duration: string;
@@ -94,6 +97,53 @@ function detectWritingPartNumber(title: string, partTitle?: string | null, total
 
             const pNum = detectWritingPartNumber(exam.title, exam.partTitle, exam.totalParts);
             const isFullWriting = pNum === 0;
+            let completedParts = Number(exam.completedParts || 0);
+            let correctQuestions: number | null =
+              exam.correctQuestions !== undefined && exam.correctQuestions !== null
+                ? Number(exam.correctQuestions)
+                : null;
+            let answeredQuestions: number | null =
+              exam.answeredQuestions !== undefined && exam.answeredQuestions !== null
+                ? Number(exam.answeredQuestions)
+                : null;
+            let questionsCount = Number(
+              exam.totalQuestions || (pNum === 1 ? 5 : pNum === 2 ? 1 : pNum === 3 ? 3 : pNum === 4 ? 2 : 11)
+            );
+            if (pNum === 4 && questionsCount === 1) questionsCount = 2;
+            let bestScore = exam.bestCefr || exam.bestScore || null;
+
+            if (typeof window !== "undefined") {
+              try {
+                const localProgStr = localStorage.getItem(`aptis_exam_progress_${exam.id}`);
+                if (localProgStr) {
+                  const localProg = JSON.parse(localProgStr);
+                  if (localProg.status === "completed") {
+                    status = "completed";
+                    completedParts = isFullWriting ? 4 : 1;
+                  } else if (
+                    localProg.status === "in_progress" &&
+                    status === "not_started" &&
+                    ((localProg.answeredQuestions && localProg.answeredQuestions > 0) ||
+                      (localProg.correctQuestions !== undefined && localProg.correctQuestions !== null))
+                  ) {
+                    status = "in_progress";
+                    completedParts = localProg.completedParts || 1;
+                  }
+                  if (localProg.correctQuestions !== undefined && localProg.correctQuestions !== null) {
+                    correctQuestions = Number(localProg.correctQuestions);
+                  }
+                  if (localProg.answeredQuestions !== undefined && localProg.answeredQuestions !== null) {
+                    answeredQuestions = Number(localProg.answeredQuestions);
+                  }
+                  if (localProg.totalQuestions && Number(localProg.totalQuestions) > 0) {
+                    questionsCount = Number(localProg.totalQuestions);
+                  }
+                  if ((localProg.bestCefr || localProg.bestScore) && !bestScore) {
+                    bestScore = localProg.bestCefr || localProg.bestScore;
+                  }
+                }
+              } catch {}
+            }
 
             // Phân bổ tỷ lệ ưu tiên (Cao, Vừa, Thấp)
             let priority: "HIGH" | "MEDIUM" | "LOW" = "HIGH";
@@ -120,13 +170,16 @@ function detectWritingPartNumber(title: string, partTitle?: string | null, total
               title: exam.title,
               parts: isFullWriting ? "Full Writing · 4 Parts (50 phút)" : (exam.partTitle || partSubtitles[pNum] || `Writing Part ${pNum}`),
               totalParts: isFullWriting ? 4 : 1,
+              completedParts,
+              correctQuestions,
+              answeredQuestions,
               partTitle: exam.partTitle,
               partNumber: pNum,
-              questionsCount: exam.totalQuestions || (pNum === 1 ? 5 : pNum === 2 ? 1 : pNum === 3 ? 3 : 2),
+              questionsCount,
               duration: `${exam.durationMinutes || (isFullWriting ? 50 : pNum === 1 ? 3 : pNum === 2 ? 7 : pNum === 3 ? 10 : 30)} phút`,
               isFree: !exam.isPro,
               status,
-              bestScore: exam.bestScore,
+              bestScore,
               bestScoreNumber: exam.bestScoreNumber,
               userAttempts: exam.userAttempts || 0,
               priority,
@@ -172,8 +225,8 @@ function detectWritingPartNumber(title: string, partTitle?: string | null, total
       filterStatus === "all"
         ? true
         : filterStatus === "completed"
-        ? e.status === "completed"
-        : e.status !== "completed";
+        ? e.status === "completed" || e.status === "in_progress"
+        : e.status === "not_started";
     const matchesPriority =
       filterPriority === "all"
         ? true
@@ -384,7 +437,11 @@ function detectWritingPartNumber(title: string, partTitle?: string | null, total
                     cloverLevel={exam.hotLevel}
                     trophyText={exam.bestScore}
                     status={exam.status}
+                    completedParts={exam.completedParts}
                     totalParts={exam.totalParts || 1}
+                    correctQuestions={exam.correctQuestions}
+                    answeredQuestions={exam.answeredQuestions}
+                    questionsCount={exam.questionsCount}
                     targetUrl={targetUrl}
                   />
                 );

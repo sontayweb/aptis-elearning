@@ -9,11 +9,11 @@ export const autosaveAnswerSchema = z.object({
   answers: z
     .array(
       z.object({
-        questionId: z.string().uuid(),
-        selectedOption: z.string().max(50, 'Lựa chọn không hợp lệ').nullable().optional(),
+        questionId: z.string().min(1),
+        selectedOption: z.string().max(2000, 'Lựa chọn không hợp lệ').nullable().optional(),
         textAnswer: z
           .string()
-          .max(3000, 'Bài viết vượt quá giới hạn 3,000 ký tự cho phép')
+          .max(5000, 'Bài viết vượt quá giới hạn 5,000 ký tự cho phép')
           .nullable()
           .optional(),
         audioUrl: z.string().max(1000).nullable().optional(),

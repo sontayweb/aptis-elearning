@@ -38,8 +38,13 @@ export const optionalAuthGuard = (
     try {
       const decoded = verifyAccessToken(token);
       req.user = decoded;
-    } catch {
-      // Bỏ qua lỗi token hết hạn/không hợp lệ cho guard tùy chọn
+    } catch (err: any) {
+      // Nếu client có gửi Bearer token nhưng token đã hết hạn (TokenExpiredError),
+      // trả về 401 để kích hoạt Silent Auto-Refresh ở Frontend thay vì âm thầm hạ xuống Guest
+      if (err?.name === 'TokenExpiredError') {
+        sendError(res, 'Phiên đăng nhập đã hết hạn, vui lòng làm mới token', 401, 'TOKEN_EXPIRED');
+        return;
+      }
     }
   }
   next();

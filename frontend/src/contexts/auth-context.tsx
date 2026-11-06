@@ -105,7 +105,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = async () => {
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("accessToken") || localStorage.getItem("refreshToken")
+          : null;
       if (!token) {
         setUser(null);
         setLoading(false);
@@ -113,14 +116,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const res = await api.auth.getMe();
       if (res.success && res.data) {
-        setUser(normalizeUserProfile(res.data));
+        const normalized = normalizeUserProfile(res.data);
+        setUser(normalized);
+        if (typeof window !== "undefined" && normalized) {
+          try {
+            localStorage.setItem("aptis_cached_user_profile", JSON.stringify(normalized));
+          } catch {}
+        }
+      } else if (res.error?.code === "NETWORK_ERROR") {
+        // Nếu rớt mạng tạm thời hoặc server đang khởi động lại, giữ nguyên phiên từ cache thay vì xóa token
+        if (typeof window !== "undefined" && !user) {
+          try {
+            const cached = localStorage.getItem("aptis_cached_user_profile");
+            if (cached) setUser(JSON.parse(cached));
+          } catch {}
+        }
       } else {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        setUser(null);
+        // Chỉ khi cả accessToken và refreshToken đều không còn hợp lệ (401/403 sau khi đã thử auto-refresh)
+        if (!localStorage.getItem("accessToken") && !localStorage.getItem("refreshToken")) {
+          localStorage.removeItem("aptis_cached_user_profile");
+          setUser(null);
+        } else {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("aptis_cached_user_profile");
+          setUser(null);
+        }
       }
     } catch {
-      setUser(null);
+      // Giữ trạng thái hiện tại nếu lỗi ngoại lệ mạng
     } finally {
       setLoading(false);
     }
@@ -191,6 +215,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("aptis_cached_user_profile");
     setUser(null);
   };
 
