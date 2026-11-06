@@ -81,13 +81,9 @@ export function resolveDisplayUrl(url: string | null | undefined): string {
   if (trimmed.startsWith("speaking/")) {
     return `https://files.aptisacademy.com.vn/${trimmed}`;
   }
-  // Nếu là /uploads/... ở môi trường production -> lấy từ api.aptisesolpremier.com
+  // Nếu là /uploads/... thì dùng relative path để frontend Next.js tự serve từ /public
   if (trimmed.startsWith("/uploads/") || trimmed.startsWith("uploads/")) {
-    const clean = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
-    if (typeof window !== "undefined" && window.location.hostname.includes("aptisesolpremier.com")) {
-      return `https://api.aptisesolpremier.com${clean}`;
-    }
-    return clean;
+    return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
   }
   return trimmed;
 }
