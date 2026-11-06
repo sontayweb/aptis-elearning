@@ -186,31 +186,31 @@ export const ExamListView: React.FC<ExamListViewProps> = ({
               { value: "ALL", label: "Tất cả độ Hot" },
               {
                 value: "HOT_5",
-                label: "5 Sao",
+                label: "☘️ 5 Cỏ",
                 activeClass:
                   "bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800 font-bold shadow-xs",
               },
               {
                 value: "HOT_4",
-                label: "4 Sao",
+                label: "☘️ 4 Cỏ",
                 activeClass:
                   "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700 font-bold",
               },
               {
                 value: "HOT_3",
-                label: "3 Sao",
+                label: "☘️ 3 Cỏ",
                 activeClass:
                   "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-700 font-bold",
               },
               {
                 value: "HOT_2",
-                label: "2 Sao",
+                label: "☘️ 2 Cỏ",
                 activeClass:
                   "bg-teal-50/70 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800 font-semibold",
               },
               {
                 value: "HOT_1",
-                label: "1 Sao",
+                label: "☘️ 1 Cỏ",
                 activeClass:
                   "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-semibold",
               },

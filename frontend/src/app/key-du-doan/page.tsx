@@ -224,7 +224,7 @@ export default function KeyDuDoanPage() {
               </div>
               <div>
                 <h3 className="font-heading font-bold text-base md:text-lg text-foreground">
-                  Ưu tiên luyện trước các đề từ 4 sao đến 5 sao
+                  Ưu tiên luyện trước các đề từ 4 Cỏ đến 5 Cỏ (☘️)
                 </h3>
                 <p className="text-xs md:text-sm text-muted-foreground">
                   Các bộ đề Speaking, Writing, Reading và Listening có độ Hot càng cao thì tần suất gặp lại trong đợt thi hiện tại càng lớn.
@@ -380,7 +380,7 @@ export default function KeyDuDoanPage() {
                               <span>VIP PRO · ĐÃ MỞ</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-amber-500/30">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
                               <Lock className="w-2.5 h-2.5" />
                               <span>VIP PRO</span>
                             </span>

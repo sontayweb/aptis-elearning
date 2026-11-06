@@ -83,7 +83,7 @@ export const BulkHotLevelModal: React.FC<Props> = ({ isOpen, onClose, defaultSki
           {LEVELS.map((lv) => (
             <div key={lv}>
               <label className="font-semibold block mb-1">
-                {lv === 0 ? "Gỡ độ hot (0)" : `${lv} Sao (Mức ${lv})`}
+                {lv === 0 ? "Gỡ độ hot (0 Cỏ)" : `☘️ ${lv} Cỏ (Mức ${lv})`}
               </label>
               <textarea
                 rows={lv >= 3 ? 3 : 2}
