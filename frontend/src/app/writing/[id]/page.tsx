@@ -570,11 +570,10 @@ function WritingExamRunnerContent() {
         if (!isSubscribed) return;
         if (res.success && res.data) {
           const sub = res.data;
-          if (
-            sub.status === "GRADED" ||
-            (Array.isArray(sub.ai_results) && sub.ai_results.length > 0) ||
-            (sub.total_score != null && sub.total_score > 0)
-          ) {
+          if (Array.isArray(sub.ai_results) && sub.ai_results.length > 0) {
+            setAiResult(sub);
+          }
+          if (sub.status === "GRADED") {
             setAiResult(sub);
             setAiEvaluationStatus("completed");
             clearInterval(pollInterval);

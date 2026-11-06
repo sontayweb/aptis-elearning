@@ -13,6 +13,8 @@ import {
   Volume2,
   ChevronDown,
   Lightbulb,
+  ArrowRight,
+  Loader2,
 } from "lucide-react";
 import type { SpeakingQuestion } from "@/lib/speaking/speaking-exam-utils";
 import { formatTimerDisplay } from "@/lib/speaking/speaking-exam-utils";
@@ -32,6 +34,7 @@ export interface SpeakingRecorderConsoleProps {
       aiResult?: any;
       prepNotes?: string;
       isCompleted?: boolean;
+      isUploaded?: boolean;
     }
   >;
   setIsSubmitted: (sub: boolean) => void;
@@ -52,7 +55,10 @@ export interface SpeakingRecorderConsoleProps {
   currentDuration: number;
   currentAudioUrl?: string | null;
   handleRetry: () => void;
-  handleAIEvaluation: () => void;
+  handleAIEvaluation?: () => void;
+  onNextQuestion?: () => void;
+  onFinishExam?: () => void;
+  onOpenCompletionModal?: () => void;
   isEvaluating: boolean;
   currentAiResult: any;
   showDetailedFeedback: boolean;
@@ -83,7 +89,9 @@ export function SpeakingRecorderConsole({
   currentDuration,
   currentAudioUrl,
   handleRetry,
-  handleAIEvaluation,
+  onNextQuestion,
+  onFinishExam,
+  onOpenCompletionModal,
   isEvaluating,
   currentAiResult,
   showDetailedFeedback,
@@ -160,7 +168,10 @@ export function SpeakingRecorderConsole({
           <div className="pt-2 border-t border-border">
             <button
               type="button"
-              onClick={() => setIsSubmitted(true)}
+              onClick={() => {
+                if (onOpenCompletionModal) onOpenCompletionModal();
+                else setIsSubmitted(true);
+              }}
               className="w-full py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-colors cursor-pointer"
             >
               Xem báo cáo điểm tổng quan
@@ -170,7 +181,7 @@ export function SpeakingRecorderConsole({
       )}
 
       {/* 0. STAGE: READY */}
-      {stage === "ready" && (
+      {!isReviewMode && stage === "ready" && (
         <div className="rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
           <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
             <Clock className="w-6 h-6 text-primary" />
@@ -207,7 +218,7 @@ export function SpeakingRecorderConsole({
       )}
 
       {/* 1. STAGE: PREPARATION COUNTDOWN */}
-      {stage === "prep" && (
+      {!isReviewMode && stage === "prep" && (
         <div className="rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-xs border border-amber-500/30">
             <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
@@ -321,7 +332,7 @@ export function SpeakingRecorderConsole({
       )}
 
       {/* 2. STAGE: ACTIVE RECORDING */}
-      {stage === "speaking" && (
+      {!isReviewMode && stage === "speaking" && (
         <div className="rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
           <span
             className={`text-xs font-bold flex items-center gap-1.5 ${isSpeakingPaused || isMicPaused ? "text-amber-500" : "text-destructive"
@@ -354,7 +365,7 @@ export function SpeakingRecorderConsole({
                 strokeWidth="6"
                 fill="transparent"
                 strokeDasharray={264}
-                strokeDashoffset={264 - (264 * timer) / (currentQ.speakTime || 30)}
+                strokeDashoffset={264 - (264 * timer) / (currentQ.speakTime || (currentQ.partNumber === 4 ? 120 : currentQ.partNumber === 1 ? 30 : 45))}
                 strokeLinecap="round"
                 className={`${isSpeakingPaused || isMicPaused ? "text-amber-500" : "text-destructive"
                   } transition-all duration-1000 ease-linear`}
@@ -437,17 +448,21 @@ export function SpeakingRecorderConsole({
       )}
 
       {/* 3. STAGE: FINISHED & REVIEW AUDIO */}
-      {stage === "finished" && (
+      {(stage === "finished" || isReviewMode) && (
         <div className="rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
           <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
             <CheckCircle2 className="w-6 h-6" />
           </div>
           <div className="space-y-1">
             <h4 className="font-heading font-bold text-sm text-foreground">
-              Đã ghi âm ({currentDuration}s)
+              {currentAudioUrl ? `Đã ghi âm (${currentDuration}s)` : "Chưa có bản ghi âm"}
             </h4>
             <p className="text-[11px] text-muted-foreground">
-              Bạn có thể nghe lại câu nói hoặc chấm điểm AI
+              {isReviewMode
+                ? currentAudioUrl
+                  ? "Nghe lại bản thu âm và xem nhận xét chi tiết từ AI bên dưới"
+                  : "Câu hỏi này chưa được thu âm trong lượt làm bài"
+                : "Bản thu âm đã sẵn sàng. Bạn có thể nghe lại, nói lại hoặc chuyển câu."}
             </p>
           </div>
 
@@ -455,28 +470,52 @@ export function SpeakingRecorderConsole({
             <SpeakingAudioPlayer src={currentAudioUrl} duration={currentDuration} />
           )}
 
-          <div className="w-full space-y-2 pt-1">
-            <button
-              type="button"
-              onClick={handleRetry}
-              className="w-full py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Nói lại</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAIEvaluation()}
-              disabled={isEvaluating}
-              className="tech-btn w-full py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{isEvaluating ? "AI đang chấm..." : "Chấm điểm với AI"}</span>
-            </button>
-          </div>
+          {!isReviewMode && (
+            <div className="w-full space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={handleRetry}
+                className="w-full py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Nói lại câu này</span>
+              </button>
+              {currentIndex < questions.length - 1 ? (
+                <button
+                  type="button"
+                  onClick={onNextQuestion}
+                  className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>Câu tiếp theo</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onFinishExam}
+                  className="tech-btn w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold shadow-xs hover:opacity-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Hoàn tất & Nộp bài chấm AI</span>
+                </button>
+              )}
+            </div>
+          )}
 
-          {/* AI Score Badge if evaluated */}
-          {currentAiResult && (
+          {isReviewMode && isEvaluating && !currentAiResult && (
+            <div className="w-full p-4 rounded-2xl border border-primary/25 bg-primary/5 flex flex-col items-center gap-2 text-center">
+              <Loader2 className="w-5 h-5 text-primary animate-spin" />
+              <span className="text-xs font-bold text-primary">
+                AI đang phân tích giọng nói & chấm điểm bài thi...
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                Kết quả sẽ tự động hiển thị ngay khi hoàn tất (khoảng 5–10 giây).
+              </span>
+            </div>
+          )}
+
+          {/* AI Score Badge if evaluated in Review Mode */}
+          {isReviewMode && currentAiResult && (
             <div className="w-full rounded-2xl bg-gradient-to-b from-primary/10 via-primary/5 to-card border border-primary/25 text-left p-4 space-y-3.5 text-xs shadow-sm">
               <div className="flex items-center justify-between border-b border-primary/15 pb-2.5">
                 <div className="flex items-center gap-1.5 font-bold text-foreground">
@@ -513,7 +552,7 @@ export function SpeakingRecorderConsole({
                   <div className="p-2 rounded-xl bg-card border border-border/60 flex flex-col justify-between">
                     <span className="text-muted-foreground text-[10px]">Phát âm (Pron.)</span>
                     <div className="flex items-center justify-between font-bold text-foreground mt-1">
-                      <span>{currentAiResult.pronunciation ?? 38}</span>
+                      <span>{currentAiResult.pronunciation ?? 0}</span>
                       <span className="text-[10px] text-muted-foreground font-normal">/50</span>
                     </div>
                     <div className="w-full bg-muted h-1 rounded-full overflow-hidden mt-1.5">
@@ -522,7 +561,7 @@ export function SpeakingRecorderConsole({
                         style={{
                           width: `${Math.min(
                             100,
-                            ((currentAiResult.pronunciation ?? 38) / 50) * 100
+                            ((currentAiResult.pronunciation ?? 0) / 50) * 100
                           )}%`,
                         }}
                       />
@@ -533,7 +572,7 @@ export function SpeakingRecorderConsole({
                   <div className="p-2 rounded-xl bg-card border border-border/60 flex flex-col justify-between">
                     <span className="text-muted-foreground text-[10px]">Lưu loát (Fluency)</span>
                     <div className="flex items-center justify-between font-bold text-foreground mt-1">
-                      <span>{currentAiResult.fluency ?? 38}</span>
+                      <span>{currentAiResult.fluency ?? 0}</span>
                       <span className="text-[10px] text-muted-foreground font-normal">/50</span>
                     </div>
                     <div className="w-full bg-muted h-1 rounded-full overflow-hidden mt-1.5">
@@ -542,7 +581,7 @@ export function SpeakingRecorderConsole({
                         style={{
                           width: `${Math.min(
                             100,
-                            ((currentAiResult.fluency ?? 38) / 50) * 100
+                            ((currentAiResult.fluency ?? 0) / 50) * 100
                           )}%`,
                         }}
                       />
@@ -553,7 +592,7 @@ export function SpeakingRecorderConsole({
                   <div className="p-2 rounded-xl bg-card border border-border/60 flex flex-col justify-between">
                     <span className="text-muted-foreground text-[10px]">Ngữ pháp (Grammar)</span>
                     <div className="flex items-center justify-between font-bold text-foreground mt-1">
-                      <span>{currentAiResult.grammar ?? 35}</span>
+                      <span>{currentAiResult.grammar ?? 0}</span>
                       <span className="text-[10px] text-muted-foreground font-normal">/50</span>
                     </div>
                     <div className="w-full bg-muted h-1 rounded-full overflow-hidden mt-1.5">
@@ -562,7 +601,7 @@ export function SpeakingRecorderConsole({
                         style={{
                           width: `${Math.min(
                             100,
-                            ((currentAiResult.grammar ?? 35) / 50) * 100
+                            ((currentAiResult.grammar ?? 0) / 50) * 100
                           )}%`,
                         }}
                       />
@@ -573,7 +612,7 @@ export function SpeakingRecorderConsole({
                   <div className="p-2 rounded-xl bg-card border border-border/60 flex flex-col justify-between">
                     <span className="text-muted-foreground text-[10px]">Từ vựng (Vocab.)</span>
                     <div className="flex items-center justify-between font-bold text-foreground mt-1">
-                      <span>{currentAiResult.vocabulary ?? 38}</span>
+                      <span>{currentAiResult.vocabulary ?? 0}</span>
                       <span className="text-[10px] text-muted-foreground font-normal">/50</span>
                     </div>
                     <div className="w-full bg-muted h-1 rounded-full overflow-hidden mt-1.5">
@@ -582,7 +621,7 @@ export function SpeakingRecorderConsole({
                         style={{
                           width: `${Math.min(
                             100,
-                            ((currentAiResult.vocabulary ?? 38) / 50) * 100
+                            ((currentAiResult.vocabulary ?? 0) / 50) * 100
                           )}%`,
                         }}
                       />

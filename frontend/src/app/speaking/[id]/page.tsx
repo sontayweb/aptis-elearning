@@ -139,6 +139,7 @@ function SpeakingExamRunnerContent() {
         aiResult?: any;
         prepNotes?: string;
         isCompleted?: boolean;
+        isUploaded?: boolean;
       }
     >
   >({});
@@ -147,6 +148,8 @@ function SpeakingExamRunnerContent() {
   const [isReviewMode, setIsReviewMode] = useState(false);
   const [showMicPrompt, setShowMicPrompt] = useState(true);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [overallScore, setOverallScore] = useState<number | null>(null);
+  const [overallCefr, setOverallCefr] = useState<string | null>(null);
 
   const [aiResult, setAiResult] = useState<{
     band: string;
@@ -367,54 +370,53 @@ function SpeakingExamRunnerContent() {
             setIsSubmitted(true);
             setStage("finished");
 
-            // Phục hồi audio, duration, aiResult vào recordedData
+            const aiResultsList: any[] = Array.isArray(sub.ai_results) ? sub.ai_results : [];
+            const answersList: any[] = Array.isArray(sub.answers) ? sub.answers : [];
+
             const restoredRecords: Record<number, any> = {};
             questions.forEach((q, idx) => {
-              const foundAns = (sub.answers || []).find(
+              const foundAns = answersList.find(
                 (a: any) => String(a.question_id || a.questionId) === String(q.id)
               );
-              if (foundAns) {
-                const aiResultObj =
-                  foundAns.ai_score !== undefined || foundAns.ai_band
-                    ? {
-                        score: foundAns.ai_score ?? 0,
-                        band: foundAns.ai_band ?? (sub.cefrBand || "B1"),
-                        pronunciation: foundAns.pronunciation_score ?? 0,
-                        fluency: foundAns.fluency_score ?? 0,
-                        grammar: foundAns.grammar_score ?? 0,
-                        vocabulary: foundAns.vocabulary_score ?? 0,
-                        transcript: foundAns.transcript || foundAns.text_answer || "",
-                        feedback: foundAns.ai_feedback
-                          ? [foundAns.ai_feedback]
-                          : sub.teacherNotes
-                          ? [sub.teacherNotes]
-                          : [],
-                        detailedFeedback: [],
-                        strengths: [],
-                        upgrades: [],
-                      }
-                    : sub.score !== undefined
-                    ? {
-                        score: sub.score,
-                        band: sub.cefrBand || "B1",
-                        pronunciation: 0,
-                        fluency: 0,
-                        grammar: 0,
-                        vocabulary: 0,
-                        transcript: foundAns.transcript || "",
-                        feedback: sub.teacherNotes ? [sub.teacherNotes] : [],
-                        detailedFeedback: [],
-                        strengths: [],
-                        upgrades: [],
-                      }
-                    : null;
+              const foundAi = aiResultsList.find(
+                (r: any) => String(r.question_id || r.questionId) === String(q.id)
+              );
 
+              const aiResultObj = foundAi
+                ? {
+                    score: typeof foundAi.score === "number" ? foundAi.score : 0,
+                    band: foundAi.cefr_level ? `CEFR ${foundAi.cefr_level} Target` : "Đã có kết quả AI",
+                    pronunciation: foundAi.pronunciation ?? foundAi.pronunciation_score ?? 0,
+                    fluency: foundAi.fluency_score ?? 0,
+                    grammar: foundAi.grammar_score ?? 0,
+                    vocabulary: foundAi.vocabulary_score ?? 0,
+                    transcript:
+                      foundAi.transcript ||
+                      foundAi.raw_ai_response?.transcribed_speech ||
+                      foundAns?.transcript_text ||
+                      foundAns?.transcript ||
+                      "",
+                    feedback: foundAi.feedback_summary ? [foundAi.feedback_summary] : [],
+                    detailedFeedback: Array.isArray(foundAi.detailed_feedback)
+                      ? foundAi.detailed_feedback
+                      : [],
+                    strengths: Array.isArray(foundAi.detailed_feedback)
+                      ? foundAi.detailed_feedback
+                          .filter((f: any) => f.criterion)
+                          .map((f: any) => f.comment || "")
+                      : [],
+                    upgrades: foundAi.raw_ai_response?.improvement_suggestions || [],
+                  }
+                : null;
+
+              if (foundAns || foundAi) {
                 restoredRecords[idx] = {
-                  audioUrl: foundAns.audio_url || foundAns.audioUrl || null,
-                  duration: foundAns.audio_duration || foundAns.audioDuration || 30,
+                  audioUrl: foundAns?.audio_url || foundAns?.audioUrl || null,
+                  duration: foundAns?.audio_duration || foundAns?.audioDuration || 30,
                   prepNotes: "",
                   aiResult: aiResultObj,
                   isCompleted: true,
+                  isUploaded: true,
                 };
               }
             });
@@ -424,6 +426,20 @@ function SpeakingExamRunnerContent() {
               if (restoredRecords[0]?.aiResult) {
                 setAiResult(restoredRecords[0].aiResult);
               }
+            }
+
+            const finalScore =
+              typeof sub.speaking_score === "number"
+                ? sub.speaking_score
+                : typeof sub.total_score === "number"
+                ? sub.total_score
+                : null;
+            const finalCefr = sub.cefr_level || sub.cefrBand || null;
+            if (finalScore !== null) setOverallScore(finalScore);
+            if (finalCefr) setOverallCefr(finalCefr);
+
+            if (sub.status === "PENDING_EVALUATION") {
+              setIsEvaluating(true);
             }
           }
         } catch (err) {
@@ -449,16 +465,34 @@ function SpeakingExamRunnerContent() {
     initSpeakingSubmission();
   }, [examId, questions.length, isReviewUrl, submissionIdParam]);
 
-  // Làm lại bài thi Speaking mới (forceNew = true)
+  // Làm lại bài thi Speaking mới (forceNew = true) và reset toàn bộ state phòng thi
   const handleRestartExam = async () => {
     try {
       setIsRestarting(true);
-      await api.submissions.start(examId, true);
-      router.push(`/speaking/${examId}`);
-      router.refresh();
+      if (timerRef.current) clearInterval(timerRef.current);
+      inFlightUploadsRef.current = {};
+      resetRecording();
+      const res = await api.submissions.start(examId, true);
+      if (res.success && res.data) {
+        setSubmissionId(res.data.submissionId || res.data.id);
+      }
+      setRecordedData({});
+      setOverallScore(null);
+      setOverallCefr(null);
+      setAiResult(null);
+      setIsEvaluating(false);
+      setIsSubmitted(false);
+      setIsReviewMode(false);
+      setIsCompletedModalOpen(false);
+      setCurrentIndex(0);
+      setStage("ready");
+      setPrepNotes("");
+      const targetUrl = `/speaking/${examId}${targetPart ? `?part=${targetPart}` : ""}`;
+      if (isReviewUrl) {
+        router.replace(targetUrl);
+      }
     } catch (err) {
       console.error("Lỗi khi tạo lượt thi Speaking mới:", err);
-      router.push(`/speaking/${examId}`);
     } finally {
       setIsRestarting(false);
     }
@@ -618,7 +652,7 @@ function SpeakingExamRunnerContent() {
         setTimer(defaultPrep);
       }
     },
-    [questions, recordedData, resetRecording]
+    [questions, recordedData, resetRecording, isReviewMode]
   );
 
   useEffect(() => {
@@ -677,6 +711,9 @@ function SpeakingExamRunnerContent() {
                   isCompleted: true,
                 },
               }));
+              if (res.blob) {
+                uploadQuestionAudioInBackground(currentIndex, res.blob, res.duration);
+              }
             }
             setStage("finished");
           });
@@ -778,6 +815,7 @@ function SpeakingExamRunnerContent() {
   // Nút Thu lại: Làm lại từ đầu câu này
   const handleRetakeSpeaking = async () => {
     if (timerRef.current) clearInterval(timerRef.current);
+    delete inFlightUploadsRef.current[currentIndex];
     await stopRecording();
     resetRecording();
     setIsPrepPaused(false);
@@ -791,6 +829,64 @@ function SpeakingExamRunnerContent() {
     setTimer(pTime);
     setStage("ready");
   };
+
+  const inFlightUploadsRef = useRef<Record<number, Promise<string | null>>>({});
+
+  // Helper upload ngầm file ghi âm của từng câu ngay khi thu xong (Progressive Upload + Deduplication)
+  const uploadQuestionAudioInBackground = useCallback(
+    async (qIdx: number, blob: Blob, duration: number, subIdOverride?: string | null) => {
+      if (inFlightUploadsRef.current[qIdx] !== undefined) {
+        return inFlightUploadsRef.current[qIdx];
+      }
+
+      const uploadTask = (async (): Promise<string | null> => {
+        const q = questions[qIdx];
+        const token =
+          typeof window !== "undefined"
+            ? localStorage.getItem("accessToken") ||
+              localStorage.getItem("token") ||
+              localStorage.getItem("aptis_token")
+            : null;
+        if (!q || !token || !blob) return null;
+
+        let activeSubId = subIdOverride || submissionId;
+        if (!activeSubId && examId) {
+          try {
+            const startRes = await api.submissions.start(examId);
+            if (startRes.success && startRes.data) {
+              activeSubId = startRes.data.submissionId || startRes.data.id;
+              setSubmissionId(activeSubId);
+            }
+          } catch {}
+        }
+        if (!activeSubId) return null;
+
+        try {
+          const remoteUrl = await uploadRecording(activeSubId, q.id, token, blob, duration || 30);
+          if (remoteUrl) {
+            setRecordedData((prev) => ({
+              ...prev,
+              [qIdx]: {
+                ...(prev[qIdx] || {}),
+                audioUrl: prev[qIdx]?.audioUrl || remoteUrl,
+                isUploaded: true,
+              },
+            }));
+            return remoteUrl;
+          }
+        } catch (err) {
+          console.warn(`[Progressive Upload] Lỗi upload câu ${qIdx + 1}:`, err);
+        }
+        return null;
+      })().finally(() => {
+        delete inFlightUploadsRef.current[qIdx];
+      });
+
+      inFlightUploadsRef.current[qIdx] = uploadTask;
+      return uploadTask;
+    },
+    [questions, submissionId, examId, uploadRecording]
+  );
 
   // Nút Hoàn thành (Thí sinh nộp câu nói sớm)
   const handleStopSpeakingEarly = async () => {
@@ -809,6 +905,9 @@ function SpeakingExamRunnerContent() {
           isCompleted: true,
         },
       }));
+      if (res.blob) {
+        uploadQuestionAudioInBackground(currentIndex, res.blob, res.duration);
+      }
     }
     setStage("finished");
 
@@ -831,7 +930,7 @@ function SpeakingExamRunnerContent() {
             status: "in_progress",
             partsList: oldParts,
             completedParts: Math.max(1, oldParts.length),
-            totalParts: 4,
+            totalParts: availableParts.length || 4,
             updatedAt: new Date().toISOString(),
           })
         );
@@ -879,8 +978,131 @@ function SpeakingExamRunnerContent() {
     }
   };
 
-  // Nộp bài thi
+  // Áp dụng danh sách kết quả chấm AI từ Server vào toàn bộ các câu trong bài
+  const applyBatchAiResults = useCallback(
+    (aiResultsList: any[], overallScoreVal?: number | null, overallCefrVal?: string | null) => {
+      if (!Array.isArray(aiResultsList) || aiResultsList.length === 0) return;
+
+      setRecordedData((prev) => {
+        const next = { ...prev };
+        questions.forEach((q, idx) => {
+          const foundAi = aiResultsList.find(
+            (r: any) => String(r.question_id || r.questionId) === String(q.id)
+          );
+          if (foundAi) {
+            const evalScore = typeof foundAi.score === "number" ? foundAi.score : 0;
+            const evaluatedResult = {
+              band: foundAi.cefr_level ? `CEFR ${foundAi.cefr_level} Target` : "Đã có kết quả AI",
+              score: evalScore,
+              pronunciation: foundAi.pronunciation ?? foundAi.pronunciation_score ?? 0,
+              fluency: foundAi.fluency_score ?? 0,
+              grammar: foundAi.grammar_score ?? 0,
+              vocabulary: foundAi.vocabulary_score ?? 0,
+              transcript:
+                foundAi.transcript ||
+                foundAi.raw_ai_response?.transcribed_speech ||
+                "",
+              feedback: [foundAi.feedback_summary || "Phân tích chi tiết bài nói của bạn."],
+              detailedFeedback: Array.isArray(foundAi.detailed_feedback)
+                ? foundAi.detailed_feedback
+                : [],
+              strengths: Array.isArray(foundAi.detailed_feedback)
+                ? foundAi.detailed_feedback
+                    .filter((f: any) => f.criterion)
+                    .map((f: any) => f.comment || "")
+                : [],
+              upgrades: foundAi.raw_ai_response?.improvement_suggestions || [],
+            };
+            next[idx] = {
+              ...(next[idx] || {}),
+              aiResult: evaluatedResult,
+              isCompleted: true,
+            };
+            if (idx === currentIndex) {
+              setAiResult(evaluatedResult);
+            }
+          }
+        });
+        return next;
+      });
+
+      const computedScore =
+        typeof overallScoreVal === "number"
+          ? overallScoreVal
+          : Math.round(
+              aiResultsList.reduce((acc, r) => acc + (Number(r.score) || 0), 0) /
+                aiResultsList.length
+            );
+      const computedCefr =
+        overallCefrVal || aiResultsList[aiResultsList.length - 1]?.cefr_level || null;
+
+      setOverallScore(computedScore);
+      if (computedCefr) setOverallCefr(computedCefr);
+
+      if (typeof window !== "undefined" && examId) {
+        try {
+          const totalPartsCount = availableParts.length || 4;
+          const finishedPartsCount = targetPart ? 1 : totalPartsCount;
+          const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
+          const oldData = oldStr ? JSON.parse(oldStr) : {};
+          localStorage.setItem(
+            `aptis_exam_progress_${examId}`,
+            JSON.stringify({
+              ...oldData,
+              examId,
+              status: "completed",
+              completedParts: finishedPartsCount,
+              totalParts: totalPartsCount,
+              bestScore: `${computedScore}/50`,
+              ...(computedCefr ? { bestCefr: computedCefr } : {}),
+              updatedAt: new Date().toISOString(),
+            })
+          );
+        } catch {}
+      }
+    },
+    [questions, currentIndex, examId, availableParts.length, targetPart]
+  );
+
+  // Polling tự động kiểm tra kết quả khi đang chờ AI chấm ngầm ở cuối bài
+  useEffect(() => {
+    if (!isEvaluating || !submissionId) return;
+
+    let isMounted = true;
+    const pollTimer = setInterval(async () => {
+      try {
+        const res = await api.submissions.getResult(submissionId);
+        if (!isMounted || !res.success || !res.data) return;
+        const sub = res.data;
+        const aiList: any[] = Array.isArray(sub.ai_results) ? sub.ai_results : [];
+        if (aiList.length > 0) {
+          applyBatchAiResults(
+            aiList,
+            sub.speaking_score ?? sub.total_score ?? null,
+            sub.cefr_level ?? sub.cefrBand ?? null
+          );
+        }
+        if (
+          sub.status === "GRADED" ||
+          (questions.length > 0 && aiList.length >= questions.length)
+        ) {
+          setIsEvaluating(false);
+          clearInterval(pollTimer);
+        }
+      } catch (err) {
+        console.warn("[Polling Speaking Result] Lỗi kiểm tra tiến trình chấm:", err);
+      }
+    }, 3000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(pollTimer);
+    };
+  }, [isEvaluating, submissionId, applyBatchAiResults, questions.length]);
+
+  // Nộp bài thi & Kích hoạt chấm điểm AI một thể cho toàn bộ các câu trong bài
   const handleFinishExam = async () => {
+    if (timerRef.current) clearInterval(timerRef.current);
     let latestData = { ...recordedData };
     if (isRecording) {
       const res = await stopRecording();
@@ -896,64 +1118,121 @@ function SpeakingExamRunnerContent() {
         latestData[currentIndex] = item;
         setRecordedData(latestData);
       }
-    }
-
-    if (submissionId) {
-      try {
-        const answersPayload = Object.entries(latestData)
-          .filter(([, rec]) => rec.isCompleted)
-          .map(([idx, rec]) => {
-            const q = questions[Number(idx)];
-            return {
-              questionId: String(q?.id || ""),
-              audioUrl: rec.audioUrl || null,
-              audioDuration: rec.duration || null,
-            };
-          })
-          .filter((a) => a.questionId && a.questionId.length > 10);
-        if (answersPayload.length > 0) {
-          await api.submissions.autosave(submissionId, answersPayload);
-        }
-        await api.submissions.submit(submissionId);
-      } catch (err) {
-        console.error("Lỗi khi lưu submission:", err);
-      }
-    }
-
-    // Tự động lưu tiến độ hoàn thành vào localStorage để hiển thị ngay trên danh sách đề
-    if (typeof window !== "undefined" && examId) {
-      try {
-        const targetCefr =
-          aiResult?.band
-            ?.replace(/[^A-Za-z0-9]/g, "")
-            .replace("CEFR", "")
-            .replace("Target", "")
-            .trim() || "B1";
-        const targetScore = aiResult?.score ? `${aiResult.score}/50` : "38/50";
-
-        localStorage.setItem(
-          `aptis_exam_progress_${examId}`,
-          JSON.stringify({
-            examId,
-            status: "completed",
-            completedParts: 4,
-            totalParts: 4,
-            bestScore: targetScore,
-            bestCefr: targetCefr,
-            updatedAt: new Date().toISOString(),
-          })
-        );
-      } catch (e) {
-        console.warn("Save progress to localStorage failed:", e);
-      }
+      setStage("finished");
     }
 
     setIsSubmitted(true);
     setIsCompletedModalOpen(true);
+
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken") ||
+          localStorage.getItem("token") ||
+          localStorage.getItem("aptis_token")
+        : null;
+
+    const totalPartsCount = availableParts.length || 4;
+    const finishedPartsCount = targetPart ? 1 : totalPartsCount;
+
+    if (typeof window !== "undefined" && examId) {
+      try {
+        const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
+        const oldData = oldStr ? JSON.parse(oldStr) : {};
+        localStorage.setItem(
+          `aptis_exam_progress_${examId}`,
+          JSON.stringify({
+            ...oldData,
+            examId,
+            status: "completed",
+            completedParts: finishedPartsCount,
+            totalParts: totalPartsCount,
+            updatedAt: new Date().toISOString(),
+          })
+        );
+      } catch {}
+    }
+
+    if (!token) return;
+
+    setIsEvaluating(true);
+
+    try {
+      let activeSubId = submissionId;
+      if (!activeSubId && examId) {
+        const startRes = await api.submissions.start(examId);
+        if (startRes.success && startRes.data) {
+          activeSubId = startRes.data.submissionId || startRes.data.id;
+          setSubmissionId(activeSubId);
+        }
+      }
+
+      if (!activeSubId) {
+        setIsEvaluating(false);
+        return;
+      }
+
+      // 1. Đảm bảo tất cả các câu có thu âm đều đã được upload file vật lý lên Server (tái sử dụng Promise nếu đang upload dở)
+      for (const [idxStr, rec] of Object.entries(latestData)) {
+        const idxNum = Number(idxStr);
+        const q = questions[idxNum];
+        if (q && rec?.audioBlob && !rec.isUploaded) {
+          const remoteUrl = await uploadQuestionAudioInBackground(
+            idxNum,
+            rec.audioBlob,
+            rec.duration || 30,
+            activeSubId
+          );
+          if (remoteUrl) {
+            latestData[idxNum] = { ...rec, isUploaded: true };
+          }
+        }
+      }
+      setRecordedData({ ...latestData });
+
+      // 2. Đăng ký các câu hỏi bị bỏ qua trong phạm vi bài thi hiện tại vào submission.answers
+      // để Backend tính đúng mẫu số trung bình (câu bỏ trống = 0 điểm thay vì bị loại khỏi mẫu số)
+      const skippedAnswersPayload = questions
+        .map((q, idx) => ({ q, idx }))
+        .filter(({ q, idx }) => {
+          const rec = latestData[idx];
+          const isValidDbUuid = Boolean(q.id && q.id.length > 10 && !q.id.startsWith("fb-"));
+          return isValidDbUuid && !rec?.audioBlob && !rec?.isUploaded && !rec?.audioUrl;
+        })
+        .map(({ q }) => ({
+          questionId: q.id,
+          audioDuration: 0,
+        }));
+
+      if (skippedAnswersPayload.length > 0) {
+        try {
+          await api.submissions.autosave(activeSubId, skippedAnswersPayload);
+        } catch (autosaveErr) {
+          console.warn("[Speaking Submit] Không thể lưu danh sách câu bỏ trống:", autosaveErr);
+        }
+      }
+
+      // 3. Nộp bài thi chính thức
+      await api.submissions.submit(activeSubId);
+
+      // 4. Kích hoạt chấm điểm AI tổng thể toàn bài (1 lượt Quota duy nhất)
+      const aiRes = await api.aiGrading.evaluate(activeSubId);
+      if (aiRes.success && aiRes.data) {
+        const aiList = aiRes.data.aiResults || [];
+        applyBatchAiResults(
+          aiList,
+          aiRes.data.overallScore ?? null,
+          aiRes.data.cefrLevel ?? null
+        );
+        setIsEvaluating(false);
+      }
+    } catch (err) {
+      console.warn("Đang chờ tiến trình chấm điểm AI ngầm hoàn tất:", err);
+    }
   };
 
   // Luyện tập lại câu này
   const handleRetry = () => {
+    delete inFlightUploadsRef.current[currentIndex];
     setRecordedData((prev) => {
       const copy = { ...prev };
       delete copy[currentIndex];
@@ -989,6 +1268,9 @@ function SpeakingExamRunnerContent() {
             isCompleted: true,
           },
         }));
+        if (res.blob) {
+          uploadQuestionAudioInBackground(currentIndex, res.blob, res.duration);
+        }
       }
     }
     if (currentIndex < questions.length - 1) {
@@ -1012,6 +1294,9 @@ function SpeakingExamRunnerContent() {
             isCompleted: true,
           },
         }));
+        if (res.blob) {
+          uploadQuestionAudioInBackground(currentIndex, res.blob, res.duration);
+        }
       }
     }
     if (currentIndex > 0) {
@@ -1019,141 +1304,9 @@ function SpeakingExamRunnerContent() {
     }
   };
 
-  // Chấm điểm AI
-  const handleAIEvaluation = async (targetIndex?: number) => {
-    const qIdx = typeof targetIndex === "number" ? targetIndex : currentIndex;
-    const targetQ = questions[qIdx];
-    if (!targetQ) return;
-
-    setIsEvaluating(true);
-
-    try {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem("accessToken") ||
-            localStorage.getItem("token") ||
-            localStorage.getItem("aptis_token")
-          : null;
-
-      if (!token) {
-        alert("Vui lòng đăng nhập tài khoản để sử dụng tính năng Chấm điểm với AI.");
-        setIsEvaluating(false);
-        return;
-      }
-
-      // 1. Đảm bảo luôn có phiên thi (submissionId) hợp lệ
-      let activeSubId = submissionId;
-      if (!activeSubId && examId) {
-        try {
-          console.log(`[AI Evaluation] Tạo phiên thi mới cho examId: ${examId}...`);
-          const startRes = await api.submissions.start(examId);
-          if (startRes.success && startRes.data) {
-            activeSubId = startRes.data.submissionId || startRes.data.id;
-            setSubmissionId(activeSubId);
-            console.log(`[AI Evaluation] Đã tạo submissionId thành công: ${activeSubId}`);
-          }
-        } catch (subErr: any) {
-          console.warn("[AI Evaluation] Không thể tạo phiên thi:", subErr);
-        }
-      }
-
-      if (!activeSubId) {
-        alert("Không thể khởi tạo phiên thi. Vui lòng kiểm tra lại kết nối mạng hoặc thử đăng nhập lại.");
-        setIsEvaluating(false);
-        return;
-      }
-
-      // 2. Upload file ghi âm giọng nói lên server
-      const rec = recordedData[qIdx];
-      const currentBlob = rec?.audioBlob || audioBlob;
-      const currentDur = rec?.duration || recordingDuration || 30;
-
-      if (activeSubId && currentBlob) {
-        console.log(`[AI Evaluation] Đang upload bản thu âm câu hỏi ${targetQ.id} (${currentDur}s)...`);
-        const remoteUrl = await uploadRecording(activeSubId, targetQ.id, token, currentBlob, currentDur);
-        if (remoteUrl) {
-          console.log(`[AI Evaluation] Upload thành công, audioUrl: ${remoteUrl}`);
-          if (qIdx === currentIndex) setUploadedUrl(remoteUrl);
-        }
-      } else {
-        console.warn("[AI Evaluation] Chưa có dữ liệu âm thanh Blob để upload.");
-      }
-
-      // 3. Gọi API chấm điểm bằng AI
-      console.log(`[AI Evaluation] Gửi yêu cầu chấm điểm AI cho submissionId: ${activeSubId}...`);
-      const aiRes = await api.aiGrading.evaluate(activeSubId);
-      console.log("[AI Evaluation] Kết quả trả về từ API chấm điểm:", aiRes);
-
-      if (aiRes.success && aiRes.data) {
-        const aiResults = aiRes.data.aiResults || [];
-        const thisResult =
-          aiResults.find((r: any) => r.question_id === targetQ.id) ||
-          aiResults[aiResults.length - 1];
-
-        if (thisResult) {
-          const evaluatedResult = {
-            band: `CEFR ${thisResult.cefr_level || "B2"} Target`,
-            score: thisResult.score || 38,
-            pronunciation: thisResult.pronunciation ?? thisResult.pronunciation_score ?? 38,
-            fluency: thisResult.fluency_score ?? 38,
-            grammar: thisResult.grammar_score ?? 35,
-            vocabulary: thisResult.vocabulary_score ?? 38,
-            transcript: thisResult.transcript || thisResult.raw_ai_response?.transcribed_speech || "",
-            feedback: [thisResult.feedback_summary || "Phân tích chi tiết bài nói của bạn."],
-            detailedFeedback: Array.isArray(thisResult.detailed_feedback) ? thisResult.detailed_feedback : [],
-            strengths: Array.isArray(thisResult.detailed_feedback)
-              ? thisResult.detailed_feedback.filter((f: any) => f.criterion).map((f: any) => f.comment || "")
-              : ["Độ dài câu trả lời phù hợp với thời lượng tiêu chuẩn."],
-            upgrades: thisResult.raw_ai_response?.improvement_suggestions || [
-              "Tiếp tục rèn luyện từ vựng chuyên sâu CEFR C1 để nâng band điểm.",
-            ],
-          };
-
-          if (qIdx === currentIndex) setAiResult(evaluatedResult);
-          setRecordedData((prev) => ({
-            ...prev,
-            [qIdx]: { ...(prev[qIdx] || {}), aiResult: evaluatedResult },
-          }));
-
-          if (typeof window !== "undefined" && examId) {
-            try {
-              const targetCefr = thisResult.cefr_level || "B2";
-              const oldStr = localStorage.getItem(`aptis_exam_progress_${examId}`);
-              const oldData = oldStr ? JSON.parse(oldStr) : {};
-              localStorage.setItem(
-                `aptis_exam_progress_${examId}`,
-                JSON.stringify({
-                  ...oldData,
-                  examId,
-                  bestCefr: targetCefr,
-                  bestScore: `${thisResult.score || 38}/50`,
-                  updatedAt: new Date().toISOString(),
-                })
-              );
-            } catch {}
-          }
-
-          setIsEvaluating(false);
-          return;
-        }
-      } else {
-        const errorMsg =
-          aiRes.error?.message ||
-          aiRes.message ||
-          "Dịch vụ chấm điểm AI tạm thời chưa hoàn tất. Vui lòng kiểm tra lại bản ghi âm và bấm Chấm điểm lại.";
-        console.warn("[AI Evaluation] API trả về thông báo:", errorMsg);
-        alert(errorMsg);
-      }
-    } catch (err: any) {
-      console.error("[AI Evaluation Exception]:", err);
-      alert(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Không thể kết nối máy chủ chấm điểm AI. Vui lòng kiểm tra đường truyền và thử lại."
-      );
-    } finally {
-      setIsEvaluating(false);
-    }
+  // Giữ tương thích chữ ký hàm
+  const handleAIEvaluation = async () => {
+    await handleFinishExam();
   };
 
   return (
@@ -1450,6 +1603,9 @@ function SpeakingExamRunnerContent() {
                   currentAiResult={currentAiResult}
                   showDetailedFeedback={showDetailedFeedback}
                   setShowDetailedFeedback={setShowDetailedFeedback}
+                  onNextQuestion={handleNextQuestion}
+                  onFinishExam={handleFinishExam}
+                  onOpenCompletionModal={() => setIsCompletedModalOpen(true)}
                 />
               </div>
           )
@@ -1469,7 +1625,7 @@ function SpeakingExamRunnerContent() {
       handlePrevQuestion={handlePrevQuestion}
       handleNextQuestion={handleNextQuestion}
       handleFinishExam={handleFinishExam}
-      targetPart={targetPart}
+      targetPart={targetPart || (availableParts.length === 1 ? availableParts[0] : null)}
       aiQuota={aiQuota}
     />
 
@@ -1535,14 +1691,15 @@ function SpeakingExamRunnerContent() {
           setStage("finished");
           setCurrentIndex(0);
         }}
-        targetPart={targetPart}
+        targetPart={targetPart || (availableParts.length === 1 ? availableParts[0] : null)}
         examTitle={examTitle}
         completedCount={completedCount}
         questions={questions}
         handleRestartExam={handleRestartExam}
         isRestarting={isRestarting}
-        estimatedScore={aiResult?.score ?? null}
-        cefrBand={aiResult?.band ?? null}
+        isEvaluating={isEvaluating}
+        estimatedScore={overallScore ?? aiResult?.score ?? null}
+        cefrBand={overallCefr ?? aiResult?.band ?? null}
       />
 
       {/* MODAL TÍNH NĂNG DÀNH CHO PRO (Screenshot 2) */}

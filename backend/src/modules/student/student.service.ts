@@ -82,7 +82,7 @@ export class StudentService {
         title: sub.exam.title,
         skill: skillLabel,
         score: scoreStr,
-        band: sub.cefr_level || (isGraded ? 'B2' : 'Đang xử lý'),
+        band: sub.cefr_level || (sub.status === SubmissionStatus.GRADED ? 'A0' : 'Đang xử lý'),
         date: dateStr,
       };
     });

@@ -137,7 +137,23 @@ ${transcriptText}
     return { ...parsed, transcriptText, raw: parsed };
   }
 
+  private activeEvaluations = new Map<string, Promise<any>>();
+
   async evaluateSubmission(submissionId: string, userId?: string, userRole?: string) {
+    const existingPromise = this.activeEvaluations.get(submissionId);
+    if (existingPromise) {
+      return existingPromise;
+    }
+
+    const evalPromise = this._executeEvaluateSubmission(submissionId, userId, userRole).finally(() => {
+      this.activeEvaluations.delete(submissionId);
+    });
+
+    this.activeEvaluations.set(submissionId, evalPromise);
+    return evalPromise;
+  }
+
+  private async _executeEvaluateSubmission(submissionId: string, userId?: string, userRole?: string) {
     const submission = await prisma.examSubmission.findUnique({
       where: { id: submissionId },
       include: {
@@ -162,12 +178,17 @@ ${transcriptText}
       throw { statusCode: 403, message: 'Bạn không có quyền yêu cầu chấm bài làm của học viên khác' };
     }
 
-    // 2. Chống lặp (Idempotency Guard): Nếu bài thi đã có kết quả AI, trả về ngay kết quả cũ
-    if (submission.ai_results && submission.ai_results.length > 0) {
+    // 2. Chống lặp (Idempotency Guard): Chỉ trả về kết quả cũ khi bài đã GRADED và đã chấm đủ các câu trả lời
+    if (
+      submission.status === SubmissionStatus.GRADED &&
+      submission.ai_results &&
+      submission.ai_results.length > 0 &&
+      submission.ai_results.length >= submission.answers.length
+    ) {
       return {
         submissionId,
         overallScore: submission.total_score || 0,
-        cefrLevel: submission.cefr_level || 'B2',
+        cefrLevel: submission.cefr_level || 'A0',
         evaluatedQuestionsCount: submission.ai_results.length,
         aiResults: submission.ai_results,
         isCached: true,
@@ -178,10 +199,11 @@ ${transcriptText}
     // 3. Quản lý Quota AI: Kiểm tra & Trừ lượt chấm AI của học viên
     let activeSubId: string | null = null;
     const isStaff = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN' || userRole === 'TEACHER';
-    if (userId && !isStaff) {
+    const targetUserId = userId || submission.user_id;
+    if (targetUserId && !isStaff) {
       const activeSub = await prisma.userSubscription.findFirst({
         where: {
-          user_id: submission.user_id,
+          user_id: targetUserId,
           is_active: true,
           end_date: { gt: new Date() },
         },
@@ -207,7 +229,55 @@ ${transcriptText}
     let writingQuestionCount = 0;
     let speakingQuestionCount = 0;
 
-    for (const ans of submission.answers) {
+    // Nếu học viên nộp bài trắng hoàn toàn (chưa có bản ghi nào trong submission.answers),
+    // tự động lấy danh sách câu hỏi tự luận trong đề để chấm 0 điểm chuẩn xác
+    const answersToEvaluate: Array<{
+      id?: string;
+      question_id: string;
+      text_answer?: string | null;
+      audio_duration?: number | null;
+      transcript_text?: string | null;
+      created_at?: Date;
+    }> =
+      submission.answers.length > 0
+        ? submission.answers
+        : submission.exam.parts.flatMap((p) =>
+            p.questions
+              .filter(
+                (q) =>
+                  q.question_type === QuestionType.ESSAY ||
+                  q.question_type === QuestionType.SHORT_TEXT ||
+                  q.question_type === QuestionType.SPEAKING_AUDIO ||
+                  submission.exam.skill === ExamSkill.WRITING ||
+                  submission.exam.skill === ExamSkill.SPEAKING
+              )
+              .map((q) => ({
+                question_id: q.id,
+                text_answer: '',
+                audio_duration: 0,
+                transcript_text: '',
+                created_at: submission.started_at,
+              }))
+          );
+
+    for (const ans of answersToEvaluate) {
+      // Nếu câu này đã có kết quả AI từ trước thì tái sử dụng, không chấm lại
+      const existingAiResult = (submission.ai_results || []).find(
+        (r) => r.question_id === ans.question_id
+      );
+      if (existingAiResult) {
+        aiResults.push(existingAiResult);
+        subjectiveQuestionCount++;
+        if (existingAiResult.skill === ExamSkill.WRITING) {
+          writingQuestionCount++;
+          writingTotalScore += existingAiResult.score || 0;
+        } else if (existingAiResult.skill === ExamSkill.SPEAKING) {
+          speakingQuestionCount++;
+          speakingTotalScore += existingAiResult.score || 0;
+        }
+        continue;
+      }
+
       // Tìm câu hỏi tương ứng
       let question;
       let part;
@@ -239,7 +309,7 @@ ${transcriptText}
         let evalResult: any = null;
         let modelUsed = 'heuristic-evaluator';
 
-        if (text.trim().length > 10) {
+        if (wordCount >= 2) {
           // 1. Ưu tiên chấm bằng Gemini với cơ chế xoay vòng model thông minh
           if (geminiRotator.isAvailable()) {
             try {
@@ -279,24 +349,25 @@ ${transcriptText}
         let feedbackSummary = evalResult?.feedback_summary;
         let detailedFeedback = evalResult?.detailed_feedback;
 
-        // Fallback ước lượng theo Rubric chuẩn British Council
-        if (!evalResult || typeof averageScore !== 'number') {
-          taskScore = Math.min(50, Math.max(10, wordCount > 30 ? 40 : 25));
-          grammarScore = 38;
-          vocabScore = 36;
-          cohesionScore = 40;
+        if (wordCount < 2) {
+          taskScore = 0;
+          grammarScore = 0;
+          vocabScore = 0;
+          cohesionScore = 0;
+          averageScore = 0;
+          cefrLevel = 'A0';
+          feedbackSummary = 'Bài viết bỏ trống hoặc quá ngắn để chấm điểm.';
+          detailedFeedback = [];
+        } else if (!evalResult || typeof averageScore !== 'number') {
+          taskScore = Math.min(50, Math.max(10, wordCount > 30 ? 35 : 20));
+          grammarScore = 30;
+          vocabScore = 30;
+          cohesionScore = 30;
           averageScore = Math.round((taskScore + grammarScore + vocabScore + cohesionScore) / 4);
 
           cefrLevel = scoreToCefr(averageScore);
-
-          feedbackSummary = `Bài viết hoàn thành tốt nhiệm vụ, độ dài ${wordCount} từ. Đạt chuẩn CEFR ${cefrLevel}.`;
-          detailedFeedback = [
-            {
-              original: text.substring(0, 40) + '...',
-              suggested: 'Gợi ý: Cải thiện thêm một số liên từ (However, Furthermore) để câu văn tự nhiên hơn.',
-              errorType: 'Vocabulary & Cohesion',
-            },
-          ];
+          feedbackSummary = `Bài viết có độ dài ${wordCount} từ. Đạt mức ước lượng ${cefrLevel}.`;
+          detailedFeedback = [];
         }
 
         writingTotalScore += averageScore;
@@ -324,7 +395,7 @@ ${transcriptText}
         // Chấm bài nói (Speaking)
         subjectiveQuestionCount++;
         speakingQuestionCount++;
-        const audioDuration = ans.audio_duration || 30;
+        const audioDuration = ans.audio_duration || 0;
 
         let evalResult: any = null;
         let modelUsed = 'heuristic-evaluator';
@@ -336,22 +407,26 @@ ${transcriptText}
           ans.created_at || submission.started_at || undefined
         );
 
-        if (audioFilePath && fs.existsSync(audioFilePath)) {
+        const hasValidAudio = Boolean(audioFilePath && fs.existsSync(audioFilePath));
+
+        if (hasValidAudio) {
           // 1. Ưu tiên chấm bằng Gemini Multimodal Audio với cơ chế xoay vòng model
           if (geminiRotator.isAvailable()) {
             try {
               evalResult = await geminiRotator.evaluateSpeaking(
-                audioFilePath,
+                audioFilePath!,
                 question.prompt,
-                audioDuration
+                audioDuration || 30
               );
               modelUsed = evalResult?.usedModel || 'gemini-multimodal';
               if (evalResult?.transcriptText) {
                 transcriptText = evalResult.transcriptText;
-                await prisma.submissionAnswer.update({
-                  where: { id: ans.id },
-                  data: { transcript_text: transcriptText },
-                });
+                if (ans.id) {
+                  await prisma.submissionAnswer.update({
+                    where: { id: ans.id },
+                    data: { transcript_text: transcriptText },
+                  });
+                }
               }
             } catch (geminiErr: any) {
               console.warn('[AI Grading] Gemini Rotator speaking failed:', geminiErr?.message);
@@ -363,17 +438,19 @@ ${transcriptText}
             try {
               evalResult = await this.evaluateSpeakingWithAI(
                 openai,
-                audioFilePath,
+                audioFilePath!,
                 question.prompt,
-                audioDuration
+                audioDuration || 30
               );
               modelUsed = 'whisper-1 + gpt-4o';
               if (evalResult?.transcriptText) {
                 transcriptText = evalResult.transcriptText;
-                await prisma.submissionAnswer.update({
-                  where: { id: ans.id },
-                  data: { transcript_text: transcriptText },
-                });
+                if (ans.id) {
+                  await prisma.submissionAnswer.update({
+                    where: { id: ans.id },
+                    data: { transcript_text: transcriptText },
+                  });
+                }
               }
             } catch (aiErr) {
               console.warn('Speaking real AI evaluation fallback triggered:', aiErr);
@@ -390,23 +467,25 @@ ${transcriptText}
         let feedbackSummary = evalResult?.feedback_summary;
         let detailedFeedback = evalResult?.detailed_feedback;
 
-        // Fallback ước lượng theo chuẩn Aptis Speaking
-        if (!evalResult || typeof averageScore !== 'number') {
-          pronScore = 38;
-          fluencyScore = 40;
-          grammarScore = 35;
-          vocabScore = 37;
-          averageScore = Math.round((pronScore + fluencyScore + grammarScore + vocabScore) / 4);
-
-          cefrLevel = scoreToCefr(averageScore);
-
-          feedbackSummary = `Phát âm rõ ràng, nhịp điệu tương đối tốt (thời lượng ${audioDuration}s). Đạt chuẩn CEFR ${cefrLevel}.`;
-          detailedFeedback = [
-            {
-              criterion: 'Pronunciation',
-              comment: 'Cần chú ý phát âm rõ âm đuôi /s/, /ed/ khi nói ở quá khứ.',
-            },
-          ];
+        if (!hasValidAudio) {
+          pronScore = 0;
+          fluencyScore = 0;
+          grammarScore = 0;
+          vocabScore = 0;
+          averageScore = 0;
+          cefrLevel = 'A0';
+          transcriptText = '';
+          feedbackSummary = 'Chưa ghi nhận bản thu âm giọng nói cho câu hỏi này.';
+          detailedFeedback = [];
+        } else if (!evalResult || typeof averageScore !== 'number') {
+          pronScore = 0;
+          fluencyScore = 0;
+          grammarScore = 0;
+          vocabScore = 0;
+          averageScore = 0;
+          cefrLevel = 'A0';
+          feedbackSummary = 'Không thể phân tích âm thanh hoặc giọng nói không rõ ràng.';
+          detailedFeedback = [];
         }
 
         speakingTotalScore += averageScore;
@@ -417,7 +496,7 @@ ${transcriptText}
             question_id: question.id,
             skill: ExamSkill.SPEAKING,
             model_name: modelUsed,
-            transcript: transcriptText || 'Recognized spoken speech from student response.',
+            transcript: transcriptText || '',
             score: averageScore,
             cefr_level: cefrLevel,
             pronunciation: pronScore,

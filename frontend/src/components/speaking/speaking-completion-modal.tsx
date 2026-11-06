@@ -22,6 +22,7 @@ export interface SpeakingCompletionModalProps {
   questions: SpeakingQuestion[];
   handleRestartExam: () => void;
   isRestarting: boolean;
+  isEvaluating?: boolean;
   estimatedScore?: number | null;
   cefrBand?: string | null;
 }
@@ -36,13 +37,23 @@ export function SpeakingCompletionModal({
   questions,
   handleRestartExam,
   isRestarting,
+  isEvaluating = false,
   estimatedScore,
   cefrBand,
 }: SpeakingCompletionModalProps) {
   if (!isOpen) return null;
 
-  const displayBand = cefrBand ? (cefrBand.toLowerCase().startsWith("band") ? cefrBand : `Band ${cefrBand}`) : "Chờ chấm";
-  const hasScore = typeof estimatedScore === "number" && !isNaN(estimatedScore);
+  const cleanBand = cefrBand
+    ? cefrBand.replace(/^CEFR\s*/i, "").replace(/\s*Target$/i, "").trim()
+    : null;
+  const displayBand = isEvaluating
+    ? "Đang chấm..."
+    : cleanBand
+    ? cleanBand.toLowerCase().startsWith("band")
+      ? cleanBand
+      : `Band ${cleanBand}`
+    : "Chờ chấm";
+  const hasScore = !isEvaluating && typeof estimatedScore === "number" && !isNaN(estimatedScore);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
@@ -56,11 +67,17 @@ export function SpeakingCompletionModal({
 
         <div className="text-center space-y-3 mb-6">
           <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25">
-            <Trophy className="w-8 h-8" />
+            {isEvaluating ? (
+              <Loader2 className="w-8 h-8 animate-spin" />
+            ) : (
+              <Trophy className="w-8 h-8" />
+            )}
           </div>
           <div>
             <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 uppercase tracking-wider">
-              Đã hoàn thành {targetPart ? `Part ${targetPart}` : "toàn bộ bài thi Speaking"}
+              {isEvaluating
+                ? "AI đang phân tích & chấm điểm toàn bài..."
+                : `Đã hoàn thành ${targetPart ? `Part ${targetPart}` : "toàn bộ bài thi Speaking"}`}
             </span>
             <h2 className="font-heading font-bold text-xl md:text-2xl text-foreground mt-2">
               Kết Quả Bài Thi Nói Aptis
@@ -79,17 +96,22 @@ export function SpeakingCompletionModal({
             <span className="text-xl md:text-2xl font-black font-heading gradient-text mt-0.5 block">
               {displayBand}
             </span>
-            <span className="text-[10px] text-emerald-600 font-semibold">{hasScore ? "Đã đánh giá" : "Chờ AI"}</span>
+            <span className="text-[10px] text-emerald-600 font-semibold">
+              {isEvaluating ? "Vui lòng đợi ~5-10s" : hasScore ? "Đã đánh giá" : "Chờ AI"}
+            </span>
           </div>
 
           <div className="p-3 rounded-xl bg-card border border-border/80">
             <span className="text-[11px] font-semibold text-muted-foreground block">
-              Điểm ước tính
+              Điểm tổng quát
             </span>
             <span className="text-xl md:text-2xl font-black font-heading text-primary mt-0.5 block">
-              {hasScore ? estimatedScore : "--"}<span className="text-xs text-muted-foreground font-normal">/50</span>
+              {isEvaluating ? "..." : hasScore ? estimatedScore : "--"}
+              <span className="text-xs text-muted-foreground font-normal">/50</span>
             </span>
-            <span className="text-[10px] text-muted-foreground font-medium">{hasScore ? "Quy đổi Aptis" : "Chưa chấm"}</span>
+            <span className="text-[10px] text-muted-foreground font-medium">
+              {isEvaluating ? "Đang tính điểm" : hasScore ? "Quy đổi Aptis" : "Chưa chấm"}
+            </span>
           </div>
 
           <div className="col-span-2 sm:col-span-1 p-3 rounded-xl bg-card border border-border/80">
@@ -114,7 +136,7 @@ export function SpeakingCompletionModal({
             className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Play className="w-4 h-4" />
-            <span>Xem lại và nghe lại bản thu âm các câu</span>
+            <span>Xem lại chi tiết &amp; nhận xét AI từng câu</span>
           </button>
 
           <div className="grid grid-cols-2 gap-2 pt-1">

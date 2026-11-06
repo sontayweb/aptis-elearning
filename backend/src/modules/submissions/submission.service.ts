@@ -492,9 +492,10 @@ export class SubmissionService {
 
     // Tự động kích hoạt chấm AI ngầm cho bài thi có Writing/Speaking (không bắt học viên chờ 24-48h)
     if (nextStatus === SubmissionStatus.PENDING_EVALUATION) {
+      const actorRole = (submission as any).user?.role;
       setImmediate(async () => {
         try {
-          await aiGradingService.evaluateSubmission(submissionId);
+          await aiGradingService.evaluateSubmission(submissionId, userId, actorRole);
           console.log(`[SUCCESS] [Auto AI Grading] Đã chấm tự động xong bài thi ${submissionId}`);
         } catch (err: any) {
           console.warn(`[WARN] [Auto AI Grading] Chấm ngầm bài ${submissionId} gặp sự cố:`, err?.message || err);
@@ -702,7 +703,7 @@ export class SubmissionService {
         score: scoreDisplay,
         scoreNumber: sub.total_score ?? 0,
         maxScore: maxScale,
-        band: sub.cefr_level || (isGraded ? 'B2' : 'Đang xử lý'),
+        band: sub.cefr_level || (sub.status === SubmissionStatus.GRADED ? 'A0' : 'Đang xử lý'),
         status: sub.status,
         totalQuestions: sub.answers.length,
         correctAnswers: sub.answers.filter((a) => (a.score || 0) > 0).length,
