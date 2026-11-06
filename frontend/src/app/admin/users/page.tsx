@@ -650,11 +650,13 @@ export default function AdminUsersPage() {
 
       {/* Top Header — Sử dụng AdminPageHeader dùng chung */}
       <AdminPageHeader
+        title="Quản lý Học viên"
+        infoTooltip="Quản lý danh sách tài khoản học viên, phân quyền VIP/Giảng viên, theo dõi trạng thái hoạt động và xuất/nhập danh sách học viên."
         stats={[
           { icon: Users, value: totalCount, label: "tài khoản" },
           { icon: Crown, value: vipCount, label: "VIP", iconColor: "text-amber-500" },
           { icon: GraduationCap, value: teacherCount, label: "giảng viên", iconColor: "text-blue-500" },
-          { icon: ShieldCheck, value: `${activeRate}%`, label: "hoạt động", iconColor: "text-emerald-500" },
+          { icon: Zap, value: `${activeRate}%`, label: "hoạt động", iconColor: "text-emerald-500" },
         ]}
         showMetricsToggle
         showMetrics={showMetrics}

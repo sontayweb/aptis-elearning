@@ -5,6 +5,8 @@ import { api } from "@/lib/api-client";
 import AdminPageHeader from "@/components/admin/admin-page-header";
 import {
   Tag,
+  Rocket,
+  Plus,
   Gift,
   PlusCircle,
   RefreshCw,
@@ -329,71 +331,59 @@ export default function AdminPromotionsPage() {
 
   // Summary Metrics
   const activeCount = promotions.filter((p) => p.isActive).length;
-  const featuredItem = promotions.find((p) => p.isFeatured);
+  const inactiveCount = promotions.length - activeCount;
   const totalRedemptions = promotions.reduce((acc, p) => acc + (p.currentUses || 0), 0);
 
   const stats = [
     {
       icon: Tag,
       value: promotions.length,
-      label: "Tổng số mã",
-      subValue: "Mã khuyến mại & quà tặng",
-      iconColor: "text-blue-500",
+      label: "Tổng mã",
+      iconColor: "text-amber-500",
     },
     {
       icon: CheckCircle2,
       value: activeCount,
       label: "Đang hoạt động",
-      subValue: `${promotions.length - activeCount} mã tạm ngưng`,
       iconColor: "text-emerald-500",
     },
     {
-      icon: Flame,
-      value: featuredItem ? featuredItem.code : "Chưa bật",
-      label: "Mã Treo Banner (Live)",
-      subValue: featuredItem
-        ? featuredItem.expiresAt
-          ? `Hết hạn: ${new Date(featuredItem.expiresAt).toLocaleDateString("vi-VN")}`
-          : "Không giới hạn hạn dùng"
-        : "Không hiển thị trên trang chủ",
-      iconColor: "text-amber-500",
+      icon: Clock,
+      value: inactiveCount,
+      label: "Tạm ngưng",
+      iconColor: "text-purple-400 dark:text-purple-300",
     },
     {
-      icon: Users,
+      icon: Rocket,
       value: totalRedemptions.toLocaleString("vi-VN"),
-      label: "Tổng lượt kích hoạt",
-      subValue: "Học viên đã trải nghiệm",
-      iconColor: "text-purple-500",
+      label: "Lượt kích hoạt VIP",
+      iconColor: "text-rose-500",
     },
   ];
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* Header */}
+      {/* Header Chuẩn hóa 2 hàng */}
       <AdminPageHeader
-        badge={{
-          icon: Sparkles,
-          label: "QUẢN TRỊ KHUYẾN MẠI & BANNER",
-        }}
         title="Quản lý Mã Khuyến Mại & Voucher"
-        description="Toàn quyền tạo mã trải nghiệm 0đ, voucher giảm giá đơn hàng, và bật cờ Treo Banner độc quyền hiển thị trực tiếp cho học viên."
+        infoTooltip="Toàn quyền tạo mã trải nghiệm 0đ, voucher giảm giá đơn hàng, và bật cờ Treo Banner độc quyền hiển thị trực tiếp cho học viên."
         stats={stats}
         actions={
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={fetchPromotions}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors shadow-sm disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors shadow-2xs disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-primary" : ""}`} />
-              Làm mới
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-primary" : "text-slate-400"}`} />
+              <span>Làm mới</span>
             </button>
             <button
               onClick={handleOpenCreate}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl bg-primary text-white hover:bg-primary/95 active:scale-[0.98] transition-all shadow-md shadow-primary/20"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-amber-500 hover:bg-amber-600 text-white transition-all shadow-xs"
             >
-              <PlusCircle className="w-4 h-4" />
-              Tạo mã mới
+              <Plus className="w-3.5 h-3.5" />
+              <span>Tạo mã mới</span>
             </button>
           </div>
         }
