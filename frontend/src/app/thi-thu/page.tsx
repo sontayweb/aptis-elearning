@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { ProUnlockButton } from "@/components/ui/pro-unlock-button";
 import {
   GraduationCap,
   Clock,
@@ -275,17 +276,17 @@ export default function MockExamListPage() {
             style={{ width: "420px", height: "420px", background: "hsl(var(--primary) / 0.3)" }}
           />
 
-          <div className="section-container py-12 md:py-16 relative z-10">
+          <div className="section-container py-10 md:py-14 relative z-10">
             <div className="max-w-3xl">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary w-fit text-xs font-bold mb-4">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary w-fit text-xs font-bold mb-3">
                 <ShieldCheck className="w-4 h-4" />
-                <span>Mô phỏng 100% phần mềm thi máy tính British Council</span>
+                <span>Format đề thi chuẩn khảo thí British Council</span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-foreground mb-4">
-                Hệ Thống 20 Bộ Đề Thi Thử Aptis ESOL Full Test
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-extrabold text-foreground mb-3 tracking-tight">
+                Luyện Thi Thử Aptis ESOL Full Test
               </h1>
-              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Mỗi bộ đề thi thử (<span className="font-mono font-bold text-foreground">APT-01</span> đến <span className="font-mono font-bold text-foreground">APT-20</span>) được tổng hợp chuẩn 4 kỹ năng chính thức (Listening, Reading, Writing, Speaking — 16 Parts) để bạn luyện full đề bất kỳ lúc nào, làm quen áp lực thời gian và kiểm tra tổng kiến thức trước kỳ thi.
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                Trải nghiệm phòng thi thực tế với trọn bộ 4 kỹ năng Listening, Reading, Writing và Speaking. Rèn luyện phản xạ, làm quen áp lực thời gian và tự tin bứt phá band điểm kỳ thi.
               </p>
             </div>
           </div>
@@ -304,7 +305,7 @@ export default function MockExamListPage() {
                     Vào nhanh đề thi thử bằng Mã Đề riêng
                   </h3>
                   <p className="text-xs md:text-sm text-muted-foreground">
-                    Nhập mã đề thi thử (VD: <span className="font-mono font-bold text-foreground">APT-01</span> miễn phí hoặc <span className="font-mono font-bold text-foreground">APT-02</span> → <span className="font-mono font-bold text-foreground">APT-20</span> dành cho tài khoản VIP PRO).
+                    Nhập mã đề thi của bạn (ví dụ: <span className="font-mono font-bold text-foreground">APT-01</span>) để vào thẳng phòng thi và bắt đầu làm bài.
                   </p>
                 </div>
               </div>
@@ -348,61 +349,60 @@ export default function MockExamListPage() {
 
         {/* Mock Exam Cards Grid */}
         <section className="section-container py-8 md:py-12">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-xl font-heading font-bold text-foreground">
-                Danh sách đề thi Aptis ESOL 2026
-              </h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Đề <span className="font-mono font-bold text-foreground">APT-01</span> mở miễn phí cho mọi học viên · Đề <span className="font-mono font-bold text-foreground">APT-02</span> đến <span className="font-mono font-bold text-foreground">APT-20</span> tự động mở khóa khi đăng nhập tài khoản VIP PRO
-              </p>
+          {/* Section Header */}
+          <div className="mb-5">
+            <h2 className="text-xl font-heading font-bold text-foreground">
+              Danh sách đề thi Aptis ESOL
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+              Kho đề thi cập nhật liên tục · Đề mẫu mở miễn phí cho mọi học viên trải nghiệm
+            </p>
+          </div>
+
+          {/* Filter Tabs & Hot Toggle (Single Unified Row) */}
+          <div className="flex items-center justify-between gap-3 overflow-x-auto pb-2 mb-6 no-scrollbar">
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-muted/60 border border-border shrink-0">
+              {[
+                { id: "FULL_TEST", label: "Full Test", icon: Sparkles },
+                { id: "ALL", label: "Tất cả", icon: null },
+                { id: "LISTENING", label: "Listening", icon: Headphones },
+                { id: "READING", label: "Reading", icon: BookOpen },
+                { id: "WRITING", label: "Writing", icon: PenTool },
+                { id: "SPEAKING", label: "Speaking", icon: Mic },
+                { id: "GRAMMAR_VOCABULARY", label: "Grammar & Từ vựng", icon: BookA },
+              ].map((tab) => {
+                const TabIcon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setSelectedSkill(tab.id)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                      selectedSkill === tab.id
+                        ? "bg-primary text-primary-foreground shadow-xs"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {TabIcon && <TabIcon className="w-3.5 h-3.5 shrink-0" />}
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Filter Tabs & Hot Toggle */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-muted/60 border border-border">
-                {[
-                  { id: "FULL_TEST", label: "Full Test (20 Đề chuẩn)", icon: Sparkles },
-                  { id: "ALL", label: "Tất cả", icon: null },
-                  { id: "LISTENING", label: "Listening", icon: Headphones },
-                  { id: "READING", label: "Reading", icon: BookOpen },
-                  { id: "WRITING", label: "Writing", icon: PenTool },
-                  { id: "SPEAKING", label: "Speaking", icon: Mic },
-                  { id: "GRAMMAR_VOCABULARY", label: "Grammar & Vocab", icon: BookA },
-                ].map((tab) => {
-                  const TabIcon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setSelectedSkill(tab.id)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                        selectedSkill === tab.id
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {TabIcon && <TabIcon className="w-3.5 h-3.5 shrink-0" />}
-                      <span>{tab.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Nút lọc Đề Hot / Đề Tủ */}
-              <button
-                type="button"
-                onClick={() => setHotOnly(!hotOnly)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 border cursor-pointer ${
-                  hotOnly
-                    ? "bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-500/20 scale-102"
-                    : "bg-card border-border text-foreground hover:border-emerald-500/50 hover:text-emerald-600"
-                }`}
-                title="Lọc nhanh các đề có mức độ hot cao nhất"
-              >
-                <span>☘️ Đề Hot ({tests.filter((t) => t.hotLevel > 0).length})</span>
-              </button>
-            </div>
+            {/* Nút lọc Đề Hot / Đề Tủ */}
+            <button
+              type="button"
+              onClick={() => setHotOnly(!hotOnly)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border cursor-pointer shrink-0 whitespace-nowrap ${
+                hotOnly
+                  ? "bg-emerald-600 text-white border-emerald-600 shadow-xs scale-102"
+                  : "bg-card border-border text-foreground hover:border-emerald-500/50 hover:text-emerald-600"
+              }`}
+              title="Lọc nhanh các đề có mức độ hot cao nhất"
+            >
+              <span>☘️ Đề Hot ({tests.filter((t) => t.hotLevel > 0).length})</span>
+            </button>
           </div>
 
           {loading ? (
@@ -470,7 +470,7 @@ export default function MockExamListPage() {
                           MIỄN PHÍ · ĐỀ MẪU
                         </span>
                       ) : isExamLocked ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-amber-500/30">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
                           <Lock className="w-2.5 h-2.5" />
                           <span>VIP PRO</span>
                         </span>
@@ -547,14 +547,10 @@ export default function MockExamListPage() {
                     Mục tiêu: {test.difficulty}
                   </span>
                   {isExamLocked ? (
-                    <button
-                      type="button"
+                    <ProUnlockButton
                       onClick={() => setLockedExamModal(test)}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs shadow-sm transition-all bg-slate-900 text-amber-300 hover:bg-slate-800 border border-amber-500/30 cursor-pointer"
-                    >
-                      <Lock className="w-3.5 h-3.5" />
-                      <span>Mở khóa đề PRO</span>
-                    </button>
+                      label="Mở khóa"
+                    />
                   ) : (
                     <Link
                       href={`/thi-thu/${test.id}`}
@@ -617,7 +613,7 @@ export default function MockExamListPage() {
               Đề thi dành riêng cho tài khoản VIP PRO
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-              Bộ đề <strong>{lockedExamModal.name}</strong> được thiết lập quyền riêng tư chỉ mở cho học viên đã đăng ký gói <strong>VIP PRO</strong>. Bạn có thể thi thử miễn phí <strong>Đề mẫu số 01 (APT-01)</strong> hoặc nâng cấp tài khoản để mở khóa toàn bộ 20 bộ đề Full Test.
+              Bộ đề <strong>{lockedExamModal.name}</strong> thuộc quyền lợi gói <strong>VIP PRO</strong>. Bạn có thể luyện tập đề mẫu miễn phí hoặc nâng cấp gói tài khoản để mở khóa toàn bộ kho đề thi.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-2.5">

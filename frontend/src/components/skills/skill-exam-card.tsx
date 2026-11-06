@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Lock } from "lucide-react";
 import { getCloverConfig } from "@/lib/clover-utils";
+import { ProUnlockButton } from "@/components/ui/pro-unlock-button";
 
 /* ============================================================================
  * SKILL MARATHON / PRO CUSTOM ACTION CARD (CARD 1)
@@ -225,20 +226,7 @@ export function SkillExamCard({
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         ) : (
-          <button
-            type="button"
-            onClick={
-              onLockedClick ||
-              (() =>
-                alert(
-                  "Đề này thuộc gói Pro. Bạn có thể luyện tập đề Free hoàn toàn miễn phí!"
-                ))
-            }
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-xs hover:bg-amber-500/10 transition-colors cursor-pointer"
-          >
-            <Lock className="w-3.5 h-3.5" />
-            <span>Mở khóa</span>
-          </button>
+          <ProUnlockButton onClick={onLockedClick} label="Mở khóa" />
         )}
       </div>
     </div>

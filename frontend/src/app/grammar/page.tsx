@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/auth-context";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { ProUnlockButton } from "@/components/ui/pro-unlock-button";
 import { FloatingActions } from "@/components/floating-actions";
 import { UniversalSkillGuideModal } from "@/components/skill-format-guide-modal";
 import {
@@ -489,13 +490,7 @@ export default function GrammarPracticePage() {
                         </span>
 
                         {isLocked ? (
-                          <Link
-                            href="/pricing"
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold text-xs hover:bg-amber-500/25 transition-colors border border-amber-500/30"
-                          >
-                            <Lock className="w-3.5 h-3.5" />
-                            <span>Mở khóa PRO</span>
-                          </Link>
+                          <ProUnlockButton href="/pricing" label="Mở khóa" size="sm" />
                         ) : (
                           <Link
                             href={`/grammar/${exam.id}`}

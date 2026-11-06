@@ -6,6 +6,7 @@ import { api } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { ProUnlockButton } from "@/components/ui/pro-unlock-button";
 import { FloatingActions } from "@/components/floating-actions";
 import {
   Sparkles,
@@ -456,13 +457,7 @@ export default function KeyDuDoanPage() {
                           )}
                         </Link>
                       ) : (
-                        <Link
-                          href="/bang-gia"
-                          className="tech-btn inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-primary text-primary hover:bg-primary/10 text-xs font-bold transition-all"
-                        >
-                          <Lock className="w-3.5 h-3.5" />
-                          <span>Mở khóa VIP</span>
-                        </Link>
+                        <ProUnlockButton href="/bang-gia" label="Mở khóa" />
                       )}
                     </div>
                   </div>
