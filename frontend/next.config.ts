@@ -2,6 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone", // Required for Docker deployment
+  async redirects() {
+    return [
+      {
+        source: "/bang-gia",
+        destination: "/pricing",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     const backendUrl =
       process.env.INTERNAL_BACKEND_URL ||

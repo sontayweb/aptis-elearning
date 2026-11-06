@@ -234,7 +234,7 @@ export default function KeyDuDoanPage() {
 
             {!userHasPro && (
               <Link
-                href="/bang-gia"
+                href="/pricing"
                 className="tech-btn px-5 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shrink-0 shadow-md transition-all flex items-center gap-1.5"
               >
                 <Sparkles className="w-4 h-4" />
@@ -457,7 +457,7 @@ export default function KeyDuDoanPage() {
                           )}
                         </Link>
                       ) : (
-                        <ProUnlockButton href="/bang-gia" label="Mở khóa" />
+                        <ProUnlockButton href="/pricing" label="Mở khóa" />
                       )}
                     </div>
                   </div>

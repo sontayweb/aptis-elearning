@@ -626,7 +626,7 @@ export default function MockExamListPage() {
                 </Link>
               ) : null}
               <Link
-                href="/bang-gia"
+                href="/pricing"
                 className="flex-1 text-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] text-white font-bold text-xs hover:opacity-95 transition-opacity"
               >
                 Nâng cấp gói VIP PRO
