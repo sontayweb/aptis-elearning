@@ -19,6 +19,11 @@ import {
 import { ReadingResultCard } from "@/components/reading-result-card";
 import { ExamSyncStatus, ExamRecoveryBanner } from "@/components/exam-sync-status";
 import {
+  countWords,
+  enforceWordLimit,
+  WRITING_WORD_LIMITS,
+} from "@/lib/writing-validator";
+import {
   Clock,
   ArrowLeft,
   ArrowRight,
@@ -578,10 +583,10 @@ export default function OfficialMockExamRoom() {
                 }
               }
 
-              // Nếu là Reading Part 1 và có dấu hiệu điền từ, ép sang GAP_FILL
+              // Nếu là Reading Part 1, ép sang GAP_FILL (trừ câu mẫu dummy)
               if (isReadingPart1 && qType === "MULTIPLE_CHOICE") {
                 const prompt = q.prompt || "";
-                if (prompt.includes("[gap]") || prompt.includes("tentisspace") || prompt.includes("___") || prompt.includes("...")) {
+                if (!/câu mẫu không cần làm/i.test(prompt)) {
                   qType = "GAP_FILL";
                 }
               }
@@ -589,9 +594,18 @@ export default function OfficialMockExamRoom() {
               // Nếu là Reading Part 2 (Sentence Order) và options là mảng chuỗi
               if (qType === "SENTENCE_ORDER" || isReadingPart2) {
                 if (Array.isArray(opts) && opts.length > 0 && typeof opts[0] === "string") {
+                  const cleanOpts = opts
+                    .map((s: string) =>
+                      String(s)
+                        .replace(/<[^>]+>/g, " ")
+                        .replace(/&nbsp;/gi, " ")
+                        .replace(/\s+/g, " ")
+                        .trim()
+                    )
+                    .filter(Boolean);
                   opts = {
                     title: part.title || "Text Cohesion",
-                    sentences: opts.map((text: string, sIdx: number) => ({ id: `s${sIdx + 1}`, text })),
+                    sentences: cleanOpts.map((text: string, sIdx: number) => ({ id: `s${sIdx + 1}`, text })),
                   };
                   qType = "SENTENCE_ORDER";
                 }
@@ -606,6 +620,7 @@ export default function OfficialMockExamRoom() {
 
               flat.push({
                 ...q,
+                correctAnswer: q.correct_answer || q.correctAnswer,
                 question_type: qType,
                 part_id: q.part_id || part.id,
                 options: opts,
@@ -613,13 +628,10 @@ export default function OfficialMockExamRoom() {
                 partTitle: part.title,
                 partAudioUrl: (q as any).audio_url || (q as any).file || part.audio_url,
                 partPassageText: (() => {
-                  if (part.passage_text && part.passage_text.length > 50) return part.passage_text;
+                  if (part.passage_text && part.passage_text.trim()) return part.passage_text;
                   const exp = q.explanation || "";
                   if (exp.includes("--- GIẢI THÍCH ĐÁP ÁN ---")) {
                     return exp.split("--- GIẢI THÍCH ĐÁP ÁN ---")[0].trim();
-                  }
-                  if (exp.length > 40 && !exp.toLowerCase().startsWith("đáp án chuẩn")) {
-                    return exp.trim();
                   }
                   return part.passage_text;
                 })(),
@@ -1311,13 +1323,24 @@ export default function OfficialMockExamRoom() {
     const handledPartIds = new Set<string>();
 
     questions.forEach((q, idx) => {
+      const pTitleUpper = (q.partTitle || "").toUpperCase();
+      const isWritingGroup =
+        q.question_type === "ESSAY" ||
+        q.question_type === "SHORT_TEXT" ||
+        q.question_type === "WRITING_ESSAY" ||
+        examData?.skill === "WRITING" ||
+        pTitleUpper.includes("WRITING") ||
+        pTitleUpper.includes("VIẾT") ||
+        pTitleUpper.includes("VIET");
+
       const isGrouped =
+        isWritingGroup ||
         q.question_type === "GAP_FILL" ||
         (q.question_type === "MATCHING" && (
-          q.partTitle?.includes("READING") ||
-          q.partTitle?.includes("LISTENING") ||
-          q.partTitle?.includes("GRAMMAR_VOCAB") ||
-          q.partTitle?.includes("Vocab")
+          pTitleUpper.includes("READING") ||
+          pTitleUpper.includes("LISTENING") ||
+          pTitleUpper.includes("GRAMMAR_VOCAB") ||
+          pTitleUpper.includes("VOCAB")
         ));
 
       if (isGrouped) {
@@ -1332,7 +1355,7 @@ export default function OfficialMockExamRoom() {
     });
 
     return stages.length > 0 ? stages : null;
-  }, [questions]);
+  }, [questions, examData?.skill]);
 
   const examStages = getExamStages();
   const currentStageIndex = examStages
@@ -3129,10 +3152,11 @@ export default function OfficialMockExamRoom() {
         )}
       </header>
 
-      {/* Main Content: Split panel cho Listening/Writing/Speaking; Reading full width */}
+      {/* Main Content: Split panel cho Listening/Speaking; Reading & Writing full width */}
       {(() => {
         const isReadingSkillOrPart =
-          examData?.skill === "READING" || currentQ?.partTitle?.includes("READING");
+          examData?.skill === "READING" ||
+          getSkillFromQuestion(currentQ).key === "READING";
         const isSpeakingPart4 =
           (currentQ?.partTitle || "").toLowerCase().includes("part 4") ||
           (currentQ?.partTitle || "").toLowerCase().includes("abstract");
@@ -3142,6 +3166,7 @@ export default function OfficialMockExamRoom() {
           (currentQ?.image_url || currentQ?.partImageUrl);
         const hasLeftPanel =
           !isReadingSkillOrPart &&
+          !isWritingCurrentQ &&
           (currentQ?.partPassageText || currentQ?.partAudioUrl || hasCueImage);
         const isFullTest = examData?.skill === "FULL_TEST";
 
@@ -3373,8 +3398,10 @@ export default function OfficialMockExamRoom() {
                     </span>
                   </div>
 
-              {/* Prompt (Ẩn cho GAP_FILL, MATCHING, SENTENCE_ORDER vì đã tích hợp sẵn trong UI) */}
-              {currentQ.question_type !== "GAP_FILL" && currentQ.question_type !== "MATCHING" && (
+              {/* Prompt (Ẩn cho GAP_FILL, MATCHING, Writing vì đã tích hợp sẵn trong UI nhóm) */}
+              {currentQ.question_type !== "GAP_FILL" &&
+                currentQ.question_type !== "MATCHING" &&
+                !isWritingCurrentQ && (
                 <div className="text-base md:text-lg font-medium text-exam-text mb-6 leading-relaxed">
                   <span className="font-bold text-primary mr-2">{questionIdx + 1}.</span>
                   {currentQ.question_type === "SENTENCE_ORDER"
@@ -3425,25 +3452,29 @@ export default function OfficialMockExamRoom() {
 
               {/* 3. MATCHING COMPONENT - Hỗ trợ toàn bộ các dạng Matching trong Aptis Full Test & từng kỹ năng */}
               {currentQ.question_type === "MATCHING" && (() => {
+                const pTitleLower = (currentQ.partTitle || "").toLowerCase();
                 const isReadingLongText =
                   isReadingSkillOrPart &&
-                  (currentQ.partTitle?.includes("Long") ||
-                    currentQ.partTitle?.includes("Part 4") ||
-                    currentQ.partTitle?.includes("Part 5") ||
-                    currentQ.partTitle?.includes("Heading"));
+                  (pTitleLower.includes("long") ||
+                    pTitleLower.includes("part 4") ||
+                    pTitleLower.includes("part 5") ||
+                    pTitleLower.includes("heading") ||
+                    currentQ.partNumber === 8);
 
                 const isReadingOpinion =
                   isReadingSkillOrPart &&
-                  (currentQ.partTitle?.includes("Opinion") || currentQ.partTitle?.includes("Part 3"));
+                  (pTitleLower.includes("opinion") ||
+                    pTitleLower.includes("part 3") ||
+                    currentQ.partNumber === 7);
 
                 const isListeningPart2 =
-                  currentQ.partTitle?.includes("LISTENING") && currentQ.partTitle?.includes("Part 2");
+                  pTitleLower.includes("listening") && pTitleLower.includes("part 2");
 
                 const isListeningPart3 =
-                  currentQ.partTitle?.includes("LISTENING") && currentQ.partTitle?.includes("Part 3");
+                  pTitleLower.includes("listening") && pTitleLower.includes("part 3");
 
                 const isVocabMatching =
-                  currentQ.partTitle?.includes("GRAMMAR_VOCAB") || currentQ.partTitle?.includes("Vocab");
+                  pTitleLower.includes("grammar_vocab") || pTitleLower.includes("vocab");
 
                 // A. Reading Long Text Comprehension (Headings matching)
                 if (isReadingLongText) {
@@ -3713,30 +3744,172 @@ export default function OfficialMockExamRoom() {
                   </div>
                 )}
 
-              {/* Essay / Writing */}
+              {/* Essay / Writing (Grouped by Writing Part 1 - 4 chuẩn British Council Aptis) */}
               {(currentQ.question_type === "ESSAY" ||
                 currentQ.question_type === "SHORT_TEXT" ||
                 currentQ.question_type === "WRITING_ESSAY" ||
-                isWritingCurrentQ) && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-exam-text-muted">Bài viết của bạn:</label>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-muted text-exam-text">
-                      {(textAnswers[currentQ.id] || "").split(/\s+/).filter(Boolean).length} từ
-                    </span>
+                isWritingCurrentQ) && (() => {
+                const partWritingQs = questions.filter(
+                  (q) => (q.part_id || q.partTitle) === (currentQ.part_id || currentQ.partTitle)
+                );
+                const pTitleLower = (currentQ.partTitle || "").toLowerCase();
+                const pNum = Number(currentQ.partNumber || 0);
+                const isWPart1 =
+                  pTitleLower.includes("part 1") ||
+                  pTitleLower.includes("word-level") ||
+                  pNum === 9 ||
+                  (examData?.skill === "WRITING" && pNum === 1) ||
+                  partWritingQs.length >= 5;
+                const isWPart2 =
+                  !isWPart1 &&
+                  (pTitleLower.includes("part 2") ||
+                    pTitleLower.includes("short text") ||
+                    pNum === 10 ||
+                    (examData?.skill === "WRITING" && pNum === 2) ||
+                    partWritingQs.length === 1);
+                const isWPart3 =
+                  !isWPart1 &&
+                  !isWPart2 &&
+                  (pTitleLower.includes("part 3") ||
+                    pTitleLower.includes("social") ||
+                    pTitleLower.includes("chat") ||
+                    pNum === 11 ||
+                    (examData?.skill === "WRITING" && pNum === 3) ||
+                    partWritingQs.length === 3);
+                const isWPart4 = !isWPart1 && !isWPart2 && !isWPart3;
+
+                return (
+                  <div className="space-y-6">
+                    {/* Hướng dẫn & Bối cảnh CLB (nếu có) */}
+                    {(currentQ.partInstructions || currentQ.partPassageText) && (
+                      <div className="p-4 sm:p-5 rounded-2xl border border-primary/20 bg-primary/5 space-y-2">
+                        {currentQ.partInstructions && (
+                          <p className="text-xs sm:text-sm font-bold text-primary leading-relaxed">
+                            {currentQ.partInstructions}
+                          </p>
+                        )}
+                        {currentQ.partPassageText &&
+                          currentQ.partPassageText !== currentQ.partTitle && (
+                            <div className="p-3.5 rounded-xl bg-exam-surface border border-exam-border text-xs sm:text-sm text-exam-text leading-relaxed whitespace-pre-wrap font-serif">
+                              {currentQ.partPassageText}
+                            </div>
+                          )}
+                      </div>
+                    )}
+
+                    {/* Danh sách câu hỏi trong Part */}
+                    <div className="space-y-5">
+                      {partWritingQs.map((wq, wIdx) => {
+                        const val = textAnswers[wq.id] || "";
+                        const words = countWords(val);
+                        const isInformalMail =
+                          isWPart4 &&
+                          (wIdx === 0 || (wq.prompt || "").toLowerCase().includes("friend"));
+                        const maxWords = isWPart1
+                          ? WRITING_WORD_LIMITS.PART_1
+                          : isWPart2
+                          ? WRITING_WORD_LIMITS.PART_2
+                          : isWPart3
+                          ? WRITING_WORD_LIMITS.PART_3
+                          : isInformalMail
+                          ? WRITING_WORD_LIMITS.PART_4_MAIL_1
+                          : WRITING_WORD_LIMITS.PART_4_MAIL_2;
+
+                        const recLabel = isWPart1
+                          ? "Khuyên dùng: 1–5 từ (Tối đa 10 từ)"
+                          : isWPart2
+                          ? "Khuyên dùng: 20–30 từ (Tối đa 45 từ)"
+                          : isWPart3
+                          ? "Khuyên dùng: 30–40 từ (Tối đa 60 từ)"
+                          : isInformalMail
+                          ? "Task 1 (Email thân mật): ~50 từ (Tối đa 75 từ)"
+                          : "Task 2 (Email trang trọng): 120–150 từ (Tối đa 225 từ)";
+
+                        const isAtLimit = words >= maxWords;
+                        const cleanPrompt = (wq.prompt || "")
+                          .replace(/<[^>]+>/g, " ")
+                          .replace(/&nbsp;/gi, " ")
+                          .replace(/\s+/g, " ")
+                          .trim();
+
+                        return (
+                          <div
+                            key={wq.id}
+                            className="p-4 sm:p-5 rounded-2xl border border-exam-border bg-exam-bg/40 space-y-3"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <label className="text-sm sm:text-base font-bold text-exam-text leading-snug">
+                                <span className="text-primary mr-1.5">
+                                  {isWPart4 ? `Task ${wIdx + 1}:` : `${wIdx + 1}.`}
+                                </span>
+                                {cleanPrompt}
+                              </label>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-[11px] text-exam-text-muted hidden sm:inline">
+                                  {recLabel}
+                                </span>
+                                <span
+                                  className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
+                                    isAtLimit
+                                      ? "bg-rose-500/15 text-rose-600 border-rose-500/30"
+                                      : words > 0
+                                      ? "bg-primary/10 text-primary border-primary/25"
+                                      : "bg-muted text-exam-text-muted border-exam-border"
+                                  }`}
+                                >
+                                  {words}/{maxWords} từ
+                                </span>
+                              </div>
+                            </div>
+
+                            {isWPart1 ? (
+                              <input
+                                type="text"
+                                value={val}
+                                onChange={(e) => {
+                                  const { value } = enforceWordLimit(
+                                    e.target.value,
+                                    val,
+                                    maxWords
+                                  );
+                                  setTextAnswers((prev) => ({ ...prev, [wq.id]: value }));
+                                }}
+                                placeholder="Nhập câu trả lời ngắn (1–5 từ)..."
+                                className="w-full px-4 py-2.5 rounded-xl border border-exam-border bg-exam-surface text-exam-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-exam-text-muted/50"
+                                spellCheck={false}
+                              />
+                            ) : (
+                              <textarea
+                                value={val}
+                                onChange={(e) => {
+                                  const { value } = enforceWordLimit(
+                                    e.target.value,
+                                    val,
+                                    maxWords
+                                  );
+                                  setTextAnswers((prev) => ({ ...prev, [wq.id]: value }));
+                                }}
+                                placeholder={
+                                  isWPart3
+                                    ? "Nhập tin nhắn phản hồi thành viên CLB (30–40 từ)..."
+                                    : isWPart2
+                                    ? "Nhập đoạn văn ngắn điền đơn CLB (20–30 từ)..."
+                                    : isInformalMail
+                                    ? "Viết email thân mật gửi người bạn (~50 từ)..."
+                                    : "Viết email trang trọng gửi Ban quản lý CLB (120–150 từ)..."
+                                }
+                                rows={isWPart2 ? 4 : isWPart3 ? 4 : isInformalMail ? 5 : 9}
+                                className="w-full p-4 rounded-xl border border-exam-border bg-exam-surface text-exam-text text-sm leading-7 resize-y focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-exam-text-muted/50"
+                                spellCheck={false}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <textarea
-                    value={textAnswers[currentQ.id] || ""}
-                    onChange={(e) =>
-                      setTextAnswers((prev) => ({ ...prev, [currentQ.id]: e.target.value }))
-                    }
-                    placeholder="Nhập bài viết của bạn tại đây..."
-                    rows={10}
-                    className="w-full p-4 rounded-xl border border-exam-border bg-exam-bg text-exam-text text-sm leading-7 resize-y focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-exam-text-muted/50"
-                    spellCheck={false}
-                  />
-                </div>
-              )}
+                );
+              })()}
 
               {/* Speaking Audio */}
               {currentQ.question_type === "SPEAKING_AUDIO" && (

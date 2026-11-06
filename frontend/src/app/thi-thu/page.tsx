@@ -47,6 +47,7 @@ interface MockTest {
   id: string;
   name: string;
   code: string;
+  rawSkill?: string;
   totalTime: string;
   skills: string;
   difficulty: string;
@@ -62,6 +63,23 @@ interface MockTest {
   bestScore: string | null;
   bestCefr: string | null;
   userAttempts: number;
+}
+
+function getExamTargetHref(skill: string | undefined, id: string): string {
+  switch ((skill || "").toUpperCase()) {
+    case "READING":
+      return `/reading/${id}`;
+    case "WRITING":
+      return `/writing/${id}`;
+    case "SPEAKING":
+      return `/speaking/${id}`;
+    case "LISTENING":
+      return `/listening/${id}`;
+    case "GRAMMAR_VOCABULARY":
+      return `/grammar/${id}`;
+    default:
+      return `/thi-thu/${id}`;
+  }
 }
 
 function formatSkillSummary(skill?: string, totalParts?: number, totalQuestions?: number): string {
@@ -163,6 +181,7 @@ export default function MockExamListPage() {
           id: exam.id,
           name: exam.title,
           code: exam.code || `APT-${exam.id.slice(0, 6).toUpperCase()}`,
+          rawSkill: exam.skill,
           totalTime: `${exam.durationMinutes || 137} phút`,
           skills: formatSkillSummary(exam.skill, exam.totalParts, exam.totalQuestions),
           difficulty: exam.skill === "FULL_TEST" ? "Chuẩn CEFR A1 – C" : "B1 - B2 Target",
@@ -219,7 +238,7 @@ export default function MockExamListPage() {
           setLockedExamModal(localMatch);
           return;
         }
-        router.push(`/thi-thu/${localMatch.id}`);
+        router.push(getExamTargetHref(localMatch.rawSkill, localMatch.id));
         return;
       }
 
@@ -233,6 +252,7 @@ export default function MockExamListPage() {
             id: examData.id,
             name: examData.title || `Đề thi ${cleanCode.toUpperCase()}`,
             code: examData.code || cleanCode.toUpperCase(),
+            rawSkill: examData.skill,
             totalTime: `${examData.durationMinutes || 137} phút`,
             skills: formatSkillSummary(examData.skill, examData.parts?.length, examData.totalQuestions),
             difficulty: "Chuẩn CEFR A1 – C",
@@ -250,7 +270,7 @@ export default function MockExamListPage() {
           });
           return;
         }
-        router.push(`/thi-thu/${res.data.id}`);
+        router.push(getExamTargetHref(examData.skill, res.data.id));
       } else {
         setRoomError(
           res.error?.message ||
@@ -556,7 +576,7 @@ export default function MockExamListPage() {
                     />
                   ) : (
                     <Link
-                      href={`/thi-thu/${test.id}`}
+                      href={getExamTargetHref(test.rawSkill || selectedSkill, test.id)}
                       className={`tech-btn inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs shadow-md transition-all ${
                         test.userStatus === "IN_PROGRESS"
                           ? "bg-amber-600 text-white hover:bg-amber-700"

@@ -140,13 +140,14 @@ export default function AdminReadingTab({
                   </thead>
                   <tbody className="divide-y divide-border">
                     {(readingData.p1?.cluesP1 || [])
+                      .map((c, realIdx) => ({ c, realIdx }))
                       .filter(
-                        (c) =>
-                          c.questionPattern.toLowerCase().includes(search.toLowerCase()) ||
-                          c.answerType.toLowerCase().includes(search.toLowerCase())
+                        ({ c }) =>
+                          (c.questionPattern || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (c.answerType || "").toLowerCase().includes(search.toLowerCase())
                       )
-                      .map((c, idx) => (
-                        <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                      .map(({ c, realIdx }, idx) => (
+                        <tr key={realIdx} className="hover:bg-muted/20 transition-colors">
                           <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                             {String(idx + 1).padStart(2, "0")}
                           </td>
@@ -169,7 +170,7 @@ export default function AdminReadingTab({
                                     skill: "reading",
                                     part: "p1",
                                     data: { ...c },
-                                    index: idx,
+                                    index: realIdx,
                                   })
                                 }
                                 className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
@@ -181,7 +182,7 @@ export default function AdminReadingTab({
                                 onClick={() => {
                                   if (confirm("Xóa mẹo này?")) {
                                     const nextClues = (readingData.p1?.cluesP1 || []).filter(
-                                      (_, i) => i !== idx
+                                      (_, i) => i !== realIdx
                                     );
                                     setReadingData((prev) => ({
                                       ...prev,
@@ -250,12 +251,13 @@ export default function AdminReadingTab({
 
               <div className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden shadow-xs">
                 {(readingData.p2?.topicsP2 || READING_P2_TOPICS)
+                  .map((topic, realIdx) => ({ topic, realIdx }))
                   .filter(
-                    (t) =>
-                      t.title.toLowerCase().includes(search.toLowerCase()) ||
-                      t.summary.toLowerCase().includes(search.toLowerCase())
+                    ({ topic }) =>
+                      (topic.title || "").toLowerCase().includes(search.toLowerCase()) ||
+                      (topic.summary || "").toLowerCase().includes(search.toLowerCase())
                   )
-                  .map((topic, tIdx) => (
+                  .map(({ topic, realIdx: tIdx }) => (
                     <div key={topic.id || tIdx} className="p-4 md:p-5 space-y-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
@@ -403,14 +405,15 @@ export default function AdminReadingTab({
                   </thead>
                   <tbody className="divide-y divide-border">
                     {(readingData.p3?.paraphraseTrapsP3 || [])
+                      .map((t, realIdx) => ({ t, realIdx }))
                       .filter(
-                        (t) =>
-                          t.questionKeyword.toLowerCase().includes(search.toLowerCase()) ||
-                          t.passageSynonym.toLowerCase().includes(search.toLowerCase()) ||
-                          t.trapNote.toLowerCase().includes(search.toLowerCase())
+                        ({ t }) =>
+                          (t.questionKeyword || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (t.passageSynonym || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (t.trapNote || "").toLowerCase().includes(search.toLowerCase())
                       )
-                      .map((t, idx) => (
-                        <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                      .map(({ t, realIdx }, idx) => (
+                        <tr key={realIdx} className="hover:bg-muted/20 transition-colors">
                           <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                             {String(idx + 1).padStart(2, "0")}
                           </td>
@@ -431,7 +434,7 @@ export default function AdminReadingTab({
                                     skill: "reading",
                                     part: "p3",
                                     data: { ...t },
-                                    index: idx,
+                                    index: realIdx,
                                   })
                                 }
                                 className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
@@ -444,7 +447,7 @@ export default function AdminReadingTab({
                                   if (confirm("Xóa bẫy paraphrase này?")) {
                                     const nextTraps = (
                                       readingData.p3?.paraphraseTrapsP3 || []
-                                    ).filter((_, i) => i !== idx);
+                                    ).filter((_, i) => i !== realIdx);
                                     setReadingData((prev) => ({
                                       ...prev,
                                       p3: { ...prev.p3, paraphraseTrapsP3: nextTraps },
@@ -510,14 +513,15 @@ export default function AdminReadingTab({
                   </thead>
                   <tbody className="divide-y divide-border">
                     {(readingData.p4?.headingStrategiesP4 || [])
+                      .map((h, realIdx) => ({ h, realIdx }))
                       .filter(
-                        (h) =>
-                          h.headingType.toLowerCase().includes(search.toLowerCase()) ||
-                          h.clueKeywords.toLowerCase().includes(search.toLowerCase()) ||
-                          h.guide.toLowerCase().includes(search.toLowerCase())
+                        ({ h }) =>
+                          (h.headingType || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (h.clueKeywords || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (h.guide || "").toLowerCase().includes(search.toLowerCase())
                       )
-                      .map((h, idx) => (
-                        <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                      .map(({ h, realIdx }, idx) => (
+                        <tr key={realIdx} className="hover:bg-muted/20 transition-colors">
                           <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                             {String(idx + 1).padStart(2, "0")}
                           </td>
@@ -538,7 +542,7 @@ export default function AdminReadingTab({
                                     skill: "reading",
                                     part: "p4",
                                     data: { ...h },
-                                    index: idx,
+                                    index: realIdx,
                                   })
                                 }
                                 className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
@@ -551,7 +555,7 @@ export default function AdminReadingTab({
                                   if (confirm("Xóa chiến lược này?")) {
                                     const nextList = (
                                       readingData.p4?.headingStrategiesP4 || []
-                                    ).filter((_, i) => i !== idx);
+                                    ).filter((_, i) => i !== realIdx);
                                     setReadingData((prev) => ({
                                       ...prev,
                                       p4: { ...prev.p4, headingStrategiesP4: nextList },
@@ -890,69 +894,50 @@ export default function AdminReadingTab({
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-foreground block mb-1">Loại bẫy (Trap Type):</label>
-                <select
-                  value={editingItem.data.trapType || "Từ đồng nghĩa đổi dạng"}
-                  onChange={(e) =>
-                    setEditingItem({
-                      ...editingItem,
-                      data: { ...editingItem.data, trapType: e.target.value },
-                    })
-                  }
-                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
-                >
-                  <option value="Từ đồng nghĩa đổi dạng">Từ đồng nghĩa đổi dạng</option>
-                  <option value="Phủ định ngầm (Negative paraphrase)">Phủ định ngầm (Negative paraphrase)</option>
-                  <option value="Bẫy mốc thời gian / thì hoàn thành">Bẫy mốc thời gian / thì hoàn thành</option>
-                  <option value="Khái quát hóa / Cụ thể hóa">Khái quát hóa / Cụ thể hóa</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="font-bold text-foreground block mb-1">Đoạn văn gốc (Original Text):</label>
-                <textarea
-                  rows={2}
-                  value={editingItem.data.originalText || ""}
-                  onChange={(e) =>
-                    setEditingItem({
-                      ...editingItem,
-                      data: { ...editingItem.data, originalText: e.target.value },
-                    })
-                  }
-                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="VD: The venue was fully booked until December..."
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-foreground block mb-1">Cách diễn đạt trong câu hỏi (Question Paraphrase):</label>
-                <textarea
-                  rows={2}
-                  value={editingItem.data.questionParaphrase || ""}
-                  onChange={(e) =>
-                    setEditingItem({
-                      ...editingItem,
-                      data: { ...editingItem.data, questionParaphrase: e.target.value },
-                    })
-                  }
-                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="VD: There were no tickets available before the end of the year..."
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-foreground block mb-1">Mẹo nhận diện & Đáp án đúng:</label>
+                <label className="font-bold text-foreground block mb-1">Từ khóa câu hỏi (Question Keyword):</label>
                 <input
                   type="text"
-                  value={editingItem.data.correctTrap || ""}
+                  value={editingItem.data.questionKeyword || ""}
                   onChange={(e) =>
                     setEditingItem({
                       ...editingItem,
-                      data: { ...editingItem.data, correctTrap: e.target.value },
+                      data: { ...editingItem.data, questionKeyword: e.target.value },
                     })
                   }
                   className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="VD: fully booked = no tickets available"
+                  placeholder="VD: prefer working alone / too expensive..."
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-foreground block mb-1">Từ đồng nghĩa trong bài đọc (Passage Synonym):</label>
+                <textarea
+                  rows={2}
+                  value={editingItem.data.passageSynonym || ""}
+                  onChange={(e) =>
+                    setEditingItem({
+                      ...editingItem,
+                      data: { ...editingItem.data, passageSynonym: e.target.value },
+                    })
+                  }
+                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="VD: work independently / beyond my budget..."
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-foreground block mb-1">Bẫy cần tránh &amp; Mẹo nhận diện (Trap Note):</label>
+                <textarea
+                  rows={2}
+                  value={editingItem.data.trapNote || ""}
+                  onChange={(e) =>
+                    setEditingItem({
+                      ...editingItem,
+                      data: { ...editingItem.data, trapNote: e.target.value },
+                    })
+                  }
+                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="VD: Cẩn thận bẫy phủ định 'used to' hoặc nhắc lại đúng từ nhưng phủ định..."
                 />
               </div>
             </div>
@@ -1009,66 +994,50 @@ export default function AdminReadingTab({
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-foreground block mb-1">Dạng đoạn văn (Type):</label>
+                <label className="font-bold text-foreground block mb-1">Dạng tiêu đề (Heading Type):</label>
                 <input
                   type="text"
-                  value={editingItem.data.type || ""}
+                  value={editingItem.data.headingType || ""}
                   onChange={(e) =>
                     setEditingItem({
                       ...editingItem,
-                      data: { ...editingItem.data, type: e.target.value },
+                      data: { ...editingItem.data, headingType: e.target.value },
                     })
                   }
                   className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="VD: Đoạn văn so sánh / đối lập"
+                  placeholder="VD: Lịch sử / Nguồn gốc (Origins / History / Past)"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-foreground block mb-1">Dấu hiệu nhận diện (Signal):</label>
+                <label className="font-bold text-foreground block mb-1">Từ khóa nhận diện (Clue Keywords):</label>
                 <textarea
                   rows={2}
-                  value={editingItem.data.signal || ""}
+                  value={editingItem.data.clueKeywords || ""}
                   onChange={(e) =>
                     setEditingItem({
                       ...editingItem,
-                      data: { ...editingItem.data, signal: e.target.value },
+                      data: { ...editingItem.data, clueKeywords: e.target.value },
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="VD: In contrast, on the other hand, unlike..."
+                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="VD: century, ancient, originally, dates back to, 19th..."
                 />
               </div>
 
               <div>
-                <label className="font-bold text-foreground block mb-1">Chiến lược chọn tiêu đề (Strategy):</label>
+                <label className="font-bold text-foreground block mb-1">Hướng dẫn xử lý (Guide):</label>
                 <textarea
-                  rows={2}
-                  value={editingItem.data.strategy || ""}
+                  rows={3}
+                  value={editingItem.data.guide || ""}
                   onChange={(e) =>
                     setEditingItem({
                       ...editingItem,
-                      data: { ...editingItem.data, strategy: e.target.value },
+                      data: { ...editingItem.data, guide: e.target.value },
                     })
                   }
                   className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="VD: Tìm tiêu đề chứa từ Differences / Comparison / Versus..."
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-foreground block mb-1">Ví dụ minh họa (Example):</label>
-                <input
-                  type="text"
-                  value={editingItem.data.example || ""}
-                  onChange={(e) =>
-                    setEditingItem({
-                      ...editingItem,
-                      data: { ...editingItem.data, example: e.target.value },
-                    })
-                  }
-                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="VD: Tiêu đề: Differences between traditional and digital media"
+                  placeholder="VD: Tìm đoạn văn có nhiều mốc năm tháng hoặc từ chỉ thời kỳ cổ đại..."
                 />
               </div>
             </div>

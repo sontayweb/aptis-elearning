@@ -172,13 +172,14 @@ export default function AdminListeningTab({
               </thead>
               <tbody className="divide-y divide-border">
                 {(part1Data[activeCat] || [])
+                  .map((q, realIdx) => ({ q, realIdx }))
                   .filter(
-                    (q) =>
-                      q.question.toLowerCase().includes(search.toLowerCase()) ||
-                      q.answer.toLowerCase().includes(search.toLowerCase())
+                    ({ q }) =>
+                      (q.question || "").toLowerCase().includes(search.toLowerCase()) ||
+                      (q.answer || "").toLowerCase().includes(search.toLowerCase())
                   )
-                  .map((q, idx) => (
-                    <tr key={q.id || idx} className="hover:bg-muted/20 transition-colors">
+                  .map(({ q, realIdx }, idx) => (
+                    <tr key={q.id || realIdx} className="hover:bg-muted/20 transition-colors">
                       <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                         {String(q.number).padStart(2, "0")}
                       </td>
@@ -196,7 +197,7 @@ export default function AdminListeningTab({
                       <td className="p-3.5 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
-                            onClick={() => setEditingItem({ part: "p1", data: { ...q }, index: idx })}
+                            onClick={() => setEditingItem({ part: "p1", data: { ...q }, index: realIdx })}
                             className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
                             title="Sửa câu hỏi"
                           >
@@ -207,7 +208,7 @@ export default function AdminListeningTab({
                               if (confirm("Xóa câu hỏi này?")) {
                                 setPart1Data((prev) => ({
                                   ...prev,
-                                  [activeCat]: (prev[activeCat] || []).filter((_, i) => i !== idx),
+                                  [activeCat]: (prev[activeCat] || []).filter((_, i) => i !== realIdx),
                                 }));
                                 showToast("Đã xóa câu hỏi");
                               }
@@ -269,8 +270,9 @@ export default function AdminListeningTab({
 
           <div className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden shadow-xs">
             {part2Data
-              .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()))
-              .map((topic, tIdx) => (
+              .map((topic, realIdx) => ({ topic, realIdx }))
+              .filter(({ topic }) => (topic.title || "").toLowerCase().includes(search.toLowerCase()))
+              .map(({ topic, realIdx: tIdx }) => (
                 <div key={topic.id || tIdx} className="p-4 md:p-5 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
@@ -428,13 +430,14 @@ export default function AdminListeningTab({
               </thead>
               <tbody className="divide-y divide-border">
                 {part3Data
+                  .map((item, realIdx) => ({ item, realIdx }))
                   .filter(
-                    (item) =>
-                      item.topic.toLowerCase().includes(search.toLowerCase()) ||
-                      item.story.toLowerCase().includes(search.toLowerCase()) ||
-                      item.code.includes(search)
+                    ({ item }) =>
+                      (item.topic || "").toLowerCase().includes(search.toLowerCase()) ||
+                      (item.story || "").toLowerCase().includes(search.toLowerCase()) ||
+                      (item.code || "").includes(search)
                   )
-                  .map((item, idx) => (
+                  .map(({ item, realIdx: idx }) => (
                     <tr key={item.stt || idx} className="hover:bg-muted/20 transition-colors">
                       <td className="p-3.5 text-center font-bold text-muted-foreground">{item.stt}.</td>
                       <td className="p-3.5 font-bold text-foreground">{item.topic}</td>
@@ -527,14 +530,15 @@ export default function AdminListeningTab({
 
           <div className="space-y-4">
             {part4Data
+              .map((topic, realIdx) => ({ topic, realIdx }))
               .filter(
-                (t) =>
-                  t.title.toLowerCase().includes(search.toLowerCase()) ||
-                  t.question1.toLowerCase().includes(search.toLowerCase()) ||
-                  t.answer1.toLowerCase().includes(search.toLowerCase()) ||
-                  t.quickTip.toLowerCase().includes(search.toLowerCase())
+                ({ topic: t }) =>
+                  (t.title || "").toLowerCase().includes(search.toLowerCase()) ||
+                  (t.question1 || "").toLowerCase().includes(search.toLowerCase()) ||
+                  (t.answer1 || "").toLowerCase().includes(search.toLowerCase()) ||
+                  (t.quickTip || "").toLowerCase().includes(search.toLowerCase())
               )
-              .map((topic, tIdx) => (
+              .map(({ topic, realIdx: tIdx }) => (
                 <div key={topic.id || tIdx} className="p-4 md:p-5 rounded-2xl border border-border bg-card space-y-3 shadow-xs">
                   <div className="flex items-center justify-between gap-2 border-b border-border pb-2.5">
                     <div className="flex items-center gap-2">

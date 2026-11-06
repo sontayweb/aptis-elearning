@@ -10,6 +10,21 @@ export interface Part1GapItem {
   id: string;
   prompt: string;
   options: string[];
+  correctAnswer?: string;
+}
+
+function stripReadingHtml(raw?: string): string {
+  if (!raw) return "";
+  return raw
+    .replace(/<\/p>\s*<p[^>]*>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/[ \t]+/g, " ")
+    .trim();
 }
 
 interface ReadingPart1StoryProps {
@@ -58,8 +73,18 @@ export function ReadingPart1Story({
 
         {/* Các câu hỏi điền từ của Part 1 */}
         {validGaps.map((gap) => {
-          // Hỗ trợ linh hoạt các định dạng gap: [gap], [blank], [...], tentisspace, _____, ....
-          const parts = (gap.prompt || "").split(/\[(?:gap|blank|\.\.\.)\]|tentisspace|_{3,}|\.{3,}/i);
+          const cleanPrompt = stripReadingHtml(gap.prompt || "");
+          // Hỗ trợ linh hoạt các định dạng gap: [gap], [blank], [...], tentisspace, tienphongSpace, _____, ....
+          let parts = cleanPrompt.split(/\[(?:gap|blank|\.\.\.)\]|tentisspace|tienphongSpace|_{3,}|\.{3,}/i);
+          if (parts.length === 1 && gap.correctAnswer) {
+            const ansEsc = gap.correctAnswer.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            if (ansEsc) {
+              const ansRegex = new RegExp(`\\b${ansEsc}\\b`, "i");
+              if (ansRegex.test(cleanPrompt)) {
+                parts = cleanPrompt.split(ansRegex);
+              }
+            }
+          }
           const currentVal = answers[gap.id] || "";
 
           // An toàn phân tích options (dù là array, JSON string hay null)
@@ -582,22 +607,51 @@ export function ReadingPart4OpinionMatching({
 
   let reviewList = reviews && reviews.length > 0 ? reviews : null;
   if (!reviewList && reviewsText) {
-    const chunks = reviewsText
-      .split(/(?=Person\s+[A-D]:)/i)
-      .map((chunk) => {
-        const match = chunk.match(/^Person\s+([A-D]):\s*([\s\S]*)$/i);
-        if (match) {
-          return {
-            id: `Person ${match[1].toUpperCase()}`,
-            text: match[2].trim(),
-          };
-        }
-        return null;
-      })
-      .filter(Boolean) as ReviewPersonItem[];
+    const cleanText = reviewsText
+      .replace(/<\/p>\s*<p[^>]*>/gi, "\n\n")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/gi, "'")
+      .trim();
 
-    if (chunks.length > 0) {
-      reviewList = chunks;
+    // 1. Try matching Person A/B/C/D or standalone A/B/C/D headers
+    const letterRegex = /(?:^|\n)\s*(?:Person\s+)?([A-D])\s*(?::|-|\n)\s*([\s\S]*?)(?=(?:\n\s*(?:Person\s+)?[A-D]\s*(?::|-|\n))|$)/gi;
+    const letterMatches = Array.from(cleanText.matchAll(letterRegex));
+    if (letterMatches.length >= 2) {
+      reviewList = letterMatches.map((m) => ({
+        id: `Person ${m[1].toUpperCase()}`,
+        text: m[2].trim(),
+      }));
+    }
+
+    // 2. Try matching named speakers: "Person Nadia: ..." or "Nadia: ..."
+    if (!reviewList || reviewList.length === 0) {
+      const namedRegex = /(?:^|\n)\s*(?:Person\s+)?([A-Z][a-zA-Z0-9_ ]{1,20})\s*:\s*([\s\S]*?)(?=(?:\n\s*(?:Person\s+)?[A-Z][a-zA-Z0-9_ ]{1,20}\s*:)|$)/g;
+      const namedMatches = Array.from(cleanText.matchAll(namedRegex));
+      if (namedMatches.length >= 2) {
+        reviewList = namedMatches.map((m) => ({
+          id: m[1].trim(),
+          text: m[2].trim(),
+        }));
+      }
+    }
+
+    // 3. Fallback: split by double newlines into paragraphs
+    if (!reviewList || reviewList.length === 0) {
+      const paras = cleanText
+        .split(/\n\s*\n/)
+        .map((p) => p.trim())
+        .filter((p) => p.length > 20);
+      if (paras.length > 0) {
+        const labels = ["A", "B", "C", "D"];
+        reviewList = paras.slice(0, 4).map((p, idx) => ({
+          id: `Person ${labels[idx] || idx + 1}`,
+          text: p.replace(/^(?:Person\s*)?[A-D]\s*[:.-]?\s*/i, "").trim(),
+        }));
+      }
     }
   }
   if (!reviewList || reviewList.length === 0) {
@@ -642,7 +696,7 @@ export function ReadingPart4OpinionMatching({
             >
               <div className="flex-1 text-sm font-semibold text-exam-text">
                 <span className="mr-1.5">{idx + 1}.</span>
-                <span>{q.prompt.replace(/^\d+[\.\:\s]+/, "")}</span>
+                <span>{stripReadingHtml(q.prompt).replace(/^\d+[\.\:\s]+/, "")}</span>
               </div>
 
               <div className="sm:w-44 shrink-0">
@@ -743,7 +797,7 @@ export function ReadingPart5LongReading({
 
               {/* Paragraph text */}
               <p className="text-sm text-exam-text/90 leading-relaxed font-normal">
-                {p.text}
+                {stripReadingHtml(p.text)}
               </p>
             </div>
           );

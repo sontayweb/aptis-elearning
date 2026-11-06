@@ -12,8 +12,8 @@ export class SettingsController {
   async getPublicSettings(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = await settingsService.getPublicSettings();
-      // Set HTTP Cache header
-      res.setHeader('Cache-Control', 'public, max-age=600');
+      // Disable HTTP cache so dynamic configs (e.g. KEY_MEO_LISTENING_CONFIG) sync immediately
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       sendSuccess(res, data, 'Lấy cấu hình hệ thống thành công', 200);
     } catch (error) {
       next(error);

@@ -476,8 +476,15 @@ export function SpeakingCheatSheetView({ customData }: SpeakingCheatSheetViewPro
                     <tbody className="divide-y divide-border">
                       {data.formulasP1.map((item, idx) => (
                         <tr key={idx} className="hover:bg-muted/40 transition-colors">
-                          <td className="p-2.5 font-bold text-foreground w-1/3">{item.category}</td>
-                          <td className="p-2.5 font-mono text-primary font-bold">{item.pattern}</td>
+                          <td className="p-2.5 font-bold text-foreground w-1/3 align-top">{item.category}</td>
+                          <td className="p-2.5 align-top space-y-1">
+                            <div className="font-mono text-primary font-bold">{item.pattern}</div>
+                            {item.example && (
+                              <div className="text-[11px] text-muted-foreground italic">
+                                VD: &ldquo;{item.example}&rdquo;
+                              </div>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
 import {
@@ -52,6 +52,76 @@ export default function AdminKeyVaMeoThiPage() {
   const [writingData, setWritingData] = useState<Record<string, WritingPartData>>(WRITING_KEY_MEO_DATA);
   const [speakingData, setSpeakingData] = useState<Record<string, SpeakingPartData>>(SPEAKING_KEY_MEO_DATA);
   const [readingData, setReadingData] = useState<Record<string, ReadingPartData>>(READING_KEY_MEO_DATA);
+
+  const isDirtyRef = useRef(false);
+
+  // Wrapped setters so any modal confirm / delete in child tabs triggers auto-save to DB
+  const updatePart1Data: React.Dispatch<React.SetStateAction<Record<string, Part1Question[]>>> = (val) => {
+    isDirtyRef.current = true;
+    setPart1Data(val);
+  };
+  const updatePart2Data: React.Dispatch<React.SetStateAction<Part2Topic[]>> = (val) => {
+    isDirtyRef.current = true;
+    setPart2Data(val);
+  };
+  const updatePart3Data: React.Dispatch<React.SetStateAction<Part3Item[]>> = (val) => {
+    isDirtyRef.current = true;
+    setPart3Data(val);
+  };
+  const updatePart4Data: React.Dispatch<React.SetStateAction<Part4Topic[]>> = (val) => {
+    isDirtyRef.current = true;
+    setPart4Data(val);
+  };
+  const updateWritingData: React.Dispatch<React.SetStateAction<Record<string, WritingPartData>>> = (val) => {
+    isDirtyRef.current = true;
+    setWritingData(val);
+  };
+  const updateSpeakingData: React.Dispatch<React.SetStateAction<Record<string, SpeakingPartData>>> = (val) => {
+    isDirtyRef.current = true;
+    setSpeakingData(val);
+  };
+  const updateReadingData: React.Dispatch<React.SetStateAction<Record<string, ReadingPartData>>> = (val) => {
+    isDirtyRef.current = true;
+    setReadingData(val);
+  };
+
+  // Auto-persist to Database whenever child tabs mutate state
+  useEffect(() => {
+    if (!isDirtyRef.current) return;
+    const timer = setTimeout(async () => {
+      isDirtyRef.current = false;
+      try {
+        setSaving(true);
+        const payload = {
+          part1: part1Data,
+          part2: part2Data,
+          part3: part3Data,
+          part4: part4Data,
+          writing: writingData,
+          speaking: speakingData,
+          reading: readingData,
+          updatedAt: new Date().toISOString(),
+        };
+        const res = await api.settings.update({
+          settings: [
+            {
+              key: "KEY_MEO_LISTENING_CONFIG",
+              value: JSON.stringify(payload),
+              description: "Cấu hình ngân hàng câu hỏi & mẹo thi 4 kỹ năng (Listening, Reading, Speaking, Writing)",
+            },
+          ],
+        });
+        if (!res.success) {
+          showToast("❌ Lưu tự động thất bại: " + (res.message || "Lỗi máy chủ"));
+        }
+      } catch (err: any) {
+        console.error("Auto-save failed:", err);
+      } finally {
+        setSaving(false);
+      }
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [part1Data, part2Data, part3Data, part4Data, writingData, speakingData, readingData]);
 
   // Load custom settings from Database if exists
   useEffect(() => {
@@ -123,6 +193,7 @@ export default function AdminKeyVaMeoThiPage() {
   // Reset to default seed data
   const handleResetToDefault = () => {
     if (confirm("Bạn có chắc chắn muốn khôi phục về dữ liệu ngân hàng đề mặc định cho tất cả kỹ năng?")) {
+      isDirtyRef.current = true;
       setPart1Data(LISTENING_PART1_DATA);
       setPart2Data(LISTENING_PART2_TOPICS);
       setPart3Data(LISTENING_PART3_DATA);
@@ -130,7 +201,7 @@ export default function AdminKeyVaMeoThiPage() {
       setWritingData(WRITING_KEY_MEO_DATA);
       setSpeakingData(SPEAKING_KEY_MEO_DATA);
       setReadingData(READING_KEY_MEO_DATA);
-      showToast("✓ Đã khôi phục về dữ liệu gốc mặc định. Bấm 'Lưu lên hệ thống' để áp dụng!");
+      showToast("✓ Đã khôi phục và đồng bộ về dữ liệu gốc mặc định!");
     }
   };
 
@@ -224,13 +295,13 @@ export default function AdminKeyVaMeoThiPage() {
       {activeSkill === "listening" && (
         <AdminListeningTab
           part1Data={part1Data}
-          setPart1Data={setPart1Data}
+          setPart1Data={updatePart1Data}
           part2Data={part2Data}
-          setPart2Data={setPart2Data}
+          setPart2Data={updatePart2Data}
           part3Data={part3Data}
-          setPart3Data={setPart3Data}
+          setPart3Data={updatePart3Data}
           part4Data={part4Data}
-          setPart4Data={setPart4Data}
+          setPart4Data={updatePart4Data}
           showToast={showToast}
         />
       )}
@@ -238,7 +309,7 @@ export default function AdminKeyVaMeoThiPage() {
       {activeSkill === "reading" && (
         <AdminReadingTab
           readingData={readingData}
-          setReadingData={setReadingData}
+          setReadingData={updateReadingData}
           showToast={showToast}
         />
       )}
@@ -246,7 +317,7 @@ export default function AdminKeyVaMeoThiPage() {
       {activeSkill === "speaking" && (
         <AdminSpeakingTab
           speakingData={speakingData}
-          setSpeakingData={setSpeakingData}
+          setSpeakingData={updateSpeakingData}
           showToast={showToast}
         />
       )}
@@ -254,7 +325,7 @@ export default function AdminKeyVaMeoThiPage() {
       {activeSkill === "writing" && (
         <AdminWritingTab
           writingData={writingData}
-          setWritingData={setWritingData}
+          setWritingData={updateWritingData}
           showToast={showToast}
         />
       )}

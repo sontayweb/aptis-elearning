@@ -374,7 +374,7 @@ class ApiClient {
   };
 
   settings = {
-    getPublic: () => this.request('/settings/public'),
+    getPublic: () => this.request('/settings/public', { cache: 'no-store' }),
     update: (body: { settings: Array<{ key: string; value: string; description?: string }> }) =>
       this.request('/settings', {
         method: 'PUT',

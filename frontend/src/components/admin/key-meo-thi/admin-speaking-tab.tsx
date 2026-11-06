@@ -171,18 +171,19 @@ export default function AdminSpeakingTab({
                   </thead>
                   <tbody className="divide-y divide-border">
                     {(speakingData.p1?.formulasP1 || [])
-                      .filter((f) => {
+                      .map((f, realIdx) => ({ f, realIdx }))
+                      .filter(({ f }) => {
                         const matchCat =
                           speakingP1Cat === "all" ||
-                          f.category.toLowerCase().includes(speakingP1Cat.toLowerCase());
+                          (f.category || "").toLowerCase().includes(speakingP1Cat.toLowerCase());
                         const matchSearch =
-                          f.category.toLowerCase().includes(search.toLowerCase()) ||
-                          f.pattern.toLowerCase().includes(search.toLowerCase()) ||
+                          (f.category || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (f.pattern || "").toLowerCase().includes(search.toLowerCase()) ||
                           (f.example && f.example.toLowerCase().includes(search.toLowerCase()));
                         return matchCat && matchSearch;
                       })
-                      .map((f, idx) => (
-                        <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                      .map(({ f, realIdx }, idx) => (
+                        <tr key={realIdx} className="hover:bg-muted/20 transition-colors">
                           <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                             {String(idx + 1).padStart(2, "0")}
                           </td>
@@ -205,7 +206,7 @@ export default function AdminSpeakingTab({
                                     skill: "speaking",
                                     part: "p1",
                                     data: { ...f },
-                                    index: idx,
+                                    index: realIdx,
                                   })
                                 }
                                 className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
@@ -218,7 +219,7 @@ export default function AdminSpeakingTab({
                                   if (confirm("Xóa cấu trúc này?")) {
                                     const nextFormulas = (
                                       speakingData.p1?.formulasP1 || []
-                                    ).filter((_, i) => i !== idx);
+                                    ).filter((_, i) => i !== realIdx);
                                     setSpeakingData((prev) => ({
                                       ...prev,
                                       p1: { ...prev.p1, formulasP1: nextFormulas },
@@ -513,6 +514,37 @@ export default function AdminSpeakingTab({
               </div>
 
               <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+                <div className="p-3.5 border-b border-border flex items-center justify-between bg-muted/20">
+                  <h4 className="font-heading font-black text-sm text-foreground">
+                    Bài Nói Mẫu So Sánh 2 Tranh (4 Bước Chuẩn B1–C)
+                  </h4>
+                  <button
+                    onClick={() =>
+                      setEditingItem({
+                        skill: "speaking",
+                        part: "p3",
+                        data: {
+                          step1Intro:
+                            speakingData.p3?.modelSampleP3?.step1Intro ||
+                            "Both pictures show people engaging in leisure activities, but in very different settings.",
+                          step2Left:
+                            speakingData.p3?.modelSampleP3?.step2Left ||
+                            "In the first picture on the left, an elderly couple is walking along a quiet beach.",
+                          step3Right:
+                            speakingData.p3?.modelSampleP3?.step3Right ||
+                            "In contrast, the second picture illustrates a vibrant city center packed with young tourists.",
+                          step4Conclusion:
+                            speakingData.p3?.modelSampleP3?.step4Conclusion ||
+                            "Personally speaking, I would rather spend my holiday in a peaceful place like the first image.",
+                        },
+                      })
+                    }
+                    className="px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-bold text-primary flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Sửa bài nói mẫu Part 3</span>
+                  </button>
+                </div>
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr className="border-b border-border bg-muted/40 text-muted-foreground font-bold">
@@ -527,25 +559,33 @@ export default function AdminSpeakingTab({
                       {
                         step: "01",
                         title: "Mở đầu tổng quan",
-                        sample: "Both pictures show people engaging in leisure activities, but in very different settings.",
+                        sample:
+                          speakingData.p3?.modelSampleP3?.step1Intro ||
+                          "Both pictures show people engaging in leisure activities, but in very different settings.",
                         connector: "Both ... but ...",
                       },
                       {
                         step: "02",
                         title: "Miêu tả tranh 1",
-                        sample: "In the first picture on the left, an elderly couple is walking along a quiet beach.",
+                        sample:
+                          speakingData.p3?.modelSampleP3?.step2Left ||
+                          "In the first picture on the left, an elderly couple is walking along a quiet beach.",
                         connector: "In the first picture / On the left",
                       },
                       {
                         step: "03",
                         title: "Miêu tả đối lập tranh 2",
-                        sample: "In contrast, the second picture illustrates a vibrant city center packed with young tourists.",
+                        sample:
+                          speakingData.p3?.modelSampleP3?.step3Right ||
+                          "In contrast, the second picture illustrates a vibrant city center packed with young tourists.",
                         connector: "In contrast / Whereas / While",
                       },
                       {
                         step: "04",
                         title: "Bày tỏ sở thích cá nhân",
-                        sample: "Personally speaking, I would rather spend my holiday in a peaceful place like the first image.",
+                        sample:
+                          speakingData.p3?.modelSampleP3?.step4Conclusion ||
+                          "Personally speaking, I would rather spend my holiday in a peaceful place like the first image.",
                         connector: "Personally / As for me",
                       },
                     ].map((row, idx) => (
@@ -642,13 +682,14 @@ export default function AdminSpeakingTab({
                         },
                       ]
                     )
+                      .map((row, realIdx) => ({ row, realIdx }))
                       .filter(
-                        (row) =>
-                          row.stage.toLowerCase().includes(search.toLowerCase()) ||
-                          row.content.toLowerCase().includes(search.toLowerCase())
+                        ({ row }) =>
+                          (row.stage || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (row.content || "").toLowerCase().includes(search.toLowerCase())
                       )
-                      .map((row, idx) => (
-                        <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                      .map(({ row, realIdx }, idx) => (
+                        <tr key={realIdx} className="hover:bg-muted/20 transition-colors">
                           <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                             {String(idx + 1).padStart(2, "0")}
                           </td>
@@ -669,7 +710,7 @@ export default function AdminSpeakingTab({
                                     skill: "speaking",
                                     part: "p4",
                                     data: { ...row },
-                                    index: idx,
+                                    index: realIdx,
                                   })
                                 }
                                 className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
@@ -682,7 +723,7 @@ export default function AdminSpeakingTab({
                                   if (confirm("Xóa giai đoạn thuyết trình này?")) {
                                     const nextList = (
                                       speakingData.p4?.modelSampleP4 || []
-                                    ).filter((_, i) => i !== idx);
+                                    ).filter((_, i) => i !== realIdx);
                                     setSpeakingData((prev) => ({
                                       ...prev,
                                       p4: { ...prev.p4, modelSampleP4: nextList },
@@ -867,6 +908,117 @@ export default function AdminSpeakingTab({
                   }));
                   setEditingItem(null);
                   showToast("Đã lưu bài nói mẫu Speaking Part 2!");
+                }}
+                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 cursor-pointer"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal chỉnh sửa Speaking Part 3 Mẫu */}
+      {editingItem && editingItem.skill === "speaking" && editingItem.part === "p3" && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2">
+                <Mic className="w-5 h-5 text-primary" />
+                <h3 className="font-black text-base text-foreground">
+                  Chỉnh Sửa Bài Nói Mẫu So Sánh (Speaking Part 3)
+                </h3>
+              </div>
+              <button
+                onClick={() => setEditingItem(null)}
+                className="p-1 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="font-bold text-foreground block mb-1">Bước 1: Mở bài – Giới thiệu chung (step1Intro):</label>
+                <textarea
+                  rows={2}
+                  value={editingItem.data.step1Intro || ""}
+                  onChange={(e) =>
+                    setEditingItem({
+                      ...editingItem,
+                      data: { ...editingItem.data, step1Intro: e.target.value },
+                    })
+                  }
+                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-foreground block mb-1">Bước 2: Mô tả ảnh bên trái (step2Left):</label>
+                <textarea
+                  rows={2}
+                  value={editingItem.data.step2Left || ""}
+                  onChange={(e) =>
+                    setEditingItem({
+                      ...editingItem,
+                      data: { ...editingItem.data, step2Left: e.target.value },
+                    })
+                  }
+                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-foreground block mb-1">Bước 3: Mô tả đối lập ảnh bên phải (step3Right):</label>
+                <textarea
+                  rows={2}
+                  value={editingItem.data.step3Right || ""}
+                  onChange={(e) =>
+                    setEditingItem({
+                      ...editingItem,
+                      data: { ...editingItem.data, step3Right: e.target.value },
+                    })
+                  }
+                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-foreground block mb-1">Bước 4: Kết luận &amp; Quan điểm cá nhân (step4Conclusion):</label>
+                <textarea
+                  rows={2}
+                  value={editingItem.data.step4Conclusion || ""}
+                  onChange={(e) =>
+                    setEditingItem({
+                      ...editingItem,
+                      data: { ...editingItem.data, step4Conclusion: e.target.value },
+                    })
+                  }
+                  className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-foreground focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
+              <button
+                onClick={() => setEditingItem(null)}
+                className="px-4 py-2 rounded-xl border border-border hover:bg-muted text-xs font-bold cursor-pointer"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={() => {
+                  setSpeakingData((prev) => ({
+                    ...prev,
+                    p3: {
+                      ...prev.p3,
+                      modelSampleP3: {
+                        step1Intro: editingItem.data.step1Intro,
+                        step2Left: editingItem.data.step2Left,
+                        step3Right: editingItem.data.step3Right,
+                        step4Conclusion: editingItem.data.step4Conclusion,
+                      },
+                    },
+                  }));
+                  setEditingItem(null);
+                  showToast("Đã lưu bài nói mẫu Speaking Part 3!");
                 }}
                 className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 cursor-pointer"
               >

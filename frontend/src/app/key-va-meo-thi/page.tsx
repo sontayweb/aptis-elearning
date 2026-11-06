@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
+import { useAuth } from "@/contexts/auth-context";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
@@ -20,6 +21,12 @@ import {
   BookOpen,
   Mic,
   PenTool,
+  Lock,
+  Crown,
+  Sparkles,
+  CheckCircle2,
+  ArrowRight,
+  Loader2,
 } from "lucide-react";
 
 type SkillTab = "listening" | "reading" | "speaking" | "writing";
@@ -34,6 +41,7 @@ export default function KeyVaMeoThiPage() {
 }
 
 function KeyVaMeoThiContent() {
+  const { user, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const partParam = searchParams.get("part") as ListeningPartTab | null;
   const skillParam = searchParams.get("skill") as SkillTab | null;
@@ -44,7 +52,21 @@ function KeyVaMeoThiContent() {
   );
   const [customConfig, setCustomConfig] = useState<any>(null);
 
+  const isProOrAdmin = Boolean(
+    user &&
+      (user.role === "SUPER_ADMIN" ||
+        user.role === "ADMIN" ||
+        user.role === "TEACHER" ||
+        (user.subscription?.code && user.subscription.code !== "FREE") ||
+        (user.activeSubscription?.code && user.activeSubscription.code !== "FREE") ||
+        (Array.isArray(user.user_subscriptions) &&
+          user.user_subscriptions.some(
+            (sub) => sub?.plan?.code && sub.plan.code !== "FREE"
+          )))
+  );
+
   useEffect(() => {
+    if (!isProOrAdmin) return;
     api.settings
       .getPublic()
       .then((res: any) => {
@@ -55,7 +77,7 @@ function KeyVaMeoThiContent() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [isProOrAdmin]);
 
   useEffect(() => {
     if (partParam && ["p1", "p2", "p3", "p4"].includes(partParam)) {
@@ -65,6 +87,107 @@ function KeyVaMeoThiContent() {
       setActiveSkill(skillParam);
     }
   }, [partParam, skillParam]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
+        <Navbar />
+        <main className="flex-1 pt-16 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3 text-muted-foreground">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-sm font-medium">Đang kiểm tra quyền truy cập...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!isProOrAdmin) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
+        <Navbar />
+        <main className="flex-1 pt-20 pb-16 flex items-center justify-center px-4">
+          <div className="max-w-xl w-full rounded-3xl border border-amber-500/30 bg-card shadow-xl overflow-hidden relative">
+            <div className="bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-transparent p-6 sm:p-8 text-center border-b border-border/60">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/25">
+                <Crown className="w-8 h-8" />
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-bold mb-3 border border-amber-500/20">
+                <Lock className="w-3.5 h-3.5" />
+                Đặc quyền Tài khoản VIP PRO
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-foreground tracking-tight">
+                Kho Key &amp; Mẹo Thi Aptis Độc Quyền
+              </h1>
+              <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto leading-relaxed">
+                Tài liệu tổng hợp ma trận đáp án trúng tủ, từ khóa nhận diện nhanh và công thức ăn điểm 4 kỹ năng Listening, Reading, Speaking, Writing chỉ dành riêng cho học viên gói <strong className="text-foreground">VIP PRO</strong>.
+              </p>
+            </div>
+
+            <div className="p-6 sm:p-8 space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                {[
+                  "Ma trận Key Listening Part 1 - 4 trúng tủ 2026",
+                  "Mẹo bẫy Paraphrase & Heading Reading Part 1 - 4",
+                  "Khung mẫu câu Speaking B2 - C đạt điểm tối đa",
+                  "Template Email & Club Writing chuẩn giám khảo",
+                ].map((benefit, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-2.5 p-3 rounded-xl bg-muted/50 border border-border/60 text-xs font-medium text-foreground"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>{benefit}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                {!user ? (
+                  <>
+                    <Link
+                      href="/login?redirect=/key-va-meo-thi"
+                      className="w-full sm:w-auto px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow-md"
+                    >
+                      Đăng nhập tài khoản PRO
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <Link
+                      href="/pricing"
+                      className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow-md shadow-amber-500/20"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Xem gói nâng cấp PRO
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/pricing"
+                      className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow-md shadow-amber-500/20"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Nâng cấp VIP PRO ngay
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <Link
+                      href="/dashboard"
+                      className="w-full sm:w-auto px-6 py-3 rounded-xl border border-border bg-card hover:bg-muted text-foreground font-semibold text-sm transition-all text-center"
+                    >
+                      Về Bảng điều khiển
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+        <FloatingActions />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">

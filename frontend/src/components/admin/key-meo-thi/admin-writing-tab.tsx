@@ -159,19 +159,20 @@ export default function AdminWritingTab({
                   </thead>
                   <tbody className="divide-y divide-border">
                     {(writingData.p1?.examplesP1 || [])
-                      .filter((ex) => {
+                      .map((ex, realIdx) => ({ ex, realIdx }))
+                      .filter(({ ex }) => {
                         const matchCat =
                           writingP1Cat === "all" ||
-                          ex.question.toLowerCase().startsWith(writingP1Cat.toLowerCase());
+                          (ex.question || "").toLowerCase().startsWith(writingP1Cat.toLowerCase());
                         const matchSearch =
-                          ex.question.toLowerCase().includes(search.toLowerCase()) ||
-                          ex.answer.toLowerCase().includes(search.toLowerCase());
+                          (ex.question || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (ex.answer || "").toLowerCase().includes(search.toLowerCase());
                         return matchCat && matchSearch;
                       })
-                      .map((ex, idx) => {
-                        const wordCount = ex.answer.trim().split(/\s+/).length;
+                      .map(({ ex, realIdx }, idx) => {
+                        const wordCount = (ex.answer || "").trim().split(/\s+/).filter(Boolean).length;
                         return (
-                          <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                          <tr key={realIdx} className="hover:bg-muted/20 transition-colors">
                             <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                               {String(idx + 1).padStart(2, "0")}
                             </td>
@@ -190,7 +191,7 @@ export default function AdminWritingTab({
                                       skill: "writing",
                                       part: "p1",
                                       data: { ...ex },
-                                      index: idx,
+                                      index: realIdx,
                                     })
                                   }
                                   className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
@@ -203,7 +204,7 @@ export default function AdminWritingTab({
                                     if (confirm("Xóa câu hỏi này?")) {
                                       const nextExs = (
                                         writingData.p1?.examplesP1 || []
-                                      ).filter((_, i) => i !== idx);
+                                      ).filter((_, i) => i !== realIdx);
                                       setWritingData((prev) => ({
                                         ...prev,
                                         p1: { ...prev.p1, examplesP1: nextExs },
@@ -269,13 +270,14 @@ export default function AdminWritingTab({
                   </thead>
                   <tbody className="divide-y divide-border">
                     {(writingData.p2?.formulasP2 || [])
+                      .map((f, realIdx) => ({ f, realIdx }))
                       .filter(
-                        (f) =>
-                          f.purpose.toLowerCase().includes(search.toLowerCase()) ||
-                          f.template.toLowerCase().includes(search.toLowerCase())
+                        ({ f }) =>
+                          (f.purpose || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (f.template || "").toLowerCase().includes(search.toLowerCase())
                       )
-                      .map((f, idx) => (
-                        <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                      .map(({ f, realIdx }, idx) => (
+                        <tr key={realIdx} className="hover:bg-muted/20 transition-colors">
                           <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                             {String(idx + 1).padStart(2, "0")}
                           </td>
@@ -291,7 +293,7 @@ export default function AdminWritingTab({
                                     skill: "writing",
                                     part: "p2",
                                     data: { ...f },
-                                    index: idx,
+                                    index: realIdx,
                                   })
                                 }
                                 className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
@@ -304,7 +306,7 @@ export default function AdminWritingTab({
                                   if (confirm("Xóa công thức này?")) {
                                     const nextList = (
                                       writingData.p2?.formulasP2 || []
-                                    ).filter((_, i) => i !== idx);
+                                    ).filter((_, i) => i !== realIdx);
                                     setWritingData((prev) => ({
                                       ...prev,
                                       p2: { ...prev.p2, formulasP2: nextList },
@@ -370,14 +372,15 @@ export default function AdminWritingTab({
                   </thead>
                   <tbody className="divide-y divide-border">
                     {(writingData.p3?.formulasP3 || [])
+                      .map((f, realIdx) => ({ f, realIdx }))
                       .filter(
-                        (f) =>
-                          f.typeTitle.toLowerCase().includes(search.toLowerCase()) ||
-                          f.formula.toLowerCase().includes(search.toLowerCase()) ||
-                          f.breakdown.toLowerCase().includes(search.toLowerCase())
+                        ({ f }) =>
+                          (f.typeTitle || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (f.formula || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (f.breakdown || "").toLowerCase().includes(search.toLowerCase())
                       )
-                      .map((f, idx) => (
-                        <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                      .map(({ f, realIdx }, idx) => (
+                        <tr key={realIdx} className="hover:bg-muted/20 transition-colors">
                           <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                             {String(idx + 1).padStart(2, "0")}
                           </td>
@@ -392,7 +395,7 @@ export default function AdminWritingTab({
                                     skill: "writing",
                                     part: "p3",
                                     data: { ...f },
-                                    index: idx,
+                                    index: realIdx,
                                   })
                                 }
                                 className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
@@ -405,7 +408,7 @@ export default function AdminWritingTab({
                                   if (confirm("Xóa cấu trúc này?")) {
                                     const nextList = (
                                       writingData.p3?.formulasP3 || []
-                                    ).filter((_, i) => i !== idx);
+                                    ).filter((_, i) => i !== realIdx);
                                     setWritingData((prev) => ({
                                       ...prev,
                                       p3: { ...prev.p3, formulasP3: nextList },
@@ -470,13 +473,14 @@ export default function AdminWritingTab({
                   </thead>
                   <tbody className="divide-y divide-border">
                     {(writingData.p4?.formulasP4 || [])
+                      .map((f, realIdx) => ({ f, realIdx }))
                       .filter(
-                        (f) =>
-                          f.purpose.toLowerCase().includes(search.toLowerCase()) ||
-                          f.phrase.toLowerCase().includes(search.toLowerCase())
+                        ({ f }) =>
+                          (f.purpose || "").toLowerCase().includes(search.toLowerCase()) ||
+                          (f.phrase || "").toLowerCase().includes(search.toLowerCase())
                       )
-                      .map((f, idx) => (
-                        <tr key={idx} className="hover:bg-muted/20 transition-colors">
+                      .map(({ f, realIdx }, idx) => (
+                        <tr key={realIdx} className="hover:bg-muted/20 transition-colors">
                           <td className="p-3.5 text-center font-bold text-muted-foreground font-mono">
                             {String(idx + 1).padStart(2, "0")}
                           </td>
@@ -492,7 +496,7 @@ export default function AdminWritingTab({
                                     skill: "writing",
                                     part: "p4",
                                     data: { ...f },
-                                    index: idx,
+                                    index: realIdx,
                                   })
                                 }
                                 className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
@@ -505,7 +509,7 @@ export default function AdminWritingTab({
                                   if (confirm("Xóa mẫu câu này?")) {
                                     const nextList = (
                                       writingData.p4?.formulasP4 || []
-                                    ).filter((_, i) => i !== idx);
+                                    ).filter((_, i) => i !== realIdx);
                                     setWritingData((prev) => ({
                                       ...prev,
                                       p4: { ...prev.p4, formulasP4: nextList },
