@@ -195,20 +195,20 @@ export default function AdminDataSyncPage() {
       if (res.success) {
         setMessage({
           type: "success",
-          text: res.message || "Xử lý đề thi thành công!",
+          text: res.message || "Cập nhật đề thi thành công!",
         });
         setSelectedDiffItem(null);
         await loadOverview();
       } else {
         setMessage({
           type: "error",
-          text: res.message || "Không thể xử lý đề thi.",
+          text: res.message || "Không thể cập nhật đề thi.",
         });
       }
     } catch (err: any) {
       setMessage({
         type: "error",
-        text: err.message || "Lỗi khi xử lý quyết định đề thi.",
+        text: err.message || "Lỗi khi xử lý đề thi.",
       });
     } finally {
       setResolvingAction(false);
@@ -246,7 +246,7 @@ export default function AdminDataSyncPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showTutorial, selectedDiffItem]);
 
-  // 1. Chạy Tự Động Sửa Lỗi & Gộp Đề Trùng
+  // 1. Chạy Tự Động Chuẩn Hóa & Dọn Đề Trùng
   const handleRunStandardize = async () => {
     try {
       setStandardizing(true);
@@ -258,20 +258,20 @@ export default function AdminDataSyncPage() {
           type: "success",
           text:
             res.message ||
-            "Đã kiểm tra & sửa lỗi tự động thành công! Toàn bộ kho đề đã được tối ưu.",
+            "Đã chuẩn hóa và dọn dẹp ngân hàng đề thành công!",
         });
         await loadOverview();
       } else {
-        setMessage({ type: "error", text: res.message || "Không thể thực hiện kiểm tra và sửa lỗi." });
+        setMessage({ type: "error", text: res.message || "Không thể thực hiện chuẩn hóa ngân hàng đề." });
       }
     } catch (err: any) {
-      setMessage({ type: "error", text: err.message || "Lỗi kết nối khi tối ưu dữ liệu." });
+      setMessage({ type: "error", text: err.message || "Lỗi kết nối khi chuẩn hóa ngân hàng đề." });
     } finally {
       setStandardizing(false);
     }
   };
 
-  // 2. Chạy Kiểm Tra Phòng Thi Thực Tế Từng Part
+  // 2. Chạy Kiểm Tra Hiển Thị Phòng Thi Từng Part
   const handleRunAudit = async () => {
     try {
       setRunningAudit(true);
@@ -299,24 +299,24 @@ export default function AdminDataSyncPage() {
   const handleExportAuditMarkdown = () => {
     if (!auditReport) return;
     const lines = [
-      `# BÁO CÁO KIỂM TRA PHÒNG THI THỰC TẾ NGÂN HÀNG ĐỀ APTIS ESOL`,
+      `# BÁO CÁO KIỂM TRA HIỂN THỊ PHÒNG THI APTIS ESOL`,
       `- **Thời gian kiểm tra**: ${new Date(auditReport.checkedAt).toLocaleString("vi-VN")}`,
       `- **Tổng số phần thi đã kiểm tra**: **${auditReport.totalPartsTested} Phần thi (Parts)**`,
-      `- **Số phần thi ĐẠT CHUẨN (PASS)**: **${auditReport.totalPassed} Phần thi**`,
-      `- **Số phần thi CẦN KIỂM TRA (FAIL)**: **${auditReport.totalFailed} Phần thi**`,
-      `- **Tỷ lệ hiển thị chuẩn toàn bộ**: **${auditReport.overallPassRate}%**`,
+      `- **Số phần thi ĐẠT CHUẨN**: **${auditReport.totalPassed} Phần thi**`,
+      `- **Số phần thi CẦN KIỂM TRA LẠI**: **${auditReport.totalFailed} Phần thi**`,
+      `- **Tỷ lệ hiển thị đạt chuẩn**: **${auditReport.overallPassRate}%**`,
       ``,
       `## Chi Tiết Đánh Giá Từng Kỹ Năng & Phần Thi`,
-      `| Kỹ năng | Phần thi | Yêu cầu chuẩn hiển thị | Số mẫu test | Đạt | Cần sửa | Đề mẫu xem thử | Trạng thái |`,
+      `| Kỹ năng | Phần thi | Yêu cầu chuẩn hiển thị | Số mẫu kiểm tra | Đạt | Cần sửa | Đề mẫu xem thử | Trạng thái |`,
       `| :--- | :--- | :--- | :---: | :---: | :---: | :--- | :---: |`,
       ...auditReport.suites.map(
         (s) =>
-          `| **${s.skill}** | ${s.partKey} | \`${s.expectedFormat}\` | ${s.testedCount} | ${s.passedCount} | ${s.failedCount} | ${s.sampleExamTitle || "—"} (${s.sampleQuestionsCount} câu) | **${s.status === "PASS" ? "ĐẠT CHUẨN" : s.status === "FAIL" ? "CẦN SỬA" : "CHƯA CÓ ĐỀ"}** |`
+          `| **${s.skill}** | ${s.partName || s.partKey} | \`${s.expectedFormat}\` | ${s.testedCount} | ${s.passedCount} | ${s.failedCount} | ${s.sampleExamTitle || "—"} (${s.sampleQuestionsCount} câu) | **${s.status === "PASS" ? "ĐẠT CHUẨN" : s.status === "FAIL" ? "CẦN SỬA" : "CHƯA CÓ ĐỀ"}** |`
       ),
       ``,
       `## Hướng Dẫn Xử Lý Tiếp Theo`,
-      `1. Với các phần thi có trạng thái **CẦN SỬA**, nhấp vào đề mẫu đại diện ở cột "Đề mẫu xem thử" để mở trang chỉnh sửa câu hỏi.`,
-      `2. Chuyển sang Tab "1. Sức Khỏe Kho Đề & Tự Động Sửa Lỗi" và bấm nút "Bắt Đầu Tự Động Sửa Lỗi & Gộp Đề" để hệ thống tự động đưa các câu hỏi về đúng dạng chuẩn.`,
+      `1. Với các phần thi có trạng thái **CẦN SỬA**, nhấp vào đề mẫu ở cột "Đề mẫu xem thử" để kiểm tra và chỉnh sửa câu hỏi.`,
+      `2. Chuyển sang Tab "1. Kiểm Tra & Chuẩn Hóa Đề Thi" và bấm nút "Bắt Đầu Chuẩn Hóa & Dọn Đề" để hệ thống tự động đưa các câu hỏi về đúng dạng chuẩn.`,
     ];
 
     const blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
@@ -441,21 +441,21 @@ export default function AdminDataSyncPage() {
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
             <RefreshCw className="w-6 h-6 text-primary" />
-            Trung Tâm Quản Lý &amp; Tối Ưu Dữ Liệu Ngân Hàng Đề Thi
+            Quản Lý &amp; Kiểm Định Ngân Hàng Đề Thi
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Kiểm tra chất lượng đề thi, tự động phát hiện &amp; sửa lỗi hiển thị, hợp nhất đề trùng lặp và nạp đề thi mới an toàn (bảo toàn lịch sử làm bài của học viên).
+            Kiểm tra chất lượng đề thi, tự động phát hiện &amp; sửa lỗi định dạng, dọn dẹp đề trùng và nạp đề thi mới an toàn (bảo toàn 100% bài làm của học viên).
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* Nút Hướng Dẫn Sử Dụng & Giải Thích Chi Tiết */}
+          {/* Nút Hướng Dẫn Sử Dụng */}
           <button
             onClick={() => setShowTutorial(true)}
             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition-all shadow-xs cursor-pointer"
           >
             <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-            <span>Hướng dẫn &amp; Giải thích tính năng</span>
+            <span>Hướng dẫn sử dụng</span>
           </button>
 
           <Link
@@ -463,7 +463,7 @@ export default function AdminDataSyncPage() {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-border bg-card hover:bg-muted text-foreground transition-colors"
           >
             <Database className="w-3.5 h-3.5 text-blue-500" />
-            Sao lưu CSDL
+            Sao lưu dữ liệu
           </Link>
 
           <button
@@ -472,7 +472,7 @@ export default function AdminDataSyncPage() {
             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border border-border bg-card hover:bg-muted text-foreground transition-colors cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loadingOverview ? "animate-spin" : ""}`} />
-            Làm mới số liệu
+            Làm mới dữ liệu
           </button>
         </div>
       </div>
@@ -520,7 +520,7 @@ export default function AdminDataSyncPage() {
             {loadingOverview ? "..." : (overview?.summary.totalExams || 0).toLocaleString()}
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
-            Đã gom nhóm &amp; loại bỏ đề trùng lặp
+            Đã loại bỏ các đề trùng lặp
           </div>
         </div>
 
@@ -556,15 +556,15 @@ export default function AdminDataSyncPage() {
             {loadingOverview ? "..." : (overview?.summary.totalQuestions || 0).toLocaleString()}
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
-            Gồm 7 dạng bài: trắc nghiệm, điền từ, thu âm, viết...
+            Gồm các dạng: trắc nghiệm, điền từ, thu âm, viết...
           </div>
         </div>
 
-        {/* Card 4: Sức khỏe đề thi */}
+        {/* Card 4: Tỷ lệ đạt chuẩn */}
         <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Độ Hoàn Hảo Dữ Liệu
+              Tỷ Lệ Đạt Chuẩn
             </span>
             <div
               className={`w-8 h-8 rounded-lg flex items-center justify-center ${
@@ -586,14 +586,14 @@ export default function AdminDataSyncPage() {
                     : "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30"
                 }`}
               >
-                {overview?.summary.isHealthy ? "HOÀN HẢO" : "CẦN TỐI ƯU"}
+                {overview?.summary.isHealthy ? "ĐẠT CHUẨN" : "CẦN KIỂM TRA"}
               </span>
             )}
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
             {overview?.anomalies.totalIssues === 0
-              ? "Kho đề hoàn hảo, không có lỗi cấu trúc"
-              : `Phát hiện ${overview?.anomalies.totalIssues} điểm cần tối ưu`}
+              ? "Ngân hàng đề chuẩn, không có lỗi cấu trúc"
+              : `Phát hiện ${overview?.anomalies.totalIssues} đề cần kiểm tra lại`}
           </div>
         </div>
       </div>
@@ -609,7 +609,7 @@ export default function AdminDataSyncPage() {
           }`}
         >
           <Wrench className="w-3.5 h-3.5" />
-          <span>1. Sức Khỏe Kho Đề &amp; Tự Động Sửa Lỗi (1 Chạm)</span>
+          <span>1. Kiểm Tra &amp; Chuẩn Hóa Đề Thi</span>
         </button>
 
         <button
@@ -621,7 +621,7 @@ export default function AdminDataSyncPage() {
           }`}
         >
           <Activity className="w-3.5 h-3.5" />
-          <span>2. Kiểm Tra Phòng Thi Thực Tế (5 Kỹ Năng)</span>
+          <span>2. Kiểm Tra Hiển Thị Phòng Thi</span>
         </button>
 
         <button
@@ -633,12 +633,12 @@ export default function AdminDataSyncPage() {
           }`}
         >
           <Upload className="w-3.5 h-3.5" />
-          <span>3. Thêm &amp; Cập Nhật Đề Thi Hàng Loạt</span>
+          <span>3. Nạp Thêm Đề Thi Hàng Loạt</span>
         </button>
       </div>
 
       {/* =====================================================================
-          TAB 1: SỨC KHỎE KHO ĐỀ & TỰ ĐỘNG SỬA LỖI (AUTO-HEAL)
+          TAB 1: KIỂM TRA & CHUẨN HÓA ĐỀ THI
          ===================================================================== */}
       {activeTab === "overview" && (
         <div className="space-y-6 animate-in fade-in duration-150">
@@ -646,7 +646,7 @@ export default function AdminDataSyncPage() {
           <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-700 dark:text-blue-300 flex items-start gap-2.5">
             <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-blue-500" />
             <div>
-              <strong>Tác dụng của phần này:</strong> Quét tự động toàn bộ đề thi để phát hiện lỗi định dạng, đề rỗng hoặc đề trùng tên. Khi bấm nút <strong>&quot;Bắt Đầu Tự Động Sửa Lỗi &amp; Gộp Đề&quot;</strong>, hệ thống sẽ tự động sửa chuẩn hóa mà <u>hoàn toàn không làm mất điểm hay bài làm</u> của học viên!
+              <strong>Lưu ý:</strong> Hệ thống hỗ trợ rà soát toàn bộ đề thi để phát hiện lỗi định dạng, đề chưa có câu hỏi hoặc đề bị trùng tên. Khi bấm nút <strong>&quot;Bắt Đầu Chuẩn Hóa &amp; Dọn Đề&quot;</strong>, hệ thống sẽ tự động xử lý mà <u>hoàn toàn không làm ảnh hưởng đến điểm số hay bài thi</u> của học viên!
             </div>
           </div>
 
@@ -656,10 +656,10 @@ export default function AdminDataSyncPage() {
               <div>
                 <h2 className="text-base font-bold text-foreground flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-primary" />
-                  Tự Động Quét &amp; Khắc Phục Lỗi Ngân Hàng Đề (1 Chạm)
+                  Tự Động Kiểm Tra &amp; Chuẩn Hóa Ngân Hàng Đề
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Quét toàn bộ kho đề để phát hiện và tự động sửa: tên đề lệch chuẩn (&quot;Đề 1&quot; → &quot;Đề 01&quot;), gom đề trùng tên, dọn đề trống 0 câu hỏi, và chuyển đổi câu hỏi về đúng dạng bài thi Aptis chuẩn.
+                  Rà soát toàn bộ ngân hàng đề: đồng bộ tên đề (&quot;Đề 1&quot; → &quot;Đề 01&quot;), gộp các đề trùng tên, dọn đề chưa có câu hỏi và đưa câu hỏi về đúng dạng bài Aptis chuẩn.
                 </p>
               </div>
 
@@ -670,8 +670,8 @@ export default function AdminDataSyncPage() {
               >
                 <Sparkles className={`w-4 h-4 ${standardizing ? "animate-spin" : ""}`} />
                 {standardizing
-                  ? "Đang tự động xử lý..."
-                  : "Bắt Đầu Tự Động Sửa Lỗi & Gộp Đề"}
+                  ? "Đang chuẩn hóa..."
+                  : "Bắt Đầu Chuẩn Hóa & Dọn Đề"}
               </button>
             </div>
 
@@ -679,9 +679,9 @@ export default function AdminDataSyncPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
               <div className="p-4 rounded-xl border border-border bg-muted/20 flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-xs font-bold text-foreground">Đề / Phần Thi Trống</div>
+                  <div className="text-xs font-bold text-foreground">Đề Chưa Có Câu Hỏi</div>
                   <div className="text-[11px] text-muted-foreground mt-0.5">
-                    Đề chưa có câu hỏi nào
+                    Đề trống cần dọn bớt
                   </div>
                   <div className="mt-2 font-mono text-lg font-black text-foreground">
                     {overview?.anomalies.emptyExamsCount ?? 0} đề
@@ -721,9 +721,9 @@ export default function AdminDataSyncPage() {
 
               <div className="p-4 rounded-xl border border-border bg-muted/20 flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-xs font-bold text-foreground">Câu Hỏi Chưa Đúng Dạng Bài</div>
+                  <div className="text-xs font-bold text-foreground">Câu Hỏi Sai Dạng Bài</div>
                   <div className="text-[11px] text-muted-foreground mt-0.5">
-                    Ví dụ: Speaking/Writing/Reading P1 sai dạng câu
+                    Ví dụ: Speaking/Writing lưu sai dạng trắc nghiệm
                   </div>
                   <div className="mt-2 font-mono text-lg font-black text-foreground">
                     {overview?.anomalies.typeMismatchCount ?? 0} câu
@@ -742,7 +742,7 @@ export default function AdminDataSyncPage() {
 
               <div className="p-4 rounded-xl border border-border bg-muted/20 flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-xs font-bold text-foreground">Câu Trắc Nghiệm Thiếu Lựa Chọn</div>
+                  <div className="text-xs font-bold text-foreground">Câu Trắc Nghiệm Thiếu Đáp Án</div>
                   <div className="text-[11px] text-muted-foreground mt-0.5">
                     Câu trắc nghiệm / điền từ có &lt; 2 phương án chọn
                   </div>
@@ -757,7 +757,7 @@ export default function AdminDataSyncPage() {
                       : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
                   }`}
                 >
-                  {(overview?.anomalies.brokenOptionsCount || 0) === 0 ? "ĐẠT CHUẨN" : "CẦN LƯU Ý"}
+                  {(overview?.anomalies.brokenOptionsCount || 0) === 0 ? "ĐẠT CHUẨN" : "CẦN BỔ SUNG"}
                 </span>
               </div>
             </div>
@@ -767,7 +767,7 @@ export default function AdminDataSyncPage() {
               <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs space-y-1">
                 <div className="font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4" />
-                  Kết quả tự động xử lý thành công ({lastStandardizeRes.durationMs}ms):
+                  Kết quả chuẩn hóa thành công ({lastStandardizeRes.durationMs}ms):
                 </div>
                 <div className="text-muted-foreground flex flex-wrap gap-x-6 gap-y-1 pt-1">
                   <span>
@@ -912,7 +912,7 @@ export default function AdminDataSyncPage() {
       )}
 
       {/* =====================================================================
-          TAB 2: KIỂM TRA PHÒNG THI THỰC TẾ (LIVE AUDIT)
+          TAB 2: KIỂM TRA HIỂN THỊ PHÒNG THI
          ===================================================================== */}
       {activeTab === "audit" && (
         <div className="space-y-6 animate-in fade-in duration-150">
@@ -920,7 +920,7 @@ export default function AdminDataSyncPage() {
           <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-700 dark:text-purple-300 flex items-start gap-2.5">
             <Activity className="w-4 h-4 shrink-0 mt-0.5 text-purple-500" />
             <div>
-              <strong>Cơ chế kiểm tra thực tế:</strong> Hệ thống sẽ đóng vai một học viên VIP vào thi từng đề để kiểm tra xem mọi câu hỏi có hiển thị đầy đủ trên màn hình, đúng chức năng tương tác (nghe, nói, kéo thả, gõ bài) hay không. Bạn có thể bấm trực tiếp vào tên đề thi để vào trang sửa nếu phát hiện lỗi!
+              <strong>Nguyên tắc kiểm tra:</strong> Hệ thống sẽ mô phỏng lượt vào thi thực tế của học viên để kiểm tra xem từng phần thi có hiển thị đầy đủ nội dung, âm thanh, hình ảnh và công cụ tương tác hay không. Bạn có thể bấm trực tiếp vào tên đề thi để mở trang chỉnh sửa nếu phát hiện lỗi!
             </div>
           </div>
 
@@ -929,16 +929,16 @@ export default function AdminDataSyncPage() {
               <div>
                 <h2 className="text-base font-bold text-foreground flex items-center gap-2">
                   <Activity className="w-5 h-5 text-primary" />
-                  Bộ Kiểm Tra Tự Động Phòng Thi Học Viên (5 Kỹ Năng)
+                  Kiểm Tra Hiển Thị Đề Thi Theo Từng Phần (Part)
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Kiểm tra trực tiếp cấu trúc từng Part 1–4 của cả 4 kỹ năng (Reading, Listening, Writing, Speaking) và Đề thi thử liên hoàn 16 Parts.
+                  Kiểm tra trực tiếp cấu trúc từng Part 1–4 của cả 4 kỹ năng (Reading, Listening, Writing, Speaking) và đề thi thử kết hợp.
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-2.5">
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className="text-muted-foreground font-medium">Số đề mẫu/kỹ năng:</span>
+                  <span className="text-muted-foreground font-medium">Số đề kiểm tra mẫu:</span>
                   <select
                     value={sampleLimit}
                     onChange={(e) => setSampleLimit(Number(e.target.value))}
@@ -957,7 +957,7 @@ export default function AdminDataSyncPage() {
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
                 >
                   <Play className={`w-3.5 h-3.5 ${runningAudit ? "animate-spin" : ""}`} />
-                  {runningAudit ? "Đang chạy kiểm tra..." : "Bắt Đầu Kiểm Tra Phòng Thi"}
+                  {runningAudit ? "Đang kiểm tra..." : "Bắt Đầu Kiểm Tra"}
                 </button>
 
                 {auditReport && (
@@ -986,7 +986,7 @@ export default function AdminDataSyncPage() {
                   </div>
                   <div className="p-3.5 rounded-xl bg-muted/30 border border-border">
                     <div className="text-[11px] text-muted-foreground uppercase font-semibold">
-                      Tổng Lượt Part Đã Test
+                      Số Phần Thi Đã Kiểm Tra
                     </div>
                     <div className="text-xl font-black font-mono text-foreground mt-1">
                       {auditReport.totalPartsTested} Parts
@@ -1037,9 +1037,9 @@ export default function AdminDataSyncPage() {
                     <thead className="bg-muted/50 border-b border-border uppercase text-muted-foreground font-semibold">
                       <tr>
                         <th className="px-4 py-3">Kỹ Năng</th>
-                        <th className="px-4 py-3">Phần Thi &amp; Nội Dung Kiểm Tra</th>
+                        <th className="px-4 py-3">Phần Thi &amp; Nội Dung</th>
                         <th className="px-4 py-3">Yêu Cầu Chuẩn Hiển Thị</th>
-                        <th className="px-4 py-3 text-center">Số Mẫu Test (Đạt / Tổng)</th>
+                        <th className="px-4 py-3 text-center">Số Mẫu Kiểm Tra (Đạt / Tổng)</th>
                         <th className="px-4 py-3">Đề Mẫu Xem Thử</th>
                         <th className="px-4 py-3 text-right">Trạng Thái</th>
                       </tr>
@@ -1122,7 +1122,7 @@ export default function AdminDataSyncPage() {
                   Sẵn sàng kiểm tra giao diện làm bài của học viên
                 </p>
                 <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
-                  Bấm nút &quot;Bắt Đầu Kiểm Tra Phòng Thi&quot; ở góc phải để hệ thống tự động kiểm tra toàn bộ 17 phân vùng kỹ năng (Reading P1-4, Listening P1-4, Writing P1-4, Speaking P1-4 &amp; Full Test).
+                  Bấm nút &quot;Bắt Đầu Kiểm Tra&quot; ở trên để hệ thống tự động kiểm tra toàn bộ 17 phân vùng kỹ năng (Reading P1-4, Listening P1-4, Writing P1-4, Speaking P1-4 &amp; Full Test).
                 </p>
               </div>
             )}
@@ -1131,7 +1131,7 @@ export default function AdminDataSyncPage() {
       )}
 
       {/* =====================================================================
-          TAB 3: THÊM & CẬP NHẬT ĐỀ THI HÀNG LOẠT
+          TAB 3: NẠP ĐỀ THI HÀNG LOẠT
          ===================================================================== */}
       {activeTab === "sync" && (
         <div className="space-y-6 animate-in fade-in duration-150">
@@ -1139,13 +1139,13 @@ export default function AdminDataSyncPage() {
           <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-200 space-y-1">
             <div className="font-bold flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300">
               <ShieldCheck className="w-4 h-4" />
-              Nguyên tắc vàng khi nạp đề thi mới:
+              Nguyên tắc an toàn khi nạp đề thi mới:
             </div>
             <p>
-              1. <strong>Luôn bấm &quot;Kiểm Tra Thử (Chưa Lưu)&quot; trước:</strong> Hệ thống sẽ đọc và kiểm tra từng câu hỏi trong file mà KHÔNG ghi đè CSDL, giúp bạn phát hiện ngay các câu bị thiếu đáp án hoặc sai định dạng.
+              1. <strong>Nên bấm &quot;Kiểm Tra Trước (Không Lưu)&quot; trước:</strong> Hệ thống sẽ quét từng câu hỏi trong file mà KHÔNG ghi đè hệ thống, giúp bạn phát hiện ngay các câu bị thiếu đáp án hoặc sai định dạng.
             </p>
             <p>
-              2. <strong>Bảo toàn kết quả học viên:</strong> Nếu đề thi đã có học viên làm bài và nộp điểm, hệ thống sẽ <u>giữ nguyên 100% lịch sử và điểm số</u> của học viên, chỉ cập nhật nội dung văn bản mới!
+              2. <strong>Bảo toàn điểm thi học viên:</strong> Nếu đề thi đã có học viên làm bài, hệ thống sẽ <u>giữ nguyên 100% lịch sử và điểm số</u> của học viên, chỉ cập nhật nội dung văn bản mới!
             </p>
           </div>
 
@@ -1155,10 +1155,10 @@ export default function AdminDataSyncPage() {
               <div>
                 <h2 className="text-base font-bold text-foreground flex items-center gap-2">
                   <Database className="w-4 h-4 text-primary" />
-                  Cách 1: Nạp Từ Kho Đề Có Sẵn Trên Hệ Thống
+                  Cách 1: Nạp Từ Gói Đề Mẫu Sẵn Có
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Sử dụng các gói đề thi đã được chuẩn bị sẵn trên máy chủ để nạp vào hệ thống luyện thi.
+                  Sử dụng các gói đề thi đã chuẩn bị sẵn trên hệ thống để nạp vào ngân hàng đề.
                 </p>
               </div>
 
@@ -1193,9 +1193,9 @@ export default function AdminDataSyncPage() {
                         onClick={() => handleExecuteSync({ snapshotId: snap.id, dryRun: true })}
                         disabled={!snap.available || syncing}
                         className="px-3 py-2 rounded-xl text-xs font-semibold border border-border bg-background hover:bg-muted text-foreground transition-colors cursor-pointer disabled:opacity-40"
-                        title="Kiểm tra tính hợp lệ của tệp mà không lưu vào CSDL"
+                        title="Kiểm tra tính hợp lệ của tệp mà không lưu vào hệ thống"
                       >
-                        Kiểm tra thử
+                        Kiểm tra trước
                       </button>
                       <button
                         onClick={() => handleExecuteSync({ snapshotId: snap.id, dryRun: false })}
@@ -1216,10 +1216,10 @@ export default function AdminDataSyncPage() {
               <div>
                 <h2 className="text-base font-bold text-foreground flex items-center gap-2">
                   <FileJson className="w-4 h-4 text-primary" />
-                  Cách 2: Tải Tệp Dữ Liệu Đề Thi (.json) Từ Máy Tính
+                  Cách 2: Tải Tệp Đề Thi (.json) Từ Máy Tính
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Tải lên tệp JSON chứa danh sách đề thi mới từ máy tính của bạn để nạp trực tiếp lên hệ thống.
+                  Tải lên tệp JSON chứa danh sách đề thi từ máy tính của bạn để nạp trực tiếp vào hệ thống.
                 </p>
               </div>
 
@@ -1259,7 +1259,7 @@ export default function AdminDataSyncPage() {
                       : "Bấm vào đây để chọn tệp .json từ máy tính của bạn"}
                   </div>
                   <div className="text-[11px] text-muted-foreground">
-                    Hỗ trợ tệp lên tới 30MB • Hệ thống tự động kiểm tra định dạng và cấu trúc đề trước khi lưu
+                    Hỗ trợ tệp lên tới 30MB • Tự động kiểm tra định dạng và cấu trúc đề trước khi lưu
                   </div>
                 </div>
 
@@ -1270,7 +1270,7 @@ export default function AdminDataSyncPage() {
                     className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold border border-border bg-background hover:bg-muted text-foreground transition-colors cursor-pointer disabled:opacity-40"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
-                    {syncing ? "Đang xử lý..." : "Kiểm Tra Thử (Chưa Lưu)"}
+                    {syncing ? "Đang xử lý..." : "Kiểm Tra Trước (Không Lưu)"}
                   </button>
 
                   <button
@@ -1292,7 +1292,7 @@ export default function AdminDataSyncPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h3 className="text-sm font-bold text-foreground">
-                    Kết Quả {syncResult.dryRun ? "Kiểm Tra Thử (Chưa Lưu Dữ Liệu)" : "Lưu Đề Vào Hệ Thống"} — Nguồn:{" "}
+                    Kết Quả {syncResult.dryRun ? "Kiểm Tra Trước (Chưa Lưu Vào Hệ Thống)" : "Lưu Đề Vào Hệ Thống"} — Nguồn:{" "}
                     <span className="font-mono text-primary">{syncResult.source}</span>
                   </h3>
                   <p className="text-xs text-muted-foreground">
@@ -1314,7 +1314,7 @@ export default function AdminDataSyncPage() {
                         Cập nhật nội dung: {syncResult.deepUpdatedCount} đề
                       </span>
                       <span className="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-600 border border-purple-500/20">
-                        Bảo toàn an toàn bài làm: {syncResult.inPlaceUpdatedCount} đề
+                        Bảo lưu bài làm cũ: {syncResult.inPlaceUpdatedCount} đề
                       </span>
                     </>
                   )}
@@ -1363,7 +1363,7 @@ export default function AdminDataSyncPage() {
                                     : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
                                 }`}
                               >
-                                Tương đồng: {item.diff.similarityPercent}%
+                                Trùng khớp: {item.diff.similarityPercent}%
                               </span>
 
                               {item.diff.modifiedQuestionsCount > 0 && (
@@ -1378,7 +1378,7 @@ export default function AdminDataSyncPage() {
                               )}
                               {item.diff.mediaChangedPartsCount > 0 && (
                                 <span className="text-purple-600 dark:text-purple-400 font-semibold text-[11px]">
-                                  • Audio/Ảnh đổi
+                                  • Âm thanh/Ảnh đổi
                                 </span>
                               )}
                               {item.submissionsPreserved !== undefined && item.submissionsPreserved > 0 && (
@@ -1390,10 +1390,10 @@ export default function AdminDataSyncPage() {
                               <button
                                 onClick={() => setSelectedDiffItem(item)}
                                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-all cursor-pointer shadow-xs ml-auto"
-                                title="Mở bảng so sánh trực quan 2 cột giữa đề trong CSDL và đề mới kéo về"
+                                title="Mở bảng so sánh trực quan giữa đề đang có và đề mới tải lên"
                               >
                                 <Eye className="w-3.5 h-3.5" />
-                                <span>Xem So Sánh (Diff)</span>
+                                <span>Xem So Sánh</span>
                               </button>
                             </div>
                           ) : item.warnings && item.warnings.length > 0 ? (
@@ -1401,7 +1401,7 @@ export default function AdminDataSyncPage() {
                           ) : (
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-emerald-600 dark:text-emerald-400">
-                                Đề mới hoàn toàn, định dạng chuẩn British Council
+                                Đề mới hoàn toàn, định dạng chuẩn
                               </span>
                             </div>
                           )}
@@ -1427,7 +1427,7 @@ export default function AdminDataSyncPage() {
                               : item.status === "DEEP_UPDATED"
                               ? "CẬP NHẬT"
                               : item.status === "IN_PLACE_UPDATED"
-                              ? "BẢO TOÀN BÀI NỘP"
+                              ? "BẢO LƯU BÀI LÀM"
                               : item.status}
                           </span>
                         </td>
