@@ -83,7 +83,7 @@ export default function AdminKeyDuDoanPage() {
   }>({
     name: "",
     hotLevel: 5,
-    forecastTag: "★★★★★ Đề tủ cực hot",
+    forecastTag: "☘️☘️☘️☘️☘️ Đề tủ cực hot",
     keywordsStr: "",
     excludeKeywordsStr: "",
     applicableSkill: "ALL",
@@ -114,7 +114,7 @@ export default function AdminKeyDuDoanPage() {
     isPro: false,
     isPublished: true,
     hotLevel: 5,
-    forecastTag: "★★★★★ Đề tủ cực hot",
+    forecastTag: "☘️☘️☘️☘️☘️ Đề tủ cực hot",
   });
   const [editLoading, setEditLoading] = useState(false);
 
@@ -126,7 +126,7 @@ export default function AdminKeyDuDoanPage() {
   const [loadingPool, setLoadingPool] = useState(false);
   const [selectedPoolExamIds, setSelectedPoolExamIds] = useState<Set<string>>(new Set());
   const [assignHotLevel, setAssignHotLevel] = useState<number>(5);
-  const [assignForecastTag, setAssignForecastTag] = useState("★★★★★ Đề tủ cực hot");
+  const [assignForecastTag, setAssignForecastTag] = useState("☘️☘️☘️☘️☘️ Đề tủ cực hot");
   const [assignLoading, setAssignLoading] = useState(false);
 
   // Confirm remove from Key
@@ -205,11 +205,11 @@ export default function AdminKeyDuDoanPage() {
     if (oldLevel === newLevel) return;
 
     const defaultTags: Record<number, string> = {
-      5: "★★★★★ Đề tủ cực hot",
-      4: "★★★★ Tần suất thi cao",
-      3: "★★★ Trọng tâm ôn tập",
-      2: "★★ Luyện tập mở rộng",
-      1: "★ Đề bổ trợ cơ bản",
+      5: "☘️☘️☘️☘️☘️ Đề tủ cực hot",
+      4: "☘️☘️☘️☘️ Tần suất thi cao",
+      3: "☘️☘️☘️ Trọng tâm ôn tập",
+      2: "☘️☘️ Luyện tập mở rộng",
+      1: "☘️ Đề bổ trợ cơ bản",
       0: "",
     };
 
@@ -323,11 +323,11 @@ export default function AdminKeyDuDoanPage() {
     setBatchLoading(true);
 
     const defaultTags: Record<number, string> = {
-      5: "★★★★★ Đề tủ cực hot",
-      4: "★★★★ Tần suất thi cao",
-      3: "★★★ Trọng tâm ôn tập",
-      2: "★★ Luyện tập mở rộng",
-      1: "★ Đề bổ trợ cơ bản",
+      5: "☘️☘️☘️☘️☘️ Đề tủ cực hot",
+      4: "☘️☘️☘️☘️ Tần suất thi cao",
+      3: "☘️☘️☘️ Trọng tâm ôn tập",
+      2: "☘️☘️ Luyện tập mở rộng",
+      1: "☘️ Đề bổ trợ cơ bản",
       0: "",
     };
 
@@ -462,7 +462,7 @@ export default function AdminKeyDuDoanPage() {
       isPro: exam.isPro,
       isPublished: exam.isPublished,
       hotLevel: exam.hotLevel ?? 3,
-      forecastTag: exam.forecastTag || "★★★★★ Đề tủ cực hot",
+      forecastTag: exam.forecastTag || "☘️☘️☘️☘️☘️ Đề tủ cực hot",
     });
   };
 
@@ -516,12 +516,12 @@ export default function AdminKeyDuDoanPage() {
   const handleTopicQuickSetHot = async (rule: TopicRule, newLevel: number) => {
     const updatedTag =
       newLevel === 5
-        ? "★★★★★ Đề tủ cực hot"
+        ? "☘️☘️☘️☘️☘️ Đề tủ cực hot"
         : newLevel === 4
-        ? "★★★★ Tần suất thi cao"
+        ? "☘️☘️☘️☘️ Tần suất thi cao"
         : newLevel === 3
-        ? "★★★ Trọng tâm ôn tập"
-        : "★★ Luyện tập mở rộng";
+        ? "☘️☘️☘️ Trọng tâm ôn tập"
+        : "☘️☘️ Luyện tập mở rộng";
 
     // Optimistic
     setTopicRules((prev) =>
@@ -592,7 +592,7 @@ export default function AdminKeyDuDoanPage() {
     setTopicFormData({
       name: "",
       hotLevel: 5,
-      forecastTag: "★★★★★ Đề tủ cực hot",
+      forecastTag: "☘️☘️☘️☘️☘️ Đề tủ cực hot",
       keywordsStr: "",
       excludeKeywordsStr: "",
       applicableSkill: "ALL",
@@ -1090,29 +1090,40 @@ export default function AdminKeyDuDoanPage() {
 
                           {/* 1-Click Clover Level Buttons */}
                           <td className="py-3 px-3" onClick={(e) => e.stopPropagation()}>
-                            <div className="flex items-center gap-1">
-                              {[0, 1, 2, 3, 4, 5].map((lvl) => {
-                                const isCurrent = currentHot === lvl;
-                                return (
-                                  <button
-                                    key={lvl}
-                                    type="button"
-                                    onClick={() => handleSetHotLevel(exam, lvl)}
-                                    title={lvl === 0 ? "Gỡ về Đề thường (0 Cỏ)" : `Gán ${lvl} Cỏ ☘️`}
-                                    className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
-                                      isCurrent
-                                        ? lvl === 0
-                                          ? "bg-slate-700 text-white font-black ring-1 ring-slate-800"
-                                          : lvl >= 4
-                                          ? "bg-emerald-600 text-white font-black shadow-xs ring-1 ring-emerald-500"
-                                          : "bg-amber-600 text-white font-black shadow-xs ring-1 ring-amber-500"
-                                        : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/40"
-                                    }`}
-                                  >
-                                    {lvl === 0 ? "0 Cỏ" : `${lvl}☘️`}
-                                  </button>
-                                );
-                              })}
+                            <div className="flex items-center gap-1.5">
+                              <div className="inline-flex rounded-lg border border-border/60 bg-muted/30 p-0.5">
+                                {[1, 2, 3, 4, 5].map((lvl) => {
+                                  const isCurrent = currentHot === lvl;
+                                  return (
+                                    <button
+                                      key={lvl}
+                                      type="button"
+                                      onClick={() => handleSetHotLevel(exam, lvl)}
+                                      title={`Gán ${lvl} Cỏ ☘️`}
+                                      className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
+                                        isCurrent
+                                          ? lvl >= 4
+                                            ? "bg-emerald-600 text-white font-black shadow-xs ring-1 ring-emerald-500"
+                                            : "bg-amber-600 text-white font-black shadow-xs ring-1 ring-amber-500"
+                                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                      }`}
+                                    >
+                                      {lvl}☘️
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {currentHot > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => setConfirmRemoveExam(exam)}
+                                  title="Gỡ khỏi Đề Key (chuyển về 0 Cỏ - Đề thường)"
+                                  className="p-1 rounded-md text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 text-xs transition-colors cursor-pointer"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                             </div>
                           </td>
 
@@ -1452,15 +1463,23 @@ export default function AdminKeyDuDoanPage() {
                       type="button"
                       onClick={() => {
                         setAssignHotLevel(lvl);
-                        setAssignForecastTag(
-                          lvl === 5
-                            ? "★★★★★ Đề tủ cực hot"
-                            : lvl === 4
-                            ? "★★★★ Tần suất thi cao"
-                            : lvl === 3
-                            ? "★★★ Trọng tâm ôn tập"
-                            : "★★ Luyện tập mở rộng"
-                        );
+                        const isDefaultTag =
+                          !assignForecastTag ||
+                          assignForecastTag.includes("Đề tủ") ||
+                          assignForecastTag.includes("Tần suất") ||
+                          assignForecastTag.includes("Trọng tâm") ||
+                          assignForecastTag.includes("Luyện tập");
+                        if (isDefaultTag) {
+                          setAssignForecastTag(
+                            lvl === 5
+                              ? "☘️☘️☘️☘️☘️ Đề tủ cực hot"
+                              : lvl === 4
+                              ? "☘️☘️☘️☘️ Tần suất thi cao"
+                              : lvl === 3
+                              ? "☘️☘️☘️ Trọng tâm ôn tập"
+                              : "☘️☘️ Luyện tập mở rộng"
+                          );
+                        }
                       }}
                       className={`py-2 rounded-xl border text-center font-bold transition-all cursor-pointer ${
                         assignHotLevel === lvl
@@ -1484,16 +1503,41 @@ export default function AdminKeyDuDoanPage() {
                   type="text"
                   value={assignForecastTag}
                   onChange={(e) => setAssignForecastTag(e.target.value)}
-                  placeholder="Ví dụ: ★★★★★ Đề tủ cực hot (Ca sáng 20/10)"
+                  placeholder="Ví dụ: ☘️☘️☘️☘️☘️ Đề tủ cực hot (Ca sáng 20/10)"
                   className="w-full px-3 py-2 rounded-xl border border-input bg-background focus:outline-none focus:ring-1 focus:ring-primary text-xs"
                 />
               </div>
 
               {/* Tìm kiếm & Lọc đề trong kho */}
               <div>
-                <label className="block font-bold text-foreground mb-1">
-                  3. Chọn đề thi từ kho ({selectedPoolExamIds.size} đã chọn):
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block font-bold text-foreground">
+                    3. Chọn đề thi từ kho ({selectedPoolExamIds.size} đã chọn):
+                  </label>
+                  {filteredPoolExams.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const allFilteredIds = filteredPoolExams.map((e) => e.id);
+                        const allSelected = allFilteredIds.every((id) => selectedPoolExamIds.has(id));
+                        setSelectedPoolExamIds((prev) => {
+                          const next = new Set(prev);
+                          if (allSelected) {
+                            allFilteredIds.forEach((id) => next.delete(id));
+                          } else {
+                            allFilteredIds.forEach((id) => next.add(id));
+                          }
+                          return next;
+                        });
+                      }}
+                      className="text-[11px] font-bold text-primary hover:underline cursor-pointer"
+                    >
+                      {filteredPoolExams.every((e) => selectedPoolExamIds.has(e.id))
+                        ? "Bỏ chọn tất cả"
+                        : `Chọn tất cả ${filteredPoolExams.length} đề`}
+                    </button>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="relative flex-1">
                     <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -1716,7 +1760,7 @@ export default function AdminKeyDuDoanPage() {
               </div>
 
               <div>
-                <label className="block font-semibold text-foreground mb-1">Mức độ Cỏ / Sao (Hot Level) *</label>
+                <label className="block font-semibold text-foreground mb-1">Mức độ Cỏ (Hot Level) (Hot Level) *</label>
                 <div className="flex items-center gap-2">
                   {[5, 4, 3, 2, 1].map((lvl) => (
                     <button
@@ -1728,12 +1772,12 @@ export default function AdminKeyDuDoanPage() {
                           hotLevel: lvl,
                           forecastTag:
                             lvl === 5
-                              ? "★★★★★ Đề tủ cực hot"
+                              ? "☘️☘️☘️☘️☘️ Đề tủ cực hot"
                               : lvl === 4
-                              ? "★★★★ Tần suất thi cao"
+                              ? "☘️☘️☘️☘️ Tần suất thi cao"
                               : lvl === 3
-                              ? "★★★ Trọng tâm ôn tập"
-                              : "★★ Luyện tập mở rộng",
+                              ? "☘️☘️☘️ Trọng tâm ôn tập"
+                              : "☘️☘️ Luyện tập mở rộng",
                         })
                       }
                       className={`flex-1 py-2 rounded-xl border text-center font-bold transition-all cursor-pointer ${
@@ -1755,7 +1799,7 @@ export default function AdminKeyDuDoanPage() {
                   type="text"
                   value={topicFormData.forecastTag}
                   onChange={(e) => setTopicFormData({ ...topicFormData, forecastTag: e.target.value })}
-                  placeholder="Ví dụ: ★★★★★ Đề tủ cực hot (Part 2/3)"
+                  placeholder="Ví dụ: ☘️☘️☘️☘️☘️ Đề tủ cực hot (Part 2/3)"
                   className="w-full px-3 py-2 rounded-xl border border-input bg-background focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
