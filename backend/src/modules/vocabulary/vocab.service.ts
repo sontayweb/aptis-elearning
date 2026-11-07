@@ -450,16 +450,99 @@ export class VocabService {
   }
 
   /**
+   * Tách văn bản dài thành các đoạn nhỏ vừa vặn để dịch qua API không bị quá tải
+   */
+  private splitTextForTranslation(str: string, maxLen = 1400): string[] {
+    if (str.length <= maxLen) return [str];
+    const paras = str.split(/\n+/);
+    const chunks: string[] = [];
+    let cur = '';
+
+    for (const p of paras) {
+      if ((cur ? cur + '\n\n' + p : p).length <= maxLen) {
+        cur = cur ? cur + '\n\n' + p : p;
+      } else {
+        if (cur) chunks.push(cur);
+        if (p.length > maxLen) {
+          const sentences = p.split(/(?<=[.?!])\s+/);
+          let sCur = '';
+          for (const s of sentences) {
+            if ((sCur ? sCur + ' ' + s : s).length <= maxLen) {
+              sCur = sCur ? sCur + ' ' + s : s;
+            } else {
+              if (sCur) chunks.push(sCur);
+              sCur = s;
+            }
+          }
+          cur = sCur;
+        } else {
+          cur = p;
+        }
+      }
+    }
+    if (cur) chunks.push(cur);
+    return chunks;
+  }
+
+  /**
+   * Dịch một đoạn văn bản tiếng Anh sang tiếng Việt qua Google Translate gtx
+   */
+  private async translateSingleChunk(
+    chunk: string,
+    isSingleWord = false
+  ): Promise<{ text: string; partOfSpeech?: string | null }> {
+    try {
+      const params = new URLSearchParams({
+        client: 'gtx',
+        sl: 'auto',
+        tl: 'vi',
+        dt: 't',
+        q: chunk,
+      });
+      if (isSingleWord) params.append('dt', 'bd');
+
+      const gRes = await fetch('https://translate.googleapis.com/translate_a/single', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        },
+        body: params.toString(),
+      });
+
+      if (gRes.ok) {
+        const gData: any = await gRes.json();
+        let translated = '';
+        let partOfSpeech: string | null = null;
+        if (Array.isArray(gData?.[0])) {
+          translated = gData[0].map((s: any) => s[0]).join('');
+        }
+        if (isSingleWord && Array.isArray(gData?.[1])) {
+          const firstDict = gData[1][0];
+          if (firstDict?.[0]) {
+            partOfSpeech = firstDict[0];
+          }
+        }
+        return { text: translated || chunk, partOfSpeech };
+      }
+    } catch (err) {
+      console.warn('[Translate] Google Translate single chunk error:', err);
+    }
+    return { text: chunk };
+  }
+
+  /**
    * Tra cứu từ vựng và dịch nghĩa văn bản tức thì
-   * Hỗ trợ tra từ đơn (IPA, audio phát âm, nghĩa, CEFR) và dịch cả câu tiếng Anh sang tiếng Việt
+   * Hỗ trợ tra từ đơn (IPA, audio phát âm, nghĩa, CEFR) và dịch cả bài/đoạn văn dài tiếng Anh sang tiếng Việt
    */
   async translateAndLookup(rawText: string, userId?: string) {
     const text = (rawText || '').trim();
     if (!text) {
       throw { statusCode: 400, message: 'Vui lòng cung cấp nội dung cần tra cứu hoặc dịch' };
     }
-    if (text.length > 1000) {
-      throw { statusCode: 400, message: 'Đoạn văn bản quá dài (tối đa 1000 ký tự)' };
+    if (text.length > 25000) {
+      throw { statusCode: 400, message: 'Đoạn văn bản quá dài (tối đa 25.000 ký tự)' };
     }
 
     const words = text.split(/\s+/).filter(Boolean);
@@ -493,47 +576,18 @@ export class VocabService {
       }
     }
 
-    // 2. Gọi Google Translate API để lấy bản dịch chuẩn tiếng Việt
-    try {
-      let gRes: Response;
-      if (text.length > 800) {
-        const params = new URLSearchParams({
-          client: 'gtx',
-          sl: 'auto',
-          tl: 'vi',
-          dt: 't',
-          q: text,
-        });
-        if (isSingleWord) params.append('dt', 'bd');
-        gRes = await fetch('https://translate.googleapis.com/translate_a/single', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': 'Mozilla/5.0',
-          },
-          body: params.toString(),
-        });
-      } else {
-        const gUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=vi&dt=t&dt=bd&q=${encodeURIComponent(text)}`;
-        gRes = await fetch(gUrl, {
-          headers: { 'User-Agent': 'Mozilla/5.0' },
-        });
-      }
-
-      if (gRes.ok) {
-        const gData: any = await gRes.json();
-        if (Array.isArray(gData?.[0])) {
-          translatedText = gData[0].map((s: any) => s[0]).join('');
-        }
-        if (isSingleWord && Array.isArray(gData?.[1])) {
-          const firstDict = gData[1][0];
-          if (firstDict?.[0] && !partOfSpeech) {
-            partOfSpeech = firstDict[0];
-          }
+    // 2. Gọi dịch thuật với cơ chế tự động chia nhỏ đoạn văn nếu dài
+    if (!translatedText || !isSingleWord) {
+      const chunks = this.splitTextForTranslation(text, 1400);
+      const translatedChunks: string[] = [];
+      for (const chunk of chunks) {
+        const res = await this.translateSingleChunk(chunk, isSingleWord);
+        translatedChunks.push(res.text);
+        if (res.partOfSpeech && !partOfSpeech) {
+          partOfSpeech = res.partOfSpeech;
         }
       }
-    } catch (e) {
-      console.warn('[Translate] Google Translate error:', e);
+      translatedText = translatedChunks.join('\n\n');
     }
 
     // 3. Nếu là từ đơn và chưa có phiên âm hoặc audio, tra Free Dictionary API

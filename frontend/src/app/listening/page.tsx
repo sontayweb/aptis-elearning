@@ -16,7 +16,7 @@ import {
 import { getCloverConfig } from "@/lib/clover-utils";
 import { useSkillHubTabSync } from "@/hooks/use-skill-hub";
 import { SkillPartTabs } from "@/components/skills/skill-part-tabs";
-import { SkillFilterBar } from "@/components/skills/skill-filter-bar";
+import { SkillFilterBar, matchesCloverPriority } from "@/components/skills/skill-filter-bar";
 import {
   SkillMarathonCard,
   SkillExamCard,
@@ -244,14 +244,7 @@ export default function ListeningPracticePage() {
   // 2. Lọc tiếp theo search, status, priority từ currentTabExams
   const filteredExams = currentTabExams.filter((e) => {
     const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPriority =
-      filterPriority === "all"
-        ? true
-        : filterPriority === "high"
-        ? (e.hotLevel || 0) >= 3 || e.priority === "HIGH"
-        : filterPriority === "medium"
-        ? (e.hotLevel || 0) === 2 || e.priority === "MEDIUM"
-        : (e.hotLevel || 0) <= 1;
+    const matchesPriority = matchesCloverPriority(e, filterPriority);
     const matchesStatus =
       filterStatus === "all"
         ? true

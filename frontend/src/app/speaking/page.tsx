@@ -26,7 +26,7 @@ import {
 import { getCloverConfig } from "@/lib/clover-utils";
 import { useSkillHubTabSync } from "@/hooks/use-skill-hub";
 import { SkillPartTabs } from "@/components/skills/skill-part-tabs";
-import { SkillFilterBar } from "@/components/skills/skill-filter-bar";
+import { SkillFilterBar, matchesCloverPriority } from "@/components/skills/skill-filter-bar";
 import {
   SkillMarathonCard,
   SkillExamCard,
@@ -224,17 +224,12 @@ export default function SpeakingPracticePage() {
         : filterStatus === "completed"
         ? e.status === "completed" || e.status === "in_progress"
         : e.status === "not_started";
-    const matchesPriority =
-      filterPriority === "all"
-        ? true
-        : filterPriority === "high"
-        ? e.priority === "HIGH"
-        : filterPriority === "medium"
-        ? e.priority === "MEDIUM"
-        : e.priority === "LOW";
+    const matchesPriority = matchesCloverPriority(e, filterPriority);
     const matchesSource = filterSource === "all" || filterSource === "web" ? true : false;
     return matchesSearch && matchesStatus && matchesPriority && matchesSource;
   }).sort((a, b) => {
+    const hotDiff = (b.hotLevel || 0) - (a.hotLevel || 0);
+    if (hotDiff !== 0) return hotDiff;
     // Sắp xếp tự nhiên theo đúng số đề gốc: Đề 01 -> Đề 02 -> ... -> Đề 26
     const numA = (a.title.match(/^(?:Đề|Test|Exam)\s*0*(\d+)/i) || [])[1];
     const numB = (b.title.match(/^(?:Đề|Test|Exam)\s*0*(\d+)/i) || [])[1];

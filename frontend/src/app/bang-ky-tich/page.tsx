@@ -497,7 +497,6 @@ export default function BangKyTichPage() {
       {selectedHonor && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
           <div className="bg-card border border-border rounded-t-3xl sm:rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
-          <div className="bg-card border border-border rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between pb-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <span className="px-3 py-1 rounded-full bg-red-600 text-white font-bold text-xs">

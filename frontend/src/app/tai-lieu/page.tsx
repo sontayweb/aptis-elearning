@@ -136,11 +136,11 @@ export default function TaiLieuPage() {
         <section className="section-container pt-4 pb-12">
           {activeTab === "docs" ? (
             /* TAB 1: TÀI LIỆU PDF */
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredDocs.map((doc) => (
                 <div
                   key={doc.id}
-                  className="rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group hover:border-primary/40 relative overflow-hidden"
+                  className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group hover:border-primary/40 relative overflow-hidden"
                 >
                   {doc.isVip && (
                     <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-amber-600 text-white text-[10px] font-extrabold px-3 py-1 rounded-bl-xl shadow-sm flex items-center gap-1">
@@ -181,7 +181,7 @@ export default function TaiLieuPage() {
                     <button
                       type="button"
                       onClick={() => handleDownload(doc)}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm shadow-primary/20 active:scale-95"
+                      className="w-full min-h-[44px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm shadow-primary/20 active:scale-95 cursor-pointer"
                     >
                       <Download className="w-4 h-4" />
                       <span>Tải tài liệu PDF</span>
@@ -303,8 +303,8 @@ export default function TaiLieuPage() {
 
       {/* MODAL DOWNLOAD THÀNH CÔNG */}
       {downloadSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-4 relative">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+          <div className="w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-2xl space-y-4 relative">
             <button
               type="button"
               onClick={() => setDownloadSuccessModal(null)}

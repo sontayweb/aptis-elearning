@@ -157,11 +157,11 @@ export default function ContactPage() {
                       placeholder="Nguyễn Văn A"
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                         Số điện thoại *
@@ -172,7 +172,7 @@ export default function ContactPage() {
                         placeholder="0912 345 678"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                       />
                     </div>
                     <div>
@@ -182,7 +182,7 @@ export default function ContactPage() {
                       <select
                         value={formData.target}
                         onChange={(e) => setFormData({ ...formData, target: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                       >
                         <option value="B1 Target">Aptis B1</option>
                         <option value="B2 Target">Aptis B2 (Khuyên dùng)</option>
@@ -200,7 +200,7 @@ export default function ContactPage() {
                       placeholder="email@example.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
 
@@ -213,14 +213,14 @@ export default function ContactPage() {
                       placeholder="Em muốn hỏi về cấu trúc bài thi Speaking và cách đăng ký gói VIP..."
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all flex items-center justify-center gap-2"
+                    className="w-full min-h-[44px] py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {loading ? (
                       <span>Đang gửi...</span>

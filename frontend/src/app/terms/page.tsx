@@ -54,10 +54,10 @@ export default function TermsPage() {
         </section>
 
         <section className="section-padding section-container max-w-4xl mx-auto">
-          <div className="space-y-8">
-            <div className="p-6 md:p-8 rounded-2xl bg-card border border-border">
+          <div className="space-y-6 sm:space-y-8">
+            <div className="p-4 sm:p-6 md:p-8 rounded-2xl bg-card border border-border">
               <h2 className="text-lg md:text-xl font-heading font-bold mb-4 flex items-center gap-2 text-foreground">
-                <ShieldCheck className="w-5 h-5 text-primary" />
+                <ShieldCheck className="w-5 h-5 text-primary shrink-0" />
                 <span>1. Điều khoản sử dụng tài khoản học viên</span>
               </h2>
               <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
@@ -70,9 +70,9 @@ export default function TermsPage() {
               </div>
             </div>
 
-            <div className="p-6 md:p-8 rounded-2xl bg-card border border-border">
+            <div className="p-4 sm:p-6 md:p-8 rounded-2xl bg-card border border-border">
               <h2 className="text-lg md:text-xl font-heading font-bold mb-4 flex items-center gap-2 text-foreground">
-                <Lock className="w-5 h-5 text-primary" />
+                <Lock className="w-5 h-5 text-primary shrink-0" />
                 <span>2. Chính sách thanh toán &amp; Kích hoạt dịch vụ</span>
               </h2>
               <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
@@ -85,9 +85,9 @@ export default function TermsPage() {
               </div>
             </div>
 
-            <div className="p-6 md:p-8 rounded-2xl bg-card border border-border">
+            <div className="p-4 sm:p-6 md:p-8 rounded-2xl bg-card border border-border">
               <h2 className="text-lg md:text-xl font-heading font-bold mb-4 flex items-center gap-2 text-foreground">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
+                <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
                 <span>3. Chính sách bảo mật dữ liệu cá nhân</span>
               </h2>
               <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">

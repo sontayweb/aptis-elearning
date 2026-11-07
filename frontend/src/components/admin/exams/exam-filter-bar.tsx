@@ -131,7 +131,7 @@ export const ExamFilterBar: React.FC<ExamFilterBarProps> = ({
       </div>
 
       {/* Row 2: Skill Tabs (Cha) — Segmented Control thanh lịch */}
-      <div className="px-3 sm:px-4 py-2.5 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+      <div className="px-3 sm:px-4 py-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <span className="text-[10.5px] font-heading font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1 shrink-0 flex items-center gap-1">
           <Layers className="w-3 h-3" />
           Kỹ năng:
@@ -143,7 +143,7 @@ export const ExamFilterBar: React.FC<ExamFilterBarProps> = ({
             <button
               key={tab.id}
               onClick={() => onSkillChange(tab.id)}
-              className={`flex-none px-3 py-1.5 rounded-xl font-heading text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              className={`flex-none px-3 py-1.5 rounded-xl font-heading text-xs font-semibold flex items-center gap-1.5 transition-all min-h-[36px] sm:min-h-[30px] shrink-0 ${
                 isActive
                   ? `${tab.activeBg} shadow-xs`
                   : "bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white"
@@ -164,7 +164,7 @@ export const ExamFilterBar: React.FC<ExamFilterBarProps> = ({
 
       {/* Row 3: Cascading Part Pills (Con) — CHỈ XUẤT HIỆN KHI skillFilter !== "ALL" */}
       {skillFilter !== "ALL" && currentSkillParts.length > 0 && (
-        <div className="px-3 sm:px-4 py-2.5 bg-slate-50/70 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto scrollbar-none animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="px-3 sm:px-4 py-2.5 bg-slate-50/70 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar animate-in fade-in slide-in-from-top-1 duration-200">
           <span className="text-[10.5px] font-heading font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider mr-1 shrink-0 flex items-center gap-1">
             <SlidersHorizontal className="w-3 h-3" />
             Phần thi:
@@ -173,7 +173,7 @@ export const ExamFilterBar: React.FC<ExamFilterBarProps> = ({
           {/* Tất cả Part */}
           <button
             onClick={() => onPartChange(null)}
-            className={`flex-none px-3 py-1 rounded-lg text-xs font-heading font-semibold transition-all ${
+            className={`flex-none px-3 py-1.5 rounded-lg text-xs font-heading font-semibold transition-all min-h-[34px] sm:min-h-[28px] shrink-0 ${
               partFilter === null
                 ? "bg-violet-600 text-white shadow-xs"
                 : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700/80"
@@ -190,7 +190,7 @@ export const ExamFilterBar: React.FC<ExamFilterBarProps> = ({
               <button
                 key={part.partNumber}
                 onClick={() => onPartChange(part.partNumber)}
-                className={`flex-none px-3 py-1 rounded-lg text-xs font-heading transition-all flex items-center gap-1.5 ${
+                className={`flex-none px-3 py-1.5 rounded-lg text-xs font-heading transition-all flex items-center gap-1.5 min-h-[34px] sm:min-h-[28px] shrink-0 ${
                   isSelected
                     ? "bg-violet-600 text-white font-bold shadow-xs"
                     : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-950/40 dark:hover:text-violet-300 border border-slate-200/80 dark:border-slate-700/80"

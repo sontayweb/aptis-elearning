@@ -183,9 +183,10 @@ export function SkillExamCard({
                 return (
                   <span
                     className={`px-2 py-0.5 rounded-md font-extrabold text-[10px] inline-flex items-center gap-1 border ${cfg.badgeClass}`}
-                    title={`${hotLvl} Cỏ ☘️`}
+                    title={cfg.label}
                   >
                     <span>{cfg.symbol}</span>
+                    <span className="opacity-90">· {cfg.shortLabel}</span>
                   </span>
                 );
               })()}

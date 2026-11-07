@@ -365,7 +365,7 @@ function ReadingMarathonContent() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Tìm tên đề, từ khóa, nội dung..."
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                  className="w-full pl-9 pr-3 py-2 text-base sm:text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
                 />
               </div>
               <button

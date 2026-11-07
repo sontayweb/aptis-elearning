@@ -55,13 +55,13 @@ export default function AdminFilterBar({
             value={searchValue ?? ""}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={searchPlaceholder}
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-sans"
+            className="w-full pl-9 pr-3 py-1.5 text-base sm:text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-sans"
           />
         </form>
       )}
 
       {/* Right controls: Segmented tabs, custom filters, refresh button */}
-      <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto scrollbar-none">
+      <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
         {/* Segmented tabs */}
         {tabs && tabs.length > 0 && (
           <div className="p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 flex items-center gap-0.5 shrink-0">
@@ -72,7 +72,7 @@ export default function AdminFilterBar({
                   key={tab.id}
                   type="button"
                   onClick={() => onTabChange?.(tab.id)}
-                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-heading font-semibold whitespace-nowrap transition-all ${
+                  className={`px-2.5 py-1.5 rounded-lg text-xs sm:text-[11px] font-heading font-semibold whitespace-nowrap transition-all min-h-[34px] sm:min-h-[28px] shrink-0 ${
                     isActive
                       ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm font-bold ring-1 ring-slate-900/5 dark:ring-white/10"
                       : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
@@ -97,7 +97,7 @@ export default function AdminFilterBar({
             type="button"
             onClick={onRefresh}
             title="Làm mới danh sách"
-            className="p-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors border border-slate-200 dark:border-slate-700 shrink-0"
+            className="p-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors border border-slate-200 dark:border-slate-700 shrink-0 min-h-[34px] min-w-[34px] flex items-center justify-center"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-slate-900 dark:text-white" : ""}`} />
           </button>

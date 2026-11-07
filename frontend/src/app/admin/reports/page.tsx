@@ -236,7 +236,7 @@ export default function AdminQuestionReportsPage() {
                 setPage(1);
               }}
               placeholder="Tìm theo tên đề thi, nội dung câu hỏi..."
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-background border border-border focus:outline-hidden focus:ring-1 focus:ring-primary text-foreground"
+              className="w-full pl-9 pr-3 py-2 text-base sm:text-xs rounded-xl bg-background border border-border focus:outline-hidden focus:ring-1 focus:ring-primary text-foreground"
             />
           </div>
         </div>

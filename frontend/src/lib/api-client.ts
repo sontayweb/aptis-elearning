@@ -939,6 +939,8 @@ class ApiClient {
       examIds?: string[];
       hotLevel?: number;
       isPublished?: boolean;
+      isPro?: boolean;
+      forecastTag?: string | null;
       skill?: string;
       rules?: Array<{ keywords: string[]; hotLevel: number }>;
     }) =>

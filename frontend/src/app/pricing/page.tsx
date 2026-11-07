@@ -684,7 +684,7 @@ export default function PricingPage() {
                       value={promoCodeInput}
                       onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
                       placeholder={`Mã CODE: ${promoCodeToDisplay}`}
-                      className="px-4 py-2 rounded-xl border border-border bg-background text-xs font-mono font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-primary w-full sm:w-56"
+                      className="px-4 py-2 rounded-xl border border-border bg-background text-base sm:text-xs font-mono font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-primary w-full sm:w-56"
                     />
                     <button
                       type="submit"
@@ -747,7 +747,7 @@ export default function PricingPage() {
                     value={promoCodeInput}
                     onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
                     placeholder="MÃ GIFTCODE"
-                    className="px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-mono font-bold uppercase tracking-wider focus:outline-none focus:ring-1 focus:ring-primary w-40"
+                    className="px-3 py-1.5 rounded-lg border border-border bg-background text-base sm:text-xs font-mono font-bold uppercase tracking-wider focus:outline-none focus:ring-1 focus:ring-primary w-40"
                   />
                   <button
                     type="submit"
@@ -1070,8 +1070,8 @@ export default function PricingPage() {
 
       {/* ================= SEPAY VIETQR PAYMENT MODAL ================= */}
       {selectedPlan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-card border border-border rounded-3xl max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+          <div className="bg-card border border-border rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               type="button"
               onClick={() => setSelectedPlan(null)}
@@ -1224,12 +1224,12 @@ export default function PricingPage() {
 
       {/* ================= DISPUTE MODAL ================= */}
       {disputeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-card border border-border rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+          <div className="bg-card border border-border rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               type="button"
               onClick={() => setDisputeModalOpen(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground"
+              className="absolute top-4 right-4 w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1249,7 +1249,7 @@ export default function PricingPage() {
                   value={disputeBankTransId}
                   onChange={(e) => setDisputeBankTransId(e.target.value)}
                   placeholder="Ví dụ: FT2428392182"
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-background font-mono"
+                  className="w-full mt-1 px-3 py-2.5 rounded-xl border border-border bg-background font-mono text-base sm:text-xs"
                 />
               </div>
               <div>
@@ -1259,7 +1259,7 @@ export default function PricingPage() {
                   value={disputePhone}
                   onChange={(e) => setDisputePhone(e.target.value)}
                   placeholder="0912..."
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-background"
+                  className="w-full mt-1 px-3 py-2.5 rounded-xl border border-border bg-background text-base sm:text-xs"
                 />
               </div>
               {disputeError && (

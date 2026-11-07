@@ -468,7 +468,7 @@ export default function AdminCmsPricingPage() {
                           type="number"
                           value={editAiQuota}
                           onChange={(e) => setEditAiQuota(Number(e.target.value))}
-                          className="w-20 py-0.5 px-1.5 text-xs border border-slate-300 dark:border-slate-700 rounded-lg text-right font-mono font-bold bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-20 py-0.5 px-1.5 text-base sm:text-xs border border-slate-300 dark:border-slate-700 rounded-lg text-right font-mono font-bold bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                       ) : (
                         <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
@@ -486,7 +486,7 @@ export default function AdminCmsPricingPage() {
                           type="number"
                           value={editTeacherQuota}
                           onChange={(e) => setEditTeacherQuota(Number(e.target.value))}
-                          className="w-20 py-0.5 px-1.5 text-xs border border-slate-300 dark:border-slate-700 rounded-lg text-right font-mono font-bold bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-20 py-0.5 px-1.5 text-base sm:text-xs border border-slate-300 dark:border-slate-700 rounded-lg text-right font-mono font-bold bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                       ) : (
                         <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">

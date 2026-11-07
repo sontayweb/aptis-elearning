@@ -104,7 +104,7 @@ export default function GioiThieuPage() {
             </p>
 
             {/* Referral Link & Code Box */}
-            <div className="max-w-xl mx-auto bg-card border border-border shadow-lg rounded-2xl p-6 text-left">
+            <div className="max-w-xl mx-auto bg-card border border-border shadow-lg rounded-2xl p-4 sm:p-6 text-left">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Mã giới thiệu độc quyền của bạn:
@@ -121,7 +121,7 @@ export default function GioiThieuPage() {
                 <button
                   type="button"
                   onClick={() => handleCopy(referralLink)}
-                  className="w-full sm:w-auto px-5 py-3 rounded-xl btn-brand-gradient text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 shrink-0"
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl btn-brand-gradient text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 shrink-0 min-h-[44px]"
                 >
                   {copied ? (
                     <>

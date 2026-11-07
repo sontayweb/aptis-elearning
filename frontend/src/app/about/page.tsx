@@ -55,17 +55,17 @@ export default function AboutPage() {
               {pageData?.content ||
                 "Nền tảng luyện thi và khảo thí tiếng Anh Aptis ESOL chuẩn hóa British Council tích hợp AI chấm điểm phát âm & ngữ pháp theo khung tham chiếu CEFR."}
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
               <Link
                 href="/thi-thu"
-                className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all inline-flex items-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
               >
                 <span>Thi thử miễn phí ngay</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/pricing"
-                className="px-6 py-3 rounded-xl bg-card border border-border text-foreground font-semibold hover:bg-accent/10 transition-colors"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-card border border-border text-foreground font-semibold hover:bg-accent/10 transition-colors inline-flex items-center justify-center min-h-[44px]"
               >
                 Xem bảng giá gói học
               </Link>
@@ -74,23 +74,23 @@ export default function AboutPage() {
         </section>
 
         {/* Stats Grid */}
-        <section className="py-12 border-b border-border bg-card/40">
+        <section className="py-8 sm:py-12 border-b border-border bg-card/40">
           <div className="section-container">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              <div className="p-6 rounded-2xl bg-background border border-border/70 shadow-sm">
-                <div className="text-3xl md:text-4xl font-extrabold gradient-text mb-2">15,200+</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 text-center">
+              <div className="p-4 sm:p-6 rounded-2xl bg-background border border-border/70 shadow-sm">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold gradient-text mb-1 sm:mb-2">15,200+</div>
                 <div className="text-xs md:text-sm text-muted-foreground font-medium">Học viên đạt B1–B2</div>
               </div>
-              <div className="p-6 rounded-2xl bg-background border border-border/70 shadow-sm">
-                <div className="text-3xl md:text-4xl font-extrabold text-primary mb-2">98.6%</div>
+              <div className="p-4 sm:p-6 rounded-2xl bg-background border border-border/70 shadow-sm">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-primary mb-1 sm:mb-2">98.6%</div>
                 <div className="text-xs md:text-sm text-muted-foreground font-medium">Tỷ lệ đỗ đúng mục tiêu</div>
               </div>
-              <div className="p-6 rounded-2xl bg-background border border-border/70 shadow-sm">
-                <div className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">860+</div>
+              <div className="p-4 sm:p-6 rounded-2xl bg-background border border-border/70 shadow-sm">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-1 sm:mb-2">860+</div>
                 <div className="text-xs md:text-sm text-muted-foreground font-medium">Bộ đề thi trúng tủ</div>
               </div>
-              <div className="p-6 rounded-2xl bg-background border border-border/70 shadow-sm">
-                <div className="text-3xl md:text-4xl font-extrabold text-amber-500 mb-2">3–5s</div>
+              <div className="p-4 sm:p-6 rounded-2xl bg-background border border-border/70 shadow-sm">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-amber-500 mb-1 sm:mb-2">3–5s</div>
                 <div className="text-xs md:text-sm text-muted-foreground font-medium">Kích hoạt VIP tức thì</div>
               </div>
             </div>

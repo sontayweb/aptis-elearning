@@ -230,7 +230,7 @@ function GrammarMarathonContent() {
                 <select
                   value={selectedExamId}
                   onChange={(e) => setSelectedExamId(e.target.value)}
-                  className="px-3 py-2 text-xs rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shrink-0 max-w-[180px] truncate"
+                  className="px-3 py-2 text-base sm:text-xs rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shrink-0 max-w-[180px] truncate"
                 >
                   <option value="all">Tất cả {availableExams.length} đề thi</option>
                   {availableExams.map((ex) => (
@@ -248,7 +248,7 @@ function GrammarMarathonContent() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Tìm câu hỏi, cấu trúc..."
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                  className="w-full pl-9 pr-3 py-2 text-base sm:text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
                 />
               </div>
 

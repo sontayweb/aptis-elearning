@@ -393,6 +393,8 @@ export class AdminService {
       examIds?: string[];
       hotLevel?: number;
       isPublished?: boolean;
+      isPro?: boolean;
+      forecastTag?: string | null;
       skill?: string;
       rules?: Array<{ keywords: string[]; hotLevel: number }>;
     },
@@ -409,6 +411,8 @@ export class AdminService {
       const data: any = {};
       if (input.hotLevel !== undefined) data.hot_level = clamp(input.hotLevel);
       if (input.isPublished !== undefined) data.is_published = input.isPublished;
+      if (input.isPro !== undefined) data.is_pro = Boolean(input.isPro);
+      if (input.forecastTag !== undefined) data.forecast_tag = input.forecastTag;
       if (Object.keys(data).length) {
         const r = await prisma.exam.updateMany({ where: { id: { in: input.examIds } }, data });
         updated += r.count;

@@ -98,7 +98,7 @@ export default function TeacherGradingPage() {
   };
 
   return (
-    <div className="p-6 md:p-10 space-y-6">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6">
       {/* Toast Alert */}
       {toastMessage && (
         <div className="fixed top-5 right-5 z-[200] px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-medium text-xs shadow-xl animate-in slide-in-from-top-2 flex items-center gap-2">
@@ -177,7 +177,7 @@ export default function TeacherGradingPage() {
 
                 <button
                   onClick={() => handleOpenGrading(item)}
-                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs inline-flex items-center gap-1.5 self-start sm:self-auto transition-colors"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs inline-flex items-center justify-center gap-1.5 transition-colors min-h-[44px] sm:min-h-9"
                 >
                   <PenTool className="w-3.5 h-3.5" />
                   <span>Mở chấm điểm</span>
@@ -192,11 +192,11 @@ export default function TeacherGradingPage() {
       {selectedSub && (
         <div
           onClick={() => setSelectedSub(null)}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in"
+          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="max-w-2xl w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95"
+            className="max-w-2xl w-full rounded-t-3xl sm:rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto pb-safe animate-in zoom-in-95"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
@@ -209,7 +209,7 @@ export default function TeacherGradingPage() {
               </div>
               <button
                 onClick={() => setSelectedSub(null)}
-                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"
+                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -246,7 +246,7 @@ export default function TeacherGradingPage() {
 
             {/* Teacher Scoring Form */}
             <form onSubmit={handleSubmitGrade} className="space-y-4 pt-2">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-700 block">
                     Điểm số tổng kết (Thang 0 - 50): *
@@ -258,14 +258,14 @@ export default function TeacherGradingPage() {
                     required
                     value={gradeScore}
                     onChange={(e) => setGradeScore(Number(e.target.value))}
-                    className="w-full px-3 py-2 text-sm font-bold text-blue-700 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full px-3 py-2 text-base sm:text-sm font-bold text-blue-700 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-700 block">
                     Quy đổi CEFR ước tính:
                   </label>
-                  <div className="px-3 py-2 text-xs font-bold rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
+                  <div className="px-3 py-2 text-xs font-bold rounded-xl bg-blue-50 text-blue-700 border border-blue-200 min-h-[38px] flex items-center">
                     {gradeScore >= 43 ? "Band C1 (Xuất sắc)" : gradeScore >= 36 ? "Band B2 (Đạt chuẩn)" : gradeScore >= 28 ? "Band B1" : "Band A2"}
                   </div>
                 </div>
@@ -281,7 +281,7 @@ export default function TeacherGradingPage() {
                   value={gradeFeedback}
                   onChange={(e) => setGradeFeedback(e.target.value)}
                   placeholder="Ghi nhận xét về hoàn thành nhiệm vụ, ngữ pháp, từ vựng và gợi ý cải thiện..."
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none leading-relaxed"
+                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none leading-relaxed"
                 />
               </div>
 
@@ -289,14 +289,14 @@ export default function TeacherGradingPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedSub(null)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 min-h-[44px]"
                 >
                   Đóng
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold text-xs shadow-xs flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold text-xs shadow-xs flex items-center gap-1.5 min-h-[44px]"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{submitting ? "Đang lưu..." : "Xác nhận & Gửi kết quả"}</span>

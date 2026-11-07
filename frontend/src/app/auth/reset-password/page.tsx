@@ -137,7 +137,7 @@ function ResetPasswordContent() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Tối thiểu 8 ký tự"
-                  className="w-full pl-9 pr-10 py-2.5 text-sm bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  className="w-full pl-9 pr-10 py-2.5 text-base sm:text-sm bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
                 <button
                   type="button"
@@ -162,7 +162,7 @@ function ResetPasswordContent() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu mới"
-                  className="w-full pl-9 pr-3 py-2.5 text-sm bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  className="w-full pl-9 pr-3 py-2.5 text-base sm:text-sm bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
             </div>
@@ -170,7 +170,7 @@ function ResetPasswordContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:brightness-110 transition-all shadow-md shadow-blue-500/25 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#1D4ED8] to-[#2563EB] hover:brightness-110 transition-all shadow-md shadow-blue-500/25 disabled:opacity-50 inline-flex items-center justify-center gap-2 min-h-[44px]"
             >
               {loading ? (
                 <>

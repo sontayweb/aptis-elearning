@@ -35,7 +35,7 @@ import { getCloverConfig } from "@/lib/clover-utils";
 import { ReadingGoogleTranslateModal } from "@/components/reading-google-translate";
 import { useSkillHubTabSync } from "@/hooks/use-skill-hub";
 import { SkillPartTabs } from "@/components/skills/skill-part-tabs";
-import { SkillFilterBar } from "@/components/skills/skill-filter-bar";
+import { SkillFilterBar, matchesCloverPriority } from "@/components/skills/skill-filter-bar";
 import {
   SkillMarathonCard,
   SkillExamCard,
@@ -252,29 +252,31 @@ export default function ReadingPracticePage() {
     return true;
   });
 
-  // 2. Lọc tiếp theo search, status, priority và sắp xếp theo ☘️ từ cao xuống thấp
-  const filteredExams = currentTabExams
-    .map((e, idx) => {
-      let cloverLevel = e.hotLevel || 0;
-      if (cloverLevel === 0) {
-        const bank =
-          activeTab === "p2" || activeTab === "full"
-            ? READING_PART2_TOPICS
-            : activeTab === "p3"
-            ? READING_PART3_TOPICS
-            : activeTab === "p4"
-            ? READING_PART4_TOPICS
-            : [];
-        const matched = bank.find((t) =>
+  // 2. Gán computedClover trước để đồng bộ đếm trên SkillFilterBar và lọc
+  const tabExamsWithClover = currentTabExams.map((e, idx) => {
+    let cloverLevel = e.hotLevel || 0;
+    if (cloverLevel === 0) {
+      const bank =
+        activeTab === "p2" || activeTab === "full"
+          ? READING_PART2_TOPICS
+          : activeTab === "p3"
+          ? READING_PART3_TOPICS
+          : activeTab === "p4"
+          ? READING_PART4_TOPICS
+          : [];
+      const matched = bank.find(
+        (t) =>
           e.title.toLowerCase().includes(t.title.toLowerCase()) ||
           t.title.toLowerCase().includes(e.title.toLowerCase())
-        );
-        if (matched && (matched.hotLevel || matched.cloverLevel)) {
-          cloverLevel = matched.hotLevel || matched.cloverLevel || 0;
-        }
+      );
+      if (matched && (matched.hotLevel || matched.cloverLevel)) {
+        cloverLevel = matched.hotLevel || matched.cloverLevel || 0;
       }
-      return { ...e, computedClover: cloverLevel, originalIdx: idx };
-    })
+    }
+    return { ...e, computedClover: cloverLevel, originalIdx: idx };
+  });
+
+  const filteredExams = tabExamsWithClover
     .filter((e) => {
       const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus =
@@ -284,13 +286,7 @@ export default function ReadingPracticePage() {
           ? e.status === "completed" || e.status === "in_progress"
           : e.status === "not_started";
       const matchesPriority =
-        activeTab === "p1" || filterPriority === "all"
-          ? true
-          : filterPriority === "high"
-          ? e.computedClover >= 5
-          : filterPriority === "medium"
-          ? e.computedClover === 4
-          : e.computedClover <= 3;
+        activeTab === "p1" ? true : matchesCloverPriority(e, filterPriority);
       return matchesSearch && matchesStatus && matchesPriority;
     })
     .sort((a, b) => {
@@ -437,7 +433,7 @@ export default function ReadingPracticePage() {
 
           {/* Sub Filters - Rows */}
           <SkillFilterBar
-            exams={currentTabExams}
+            exams={tabExamsWithClover}
             activeTab={activeTab}
             filterPriority={filterPriority}
             setFilterPriority={setFilterPriority}

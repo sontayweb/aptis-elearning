@@ -162,14 +162,14 @@ export default function MyClassesPage() {
                   value={classCodeInput}
                   onChange={(e) => setClassCodeInput(e.target.value.toUpperCase())}
                   disabled={!isAuthenticated || joining}
-                  className="w-full px-4 py-3 text-sm font-mono uppercase tracking-wider rounded-2xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50"
+                  className="w-full px-4 py-3 text-base sm:text-sm font-mono uppercase tracking-wider rounded-2xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={!isAuthenticated || joining || !classCodeInput.trim()}
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-md shadow-primary/20 disabled:opacity-50 shrink-0"
+                className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] rounded-2xl text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-md shadow-primary/20 disabled:opacity-50 shrink-0 w-full sm:w-auto cursor-pointer"
               >
                 {joining ? (
                   <>
@@ -231,11 +231,11 @@ export default function MyClassesPage() {
                 <span className="text-sm">Đang tải danh sách lớp học...</span>
               </div>
             ) : classrooms.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {classrooms.map((item) => (
                   <div
                     key={item.membershipId}
-                    className="rounded-3xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+                    className="rounded-3xl border border-border bg-card p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
                   >
                     <div>
                       {/* Top Header */}

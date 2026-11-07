@@ -584,7 +584,7 @@ function SpeakingMarathonContent() {
                     ? "Tìm kiếm cặp tranh Part 3..."
                     : "Tìm kiếm đề thảo luận Part 4..."
                 }
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-input bg-card text-xs sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-input bg-card text-base sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs"
               />
             </div>
 
@@ -592,7 +592,7 @@ function SpeakingMarathonContent() {
               <select
                 value={selectedUnit}
                 onChange={(e) => setSelectedUnit(e.target.value)}
-                className="px-3 py-2.5 rounded-xl border border-input bg-card text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs"
+                className="px-3 py-2.5 rounded-xl border border-input bg-card text-base sm:text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-xs"
               >
                 <option value="all">Tất cả Unit ({p1UnitsCombined.length})</option>
                 {p1UnitsCombined.map((u) => (

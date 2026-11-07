@@ -232,7 +232,7 @@ function KeyVaMeoThiContent() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveSkill(tab.id as SkillTab)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border shrink-0 min-h-[36px] sm:min-h-[32px] ${
                       isActive
                         ? "bg-primary text-primary-foreground border-primary shadow-xs"
                         : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -257,11 +257,11 @@ function KeyVaMeoThiContent() {
         </section>
 
         {/* Main Content Area */}
-        <section className="section-container max-w-6xl mx-auto py-8">
+        <section className="section-container max-w-6xl mx-auto py-6 sm:py-8">
           {activeSkill === "listening" && (
             <div className="space-y-6">
               {/* LEVEL 2: LISTENING SUB-TABS (Part 1 - 4) */}
-              <div className="flex items-center justify-center sm:justify-start gap-2 overflow-x-auto pb-2 border-b border-border">
+              <div className="flex items-center justify-start gap-2 overflow-x-auto pb-2 border-b border-border no-scrollbar">
                 {[
                   {
                     id: "p1",
@@ -293,7 +293,7 @@ function KeyVaMeoThiContent() {
                     <button
                       key={pTab.id}
                       onClick={() => setActiveListeningPart(pTab.id as ListeningPartTab)}
-                      className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border ${
+                      className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border shrink-0 min-h-[40px] sm:min-h-[36px] ${
                         isActive
                           ? "bg-primary/10 border-primary text-primary shadow-xs"
                           : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border-border"

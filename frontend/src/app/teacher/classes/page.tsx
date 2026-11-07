@@ -91,11 +91,11 @@ export default function TeacherClassesPage() {
   };
 
   return (
-    <div className="p-6 md:p-10 space-y-6">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-heading font-extrabold text-slate-900">
+          <h1 className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">
             Quản Lý Lớp Học &amp; Cấp Mã Phòng
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -105,7 +105,7 @@ export default function TeacherClassesPage() {
 
         <button
           onClick={() => setCreateModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold text-xs shadow-xs transition-colors flex items-center justify-center gap-2 self-start"
+          className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold text-xs shadow-xs transition-colors flex items-center justify-center gap-2 min-h-[44px]"
         >
           <Plus className="w-4 h-4" />
           <span>Tạo lớp học mới</span>
@@ -196,17 +196,17 @@ export default function TeacherClassesPage() {
       {createModalOpen && (
         <div
           onClick={() => setCreateModalOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="max-w-md w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4 animate-in zoom-in-95"
+            className="max-w-md w-full rounded-t-3xl sm:rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-safe animate-in zoom-in-95"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-heading font-bold text-slate-900">Tạo Lớp Học Mới</h3>
               <button
                 onClick={() => setCreateModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"
+                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -221,7 +221,7 @@ export default function TeacherClassesPage() {
                   value={newClass.name}
                   onChange={(e) => setNewClass({ ...newClass, name: e.target.value })}
                   placeholder="VD: Lớp Aptis B2 Cấp Tốc - Khóa 24"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
@@ -232,7 +232,7 @@ export default function TeacherClassesPage() {
                   value={newClass.description}
                   onChange={(e) => setNewClass({ ...newClass, description: e.target.value })}
                   placeholder="Lịch học Thứ 3 - 5 - 7, mục tiêu cam kết B2 cho sinh viên..."
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
                 />
               </div>
 
@@ -240,14 +240,14 @@ export default function TeacherClassesPage() {
                 <button
                   type="button"
                   onClick={() => setCreateModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 min-h-[44px]"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={createLoading}
-                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold text-xs shadow-xs"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold text-xs shadow-xs min-h-[44px]"
                 >
                   {createLoading ? "Đang tạo..." : "Xác nhận tạo lớp"}
                 </button>
@@ -261,11 +261,11 @@ export default function TeacherClassesPage() {
       {selectedClass && (
         <div
           onClick={() => setSelectedClass(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="max-w-lg w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4 animate-in zoom-in-95"
+            className="max-w-lg w-full rounded-t-3xl sm:rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-safe animate-in zoom-in-95"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
@@ -274,7 +274,7 @@ export default function TeacherClassesPage() {
               </div>
               <button
                 onClick={() => setSelectedClass(null)}
-                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"
+                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -304,7 +304,7 @@ export default function TeacherClassesPage() {
             <div className="pt-2 border-t border-slate-100 flex justify-end">
               <button
                 onClick={() => setSelectedClass(null)}
-                className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold"
+                className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold min-h-[44px]"
               >
                 Đóng
               </button>

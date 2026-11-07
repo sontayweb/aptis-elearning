@@ -26,7 +26,7 @@ import {
 import { getCloverConfig } from "@/lib/clover-utils";
 import { useSkillHubTabSync } from "@/hooks/use-skill-hub";
 import { SkillPartTabs } from "@/components/skills/skill-part-tabs";
-import { SkillFilterBar } from "@/components/skills/skill-filter-bar";
+import { SkillFilterBar, matchesCloverPriority } from "@/components/skills/skill-filter-bar";
 import {
   SkillMarathonCard,
   SkillExamCard,
@@ -227,14 +227,7 @@ function detectWritingPartNumber(title: string, partTitle?: string | null, total
         : filterStatus === "completed"
         ? e.status === "completed" || e.status === "in_progress"
         : e.status === "not_started";
-    const matchesPriority =
-      filterPriority === "all"
-        ? true
-        : filterPriority === "high"
-        ? (e.hotLevel || 0) >= 3 || e.priority === "HIGH"
-        : filterPriority === "medium"
-        ? (e.hotLevel || 0) === 2 || e.priority === "MEDIUM"
-        : (e.hotLevel || 0) <= 1 && e.priority === "LOW";
+    const matchesPriority = matchesCloverPriority(e, filterPriority);
     const matchesSource = filterSource === "all" || filterSource === "web" ? true : false;
     return matchesSearch && matchesStatus && matchesPriority && matchesSource;
   }).sort((a, b) => {

@@ -39,6 +39,7 @@ export interface Part4Recording {
   recNum: number;
   title: string;
   passageText: string;
+  transcript?: string;
   questions: Part4Question[];
   audioUrl?: string;
   translationText?: string;

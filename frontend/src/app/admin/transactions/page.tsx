@@ -646,12 +646,12 @@ export default function AdminTransactionsPage() {
             placeholder="Tìm theo mã đơn, học viên, email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            className="w-full pl-9 pr-3 py-1.5 text-base sm:text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
           />
         </div>
 
         {/* Status Filters & Refresh */}
-        <div className="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto">
+        <div className="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
           {[
             { id: "ALL", label: "Tất cả" },
             { id: "COMPLETED", label: "Thành công" },
@@ -661,7 +661,7 @@ export default function AdminTransactionsPage() {
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 min-h-[34px] sm:min-h-[28px] ${
                 statusFilter === tab.id
                   ? "bg-blue-600 text-white shadow-xs"
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -673,7 +673,7 @@ export default function AdminTransactionsPage() {
 
           <button
             onClick={fetchTransactions}
-            className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors shrink-0 ml-1"
+            className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors shrink-0 ml-1 min-h-[34px] min-w-[34px] flex items-center justify-center"
             title="Làm mới danh sách"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />

@@ -8,6 +8,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ProUnlockButton } from "@/components/ui/pro-unlock-button";
 import { FloatingActions } from "@/components/floating-actions";
+import { getCloverConfig, cleanForecastTag } from "@/lib/clover-utils";
 import {
   Sparkles,
   Info,
@@ -121,6 +122,9 @@ export default function KeyDuDoanPage() {
               ? new Date(exam.createdAt).toLocaleDateString("vi-VN")
               : "Cập nhật mới";
 
+            const rawForecast = exam.forecastTag ?? exam.forecast_tag ?? null;
+            const cleanedNote = cleanForecastTag(rawForecast, lvl);
+
             return {
               id: exam.id,
               code: exam.code || `KEY-${exam.id.slice(0, 6).toUpperCase()}`,
@@ -130,15 +134,15 @@ export default function KeyDuDoanPage() {
               updateDate: createdDate,
               matchRate: "☘️".repeat(lvl),
               cloverLevel: lvl,
-              forecastTag: exam.forecastTag ?? exam.forecast_tag ?? null,
+              forecastTag: cleanedNote,
               topicsCount: exam.totalQuestions || 0,
               partsCount: exam.totalParts || 1,
               durationMinutes: exam.durationMinutes || 45,
               isFree,
               isUnlocked: hasAccess,
               hotTopic:
+                cleanedNote ||
                 exam.description ||
-                exam.forecastTag ||
                 "Bộ đề trọng tâm có tần suất xuất hiện cao trong các ca thi gần nhất tại Hội đồng thi British Council.",
               userStatus: exam.userStatus || "NOT_STARTED",
               bestScore: exam.bestScore || null,
@@ -287,27 +291,27 @@ export default function KeyDuDoanPage() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Tìm tên đề hoặc chủ đề Key..."
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-input bg-card text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-input bg-card text-base sm:text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </div>
             </div>
 
             {/* Clover Hot Level Filter Pills */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-bold text-muted-foreground mr-1">Lọc theo độ Hot:</span>
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0 sm:flex-wrap">
+              <span className="text-xs font-bold text-muted-foreground mr-1 shrink-0">Mức độ ưu tiên ôn tập:</span>
               {[
-                { val: "ALL" as const, label: "Tất cả mức Cỏ" },
-                { val: 5 as const, label: "☘️☘️☘️☘️☘️ 5 Cỏ" },
-                { val: 4 as const, label: "☘️☘️☘️☘️ 4 Cỏ" },
-                { val: 3 as const, label: "☘️☘️☘️ 3 Cỏ" },
-                { val: 2 as const, label: "☘️☘️ 2 Cỏ" },
-                { val: 1 as const, label: "☘️ 1 Cỏ" },
+                { val: "ALL" as const, label: `Tất cả (${keySets.length})` },
+                { val: 5 as const, label: `☘️☘️☘️☘️☘️ 5 Cỏ · Siêu Hot (${keySets.filter((k) => k.cloverLevel === 5).length})` },
+                { val: 4 as const, label: `☘️☘️☘️☘️ 4 Cỏ · Hay ra (${keySets.filter((k) => k.cloverLevel === 4).length})` },
+                { val: 3 as const, label: `☘️☘️☘️ 3 Cỏ · Trọng tâm (${keySets.filter((k) => k.cloverLevel === 3).length})` },
+                { val: 2 as const, label: `☘️☘️ 2 Cỏ · Mở rộng (${keySets.filter((k) => k.cloverLevel === 2).length})` },
+                { val: 1 as const, label: `☘️ 1 Cỏ · Cơ bản (${keySets.filter((k) => k.cloverLevel === 1).length})` },
               ].map((c) => (
                 <button
                   key={String(c.val)}
                   type="button"
                   onClick={() => setCloverFilter(c.val)}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer shrink-0 min-h-[34px] sm:min-h-[28px] ${
                     cloverFilter === c.val
                       ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
                       : "bg-card text-muted-foreground border-border hover:border-emerald-500/50 hover:text-foreground"
@@ -353,13 +357,13 @@ export default function KeyDuDoanPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {filteredSets.map((ks) => {
                 const targetHref = getKeyExamHref(ks.rawSkill, ks.id);
                 return (
                   <div
                     key={ks.id}
-                    className={`rounded-2xl border bg-card p-6 shadow-sm transition-all flex flex-col justify-between hover:shadow-glow-soft ${
+                    className={`rounded-2xl border bg-card p-4 sm:p-6 shadow-sm transition-all flex flex-col justify-between hover:shadow-glow-soft ${
                       ks.cloverLevel >= 4
                         ? "border-emerald-500/50 bg-gradient-to-b from-emerald-500/5 via-card to-card hover:border-emerald-500"
                         : "border-border hover:border-primary/50"
@@ -371,9 +375,16 @@ export default function KeyDuDoanPage() {
                           <span className="text-xs font-bold px-2.5 py-0.5 rounded bg-primary/10 text-primary">
                             {ks.skillLabel}
                           </span>
-                          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                            {ks.matchRate}
-                          </span>
+                          {(() => {
+                            const cfg = getCloverConfig(ks.cloverLevel);
+                            return (
+                              <span
+                                className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${cfg.badgeClass}`}
+                              >
+                                {ks.matchRate} · {cfg.shortLabel}
+                              </span>
+                            );
+                          })()}
                           {ks.isFree ? (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
                               MIỄN PHÍ
@@ -400,11 +411,13 @@ export default function KeyDuDoanPage() {
                         {ks.title}
                       </h3>
 
-                      <div className="p-3 rounded-xl bg-muted/40 border border-border text-xs mb-4">
-                        <span className="font-bold text-muted-foreground block mb-0.5">
-                          Trọng tâm đề Key:
-                        </span>
-                        <span className="text-foreground font-semibold">{ks.hotTopic}</span>
+                      <div className="p-3 rounded-xl bg-muted/40 border border-border text-xs mb-4 flex items-center justify-between gap-2">
+                        <div>
+                          <span className="font-bold text-muted-foreground block mb-0.5">
+                            Ghi chú đợt thi:
+                          </span>
+                          <span className="text-foreground font-semibold">{ks.hotTopic}</span>
+                        </div>
                       </div>
 
                       {ks.userStatus === "IN_PROGRESS" && (
@@ -433,7 +446,7 @@ export default function KeyDuDoanPage() {
                       )}
                     </div>
 
-                    <div className="pt-4 border-t border-border flex items-center justify-between">
+                    <div className="pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <span className="text-xs text-muted-foreground">
                         {ks.partsCount} Parts · {ks.topicsCount} câu hỏi · {ks.durationMinutes} phút
                       </span>
@@ -441,7 +454,7 @@ export default function KeyDuDoanPage() {
                       {ks.isUnlocked ? (
                         <Link
                           href={targetHref}
-                          className="tech-btn inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown text-xs font-bold shadow-sm transition-all"
+                          className="tech-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown text-xs font-bold shadow-sm transition-all min-h-[44px] sm:min-h-9 w-full sm:w-auto"
                         >
                           {ks.userStatus === "IN_PROGRESS" ? (
                             <>
@@ -461,7 +474,7 @@ export default function KeyDuDoanPage() {
                           )}
                         </Link>
                       ) : (
-                        <ProUnlockButton href="/pricing" label="Mở khóa" />
+                        <ProUnlockButton href="/pricing" label="Mở khóa" className="w-full sm:w-auto min-h-[44px] sm:min-h-9" />
                       )}
                     </div>
                   </div>

@@ -303,7 +303,7 @@ function WritingMarathonContent() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Tìm chủ đề, câu hỏi, đề bài..."
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                  className="w-full pl-9 pr-3 py-2 text-base sm:text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
                 />
               </div>
 
@@ -480,7 +480,7 @@ function WritingMarathonContent() {
                                       setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
                                     }
                                     placeholder="Gõ câu trả lời của bạn (1-5 từ)..."
-                                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                                    className="w-full px-3 py-2 text-base sm:text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
                                   />
 
                                   <div className="flex items-center justify-between text-[11px] pt-1">
@@ -581,7 +581,7 @@ function WritingMarathonContent() {
                                     setUserAnswers((prev) => ({ ...prev, [inputKey]: e.target.value }))
                                   }
                                   placeholder="Gõ câu trả lời của bạn (1-5 từ)..."
-                                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                                  className="w-full px-3 py-2 text-base sm:text-xs rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
                                 />
 
                                 <div className="flex items-center justify-between text-[11px] pt-1">

@@ -95,9 +95,10 @@ export function BilingualTranscriptPanel({
   
                 <button
                   type="button"
-                  id="tab-bilingual-vi" onClick={() => {
+                  id="tab-bilingual-vi"
+                  onClick={() => {
                     onTabChange("vi");
-  if (!cachedTranslation) onRequestTranslation(false);
+                    if (!activeTranslation && !isTranslating) onRequestTranslation(false);
                   }}
                   className={`px-3 py-1.5 rounded-t-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border-t border-x -mb-[1px] ${
                     tab === "vi"
@@ -185,20 +186,26 @@ export function BilingualTranscriptPanel({
                     activeTranslation
                   ) : isTranslating ? (
                     <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
-                      <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-                      <span className="text-xs font-medium">Đang tạo bản dịch tiếng Việt bằng AI...</span>
+                      <Loader2 className="w-5 h-5 animate-spin text-amber-500" />
+                      <span className="text-xs font-semibold">Đang tạo bản dịch tiếng Việt bằng AI...</span>
+                      <span className="text-[11px] opacity-75">Hệ thống đang dịch toàn bộ nội dung lời thoại</span>
                     </div>
-                  ) : (
+                  ) : bilingual.script && bilingual.script.trim().length >= 5 ? (
                     <div className="flex flex-col items-center justify-center py-6 gap-2.5 text-muted-foreground text-center">
-                      <span className="text-xs">Đang cập nhật bản dịch tiếng Việt cho câu này...</span>
+                      <span className="text-xs font-medium">Bản dịch tiếng Việt chưa được tải cho câu này.</span>
                       <button
                         type="button"
+                        disabled={isTranslating}
                         onClick={() => onRequestTranslation(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>Dịch ngay bằng AI</span>
                       </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-6 gap-1 text-muted-foreground text-center">
+                      <span className="text-xs">Đang cập nhật lời thoại và bản dịch tiếng Việt cho câu này...</span>
                     </div>
                   )}
                 </div>

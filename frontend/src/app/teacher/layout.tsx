@@ -16,11 +16,14 @@ import {
   ArrowLeft,
   Sparkles,
   BookOpen,
+  Menu,
+  X,
 } from "lucide-react";
 
 export default function TeacherLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, isAuthenticated, loading, logout, quickLogin } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isTeacherOrAdmin =
     user?.role === "TEACHER" || user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
 
@@ -82,8 +85,44 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white border-r border-slate-200/80 flex flex-col shrink-0">
+      {/* Mobile Topbar */}
+      <div className="h-14 px-4 bg-white border-b border-slate-200 flex items-center justify-between md:hidden shrink-0 z-30 sticky top-0">
+        <Link href="/teacher" className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold">
+            <GraduationCap className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="text-xs font-heading font-extrabold text-slate-900 leading-tight">
+              Cổng Giảng Viên
+            </div>
+            <div className="text-[9px] text-blue-600 font-semibold uppercase tracking-wider">
+              APTIS ESOL PREMIER
+            </div>
+          </div>
+        </Link>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* Mobile Drawer Backdrop */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar (Desktop fixed, Mobile sliding drawer) */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200/80 flex flex-col shrink-0 transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:w-64 ${
+          mobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full md:shadow-none"
+        }`}
+      >
         {/* Brand */}
         <div className="h-16 px-6 border-b border-slate-200/80 flex items-center justify-between">
           <Link href="/teacher" className="flex items-center gap-2.5">
@@ -99,10 +138,16 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
               </div>
             </div>
           </Link>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="md:hidden p-1.5 text-slate-400 hover:text-slate-600"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-1 flex-1">
+        <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
           <div className="text-[10px] uppercase font-bold text-slate-400 px-3 py-2 tracking-wider">
             Nghiệp vụ Học vụ
           </div>
@@ -113,7 +158,8 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-heading font-semibold transition-all ${
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-heading font-semibold transition-all min-h-[44px] ${
                   isActive
                     ? "bg-blue-600 text-white shadow-xs"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -145,14 +191,14 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="flex-1 py-1.5 rounded-lg border border-slate-200 text-center text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+              className="flex-1 py-2 rounded-lg border border-slate-200 text-center text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors min-h-[38px] flex items-center justify-center"
             >
               Về Website
             </Link>
             <button
               onClick={logout}
               title="Đăng xuất"
-              className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center"
             >
               <LogOut className="w-4 h-4" />
             </button>

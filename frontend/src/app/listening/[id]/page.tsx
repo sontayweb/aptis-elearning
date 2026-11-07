@@ -214,33 +214,48 @@ function ListeningExamRunnerContent() {
   const getCurrentBilingualData = () => {
     if (!currentStage) return null;
     if (currentStage.partNum === 2) {
+      const p2Script =
+        (examData.part2 as any).passageText ||
+        (examData.part2 as any).transcript ||
+        (examData.part2.speakers && examData.part2.speakers.length > 0
+          ? examData.part2.speakers
+              .map((s) => (s.transcript ? `${s.speaker}: "${s.transcript}"` : `${s.speaker}: "${s.correctAnswer}"`))
+              .join("\n\n")
+          : "");
       return {
         title: "Part 2 — Đoạn ghi âm 4 người nói",
-        script:
-          (examData.part2 as any).passageText ||
-          examData.part2.speakers.map((s) => `${s.speaker}: "${s.correctAnswer}"`).join("\n\n"),
+        script: p2Script,
         translation: (examData.part2 as any).translationText || "",
       };
     } else if (currentStage.partNum === 3) {
+      const p3Script =
+        (examData.part3 as any).passageText ||
+        (examData.part3 as any).transcript ||
+        (examData.part3.opinions && examData.part3.opinions.length > 0
+          ? examData.part3.opinions.map((o) => `• ${o.statement} (${o.correctAnswer})`).join("\n\n")
+          : "");
       return {
         title: "Part 3 — Hội thoại thảo luận quan điểm",
-        script:
-          (examData.part3 as any).passageText ||
-          examData.part3.opinions.map((o) => `• ${o.statement} (${o.correctAnswer})`).join("\n\n"),
+        script: p3Script,
         translation: (examData.part3 as any).translationText || "",
       };
     } else if (currentStage.partNum === 4) {
       const rec = examData.part4[currentStage.subIndex];
       return {
         title: `Part 4 — Bài thuyết trình ${currentStage.subIndex + 1}`,
-        script: rec?.passageText || "",
+        script: rec?.passageText || rec?.transcript || "",
         translation: rec?.translationText || "",
       };
     } else if (currentStage.partNum === 1) {
       const q = examData.part1[currentStage.subIndex];
+      const p1Script =
+        q?.transcript ||
+        (q?.explanation ? extractTranscriptFromExplanation(q.explanation) : "") ||
+        q?.prompt ||
+        "";
       return {
         title: `Part 1 — Câu hỏi ${currentStage.subIndex + 1}`,
-        script: q?.transcript || q?.prompt || "",
+        script: p1Script,
         translation: q?.translation || (q as any)?.translationText || "",
       };
     }
@@ -381,15 +396,22 @@ function ListeningExamRunnerContent() {
   // Tách phần transcript tiếng Anh và phần giải thích đáp án tiếng Việt (nếu có lẫn trong transcript)
   const parseBilingualContent = (rawText: string) => {
     if (!rawText) return { scriptEn: "", explanationVi: "" };
-    const match = rawText.match(/(\n*---+\s*GIẢI THÍCH[\s\S]*)/i);
+    const cleaned = rawText
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/p>/gi, "\n")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .trim();
+
+    const match = cleaned.match(/(\n*---+\s*GIẢI THÍCH[\s\S]*)/i);
     if (match && match.index !== undefined) {
       return {
-        scriptEn: rawText.slice(0, match.index).trim(),
+        scriptEn: cleaned.slice(0, match.index).trim(),
         explanationVi: match[1].trim(),
       };
     }
     return {
-      scriptEn: rawText.trim(),
+      scriptEn: cleaned.trim(),
       explanationVi: "",
     };
   };
@@ -403,44 +425,37 @@ function ListeningExamRunnerContent() {
       const current = listeningStages[stageIdx];
       if (!current) return null;
 
-      let rawScript = "";
-      let staticTrans = "";
-      if (current.partNum === 1) {
-        const q = examData.part1[current.subIndex];
-        rawScript = q?.transcript || q?.prompt || "";
-        staticTrans = q?.translation || "";
-      } else if (current.partNum === 2) {
-        rawScript =
-          (examData.part2 as any).passageText ||
-          examData.part2.speakers.map((s) => `${s.speaker}: "${s.correctAnswer}"`).join("\n\n");
-        staticTrans = (examData.part2 as any).translationText || "";
-      } else if (current.partNum === 3) {
-        rawScript =
-          (examData.part3 as any).passageText ||
-          examData.part3.opinions.map((o) => `• ${o.statement} (${o.correctAnswer})`).join("\n\n");
-        staticTrans = (examData.part3 as any).translationText || "";
-      } else if (current.partNum === 4) {
-        const rec = examData.part4[current.subIndex];
-        rawScript = rec?.passageText || "";
-        staticTrans = rec?.translationText || "";
-      }
+      const bilingualData = getCurrentBilingualData();
+      let rawScript = bilingualData?.script || "";
+      let staticTrans = bilingualData?.translation || "";
 
-      if (!force && staticTrans) {
+      if (!force && staticTrans && staticTrans.trim().length > 0) {
+        setTranslationCache((prev) => {
+          const next = { ...prev, [stageKey]: staticTrans };
+          try {
+            if (examId) {
+              localStorage.setItem(`aptis_listening_trans_${examId}`, JSON.stringify(next));
+            }
+          } catch {}
+          return next;
+        });
         return staticTrans;
       }
 
       if (!rawScript || rawScript.trim().length < 5) return null;
 
       const { scriptEn, explanationVi } = parseBilingualContent(rawScript);
-      if (!scriptEn) return null;
+      const textToTranslate = scriptEn || rawScript.trim();
+      if (!textToTranslate || textToTranslate.length < 5) return null;
 
       setIsTranslating(true);
       try {
-        const res = await api.vocabulary.translate(scriptEn);
+        const res = await api.vocabulary.translate(textToTranslate);
         if (res.success && res.data?.translatedText) {
+          const bodyTrans = res.data.translatedText.trim();
           const finalVi = explanationVi
-            ? `${res.data.translatedText.trim()}\n\n${explanationVi}`
-            : res.data.translatedText.trim();
+            ? `${bodyTrans}\n\n${explanationVi}`
+            : bodyTrans;
 
           setTranslationCache((prev) => {
             const next = { ...prev, [stageKey]: finalVi };
@@ -460,7 +475,7 @@ function ListeningExamRunnerContent() {
       }
       return null;
     },
-    [listeningStages, examData, translationCache, examId]
+    [listeningStages, examData, translationCache, examId, activeStage]
   );
 
   // Kích hoạt dịch tự động khi người dùng bật tab dịch hoặc chuyển câu hỏi

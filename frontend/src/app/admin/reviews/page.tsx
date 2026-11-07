@@ -296,7 +296,7 @@ export default function AdminReviewsPage() {
                     }
                   }}
                   id={`note-${rev.id}`}
-                  className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-sans"
+                  className="flex-1 px-3 py-1.5 text-base sm:text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-slate-50/50 dark:bg-slate-800/70 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-sans"
                 />
                 <button
                   onClick={() => {

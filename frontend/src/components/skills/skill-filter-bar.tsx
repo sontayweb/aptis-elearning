@@ -26,6 +26,21 @@ interface SkillFilterBarProps {
   showPriorityRow?: boolean;
 }
 
+export function getExamCloverLevel(e: FilterableExamItem): number {
+  return Number(e.computedClover ?? e.hotLevel ?? 0);
+}
+
+export function matchesCloverPriority(
+  e: FilterableExamItem,
+  filterPriority: PriorityFilter
+): boolean {
+  if (filterPriority === "all") return true;
+  const lvl = getExamCloverLevel(e);
+  if (filterPriority === "high") return lvl >= 4;
+  if (filterPriority === "medium") return lvl === 3;
+  return lvl <= 2;
+}
+
 export function SkillFilterBar({
   exams,
   activeTab,
@@ -37,26 +52,20 @@ export function SkillFilterBar({
   setFilterSource,
   showPriorityRow = true,
 }: SkillFilterBarProps) {
-  const getLvl = (e: FilterableExamItem) => e.computedClover ?? e.hotLevel ?? 0;
-
-  const highCount = exams.filter(
-    (e) => getLvl(e) >= 3 || e.priority === "HIGH"
-  ).length;
-  const mediumCount = exams.filter(
-    (e) => getLvl(e) === 2 || (getLvl(e) === 0 && e.priority === "MEDIUM")
-  ).length;
-  const lowCount = exams.filter(
-    (e) => getLvl(e) === 1 || (getLvl(e) === 0 && e.priority === "LOW")
-  ).length;
+  const highCount = exams.filter((e) => matchesCloverPriority(e, "high")).length;
+  const mediumCount = exams.filter((e) => matchesCloverPriority(e, "medium")).length;
+  const lowCount = exams.filter((e) => matchesCloverPriority(e, "low")).length;
 
   const priorityOptions: Array<{ id: PriorityFilter; label: string }> = [
     { id: "all", label: `Tất cả (${exams.length})` },
-    { id: "high", label: `☘️☘️☘️+ Siêu Hot (${highCount})` },
+    ...(highCount > 0
+      ? [{ id: "high" as const, label: `☘️ 4–5 Cỏ · Siêu Hot (${highCount})` }]
+      : []),
     ...(mediumCount > 0
-      ? [{ id: "medium" as const, label: `☘️☘️ Hay ra (${mediumCount})` }]
+      ? [{ id: "medium" as const, label: `☘️ 3 Cỏ · Trọng tâm (${mediumCount})` }]
       : []),
     ...(lowCount > 0
-      ? [{ id: "low" as const, label: `☘️ Cơ bản (${lowCount})` }]
+      ? [{ id: "low" as const, label: `Đề luyện thêm (${lowCount})` }]
       : []),
   ];
 
