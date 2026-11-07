@@ -1,0 +1,34 @@
+# Dependencies & build output (được cài/build lại trong Docker)
+**/node_modules
+**/.next
+**/dist
+**/out
+**/coverage
+**/*.log
+**/.env
+**/.env.*
+!**/.env.example
+
+# Git & IDE
+.git
+.gitignore
+.vscode
+.idea
+.agents
+.agent
+.gemini
+
+# Thư mục không dùng khi build frontend/backend
+tools
+crawler
+docs
+backups
+SPEAKING
+READING
+graphify-out
+.chrome_profile*
+ảnh feedback
+*.docx
+*.md
+!frontend/**/*.md
+
