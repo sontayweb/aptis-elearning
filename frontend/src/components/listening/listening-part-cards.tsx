@@ -189,6 +189,11 @@ export function ListeningPart2Card({
 }) {
   if (!part2.speakers || part2.speakers.length === 0) return null;
 
+  // Lọc an toàn: Chỉ lấy các lựa chọn ngắn gọn chuẩn Aptis (tối đa 80 ký tự, không chứa xuống dòng/đoạn văn)
+  const cleanOptions = (part2.options || [])
+    .map((o) => (typeof o === "string" ? o.trim() : ""))
+    .filter((o) => o.length > 0 && o.length <= 80 && !o.includes("\n"));
+
   return (
     <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
@@ -205,6 +210,60 @@ export function ListeningPart2Card({
         </span>
       </div>
 
+      {/* Bảng danh sách tất cả các lựa chọn thông tin (UX preview trước & trong khi nghe) */}
+      {cleanOptions.length > 0 && (
+        <div className="p-4 rounded-xl bg-muted/30 border border-border/70 space-y-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span className="font-bold text-foreground flex items-center gap-1.5">
+              <span>Danh sách thông tin lựa chọn ({cleanOptions.length} phương án)</span>
+            </span>
+            <span className="text-[11px] text-muted-foreground italic">
+              {part2.speakers.length} người nói • Mỗi người chọn 1 ý • Có {Math.max(0, cleanOptions.length - part2.speakers.length)} ý nhiễu
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {cleanOptions.map((opt, oIdx) => {
+              const assignedSpeakerIdx = Object.entries(answers).find(([_, val]) => val === opt)?.[0];
+              const isAssigned = assignedSpeakerIdx !== undefined;
+              const assignedSpeakerName = isAssigned
+                ? part2.speakers[Number(assignedSpeakerIdx)]?.speaker || `Người ${Number(assignedSpeakerIdx) + 1}`
+                : null;
+
+              return (
+                <div
+                  key={oIdx}
+                  className={`px-3 py-2 rounded-lg border text-xs flex items-center justify-between gap-2 transition-all ${
+                    isAssigned
+                      ? "border-primary/40 bg-primary/10 text-primary font-medium"
+                      : "border-border/60 bg-background text-foreground/90"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span
+                      className={`w-5 h-5 rounded flex items-center justify-center font-bold text-[10px] shrink-0 ${
+                        isAssigned ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {String.fromCharCode(65 + oIdx)}
+                    </span>
+                    <span className="truncate" title={opt}>
+                      {opt}
+                    </span>
+                  </div>
+                  {isAssigned && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-primary font-bold shrink-0">
+                      {assignedSpeakerName}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Danh sách 4 Speakers nối đáp án */}
       <div className="space-y-4">
         {part2.speakers.map((spk, idx) => {
           const userChoice = answers[idx];
@@ -215,12 +274,12 @@ export function ListeningPart2Card({
           return (
             <div
               key={idx}
-              className={`p-4 rounded-xl border bg-background flex flex-col gap-3 ${
+              className={`p-4 rounded-xl border bg-background flex flex-col gap-3 transition-colors ${
                 isReviewMode
                   ? isCor
                     ? "border-emerald-500/50 bg-emerald-500/5"
                     : "border-red-500/50 bg-red-500/5"
-                  : "border-border"
+                  : "border-border hover:border-border/80"
               }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -243,19 +302,36 @@ export function ListeningPart2Card({
                   disabled={isReviewMode}
                   value={answers[idx] || ""}
                   onChange={(e) => onAnswer(idx, e.target.value)}
-                  className="flex-1 p-2.5 rounded-lg border border-input bg-card text-foreground text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans cursor-pointer disabled:opacity-85"
+                  className="flex-1 p-2.5 rounded-lg border border-input bg-card text-foreground text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-sans cursor-pointer disabled:opacity-85 shadow-2xs"
                 >
-                  <option value="">-- Chọn thông tin phù hợp --</option>
-                  {(part2.options || []).map((opt, oIdx) => (
-                    <option key={oIdx} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
+                  <option value="" className="bg-background text-foreground">
+                    -- Chọn thông tin phù hợp --
+                  </option>
+                  {cleanOptions.map((opt, oIdx) => {
+                    // Kiểm tra xem phương án này đã được người khác chọn chưa
+                    const assignedSpeakerEntry = Object.entries(answers).find(
+                      ([sIdx, val]) => Number(sIdx) !== idx && val === opt
+                    );
+                    const assignedToOtherName = assignedSpeakerEntry
+                      ? part2.speakers[Number(assignedSpeakerEntry[0])]?.speaker || `Người ${Number(assignedSpeakerEntry[0]) + 1}`
+                      : null;
+
+                    return (
+                      <option
+                        key={oIdx}
+                        value={opt}
+                        className="bg-background text-foreground py-1"
+                      >
+                        {opt}
+                        {assignedToOtherName ? ` (Đã chọn cho ${assignedToOtherName})` : ""}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
               {isReviewMode && (
-                <div className="text-xs space-y-1 pt-2 border-t border-border/50 text-muted-foreground">
+                <div className="text-xs space-y-2 pt-3 border-t border-border/50 text-muted-foreground">
                   <div className="flex flex-wrap items-center gap-3">
                     <span>
                       Bạn chọn:{" "}
@@ -268,7 +344,22 @@ export function ListeningPart2Card({
                       Đáp án chuẩn: <strong>{spk.correctAnswer}</strong>
                     </span>
                   </div>
-                  {spk.explanation && <p className="italic text-[11px] pt-1">{spk.explanation}</p>}
+
+                  {/* Trích đoạn audio của riêng người nói này nếu có */}
+                  {spk.transcript && (
+                    <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-foreground/90 leading-relaxed font-sans">
+                      <span className="font-bold text-primary mr-1">Trích dẫn audio ({spk.speaker}): </span>
+                      <span className="italic">"{spk.transcript}"</span>
+                    </div>
+                  )}
+
+                  {/* Giải thích chi tiết cho câu này */}
+                  {(spk.speakerExplanation || spk.explanation) && (
+                    <div className="p-3 rounded-lg bg-muted/40 border border-border/60 text-xs text-foreground/80 leading-relaxed font-sans">
+                      <span className="font-bold text-foreground mr-1">Giải thích: </span>
+                      <span>{spk.speakerExplanation || spk.explanation}</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

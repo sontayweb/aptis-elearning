@@ -1,12 +1,20 @@
 import nodemailer, { Transporter } from 'nodemailer';
 import { auditService } from '../audit/audit.service';
-import { AuditAction } from '@prisma/client';
+import { AuditAction, NotificationType } from '@prisma/client';
+import { prisma } from '../../config/database';
+import { notificationService } from '../notifications/notification.service';
 
 export interface SendMailOptions {
   to: string;
   subject: string;
   html: string;
   text?: string;
+  /**
+   * Mức ưu tiên ngân sách email (Resend Free: 100 email/ngày):
+   * - 'high' (mặc định): email giao dịch bắt buộc (xác thực, quên mật khẩu, biên nhận VIP, khóa tài khoản...) -> luôn gửi.
+   * - 'low': email hàng loạt / nhắc nhở (Full Test AI, nhắc VIP sắp hết hạn...) -> tự dừng ở ngưỡng 80/100 email/ngày để dành 20 email cho giao dịch bắt buộc.
+   */
+  priority?: 'high' | 'low';
 }
 
 export class EmailService {
@@ -14,23 +22,57 @@ export class EmailService {
   private isConfigured: boolean = false;
   private frontendUrl: string;
   private fromSender: string;
+  private provider: 'resend' | 'smtp' = 'smtp';
+  private resendApiKey: string | null = null;
+  private resendFrom: string;
 
   constructor() {
     this.frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     this.fromSender = process.env.SMTP_FROM || `"APTIS KỲ TÍCH" <${process.env.SMTP_USER || 'no-reply@aptiskytich.vn'}>`;
+
+    // Địa chỉ gửi của Resend phải thuộc domain đã verify. Mặc định suy ra từ FRONTEND_URL.
+    let siteHost = 'aptisesolpremier.com';
+    try {
+      siteHost = new URL(this.frontendUrl).hostname.replace(/^www\./, '');
+    } catch {
+      /* giữ mặc định */
+    }
+    this.resendFrom = process.env.EMAIL_FROM || `Aptis E-learning <no-reply@${siteHost}>`;
 
     const host = process.env.SMTP_HOST || 'smtp.gmail.com';
     const port = Number(process.env.SMTP_PORT) || 587;
     const user = process.env.SMTP_USER;
     const pass = process.env.SMTP_PASS;
 
+    const smtpUsable = !!(user && pass && !pass.includes('your-app-password') && !pass.includes('xxxx'));
+    const resendKey = process.env.RESEND_API_KEY;
+    const resendUsable = !!(resendKey && resendKey.startsWith('re_'));
+
+    // Chọn nhà cung cấp: EMAIL_PROVIDER=resend|smtp; mặc định ưu tiên Resend nếu có API key hợp lệ
+    const requested = (process.env.EMAIL_PROVIDER || '').toLowerCase();
+    if (requested === 'resend' || (requested !== 'smtp' && resendUsable)) {
+      if (resendUsable) {
+        this.provider = 'resend';
+        this.resendApiKey = resendKey as string;
+        this.isConfigured = true;
+        console.log(`[EmailService] Resend configured. From: ${this.resendFrom}`);
+        return;
+      }
+      console.warn('[EmailService] EMAIL_PROVIDER=resend nhưng RESEND_API_KEY thiếu hoặc không hợp lệ (phải bắt đầu bằng re_). Chuyển sang SMTP nếu có.');
+    }
+
     // Kiểm tra cấu hình SMTP khả dụng
-    if (user && pass && !pass.includes('your-app-password') && !pass.includes('xxxx')) {
+    if (smtpUsable) {
+      this.provider = 'smtp';
       this.transporter = nodemailer.createTransport({
         host,
         port,
         secure: port === 465 || process.env.SMTP_SECURE === 'true',
         auth: { user, pass },
+        // Tái sử dụng kết nối SMTP, tránh mở kết nối mới cho từng email khi gửi số lượng lớn
+        pool: true,
+        maxConnections: Number(process.env.SMTP_MAX_CONNECTIONS) || 3,
+        maxMessages: 100,
         tls: {
           rejectUnauthorized: false,
         },
@@ -39,8 +81,52 @@ export class EmailService {
       console.log(`[EmailService] SMTP Transporter configured (${host}:${port}) for ${user}`);
     } else {
       this.isConfigured = false;
-      console.log(`[EmailService] SMTP credentials not set or using placeholder. Running in DEV/LOG mode.`);
+      console.error(`[EmailService] CẢNH BÁO: Chưa cấu hình Resend hoặc SMTP hợp lệ. Mọi lệnh gửi email sẽ báo lỗi thực tế (không chạy chế độ Mock).`);
     }
+  }
+
+  /**
+   * Gửi email qua Resend REST API (có retry nhẹ khi gặp 429/5xx).
+   * Ném lỗi nếu thất bại để tầng trên ghi audit log / hàng đợi retry.
+   */
+  private async sendViaResend(options: SendMailOptions): Promise<{ id?: string }> {
+    const maxAttempts = 3;
+    let lastError = 'Resend error';
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.resendApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: this.resendFrom,
+          to: [options.to],
+          subject: options.subject,
+          html: options.html,
+          text: options.text,
+        }),
+      });
+
+      if (res.ok) {
+        return (await res.json().catch(() => ({}))) as { id?: string };
+      }
+
+      const body: any = await res.json().catch(() => ({}));
+      lastError = `Resend ${res.status} ${body?.name || ''}: ${body?.message || res.statusText}`.trim();
+
+      // 429 (rate limit hoặc quota ngày) và 5xx có thể thử lại; lỗi còn lại (domain chưa verify, from sai...) thì dừng
+      const retryable = res.status === 429 || res.status >= 500;
+      const quotaExceeded = /quota/i.test(`${body?.name} ${body?.message}`);
+      if (!retryable || quotaExceeded || attempt === maxAttempts) break;
+
+      const retryAfter = Number(res.headers.get('retry-after'));
+      const waitMs = (retryAfter > 0 ? retryAfter : attempt) * 1000;
+      await new Promise((r) => setTimeout(r, waitMs));
+    }
+
+    throw new Error(lastError);
   }
 
   /**
@@ -92,23 +178,118 @@ export class EmailService {
   }
 
   /**
-   * Hàm cốt lõi gửi email (bọc try-catch, non-blocking, hỗ trợ mock log)
+   * Hàm cốt lõi gửi email (Không dùng chế độ Mock: nếu thiếu cấu hình hoặc gửi lỗi sẽ ghi Audit Log SENT_FAILED,
+   * bắn thông báo chuông cảnh báo cho Admin và trả về trạng thái thất bại thật).
+   * Tích hợp kiểm soát ngân sách 80/100 email/ngày UTC qua Redis.
    */
-  async sendMail(options: SendMailOptions): Promise<{ success: boolean; messageId?: string; error?: string }> {
-    try {
-      if (!this.isConfigured || !this.transporter) {
-        console.log(`[EmailService MOCK-LOG] To: ${options.to} | Subject: "${options.subject}"`);
+  async sendMail(
+    options: SendMailOptions
+  ): Promise<{ success: boolean; messageId?: string; error?: string; skippedByBudget?: boolean }> {
+    const priority = options.priority || 'high';
+    const lowPriorityLimit = Number(process.env.EMAIL_LOW_PRIORITY_DAILY_LIMIT) || 80;
+    const dailyLimit = Number(process.env.EMAIL_DAILY_LIMIT) || 100;
 
-        // Ghi Audit Log chế độ Dev/Mock để Quản trị viên nắm bắt
+    try {
+      if (!this.isConfigured || (this.provider === 'smtp' && !this.transporter)) {
+        throw new Error(
+          'Hệ thống gửi email chưa được cấu hình hợp lệ (thiếu RESEND_API_KEY hoặc thông tin SMTP_USER/SMTP_PASS).'
+        );
+      }
+
+      // Kiểm tra ngân sách 80/100 email/ngày đối với các email ưu tiên thấp
+      const { emailQueue } = await import('./email.queue');
+      if (priority === 'low') {
+        const sentToday = await emailQueue.getTodaySentCount();
+        if (sentToday >= lowPriorityLimit) {
+          const skipMsg = `Đã đạt ngưỡng ngân sách ${sentToday}/${lowPriorityLimit} email/ngày cho nhóm ưu tiên thấp (dành ${dailyLimit - lowPriorityLimit} email cho giao dịch bắt buộc).`;
+          console.warn(`[EmailService BUDGET] Bỏ qua email ưu tiên thấp tới ${options.to}: ${skipMsg}`);
+          Promise.resolve(
+            auditService.record({
+              action: AuditAction.EMAIL_NOTIFICATION_SENT,
+              entityType: 'EMAIL',
+              entityId: `budget-skip-${Date.now()}`,
+              description: `[NGÂN SÁCH EMAIL] Tạm dừng gửi email ưu tiên thấp tới ${options.to}: "${options.subject}" (${sentToday}/${dailyLimit})`,
+              newValue: {
+                to: options.to,
+                subject: options.subject,
+                priority,
+                status: 'SKIPPED_BUDGET_LIMIT',
+                sentToday,
+                lowPriorityLimit,
+              },
+              systemActor: {
+                name: 'Hệ thống Email',
+                email: 'mailer@aptiskytich.vn',
+                role: 'SYSTEM',
+              },
+            })
+          ).catch(() => {});
+
+          return { success: false, skippedByBudget: true, error: skipMsg };
+        }
+      }
+
+      let messageId: string | undefined;
+      if (this.provider === 'resend') {
+        const sent = await this.sendViaResend(options);
+        messageId = sent.id;
+      } else {
+        const info = await (this.transporter as Transporter).sendMail({
+          from: this.fromSender,
+          to: options.to,
+          subject: options.subject,
+          html: options.html,
+          text: options.text,
+        });
+        messageId = info.messageId;
+      }
+      const info = { messageId };
+
+      const newCount = await emailQueue.incrementTodaySentCount();
+      console.log(
+        `[EmailService SUCCESS] (${this.provider} | ${newCount}/${dailyLimit} today UTC) Mail sent to ${options.to}. MessageId: ${info.messageId}`
+      );
+
+      // Khi chạm đúng ngưỡng 80/100 email trong ngày UTC, bắn chuông cảnh báo cho Admin
+      if (newCount === lowPriorityLimit) {
+        Promise.resolve(
+          prisma.user?.findMany({
+            where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] }, is_active: true },
+            select: { id: true },
+          })
+        )
+          .then((admins) => {
+            if (!Array.isArray(admins)) return;
+            for (const admin of admins) {
+              Promise.resolve(
+                notificationService.createNotification({
+                  userId: admin.id,
+                  type: NotificationType.SYSTEM,
+                  title: `[CẢNH BÁO QUOTA EMAIL] Đã dùng ${newCount}/${dailyLimit} email hôm nay`,
+                  message: `Hệ thống tự động tạm ngưng email ưu tiên thấp và giữ ${dailyLimit - lowPriorityLimit} email còn lại cho các giao dịch bắt buộc.`,
+                  link: '/admin/audit-logs',
+                })
+              ).catch(() => {});
+            }
+          })
+          .catch(() => {});
+      }
+
+      // Ghi Audit Log gửi mail thành công vào cơ sở dữ liệu
+      Promise.resolve(
         auditService.record({
           action: AuditAction.EMAIL_NOTIFICATION_SENT,
           entityType: 'EMAIL',
-          entityId: `mock-${Date.now()}`,
-          description: `[EMAIL MOCK-DEV] Giả lập gửi email tới ${options.to}: "${options.subject}" (Hệ thống đang chạy chế độ Dev hoặc chưa nạp SMTP App Password)`,
+          entityId: info.messageId || `mail-${Date.now()}`,
+          description: `[EMAIL THÀNH CÔNG] Đã gửi email tới ${options.to}: "${options.subject}" (${newCount}/${dailyLimit} hôm nay)`,
           newValue: {
             to: options.to,
             subject: options.subject,
-            status: 'MOCK_DEV',
+            provider: this.provider,
+            priority,
+            sentToday: newCount,
+            status: 'SENT_SUCCESS',
+            messageId: info.messageId,
             sentAt: new Date(),
           },
           systemActor: {
@@ -116,73 +297,72 @@ export class EmailService {
             email: 'mailer@aptiskytich.vn',
             role: 'SYSTEM',
           },
-        }).catch(() => {});
-
-        return { success: true, messageId: `mock-${Date.now()}` };
-      }
-
-      const info = await this.transporter.sendMail({
-        from: this.fromSender,
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
-        text: options.text,
-      });
-
-      console.log(`[EmailService SUCCESS] Mail sent to ${options.to}. MessageId: ${info.messageId}`);
-
-      // Ghi Audit Log gửi mail thành công vào cơ sở dữ liệu
-      auditService.record({
-        action: AuditAction.EMAIL_NOTIFICATION_SENT,
-        entityType: 'EMAIL',
-        entityId: info.messageId || `mail-${Date.now()}`,
-        description: `[EMAIL THÀNH CÔNG] Đã gửi email tới ${options.to}: "${options.subject}"`,
-        newValue: {
-          to: options.to,
-          subject: options.subject,
-          status: 'SENT_SUCCESS',
-          messageId: info.messageId,
-          sentAt: new Date(),
-        },
-        systemActor: {
-          name: 'Hệ thống Email',
-          email: 'mailer@aptiskytich.vn',
-          role: 'SYSTEM',
-        },
-      }).catch(() => {});
+        })
+      ).catch(() => {});
 
       return { success: true, messageId: info.messageId };
     } catch (err: any) {
-      console.error(`[EmailService ERROR] Failed to send email to ${options.to}:`, err.message);
+      const errorMessage = err?.message || 'Lỗi gửi email không xác định';
+      console.error(`[EmailService ERROR] Failed to send email to ${options.to}:`, errorMessage);
 
-      // Ghi Audit Log cảnh báo gửi mail thất bại
-      auditService.record({
-        action: AuditAction.EMAIL_NOTIFICATION_SENT,
-        entityType: 'EMAIL',
-        entityId: `fail-${Date.now()}`,
-        description: `[EMAIL THẤT BẠI] Lỗi gửi email tới ${options.to}: "${options.subject}". Lỗi: ${err.message}`,
-        newValue: {
-          to: options.to,
-          subject: options.subject,
-          status: 'SENT_FAILED',
-          error: err.message,
-          failedAt: new Date(),
-        },
-        systemActor: {
-          name: 'Hệ thống Email',
-          email: 'mailer@aptiskytich.vn',
-          role: 'SYSTEM',
-        },
-      }).catch(() => {});
+      // 1. Ghi Audit Log cảnh báo gửi mail thất bại
+      Promise.resolve(
+        auditService.record({
+          action: AuditAction.EMAIL_NOTIFICATION_SENT,
+          entityType: 'EMAIL',
+          entityId: `fail-${Date.now()}`,
+          description: `[EMAIL THẤT BẠI] Lỗi gửi email tới ${options.to}: "${options.subject}". Lỗi: ${errorMessage}`,
+          newValue: {
+            to: options.to,
+            subject: options.subject,
+            provider: this.provider,
+            status: 'SENT_FAILED',
+            error: errorMessage,
+            failedAt: new Date(),
+          },
+          systemActor: {
+            name: 'Hệ thống Email',
+            email: 'mailer@aptiskytich.vn',
+            role: 'SYSTEM',
+          },
+        })
+      ).catch(() => {});
 
-      return { success: false, error: err.message };
+      // 2. Bắn thông báo chuông cảnh báo cho Quản trị viên để nắm bắt sự cố ngay lập tức
+      Promise.resolve(
+        prisma.user?.findMany({
+          where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] }, is_active: true },
+          select: { id: true },
+        })
+      )
+        .then((admins) => {
+          if (!Array.isArray(admins)) return;
+          for (const admin of admins) {
+            Promise.resolve(
+              notificationService.createNotification({
+                userId: admin.id,
+                type: NotificationType.SYSTEM,
+                title: `[LỖI GỬI EMAIL] Không gửi được tới ${options.to}`,
+                message: `Tiêu đề: "${options.subject}". Nguyên nhân: ${errorMessage}`,
+                link: '/admin/audit-logs',
+              })
+            ).catch(() => {});
+          }
+        })
+        .catch(() => {});
+
+      return { success: false, error: errorMessage };
     }
   }
 
   /**
    * 1. Gửi email Đặt lại mật khẩu (Password Reset)
    */
-  async sendPasswordResetEmail(toEmail: string, resetToken: string, fullName?: string): Promise<void> {
+  async sendPasswordResetEmail(
+    toEmail: string,
+    resetToken: string,
+    fullName?: string
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     const resetUrl = `${this.frontendUrl}/auth/reset-password?token=${encodeURIComponent(resetToken)}`;
     const recipientName = fullName || 'Học viên';
 
@@ -210,7 +390,7 @@ export class EmailService {
       </p>
     `;
 
-    await this.sendMail({
+    return this.sendMail({
       to: toEmail,
       subject: '[Aptis Kỳ Tích] Hướng dẫn đặt lại mật khẩu tài khoản',
       html: this.wrapEmailTemplate('Đặt lại mật khẩu', bodyContent),
@@ -221,7 +401,11 @@ export class EmailService {
   /**
    * 1b. Gửi email Xác thực tài khoản (Email Verification)
    */
-  async sendVerificationEmail(toEmail: string, verificationToken: string, fullName?: string): Promise<void> {
+  async sendVerificationEmail(
+    toEmail: string,
+    verificationToken: string,
+    fullName?: string
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     const verifyUrl = `${this.frontendUrl}/auth/verify-email?token=${encodeURIComponent(verificationToken)}`;
     const recipientName = fullName || 'Học viên';
 
@@ -248,7 +432,7 @@ export class EmailService {
       </p>
     `;
 
-    await this.sendMail({
+    return this.sendMail({
       to: toEmail,
       subject: '[Aptis Kỳ Tích] Vui lòng xác thực địa chỉ email của bạn',
       html: this.wrapEmailTemplate('Xác thực tài khoản', bodyContent),
@@ -259,7 +443,12 @@ export class EmailService {
   /**
    * 2. Gửi email Chào mừng & Cấp tài khoản mới (Bulk Import / Admin tạo)
    */
-  async sendAccountCreatedEmail(toEmail: string, tempPassword: string, fullName: string, role: string = 'STUDENT'): Promise<void> {
+  buildAccountCreatedMail(
+    toEmail: string,
+    tempPassword: string,
+    fullName: string,
+    role: string = 'STUDENT'
+  ): SendMailOptions {
     const loginUrl = `${this.frontendUrl}/auth`;
 
     const bodyContent = `
@@ -295,12 +484,17 @@ export class EmailService {
       </p>
     `;
 
-    await this.sendMail({
+    return {
       to: toEmail,
       subject: '[Aptis Kỳ Tích] Thông tin tài khoản học tập của bạn',
       html: this.wrapEmailTemplate('Tài khoản mới', bodyContent),
       text: `Xin chào ${fullName}, tài khoản Aptis Kỳ Tích của bạn đã được tạo. Email: ${toEmail}, Mật khẩu: ${tempPassword}. Đăng nhập tại: ${loginUrl}`,
-    });
+      priority: 'high',
+    };
+  }
+
+  async sendAccountCreatedEmail(toEmail: string, tempPassword: string, fullName: string, role: string = 'STUDENT'): Promise<void> {
+    await this.sendMail(this.buildAccountCreatedMail(toEmail, tempPassword, fullName, role));
   }
 
   /**
@@ -425,6 +619,154 @@ export class EmailService {
       subject: `[ADMIN ALERT] ${subject}`,
       html: this.wrapEmailTemplate('Cảnh báo quản trị', bodyContent),
       text: message,
+    });
+  }
+
+  /**
+   * 6. Dựng nội dung email thông báo AI đã chấm xong bài thi Speaking/Writing
+   * (tách riêng để hàng đợi email có thể gửi và retry khi lỗi)
+   */
+  buildAiGradedMail(toEmail: string, data: {
+    fullName: string;
+    examTitle: string;
+    totalScore: number | string;
+    cefrLevel?: string;
+    submissionId: string;
+    maxScore?: number;
+  }): SendMailOptions {
+    const detailUrl = `${this.frontendUrl}/history`;
+
+    const bodyContent = `
+      <h2 style="margin-top:0; color:#0f172a; font-size:20px;">AI đã chấm xong bài thi của bạn!</h2>
+      <p>Xin chào <strong>${data.fullName}</strong>,</p>
+      <p>Hệ thống AI vừa hoàn tất chấm điểm và nhận xét chi tiết bài thi của bạn.</p>
+
+      <div class="info-box">
+        <div class="info-row">
+          <span class="info-label">Đề thi:</span>
+          <span class="info-value">${data.examTitle}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Điểm tổng kết:</span>
+          <span class="info-value" style="color:#059669; font-size:16px;">${data.totalScore}/${data.maxScore ?? 50}</span>
+        </div>
+        ${data.cefrLevel ? `
+        <div class="info-row">
+          <span class="info-label">Trình độ quy đổi:</span>
+          <span class="info-value" style="color:#4f46e5; font-size:15px;">CEFR ${data.cefrLevel}</span>
+        </div>` : ''}
+      </div>
+
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${detailUrl}" class="email-btn" target="_blank">Xem Kết Quả Chi Tiết</a>
+      </div>
+    `;
+
+    return {
+      to: toEmail,
+      subject: `[Aptis Kỳ Tích] AI đã chấm xong bài thi: ${data.examTitle}`,
+      html: this.wrapEmailTemplate('Kết quả chấm AI', bodyContent),
+      text: `Xin chào ${data.fullName}, AI đã chấm xong bài thi ${data.examTitle} (${data.totalScore} điểm). Xem chi tiết tại: ${detailUrl}`,
+      priority: 'low',
+    };
+  }
+
+  /**
+   * 6b. Dựng nội dung email nhắc gói VIP sắp hết hạn (1 ngày trước khi hết hạn) - mức ưu tiên 'low' (tuân thủ ngân sách 80/100)
+   */
+  buildVipExpiringMail(
+    toEmail: string,
+    data: {
+      fullName: string;
+      planName: string;
+      endDate: Date | string;
+      aiQuotaLeft: number;
+    }
+  ): SendMailOptions {
+    const pricingUrl = `${this.frontendUrl}/pricing`;
+    const formattedDate = new Date(data.endDate).toLocaleDateString('vi-VN');
+
+    const bodyContent = `
+      <h2 style="margin-top:0; color:#0f172a; font-size:20px;">Gói VIP của bạn sắp hết hạn vào ngày mai</h2>
+      <p>Xin chào <strong>${data.fullName}</strong>,</p>
+      <p>Hệ thống ghi nhận gói học tập <strong>${data.planName}</strong> của bạn sẽ hết hạn vào ngày <strong>${formattedDate}</strong>.</p>
+      <div class="info-box">
+        <div class="info-row">
+          <span class="info-label">Gói hiện tại:</span>
+          <span class="info-value">${data.planName}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Ngày hết hạn:</span>
+          <span class="info-value" style="color:#dc2626;">${formattedDate}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Lượt AI chấm còn lại:</span>
+          <span class="info-value">${data.aiQuotaLeft} lượt</span>
+        </div>
+      </div>
+      <p>Bạn hãy tranh thủ sử dụng hết lượt chấm AI hoặc gia hạn sớm để quá trình ôn thi không bị gián đoạn.</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${pricingUrl}" class="email-btn" target="_blank">Gia Hạn Hoặc Luyện Tập Ngay</a>
+      </div>
+    `;
+
+    return {
+      to: toEmail,
+      subject: `[Aptis Kỳ Tích] Gói ${data.planName} của bạn sẽ hết hạn vào ngày ${formattedDate}`,
+      html: this.wrapEmailTemplate('Nhắc hạn gói VIP', bodyContent),
+      text: `Xin chào ${data.fullName}, gói ${data.planName} của bạn sẽ hết hạn vào ngày ${formattedDate}. Gia hạn tại: ${pricingUrl}`,
+      priority: 'low',
+    };
+  }
+
+  async sendAiGradedEmail(toEmail: string, data: {
+    fullName: string;
+    examTitle: string;
+    totalScore: number | string;
+    cefrLevel?: string;
+    submissionId: string;
+    maxScore?: number;
+  }): Promise<void> {
+    await this.sendMail(this.buildAiGradedMail(toEmail, data));
+  }
+
+  /**
+   * 7. Email thông báo tổng quát (dùng cho các luồng bắt buộc: bảo mật tài khoản, thanh toán, khóa/mở khóa...)
+   * Nội dung dựng từ tiêu đề + các đoạn văn + nút hành động tùy chọn.
+   */
+  async sendNotificationEmail(
+    toEmail: string,
+    data: {
+      subject: string;
+      heading: string;
+      fullName?: string;
+      paragraphs: string[];
+      ctaLabel?: string;
+      ctaPath?: string;
+    }
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const ctaUrl = data.ctaPath ? `${this.frontendUrl}${data.ctaPath}` : '';
+
+    const bodyContent = `
+      <h2 style="margin-top:0; color:#0f172a; font-size:20px;">${esc(data.heading)}</h2>
+      <p>Xin chào <strong>${esc(data.fullName || 'Học viên')}</strong>,</p>
+      ${data.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('\n      ')}
+      ${
+        ctaUrl && data.ctaLabel
+          ? `<div style="text-align: center; margin: 24px 0;">
+        <a href="${ctaUrl}" class="email-btn" target="_blank">${esc(data.ctaLabel)}</a>
+      </div>`
+          : ''
+      }
+    `;
+
+    return this.sendMail({
+      to: toEmail,
+      subject: `[Aptis Kỳ Tích] ${data.subject}`,
+      html: this.wrapEmailTemplate(data.heading, bodyContent),
+      text: `Xin chào ${data.fullName || 'Học viên'}, ${data.paragraphs.join(' ')}${ctaUrl ? ` Chi tiết: ${ctaUrl}` : ''}`,
     });
   }
 }

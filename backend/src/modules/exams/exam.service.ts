@@ -1267,20 +1267,25 @@ export class ExamService {
         (part as any).recommendedMinutes = 25;
         (part as any).partSubtitle = 'Grammar & Vocabulary Core';
       } else if (isListeningPart) {
-        if (partType === 'PART_1') {
-          (part as any).partSubtitle = 'Part 1 - Information Recognition';
-          (part as any).topic = 'Everyday Information & Announcements';
-        } else if (partType === 'PART_2') {
-          (part as any).partSubtitle = 'Part 2 - Information Matching (4 Speakers)';
-          (part as any).topic = 'Workplace & Daily Life Views';
-        } else if (partType === 'PART_3') {
-          (part as any).partSubtitle = 'Part 3 - Opinion Matching (Discussion)';
-          (part as any).topic = 'Discussion & Perspectives';
-        } else if (partType === 'PART_4') {
-          (part as any).partSubtitle = 'Part 4 - Monologue Comprehension';
-          (part as any).topic = 'Lectures & Public Announcements';
+        let extractedExamTopic = '';
+        if (exam.title && !/full\s*(listening|test|exam|part)|4\s*parts|kỳ\s*tích/i.test(exam.title)) {
+          const clean = exam.title.replace(/^Đề\s*\d+\s*[-:—–]*\s*/i, '').trim();
+          if (clean.length > 2) extractedExamTopic = clean;
         }
 
+        if (partType === 'PART_1') {
+          (part as any).partSubtitle = 'Part 1 - Information Recognition';
+          (part as any).topic = (part as any).topic || extractedExamTopic || 'Everyday Information & Announcements';
+        } else if (partType === 'PART_2') {
+          (part as any).partSubtitle = 'Part 2 - Information Matching (4 Speakers)';
+          (part as any).topic = (part as any).topic || extractedExamTopic || 'Workplace & Daily Life Views';
+        } else if (partType === 'PART_3') {
+          (part as any).partSubtitle = 'Part 3 - Opinion Matching (Discussion)';
+          (part as any).topic = (part as any).topic || extractedExamTopic || 'Discussion & Perspectives';
+        } else if (partType === 'PART_4') {
+          (part as any).partSubtitle = 'Part 4 - Monologue Comprehension';
+          (part as any).topic = (part as any).topic || extractedExamTopic || 'Lectures & Public Announcements';
+        }
       }
 
       // BẢO MẬT: Tuyệt đối không để lộ explanation và correct_answer cho các kỹ năng trắc nghiệm khi chưa nộp bài
@@ -1687,6 +1692,24 @@ export class ExamService {
         new_value: updatedVal,
       },
     });
+
+    // Luồng #20 hoàn thiện: nếu học viên đã đăng nhập khi gửi báo lỗi và Admin xử lý xong (RESOLVED),
+    // bắn thông báo chuông phản hồi kết quả cho học viên đó (không gửi email để tiết kiệm quota).
+    const reporterUserId = (log as any).user_id as string | null | undefined;
+    if (newStatus === 'RESOLVED' && currentVal.status !== 'RESOLVED' && reporterUserId) {
+      const examTitle = currentVal.examTitle || 'Đề thi';
+      const qNum = currentVal.questionNumber ? ` (Câu #${currentVal.questionNumber})` : '';
+      const noteSuffix = updatedVal.resolutionNote ? ` Phản hồi: "${updatedVal.resolutionNote}".` : '';
+      notificationService
+        .createNotification({
+          userId: reporterUserId,
+          type: NotificationType.SYSTEM,
+          title: `Báo lỗi đề "${examTitle}"${qNum} đã được xử lý`,
+          message: `Cảm ơn bạn đã đóng góp! Ban chuyên môn đã kiểm tra và cập nhật câu hỏi.${noteSuffix}`,
+          link: '/history',
+        })
+        .catch(() => {});
+    }
 
     return {
       id: updated.id,

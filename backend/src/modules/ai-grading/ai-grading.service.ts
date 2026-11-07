@@ -1,7 +1,10 @@
 import fs from 'fs';
 import OpenAI from 'openai';
 import { prisma } from '../../config/database';
-import { ExamSkill, QuestionType, SubmissionStatus } from '@prisma/client';
+import { ExamSkill, NotificationType, QuestionType, SubmissionStatus } from '@prisma/client';
+import { notificationService } from '../notifications/notification.service';
+import { emailService } from '../email/email.service';
+import { emailQueue } from '../email/email.queue';
 import { audioService } from '../audio/audio.service';
 import { geminiRotator } from './gemini-rotator.service';
 import { scoreToCefr } from '../../utils/cefr-engine';
@@ -576,15 +579,48 @@ ${transcriptText}
       },
     });
 
-    // Trừ 1 lượt chấm AI khỏi tài khoản của học viên
+    // Trừ 1 lượt chấm AI khỏi tài khoản của học viên + Luồng #13: cảnh báo chuông khi sắp hết / hết lượt AI
     if (activeSubId) {
-      await prisma.userSubscription.update({
+      const updatedSub = await prisma.userSubscription.update({
         where: { id: activeSubId },
         data: {
           ai_quota_left: { decrement: 1 },
         },
       });
+
+      if (updatedSub.ai_quota_left <= 0) {
+        notificationService
+          .createNotification({
+            userId: submission.user_id,
+            type: NotificationType.SYSTEM,
+            title: 'Bạn đã sử dụng hết lượt chấm AI',
+            message: 'Số lượt chấm AI của bạn đã về 0. Hãy nâng cấp hoặc gia hạn gói VIP để tiếp tục chấm Speaking & Writing.',
+            link: '/pricing',
+          })
+          .catch(() => {});
+      } else if (updatedSub.ai_quota_left <= 3) {
+        notificationService
+          .createNotification({
+            userId: submission.user_id,
+            type: NotificationType.SYSTEM,
+            title: `Sắp hết lượt chấm AI (còn ${updatedSub.ai_quota_left} lượt)`,
+            message: `Tài khoản của bạn chỉ còn ${updatedSub.ai_quota_left} lượt chấm AI. Hãy gia hạn sớm để việc luyện thi không bị gián đoạn.`,
+            link: '/pricing',
+          })
+          .catch(() => {});
+      }
     }
+
+    // Thông báo chuông + email cho học viên khi AI chấm xong (không chặn luồng chính)
+    this.notifyGradingCompleted(submission.user_id, {
+      submissionId,
+      examTitle: submission.exam.title,
+      totalScore: finalTotalScore,
+      cefrLevel: overallCefr,
+      maxScore: submission.exam.skill === ExamSkill.FULL_TEST ? 200 : 50,
+    }).catch((err) => {
+      console.error('[AiGradingService] Lỗi gửi thông báo AI chấm xong:', err);
+    });
 
     return {
       submissionId,
@@ -594,6 +630,51 @@ ${transcriptText}
       aiResults,
       quotaDeducted: !!activeSubId,
     };
+  }
+
+  private async notifyGradingCompleted(
+    userId: string,
+    data: {
+      submissionId: string;
+      examTitle: string;
+      totalScore: number;
+      cefrLevel: string;
+      maxScore: number;
+    }
+  ) {
+    await notificationService
+      .createNotification({
+        userId,
+        type: NotificationType.EXAM_GRADED,
+        title: 'AI đã chấm xong bài thi của bạn',
+        message: `Bài "${data.examTitle}" đạt ${data.totalScore}/${data.maxScore} điểm (CEFR ${data.cefrLevel}). Xem nhận xét chi tiết ngay.`,
+        link: `/history`,
+      })
+      .catch(() => {});
+
+    // Email chỉ gửi cho bài Full Test hoặc khi bật NOTIFY_AI_GRADED_EMAIL=true.
+    // Mặc định chỉ bắn thông báo chuông để tránh vượt hạn mức SMTP khi đông người cùng làm bài.
+    const shouldEmail =
+      process.env.NOTIFY_AI_GRADED_EMAIL === 'true' || data.maxScore === 200;
+    if (shouldEmail) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true, full_name: true },
+      });
+      if (user?.email) {
+        // Đi qua hàng đợi có giới hạn tốc độ + retry
+        await emailQueue.enqueue(
+          emailService.buildAiGradedMail(user.email, {
+            fullName: user.full_name || 'Học viên',
+            examTitle: data.examTitle,
+            totalScore: data.totalScore,
+            cefrLevel: data.cefrLevel,
+            submissionId: data.submissionId,
+            maxScore: data.maxScore,
+          })
+        );
+      }
+    }
   }
 
   async getAiFeedback(submissionId: string, userId?: string, userRole?: string) {

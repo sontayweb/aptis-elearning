@@ -654,19 +654,35 @@ class ApiClient {
   payment = {
     getPlans: () => this.request('/payment/plans'),
 
-    initiate: (planId: string) =>
-      this.request<{
+    initiate: (planIdOrCode: string, promoCode?: string) => {
+      const upper = String(planIdOrCode || '').trim().toUpperCase();
+      const isEnumCode = ['FREE', 'PRO', 'VIP', 'VIP_1M', 'VIP_3M', 'PREMIER_6M'].includes(upper);
+      return this.request<{
         order_code: string;
+        orderCode?: string;
         amount: number;
+        original_amount?: number;
+        discount_amount?: number;
+        applied_promo_code?: string | null;
         bank_name: string;
+        bankName?: string;
         bank_account: string;
+        bankAccount?: string;
         account_name: string;
+        accountHolder?: string;
         qr_code_url: string;
+        qrUrl?: string;
         payment_status: string;
       }>('/payment/initiate', {
         method: 'POST',
-        body: JSON.stringify({ plan_id: planId }),
-      }),
+        body: JSON.stringify({
+          ...(isEnumCode ? { planCode: upper } : {}),
+          planId: planIdOrCode,
+          plan_id: planIdOrCode,
+          ...(promoCode ? { promoCode } : {}),
+        }),
+      });
+    },
 
     getMySubscription: () => this.request('/payment/my-subscription'),
 

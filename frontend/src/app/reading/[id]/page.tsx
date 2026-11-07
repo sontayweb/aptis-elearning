@@ -794,6 +794,9 @@ function ReadingExamRunner() {
         if (draft.p4Answers && Object.keys(draft.p4Answers).length > 0) {
           setP4Answers((prev) => ({ ...draft.p4Answers, ...prev }));
         }
+        if (typeof draft.activeStage === "number" && draft.activeStage >= 0) {
+          setActiveStage(draft.activeStage);
+        }
       }
     } catch {}
   }, [examId, isSubmitted, isReviewMode, modeParam]);
@@ -830,6 +833,7 @@ function ReadingExamRunner() {
             p2Orders,
             p3Answers,
             p4Answers,
+            activeStage,
             savedAt: new Date().toISOString(),
           })
         );
@@ -1365,8 +1369,8 @@ function ReadingExamRunner() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
       {/* 1. TOP HEADER PHÒNG THI CHUẨN */}
-      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-3 sm:px-6 md:px-8 py-2 sm:py-2.5 flex items-center justify-between shadow-xs gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
             onClick={() => {
@@ -1378,49 +1382,53 @@ function ReadingExamRunner() {
                 setShowExitConfirm(true);
               }
             }}
-            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer shrink-0"
             title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Quay lại danh sách đề"}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-              Reading Practice
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-primary uppercase tracking-wider truncate block">
+              {isReviewMode ? "Xem lại" : "Reading Practice"}
             </span>
-            <span className="text-sm md:text-base font-bold text-foreground">
+            <span className="text-xs sm:text-sm md:text-base font-bold text-foreground truncate max-w-[120px] sm:max-w-xs md:max-w-none">
               {examData.title}
             </span>
           </div>
         </div>
 
         {/* Căn giữa: Đồng hồ đếm ngược & Sync status */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {isReviewMode ? (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-xs">
-                <Eye className="w-3.5 h-3.5" />
-                <span>Chế độ xem lại bài làm</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-[11px] sm:text-xs">
+                <Eye className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden sm:inline">Xem lại bài làm</span>
+                <span className="sm:hidden">Xem lại</span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSubmitted(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold hover:bg-primary/20 transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] sm:text-xs font-bold hover:bg-primary/20 transition-colors cursor-pointer"
                 title="Bấm để xem lại bảng điểm tổng quan"
               >
-                <Award className="w-3.5 h-3.5" />
-                <span>Báo cáo điểm</span>
+                <Award className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden sm:inline">Báo cáo điểm</span>
+                <span className="sm:hidden">Điểm số</span>
               </button>
             </div>
           ) : (
             <>
-              <ExamSyncStatus
-                status={syncStatus}
-                lastSavedAt={lastSavedAt}
-                isResumed={isResumedSession}
-              />
+              <div className="hidden sm:block">
+                <ExamSyncStatus
+                  status={syncStatus}
+                  lastSavedAt={lastSavedAt}
+                  isResumed={isResumedSession}
+                />
+              </div>
               <div className="flex items-center gap-1.5">
-                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-                  <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-xs sm:text-sm">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
                   <span>{formatTime(timeLeft)}</span>
                 </div>
                 <button
@@ -1433,18 +1441,18 @@ function ReadingExamRunner() {
                   }`}
                   title={isPaused ? "Tiếp tục làm bài (Resume)" : "Tạm dừng làm bài (Pause)"}
                 >
-                  {isPaused ? <Play className="w-4 h-4 fill-current" /> : <Pause className="w-4 h-4" />}
+                  {isPaused ? <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" /> : <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                 </button>
               </div>
             </>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             type="button"
             onClick={() => handleOpenTranslate()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-xs font-bold transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-xs font-bold transition-colors cursor-pointer"
             title="Tra từ điển & dịch câu bằng Google Dịch"
           >
             <Languages className="w-3.5 h-3.5" />
@@ -1461,11 +1469,11 @@ function ReadingExamRunner() {
                 setShowExitConfirm(true);
               }
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
             title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Thoát về danh sách đề"}
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>{isReviewMode ? "Về Lịch sử" : "Thoát"}</span>
+            <span className="hidden sm:inline">{isReviewMode ? "Về Lịch sử" : "Thoát"}</span>
           </button>
         </div>
       </header>

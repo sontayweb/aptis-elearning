@@ -50,32 +50,34 @@ export function ListeningBottomDock({
   onFinalSubmit,
 }: ListeningBottomDockProps) {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
+    <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-2.5 sm:px-6 md:px-8 py-2 sm:py-3 flex items-center justify-between z-40 shadow-lg pb-safe gap-1 sm:gap-3">
       {/* Left: Hiện đáp án & Báo lỗi */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         <button
           type="button"
           onClick={onOpenSampleAnswers}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors min-h-[36px]"
+          title="Xem đáp án tham khảo"
         >
-          <Eye className="w-3.5 h-3.5" />
-          <span>Hiện đáp án</span>
+          <Eye className="w-3.5 h-3.5 shrink-0" />
+          <span className="hidden md:inline">Hiện đáp án</span>
         </button>
 
         <button
           type="button"
           onClick={onOpenReportModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer min-h-[36px]"
+          title="Báo cáo câu hỏi có vấn đề"
         >
-          <Flag className="w-3.5 h-3.5" />
-          <span>Báo lỗi</span>
+          <Flag className="w-3.5 h-3.5 shrink-0" />
+          <span className="hidden md:inline">Báo lỗi</span>
         </button>
       </div>
 
       {/* Center: Quick Part Question Pills & Navigation Controls */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
-        <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm">
-          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[42vw] sm:max-w-[44vw] md:max-w-[50vw] lg:max-w-[56vw] py-0.5 px-0.5">
+      <div className="flex items-center gap-1 sm:gap-2 shrink min-w-0">
+        <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm max-w-full">
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[38vw] sm:max-w-[44vw] md:max-w-[48vw] lg:max-w-[56vw] py-0.5 px-0.5">
             {listeningStages
               .map((stage, idx) => ({ stage, idx }))
               .filter(({ stage }) => stage.partNum === currentStage.partNum)
@@ -99,7 +101,7 @@ export function ListeningBottomDock({
                     id={`stage-pill-${idx}`}
                     type="button"
                     onClick={() => setActiveStage(idx)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
+                    className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-150 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
                       isCurrent
                         ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
                         : isAnswered
@@ -145,30 +147,34 @@ export function ListeningBottomDock({
       </div>
 
       {/* Right: Previous & Next / Submit */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <button
           type="button"
           disabled={activeStage === 0}
           onClick={() => setActiveStage((p) => Math.max(0, p - 1))}
-          className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors"
+          className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-colors min-h-[36px]"
+          title="Câu hỏi trước"
         >
-          ← Previous
+          <span className="hidden sm:inline">← Previous</span>
+          <span className="sm:hidden">← Trước</span>
         </button>
 
         {activeStage < listeningStages.length - 1 ? (
           <button
             type="button"
             onClick={() => setActiveStage((p) => Math.min(listeningStages.length - 1, p + 1))}
-            className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1"
+            className="tech-btn px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all flex items-center gap-1 min-h-[36px]"
+            title="Câu hỏi tiếp theo"
           >
-            <span>Next</span>
+            <span className="hidden sm:inline">Next</span>
+            <span className="sm:hidden">Tiếp</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         ) : (
           <button
             type="button"
             onClick={onFinalSubmit}
-            className="tech-btn px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all"
+            className="tech-btn px-3.5 sm:px-6 py-1.5 sm:py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all min-h-[36px]"
           >
             Nộp bài
           </button>
@@ -329,10 +335,11 @@ export function ListeningModalsAndDrawer({
         skillName="Listening"
       />
 
-      {/* DRAWER DANH SÁCH CÂU HỎI */}
+      {/* DRAWER DANH SÁCH CÂU HỎI (Bottom Sheet trên mobile, Center modal trên desktop) */}
       {showDrawer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md p-5 rounded-2xl bg-card border border-border shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full sm:max-w-md p-5 rounded-t-3xl sm:rounded-2xl bg-card border border-border shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-8 sm:pb-5">
+            <div className="w-12 h-1 rounded-full bg-muted-foreground/30 mx-auto -mt-1 mb-2 sm:hidden" />
             <div className="flex items-center justify-between border-b border-border pb-2">
               <h3 className="font-heading font-bold text-xs uppercase text-muted-foreground tracking-wider">
                 Danh sách bài tập Listening ({listeningStages.length} bài)

@@ -3945,14 +3945,14 @@ export default function OfficialMockExamRoom() {
   })()}
 
       {/* Bottom Navigation */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 border-t bg-exam-surface border-exam-border">
-        <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 border-t bg-exam-surface border-exam-border pb-safe">
+        <div className="max-w-6xl mx-auto px-2.5 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => setIsQuestionListOpen(true)}
               title="Danh sách câu hỏi"
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 transition-colors"
+              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 transition-colors"
             >
               <List className="w-4 h-4" />
             </button>
@@ -3960,7 +3960,7 @@ export default function OfficialMockExamRoom() {
               type="button"
               onClick={() => setIsInfoOpen(true)}
               title="Thông tin bài thi"
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 transition-colors"
+              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg bg-exam-surface border border-exam-border text-exam-text hover:bg-exam-border/40 transition-colors"
             >
               <Info className="w-4 h-4" />
             </button>
@@ -3968,7 +3968,7 @@ export default function OfficialMockExamRoom() {
               type="button"
               onClick={handleScrollToTop}
               title={hasScrolled ? "Cuộn nhanh lên đầu trang" : "Bạn đang ở đầu trang rồi"}
-              className={`w-9 h-9 flex items-center justify-center rounded-lg border text-xs font-bold transition-all ${
+              className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg border text-xs font-bold transition-all ${
                 hasScrolled
                   ? "border-primary bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground shadow-sm scale-105 active:scale-95 cursor-pointer ring-2 ring-primary/20"
                   : "border-exam-border/60 text-exam-text-muted/40 hover:bg-exam-border/20 cursor-default"
@@ -3983,42 +3983,45 @@ export default function OfficialMockExamRoom() {
             type="button"
             onClick={() => setIsSubmitModalOpen(true)}
             disabled={isSubmitting}
-            className="px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-1.5 disabled:opacity-60"
+            className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-1 sm:gap-1.5 disabled:opacity-60 shrink-0 min-h-[36px]"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Nộp bài ({answeredCount}/{questions.length})</span>
+            <span className="hidden sm:inline">Nộp bài ({answeredCount}/{questions.length})</span>
+            <span className="sm:hidden">Nộp ({answeredCount}/{questions.length})</span>
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               type="button"
               onClick={handlePrev}
               disabled={questionIdx === 0}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-sm font-medium hover:bg-exam-border/40 transition-colors disabled:opacity-40"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-exam-surface border border-exam-border text-exam-text text-xs sm:text-sm font-medium hover:bg-exam-border/40 transition-colors disabled:opacity-40 min-h-[36px]"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Previous</span>
+              <span className="sm:hidden">Trước</span>
             </button>
             <button
               type="button"
               onClick={handleNext}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-brand-brown text-sm font-bold shadow-sm transition-all cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 sm:px-5 py-1.5 sm:py-2 rounded-lg bg-primary text-primary-foreground hover:bg-brand-brown text-xs sm:text-sm font-bold shadow-sm transition-all cursor-pointer min-h-[36px]"
             >
-              <span>{isLastStage ? "Nộp bài" : "Next"}</span>
+              <span className="hidden sm:inline">{isLastStage ? "Nộp bài" : "Next"}</span>
+              <span className="sm:hidden">{isLastStage ? "Nộp" : "Tiếp"}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       </footer>
 
-      {/* Question List Modal */}
+      {/* Question List Modal (Bottom sheet trên mobile, Dialog trên desktop) */}
       {isQuestionListOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in"
           onClick={() => setIsQuestionListOpen(false)}
         >
           <div
-            className="bg-exam-surface border border-exam-border rounded-2xl max-w-2xl w-full p-5 md:p-6 shadow-2xl space-y-4"
+            className="bg-exam-surface border border-exam-border rounded-t-3xl sm:rounded-2xl max-w-2xl w-full p-5 md:p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-8 sm:pb-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-exam-border">

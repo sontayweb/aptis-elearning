@@ -281,7 +281,7 @@ function ListeningExamRunnerContent() {
     }
   }, [activeStage]);
 
-  // 1. Phục hồi bản nháp LocalStorage ngay khi vào phòng thi Listening
+  // 1. Phục hồi bản nháp LocalStorage ngay khi vào phòng thi Listening (hỗ trợ F5 bay thẳng vào câu đang làm)
   useEffect(() => {
     if (typeof window === "undefined" || !examId || isSubmitted) return;
     try {
@@ -292,11 +292,28 @@ function ListeningExamRunnerContent() {
         if (draft.p2Answers) setP2Answers((prev) => ({ ...draft.p2Answers, ...prev }));
         if (draft.p3Answers) setP3Answers((prev) => ({ ...draft.p3Answers, ...prev }));
         if (draft.p4Answers) setP4Answers((prev) => ({ ...draft.p4Answers, ...prev }));
+
+        // Khôi phục chính xác vị trí câu hỏi đang làm dở
+        if (typeof draft.activeStage === "number" && draft.activeStage >= 0) {
+          setActiveStage(draft.activeStage);
+        }
+
+        const hasStarted =
+          Boolean(draft.hasStarted) ||
+          (draft.p1Answers && Object.keys(draft.p1Answers).length > 0) ||
+          (draft.p2Answers && Object.keys(draft.p2Answers).length > 0) ||
+          (draft.p3Answers && Object.keys(draft.p3Answers).length > 0) ||
+          (draft.p4Answers && Object.keys(draft.p4Answers).length > 0);
+
+        if (hasStarted) {
+          setShowSoundCheck(false);
+          setIsResumedSession(true);
+        }
       }
     } catch {}
   }, [examId, isSubmitted]);
 
-  // 2. Tự động ghi bản nháp vào LocalStorage khi câu trả lời thay đổi
+  // 2. Tự động ghi bản nháp vào LocalStorage khi câu trả lời hoặc vị trí câu thay đổi
   useEffect(() => {
     if (typeof window === "undefined" || !examId || isSubmitted) return;
     const hasAnswers =
@@ -305,7 +322,7 @@ function ListeningExamRunnerContent() {
       Object.keys(p3Answers).length > 0 ||
       Object.keys(p4Answers).length > 0;
 
-    if (hasAnswers) {
+    if (hasAnswers || !showSoundCheck) {
       try {
         localStorage.setItem(
           `aptis_draft_listening_${examId}`,
@@ -314,12 +331,14 @@ function ListeningExamRunnerContent() {
             p2Answers,
             p3Answers,
             p4Answers,
+            activeStage,
+            hasStarted: !showSoundCheck,
             savedAt: new Date().toISOString(),
           })
         );
       } catch {}
     }
-  }, [p1Answers, p2Answers, p3Answers, p4Answers, examId, isSubmitted]);
+  }, [p1Answers, p2Answers, p3Answers, p4Answers, activeStage, showSoundCheck, examId, isSubmitted]);
 
   // 3. Cảnh báo beforeunload & popstate chống vô tình F5/thoát trang khi đang thi
   useEffect(() => {
@@ -545,6 +564,7 @@ function ListeningExamRunnerContent() {
 
           if (subData.isResumed) {
             setIsResumedSession(true);
+            setShowSoundCheck(false); // Đang làm dở bài thi -> bỏ qua màn hình kiểm tra âm thanh
             setSyncStatus("resumed");
             setTimeout(() => setSyncStatus("idle"), 4000);
 
@@ -798,7 +818,10 @@ function ListeningExamRunnerContent() {
 
       // Part 2: Speakers matching
       if (detectedPart === 2) {
-        const p2Topic = (p as any).topic || p.topic || p.partSubtitle || extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "Workplace & Daily Life Views");
+        const extractedTopic = extractListeningTopic(p.title, apiData.title, p.instructions || p.passage_text, "");
+        const rawPartTopic = (p as any).topic || p.topic || "";
+        const isGenericTopic = !rawPartTopic || /workplace\s*&\s*daily\s*life/i.test(rawPartTopic) || /general\s*topic/i.test(rawPartTopic);
+        const p2Topic = (!isGenericTopic && rawPartTopic) ? rawPartTopic : (extractedTopic || rawPartTopic || "Workplace & Daily Life Views");
         result.part2.topic = p2Topic;
 
         const p2Candidate = questions.find((q: any) => q.explanation || q.transcript);
@@ -831,9 +854,10 @@ function ListeningExamRunnerContent() {
               extractedOptions = Array.from(new Set([...extractedOptions, ...qOpts]));
             }
           }
+          // Chuẩn hóa và chỉ giữ lại các lựa chọn hợp lệ (ngắn gọn, tối đa 80 ký tự, không chứa xuống dòng, không phải UUID hay metadata)
           extractedOptions = extractedOptions
-            .map((o) => o.trim())
-            .filter((o) => o && !/sẽ có thêm|gây nhiễu|đáp án nhiễu/i.test(o) && !/^[0-9a-f-]{30,}$/i.test(o));
+            .map((o) => (typeof o === "string" ? o.trim() : ""))
+            .filter((o) => o && o.length <= 80 && !o.includes("\n") && !/sẽ có thêm|gây nhiễu|đáp án nhiễu/i.test(o) && !/^[0-9a-f-]{30,}$/i.test(o));
 
           const allSourceText = [
             ...questions.map((q: any) => q.explanation || ""),
@@ -849,36 +873,26 @@ function ListeningExamRunnerContent() {
             .replace(/<[^>]*>/g, " ")
             .replace(/&nbsp;/gi, " ");
 
+          // Chỉ tìm đáp án giải thích từ section --- GIẢI THÍCH ĐÁP ÁN --- để tránh nhầm với đoạn hội thoại transcript
+          const explSectionMatch = cleanText.match(/---+\s*GIẢI THÍCH[\s\S]*/i);
+          const answerSearchText = explSectionMatch ? explSectionMatch[0] : cleanText;
+
           const explAnswerMap: Record<string, string> = {};
 
-          const letterMatches = cleanText.matchAll(/(?:Speaker\s*)?([A-D])\s*[:.\-=–]\s*([^\n\r]+)/gi);
+          // Match dạng "A = Mountain biking" hoặc "A: Mountain biking"
+          const letterMatches = answerSearchText.matchAll(/(?:Speaker\s*)?([A-D])\s*[:=\-=–]\s*([^\n\r(.,]+)/gi);
           for (const m of letterMatches) {
             const letter = m[1].toUpperCase();
-            const val = m[2].trim().replace(/^["']|["']$/g, "").replace(/[.,;]$/, "").trim();
-            if (val && !/topic|version|phiên bản|đáp án/i.test(val) && !explAnswerMap[letter]) {
-              explAnswerMap[letter] = val;
-            }
-          }
-
-          const numMatches = cleanText.matchAll(/(?:^|\n)\s*([1-4])\s*[:.\-=–]\s*([^\n\r]+)/gi);
-          const numToLetter: Record<string, string> = { "1": "A", "2": "B", "3": "C", "4": "D" };
-          for (const m of numMatches) {
-            const letter = numToLetter[m[1]];
-            const val = m[2].trim().replace(/^["']|["']$/g, "").replace(/[.,;]$/, "").trim();
-            if (val && !explAnswerMap[letter]) {
-              explAnswerMap[letter] = val;
-            }
-          }
-
-          for (const [letter, val] of Object.entries(explAnswerMap)) {
-            const matchedOpt = extractedOptions.find(
-              (o) =>
-                o.toLowerCase().trim() === val.toLowerCase().trim() ||
-                o.toLowerCase().includes(val.toLowerCase()) ||
-                val.toLowerCase().includes(o.toLowerCase())
-            );
-            if (matchedOpt) {
-              explAnswerMap[letter] = matchedOpt;
+            const val = m[2].trim().replace(/^["']|["']$/g, "").trim();
+            if (val && val.length <= 80 && !/topic|version|phiên bản|đáp án|speaker/i.test(val) && !explAnswerMap[letter]) {
+              const matchedOpt = extractedOptions.find(
+                (o) => o.toLowerCase().trim() === val.toLowerCase().trim()
+              );
+              if (matchedOpt) {
+                explAnswerMap[letter] = matchedOpt;
+              } else if (extractedOptions.length === 0) {
+                explAnswerMap[letter] = val;
+              }
             }
           }
 
@@ -895,26 +909,42 @@ function ListeningExamRunnerContent() {
               else if (extractedOptions[idx]) ans = extractedOptions[idx];
             }
 
+            // Tách transcript và explanation riêng cho từng Speaker
+            const rawExp = q.explanation || cleanText;
+            const spkTransMatch = rawExp.match(
+              new RegExp(`Speaker\\s*${letter}\\s*:\\s*([\\s\\S]*?)(?=(?:Speaker\\s*[A-D]\\s*:|---+\\s*GIẢI THÍCH|$))`, "i")
+            );
+            const speakerSpecificTranscript = spkTransMatch ? spkTransMatch[1].trim() : "";
+
+            const spkExplMatch = answerSearchText.match(
+              new RegExp(`(?:^|\\b)${letter}\\s*[:=\\-=–]\\s*([^\\n\\r]+?)(?=(?:\\s+[A-D]\\s*[:=\\-=–]|\\n|Nhiễu|$))`, "i")
+            );
+            const speakerSpecificExplanation = spkExplMatch ? spkExplMatch[1].trim() : "";
+
             return {
               id: q.id,
               speaker: q.prompt && isNaN(Number(q.prompt)) && !q.prompt.startsWith("<p>") ? q.prompt : `Speaker ${letter}`,
               correctAnswer: ans,
               explanation: q.explanation || `Giải thích đáp án cho Speaker ${letter}`,
-              transcript: q.transcript || p2Script || "",
+              transcript: speakerSpecificTranscript || q.transcript || p2Script || "",
+              speakerExplanation: speakerSpecificExplanation || "",
             };
           });
 
           result.part2.speakers = spkList;
-          const finalOptions = Array.from(
+
+          // finalOptions CHỈ bao gồm các options hợp lệ (< 80 ký tự), TUYỆT ĐỐI không chèn đoạn văn transcript vào!
+          const validOptions = Array.from(
             new Set([
               ...extractedOptions,
-              ...Object.values(explAnswerMap),
               ...spkList.map((s: any) => s.correctAnswer),
             ])
-          ).filter((o) => o && !/^[0-9a-f-]{30,}$/i.test(o) && !/sẽ có thêm|gây nhiễu/i.test(o));
+          ).filter((o) => o && o.length <= 80 && !o.includes("\n") && !/^[0-9a-f-]{30,}$/i.test(o));
 
-          result.part2.options = finalOptions.length >= 4 ? finalOptions : (result.part2.options || finalOptions);
-          if (p.instructions) result.part2.instructions = p.instructions;
+          result.part2.options = validOptions.length >= 4 ? validOptions : (result.part2.options || validOptions);
+
+          const autoInstruction = `Four people are talking about ${p2Topic.toLowerCase()}. Match each person to the correct information.`;
+          result.part2.instructions = p.instructions && p.instructions.trim().length > 5 ? p.instructions : autoInstruction;
         }
       }
 
@@ -1138,16 +1168,31 @@ function ListeningExamRunnerContent() {
     }
     setIsTestingSound(false);
     setShowSoundCheck(false);
+    try {
+      localStorage.setItem(
+        `aptis_draft_listening_${examId}`,
+        JSON.stringify({
+          p1Answers,
+          p2Answers,
+          p3Answers,
+          p4Answers,
+          activeStage,
+          hasStarted: true,
+          savedAt: new Date().toISOString(),
+        })
+      );
+    } catch {}
   };
 
-  // Timer đếm ngược thời gian phòng thi
+  // Timer đếm ngược thời gian phòng thi (chỉ tạm dừng nếu chưa bấm bắt đầu lần nào)
   useEffect(() => {
-    if (loading || isPaused || isSubmitted || showSoundCheck) return;
+    if (loading || isPaused || isSubmitted) return;
+    if (showSoundCheck && !isResumedSession) return;
     const timer = setInterval(() => {
       setTimeLeft((t) => (t <= 1 ? 0 : t - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, [loading, isPaused, isSubmitted, showSoundCheck]);
+  }, [loading, isPaused, isSubmitted, showSoundCheck, isResumedSession]);
 
   // Lấy nội dung văn bản kịch bản cho stage hiện tại (phục vụ SpeechSynthesis khi không có file âm thanh tĩnh)
   const getCurrentStageScript = () => {
@@ -1809,8 +1854,8 @@ function ListeningExamRunnerContent() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none">
       {/* 1. TOP HEADER */}
-      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-3 sm:px-6 md:px-8 py-2 sm:py-2.5 flex items-center justify-between shadow-xs gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
             onClick={() => {
@@ -1822,44 +1867,46 @@ function ListeningExamRunnerContent() {
                 setShowExitConfirm(true);
               }
             }}
-            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer shrink-0"
             title={isReviewMode ? "Quay lại lịch sử" : "Quay lại danh sách đề"}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-              {isReviewMode ? "Chế độ xem lại bài thi" : "Listening Practice"}
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-primary uppercase tracking-wider truncate block">
+              {isReviewMode ? "Xem lại" : "Listening Practice"}
             </span>
-            <span className="text-sm md:text-base font-bold text-foreground">
+            <span className="text-xs sm:text-sm md:text-base font-bold text-foreground truncate max-w-[120px] sm:max-w-xs md:max-w-none">
               {currentMeta.partName}
             </span>
           </div>
         </div>
 
         {/* Căn giữa: Đồng hồ đếm ngược & Sync status / Review mode score */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {isReviewMode ? (
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300 font-bold text-xs">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Điểm: {results.totalScore}/{results.maxScore} ({results.totalCorrect}/{results.totalQuestionsInExam} đúng)</span>
+            <div className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] sm:text-xs">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>{results.totalScore}/{results.maxScore} đ</span>
             </div>
           ) : (
             <>
-              <ExamSyncStatus
-                status={syncStatus}
-                lastSavedAt={lastSavedAt}
-                isResumed={isResumedSession}
-              />
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-                <Clock className="w-4 h-4" />
+              <div className="hidden sm:block">
+                <ExamSyncStatus
+                  status={syncStatus}
+                  lastSavedAt={lastSavedAt}
+                  isResumed={isResumedSession}
+                />
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-xs sm:text-sm">
+                <Clock className="w-3.5 h-3.5 shrink-0" />
                 <span>{formatTime(timeLeft)}</span>
               </div>
             </>
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => {
@@ -1871,11 +1918,11 @@ function ListeningExamRunnerContent() {
                 setShowExitConfirm(true);
               }
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
             title={isReviewMode ? "Quay lại lịch sử" : "Thoát về danh sách đề"}
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>{isReviewMode ? "Lịch sử" : "Thoát"}</span>
+            <span className="hidden sm:inline">{isReviewMode ? "Lịch sử" : "Thoát"}</span>
           </button>
         </div>
       </header>

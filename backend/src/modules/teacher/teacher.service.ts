@@ -226,13 +226,38 @@ export class TeacherService {
       throw { statusCode: 400, message: 'Bạn đã tham gia lớp học này rồi' };
     }
 
-    return prisma.classroomMember.create({
+    const created = await prisma.classroomMember.create({
       data: {
         classroom_id: classroom.id,
         user_id: userId,
       },
       include: { classroom: true },
     });
+
+    // Luồng #18 & #19: Bắn chuông CLASS_ANNOUNCEMENT cho học viên & cho Giảng viên phụ trách lớp
+    notificationService
+      .createNotification({
+        userId,
+        type: NotificationType.CLASS_ANNOUNCEMENT,
+        title: `Đã tham gia lớp "${classroom.name}"`,
+        message: `Bạn đã gia nhập lớp học "${classroom.name}" (Mã lớp: ${classroom.class_code}) thành công.`,
+        link: '/profile',
+      })
+      .catch(() => {});
+
+    if (classroom.teacher_id && classroom.teacher_id !== userId) {
+      notificationService
+        .createNotification({
+          userId: classroom.teacher_id,
+          type: NotificationType.CLASS_ANNOUNCEMENT,
+          title: `Học viên mới tham gia lớp "${classroom.name}"`,
+          message: `Một học viên mới vừa tham gia lớp "${classroom.name}" bằng mã ${classroom.class_code}.`,
+          link: '/teacher',
+        })
+        .catch(() => {});
+    }
+
+    return created;
   }
 
   async getClassroomMembers(teacherId: string, classroomId: string) {

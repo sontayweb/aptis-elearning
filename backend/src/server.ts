@@ -3,12 +3,15 @@ dotenv.config();
 
 import app from './app';
 import { prisma } from './config/database';
+import { emailQueue } from './modules/email/email.queue';
+import { subscriptionReminderJob } from './modules/notifications/subscription-reminder.job';
 
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log(`[Aptis Backend Server] running on http://localhost:${PORT}`);
   console.log(`[Environment]: ${process.env.NODE_ENV || 'development'}`);
+  subscriptionReminderJob.start();
 });
 
 /**
@@ -19,6 +22,8 @@ async function gracefulShutdown(signal: string) {
   server.close(async () => {
     console.log('[Aptis Backend Server] HTTP server closed.');
     try {
+      subscriptionReminderJob.stop();
+      await emailQueue.close();
       await prisma.$disconnect();
       console.log('[Aptis Backend Server] Database connections closed cleanly.');
     } catch (err) {

@@ -421,6 +421,9 @@ function WritingExamRunnerContent() {
         if (draft.answers && Object.keys(draft.answers).length > 0) {
           setAnswers((prev) => ({ ...draft.answers, ...prev }));
         }
+        if (typeof draft.currentPartIdx === "number" && draft.currentPartIdx >= 0) {
+          setCurrentPartIdx(draft.currentPartIdx);
+        }
       }
     } catch {}
   }, [examId]);
@@ -439,6 +442,7 @@ function WritingExamRunnerContent() {
           `aptis_draft_writing_${examId}`,
           JSON.stringify({
             answers,
+            currentPartIdx,
             savedAt: new Date().toISOString(),
           })
         );
@@ -735,8 +739,8 @@ function WritingExamRunnerContent() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none">
       {/* 1. TOP HEADER (THEO DESIGN SYSTEM CỦA DỰ ÁN) */}
-      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-3 sm:px-6 md:px-8 py-2 sm:py-2.5 flex items-center justify-between shadow-xs gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
             onClick={() => {
@@ -746,71 +750,75 @@ function WritingExamRunnerContent() {
                 setShowExitConfirm(true);
               }
             }}
-            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer shrink-0"
             title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Rời khỏi bài thi"}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-              {isReviewMode ? "Writing Review Mode" : "Writing Practice"}
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-primary uppercase tracking-wider truncate block">
+              {isReviewMode ? "Xem lại" : "Writing Practice"}
             </span>
-            <span className="text-sm md:text-base font-bold text-foreground">
+            <span className="text-xs sm:text-sm md:text-base font-bold text-foreground truncate max-w-[120px] sm:max-w-xs md:max-w-none">
               {currentPart.partSubtitle}
             </span>
           </div>
         </div>
 
         {/* Căn giữa: Trạng thái Live / Đồng hồ đếm ngược */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {isReviewMode ? (
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-xs">
+            <div className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-[11px] sm:text-xs">
               {aiEvaluationStatus === "evaluating" ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>AI Premier đang chấm ngầm...</span>
+                  <span className="hidden sm:inline">AI Premier đang chấm...</span>
+                  <span className="sm:hidden">Đang chấm...</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Báo Cáo Điểm &amp; Xem Lại Bài Làm</span>
+                  <span className="hidden sm:inline">Báo Cáo Điểm AI</span>
+                  <span className="sm:hidden">Báo cáo điểm</span>
                 </>
               )}
             </div>
           ) : (
             <>
-              <ExamSyncStatus
-                status={syncStatus}
-                lastSavedAt={lastSavedAt}
-                isResumed={isResumedSession}
-              />
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-sm">
-                <Clock className="w-4 h-4" />
+              <div className="hidden sm:block">
+                <ExamSyncStatus
+                  status={syncStatus}
+                  lastSavedAt={lastSavedAt}
+                  isResumed={isResumedSession}
+                />
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-mono font-bold text-xs sm:text-sm">
+                <Clock className="w-3.5 h-3.5 shrink-0" />
                 <span>{formatTime(timeLeft)}</span>
               </div>
             </>
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           {isReviewMode ? (
             <Link
               href="/history"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
               title="Về Lịch sử làm bài"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Về Lịch sử</span>
+              <span className="hidden sm:inline">Lịch sử</span>
             </Link>
           ) : (
             <button
               type="button"
               onClick={() => setShowExitConfirm(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
               title="Thoát về danh sách đề"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Thoát</span>
+              <span className="hidden sm:inline">Thoát</span>
             </button>
           )}
         </div>

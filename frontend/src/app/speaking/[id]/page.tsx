@@ -1364,7 +1364,7 @@ function SpeakingExamRunnerContent() {
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans select-none pb-20">
       {/* 1. TOP HEADER PHÒNG THI CHUẨN */}
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-8 py-2.5 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
             onClick={() => {
@@ -1376,16 +1376,16 @@ function SpeakingExamRunnerContent() {
                 setShowExitConfirm(true);
               }
             }}
-            className="w-9 h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border border-border hover:bg-muted flex items-center justify-center transition-colors text-foreground cursor-pointer shrink-0"
             title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Quay lại danh sách đề"}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block">
-              Speaking Practice
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-primary uppercase tracking-wider truncate block">
+              {isReviewMode ? "Xem lại" : "Speaking Practice"}
             </span>
-            <span className="text-sm md:text-base font-bold text-foreground">
+            <span className="text-xs sm:text-sm md:text-base font-bold text-foreground truncate max-w-[120px] sm:max-w-xs md:max-w-none">
               {headerPartTitle}
             </span>
           </div>
@@ -1424,25 +1424,26 @@ function SpeakingExamRunnerContent() {
         )}
 
         {/* Bên phải: Chế độ Xem lại & Nút Thoát */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {isReviewMode && (
             <>
               <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 font-bold text-xs">
                 <Eye className="w-3.5 h-3.5" />
-                Xem lại bài thi
+                <span>Xem lại</span>
               </span>
               <button
                 type="button"
                 onClick={handleRestartExam}
                 disabled={isRestarting}
-                className="tech-btn px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 flex items-center gap-1.5 disabled:opacity-50"
+                className="tech-btn px-2.5 sm:px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 flex items-center gap-1.5 disabled:opacity-50"
               >
                 {isRestarting ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
                   <RotateCcw className="w-3.5 h-3.5" />
                 )}
-                <span>Làm lại đề mới</span>
+                <span className="hidden sm:inline">Làm lại đề mới</span>
+                <span className="sm:hidden">Làm lại</span>
               </button>
             </>
           )}
@@ -1458,11 +1459,11 @@ function SpeakingExamRunnerContent() {
                 setShowExitConfirm(true);
               }
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
             title={isReviewMode ? "Quay lại Lịch sử làm bài" : "Thoát về danh sách đề"}
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>{isReviewMode ? "Về Lịch sử" : "Thoát"}</span>
+            <span className="hidden sm:inline">{isReviewMode ? "Về Lịch sử" : "Thoát"}</span>
           </button>
         </div>
       </header>

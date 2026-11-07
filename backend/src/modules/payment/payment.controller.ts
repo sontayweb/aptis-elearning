@@ -26,8 +26,10 @@ export class PaymentController {
   async initiate(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user!.userId;
-      const { planCode, promoCode } = initiatePaymentSchema.parse(req.body);
-      const result = await paymentService.initiatePayment(userId, planCode, promoCode);
+      const parsed = initiatePaymentSchema.parse(req.body);
+      const planIdentifier = (parsed.planCode || parsed.planId || parsed.plan_id)!;
+      const promoCode = parsed.promoCode || parsed.promo_code || undefined;
+      const result = await paymentService.initiatePayment(userId, planIdentifier, promoCode);
       sendSuccess(res, result, 'Khởi tạo đơn hàng thanh toán thành công', 201);
     } catch (error) {
       next(error);

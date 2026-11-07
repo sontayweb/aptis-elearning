@@ -16,6 +16,8 @@ export interface Part2Speaker {
   speaker: string;
   correctAnswer: string;
   explanation: string;
+  transcript?: string;
+  speakerExplanation?: string;
 }
 
 export interface Part3Opinion {

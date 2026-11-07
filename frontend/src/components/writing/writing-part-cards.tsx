@@ -879,32 +879,34 @@ export function WritingBottomDock({
   onSubmit,
 }: WritingBottomDockProps) {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-4 md:px-8 py-3 flex items-center justify-between z-40 shadow-lg">
+    <footer className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border px-2.5 sm:px-6 md:px-8 py-2 sm:py-3 flex items-center justify-between z-40 shadow-lg pb-safe gap-1 sm:gap-3">
       {/* Left: Hiện đáp án & Báo lỗi */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         <button
           type="button"
           onClick={onOpenSampleAnswers}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors min-h-[36px]"
+          title="Xem đáp án tham khảo"
         >
-          <Eye className="w-3.5 h-3.5" />
-          <span>Hiện đáp án</span>
+          <Eye className="w-3.5 h-3.5 shrink-0" />
+          <span className="hidden md:inline">Hiện đáp án</span>
         </button>
 
         <button
           type="button"
           onClick={onOpenReportModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-muted text-xs font-medium transition-colors cursor-pointer min-h-[36px]"
+          title="Báo cáo câu hỏi có vấn đề"
         >
-          <Flag className="w-3.5 h-3.5" />
-          <span>Báo lỗi</span>
+          <Flag className="w-3.5 h-3.5 shrink-0" />
+          <span className="hidden md:inline">Báo lỗi</span>
         </button>
       </div>
 
       {/* Center: Quick Part Pills & Navigation Controls */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
-        <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm">
-          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[42vw] sm:max-w-[44vw] md:max-w-[50vw] lg:max-w-[56vw] py-0.5 px-0.5">
+      <div className="flex items-center gap-1 sm:gap-2 shrink min-w-0">
+        <div className="bg-muted/40 dark:bg-slate-800/60 p-1 rounded-2xl border border-border/80 shadow-2xs flex items-center gap-1 backdrop-blur-sm max-w-full">
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar scrollbar-none scroll-smooth max-w-[38vw] sm:max-w-[44vw] md:max-w-[48vw] lg:max-w-[56vw] py-0.5 px-0.5">
             {parts.map((p, idx) => {
               const isCurrent = currentPartIdx === idx;
               const isAnswered = p.questions.some((_, qIdx) => {
@@ -918,7 +920,7 @@ export function WritingBottomDock({
                   id={`writing-part-pill-${idx}`}
                   type="button"
                   onClick={() => onSelectPart(idx)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-300 ease-out active:scale-95 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
+                  className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all duration-300 ease-out active:scale-95 flex items-center gap-1.5 cursor-pointer whitespace-nowrap select-none ${
                     isCurrent
                       ? "bg-primary text-primary-foreground font-black shadow-sm border border-primary"
                       : isAnswered
@@ -964,8 +966,8 @@ export function WritingBottomDock({
       </div>
 
       {/* Right: Previous & Next / Submit */}
-      <div className="flex items-center gap-2">
-        <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="hidden xl:flex items-center gap-1.5 text-[11px] font-semibold text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
           <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
           <span>Còn {aiQuota} lượt chấm AI</span>
         </div>
@@ -974,27 +976,32 @@ export function WritingBottomDock({
           type="button"
           disabled={currentPartIdx === 0}
           onClick={() => onSelectPart(Math.max(0, currentPartIdx - 1))}
-          className="px-4 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-all active:scale-95 cursor-pointer"
+          className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted disabled:opacity-40 transition-all active:scale-95 cursor-pointer min-h-[36px]"
+          title="Phần trước"
         >
-          ← Previous
+          <span className="hidden sm:inline">← Previous</span>
+          <span className="sm:hidden">← Trước</span>
         </button>
 
         {currentPartIdx < parts.length - 1 ? (
           <button
             type="button"
             onClick={() => onSelectPart(Math.min(parts.length - 1, currentPartIdx + 1))}
-            className="tech-btn px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
+            className="tech-btn px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all active:scale-95 flex items-center gap-1 cursor-pointer min-h-[36px]"
+            title="Phần tiếp theo"
           >
-            <span>Next</span>
+            <span className="hidden sm:inline">Next</span>
+            <span className="sm:hidden">Tiếp</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         ) : (
           <button
             type="button"
             onClick={onSubmit}
-            className="tech-btn inline-flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+            className="tech-btn inline-flex items-center gap-1.5 px-3.5 sm:px-6 py-1.5 sm:py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer min-h-[36px]"
           >
-            <span>Submit &amp; Chấm AI</span>
+            <span className="hidden sm:inline">Submit &amp; Chấm AI</span>
+            <span className="sm:hidden">Chấm AI</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         )}

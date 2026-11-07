@@ -1,7 +1,8 @@
 import { prisma } from '../../config/database';
 import { AutosaveAnswerInput, HeartbeatInput, MyHistoryFilterInput } from './submission.dto';
-import { SubmissionStatus, QuestionType, AuditAction } from '@prisma/client';
+import { SubmissionStatus, QuestionType, AuditAction, NotificationType } from '@prisma/client';
 import { auditService } from '../audit/audit.service';
+import { notificationService } from '../notifications/notification.service';
 import { assertProAccess } from '../../utils/pro-guard';
 import { scoreToCefr } from '../../utils/cefr-engine';
 import { gradeObjectiveQuestion } from '../../utils/scoring-engine';
@@ -574,12 +575,46 @@ export class SubmissionService {
     // Tự động kích hoạt chấm AI ngầm cho bài thi có Writing/Speaking (không bắt học viên chờ 24-48h)
     if (nextStatus === SubmissionStatus.PENDING_EVALUATION) {
       const actorRole = (submission as any).user?.role;
+      const studentName = (submission as any).user?.full_name || 'Học viên';
+
+      // Luồng #17: Bắn chuông thông báo cho Giảng viên chủ nhiệm lớp (nếu học viên đang tham gia lớp học)
+      prisma.classroomMember
+        .findMany({
+          where: { user_id: userId },
+          include: { classroom: { select: { teacher_id: true, name: true } } },
+        })
+        .then((memberships) => {
+          const teacherIds = Array.from(new Set(memberships.map((m) => m.classroom.teacher_id)));
+          for (const teacherId of teacherIds) {
+            notificationService
+              .createNotification({
+                userId: teacherId,
+                type: NotificationType.SYSTEM,
+                title: `[Bài nộp mới] ${studentName} vừa nộp bài`,
+                message: `Học viên ${studentName} vừa nộp bài thi "${submission.exam.title}" cần đánh giá.`,
+                link: '/teacher',
+              })
+              .catch(() => {});
+          }
+        })
+        .catch(() => {});
+
       setImmediate(async () => {
         try {
           await aiGradingService.evaluateSubmission(submissionId, userId, actorRole);
           console.log(`[SUCCESS] [Auto AI Grading] Đã chấm tự động xong bài thi ${submissionId}`);
         } catch (err: any) {
           console.warn(`[WARN] [Auto AI Grading] Chấm ngầm bài ${submissionId} gặp sự cố:`, err?.message || err);
+          // Luồng #15: Nếu quá trình chấm AI gặp lỗi hoặc hết lượt, bắn chuông thông báo rõ ràng cho học viên (không trừ lượt nếu lỗi hệ thống)
+          notificationService
+            .createNotification({
+              userId,
+              type: NotificationType.SYSTEM,
+              title: `Chưa thể chấm AI tự động bài "${submission.exam.title}"`,
+              message: err?.message || 'Hệ thống AI đang quá tải hoặc tài khoản đã hết lượt chấm. Bài làm của bạn đã được lưu an toàn.',
+              link: '/history',
+            })
+            .catch(() => {});
         }
       });
     }

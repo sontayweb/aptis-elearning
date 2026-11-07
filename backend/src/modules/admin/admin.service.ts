@@ -12,12 +12,15 @@ import {
   AdminCreatePromotionInput,
   AdminUpdatePromotionInput,
 } from './admin.dto';
-import { TransactionStatus, SubmissionStatus, AuditAction, TargetBand, UserRole } from '@prisma/client';
+import { TransactionStatus, SubmissionStatus, AuditAction, TargetBand, UserRole, NotificationType } from '@prisma/client';
+import { notifyUser } from '../notifications/notify.helper';
 import { auditService } from '../audit/audit.service';
 import { Request } from 'express';
 import { grantOrExtendSubscription } from '../../utils/subscription-helper';
+import { parsePaymentMetadata } from '../payment/payment.service';
 import * as xlsx from 'xlsx';
 import { emailService } from '../email/email.service';
+import { emailQueue } from '../email/email.queue';
 import { ensureTwentyFullTestExams, rerandomizeSingleFullTestExam } from '../exams/fulltest-generator';
 import fs from 'fs';
 import path from 'path';
@@ -225,10 +228,12 @@ export class AdminService {
         results.successCount++;
         results.createdUsers.push(newUser);
 
-        // Gửi email chào mừng và cấp thông tin đăng nhập tự động
-        emailService.sendAccountCreatedEmail(email, rawPassword, fullName, roleStr).catch((err) => {
-          console.error(`[AdminService] Lỗi gửi email tạo tài khoản cho ${email}:`, err);
-        });
+        // K6: Đẩy email tạo tài khoản hàng loạt qua hàng đợi BullMQ (rate 5 email/giây + retry) để tránh vượt 10 req/s của Resend
+        emailQueue
+          .enqueue(emailService.buildAccountCreatedMail(email, rawPassword, fullName, roleStr))
+          .catch((err) => {
+            console.error(`[AdminService] Lỗi xếp hàng đợi email tạo tài khoản cho ${email}:`, err);
+          });
       } catch (err: any) {
         results.errorCount++;
         results.errors.push({ row: i + 1, email, reason: err.message || 'Lỗi lưu trữ cơ sở dữ liệu' });
@@ -278,6 +283,29 @@ export class AdminService {
       oldValue: { is_active: user.is_active },
       newValue: { is_active: isActive },
     });
+
+    // Luồng bắt buộc: báo cho người dùng biết tài khoản bị khóa / được mở khóa (chuông + email)
+    if (user.is_active !== isActive) {
+      notifyUser({
+        userId,
+        title: isActive ? 'Tài khoản của bạn đã được mở khóa' : 'Tài khoản của bạn đã bị khóa',
+        message: isActive
+          ? 'Tài khoản đã được mở khóa, bạn có thể đăng nhập và tiếp tục học tập.'
+          : 'Tài khoản của bạn đã bị tạm khóa. Vui lòng liên hệ hỗ trợ để biết thêm chi tiết.',
+        link: '/profile',
+        email: {
+          subject: isActive ? 'Tài khoản đã được mở khóa' : 'Tài khoản của bạn đã bị khóa',
+          paragraphs: isActive
+            ? ['Tài khoản của bạn đã được mở khóa. Bạn có thể đăng nhập và tiếp tục học tập.']
+            : [
+                'Tài khoản của bạn đã bị tạm khóa bởi quản trị viên.',
+                'Nếu bạn cho rằng đây là nhầm lẫn, vui lòng liên hệ hỗ trợ (Zalo/Hotline) để được xử lý.',
+              ],
+          ctaLabel: isActive ? 'Đăng nhập' : undefined,
+          ctaPath: isActive ? '/login' : undefined,
+        },
+      });
+    }
 
     return updated;
   }
@@ -873,6 +901,8 @@ export class AdminService {
       : txRecord.user;
 
     // Thực thi trong Prisma Transaction ATOMIC
+    let activatedPlanName: string | undefined;
+    let activatedSub: { end_date: Date; ai_quota_left: number; teacher_quota_left: number } | undefined;
     const updated = await prisma.$transaction(async (tx) => {
       const updatedTx = await tx.transaction.update({
         where: { id: transactionId },
@@ -883,22 +913,44 @@ export class AdminService {
         },
       });
 
-      // Nếu duyệt thành công (COMPLETED), kích hoạt hoặc gia hạn gói VIP cộng dồn cho học viên
-      if (input.status === TransactionStatus.COMPLETED) {
-        const defaultPlan =
-          (await tx.subscriptionPlan.findFirst({
-            where: { is_active: true, price_vnd: { lte: txRecord.amount } },
-            orderBy: { price_vnd: 'desc' },
-          })) ||
-          (await tx.subscriptionPlan.findFirst({
-            where: { is_active: true },
-            orderBy: { price_vnd: 'asc' },
-          }));
+      // Nếu duyệt thành công (COMPLETED) và đơn chưa COMPLETED trước đó, kích hoạt hoặc gia hạn gói VIP cộng dồn cho học viên
+      if (input.status === TransactionStatus.COMPLETED && txRecord.status !== TransactionStatus.COMPLETED) {
+        const meta = parsePaymentMetadata(txRecord.payment_method, txRecord.order_code);
+        let targetPlan = null;
 
-        if (defaultPlan) {
-          await grantOrExtendSubscription(tx, {
+        if (input.planId) {
+          targetPlan = await tx.subscriptionPlan.findUnique({ where: { id: input.planId } });
+        }
+        if (!targetPlan && meta.planCode) {
+          targetPlan = await tx.subscriptionPlan.findUnique({ where: { code: meta.planCode } });
+        }
+        if (!targetPlan && meta.targetDurationDays) {
+          targetPlan = await tx.subscriptionPlan.findFirst({
+            where: { is_active: true, duration_days: meta.targetDurationDays },
+            orderBy: { price_vnd: 'desc' },
+          });
+        }
+        if (!targetPlan) {
+          targetPlan =
+            (await tx.subscriptionPlan.findFirst({
+              where: { is_active: true, price_vnd: { gt: 0, lte: txRecord.amount } },
+              orderBy: { price_vnd: 'desc' },
+            })) ||
+            (await tx.subscriptionPlan.findFirst({
+              where: { is_active: true, price_vnd: { gt: 0 } },
+              orderBy: { price_vnd: 'asc' },
+            })) ||
+            (await tx.subscriptionPlan.findFirst({
+              where: { is_active: true },
+              orderBy: { price_vnd: 'asc' },
+            }));
+        }
+
+        if (targetPlan) {
+          activatedPlanName = targetPlan.name;
+          activatedSub = await grantOrExtendSubscription(tx, {
             userId: targetUserId,
-            planId: defaultPlan.id,
+            planId: targetPlan.id,
             transactionId: txRecord.id,
           });
         }
@@ -906,6 +958,57 @@ export class AdminService {
 
       return updatedTx;
     });
+
+    // Luồng bắt buộc #8 & #10: báo kết quả xử lý giao dịch cho học viên (kích hoạt bù / thất bại / hoàn tiền)
+    const amountText = `${txRecord.amount.toLocaleString('vi-VN')}đ`;
+    if (input.status === TransactionStatus.COMPLETED && txRecord.status !== TransactionStatus.COMPLETED) {
+      const endDateStr = activatedSub?.end_date ? new Date(activatedSub.end_date).toLocaleDateString('vi-VN') : '';
+      // 1. Bắn chuông VIP_ACTIVATED
+      notifyUser({
+        userId: targetUserId,
+        type: NotificationType.VIP_ACTIVATED,
+        title: 'Đã kích hoạt bù gói VIP thành công',
+        message: `Đơn ${txRecord.order_code} (${amountText}) đã được xác nhận${activatedPlanName ? `, gói ${activatedPlanName} được kích hoạt đến ${endDateStr}` : ''}.`,
+        link: '/pricing',
+      });
+      // 2. Gửi biên nhận VIP đầy đủ (gói, hạn dùng, lượt AI, lượt Giáo viên) đồng bộ với SePay
+      if (targetUser?.email && activatedPlanName && activatedSub) {
+        emailService
+          .sendVipActivatedEmail(targetUser.email, {
+            fullName: targetUser.full_name || 'Học viên',
+            planName: activatedPlanName,
+            endDate: activatedSub.end_date,
+            aiQuota: activatedSub.ai_quota_left,
+            teacherQuota: activatedSub.teacher_quota_left,
+          })
+          .catch(() => {});
+      }
+    } else if (
+      (input.status === TransactionStatus.FAILED || input.status === TransactionStatus.REFUNDED) &&
+      txRecord.status !== input.status
+    ) {
+      const refunded = input.status === TransactionStatus.REFUNDED;
+      notifyUser({
+        userId: targetUserId,
+        title: refunded ? 'Đơn hàng đã được hoàn tiền' : 'Thanh toán không thành công',
+        message: refunded
+          ? `Đơn ${txRecord.order_code} (${amountText}) đã được hoàn tiền.`
+          : `Đơn ${txRecord.order_code} (${amountText}) không thành công. Vui lòng liên hệ hỗ trợ nếu bạn đã chuyển khoản.`,
+        link: '/profile',
+        email: {
+          subject: refunded
+            ? `Hoàn tiền đơn hàng ${txRecord.order_code}`
+            : `Thanh toán đơn hàng ${txRecord.order_code} không thành công`,
+          paragraphs: [
+            refunded
+              ? `Đơn hàng ${txRecord.order_code} (${amountText}) đã được hoàn tiền. Thời gian tiền về tài khoản phụ thuộc ngân hàng của bạn.`
+              : `Đơn hàng ${txRecord.order_code} (${amountText}) chưa được ghi nhận thanh toán thành công.`,
+            ...(input.note ? [`Ghi chú từ quản trị viên: ${input.note}`] : []),
+            'Nếu cần hỗ trợ, vui lòng liên hệ Zalo/Hotline của Aptis.',
+          ],
+        },
+      });
+    }
 
     auditService.record({
       req,
@@ -977,6 +1080,24 @@ export class AdminService {
       newValue: { orderCode, amount: input.amount, userId: input.userId, note: input.note },
     });
 
+    // Biên nhận cho học viên: giao dịch thủ công đã được ghi nhận
+    notifyUser({
+      userId: input.userId,
+      type: NotificationType.VIP_ACTIVATED,
+      title: 'Đã ghi nhận thanh toán của bạn',
+      message: `Đơn ${orderCode} (${input.amount.toLocaleString('vi-VN')}đ) đã được ghi nhận${plan ? `, gói ${plan.name} đã được kích hoạt` : ''}.`,
+      link: '/pricing',
+      email: {
+        subject: `Xác nhận thanh toán đơn ${orderCode}`,
+        paragraphs: [
+          `Đơn hàng ${orderCode} (${input.amount.toLocaleString('vi-VN')}đ) đã được quản trị viên ghi nhận.`,
+          plan ? `Gói ${plan.name} đã được kích hoạt cho tài khoản của bạn.` : 'Quyền lợi tài khoản đã được cập nhật.',
+        ],
+        ctaLabel: 'Bắt đầu luyện thi',
+        ctaPath: '/thi-thu',
+      },
+    });
+
     return result;
   }
 
@@ -1010,8 +1131,8 @@ export class AdminService {
       userId,
       planId: plan.id,
       customDurationDays: days,
-      customAiQuota: plan.ai_quota || 50,
-      customTeacherQuota: plan.teacher_quota || 5,
+      customAiQuota: plan.ai_quota ?? 10,
+      customTeacherQuota: plan.teacher_quota ?? 0,
     });
     const newEndDate = subscription.end_date;
 
@@ -1022,6 +1143,23 @@ export class AdminService {
       entityId: userId,
       description: `Cấp/Gia hạn VIP ${days} ngày cho học viên ${user.full_name} (${user.email}). Lý do: ${input.reason || 'Học vụ kích hoạt'}`,
       newValue: { days, planName: plan.name, reason: input.reason, endDate: newEndDate },
+    });
+
+    notifyUser({
+      userId,
+      type: NotificationType.VIP_ACTIVATED,
+      title: 'Bạn được cấp/gia hạn VIP',
+      message: `Gói ${plan.name} đã được kích hoạt${newEndDate ? `, hạn sử dụng đến ${new Date(newEndDate).toLocaleDateString('vi-VN')}` : ''}.`,
+      link: '/pricing',
+      email: {
+        subject: `Tài khoản của bạn đã được cấp gói ${plan.name}`,
+        paragraphs: [
+          `Quản trị viên đã cấp/gia hạn gói ${plan.name} (${days} ngày) cho tài khoản của bạn.`,
+          ...(newEndDate ? [`Hạn sử dụng đến: ${new Date(newEndDate).toLocaleDateString('vi-VN')}.`] : []),
+        ],
+        ctaLabel: 'Bắt đầu luyện thi',
+        ctaPath: '/thi-thu',
+      },
     });
 
     return subscription;
@@ -1051,6 +1189,21 @@ export class AdminService {
       entityType: 'USER',
       entityId: userId,
       description: `Đặt lại mật khẩu cho tài khoản ${user.full_name} (${user.email}) thành ${newPassword}`,
+    });
+
+    // Báo cho người dùng biết (không kèm mật khẩu trong thông báo)
+    notifyUser({
+      userId,
+      title: 'Quản trị viên đã đặt lại mật khẩu của bạn',
+      message: 'Mật khẩu tài khoản vừa được quản trị viên đặt lại. Hãy đăng nhập và đổi mật khẩu mới ngay.',
+      link: '/profile',
+      email: {
+        subject: 'Mật khẩu tài khoản đã được đặt lại bởi quản trị viên',
+        paragraphs: [
+          'Mật khẩu tài khoản của bạn vừa được quản trị viên đặt lại.',
+          'Vui lòng liên hệ quản trị viên để nhận mật khẩu tạm và đổi lại mật khẩu ngay sau khi đăng nhập.',
+        ],
+      },
     });
 
     return {
@@ -1088,6 +1241,15 @@ export class AdminService {
       entityId: sub.id,
       description: `Cộng thêm ${input.aiQuota} lượt chấm AI cho học viên. Lý do: ${input.reason || 'Học vụ hỗ trợ'}`,
       newValue: { addedAiQuota: input.aiQuota, currentAiQuota: updated.ai_quota_left },
+    });
+
+    // Luồng #13: Bắn chuông thông báo cho học viên khi được cộng thêm lượt chấm AI / Giảng viên
+    notifyUser({
+      userId,
+      type: NotificationType.VIP_ACTIVATED,
+      title: `Bạn vừa được cộng thêm ${input.aiQuota} lượt chấm AI`,
+      message: `Quản trị viên đã cộng thêm ${input.aiQuota} lượt chấm AI${input.teacherQuota ? ` và ${input.teacherQuota} lượt chấm Giảng viên` : ''}. Tổng lượt AI hiện có: ${updated.ai_quota_left} lượt.`,
+      link: '/thi-thu',
     });
 
     return updated;

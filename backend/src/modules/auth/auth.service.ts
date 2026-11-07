@@ -8,6 +8,7 @@ import { auditService } from '../audit/audit.service';
 import { AuditAction, TargetBand } from '@prisma/client';
 import { Request } from 'express';
 import { emailService } from '../email/email.service';
+import { notifyUser } from '../notifications/notify.helper';
 
 const DEFAULT_GOOGLE_CLIENT_ID =
   '686564345536-iddvjvle0bprc5uga1ogaqcicrdha4ls.apps.googleusercontent.com';
@@ -420,6 +421,22 @@ export class AuthService {
         },
       });
 
+      notifyUser({
+        userId: user.id,
+        title: 'Mật khẩu của bạn đã được đặt lại',
+        message: 'Mật khẩu tài khoản vừa được đặt lại thành công. Nếu không phải bạn thực hiện, hãy liên hệ hỗ trợ ngay.',
+        link: '/profile',
+        email: {
+          subject: 'Mật khẩu của bạn đã được đặt lại',
+          paragraphs: [
+            `Mật khẩu tài khoản của bạn vừa được đặt lại lúc ${new Date().toLocaleString('vi-VN')}.`,
+            'Nếu không phải bạn thực hiện, vui lòng liên hệ hỗ trợ ngay để bảo vệ tài khoản.',
+          ],
+          ctaLabel: 'Đăng nhập',
+          ctaPath: '/login',
+        },
+      });
+
       return { message: 'Đặt lại mật khẩu thành công. Bạn có thể đăng nhập ngay bây giờ.' };
     } catch (err: any) {
       throw {
@@ -522,6 +539,20 @@ export class AuthService {
       },
     });
 
+    notifyUser({
+      userId,
+      title: 'Bạn vừa đổi mật khẩu',
+      message: 'Mật khẩu tài khoản vừa được đổi thành công. Nếu không phải bạn thực hiện, hãy liên hệ hỗ trợ ngay.',
+      link: '/profile',
+      email: {
+        subject: 'Mật khẩu tài khoản đã được thay đổi',
+        paragraphs: [
+          `Mật khẩu tài khoản của bạn vừa được thay đổi lúc ${new Date().toLocaleString('vi-VN')}.`,
+          'Nếu không phải bạn thực hiện, vui lòng liên hệ hỗ trợ ngay để bảo vệ tài khoản.',
+        ],
+      },
+    });
+
     return { message: 'Đổi mật khẩu thành công. Vui lòng sử dụng mật khẩu mới cho các lần đăng nhập tiếp theo.' };
   }
 
@@ -585,6 +616,14 @@ export class AuthService {
         systemActor: { id: user.id, name: user.full_name, email: user.email, role: user.role },
       }).catch(() => {});
 
+      // Luồng #2: Chào mừng sau khi xác thực email thành công (chỉ bắn chuông, không gửi email để tiết kiệm quota)
+      notifyUser({
+        userId: user.id,
+        title: 'Chào mừng bạn đến với Aptis Kỳ Tích!',
+        message: 'Email của bạn đã được xác thực thành công. Hãy bắt đầu làm đề thi thử để đánh giá trình độ CEFR ngay.',
+        link: '/thi-thu',
+      });
+
       return {
         alreadyVerified: false,
         message: 'Xác thực địa chỉ email thành công! Tài khoản của bạn đã được kích hoạt đầy đủ quyền lợi.',
@@ -625,7 +664,14 @@ export class AuthService {
       { expiresIn: '24h' }
     );
 
-    await emailService.sendVerificationEmail(user.email, verificationToken, user.full_name);
+    const mailRes = await emailService.sendVerificationEmail(user.email, verificationToken, user.full_name);
+    if (!mailRes.success) {
+      throw {
+        statusCode: 502,
+        code: 'EMAIL_SEND_FAILED',
+        message: `Không thể gửi email xác thực tới ${user.email}: ${mailRes.error || 'Dịch vụ email đang gặp sự cố'}`,
+      };
+    }
 
     return {
       success: true,

@@ -71,6 +71,7 @@ export const adminResolveTransactionSchema = z.object({
   status: z.nativeEnum(TransactionStatus),
   note: z.string().optional(),
   targetUserId: z.string().optional(),
+  planId: z.string().optional(),
 });
 
 export const adminCreateManualTransactionSchema = z.object({

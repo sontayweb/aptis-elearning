@@ -288,15 +288,24 @@ export default function PricingPage() {
     loadPlans();
   }, []);
 
-  // Polling tự động phát hiện webhook SePay kích hoạt gói
+  // Polling tự động phát hiện webhook SePay kích hoạt đúng mã đơn hàng hiện tại
   useEffect(() => {
-    if (!orderDetails || paymentStatus === "success") return;
+    const activeOrderCode = orderDetails?.order_code;
+    if (!activeOrderCode || paymentStatus === "success") return;
 
     const interval = setInterval(async () => {
       try {
-        const subRes = await api.payment.getMySubscription();
-        if (subRes.success && subRes.data && subRes.data.is_active) {
+        const statusRes: any = await api.payment.getOrderStatus(activeOrderCode);
+        if (
+          statusRes?.success &&
+          statusRes.data &&
+          (statusRes.data.status === "COMPLETED" || statusRes.data.isCompleted)
+        ) {
           setPaymentStatus("success");
+          setVerifyNotice({
+            type: "success",
+            text: "Thanh toán thành công! Đang cập nhật quyền lợi VIP...",
+          });
           await refreshUser();
           setTimeout(() => {
             setSelectedPlan(null);
@@ -324,14 +333,25 @@ export default function PricingPage() {
     }
 
     setSelectedPlan(plan);
+    setOrderDetails(null);
+    setVerifyNotice(null);
+    setPaymentStatus("pending");
     setLoading(true);
 
     try {
-      const res = await api.payment.initiate(plan.id);
+      const res: any = await api.payment.initiate(plan.code || plan.id);
       if (res.success && res.data) {
-        setOrderDetails(res.data);
+        const d = res.data;
+        setOrderDetails({
+          order_code: d.order_code || d.orderCode,
+          amount: d.amount ?? plan.amount,
+          qr_code_url: d.qr_code_url || d.qrUrl,
+          bank_name: d.bank_name || d.bankName || "MBBank",
+          bank_account: d.bank_account || d.bankAccount || "0866950837",
+          account_name: d.account_name || d.accountHolder || "APTIS ESOL PREMIER",
+        });
       } else {
-        alert(res.error?.message || "Không thể khởi tạo mã thanh toán từ máy chủ. Vui lòng thử lại sau.");
+        alert(res.error?.message || res.message || "Không thể khởi tạo mã thanh toán từ máy chủ. Vui lòng thử lại sau.");
         setSelectedPlan(null);
       }
     } catch (err: any) {
@@ -1038,29 +1058,28 @@ export default function PricingPage() {
                 {selectedPlan.name}
               </h3>
               <p className="text-2xl font-black font-heading text-primary mt-1">
-                {selectedPlan.price}
+                {orderDetails?.amount
+                  ? `${orderDetails.amount.toLocaleString("vi-VN")}đ`
+                  : selectedPlan.price}
               </p>
             </div>
 
             {/* Dynamic VietQR Code Box */}
             <div className="p-4 rounded-2xl bg-white border border-slate-200 text-center mb-6 max-w-[260px] mx-auto shadow-inner">
-              {orderDetails?.qr_code_url ? (
+              {loading || !orderDetails?.qr_code_url ? (
+                <div className="w-56 h-56 mx-auto rounded-xl bg-slate-50 flex flex-col items-center justify-center text-slate-600 space-y-2.5 p-4">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="text-xs font-bold">
+                    Đang khởi tạo mã đơn VietQR...
+                  </span>
+                </div>
+              ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={orderDetails.qr_code_url}
                   alt="VietQR MB Bank"
                   className="w-56 h-56 mx-auto rounded-xl object-contain shadow-sm"
                 />
-              ) : (
-                <div className="w-48 h-48 mx-auto bg-slate-900 rounded-xl p-2 flex flex-col items-center justify-center text-white space-y-2">
-                  <QrCode className="w-24 h-24 text-white" />
-                  <span className="text-[10px] font-mono tracking-wider font-bold">
-                    MB BANK · 0866950837
-                  </span>
-                  <span className="text-[9px] bg-blue-600 px-2 py-0.5 rounded text-white font-bold">
-                    QUÉT MÃ VIETQR
-                  </span>
-                </div>
               )}
               <p className="text-[11px] text-slate-600 mt-2.5 font-bold">
                 Mở App ngân hàng bất kỳ để quét mã
@@ -1102,23 +1121,29 @@ export default function PricingPage() {
 
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Số tiền:</span>
-                <span className="font-bold text-primary text-sm">{selectedPlan.price}</span>
+                <span className="font-bold text-primary text-sm">
+                  {orderDetails?.amount
+                    ? `${orderDetails.amount.toLocaleString("vi-VN")}đ`
+                    : selectedPlan.price}
+                </span>
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t border-border">
                 <span className="text-muted-foreground font-bold">Nội dung CK:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-extrabold text-primary text-sm bg-primary/10 px-2 py-0.5 rounded">
-                    {orderDetails?.order_code || "APTIS VIP"}
+                    {orderDetails?.order_code || "Đang tạo mã..."}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard(orderDetails?.order_code || "APTIS VIP", "nd")}
-                    className="p-1 rounded hover:bg-muted text-primary"
-                    title="Sao chép nội dung"
-                  >
-                    {copiedField === "nd" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
+                  {orderDetails?.order_code && (
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(orderDetails.order_code, "nd")}
+                      className="p-1 rounded hover:bg-muted text-primary"
+                      title="Sao chép nội dung"
+                    >
+                      {copiedField === "nd" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -1146,8 +1171,8 @@ export default function PricingPage() {
                 <button
                   type="button"
                   onClick={handleVerifyTransaction}
-                  disabled={verifyingPayment}
-                  className="flex-1 py-2 rounded-xl bg-primary hover:brightness-90 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-1.5"
+                  disabled={verifyingPayment || loading || !orderDetails?.order_code}
+                  className="flex-1 py-2 rounded-xl bg-primary hover:brightness-90 disabled:opacity-50 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-1.5"
                 >
                   {verifyingPayment ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                   <span>Tôi đã chuyển tiền</span>
@@ -1155,21 +1180,12 @@ export default function PricingPage() {
                 <button
                   type="button"
                   onClick={handleOpenDispute}
-                  className="px-3 py-2 rounded-xl border border-border hover:bg-muted text-xs font-bold text-muted-foreground transition-colors"
+                  disabled={loading || !orderDetails?.order_code}
+                  className="px-3 py-2 rounded-xl border border-border hover:bg-muted disabled:opacity-50 text-xs font-bold text-muted-foreground transition-colors"
                 >
                   Báo sự cố
                 </button>
               </div>
-
-              {process.env.NODE_ENV !== "production" && (
-                <button
-                  type="button"
-                  onClick={handleSimulatePaymentSuccess}
-                  className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-sm transition-colors"
-                >
-                  ✓ [DEV] Mô phỏng đã chuyển khoản thành công
-                </button>
-              )}
             </div>
           </div>
         </div>
