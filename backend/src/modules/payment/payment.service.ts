@@ -276,14 +276,14 @@ export class PaymentService {
           amount: finalAmount,
           status: TransactionStatus.PENDING,
           payment_method: paymentMethodMeta,
-          bank_account: process.env.SEPAY_BANK_ACCOUNT || '0866950837',
-          bank_name: process.env.SEPAY_BANK_NAME || 'MBBank',
+          bank_account: process.env.SEPAY_BANK_ACCOUNT || '96247SONTAY',
+          bank_name: process.env.SEPAY_BANK_NAME || 'BIDV',
         },
       });
     }
 
-    const accountHolder = process.env.SEPAY_ACCOUNT_NAME || 'APTIS ESOL PREMIER';
-    const qrUrl = `https://qr.sepay.vn/img?acc=${encodeURIComponent(transaction.bank_account || '0866950837')}&bank=${encodeURIComponent(transaction.bank_name || 'MBBank')}&amount=${transaction.amount}&des=${encodeURIComponent(transaction.order_code)}`;
+    const accountHolder = process.env.SEPAY_ACCOUNT_NAME || 'TRUONG HOANG HIEP';
+    const qrUrl = `https://qr.sepay.vn/img?acc=${encodeURIComponent(transaction.bank_account || '96247SONTAY')}&bank=${encodeURIComponent(transaction.bank_name || 'BIDV')}&amount=${transaction.amount}&des=${encodeURIComponent(transaction.order_code)}`;
 
     // Trả về đồng thời cả camelCase và snake_case để tương thích 100% với mọi client
     return {
@@ -333,10 +333,16 @@ export class PaymentService {
       };
     }
 
-    // 0.2. Đối chiếu số tài khoản nhận nếu có cấu hình SEPAY_BANK_ACCOUNT
-    const configuredAccount = (process.env.SEPAY_BANK_ACCOUNT || '').replace(/\s+/g, '');
-    const incomingAccount = (data.accountNumber || '').replace(/\s+/g, '');
-    if (configuredAccount && incomingAccount && configuredAccount !== incomingAccount) {
+    // 0.2. Đối chiếu số tài khoản nhận hoặc tài khoản VA (subAccount) nếu có cấu hình SEPAY_BANK_ACCOUNT
+    const configuredAccount = (process.env.SEPAY_BANK_ACCOUNT || '').replace(/\s+/g, '').toUpperCase();
+    const incomingAccount = (data.accountNumber || '').replace(/\s+/g, '').toUpperCase();
+    const incomingSubAccount = (data.subAccount || '').replace(/\s+/g, '').toUpperCase();
+    if (
+      configuredAccount &&
+      (incomingAccount || incomingSubAccount) &&
+      configuredAccount !== incomingAccount &&
+      configuredAccount !== incomingSubAccount
+    ) {
       return {
         success: false,
         message: 'Số tài khoản thụ hưởng trong Webhook không khớp với tài khoản hệ thống',
@@ -697,11 +703,15 @@ export class PaymentService {
     }
 
     try {
-      const acc = accountNumber || process.env.SEPAY_BANK_ACCOUNT || '0866950837';
+      const acc = accountNumber || process.env.SEPAY_BANK_ACCOUNT || '96247SONTAY';
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-      const url = `https://my.sepay.vn/userapi/transactions/list?account_number=${encodeURIComponent(acc)}&limit=50`;
+      // Nếu dùng tài khoản VA (có chữ cái như 96247SONTAY), lấy danh sách giao dịch chung của tài khoản SePay
+      const isVirtualAccount = /[A-Za-z]/.test(acc);
+      const url = isVirtualAccount
+        ? `https://my.sepay.vn/userapi/transactions/list?limit=50`
+        : `https://my.sepay.vn/userapi/transactions/list?account_number=${encodeURIComponent(acc)}&limit=50`;
       const res = await fetch(url, {
         headers: {
           Authorization: `Apikey ${apiKey}`,
