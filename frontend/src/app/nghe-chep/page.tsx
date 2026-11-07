@@ -309,7 +309,7 @@ export default function NgheChepPage() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      <main className="flex-1 pt-32 md:pt-36 pb-20">
+      <main className="flex-1 pt-[calc(var(--navbar-total-height,64px)+16px)] sm:pt-[calc(var(--navbar-total-height,64px)+24px)] pb-16">
         <div className="section-container max-w-5xl mx-auto px-4">
           {/* ========================================================================= */}
           {/* SCREEN 1: HUB / CHỌN KIỂU LUYỆN TẬP & LEVEL (Chuẩn aptiskytich.vn)          */}
@@ -767,7 +767,7 @@ export default function NgheChepPage() {
                   value={lessonSearch}
                   onChange={(e) => setLessonSearch(e.target.value)}
                   placeholder="Tìm kiếm bài luyện..."
-                  className="w-full pl-10 pr-8 py-2 rounded-xl border border-border/80 bg-card text-xs focus:outline-hidden focus:border-[#ea580c] transition-colors"
+                  className="w-full pl-10 pr-8 py-2 rounded-xl border border-border/80 bg-card text-base sm:text-xs focus:outline-hidden focus:border-[#ea580c] transition-colors"
                 />
                 {lessonSearch && (
                   <button
@@ -1073,7 +1073,7 @@ export default function NgheChepPage() {
                                           handleCheck();
                                         }
                                       }}
-                                      className={`px-2 py-0.5 min-w-[70px] max-w-[130px] text-center border-b-2 bg-transparent text-sm md:text-base font-bold outline-none transition-colors ${
+                                      className={`px-2 py-0.5 min-w-[70px] max-w-[130px] text-center border-b-2 bg-transparent text-base font-bold outline-none transition-colors ${
                                         isCorrect
                                           ? "border-emerald-500 text-emerald-600 bg-emerald-500/10 rounded"
                                           : isWrong

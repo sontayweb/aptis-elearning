@@ -389,7 +389,7 @@ export default function ReadingPracticePage() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex w-full rounded-xl border border-input px-3 py-2 text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-sm"
+                className="flex w-full rounded-xl border border-input px-3 py-2 text-base md:text-sm pl-10 h-11 bg-card placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-sm"
                 placeholder="Tìm kiếm bộ đề Reading..."
               />
             </div>

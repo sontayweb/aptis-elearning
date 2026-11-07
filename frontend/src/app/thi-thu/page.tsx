@@ -474,7 +474,7 @@ export default function MockExamListPage() {
                 return (
               <div
                 key={test.id}
-                className={`group relative rounded-2xl border bg-card p-6 shadow-sm transition-all flex flex-col justify-between hover:shadow-glow-soft ${
+                className={`group relative rounded-2xl border bg-card p-4 sm:p-6 shadow-sm transition-all flex flex-col justify-between hover:shadow-glow-soft ${
                   test.hotLevel >= 4
                     ? "border-emerald-500/50 bg-gradient-to-b from-emerald-500/5 via-card to-card hover:border-emerald-500"
                     : test.hotLevel >= 2
@@ -565,7 +565,7 @@ export default function MockExamListPage() {
                   )}
                 </div>
 
-                <div className="pt-4 border-t border-border flex items-center justify-between">
+                <div className="pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                   <span className="text-xs font-semibold text-primary">
                     Mục tiêu: {test.difficulty}
                   </span>
@@ -573,11 +573,12 @@ export default function MockExamListPage() {
                     <ProUnlockButton
                       onClick={() => setLockedExamModal(test)}
                       label="Mở khóa"
+                      className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
                     />
                   ) : (
                     <Link
                       href={getExamTargetHref(test.rawSkill || selectedSkill, test.id)}
-                      className={`tech-btn inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs shadow-md transition-all ${
+                      className={`tech-btn w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[44px] sm:min-h-0 rounded-xl font-bold text-xs shadow-md transition-all ${
                         test.userStatus === "IN_PROGRESS"
                           ? "bg-amber-600 text-white hover:bg-amber-700"
                           : "bg-primary text-primary-foreground hover:bg-brand-brown"
@@ -612,8 +613,8 @@ export default function MockExamListPage() {
 
       {/* Modal thông báo quyền riêng tư VIP PRO cho các đề APT-02 -> APT-20 */}
       {lockedExamModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-card border border-border rounded-t-3xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 max-h-[85vh] overflow-y-auto">
             <button
               type="button"
               onClick={() => setLockedExamModal(null)}

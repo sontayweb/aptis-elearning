@@ -286,14 +286,14 @@ export default function GrammarPracticePage() {
             </div>
 
             {/* Filter pills */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold text-muted-foreground mr-1">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0 sm:flex-wrap">
+              <span className="text-xs font-semibold text-muted-foreground mr-1 shrink-0">
                 Lọc:
               </span>
               <button
                 type="button"
                 onClick={() => setFilterStatus("all")}
-                className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors cursor-pointer ${
+                className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors cursor-pointer shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 ${
                   filterStatus === "all"
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-card text-foreground border-border hover:bg-muted"
@@ -304,7 +304,7 @@ export default function GrammarPracticePage() {
               <button
                 type="button"
                 onClick={() => setFilterStatus("not_started")}
-                className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors cursor-pointer ${
+                className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors cursor-pointer shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 ${
                   filterStatus === "not_started"
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-card text-foreground border-border hover:bg-muted"
@@ -315,7 +315,7 @@ export default function GrammarPracticePage() {
               <button
                 type="button"
                 onClick={() => setFilterStatus("completed")}
-                className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors cursor-pointer ${
+                className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors cursor-pointer shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 ${
                   filterStatus === "completed"
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-card text-foreground border-border hover:bg-muted"
@@ -358,7 +358,7 @@ export default function GrammarPracticePage() {
           ) : (
             <div id="practice-sets-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 scroll-mt-24">
               {/* CARD 1: Marathon Card */}
-              <div className="relative rounded-2xl border-2 border-primary/50 bg-card p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
+              <div className="relative rounded-2xl border-2 border-primary/50 bg-card p-4 sm:p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-1.5">
@@ -372,7 +372,7 @@ export default function GrammarPracticePage() {
                     <span className="text-[11px] font-semibold text-muted-foreground">Chưa làm</span>
                   </div>
 
-                  <h3 className="text-lg font-heading font-extrabold text-foreground mb-2">
+                  <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-2 break-words">
                     Ngân Hàng Marathon Ngữ Pháp &amp; Từ Vựng
                   </h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
@@ -380,16 +380,16 @@ export default function GrammarPracticePage() {
                   </p>
                 </div>
 
-                <div className="pt-6 mt-4 border-t border-border/40 grid grid-cols-2 gap-2">
+                <div className="pt-4 sm:pt-6 mt-4 border-t border-border/40 flex flex-col sm:grid sm:grid-cols-2 gap-2">
                   <Link
                     href="/grammar/marathon?part=grammar"
-                    className="py-2.5 px-2 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center cursor-pointer truncate"
+                    className="flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-2 rounded-xl bg-primary text-primary-foreground hover:bg-brand-brown font-bold text-xs shadow-sm transition-colors text-center cursor-pointer truncate"
                   >
                     Luyện Ngữ pháp →
                   </Link>
                   <Link
                     href="/grammar/marathon?part=vocab"
-                    className="py-2.5 px-2 rounded-xl border border-primary text-primary hover:bg-primary/10 font-bold text-xs transition-colors text-center cursor-pointer truncate"
+                    className="flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-2 rounded-xl border border-primary text-primary hover:bg-primary/10 font-bold text-xs transition-colors text-center cursor-pointer truncate"
                   >
                     Luyện Từ vựng →
                   </Link>
@@ -401,7 +401,7 @@ export default function GrammarPracticePage() {
 
                 return (
                   <div key={exam.id} className="group relative">
-                    <div className="bg-card border border-border rounded-2xl p-5 flex flex-col h-full hover:border-primary/50 hover:shadow-md transition-all">
+                    <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 flex flex-col h-full hover:border-primary/50 hover:shadow-md transition-all">
                       {/* Card Header Tags */}
                       <div className="flex items-center justify-between gap-2 mb-3">
                         <div className="flex items-center gap-1.5 flex-wrap">

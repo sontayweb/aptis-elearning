@@ -532,17 +532,6 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify(body),
       }),
-
-    sentenceCheck: (body: {
-      lesson_id: string;
-      sentence_index: number;
-      user_input: string;
-      time_spent_seconds?: number;
-    }) =>
-      this.request('/dictation/sentence-check', {
-        method: 'POST',
-        body: JSON.stringify(body),
-      }),
   };
 
   vocabulary = {

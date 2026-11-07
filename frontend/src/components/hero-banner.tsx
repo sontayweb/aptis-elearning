@@ -401,12 +401,12 @@ export function HeroBanner({
 
       {/* Goal Edit Modal (Tích hợp logic từ GoalTracker) */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
             <button
               type="button"
               onClick={() => setModalOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="absolute top-4 right-4 p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -458,7 +458,7 @@ export function HeroBanner({
                   type="date"
                   value={currentDate}
                   onChange={(e) => setCurrentDate(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-input bg-background text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="w-full h-10 px-3 rounded-xl border border-input bg-background text-base sm:text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 />
               </div>
 

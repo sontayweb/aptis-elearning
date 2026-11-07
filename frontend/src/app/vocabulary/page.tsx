@@ -500,7 +500,7 @@ export default function VocabularyPage() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-10 pl-10 pr-3.5 rounded-xl border border-input bg-card text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all shadow-xs"
+                className="w-full h-10 pl-10 pr-3.5 rounded-xl border border-input bg-card text-foreground text-base sm:text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all shadow-xs"
                 placeholder="Tìm bộ từ vựng, chủ đề..."
               />
             </div>
@@ -849,8 +849,8 @@ export default function VocabularyPage() {
 
           {/* Add Word Modal */}
           {isAddWordModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-              <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+              <div className="bg-card border border-border rounded-t-3xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between pb-3 border-b border-border mb-4">
                   <h3 className="font-heading font-bold text-base text-foreground flex items-center gap-2">
                     <Plus className="w-4 h-4 text-primary" />
@@ -876,7 +876,7 @@ export default function VocabularyPage() {
                       placeholder="e.g. Ubiquitous"
                       value={newWord.word}
                       onChange={(e) => setNewWord((prev) => ({ ...prev, word: e.target.value }))}
-                      className="w-full px-3.5 py-2 rounded-xl bg-muted/40 border border-border text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-muted/40 border border-border text-base sm:text-xs focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
 
@@ -889,7 +889,7 @@ export default function VocabularyPage() {
                       placeholder="e.g. /juːˈbɪk.wə.təs/"
                       value={newWord.phonetic}
                       onChange={(e) => setNewWord((prev) => ({ ...prev, phonetic: e.target.value }))}
-                      className="w-full px-3.5 py-2 rounded-xl bg-muted/40 border border-border text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-muted/40 border border-border text-base sm:text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
 
@@ -903,7 +903,7 @@ export default function VocabularyPage() {
                       placeholder="e.g. Phổ biến, có mặt ở khắp mọi nơi"
                       value={newWord.meaning}
                       onChange={(e) => setNewWord((prev) => ({ ...prev, meaning: e.target.value }))}
-                      className="w-full px-3.5 py-2 rounded-xl bg-muted/40 border border-border text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-muted/40 border border-border text-base sm:text-xs focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
 
@@ -916,7 +916,7 @@ export default function VocabularyPage() {
                       placeholder="e.g. Smartphones have become ubiquitous in daily life."
                       value={newWord.example}
                       onChange={(e) => setNewWord((prev) => ({ ...prev, example: e.target.value }))}
-                      className="w-full px-3.5 py-2 rounded-xl bg-muted/40 border border-border text-xs focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-muted/40 border border-border text-base sm:text-xs focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                     />
                   </div>
 
@@ -924,13 +924,13 @@ export default function VocabularyPage() {
                     <button
                       type="button"
                       onClick={() => setIsAddWordModalOpen(false)}
-                      className="px-4 py-2 rounded-xl border border-border hover:bg-muted text-xs font-semibold"
+                      className="px-4 py-2.5 sm:py-2 rounded-xl border border-border hover:bg-muted text-xs font-semibold"
                     >
                       Hủy
                     </button>
                     <button
                       type="submit"
-                      className="tech-btn px-4 py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-md hover:bg-primary-glow transition-all"
+                      className="tech-btn px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-md hover:bg-primary-glow transition-all"
                     >
                       Lưu từ vựng
                     </button>
@@ -942,8 +942,8 @@ export default function VocabularyPage() {
 
           {/* Google Sheet Import Modal */}
           {isGoogleSheetModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-              <div className="bg-card border border-border rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
+            <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+              <div className="bg-card border border-border rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between pb-3 border-b border-border mb-4 shrink-0">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
@@ -1116,8 +1116,8 @@ export default function VocabularyPage() {
 
       {/* Quick View Modal */}
       {selectedTopic && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-card border border-border rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+          <div className="bg-card border border-border rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between pb-4 border-b border-border">
               <div>
                 <span className="text-xs font-bold text-primary uppercase">

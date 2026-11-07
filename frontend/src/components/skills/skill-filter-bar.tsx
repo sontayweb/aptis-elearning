@@ -79,20 +79,45 @@ export function SkillFilterBar({
   ];
 
   return (
-    <div className="space-y-2.5 mb-8 text-xs">
+    <div className="space-y-3 mb-8 text-xs">
       {/* Hàng 1: Lọc ưu tiên theo Độ Hot ☘️ */}
       {showPriorityRow && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-muted-foreground font-semibold w-24">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+          <span className="text-muted-foreground font-semibold text-[11px] sm:text-xs sm:w-24 shrink-0">
             Độ Hot ☘️:
           </span>
-          {priorityOptions.map((item) => (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0 sm:flex-wrap">
+            {priorityOptions.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setFilterPriority(item.id)}
+                className={`px-3 py-1.5 sm:py-1 rounded-full font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-[28px] ${
+                  filterPriority === item.id
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "border border-border bg-card text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Hàng 2: Trạng thái */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+        <span className="text-muted-foreground font-semibold text-[11px] sm:text-xs sm:w-24 shrink-0">
+          Trạng thái:
+        </span>
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0 sm:flex-wrap">
+          {statusOptions.map((item) => (
             <button
               key={item.id}
               type="button"
-              onClick={() => setFilterPriority(item.id)}
-              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
-                filterPriority === item.id
+              onClick={() => setFilterStatus(item.id)}
+              className={`px-3 py-1.5 sm:py-1 rounded-full font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-[28px] ${
+                filterStatus === item.id
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "border border-border bg-card text-muted-foreground hover:bg-muted"
               }`}
@@ -101,49 +126,30 @@ export function SkillFilterBar({
             </button>
           ))}
         </div>
-      )}
-
-      {/* Hàng 2: Trạng thái */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-muted-foreground font-semibold w-24">
-          Trạng thái:
-        </span>
-        {statusOptions.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => setFilterStatus(item.id)}
-            className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
-              filterStatus === item.id
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "border border-border bg-card text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
       </div>
 
       {/* Hàng 3: Nguồn (ở Full Part) */}
       {activeTab === "full" && setFilterSource && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-muted-foreground font-semibold w-24">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+          <span className="text-muted-foreground font-semibold text-[11px] sm:text-xs sm:w-24 shrink-0">
             Nguồn:
           </span>
-          {sourceOptions.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setFilterSource(item.id)}
-              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
-                filterSource === item.id
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "border border-border bg-card text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0 sm:flex-wrap">
+            {sourceOptions.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setFilterSource(item.id)}
+                className={`px-3 py-1.5 sm:py-1 rounded-full font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-[28px] ${
+                  filterSource === item.id
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "border border-border bg-card text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

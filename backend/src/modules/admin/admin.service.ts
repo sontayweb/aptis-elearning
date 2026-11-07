@@ -900,52 +900,98 @@ export class AdminService {
       ? await prisma.user.findUnique({ where: { id: input.targetUserId } })
       : txRecord.user;
 
-    // Thực thi trong Prisma Transaction ATOMIC
+    // Thực thi trong Prisma Transaction ATOMIC (Chống Race Condition khi 2 Admin bấm duyệt cùng lúc)
     let activatedPlanName: string | undefined;
     let activatedSub: { end_date: Date; ai_quota_left: number; teacher_quota_left: number } | undefined;
+    let didTransitionStatus = false;
+
+    const resolveTargetPlan = async (tx: any) => {
+      const meta = parsePaymentMetadata(txRecord.payment_method, txRecord.order_code);
+      let targetPlan = null;
+
+      if (input.planId) {
+        targetPlan = await tx.subscriptionPlan.findUnique({ where: { id: input.planId } });
+      }
+      if (!targetPlan && meta.planCode) {
+        targetPlan = await tx.subscriptionPlan.findUnique({ where: { code: meta.planCode } });
+      }
+      if (!targetPlan && meta.targetDurationDays) {
+        targetPlan = await tx.subscriptionPlan.findFirst({
+          where: { is_active: true, duration_days: meta.targetDurationDays },
+          orderBy: { price_vnd: 'desc' },
+        });
+      }
+      if (!targetPlan) {
+        targetPlan =
+          (await tx.subscriptionPlan.findFirst({
+            where: { is_active: true, price_vnd: { gt: 0, lte: txRecord.amount } },
+            orderBy: { price_vnd: 'desc' },
+          })) ||
+          (await tx.subscriptionPlan.findFirst({
+            where: { is_active: true, price_vnd: { gt: 0 } },
+            orderBy: { price_vnd: 'asc' },
+          })) ||
+          (await tx.subscriptionPlan.findFirst({
+            where: { is_active: true },
+            orderBy: { price_vnd: 'asc' },
+          }));
+      }
+      return targetPlan;
+    };
+
     const updated = await prisma.$transaction(async (tx) => {
+      const now = new Date();
+
+      // 1. Khóa dòng nguyên tử theo trạng thái đích
+      if (input.status === TransactionStatus.COMPLETED) {
+        if (typeof tx.transaction?.updateMany === 'function') {
+          const claimed = await tx.transaction.updateMany({
+            where: {
+              id: transactionId,
+              status: { not: TransactionStatus.COMPLETED },
+            },
+            data: {
+              user_id: targetUserId,
+              status: TransactionStatus.COMPLETED,
+              paid_at: now,
+            },
+          });
+          didTransitionStatus = Boolean(claimed && claimed.count > 0);
+        } else {
+          didTransitionStatus = txRecord.status !== TransactionStatus.COMPLETED;
+        }
+      } else if (input.status === TransactionStatus.REFUNDED) {
+        if (typeof tx.transaction?.updateMany === 'function') {
+          const claimed = await tx.transaction.updateMany({
+            where: {
+              id: transactionId,
+              status: { not: TransactionStatus.REFUNDED },
+            },
+            data: {
+              user_id: targetUserId,
+              status: TransactionStatus.REFUNDED,
+            },
+          });
+          didTransitionStatus = Boolean(claimed && claimed.count > 0);
+        } else {
+          didTransitionStatus = txRecord.status !== TransactionStatus.REFUNDED;
+        }
+      } else {
+        didTransitionStatus = txRecord.status !== input.status;
+      }
+
       const updatedTx = await tx.transaction.update({
         where: { id: transactionId },
         data: {
           user_id: targetUserId,
           status: input.status,
-          paid_at: input.status === TransactionStatus.COMPLETED ? new Date() : txRecord.paid_at,
+          paid_at: input.status === TransactionStatus.COMPLETED ? now : txRecord.paid_at,
         },
       });
 
-      // Nếu duyệt thành công (COMPLETED) và đơn chưa COMPLETED trước đó, kích hoạt hoặc gia hạn gói VIP cộng dồn cho học viên
-      if (input.status === TransactionStatus.COMPLETED && txRecord.status !== TransactionStatus.COMPLETED) {
-        const meta = parsePaymentMetadata(txRecord.payment_method, txRecord.order_code);
-        let targetPlan = null;
-
-        if (input.planId) {
-          targetPlan = await tx.subscriptionPlan.findUnique({ where: { id: input.planId } });
-        }
-        if (!targetPlan && meta.planCode) {
-          targetPlan = await tx.subscriptionPlan.findUnique({ where: { code: meta.planCode } });
-        }
-        if (!targetPlan && meta.targetDurationDays) {
-          targetPlan = await tx.subscriptionPlan.findFirst({
-            where: { is_active: true, duration_days: meta.targetDurationDays },
-            orderBy: { price_vnd: 'desc' },
-          });
-        }
-        if (!targetPlan) {
-          targetPlan =
-            (await tx.subscriptionPlan.findFirst({
-              where: { is_active: true, price_vnd: { gt: 0, lte: txRecord.amount } },
-              orderBy: { price_vnd: 'desc' },
-            })) ||
-            (await tx.subscriptionPlan.findFirst({
-              where: { is_active: true, price_vnd: { gt: 0 } },
-              orderBy: { price_vnd: 'asc' },
-            })) ||
-            (await tx.subscriptionPlan.findFirst({
-              where: { is_active: true },
-              orderBy: { price_vnd: 'asc' },
-            }));
-        }
-
+      // 2. Nếu vừa chuyển sang COMPLETED (chỉ đúng 1 luồng thắng khóa nguyên tử), cộng dồn VIP
+      if (input.status === TransactionStatus.COMPLETED && didTransitionStatus) {
+        const targetPlan = await resolveTargetPlan(tx);
         if (targetPlan) {
           activatedPlanName = targetPlan.name;
           activatedSub = await grantOrExtendSubscription(tx, {
@@ -956,12 +1002,50 @@ export class AdminService {
         }
       }
 
+      // 3. Nếu đơn đã COMPLETED trước đó mà bị chuyển sang REFUNDED -> Thu hồi số ngày & quota tương ứng
+      if (
+        input.status === TransactionStatus.REFUNDED &&
+        didTransitionStatus &&
+        txRecord.status === TransactionStatus.COMPLETED &&
+        typeof tx.userSubscription?.findFirst === 'function'
+      ) {
+        const refundedPlan = await resolveTargetPlan(tx);
+        const activeSub = await tx.userSubscription.findFirst({
+          where: {
+            user_id: targetUserId,
+            is_active: true,
+          },
+          orderBy: { end_date: 'desc' },
+        });
+
+        if (activeSub && refundedPlan) {
+          const revokeMs = (refundedPlan.duration_days || 30) * 24 * 60 * 60 * 1000;
+          const newEndDate = new Date(new Date(activeSub.end_date).getTime() - revokeMs);
+          const newAiQuota = Math.max(0, (activeSub.ai_quota_left || 0) - (refundedPlan.ai_quota ?? 0));
+          const newTeacherQuota = Math.max(
+            0,
+            (activeSub.teacher_quota_left || 0) - (refundedPlan.teacher_quota ?? 0)
+          );
+          const stillActive = newEndDate > now;
+
+          await tx.userSubscription.update({
+            where: { id: activeSub.id },
+            data: {
+              end_date: stillActive ? newEndDate : now,
+              is_active: stillActive,
+              ai_quota_left: stillActive ? newAiQuota : 0,
+              teacher_quota_left: stillActive ? newTeacherQuota : 0,
+            },
+          });
+        }
+      }
+
       return updatedTx;
     });
 
     // Luồng bắt buộc #8 & #10: báo kết quả xử lý giao dịch cho học viên (kích hoạt bù / thất bại / hoàn tiền)
     const amountText = `${txRecord.amount.toLocaleString('vi-VN')}đ`;
-    if (input.status === TransactionStatus.COMPLETED && txRecord.status !== TransactionStatus.COMPLETED) {
+    if (input.status === TransactionStatus.COMPLETED && didTransitionStatus) {
       const endDateStr = activatedSub?.end_date ? new Date(activatedSub.end_date).toLocaleDateString('vi-VN') : '';
       // 1. Bắn chuông VIP_ACTIVATED
       notifyUser({
@@ -985,7 +1069,7 @@ export class AdminService {
       }
     } else if (
       (input.status === TransactionStatus.FAILED || input.status === TransactionStatus.REFUNDED) &&
-      txRecord.status !== input.status
+      didTransitionStatus
     ) {
       const refunded = input.status === TransactionStatus.REFUNDED;
       notifyUser({
@@ -1027,6 +1111,26 @@ export class AdminService {
     const user = await prisma.user.findUnique({ where: { id: input.userId } });
     if (!user) {
       throw { statusCode: 404, message: 'Học viên không tồn tại' };
+    }
+
+    // Chống trùng lặp (Idempotency Guard): Chặn click đúp chuột tạo 2 giao dịch giống hệt nhau trong 2 phút
+    if (typeof prisma.transaction?.findFirst === 'function') {
+      const twoMinsAgo = new Date(Date.now() - 2 * 60 * 1000);
+      const duplicateManualTx = await prisma.transaction.findFirst({
+        where: {
+          user_id: input.userId,
+          amount: input.amount,
+          status: TransactionStatus.COMPLETED,
+          order_code: { startsWith: 'OFFLINE_' },
+          created_at: { gte: twoMinsAgo },
+        },
+      });
+      if (duplicateManualTx) {
+        throw {
+          statusCode: 409,
+          message: `Giao dịch thủ công (${duplicateManualTx.order_code}) với cùng số tiền cho học viên này vừa được tạo trong 2 phút qua. Đã chặn tự động để tránh cộng trùng VIP.`,
+        };
+      }
     }
 
     const orderCode = `OFFLINE_${Date.now().toString().slice(-6)}_${Math.random().toString(36).substring(2, 5).toUpperCase()}`;

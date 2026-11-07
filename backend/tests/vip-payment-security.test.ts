@@ -395,4 +395,73 @@ describe('VIP Payment & SePay Security Suite (VP-01 -> VP-10)', () => {
     expect(createdSubData.ai_quota_left).toBe(10);
     expect(createdSubData.teacher_quota_left).toBe(0); // Phải bằng 0, không bị lỗi 0 || 5 = 5!
   });
+
+  test('Task 2, 3 & 4: Admin resolveTransaction atomic lock, REFUNDED VIP revocation, and createManualTransaction idempotency', async () => {
+    // 1. Task 3: Chặn trùng lặp createManualTransaction trong 2 phút (409)
+    (prisma.transaction.findFirst as jest.Mock).mockResolvedValueOnce({
+      id: 'tx-offline-dup',
+      order_code: 'OFFLINE_123456_ABC',
+      amount: 159000,
+    });
+
+    await expect(
+      adminService.createManualTransaction({
+        userId: 'user-1',
+        amount: 159000,
+        paymentMethod: 'MANUAL_BANK_TRANSFER',
+      })
+    ).rejects.toMatchObject({ statusCode: 409 });
+
+    // 2. Task 4: Khi chuyển đơn từ COMPLETED -> REFUNDED, thu hồi ngày VIP và Quota tương ứng
+    (prisma.transaction.findUnique as jest.Mock).mockResolvedValueOnce({
+      id: 'tx-to-refund',
+      user_id: 'user-1',
+      order_code: 'APTIS1M8888888',
+      amount: 159000,
+      status: TransactionStatus.COMPLETED,
+      payment_method: 'SEPAY_QR|PLAN:VIP_1M',
+      paid_at: new Date(),
+      user: { id: 'user-1', full_name: 'Học Viên A', email: 'student@example.com' },
+    });
+
+    let updatedSubAfterRefund: any = null;
+    (prisma.$transaction as jest.Mock).mockImplementationOnce(async (cb: any) => {
+      const txClient = {
+        transaction: {
+          updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+          update: jest.fn().mockResolvedValue({
+            id: 'tx-to-refund',
+            status: TransactionStatus.REFUNDED,
+          }),
+        },
+        subscriptionPlan: {
+          findUnique: jest.fn().mockResolvedValue(mockPlan1M),
+        },
+        userSubscription: {
+          findFirst: jest.fn().mockResolvedValue({
+            id: 'sub-active-1',
+            user_id: 'user-1',
+            is_active: true,
+            end_date: new Date(Date.now() + 20 * 86400000), // Còn 20 ngày, trừ 30 ngày -> hết hạn
+            ai_quota_left: 8,
+            teacher_quota_left: 0,
+          }),
+          update: jest.fn().mockImplementation(({ data }: any) => {
+            updatedSubAfterRefund = data;
+            return Promise.resolve(data);
+          }),
+        },
+      };
+      return cb(txClient);
+    });
+
+    await adminService.resolveTransaction('tx-to-refund', {
+      status: TransactionStatus.REFUNDED,
+      note: 'Hoàn tiền theo yêu cầu',
+    });
+
+    expect(updatedSubAfterRefund).toBeDefined();
+    expect(updatedSubAfterRefund.is_active).toBe(false);
+    expect(updatedSubAfterRefund.ai_quota_left).toBe(0);
+  });
 });

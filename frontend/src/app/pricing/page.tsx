@@ -47,6 +47,38 @@ interface PricingPlan {
   features: string[];
   isPopular?: boolean;
   amount: number;
+  durationDays?: number;
+}
+
+// Thứ hạng gói theo mã/thời hạn (không phụ thuộc giá để tránh lệch khi Admin đổi giá)
+const PLAN_RANK: Record<string, number> = {
+  FREE: 0,
+  PRO: 1,
+  VIP_1M: 1,
+  VIP: 2,
+  VIP_3M: 2,
+  PREMIER_6M: 3,
+};
+
+function getPlanRank(code?: string | null, durationDays?: number | null, name?: string | null): number {
+  if (code && PLAN_RANK[code] !== undefined) return PLAN_RANK[code];
+  if (durationDays) {
+    if (durationDays >= 150 && durationDays <= 365) return 3;
+    if (durationDays >= 60 && durationDays < 150) return 2;
+    if (durationDays > 0 && durationDays < 60) return 1;
+  }
+  if (name) {
+    if (name.includes("6 Tháng")) return 3;
+    if (name.includes("3 Tháng")) return 2;
+    if (name.includes("1 Tháng")) return 1;
+  }
+  return 0;
+}
+
+function getPlanDurationDays(plan: { code?: string; durationDays?: number }): number {
+  if (plan.durationDays && plan.durationDays > 0 && plan.durationDays <= 365) return plan.durationDays;
+  const rank = getPlanRank(plan.code);
+  return rank === 3 ? 180 : rank === 2 ? 90 : 30;
 }
 
 const defaultPlans: PricingPlan[] = [
@@ -80,6 +112,7 @@ const defaultPlans: PricingPlan[] = [
       "Phân tích lỗi sai ngữ pháp theo chuẩn CEFR",
     ],
     amount: 199000,
+    durationDays: 30,
   },
   {
     id: "vip-unlimited",
@@ -99,6 +132,7 @@ const defaultPlans: PricingPlan[] = [
     ],
     isPopular: true,
     amount: 399000,
+    durationDays: 90,
   },
   {
     id: "premier-six",
@@ -116,6 +150,7 @@ const defaultPlans: PricingPlan[] = [
       "Ưu tiên hỗ trợ kỹ thuật và học tập 1:1 riêng biệt",
     ],
     amount: 699000,
+    durationDays: 180,
   },
 ];
 
@@ -278,6 +313,7 @@ export default function PricingPage() {
             features: p.features || [],
             isPopular: p.code === "VIP_3M",
             amount: p.price_vnd,
+            durationDays: p.duration_days,
           }));
           setPlans(mapped);
         }
@@ -739,24 +775,19 @@ export default function PricingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {plans.map((plan) => {
-              const currentPlanAmount =
-                (activeSub?.code === "PREMIER_6M" || activeSub?.planName?.includes("6 Tháng")) ? 699000 :
-                (activeSub?.code === "VIP_3M" || activeSub?.planName?.includes("3 Tháng")) ? 399000 :
-                (activeSub?.code === "VIP_1M" || activeSub?.planName?.includes("1 Tháng")) ? 199000 :
-                0;
+              const currentRank = isVip ? getPlanRank(activeSub?.code, null, activeSub?.planName) : 0;
+              const planRank = getPlanRank(plan.code, plan.durationDays, plan.name);
+              const planDays = getPlanDurationDays(plan);
 
-              const isCurrentPlan = isVip && (
+              const isCurrentPlan = isVip && plan.amount > 0 && (
                 (plan.code && activeSub?.code && plan.code === activeSub.code) ||
-                (plan.amount > 0 && activeSub?.planName && plan.name.toLowerCase().includes(activeSub.planName.toLowerCase())) ||
-                (plan.amount === 699000 && activeSub?.planName?.includes("6 Tháng")) ||
-                (plan.amount === 399000 && activeSub?.planName?.includes("3 Tháng")) ||
-                (plan.amount === 199000 && activeSub?.planName?.includes("1 Tháng"))
+                (currentRank > 0 && planRank === currentRank)
               );
 
-              const isLowerTier = isVip && !isCurrentPlan && plan.amount > 0 && plan.amount < currentPlanAmount;
-              const isHigherTier = isVip && !isCurrentPlan && plan.amount > currentPlanAmount;
+              const isLowerTier = isVip && !isCurrentPlan && plan.amount > 0 && planRank < currentRank;
+              const isHigherTier = isVip && !isCurrentPlan && plan.amount > 0 && planRank > currentRank;
               const isRecommended = plan.isPopular || plan.code === "VIP_3M";
-              const isPremier = plan.code === "PREMIER_6M" || plan.amount === 699000;
+              const isPremier = planRank === 3;
 
               return (
                 <div
@@ -853,12 +884,12 @@ export default function PricingPage() {
                       {isCurrentPlan ? (
                         <>
                           <Sparkles className="w-3.5 h-3.5 fill-white" />
-                          <span>Gia Hạn Thêm ({plan.amount === 699000 ? "+180 ngày" : plan.amount === 399000 ? "+90 ngày" : "+30 ngày"})</span>
+                          <span>Gia Hạn Thêm (+{planDays} ngày)</span>
                         </>
                       ) : isVip && plan.amount === 0 ? (
                         <span>Gói Cơ Bản (Đã Có VIP)</span>
                       ) : isLowerTier ? (
-                        <span>Mua Cộng Dồn ({plan.amount === 199000 ? "+30 ngày" : "+90 ngày"})</span>
+                        <span>Mua Cộng Dồn (+{planDays} ngày)</span>
                       ) : isHigherTier ? (
                         <span>Nâng Cấp Lên Gói Này</span>
                       ) : plan.amount === 0 ? (

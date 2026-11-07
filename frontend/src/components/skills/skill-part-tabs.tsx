@@ -21,7 +21,7 @@ export function SkillPartTabs({
   onSelectTab,
 }: SkillPartTabsProps) {
   return (
-    <div className="inline-flex items-center justify-center rounded-xl text-muted-foreground w-full h-auto flex-wrap gap-1.5 bg-muted/50 p-1.5 mb-6 border border-border/60">
+    <div className="flex items-center rounded-2xl text-muted-foreground w-full bg-muted/60 p-1.5 mb-6 border border-border/60 overflow-x-auto no-scrollbar gap-1.5 sm:flex-wrap">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
@@ -29,7 +29,7 @@ export function SkillPartTabs({
             key={tab.id}
             type="button"
             onClick={() => onSelectTab(tab.id)}
-            className={`inline-flex items-center justify-center rounded-xl px-3.5 font-semibold flex-1 min-w-[130px] text-xs sm:text-sm py-2.5 transition-all cursor-pointer whitespace-nowrap ${
+            className={`inline-flex items-center justify-center rounded-xl px-3.5 sm:px-4 py-2 sm:py-2.5 font-semibold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap shrink-0 sm:flex-1 min-h-[42px] sm:min-h-[40px] ${
               isActive
                 ? "bg-primary text-primary-foreground shadow-md font-bold"
                 : "hover:text-foreground hover:bg-card/70"

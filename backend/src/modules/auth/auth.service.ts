@@ -372,7 +372,7 @@ export class AuthService {
 
     return {
       message: 'Nếu email tồn tại, đường link đặt lại mật khẩu đã được gửi về hòm thư của bạn',
-      ...(process.env.NODE_ENV !== 'production' ? { resetToken } : {}),
+      ...(process.env.NODE_ENV === 'test' ? { resetToken } : {}),
     };
   }
 

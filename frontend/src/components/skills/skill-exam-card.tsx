@@ -28,7 +28,7 @@ export function SkillMarathonCard({
   onActionClick,
 }: SkillMarathonCardProps) {
   return (
-    <div className="relative rounded-2xl border-2 border-primary/50 bg-card p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
+    <div className="relative rounded-2xl border-2 border-primary/50 bg-card p-4 sm:p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
       <div>
         <div className="flex items-center justify-between mb-3">
           {marathonType === "custom" ? (
@@ -52,7 +52,7 @@ export function SkillMarathonCard({
           )}
         </div>
 
-        <h3 className="text-lg font-heading font-extrabold text-foreground mb-2">
+        <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-2 break-words">
           {marathonText}
         </h3>
         <p className="text-xs text-muted-foreground leading-relaxed">
@@ -60,11 +60,11 @@ export function SkillMarathonCard({
         </p>
       </div>
 
-      <div className="pt-6 mt-4 border-t border-border/40">
+      <div className="pt-4 sm:pt-6 mt-4 border-t border-border/40">
         {marathonUrl ? (
           <Link
             href={marathonUrl}
-            className="tech-btn block w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-all text-center cursor-pointer"
+            className="tech-btn flex items-center justify-center w-full min-h-[44px] sm:py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-all text-center cursor-pointer"
           >
             {marathonBtn}
           </Link>
@@ -72,7 +72,7 @@ export function SkillMarathonCard({
           <button
             type="button"
             onClick={onActionClick}
-            className="tech-btn w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-all text-center cursor-pointer"
+            className="tech-btn flex items-center justify-center w-full min-h-[44px] sm:py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary-glow font-bold text-xs shadow-sm transition-all text-center cursor-pointer"
           >
             {marathonBtn}
           </button>
@@ -155,7 +155,7 @@ export function SkillExamCard({
 
   return (
     <div
-      className={`relative rounded-2xl border bg-card hover:border-primary/50 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group ${borderClass}`}
+      className={`relative rounded-2xl border bg-card hover:border-primary/50 p-4 sm:p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group ${borderClass}`}
     >
       <div>
         {/* Top Badges & Trophy */}
@@ -199,7 +199,7 @@ export function SkillExamCard({
         </div>
 
         {/* Title */}
-        <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1.5 group-hover:text-primary transition-colors">
+        <h3 className="text-base sm:text-lg font-heading font-extrabold text-foreground mb-1.5 group-hover:text-primary transition-colors break-words">
           {title}
         </h3>
 
@@ -243,17 +243,17 @@ export function SkillExamCard({
       </div>
 
       {/* Bottom Action CTA */}
-      <div className="pt-6 mt-4 border-t border-border/40 flex items-center justify-end">
+      <div className="pt-4 sm:pt-6 mt-4 border-t border-border/40 flex items-center justify-end">
         {isFree || isProOrAdmin ? (
           <Link
             href={targetUrl}
-            className="tech-btn inline-flex items-center justify-center whitespace-nowrap text-xs font-bold h-9 rounded-xl px-4 bg-primary text-primary-foreground hover:bg-primary-glow shadow-sm gap-1.5 group-hover:gap-2 transition-all cursor-pointer"
+            className="tech-btn w-full sm:w-auto inline-flex items-center justify-center whitespace-nowrap text-xs font-bold min-h-[44px] sm:h-9 rounded-xl px-4 bg-primary text-primary-foreground hover:bg-primary-glow shadow-sm gap-1.5 group-hover:gap-2 transition-all cursor-pointer"
           >
             <span>{isInProgress ? "Tiếp tục luyện tập" : "Bắt đầu luyện tập"}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         ) : (
-          <ProUnlockButton onClick={onLockedClick} label="Mở khóa" />
+          <ProUnlockButton onClick={onLockedClick} label="Mở khóa" className="w-full sm:w-auto min-h-[44px] sm:h-9" />
         )}
       </div>
     </div>
