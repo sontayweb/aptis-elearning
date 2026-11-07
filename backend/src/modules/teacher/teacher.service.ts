@@ -7,9 +7,19 @@ import { emailService } from '../email/email.service';
 
 export class TeacherService {
   async getGradingQueue(teacherId: string) {
+    const now = new Date();
     return prisma.examSubmission.findMany({
       where: {
         status: SubmissionStatus.PENDING_EVALUATION,
+        user: {
+          subscriptions: {
+            some: {
+              is_active: true,
+              end_date: { gt: now },
+              teacher_quota_left: { gt: 0 },
+            },
+          },
+        },
       },
       include: {
         user: {
@@ -79,8 +89,10 @@ export class TeacherService {
     }
 
     const teacher = await prisma.user.findUnique({ where: { id: teacherId } });
+    const isFirstTeacherGrade = !submission.graded_by_id;
+    let remainingTeacherQuota: number | null = null;
 
-    // Thực thi trong Prisma Transaction ATOMIC
+    // Thực thi trong Prisma Transaction ATOMIC (Chấm điểm + Trừ 1 lượt teacher_quota_left nếu chấm lần đầu)
     const updated = await prisma.$transaction(async (tx) => {
       // Cập nhật điểm từng câu nếu có
       if (data.answersFeedback && data.answersFeedback.length > 0) {
@@ -92,6 +104,29 @@ export class TeacherService {
               feedback: af.feedback || null,
             },
           });
+        }
+      }
+
+      // Trừ 1 lượt Giảng viên chấm bài 1:1 (teacher_quota_left) trong gói VIP đang hoạt động của học viên
+      if (isFirstTeacherGrade && typeof tx.userSubscription?.findFirst === 'function') {
+        const activeSub = await tx.userSubscription.findFirst({
+          where: {
+            user_id: submission.user_id,
+            is_active: true,
+            end_date: { gt: new Date() },
+            teacher_quota_left: { gt: 0 },
+          },
+          orderBy: { end_date: 'desc' },
+        });
+
+        if (activeSub) {
+          const updatedSub = await tx.userSubscription.update({
+            where: { id: activeSub.id },
+            data: {
+              teacher_quota_left: { decrement: 1 },
+            },
+          });
+          remainingTeacherQuota = updatedSub.teacher_quota_left;
         }
       }
 
@@ -112,6 +147,31 @@ export class TeacherService {
         },
       });
     });
+
+    // Cảnh báo chuông nếu học viên vừa dùng hết hoặc chỉ còn 1 lượt Giảng viên chấm bài
+    if (remainingTeacherQuota !== null) {
+      if (remainingTeacherQuota <= 0) {
+        notificationService
+          .createNotification({
+            userId: submission.user_id,
+            type: NotificationType.SYSTEM,
+            title: 'Bạn đã sử dụng hết lượt Giảng viên chấm bài 1:1',
+            message: 'Số lượt Giảng viên chấm bài chi tiết của bạn đã về 0. Hãy nâng cấp hoặc gia hạn gói VIP để tiếp tục nhận bài sửa 1:1.',
+            link: '/pricing',
+          })
+          .catch(() => {});
+      } else if (remainingTeacherQuota === 1) {
+        notificationService
+          .createNotification({
+            userId: submission.user_id,
+            type: NotificationType.SYSTEM,
+            title: 'Sắp hết lượt Giảng viên chấm bài (còn 1 lượt)',
+            message: 'Tài khoản của bạn chỉ còn 1 lượt Giảng viên chấm bài 1:1.',
+            link: '/pricing',
+          })
+          .catch(() => {});
+      }
+    }
 
     // Ghi Audit Log giáo viên hoàn thành chấm bài
     auditService.record({

@@ -595,7 +595,7 @@ export default function ProfilePage() {
                           setAvatarImageError(false);
                         }}
                         placeholder="Hoặc dán URL ảnh đại diện tùy thích (https://...)"
-                        className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-xs font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+                        className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-base sm:text-xs font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -616,7 +616,7 @@ export default function ProfilePage() {
                         type="email"
                         value={user.email}
                         disabled
-                        className="w-full px-3.5 py-2 rounded-xl border border-border bg-muted/60 text-muted-foreground text-xs sm:text-sm font-medium cursor-not-allowed pr-9"
+                        className="w-full px-3.5 py-2 rounded-xl border border-border bg-muted/60 text-muted-foreground text-base sm:text-sm font-medium cursor-not-allowed pr-9"
                       />
                       <Lock className="w-3.5 h-3.5 text-muted-foreground absolute right-3 top-2.5" />
                     </div>
@@ -637,7 +637,7 @@ export default function ProfilePage() {
                       onChange={(e) => setFullName(e.target.value)}
                       required
                       placeholder="Ví dụ: Thầy Hưng Aptis Master"
-                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-base sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all"
                     />
                   </div>
 
@@ -652,7 +652,7 @@ export default function ProfilePage() {
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                       placeholder="Ví dụ: 0987654321"
-                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-base sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all"
                     />
                     <p className="text-[11px] text-muted-foreground">
                       Dùng để nhận tư vấn lộ trình và tài liệu ôn thi độc quyền qua Zalo.
@@ -820,7 +820,7 @@ export default function ProfilePage() {
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
                       placeholder="Nhập mật khẩu đang dùng"
-                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all pr-9"
+                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-base sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all pr-9"
                     />
                     <button
                       type="button"
@@ -846,7 +846,7 @@ export default function ProfilePage() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       placeholder="Tối thiểu 6 ký tự"
-                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all pr-9"
+                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-base sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all pr-9"
                     />
                     <button
                       type="button"
@@ -879,7 +879,7 @@ export default function ProfilePage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       placeholder="Nhập lại mật khẩu mới"
-                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all pr-9"
+                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-base sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all pr-9"
                     />
                     <button
                       type="button"

@@ -199,8 +199,10 @@ ${transcriptText}
       };
     }
 
-    // 3. Quản lý Quota AI: Kiểm tra & Trừ lượt chấm AI của học viên
+    // 3. Quản lý Quota AI: Kiểm tra & Trừ lượt chấm AI của học viên (Gói Free giới hạn đúng 3 lượt dùng thử)
     let activeSubId: string | null = null;
+    let freeTrialRemainingAfterThis: number | null = null;
+    const FREE_TRIAL_AI_LIMIT = 3;
     const isStaff = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN' || userRole === 'TEACHER';
     const targetUserId = userId || submission.user_id;
     if (targetUserId && !isStaff) {
@@ -221,6 +223,23 @@ ${transcriptText}
           };
         }
         activeSubId = activeSub.id;
+      } else if (typeof prisma.examSubmission?.count === 'function') {
+        // Học viên chưa có gói VIP (hoặc VIP đã hết hạn): kiểm tra giới hạn 3 lượt chấm thử miễn phí
+        const usedFreeAiCount = await prisma.examSubmission.count({
+          where: {
+            user_id: targetUserId,
+            id: { not: submissionId },
+            ai_results: { some: {} },
+          },
+        });
+        if (usedFreeAiCount >= FREE_TRIAL_AI_LIMIT) {
+          throw {
+            statusCode: 403,
+            message:
+              'Tài khoản Miễn phí của bạn đã sử dụng hết 3/3 lượt chấm thử AI Speaking & Writing. Vui lòng nâng cấp gói VIP để tiếp tục sử dụng.',
+          };
+        }
+        freeTrialRemainingAfterThis = Math.max(0, FREE_TRIAL_AI_LIMIT - (usedFreeAiCount + 1));
       }
     }
 
@@ -605,6 +624,18 @@ ${transcriptText}
             type: NotificationType.SYSTEM,
             title: `Sắp hết lượt chấm AI (còn ${updatedSub.ai_quota_left} lượt)`,
             message: `Tài khoản của bạn chỉ còn ${updatedSub.ai_quota_left} lượt chấm AI. Hãy gia hạn sớm để việc luyện thi không bị gián đoạn.`,
+            link: '/pricing',
+          })
+          .catch(() => {});
+      }
+    } else if (freeTrialRemainingAfterThis !== null) {
+      if (freeTrialRemainingAfterThis === 0) {
+        notificationService
+          .createNotification({
+            userId: submission.user_id,
+            type: NotificationType.SYSTEM,
+            title: 'Bạn đã dùng hết 3/3 lượt chấm thử AI miễn phí',
+            message: 'Hãy nâng cấp gói VIP hoặc nhập mã trải nghiệm để tiếp tục mở khóa chấm AI Speaking & Writing.',
             link: '/pricing',
           })
           .catch(() => {});

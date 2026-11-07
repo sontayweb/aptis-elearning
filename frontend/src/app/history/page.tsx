@@ -166,13 +166,13 @@ export default function HistoryPage() {
           </div>
 
           {/* Filters */}
-          <div className="flex flex-wrap items-center gap-2 mb-6">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0 sm:flex-wrap mb-6">
             <button
               type="button"
               onClick={() => setFilterSkill("all")}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 ${
                 filterSkill === "all"
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-xs"
                   : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
@@ -181,9 +181,9 @@ export default function HistoryPage() {
             <button
               type="button"
               onClick={() => setFilterSkill("grammar")}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 ${
                 filterSkill === "grammar"
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-xs"
                   : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
@@ -192,9 +192,9 @@ export default function HistoryPage() {
             <button
               type="button"
               onClick={() => setFilterSkill("listening")}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 ${
                 filterSkill === "listening"
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-xs"
                   : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
@@ -203,9 +203,9 @@ export default function HistoryPage() {
             <button
               type="button"
               onClick={() => setFilterSkill("reading")}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 ${
                 filterSkill === "reading"
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-xs"
                   : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
@@ -214,9 +214,9 @@ export default function HistoryPage() {
             <button
               type="button"
               onClick={() => setFilterSkill("writing")}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 ${
                 filterSkill === "writing"
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-xs"
                   : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
@@ -225,9 +225,9 @@ export default function HistoryPage() {
             <button
               type="button"
               onClick={() => setFilterSkill("speaking")}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 ${
                 filterSkill === "speaking"
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-xs"
                   : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
@@ -294,10 +294,10 @@ export default function HistoryPage() {
               {filtered.map((item) => (
                 <div
                   key={item.id}
-                  className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary/40 transition-all"
+                  className="p-4 sm:p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary/40 transition-all"
                 >
-                  <div>
-                    <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                       <span className="text-xs font-bold px-2 py-0.5 rounded bg-primary/10 text-primary">
                         {item.skill}
                       </span>
@@ -306,7 +306,7 @@ export default function HistoryPage() {
                         {item.date}
                       </span>
                     </div>
-                    <h3 className="font-heading font-bold text-base text-foreground">
+                    <h3 className="font-heading font-bold text-base text-foreground break-words">
                       {item.examTitle}
                     </h3>
                     <span className="text-xs text-muted-foreground">
@@ -314,9 +314,9 @@ export default function HistoryPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <span className="text-xs text-muted-foreground block">Điểm số</span>
+                  <div className="flex items-center justify-between sm:justify-end gap-4 pt-3 sm:pt-0 border-t sm:border-t-0 border-border/50">
+                    <div className="text-left sm:text-right">
+                      <span className="text-[11px] text-muted-foreground block">Điểm số</span>
                       <span className="text-lg font-heading font-extrabold text-primary">
                         {item.score}
                       </span>
@@ -327,7 +327,7 @@ export default function HistoryPage() {
 
                     <Link
                       href={getExamLink(item)}
-                      className="tech-btn px-4 py-2 rounded-xl border border-border hover:bg-muted text-xs font-bold transition-colors inline-flex items-center gap-1"
+                      className="tech-btn px-4 py-2 min-h-[40px] rounded-xl border border-border hover:bg-muted text-xs font-bold transition-colors inline-flex items-center justify-center gap-1 shrink-0"
                     >
                       <span>Xem lại</span>
                       <ArrowRight className="w-3 h-3" />

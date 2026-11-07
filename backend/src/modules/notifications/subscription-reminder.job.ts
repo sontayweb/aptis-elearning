@@ -3,15 +3,19 @@ import { prisma } from '../../config/database';
 import { notificationService } from './notification.service';
 import { emailService } from '../email/email.service';
 import { emailQueue } from '../email/email.queue';
+import { paymentService } from '../payment/payment.service';
 
 /**
- * Tác vụ định kỳ kiểm tra gói VIP của học viên (#11 & #12):
+ * Tác vụ định kỳ kiểm tra gói VIP của học viên (#11 & #12) & Đối soát tự động đơn SePay PENDING:
  * - #11 VIP sắp hết hạn (còn dưới 24 giờ): Bắn chuông + xếp hàng đợi email nhắc nhở 1 lần duy nhất (ưu tiên 'low', tuân thủ ngân sách 80/100 email/ngày).
  * - #12 VIP vừa hết hạn (end_date <= now & is_active = true): Chuyển is_active = false + bắn chuông thông báo (không gửi email để tiết kiệm quota).
+ * - Tự động đối soát đơn PENDING SePay mỗi 3 phút (chỉ gọi SePay API khi trong DB thực sự có đơn PENDING).
  */
 class SubscriptionReminderJob {
   private timer: NodeJS.Timeout | null = null;
+  private reconcileTimer: NodeJS.Timeout | null = null;
   private isRunning = false;
+  private isReconciling = false;
 
   start() {
     if (this.timer) return;
@@ -24,13 +28,34 @@ class SubscriptionReminderJob {
       this.runOnce().catch((err) => console.error('[SubscriptionReminderJob] Lỗi định kỳ:', err));
     }, 6 * 60 * 60 * 1000);
 
-    console.log('[SubscriptionReminderJob] Đã kích hoạt tác vụ kiểm tra hạn gói VIP (chu kỳ 6 giờ).');
+    // Chạy đối soát tự động các đơn PENDING bị rớt Webhook mỗi 3 phút
+    this.reconcileTimer = setInterval(() => {
+      this.runPaymentReconcileOnce().catch((err) =>
+        console.error('[SubscriptionReminderJob] Lỗi đối soát SePay định kỳ:', err)
+      );
+    }, 3 * 60 * 1000);
+
+    console.log('[SubscriptionReminderJob] Đã kích hoạt tác vụ kiểm tra hạn gói VIP (6h) & đối soát SePay nền (3p).');
   }
 
   stop() {
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
+    }
+    if (this.reconcileTimer) {
+      clearInterval(this.reconcileTimer);
+      this.reconcileTimer = null;
+    }
+  }
+
+  async runPaymentReconcileOnce(): Promise<void> {
+    if (this.isReconciling) return;
+    this.isReconciling = true;
+    try {
+      await paymentService.reconcilePendingTransactions();
+    } finally {
+      this.isReconciling = false;
     }
   }
 

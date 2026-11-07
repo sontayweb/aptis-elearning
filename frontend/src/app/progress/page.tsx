@@ -274,34 +274,32 @@ export default function ProgressPage() {
               </h2>
 
               {/* Bộ lọc kỹ năng */}
-              <div className="flex flex-wrap gap-2">
-                <div className="flex gap-1 flex-wrap">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0 sm:flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setSelectedSkill("all")}
+                  className={`tech-btn inline-flex items-center justify-center text-xs font-semibold h-8 rounded-lg px-3 transition-colors shrink-0 whitespace-nowrap ${
+                    selectedSkill === "all"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "border border-primary/40 text-primary dark:text-primary-foreground bg-background hover:bg-primary/10"
+                  }`}
+                >
+                  Tất cả
+                </button>
+                {SKILLS.map((sk) => (
                   <button
+                    key={sk.key}
                     type="button"
-                    onClick={() => setSelectedSkill("all")}
-                    className={`tech-btn inline-flex items-center justify-center text-xs font-semibold h-8 rounded-lg px-3 transition-colors ${
-                      selectedSkill === "all"
+                    onClick={() => setSelectedSkill(sk.key)}
+                    className={`tech-btn inline-flex items-center justify-center text-xs font-semibold h-8 rounded-lg px-3 transition-colors shrink-0 whitespace-nowrap ${
+                      selectedSkill === sk.key
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "border border-primary/40 text-primary dark:text-primary-foreground bg-background hover:bg-primary/10"
                     }`}
                   >
-                    Tất cả
+                    {sk.label}
                   </button>
-                  {SKILLS.map((sk) => (
-                    <button
-                      key={sk.key}
-                      type="button"
-                      onClick={() => setSelectedSkill(sk.key)}
-                      className={`tech-btn inline-flex items-center justify-center text-xs font-semibold h-8 rounded-lg px-3 transition-colors ${
-                        selectedSkill === sk.key
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "border border-primary/40 text-primary dark:text-primary-foreground bg-background hover:bg-primary/10"
-                      }`}
-                    >
-                      {sk.label}
-                    </button>
-                  ))}
-                </div>
+                ))}
               </div>
             </div>
 
@@ -532,7 +530,7 @@ export default function ProgressPage() {
                     return (
                       <div
                         key={item.skill}
-                        className="rounded-xl border border-border p-3.5 bg-card/90 hover:border-primary/40 transition-colors shadow-sm"
+                        className="rounded-xl border border-border p-3.5 bg-card/90 hover:border-primary/40 transition-colors shadow-sm last:col-span-2 md:last:col-span-1"
                       >
                         <div className="text-xs font-semibold text-muted-foreground">{item.skill}</div>
                         <div className="mt-1 flex items-baseline gap-1">

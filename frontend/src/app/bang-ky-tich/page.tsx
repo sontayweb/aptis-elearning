@@ -322,7 +322,7 @@ export default function BangKyTichPage() {
               <select
                 value={partFilter}
                 onChange={(e) => setPartFilter(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-background border border-border text-xs font-semibold text-foreground focus:outline-hidden focus:ring-1 focus:ring-primary"
+                className="w-full px-3 py-2.5 rounded-xl bg-background border border-border text-base sm:text-xs font-semibold text-foreground focus:outline-hidden focus:ring-1 focus:ring-primary"
               >
                 <option value="all">Tất cả part</option>
                 <option value="1">Part 1</option>
@@ -337,7 +337,7 @@ export default function BangKyTichPage() {
               <select
                 value={bandFilter}
                 onChange={(e) => setBandFilter(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-background border border-border text-xs font-semibold text-foreground focus:outline-hidden focus:ring-1 focus:ring-primary"
+                className="w-full px-3 py-2.5 rounded-xl bg-background border border-border text-base sm:text-xs font-semibold text-foreground focus:outline-hidden focus:ring-1 focus:ring-primary"
               >
                 <option value="all">Tất cả band</option>
                 <option value="B1">Band B1</option>
@@ -353,7 +353,7 @@ export default function BangKyTichPage() {
                 placeholder="Đề 01 - Receiving a gift..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-base sm:text-xs text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary"
               />
             </div>
 
@@ -459,12 +459,12 @@ export default function BangKyTichPage() {
 
       {/* MODAL TÍNH NĂNG DÀNH CHO PRO (Screenshot 2) */}
       {isProModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-card border border-border rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl relative space-y-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+          <div className="bg-card border border-border rounded-t-3xl sm:rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl relative space-y-4">
             <button
               type="button"
               onClick={() => setIsProModalOpen(false)}
-              className="absolute top-4 right-4 w-7 h-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+              className="absolute top-4 right-4 w-7 h-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -484,7 +484,7 @@ export default function BangKyTichPage() {
 
             <Link
               href="/pricing"
-              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition-all"
+              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer min-h-[44px]"
             >
               <Crown className="w-4 h-4" />
               <span>Nâng cấp Pro</span>
@@ -495,7 +495,8 @@ export default function BangKyTichPage() {
 
       {/* MODAL XEM CHI TIẾT DÀNH CHO USER PRO */}
       {selectedHonor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+          <div className="bg-card border border-border rounded-t-3xl sm:rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
           <div className="bg-card border border-border rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between pb-4 border-b border-border">
               <div className="flex items-center gap-3">
@@ -546,12 +547,12 @@ export default function BangKyTichPage() {
 
       {/* MODAL GỬI BÀI CHIA SẺ REVIEW */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+          <div className="bg-card border border-border rounded-t-3xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               type="button"
               onClick={() => setIsReviewModalOpen(false)}
-              className="absolute top-4 right-4 w-7 h-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-muted"
+              className="absolute top-4 right-4 w-7 h-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-muted cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -600,7 +601,7 @@ export default function BangKyTichPage() {
                   type="text"
                   value={reviewForm.scoreAchieved}
                   onChange={(e) => setReviewForm({ ...reviewForm, scoreAchieved: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground"
+                  className="w-full px-3 py-2 rounded-xl bg-background border border-border text-base sm:text-xs text-foreground"
                 />
               </div>
 
@@ -613,7 +614,7 @@ export default function BangKyTichPage() {
                   value={reviewForm.comment}
                   onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
                   placeholder="Ghi lại đề thi bạn đã gặp và kinh nghiệm xử lý..."
-                  className="w-full px-3 py-2 rounded-xl bg-background border border-border text-xs text-foreground"
+                  className="w-full px-3 py-2 rounded-xl bg-background border border-border text-base sm:text-xs text-foreground"
                 />
               </div>
 
@@ -626,7 +627,7 @@ export default function BangKyTichPage() {
               <button
                 type="submit"
                 disabled={reviewSubmitting || reviewSuccess}
-                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 transition-all"
+                className="w-full min-h-[44px] sm:min-h-0 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 transition-all cursor-pointer"
               >
                 {reviewSubmitting ? "Đang gửi..." : "Gửi chia sẻ"}
               </button>
